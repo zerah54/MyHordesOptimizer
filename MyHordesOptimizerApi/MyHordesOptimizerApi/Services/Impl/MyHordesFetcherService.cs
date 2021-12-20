@@ -7,30 +7,48 @@ using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyHordesOptimizerApi.Services.Impl
 {
     public class MyHordesFetcherService : IMyHordesFetcherService
     {
         protected ILogger<MyHordesFetcherService> Logger { get; set; }
-        protected IMyHordesApiRepository MyHordesApiRepository { get; set; }
+        protected IMyHordesJsonApiRepository MyHordesJsonApiRepository { get; set; }
+        protected IMyHordesXmlApiRepository MyHordesXmlApiRepository { get; set; }
         private readonly IMapper Mapper;
 
 
         public MyHordesFetcherService(ILogger<MyHordesFetcherService> logger,
-            IMyHordesApiRepository myHordesApiRepository,
+            IMyHordesJsonApiRepository myHordesJsonApiRepository,
+            IMyHordesXmlApiRepository myHordesXmlApiRepository,
             IMapper mapper)
         {
             Logger = logger;
-            MyHordesApiRepository = myHordesApiRepository;
+            MyHordesJsonApiRepository = myHordesJsonApiRepository;
+            MyHordesXmlApiRepository = myHordesXmlApiRepository;
             Mapper = mapper;
         }
 
         public IEnumerable<Item> GetItems()
         {
-            var myHordesItems = MyHordesApiRepository.GetItems();
-            var items = Mapper.Map<List<Item>>(myHordesItems);
-            return items;
+            var jsonApiResult = MyHordesJsonApiRepository.GetItems();
+            var jsonItems = Mapper.Map<List<Item>>(jsonApiResult);
+
+            var xmlApiResult = MyHordesXmlApiRepository.GetItems();
+            var xmlItems = Mapper.Map<List<Item>>(xmlApiResult.Data.Items.Item);
+
+           foreach(var item in xmlItems)
+            {
+                var miror = jsonItems.FirstOrDefault(x => x.Img == item.Img);
+                if(miror != null)
+                {
+                    item.JsonIdName = miror.JsonIdName;
+                    item.Labels = miror.Labels;
+                }
+            }
+
+            return xmlItems;
         }
     }
 }

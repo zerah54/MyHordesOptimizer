@@ -176,6 +176,8 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             {
                 case MediaTypeNames.Application.Json:
                     return stringResult.FromJson<TResult>();
+                case MediaTypeNames.Application.Xml:
+                    return stringResult.FromXml<TResult>();
                 default:
                     return stringResult.FromJson<TResult>();
             }

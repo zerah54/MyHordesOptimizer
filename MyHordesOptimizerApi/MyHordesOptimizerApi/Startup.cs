@@ -9,6 +9,8 @@ using Microsoft.Extensions.Hosting;
 using MyHordesOptimizerApi.Configuration.Impl;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.MappingProfiles;
+using MyHordesOptimizerApi.Providers.Impl;
+using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Impl;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Impl;
@@ -36,14 +38,16 @@ namespace MyHordesOptimizerApi
             services.AddControllers();
             services.AddHttpClient();
             services.AddSingleton(BuildAutoMapper());
-
+            // Providers
+            services.AddScoped<IUserKeyProvider, UserKeyProvider>();
             // Configuration
             services.AddSingleton<IMyHordesApiConfiguration, MyHordesApiConfiguration>();
             // Repository
             services.AddSingleton<IWebApiRepository, SimpleWebApiRepository>();
-            services.AddSingleton<IMyHordesApiRepository, MyHordesApiRepository>();
+            services.AddScoped<IMyHordesJsonApiRepository, MyHordesJsonApiRepository>();
+            services.AddScoped<IMyHordesXmlApiRepository, MyHordesXmlApiRepository>();
             // Services
-            services.AddSingleton<IMyHordesFetcherService, MyHordesFetcherService>();
+            services.AddScoped<IMyHordesFetcherService, MyHordesFetcherService>();
 
 
             services.AddApplicationInsightsTelemetry();
