@@ -4,8 +4,6 @@ using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
-using System;
-using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Controllers
 {
@@ -15,7 +13,7 @@ namespace MyHordesOptimizerApi.Controllers
     {
         protected IExternalToolsService ExternalToolsService { get; private set; }
 
-        public ExternalToolsController(ILogger<ExternalToolsController> logger, 
+        public ExternalToolsController(ILogger<ExternalToolsController> logger,
             IUserKeyProvider userKeyProvider,
             IExternalToolsService externalToolsService) : base(logger, userKeyProvider)
         {
@@ -24,7 +22,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Update")]
-        public IActionResult UpdateExternalsTools(string userKey, [FromBody] UpdateRequestDto updateRequestDto)
+        public ActionResult<UpdateResponseDto> UpdateExternalsTools(string userKey, [FromBody] UpdateRequestDto updateRequestDto)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
@@ -35,8 +33,8 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(updateRequestDto)} cannot be null");
             }
             UserKeyProvider.UserKey = userKey;
-            ExternalToolsService.UpdateExternalsTools(updateRequestDto);
-            return Ok();
+            var response = ExternalToolsService.UpdateExternalsTools(updateRequestDto);
+            return Ok(response);
         }
     }
 }

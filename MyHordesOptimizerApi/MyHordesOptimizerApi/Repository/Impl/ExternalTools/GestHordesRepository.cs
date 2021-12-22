@@ -28,7 +28,6 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
         public void Update()
         {
             var url = AddParameterToQuery($"{GestHordesConfiguration.Url}", _parameterReset, string.Empty);
-
             base.Get(url: url);
         }
     }

@@ -4,6 +4,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces.ExternalTools
 {
     public interface IExternalToolsService
     {
-        public void UpdateExternalsTools(UpdateRequestDto updateRequestDto);
+        public UpdateResponseDto UpdateExternalsTools(UpdateRequestDto updateRequestDto);
     }
 }

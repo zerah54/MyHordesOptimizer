@@ -1,6 +1,7 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
+using System;
 
 namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 {
@@ -17,20 +18,49 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             GestHordesRepository = gestHordesRepository;
         }
 
-        public void UpdateExternalsTools(UpdateRequestDto updateRequestDto)
+        public UpdateResponseDto UpdateExternalsTools(UpdateRequestDto updateRequestDto)
         {
+            var response = new UpdateResponseDto(updateRequestDto);
+
             if (updateRequestDto.IsBigBrothHordes)
             {
-                BigBrothHordesRepository.Update();
+                try
+                {
+                    BigBrothHordesRepository.Update();
+                }
+                catch (Exception e)
+                {
+                    response.BigBrothHordesStatus = e.Message;
+                }
             }
+
             if (updateRequestDto.IsFataMorgana)
             {
-                FataMorganaRepository.Update();
+                try
+                {
+                    FataMorganaRepository.Update();
+                }
+                catch (Exception e)
+                {
+                    response.FataMorganaStatus = e.Message;
+                }
             }
+
             if (updateRequestDto.IsGestHordes)
             {
-                GestHordesRepository.Update();
+                try
+                {
+                    GestHordesRepository.Update();
+
+                }
+                catch (Exception e)
+                {
+
+                    response.GestHordesStatus = e.Message;
+                }
             }
+
+            return response;
         }
     }
 }
