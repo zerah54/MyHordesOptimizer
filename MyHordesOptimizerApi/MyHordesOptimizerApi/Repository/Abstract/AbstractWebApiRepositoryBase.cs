@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
+using System.Web;
 
 namespace MyHordesOptimizerApi.Repository.Abstract
 {
@@ -169,6 +170,16 @@ namespace MyHordesOptimizerApi.Repository.Abstract
 
             return client;
         }
+
+        protected string AddParameterToQuery(string url, string parameterKey, object parameterValue)
+        {
+            var uriBulder = new UriBuilder(url);
+            var query = HttpUtility.ParseQueryString(uriBulder.Query);
+            query[parameterKey] = parameterValue.ToString();
+            uriBulder.Query = query.ToString();
+            return uriBulder.ToString();
+        }
+
 
         private static TResult GetResult<TResult>(string mediaTypeOut, string stringResult)
         {

@@ -7,14 +7,20 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MyHordesOptimizerApi.Configuration.Impl;
+using MyHordesOptimizerApi.Configuration.Impl.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.MappingProfiles;
 using MyHordesOptimizerApi.Providers.Impl;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Impl;
+using MyHordesOptimizerApi.Repository.Impl.ExternalTools;
 using MyHordesOptimizerApi.Repository.Interfaces;
+using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Impl;
+using MyHordesOptimizerApi.Services.Impl.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces;
+using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 
 namespace MyHordesOptimizerApi
 {
@@ -38,16 +44,29 @@ namespace MyHordesOptimizerApi
             services.AddControllers();
             services.AddHttpClient();
             services.AddSingleton(BuildAutoMapper());
+
             // Providers
             services.AddScoped<IUserKeyProvider, UserKeyProvider>();
+
             // Configuration
             services.AddSingleton<IMyHordesApiConfiguration, MyHordesApiConfiguration>();
+            services.AddSingleton<IGestHordesConfiguration, GestHordesConfiguration>();
+            services.AddSingleton<IBigBrothHordesConfiguration, BigBrothHordesConfiguration>();
+            services.AddSingleton<IFataMorganaConfiguration, FataMorganaConfiguration>();
+
             // Repository
             services.AddSingleton<IWebApiRepository, SimpleWebApiRepository>();
+
             services.AddScoped<IMyHordesJsonApiRepository, MyHordesJsonApiRepository>();
             services.AddScoped<IMyHordesXmlApiRepository, MyHordesXmlApiRepository>();
+
+            services.AddScoped<IBigBrothHordesRepository, BigBrothHordesRepository>();
+            services.AddScoped<IFataMorganaRepository, FataMorganaRepository>();
+            services.AddScoped<IGestHordesRepository, GestHordesRepository>();
+
             // Services
             services.AddScoped<IMyHordesFetcherService, MyHordesFetcherService>();
+            services.AddScoped<IExternalToolsService, ExternalToolsService>();
 
 
             services.AddApplicationInsightsTelemetry();

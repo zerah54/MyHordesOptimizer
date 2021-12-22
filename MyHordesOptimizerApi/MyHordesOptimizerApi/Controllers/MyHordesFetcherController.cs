@@ -1,41 +1,38 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyHordesOptimizerApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class MyHordesFetcherController : ControllerBase
+    public class MyHordesFetcherController : AbstractMyHordesOptimizerControllerBase
     {
 
-        private readonly ILogger<MyHordesFetcherController> _logger;
         private readonly IMyHordesFetcherService _myHordesFetcherService;
-        private readonly IUserKeyProvider _userKeyProvider;
 
-        public MyHordesFetcherController(ILogger<MyHordesFetcherController> logger, 
+        public MyHordesFetcherController(ILogger<MyHordesFetcherController> logger,
             IMyHordesFetcherService myHordesFetcherService,
-            IUserKeyProvider userKeyProvider)
+            IUserKeyProvider userKeyProvider) : base(logger, userKeyProvider)
         {
-            _logger = logger;
             _myHordesFetcherService = myHordesFetcherService;
-            _userKeyProvider = userKeyProvider;
         }
 
         [HttpGet]
         [Route("Citizens")]
-        public IEnumerable<Citizen> GetCitizens(string userKey)
+        public ActionResult<IEnumerable<Citizen>> GetCitizens(string userKey)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
-                throw new ArgumentException($"{nameof(userKey)} cannot be empty");
+                return BadRequest($"{nameof(userKey)} cannot be empty");
             }
-            _userKeyProvider.UserKey = userKey;
+            UserKeyProvider.UserKey = userKey;
             var list = new List<Citizen>();
             list.Add(new Citizen() { Nom = "test" });
             return list;
@@ -43,14 +40,14 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Items")]
-        public IEnumerable<Item> GetItems(string userKey)
+        public ActionResult<IEnumerable<Item>> GetItems(string userKey)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
-                throw new ArgumentException($"{nameof(userKey)} cannot be empty");
+                return BadRequest($"{nameof(userKey)} cannot be empty");
             }
-            _userKeyProvider.UserKey = userKey;
-            var items = _myHordesFetcherService.GetItems();
+            UserKeyProvider.UserKey = userKey;
+            var items = _myHordesFetcherService.GetItems().ToList();
             return items;
         }
     }
