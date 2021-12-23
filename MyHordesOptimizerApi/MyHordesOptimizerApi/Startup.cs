@@ -54,6 +54,8 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<IBigBrothHordesConfiguration, BigBrothHordesConfiguration>();
             services.AddSingleton<IFataMorganaConfiguration, FataMorganaConfiguration>();
 
+            services.AddSingleton<IMyHordesOptimizerFirebaseConfiguration, MyHordesOptimizerFirebaseConfiguration>();
+
             // Repository
             services.AddSingleton<IWebApiRepository, SimpleWebApiRepository>();
 
@@ -63,6 +65,8 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IBigBrothHordesRepository, BigBrothHordesRepository>();
             services.AddScoped<IFataMorganaRepository, FataMorganaRepository>();
             services.AddScoped<IGestHordesRepository, GestHordesRepository>();
+
+            services.AddScoped<IMyHordesOptimizerFirebaseRepository, MyHordesOptimizerFirebaseRepository>();
 
             // Services
             services.AddScoped<IMyHordesFetcherService, MyHordesFetcherService>();

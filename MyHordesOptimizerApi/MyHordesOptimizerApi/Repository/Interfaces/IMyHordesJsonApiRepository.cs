@@ -1,10 +1,12 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordes.Items;
+using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
 {
     public interface IMyHordesJsonApiRepository
     {
-        public Dictionary<string, MyHordesJsonItem> GetItems();
+        Dictionary<string, MyHordesJsonItem> GetItems();
+        MyHordesMeResponseDto GetMe();
     }
 }

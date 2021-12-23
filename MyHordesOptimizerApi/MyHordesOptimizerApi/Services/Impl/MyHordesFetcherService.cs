@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
@@ -16,17 +17,20 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected ILogger<MyHordesFetcherService> Logger { get; set; }
         protected IMyHordesJsonApiRepository MyHordesJsonApiRepository { get; set; }
         protected IMyHordesXmlApiRepository MyHordesXmlApiRepository { get; set; }
+        protected IMyHordesOptimizerFirebaseRepository FirebaseRepository { get; set; }
         private readonly IMapper Mapper;
 
 
         public MyHordesFetcherService(ILogger<MyHordesFetcherService> logger,
             IMyHordesJsonApiRepository myHordesJsonApiRepository,
             IMyHordesXmlApiRepository myHordesXmlApiRepository,
+            IMyHordesOptimizerFirebaseRepository firebaseRepository,
             IMapper mapper)
         {
             Logger = logger;
             MyHordesJsonApiRepository = myHordesJsonApiRepository;
             MyHordesXmlApiRepository = myHordesXmlApiRepository;
+            FirebaseRepository = firebaseRepository;
             Mapper = mapper;
         }
 
@@ -49,6 +53,15 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
 
             return xmlItems;
+        }
+
+        public void SynchronizeTown()
+        {
+            var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
+            var town = Mapper.Map<Town>(myHordeMeResponse.Map);
+
+            // Enregistrer en base
+            FirebaseRepository.PatchTown(town);
         }
     }
 }

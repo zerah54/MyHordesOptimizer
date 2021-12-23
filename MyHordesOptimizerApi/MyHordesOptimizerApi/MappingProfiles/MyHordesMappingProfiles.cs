@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.MappingProfiles
@@ -24,6 +26,11 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IsHeaver, opt => opt.MapFrom(src => src.Heavy))
                 .ForMember(dest => dest.XmlId, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.XmlName, opt => opt.MapFrom(src => src.Name))
+                .ForAllOtherMembers(opt => opt.Ignore());
+
+            CreateMap<MyHordesMap, Town>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.MyHordesMap, opt => opt.MapFrom(src => src))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }

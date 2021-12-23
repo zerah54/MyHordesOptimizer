@@ -2,6 +2,7 @@
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Items;
+using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Abstract;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -26,8 +27,16 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public Dictionary<string, MyHordesJsonItem> GetItems()
         {
-            string url = GenerateUrl(EndpointItems);
+            var url = GenerateUrl(EndpointItems);
             return base.Get<Dictionary<string, MyHordesJsonItem>>(url);
+        }
+
+        public MyHordesMeResponseDto GetMe()
+        {
+            var url = GenerateUrl(EndpointMe);
+            url = AddParameterToQuery(url, _parameterFields, "map.fields(id, city, citizens, wid, hei, consiparcy, cadavers)");
+            var response = base.Get<MyHordesMeResponseDto>(url);
+            return response;
         }
     }
 }

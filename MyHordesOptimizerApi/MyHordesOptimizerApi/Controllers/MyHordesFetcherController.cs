@@ -25,17 +25,16 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpGet]
-        [Route("Citizens")]
-        public ActionResult<IEnumerable<Citizen>> GetCitizens(string userKey)
+        [Route("Town")]
+        public ActionResult<IEnumerable<Town>> GetTown(string userKey)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
             UserKeyProvider.UserKey = userKey;
-            var list = new List<Citizen>();
-            list.Add(new Citizen() { Nom = "test" });
-            return list;
+            _myHordesFetcherService.SynchronizeTown();
+            return null;
         }
 
         [HttpGet]

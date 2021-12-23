@@ -6,5 +6,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces
     public interface IMyHordesFetcherService
     {
         IEnumerable<Item> GetItems();
+        void SynchronizeTown();
     }
 }

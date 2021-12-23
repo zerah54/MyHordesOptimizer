@@ -13,10 +13,12 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         protected IMyHordesApiConfiguration MyHordesApiConfiguration { get; set; }
         protected IUserKeyProvider UserKeyProvider { get; set; }
 
-        private const string _parameterAppKey = "appkey";
-        private const string _parameterUserKey = "userkey";
+        protected const string _parameterAppKey = "appkey";
+        protected const string _parameterUserKey = "userkey";
+        protected const string _parameterFields = "fields";
 
         protected const string EndpointItems = "items";
+        protected const string EndpointMe = "me";
 
 
         protected AbstractMyHordeRepositoryBase(ILogger<AbstractMyHordeRepositoryBase> logger,
