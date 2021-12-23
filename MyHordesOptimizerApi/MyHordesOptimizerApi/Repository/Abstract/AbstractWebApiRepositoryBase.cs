@@ -67,6 +67,48 @@ namespace MyHordesOptimizerApi.Repository.Abstract
 
         #endregion
 
+        #region Patch
+
+        public TResult Patch<TResult>(string url,
+            object body,
+            bool ensureStatusCode = true,
+            Dictionary<string, string> customHeader = null,
+            string mediaTypeIn = MediaTypeNames.Application.Json,
+            string mediaTypeOut = null)
+        {
+            var response = Patch(url: url,
+                body: body,
+                ensureStatusCode: ensureStatusCode,
+                customHeaders: customHeader,
+                mediaTypeIn: mediaTypeIn);
+            var stringResult = response.Content.ReadAsStringAsync().Result;
+            return GetResult<TResult>(mediaTypeOut, stringResult);
+
+        }
+
+        public HttpResponseMessage Patch(string url,
+            object body,
+            bool ensureStatusCode = true,
+            Dictionary<string, string> customHeaders = null,
+            string mediaTypeIn = MediaTypeNames.Application.Json)
+        {
+            var client = CreateClient();
+            AddCustomHeaders(client, customHeaders);
+            Logger.LogDebug($"PATCH call initiated [HttpRequestUrl={url}]");
+            var content = GenerateContent(mediaTypeIn, body);
+            var response = client.PatchAsync(url, content).Result;
+            Logger.LogDebug($"Async PATCH call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
+
+            if (ensureStatusCode)
+            {
+                response.EnsureSuccessStatusCodeEnriched();
+            }
+
+            return response;
+        }
+
+        #endregion
+
         #region Put
 
         public TResult Put<TResult>(string url,

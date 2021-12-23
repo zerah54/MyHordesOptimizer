@@ -1,55 +1,99 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Repository.Abstract;
 using MyHordesOptimizerApi.Repository.Interfaces;
-using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
-    public class MyHordesOptimizerFirebaseRepository : IMyHordesOptimizerFirebaseRepository
+    public class MyHordesOptimizerFirebaseRepository : AbstractWebApiRepositoryBase, IMyHordesOptimizerFirebaseRepository
     {
         protected IMyHordesOptimizerFirebaseConfiguration Configuration { get; set; }
 
-        public MyHordesOptimizerFirebaseRepository(IMyHordesOptimizerFirebaseConfiguration configuration)
+        public override string HttpClientName => nameof(MyHordesOptimizerFirebaseRepository);
+
+        private const string _townCollection = "towns";
+        private const string _parameterAuth = "auth";
+
+        public MyHordesOptimizerFirebaseRepository(ILogger<AbstractWebApiRepositoryBase> logger,
+            IHttpClientFactory httpClientFactory,
+            IMyHordesOptimizerFirebaseConfiguration configuration) : base(logger, httpClientFactory)
         {
             Configuration = configuration;
         }
 
         public void PatchTown(Town town)
         {
-            var token = GenerateToken();
+            var url = $"{Configuration.Url}/{_townCollection}/{town.Id}/{nameof(town.MyHordesMap)}.json";
+            url = AddAuthentication(url);
+            base.Patch(url: url, body: town.MyHordesMap);
+
+            foreach (var citizen in town.MyHordesMap.Citizens)
+            {
+                url = $"{Configuration.Url}/{_townCollection}/{town.Id}/{nameof(town.Citizens)}/{citizen.Name}.json";
+                url = AddParameterToQuery(url, "auth", Configuration.Secret);
+                base.Patch(url: url, body: citizen);
+            }
         }
 
+        public Town GetTown(int townId)
+        {
+            var url = $"{Configuration.Url}/{_townCollection}/{townId}.json";
+            url = AddAuthentication(url);
+            return base.Get<Town>(url);
+        }
+
+        private string AddAuthentication(string url)
+        {
+            url = AddParameterToQuery(url, _parameterAuth, Configuration.Secret);
+            return url;
+        }
+
+        // Ne marche pas
+        #region tentative de token
         private string GenerateToken()
         {
             using RSA rsa = RSA.Create();
             var rsaParams = GetRsaParameters(Configuration.PrivateKey);
             rsa.ImportParameters(rsaParams);
 
-            var signingCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256)
+            RsaSecurityKey key = new RsaSecurityKey(rsa);
+            key.KeyId = Configuration.PrivateKeyId;
+            var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256)
             {
-                CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false }
+                CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false },
             };
 
-            var myIssuer = Configuration.ClientEmail;
+            // Create a collection of optional claims
+            var now = DateTimeOffset.UtcNow;
+            var claims = new Claim[]
+            {
+            new Claim(JwtRegisteredClaimNames.Sub, Configuration.ClientEmail),
+            new Claim(JwtRegisteredClaimNames.Iat, now.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+            new Claim("uid", Configuration.ClientId, ClaimValueTypes.String),
+            new Claim("premium_account", "true", ClaimValueTypes.Boolean)
+            };
+
             var myAudience = Configuration.TokenUri;
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Expires = DateTime.UtcNow.AddDays(7),
-                Issuer = myIssuer,
-                Audience = myAudience,
-                SigningCredentials = signingCredentials
+                Issuer = Configuration.ClientEmail,
+                Audience = "https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit",
+                SigningCredentials = signingCredentials,
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -69,5 +113,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
             RSAParameters rsaParams = DotNetUtilities.ToRSAParameters(keyPair);
             return rsaParams;
         }
+        #endregion
     }
 }

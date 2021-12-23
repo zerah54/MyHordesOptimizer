@@ -1,8 +1,5 @@
 ﻿using AutoMapper;
-using Common.Core.Repository.Interfaces;
 using Microsoft.Extensions.Logging;
-using MyHordesOptimizerApi.Configuration.Interfaces;
-using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -42,10 +39,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             var xmlApiResult = MyHordesXmlApiRepository.GetItems();
             var xmlItems = Mapper.Map<List<Item>>(xmlApiResult.Data.Items.Item);
 
-           foreach(var item in xmlItems)
+            foreach (var item in xmlItems)
             {
                 var miror = jsonItems.FirstOrDefault(x => x.Img == item.Img);
-                if(miror != null)
+                if (miror != null)
                 {
                     item.JsonIdName = miror.JsonIdName;
                     item.Labels = miror.Labels;
@@ -55,13 +52,16 @@ namespace MyHordesOptimizerApi.Services.Impl
             return xmlItems;
         }
 
-        public void SynchronizeTown()
+        public Town GetTown()
         {
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
             var town = Mapper.Map<Town>(myHordeMeResponse.Map);
 
             // Enregistrer en base
             FirebaseRepository.PatchTown(town);
+            town = FirebaseRepository.GetTown(town.Id);
+
+            return town;
         }
     }
 }

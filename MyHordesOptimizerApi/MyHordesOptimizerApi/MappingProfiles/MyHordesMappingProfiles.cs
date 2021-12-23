@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
@@ -31,7 +32,12 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<MyHordesMap, Town>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.MyHordesMap, opt => opt.MapFrom(src => src))
+                .ForMember(dest => dest.Citizens, opt => opt.MapFrom(src => src.Citizens.ToDictionary(citizen => citizen.Name, citizen => citizen)))
                 .ForAllOtherMembers(opt => opt.Ignore());
+
+            CreateMap<MyHordesCitizen, Citizen>()
+                .ForMember(dest => dest.NombreJourHero, opt => opt.Ignore())
+                .ForMember(dest => dest.PouvoirsHero, opt => opt.Ignore());
         }
     }
 }

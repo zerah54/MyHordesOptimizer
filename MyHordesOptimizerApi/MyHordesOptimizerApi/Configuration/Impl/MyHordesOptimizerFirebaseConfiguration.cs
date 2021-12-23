@@ -26,6 +26,7 @@ namespace MyHordesOptimizerApi.Configuration.Impl
         public string ClientX509CertUrl => _configuration.GetValue<string>("client_x509_cert_url");
         public string ApiKey => _configuration.GetValue<string>("api_key");
         public string Url => _configuration.GetValue<string>("url");
+        public string Secret => _configuration.GetValue<string>("secret");
 
         private IConfigurationSection _configuration;
 

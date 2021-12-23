@@ -14,5 +14,6 @@
             public string ClientX509CertUrl { get; }
             public string ApiKey { get; }
             public string Url { get; }
+            public string Secret { get; }
     }
 }
