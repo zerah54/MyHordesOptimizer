@@ -15,6 +15,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         public ExternalToolsController(ILogger<ExternalToolsController> logger,
             IUserKeyProvider userKeyProvider,
+            IGestHordeCookieProvider gestHordeCookieProvider
             IExternalToolsService externalToolsService) : base(logger, userKeyProvider)
         {
             ExternalToolsService = externalToolsService;

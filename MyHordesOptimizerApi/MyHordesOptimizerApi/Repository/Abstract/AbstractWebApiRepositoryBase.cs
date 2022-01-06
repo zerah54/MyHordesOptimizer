@@ -209,8 +209,13 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             var client = HttpClientFactory.CreateClient(HttpClientName);
             if (client == null)
                 throw new Exception($"HttpClient not found with name : {HttpClientName}");
-
+            CustomizeHttpClient(client);
             return client;
+        }
+
+        protected virtual void CustomizeHttpClient(HttpClient client)
+        {
+           // Do nothing here
         }
 
         protected string AddParameterToQuery(string url, string parameterKey, object parameterValue)

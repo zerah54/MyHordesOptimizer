@@ -21,6 +21,7 @@ using MyHordesOptimizerApi.Services.Impl;
 using MyHordesOptimizerApi.Services.Impl.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
+using System.Net.Http;
 
 namespace MyHordesOptimizerApi
 {
@@ -43,10 +44,18 @@ namespace MyHordesOptimizerApi
         {
             services.AddControllers();
             services.AddHttpClient();
+            services.AddHttpClient(nameof(GestHordesRepository)).ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                return new HttpClientHandler()
+                {
+                    UseCookies = false,
+                };
+            });
             services.AddSingleton(BuildAutoMapper());
 
             // Providers
             services.AddScoped<IUserKeyProvider, UserKeyProvider>();
+            services.AddScoped<IGestHordeCookieProvider, GestHordeCookieProvider>();
 
             // Configuration
             services.AddSingleton<IMyHordesApiConfiguration, MyHordesApiConfiguration>();

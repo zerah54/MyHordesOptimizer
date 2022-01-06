@@ -11,6 +11,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
     {
         public override string HttpClientName => nameof(GestHordesRepository);
         protected IUserKeyProvider UserKeyProvider { get; private set; }
+        protected IGestHordeCookieProvider GestHordeCookieProvider { get; private set; }
         protected IGestHordesConfiguration GestHordesConfiguration { get; private set; }
 
         private string _parameterReset = "reset";
@@ -29,6 +30,12 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
         {
             var url = AddParameterToQuery($"{GestHordesConfiguration.Url}", _parameterReset, string.Empty);
             base.Get(url: url);
+        }
+
+        protected override void CustomizeHttpClient(HttpClient client)
+        {
+            base.CustomizeHttpClient(client);
+            client.DefaultRequestHeaders.Add("Cookie", "auth=ArbitrarySessionToken");
         }
     }
 }
