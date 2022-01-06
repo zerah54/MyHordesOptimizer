@@ -55,7 +55,6 @@ namespace MyHordesOptimizerApi
 
             // Providers
             services.AddScoped<IUserKeyProvider, UserKeyProvider>();
-            services.AddScoped<IGestHordeCookieProvider, GestHordeCookieProvider>();
 
             // Configuration
             services.AddSingleton<IMyHordesApiConfiguration, MyHordesApiConfiguration>();
