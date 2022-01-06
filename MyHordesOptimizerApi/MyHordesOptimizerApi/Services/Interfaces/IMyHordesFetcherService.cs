@@ -8,5 +8,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces
     {
         IEnumerable<Item> GetItems();
         Town GetTown();
+        SimpleMe GetSimpleMe();
     }
 }

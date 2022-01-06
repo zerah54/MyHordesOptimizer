@@ -49,5 +49,18 @@ namespace MyHordesOptimizerApi.Controllers
             var items = _myHordesFetcherService.GetItems().ToList();
             return items;
         }
+
+        [HttpGet]
+        [Route("Me")]
+        public ActionResult<SimpleMe> GetMe(string userKey)
+        {
+            if (string.IsNullOrWhiteSpace(userKey))
+            {
+                return BadRequest($"{nameof(userKey)} cannot be empty");
+            }
+            UserKeyProvider.UserKey = userKey;
+            var me = _myHordesFetcherService.GetSimpleMe();
+            return me;
+        }
     }
 }

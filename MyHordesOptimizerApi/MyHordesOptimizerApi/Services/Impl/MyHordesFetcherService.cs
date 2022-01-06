@@ -63,5 +63,13 @@ namespace MyHordesOptimizerApi.Services.Impl
 
             return town;
         }
+
+        public SimpleMe GetSimpleMe()
+        {
+            var me = MyHordesJsonApiRepository.GetMe();
+            var simpleMe = Mapper.Map<SimpleMe>(me);
+
+            return simpleMe;
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Items;
+using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using System.Collections.Generic;
@@ -38,6 +39,9 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<MyHordesCitizen, Citizen>()
                 .ForMember(dest => dest.NombreJourHero, opt => opt.Ignore())
                 .ForMember(dest => dest.PouvoirsHero, opt => opt.Ignore());
+
+            CreateMap<MyHordesMeResponseDto, SimpleMe>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
         }
     }
 }
