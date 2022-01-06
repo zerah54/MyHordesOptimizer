@@ -1,0 +1,8 @@
+.mho-content {
+    overflow: auto;
+    > div {
+        > :last-child > div {
+            background-color: red;
+        }
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "hosting": {
+        "public": "dist/my-hordes-optimizer-website",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+        ]
+    }
+}

@@ -1,0 +1,9 @@
+<mat-toolbar class="mho-navbar" color="primary">
+    <div class="title">{{title}}</div>
+    <ng-container *ngFor="let tab of tabs">
+        <a mat-button [routerLink]="[tab.url]" [routerLinkActive]="['is-active']"
+            [routerLinkActiveOptions]="{exact: true}">
+            {{tab.label}}
+        </a>
+    </ng-container>
+</mat-toolbar>
