@@ -19,8 +19,10 @@ using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Impl;
 using MyHordesOptimizerApi.Services.Impl.ExternalTools;
+using MyHordesOptimizerApi.Services.Impl.Import;
 using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
+using MyHordesOptimizerApi.Services.Interfaces.Import;
 using System.Net.Http;
 
 namespace MyHordesOptimizerApi
@@ -79,6 +81,7 @@ namespace MyHordesOptimizerApi
             // Services
             services.AddScoped<IMyHordesFetcherService, MyHordesFetcherService>();
             services.AddScoped<IExternalToolsService, ExternalToolsService>();
+            services.AddScoped<IMyHordesImportService, MyHordesImportService>();
 
 
             services.AddApplicationInsightsTelemetry();

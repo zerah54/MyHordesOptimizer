@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using MyHordesOptimizerApi.Attributes.Firebase;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Repository.Abstract;
@@ -8,6 +9,7 @@ using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Net.Http;
@@ -24,6 +26,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         public override string HttpClientName => nameof(MyHordesOptimizerFirebaseRepository);
 
         private const string _townCollection = "towns";
+        private const string _heroSkillCollection = "Wiki/heroSkills";
         private const string _parameterAuth = "auth";
 
         public MyHordesOptimizerFirebaseRepository(ILogger<AbstractWebApiRepositoryBase> logger,
@@ -32,6 +35,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             Configuration = configuration;
         }
+
+        #region Town
 
         public void PatchTown(Town town)
         {
@@ -53,6 +58,30 @@ namespace MyHordesOptimizerApi.Repository.Impl
             url = AddAuthentication(url);
             return base.Get<Town>(url);
         }
+
+        #endregion
+
+        #region HeroSkill
+
+        public void PatchHeroSkill(IEnumerable<HeroSkill> heroSkills)
+        {
+            foreach (var heroSkill in heroSkills)
+            {
+                foreach (var prop in typeof(HeroSkill).GetProperties())
+                {
+                    var hehe = prop.GetCustomAttributes(typeof(FirebaseIgnoreOnPatch), inherit: true);
+                    if (hehe.Length == 0)
+                    {
+                        var value = prop.GetValue(heroSkill);
+                        var url = $"{Configuration.Url}/{_heroSkillCollection}/{heroSkill.Name}/{prop.Name}.json";
+                        url = AddAuthentication(url);
+                        base.Put(url: url, body: value);
+                    }
+                }
+            }
+        }
+
+        #endregion
 
         private string AddAuthentication(string url)
         {
@@ -113,6 +142,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             RSAParameters rsaParams = DotNetUtilities.ToRSAParameters(keyPair);
             return rsaParams;
         }
+
         #endregion
     }
 }

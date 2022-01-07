@@ -1,4 +1,5 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
 {
@@ -6,5 +7,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
     {
         void PatchTown(Town town);
         Town GetTown(int townId);
+        void PatchHeroSkill(IEnumerable<HeroSkill> heroSkills);
     }
 }
