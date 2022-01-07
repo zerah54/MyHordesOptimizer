@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.Attributes;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordes.Import;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -10,7 +11,7 @@ namespace MyHordesOptimizerApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    // Todo : mettre une authent pour que tout le monde ne puissent pas upload nimp'
+    [BasicAuthentication]
     public class MyHordesDataImportController : AbstractMyHordesOptimizerControllerBase
     {
         protected IMyHordesImportService MyHordesImportService { get; private set; }
