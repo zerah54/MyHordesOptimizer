@@ -1,0 +1,9 @@
+<mho-navbar #navbar></mho-navbar>
+<div #content class="mho-content"
+    [ngStyle]="{'height': 'calc(100% - ' + navbar?.mat_toolbar?._elementRef?.nativeElement.clientHeight + 'px)'}">
+    <div
+        [ngStyle]="{'min-height': 'calc(' + content.clientHeight + 'px - ' + footer?.mat_toolbar?._elementRef?.nativeElement.clientHeight + 'px)'}">
+        <router-outlet></router-outlet>
+    </div>
+    <mho-footer #footer></mho-footer>
+</div>

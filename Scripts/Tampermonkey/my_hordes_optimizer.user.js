@@ -1,8 +1,12 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
+// @version      1.0.0-alpha.1
+// @namespace    https://github.com/zerah54/MyHordesOptimizer
 // @description  Optimizer for MyHordes
 // @author       Zerah
-// @version      0
+//
+// @downloadURL  https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.js
+// @updateURL    https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.js
 //
 // @match        https://zombvival.de/myhordes/*
 // @match        https://myhordes.de/*
@@ -23,11 +27,13 @@ const lang = document.documentElement.lang;
 const gm_bbh_updated_key = 'bbh_updated';
 const gm_gh_updated_key = 'gh_updated';
 const gm_fata_updated_key = 'fata_updated';
-const gm_mho_external_app_id = 'mho_external_app_id';
+const gm_mh_external_app_id_key = 'mh_external_app_id';
 const gm_parameters_key = 'mh_optimizer_parameters';
+const mh_user_id_key = 'mh_user_id';
 
 let mho_parameters = GM_getValue(gm_parameters_key);
-let external_app_id = GM_getValue(gm_mho_external_app_id);
+let external_app_id = GM_getValue(gm_mh_external_app_id_key);
+let mh_user_id = GM_getValue(mh_user_id_key);
 
 
 ////////////////////
@@ -45,11 +51,11 @@ const img_url = '/build/images/';
 const mh_optimizer_icon = img_url + 'icons/small_archive.dabc70be.gif';
 const close_icon = img_url + 'icons/b_close.17c6704e.png';
 
-const mh_optimizer_title = "MH Optimizer";
+const mho_title = "MH Optimizer";
 const mh_optimizer_window_id = 'optimizer-window';
 const btn_id = 'optimizer-btn';
 const mh_header_id = 'header-reload-area';
-const mho_update_external_tools_id = 'mho-update-external-tools';
+const mh_update_external_tools_id = 'mh-update-external-tools';
 
 const texts = {
     save_external_app_id: {
@@ -57,7 +63,7 @@ const texts = {
         fr: `Enregistrez votre ID d'app externe`,
         de: `TODO`,
         es: `TODO`
-        },
+    },
     external_app_id_help: {
         en: `TODO`,
         fr: `Vous devez renseigner votre ID externe pour les apps.<br />Celle-ci se trouve dans "Votre âme" > "Réglages" > "Avancés" > "Applications externes"`,
@@ -227,7 +233,8 @@ let params = [
     {id: 'update_bbh', label: {en: 'TODO', fr: `Mettre à jour BigBroth'Hordes`, de: 'TODO', es: 'TODO'}},
     {id: 'update_gh', label: {en: 'TODO', fr: `Mettre à jour Gest'Hordes`, de: 'TODO', es: 'TODO'}},
     {id: 'update_fata', label: {en: 'TODO', fr: `Mettre à jour Fata Morgana`, de: 'TODO', es: 'TODO'}},
-    {id: 'enhanced_tooltips', label: {en: 'TODO', fr: `Afficher des tooltips détaillés`, de: 'TODO', es: 'TODO'}},
+    //{id: 'enhanced_tooltips', label: {en: 'TODO', fr: `Afficher des tooltips détaillés`, de: 'TODO', es: 'TODO'}},
+    {id: 'click_on_voted', label: {en: 'TODO', fr: `Navigation rapide vers le chantier recommandé`, de: 'TODO', es: 'TODO'}},
 ];
 
 //////////////////////////////////////
@@ -253,10 +260,10 @@ function buttonOptimizerExists() {
 }
 
 /**
-  * TODO Supprimer une fois les données remontées proprement de la base
-  * @param {string} category
-  * @return la catégorie complète associé au string passé en paramètre
-  */
+* TODO Supprimer une fois les données remontées proprement de la base
+* @param {string} category
+* @return la catégorie complète associé au string passé en paramètre
+*/
 function getCategory(category) {
     return categories_mapping[category.toLowerCase()];
 }
@@ -272,7 +279,7 @@ function createOptimizerBtn() {
         img.src = mh_optimizer_icon;
 
         let title_hidden = document.createElement('span');
-        title_hidden.innerHTML = mh_optimizer_title;
+        title_hidden.innerHTML = mho_title;
 
         let title = document.createElement('h1');
         title.appendChild(img);
@@ -371,8 +378,9 @@ function createOptimizerButtonContent() {
         keysend.classList.add('button');
         keysend.innerHTML = texts.save_external_app_id[lang];
         keysend.addEventListener('click', () => {
-            GM_setValue(gm_mho_external_app_id, keytext.value);
-            external_app_id = GM_getValue(gm_mho_external_app_id)
+            GM_setValue(gm_mh_external_app_id_key, keytext.value);
+            external_app_id = GM_getValue(gm_mh_external_app_id_key);
+            content.innerHTML = '';
             createOptimizerButtonContent();
         });
 
@@ -413,13 +421,15 @@ function createWindow() {
 
     window_overlay_li.addEventListener('click', () => {
         window.classList.remove('visible');
+        let body = document.getElementsByTagName('body')[0];
+        body.removeAttribute('style', 'overflow: hidden');
     });
 }
 
 /**
-  * Crée la liste des onglets de la page de wiki
-  * @param {string} window_type
-  */
+* Crée la liste des onglets de la page de wiki
+* @param {string} window_type
+*/
 function createTabs(window_type) {
     let window_content = document.getElementById(mh_optimizer_window_id + '-content');
     window_content.innerHTML = '';
@@ -469,32 +479,38 @@ function createTabs(window_type) {
 }
 
 /**
-  * Affiche la fenêtre de wiki et charge la liste d'objets si elle n'a jamais été chargée
-  * @param {string} window_type
-  */
+* Affiche la fenêtre de wiki et charge la liste d'objets si elle n'a jamais été chargée
+* @param {string} window_type
+*/
 function displayWindow(window_type) {
     document.getElementById(mh_optimizer_window_id).classList.add('visible');
+    let body = document.getElementsByTagName('body')[0];
+    body.setAttribute('style', 'overflow: hidden');
     createTabs(window_type);
 }
 
 /**
-  * Crée le bloc de contenu de la page
-  * @param {string} window_tyme     Le type de fenêtre à afficher, correspondant au nom utilisé dans la liste des onglets
-  */
+* Crée le bloc de contenu de la page
+* @param {string} window_tyme     Le type de fenêtre à afficher, correspondant au nom utilisé dans la liste des onglets
+*/
 function createTabContent(window_type) {
     let window_content = document.getElementById(mh_optimizer_window_id + '-content');
 
-    let tab_content = document.createElement('div');
-    tab_content.id = 'tab-content';
+    let tab_content = document.getElementById('tab-content');
+    if(!tab_content) {
 
-    window_content.appendChild(tab_content);
+        tab_content = document.createElement('div');
+        tab_content.id = 'tab-content';
+
+        window_content.appendChild(tab_content);
+    }
 }
 
 /**
-  * Détermine quelle fonction appeler en fonction de l'onglet sélectionné
-  * @param {string} window_type     Le type de l'onglet
-  * @param tab                      L'onglet à afficher
-  */
+* Détermine quelle fonction appeler en fonction de l'onglet sélectionné
+* @param {string} window_type     Le type de l'onglet
+* @param tab                      L'onglet à afficher
+*/
 function dispatchContent(window_type, tab) {
 
     createTabContent(window_type);
@@ -544,9 +560,9 @@ function filterItems() {
 }
 
 /**
-  * Affiche la liste des objets
-  * @param filtered_items
-  */
+* Affiche la liste des objets
+* @param filtered_items
+*/
 function displayItems(filtered_items) {
     console.log('items', items);
     let tab_content = document.getElementById('tab-content');
@@ -631,12 +647,12 @@ function displayCitizens() {
             clearInterval(interval);
         }
     }, 500)
-}
+    }
 
 /**
-  * Crée un bouton d'aide
-  * @param {string} text_to_display    Le contenu de la popup d'aide
-  */
+* Crée un bouton d'aide
+* @param {string} text_to_display    Le contenu de la popup d'aide
+*/
 function createHelpButton(text_to_display) {
 
     let help_button = document.createElement('a');
@@ -675,7 +691,7 @@ function createUpdateExternalToolsButton() {
 
     let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
 
-    let update_external_tools_btn = document.getElementById(mho_update_external_tools_id);
+    let update_external_tools_btn = document.getElementById(mh_update_external_tools_id);
     const zone_marker = document.getElementById('zone-marker');
 
     /** Cette fonction ne doit s'exécuter que si on a un id d'app externe ET au moins l'une des options qui est cochée dans les paramètres ET qu'on est hors de la ville */
@@ -693,7 +709,7 @@ function createUpdateExternalToolsButton() {
         let btn = document.createElement('button');
 
         btn.innerHTML = '<img src ="' + img_url + 'emotes/arrowright.7870eca6.gif">' + texts.update_external_tools_needed_btn_label[lang];
-        btn.id = mho_update_external_tools_id;
+        btn.id = mh_update_external_tools_id;
 
         btn.addEventListener('click', () => {
             /** Au clic sur le bouton, on appelle la fonction de mise à jour */
@@ -705,6 +721,33 @@ function createUpdateExternalToolsButton() {
     } else if (update_external_tools_btn) {
         update_external_tools_btn.parentElement.remove();
     }
+}
+
+/** Si l'option associée est activée, un clic sur le chantier recommandé permet de rediriger vers la ligne du chantier en question */
+function clickOnVotedToRedirect() {
+    if (mho_parameters.click_on_voted && document.URL.indexOf('town')) {
+        let voted_building = document.getElementsByClassName('voted-building')[0];
+        if (voted_building) {
+            voted_building.setAttribute('style', 'cursor: pointer');
+            voted_building.addEventListener('click', () => {
+                let voted_row = document.getElementsByClassName('voted')[0];
+                voted_row.setAttribute('style', 'scroll-margin: 100px');
+                voted_row.scrollIntoView();
+            });
+        }
+    }
+}
+
+/** Affiche la page de chargement de MyHordes */
+function startLoading() {
+    let loadzone = document.getElementById('loadzone');
+    loadzone.setAttribute('x-stack', 1);
+}
+
+/** Masque la page de chargement de MyHordes */
+function endLoading() {
+    let loadzone = document.getElementById('loadzone');
+    loadzone.setAttribute('x-stack', 0);
 }
 
 ///////////
@@ -770,7 +813,7 @@ function createStyles() {
     + 'display: none;'
     + 'margin: 0 5px 8px 5px;'
     + 'font-size: 0.9em;'
-    + 'width: 300px;'
+    + 'width: 350px;'
     + '}';
 
     const mh_optimizer_window_style = '#' + mh_optimizer_window_id + '{'
@@ -974,7 +1017,27 @@ function getItems() {
 }
 
 /** Récupère les informations de la ville */
+function getMe() {
+    startLoading();
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: api_url + 'myhordesfetcher/me?userKey=' + external_app_id,
+        responseType: 'json',
+        onload: function(response){
+            if (response.status === 200) {
+                mh_user_id = response.response.id;
+                GM_setValue(mh_user_id_key, mh_user_id);
+            } else {
+                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+            }
+            endLoading();
+        }
+    });
+}
+
+/** Récupère les informations de la ville */
 function getTown() {
+    startLoading();
     GM_xmlhttpRequest({
         method: 'GET',
         url: api_url + 'myhordesfetcher/town?userKey=' + external_app_id,
@@ -985,6 +1048,7 @@ function getTown() {
             } else {
                 console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
             }
+            endLoading();
         }
     });
 }
@@ -995,10 +1059,10 @@ function updateExternalTools() {
         isFataMorgana: mho_parameters ? mho_parameters.update_fata : false,
         isGestHordes: mho_parameters ? mho_parameters.update_gh : false
     };
-    let btn = document.getElementById(mho_update_external_tools_id);
+    let btn = document.getElementById(mh_update_external_tools_id);
     GM_xmlhttpRequest({
         method: 'POST',
-        url: api_url + 'externaltools/update?userKey=' + external_app_id,
+        url: api_url + 'externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user_id,
         data: JSON.stringify (tools_to_update),
         headers: {
             "Content-Type": "application/json"
@@ -1023,14 +1087,14 @@ function updateExternalTools() {
     });
 }
 
+
 ///////////////////////////
 //     MAIN FUNCTION     //
 ///////////////////////////
-
 (function() {
     "use strict";
 
-     if(document.URL.startsWith("https://bbh.fred26.fr/") || document.URL.startsWith("https://gest-hordes2.eragaming.fr/") || document.URL.startsWith("https://fatamorgana.md26.eu/")) {
+    if(document.URL.startsWith("https://bbh.fred26.fr/") || document.URL.startsWith("https://gest-hordes2.eragaming.fr/") || document.URL.startsWith("https://fatamorgana.md26.eu/")) {
         let current_key = '';
         if (document.URL.startsWith("https://bbh.fred26.fr/")) {
             current_key = gm_bbh_updated_key
@@ -1053,8 +1117,14 @@ function updateExternalTools() {
             createOptimizerBtn();
             createWindow();
         }
+
+        if (!mh_user_id) {
+            getMe();
+        }
+
         setInterval(() => {
             createUpdateExternalToolsButton();
+            clickOnVotedToRedirect();
         }, 500);
     }
 
