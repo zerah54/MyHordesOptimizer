@@ -15,7 +15,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IMyHordesJsonApiRepository MyHordesJsonApiRepository { get; set; }
         protected IMyHordesXmlApiRepository MyHordesXmlApiRepository { get; set; }
         protected IMyHordesOptimizerFirebaseRepository FirebaseRepository { get; set; }
-        private readonly IMapper Mapper;
+        protected readonly IMapper Mapper;
 
 
         public MyHordesFetcherService(ILogger<MyHordesFetcherService> logger,
@@ -33,23 +33,8 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public IEnumerable<Item> GetItems()
         {
-            var jsonApiResult = MyHordesJsonApiRepository.GetItems();
-            var jsonItems = Mapper.Map<List<Item>>(jsonApiResult);
-
-            var xmlApiResult = MyHordesXmlApiRepository.GetItems();
-            var xmlItems = Mapper.Map<List<Item>>(xmlApiResult.Data.Items.Item);
-
-            foreach (var item in xmlItems)
-            {
-                var miror = jsonItems.FirstOrDefault(x => x.Img == item.Img);
-                if (miror != null)
-                {
-                    item.JsonIdName = miror.JsonIdName;
-                    item.Labels = miror.Labels;
-                }
-            }
-
-            return xmlItems;
+            var items = FirebaseRepository.GetItems();
+            return items.Values;
         }
 
         public Town GetTown()

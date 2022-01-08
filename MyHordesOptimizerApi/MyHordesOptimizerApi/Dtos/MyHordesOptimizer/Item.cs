@@ -14,5 +14,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
         public int Guard { get; set; }
         public string XmlName { get; set; }
         public string Description { get; set; }
+
+        public IEnumerable<string> Properties { get; set; }
+        public IEnumerable<string> Actions { get; set; }
     }
 }

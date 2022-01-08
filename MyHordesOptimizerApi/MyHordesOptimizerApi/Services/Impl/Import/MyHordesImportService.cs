@@ -1,6 +1,8 @@
-﻿using Common.Core.Repository.Interfaces;
+﻿using AutoMapper;
+using Common.Core.Repository.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordes.Import;
 using MyHordesOptimizerApi.Dtos.MyHordes.Import.i18n;
+using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
@@ -14,15 +16,28 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 {
     public class MyHordesImportService : IMyHordesImportService
     {
+        private const string RegexPattern_SplitOnCommaNotInBraces = ",\\s*(?=([^']*'[^']*')*[^']*$)";
         protected readonly IMyHordesOptimizerFirebaseRepository FirebaseRepository;
         protected readonly IWebApiRepository WebApiRepository;
+        protected IMyHordesJsonApiRepository MyHordesJsonApiRepository { get; set; }
+        protected IMyHordesXmlApiRepository MyHordesXmlApiRepository { get; set; }
+        protected readonly IMapper Mapper;
+
 
         public MyHordesImportService(IMyHordesOptimizerFirebaseRepository firebaseRepository,
-            IWebApiRepository webApiRepository)
+            IWebApiRepository webApiRepository,
+            IMyHordesJsonApiRepository myHordesJsonApiRepository,
+            IMyHordesXmlApiRepository myHordesXmlApiRepository,
+            IMapper mapper)
         {
             FirebaseRepository = firebaseRepository;
             WebApiRepository = webApiRepository;
+            MyHordesJsonApiRepository = myHordesJsonApiRepository;
+            MyHordesXmlApiRepository = myHordesXmlApiRepository;
+            Mapper = mapper;
         }
+
+        #region HeroSkill
 
         public void ImportHeroSkill(ImportHeroSkillRequestDto request)
         {
@@ -95,7 +110,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 workingRawSkill = workingRawSkill.Replace("[", "");
                 workingRawSkill = workingRawSkill.Replace("]", "");
 
-                var items = Regex.Split(workingRawSkill, ",\\s*(?=([^']*'[^']*')*[^']*$)");
+                var items = Regex.Split(workingRawSkill, RegexPattern_SplitOnCommaNotInBraces);
 
                 var dico = new Dictionary<string, string>();
                 foreach (var item in items)
@@ -129,5 +144,72 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 yield return heroSkill;
             }
         }
+
+        #endregion
+
+        #region Items
+
+        public void ImportItems(ImportItemsRequestDto request)
+        {
+            var items = GetItemFromMyHordesApis();
+            ParseItemInfo(request.ItemsProperties, items, nameof(Item.Properties));
+            ParseItemInfo(request.ItemActions, items, nameof(Item.Actions));
+
+            // Enregistrer dans firebase
+            FirebaseRepository.PatchItems(items);
+        }
+
+        private static void ParseItemInfo(string strToParse, List<Item> items, string propertieName)
+        {
+            var regex = new Regex("(?![^)(]*\\([^)(]*?\\)\\)),(?![^\\[]*\\])");
+            var workingAllProperties = regex.Replace(strToParse, "\n");
+            var hehes = workingAllProperties.Split("\n");
+            foreach (var hehe in hehes)
+            {
+                if (!string.IsNullOrWhiteSpace(hehe))
+                {
+                    try
+                    {
+                        var splited = Regex.Split(hehe, "=>");
+                        var key = splited[0].Replace("'", "").Trim(); // On récupère un truc du genre saw_tool_#00
+                        key = key.Remove(key.Length - 4); // On retire le _#00
+                        var properties = splited[1].Replace("[", "").Replace("]", "").Trim(); // On récupère un truc du genre 'impoundable', 'can_opener', 'box_opener'
+                        var list = new List<string>();
+                        foreach (var propertie in properties.Split(','))
+                        {
+                            list.Add(propertie.Replace("'", "").Trim());
+                        }
+                        typeof(Item).GetProperty(propertieName).SetValue(items.First(item => item.JsonIdName == key), list);
+                    }
+                    catch (Exception)
+                    {
+                        // silent
+                    }
+                }
+            }
+        }
+
+        private List<Item> GetItemFromMyHordesApis()
+        {
+            var jsonApiResult = MyHordesJsonApiRepository.GetItems();
+            var jsonItems = Mapper.Map<List<Item>>(jsonApiResult);
+
+            var xmlApiResult = MyHordesXmlApiRepository.GetItems();
+            var xmlItems = Mapper.Map<List<Item>>(xmlApiResult.Data.Items.Item);
+
+            foreach (var item in xmlItems)
+            {
+                var miror = jsonItems.FirstOrDefault(x => x.Img == item.Img);
+                if (miror != null)
+                {
+                    item.JsonIdName = miror.JsonIdName;
+                    item.Labels = miror.Labels;
+                }
+            }
+
+            return xmlItems;
+        }
+
+        #endregion
     }
 }

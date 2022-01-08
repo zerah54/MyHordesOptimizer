@@ -44,5 +44,38 @@ namespace MyHordesOptimizerApi.Controllers
             MyHordesImportService.ImportHeroSkill(request);
             return Ok();
         }
+
+        [HttpPost]
+        [Route("Items")]
+        public ActionResult ImportItems(string userKey, ImportItemsRequestDto request)
+        {
+            if (string.IsNullOrEmpty(request.ItemsProperties))
+            {
+                return BadRequest($"{nameof(request.ItemsProperties)} is required");
+            }
+            if (string.IsNullOrEmpty(request.ItemActions))
+            {
+                return BadRequest($"{nameof(request.ItemActions)} is required");
+            }
+            if (string.IsNullOrEmpty(request.Recipes))
+            {
+                return BadRequest($"{nameof(request.Recipes)} is required");
+            }
+            if (string.IsNullOrEmpty(request.Fr))
+            {
+                return BadRequest($"{nameof(request.Fr)} is required");
+            }
+            if (string.IsNullOrEmpty(request.En))
+            {
+                return BadRequest($"{nameof(request.En)} is required");
+            }
+            if (string.IsNullOrEmpty(request.Es))
+            {
+                return BadRequest($"{nameof(request.Es)} is required");
+            }
+            UserKeyProvider.UserKey = userKey;
+            MyHordesImportService.ImportItems(request);
+            return Ok();
+        }
     }
 }

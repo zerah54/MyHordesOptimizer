@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using MyHordesOptimizerApi.Attributes.Firebase;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Repository.Abstract;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -27,6 +28,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         private const string _townCollection = "towns";
         private const string _heroSkillCollection = "Wiki/heroSkills";
+        private const string _itemCollection = "Wiki/items";
         private const string _parameterAuth = "auth";
 
         public MyHordesOptimizerFirebaseRepository(ILogger<AbstractWebApiRepositoryBase> logger,
@@ -91,11 +93,32 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #endregion
 
+        #region Items
+
+        public void PatchItems(List<Item> items)
+        {    
+            foreach(var item in items)
+            {
+                var url = $"{Configuration.Url}/{_itemCollection}/{item.JsonIdName}.json";
+                url = AddAuthentication(url);
+                base.Patch(url: url, body: item);
+            }
+        }
+
+        public Dictionary<string, Item> GetItems()
+        {
+            var url = $"{Configuration.Url}/{_itemCollection}.json";
+            url = AddAuthentication(url);
+            return base.Get<Dictionary<string, Item>>(url);
+        }
+
+        #endregion
         private string AddAuthentication(string url)
         {
             url = AddParameterToQuery(url, _parameterAuth, Configuration.Secret);
             return url;
         }
+
 
         // Ne marche pas
         #region tentative de token
