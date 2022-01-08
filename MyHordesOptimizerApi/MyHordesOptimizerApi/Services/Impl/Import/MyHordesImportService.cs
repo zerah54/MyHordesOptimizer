@@ -6,7 +6,6 @@ using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
@@ -83,17 +82,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 {
                     if (!string.IsNullOrWhiteSpace(item))
                     {
-                        try
-                        {
-                            var splited = Regex.Split(item, "=>");
-                            var key = splited[0].Replace("'", "").Trim();
-                            var value = splited[1].Replace("'", "").Trim();
-                            dico[key] = value;
-                        }
-                        catch (Exception)
-                        {
-                            // silent
-                        }
+                        var splited = Regex.Split(item, "=>");
+                        var key = splited[0].Replace("'", "").Trim();
+                        var value = splited[1].Replace("'", "").Trim();
+                        dico[key] = value;
                     }
                 }
                 listOfDictionnary.Add(dico);
@@ -132,22 +124,20 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 if (!string.IsNullOrWhiteSpace(line))
                 {
-                    try
+                    var splited = Regex.Split(line, "=>");
+                    var key = splited[0].Replace("'", "").Trim(); // On récupère un truc du genre saw_tool_#00
+                    key = key.Remove(key.Length - 4); // On retire le _#00
+                    var properties = splited[1].Replace("[", "").Replace("]", "").Trim(); // On récupère un truc du genre 'impoundable', 'can_opener', 'box_opener'
+                    var list = new List<string>();
+                    foreach (var propertie in properties.Split(','))
                     {
-                        var splited = Regex.Split(line, "=>");
-                        var key = splited[0].Replace("'", "").Trim(); // On récupère un truc du genre saw_tool_#00
-                        key = key.Remove(key.Length - 4); // On retire le _#00
-                        var properties = splited[1].Replace("[", "").Replace("]", "").Trim(); // On récupère un truc du genre 'impoundable', 'can_opener', 'box_opener'
-                        var list = new List<string>();
-                        foreach (var propertie in properties.Split(','))
-                        {
-                            list.Add(propertie.Replace("'", "").Trim());
-                        }
-                        typeof(Item).GetProperty(propertieName).SetValue(items.First(item => item.JsonIdName == key), list);
+                        list.Add(propertie.Replace("'", "").Trim());
                     }
-                    catch (Exception)
+
+                    Item item = items.FirstOrDefault(item => item.JsonIdName == key);
+                    if (item != null)
                     {
-                        // silent
+                        typeof(Item).GetProperty(propertieName).SetValue(item, list);
                     }
                 }
             }
