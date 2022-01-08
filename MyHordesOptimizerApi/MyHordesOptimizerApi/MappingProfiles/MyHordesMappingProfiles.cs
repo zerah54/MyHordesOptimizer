@@ -21,7 +21,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             CreateMap<MyHordesXmlApiItemDto, Item>()
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Cat))
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Text))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr" , src.Text } }))
                 .ForMember(dest => dest.Deco, opt => opt.MapFrom(src => src.Deco))
                 .ForMember(dest => dest.Guard, opt => opt.MapFrom(src => src.Guard))
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Img))
@@ -37,8 +37,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForAllOtherMembers(opt => opt.Ignore());
 
             CreateMap<MyHordesCitizen, Citizen>()
-                .ForMember(dest => dest.NombreJourHero, opt => opt.Ignore())
-                .ForMember(dest => dest.PouvoirsHero, opt => opt.Ignore());
+                .ForMember(dest => dest.NombreJourHero, opt => opt.Ignore());
 
             CreateMap<MyHordesMeResponseDto, SimpleMe>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));

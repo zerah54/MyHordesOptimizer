@@ -112,7 +112,13 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var items = GetItemFromMyHordesApis();
             ParseItemInfo(request.ItemsProperties, items, nameof(Item.Properties));
             ParseItemInfo(request.ItemActions, items, nameof(Item.Actions));
-
+            // Traductions
+            var translationFile = WebApiRepository.Get<TranslationFileDto>(url: request.Fr, mediaTypeOut: MediaTypeNames.Application.Xml);
+            GetTranslationFromTarget(items: items, translationFile: translationFile, targetLocale: "fr", "de", nameof(Item.Description));
+            translationFile = WebApiRepository.Get<TranslationFileDto>(url: request.En, mediaTypeOut: MediaTypeNames.Application.Xml);
+            GetTranslationFromSource(items: items, translationFile: translationFile, targetLocale: "en", "de", nameof(Item.Description));
+            translationFile = WebApiRepository.Get<TranslationFileDto>(url: request.Es, mediaTypeOut: MediaTypeNames.Application.Xml);
+            GetTranslationFromSource(items: items, translationFile: translationFile, targetLocale: "es", "de", nameof(Item.Description));
             // Enregistrer dans firebase
             FirebaseRepository.PatchItems(items);
         }
@@ -180,6 +186,30 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var workingAllProperties = regex.Replace(strToParse, "\n");
             var hehes = workingAllProperties.Split("\n");
             return hehes;
+        }
+
+        private static void GetTranslationFromTarget<TParam>(List<TParam> items, TranslationFileDto translationFile, string targetLocale, string sourceLocale, string propertieName) where TParam : class
+        {
+            foreach (var item in items)
+            {
+                var property = typeof(Item).GetProperty(propertieName);
+                var dictionary = property.GetValue(item) as IDictionary<string, string>;
+                var descriptionUnit = translationFile.File.Unit.First(unit => unit.Segment.Target == dictionary[targetLocale]);
+                dictionary[sourceLocale] = descriptionUnit.Segment.Source;
+                property.SetValue(item, dictionary);
+            }
+        }
+
+        private static void GetTranslationFromSource<TParam>(List<TParam> items, TranslationFileDto translationFile, string targetLocale, string sourceLocale, string propertieName) where TParam : class
+        {
+            foreach (var item in items)
+            {
+                var property = typeof(Item).GetProperty(propertieName);
+                var dictionary = property.GetValue(item) as IDictionary<string, string>;
+                var descriptionUnit = translationFile.File.Unit.First(unit => unit.Segment.Source == dictionary[sourceLocale]);
+                dictionary[targetLocale] = descriptionUnit.Segment.Target;
+                property.SetValue(item, dictionary);
+            }
         }
     }
 }
