@@ -16,7 +16,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 {
     public class MyHordesImportService : IMyHordesImportService
     {
-        private const string RegexPattern_SplitOnCommaNotInBraces = ",\\s*(?=([^']*'[^']*')*[^']*$)";
         protected readonly IMyHordesOptimizerFirebaseRepository FirebaseRepository;
         protected readonly IWebApiRepository WebApiRepository;
         protected IMyHordesJsonApiRepository MyHordesJsonApiRepository { get; set; }
@@ -64,53 +63,20 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         private IEnumerable<HeroSkill> GetHeroSkillInDeutch(string heroSkillStr)
         {
-            string pattern = "^[^\\[\\]]*" +
-                       "(" +
-                       "((?'Open'\\[)[^\\[\\]]*)+" +
-                       "((?'Close-Open'\\])[^\\[\\]]*)+" +
-                       ")*" +
-                       "(?(Open)(?!))$";
-            Match m = Regex.Match(heroSkillStr, pattern);
-            var listOfRawSkill = new List<string>();
-            var list = new List<string>();
-            if (m.Success == true)
-            {
-                int grpCtr = 0;
-                foreach (Group grp in m.Groups)
-                {
-                    list.Add($"   Group {grpCtr}: {grp.Value}");
-                    grpCtr++;
-                    int capCtr = 0;
-                    foreach (Capture cap in grp.Captures)
-                    {
-                        list.Add($"      Capture {capCtr}: {cap.Value}");
-                        capCtr++;
-                        if (grpCtr == 1 + 1)
-                        {
-                            listOfRawSkill.Add(cap.Value);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                list.Add("Match failed.");
-            }
-
+            var strSplitOnCommaNotInBrace = SplitOnCommaNotInBraces(heroSkillStr);
             var listOfDictionnary = new List<Dictionary<string, string>>();
-
-            foreach (var rawSkill in listOfRawSkill)
+            foreach (var line in strSplitOnCommaNotInBrace)
             {
-                var workingRawSkill = rawSkill;
-                workingRawSkill = workingRawSkill.TrimEnd();
-                if (workingRawSkill.EndsWith(","))
+                var workingLine = line;
+                workingLine = workingLine.TrimEnd();
+                if (workingLine.EndsWith(","))
                 {
-                    workingRawSkill = workingRawSkill.Remove(workingRawSkill.Length - 1);
+                    workingLine = workingLine.Remove(workingLine.Length - 1);
                 }
-                workingRawSkill = workingRawSkill.Replace("[", "");
-                workingRawSkill = workingRawSkill.Replace("]", "");
+                workingLine = workingLine.Replace("[", "");
+                workingLine = workingLine.Replace("]", "");
 
-                var items = Regex.Split(workingRawSkill, RegexPattern_SplitOnCommaNotInBraces);
+                var items = SplitOnCommaNotInString(workingLine, "'");
 
                 var dico = new Dictionary<string, string>();
                 foreach (var item in items)
@@ -161,16 +127,14 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         private static void ParseItemInfo(string strToParse, List<Item> items, string propertieName)
         {
-            var regex = new Regex("(?![^)(]*\\([^)(]*?\\)\\)),(?![^\\[]*\\])");
-            var workingAllProperties = regex.Replace(strToParse, "\n");
-            var hehes = workingAllProperties.Split("\n");
-            foreach (var hehe in hehes)
+            var strSplitOnCommaNotInBrace = SplitOnCommaNotInBraces(strToParse);
+            foreach (var line in strSplitOnCommaNotInBrace)
             {
-                if (!string.IsNullOrWhiteSpace(hehe))
+                if (!string.IsNullOrWhiteSpace(line))
                 {
                     try
                     {
-                        var splited = Regex.Split(hehe, "=>");
+                        var splited = Regex.Split(line, "=>");
                         var key = splited[0].Replace("'", "").Trim(); // On récupère un truc du genre saw_tool_#00
                         key = key.Remove(key.Length - 4); // On retire le _#00
                         var properties = splited[1].Replace("[", "").Replace("]", "").Trim(); // On récupère un truc du genre 'impoundable', 'can_opener', 'box_opener'
@@ -211,5 +175,21 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         }
 
         #endregion
+
+        private static string[] SplitOnCommaNotInBraces(string strToParse)
+        {
+            var regex = new Regex("(?![^)(]*\\([^)(]*?\\)\\)),(?![^\\[]*\\])");
+            var workingAllProperties = regex.Replace(strToParse, "\n");
+            var hehes = workingAllProperties.Split("\n");
+            return hehes;
+        }
+
+        private static string[] SplitOnCommaNotInString(string strToParse, string englobingStr)
+        {
+            var regex = new Regex($"(?!\\B{englobingStr}[^{englobingStr}]*),(?![^{englobingStr}]*{englobingStr}\\B)");
+            var workingAllProperties = regex.Replace(strToParse, "\n");
+            var hehes = workingAllProperties.Split("\n");
+            return hehes;
+        }
     }
 }
