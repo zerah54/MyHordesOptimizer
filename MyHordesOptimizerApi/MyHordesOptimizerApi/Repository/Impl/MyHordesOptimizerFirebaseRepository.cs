@@ -81,6 +81,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             }
         }
 
+        public Dictionary<string, HeroSkill> GetHeroSkills()
+        {
+            var url = $"{Configuration.Url}/{_heroSkillCollection}.json";
+            url = AddAuthentication(url);
+            return base.Get<Dictionary<string,HeroSkill>>(url);
+        }
+
+
         #endregion
 
         private string AddAuthentication(string url)

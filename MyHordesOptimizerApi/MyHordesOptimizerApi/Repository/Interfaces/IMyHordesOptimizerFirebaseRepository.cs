@@ -8,5 +8,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PatchTown(Town town);
         Town GetTown(int townId);
         void PatchHeroSkill(IEnumerable<HeroSkill> heroSkills);
+        Dictionary<string, HeroSkill> GetHeroSkills();
     }
 }
