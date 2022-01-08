@@ -1,0 +1,38 @@
+@import 'variables.scss';
+
+.mho-script {
+    .sidenav {
+        width: 250px;
+        background-color: $sidenav_bg_color;
+
+        .mat-list-item:hover {
+            background-color: rgba(0, 0, 0, 0.20);
+        }
+
+        @for $i from 1 through 5 {
+            $base: 16px;
+            $padding: calc(($i - 1) * $base);
+            .level-#{$i} {
+                text-decoration: none;
+                padding-left: $padding;
+                width: calc(100% - $padding)
+            }
+        }
+    }
+
+    .sidenav-content {
+        padding: 1em;
+
+        @for $i from 1 through 5 {
+            h#{$i} {
+                scroll-margin: 100px;
+            }
+        }
+
+        ul {
+            li {
+                list-style: none;
+            }
+        }
+    }
+}

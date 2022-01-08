@@ -1,3 +1,100 @@
-<div class="mho-script">
+<div #mhoScript class="mho-script" [ngStyle]="{'height': mhoScript.parentElement?.parentElement?.clientHeight + 'px'}">
+    <mat-drawer-container [style.height]="'100%'">
+        <mat-drawer class="sidenav" mode="side" opened>
+            <mat-list>
+                <a mat-list-item (click)="scrollToTitle(title.id)" [routerLink]="['./']" [fragment]="title.id"
+                    [ngClass]="'level-' + title.level" *ngFor="let title of titles">{{title.label}}</a>
+            </mat-list>
+        </mat-drawer>
 
+        <div class="sidenav-content">
+            <ng-container *ngTemplateOutlet="overview"></ng-container>
+            <ng-container *ngTemplateOutlet="features"></ng-container>
+            <ng-container *ngTemplateOutlet="install"></ng-container>
+        </div>
+
+    </mat-drawer-container>
+
+    <ng-template #overview>
+        <h1 id="overview">Présentation du script</h1>
+        <p>
+            Ce script pour MyHordes a pour objectif de simplifier la vie des joueurs au maximum. Plusieurs
+            fonctionnalités sont proposées.
+        </p>
+    </ng-template>
+    <ng-template #features>
+        <h1 id="features">Fonctionnalités</h1>
+        <ul>
+            <li>
+                <h2 id="update-external-tools">Mise à jour des outils externes</h2>
+                <p>
+                    Dans l'interface, vous pouvez cocher les différents outils externes que vous souhaitez pouvoir
+                    mettre à jour en un clic. Une fois sorti de la ville, vous pourrez cliquer sur un nouveau bouton qui
+                    mettra à jour tous les outils externes que vous avez sélectionnés dans vos options.
+                    <br />
+                    Si vous avez l'un des outils en question ouvert dans votre navigateur, alors la prochaine fois que
+                    vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.
+                </p>
+            </li>
+            <li>
+                <h2 id="quick-navigation">Navigation rapide vers le chantier recommandé</h2>
+                <p>
+                    Dans l'interface, vous pouvez cocher le bouton "Navigation rapide vers le chantier recommandé", ce
+                    qui activera la fonctionnalité de navigation rapide. Il s'agit simplement, lorsqu'il existe un
+                    chantier recommandé, de pouvoir cliquer dessus pour être automatiquement redirigé vers la ligne du
+                    du chantier dans la liste.
+                </p>
+            </li>
+            <li>
+                <h2 id="wiki">Wiki</h2>
+                <ul>
+                    <li>
+                        <h3 id="items-list">(à venir) Liste des objets</h3>
+                        <p>
+
+                        </p>
+                    </li>
+                    <li>
+                        <h3 id="items-list">(à venir) Liste des recettes</h3>
+                        <p>
+
+                        </p>
+                        <h3 id="heroskills">Pouvoirs</h3>
+                        <p>Présente tout simplement la liste des pouvoirs héros, leur description et le nombre de jours
+                            avant obtention.</p>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <h2 id="tools">Outils</h2>
+                <ul>
+                    <h3 id="citizens-list">(À venir) Liste des citoyens</h3>
+                    <p></p>
+                </ul>
+            </li>
+        </ul>
+    </ng-template>
+    <ng-template #install>
+        <h1 id="install">Installation</h1>
+        <p>
+            Lien vers le script : <a mat-button color="accent"
+                href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js"
+                target="_blank">Installer le script</a>
+            <br />
+            <br />
+            Ce fichier contient un script Tampermonkey. Pour le faire fonctionner, il faut que Tampermonkey soit
+            installé sur votre navigateur.
+            <br />
+            <br />
+            Une fois le script installé, vous verrez apparaittre un nouveau bouton en haut de votre page MyHordes. Au
+            survol, une fenête s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses
+            fonctionnalités.
+            <br />
+            <br />
+            <strong>Attention :</strong>
+            <br />
+            Vous allez d'abord devoir renseigner votre ID d'apps externes. Lors de la validation de l'ID d'apps, une
+            confirmation sera demandée. Il faut l'autoriser.
+        </p>
+    </ng-template>
 </div>

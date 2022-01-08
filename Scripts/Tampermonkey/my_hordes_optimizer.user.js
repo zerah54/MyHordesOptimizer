@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.1
+// @version      1.0.0-alpha.2
 // @namespace    https://github.com/zerah54/MyHordesOptimizer
 // @description  Optimizer for MyHordes
 // @author       Zerah
@@ -46,10 +46,11 @@ const api_url = 'https://myhordesoptimizerapi.azurewebsites.net/';
 // Listes de constantes / Constants list //
 ///////////////////////////////////////////
 
-const img_url = '/build/images/';
+const hordes_img_url = '/build/images/';
+const repo_img_url = 'https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/hordes_img/';
 
-const mh_optimizer_icon = img_url + 'icons/small_archive.dabc70be.gif';
-const close_icon = img_url + 'icons/b_close.17c6704e.png';
+const mh_optimizer_icon = repo_img_url + 'icons/small_archive.gif';
+const close_icon = repo_img_url + 'icons/b_close.png';
 
 const mho_title = "MH Optimizer";
 const mh_optimizer_window_id = 'optimizer-window';
@@ -207,13 +208,19 @@ let tabs_list = {
             ordering: 0,
             id: 'items',
             label: {en: 'Items', fr: 'Objets', de: 'TODO', es: 'TODO'},
-            icon: img_url + 'emotes/bag.2b707aec.gif'
+            icon: repo_img_url + 'emotes/bag.gif'
         },
         {
             ordering: 1,
             id: 'recipes',
             label: {en: 'Recipes', fr: 'Recettes', de: 'TODO', es: 'TODO'},
-            icon: img_url + 'icons/home.a9951a08.gif'
+            icon: repo_img_url + 'icons/home.gif'
+        },
+        {
+            ordering: 2,
+            id: 'skills',
+            label: {en: 'Hero Skills', fr: 'Pouvoirs', de: 'TODO', es: 'TODO'},
+            icon: repo_img_url + 'icons/home.gif'
         }
     ],
     tools: [
@@ -221,7 +228,7 @@ let tabs_list = {
             ordering: 0,
             id: 'citizens',
             label: {en: 'Citizens', fr: 'Citoyens', de: 'TODO', es: 'TODO'},
-            icon: img_url + 'icons/small_human.46a3e93f.gif'
+            icon: repo_img_url + 'icons/small_human.gif'
         }
     ]
 };
@@ -244,6 +251,7 @@ let params = [
 let items;
 let recipes;
 let citizens;
+let hero_skills;
 
 /////////////////////////////////////////
 // Fonctions utiles / Useful functions //
@@ -546,6 +554,9 @@ function dispatchContent(window_type, tab) {
             break;
         case 'recipes':
             break;
+        case 'skills':
+            displaySkills()
+            break;
         case 'citizens':
             displayCitizens();
             break;
@@ -589,7 +600,7 @@ function displayItems(filtered_items) {
             item_list.appendChild(category_container);
         }
         let item_icon = document.createElement('img');
-        item_icon.src = img_url + item.img;
+        item_icon.src = hordes_img_url + item.img;
 
         let item_title = document.createElement('span');
         item_title.innerText = item.labels[lang];
@@ -620,6 +631,7 @@ function displayCitizens() {
     let interval = setInterval(() => {
         if (citizens) {
             let header_row = document.createElement('tr');
+            header_row.classList.add('header');
 
             header_cells.forEach((header_cell) => {
                 let cell = document.createElement('th');
@@ -628,6 +640,7 @@ function displayCitizens() {
             })
 
             let table = document.createElement('table');
+            table.classList.add('mho-table');
             table.appendChild(header_row);
 
             tab_content.appendChild(table);
@@ -647,7 +660,68 @@ function displayCitizens() {
             clearInterval(interval);
         }
     }, 500)
+}
+
+/** Affiche la liste des pouvoirs */
+function displaySkills() {
+    if (hero_skills) {
+        let tab_content = document.getElementById('tab-content');
+
+        let header_cells = [
+            {id: 'icon', label: {en: '', fr: '', de: '', es: ''}, type: 'th'},
+            {id: 'label', label: {en: '', fr: 'Capacité', de: '', es: ''}, type: 'th'},
+            {id: 'daysNeeded', label: {en: '', fr: 'Jours héros nécessaires', de: '', es: ''}, type: 'td'},
+            {id: 'description', label: {en: 'Description', fr: 'Description', de: '', es: ''}, type: 'td'}
+        ];
+
+        let header_row = document.createElement('tr');
+        header_row.classList.add('header');
+        header_cells.forEach((header_cell) => {
+            let cell = document.createElement('th');
+            cell.innerText = header_cell.label[lang];
+            header_row.appendChild(cell);
+        })
+
+        let table = document.createElement('table');
+        table.classList.add('mho-table');
+        table.appendChild(header_row);
+        tab_content.appendChild(table);
+        for (let skill_key in hero_skills) {
+            let skill = hero_skills[skill_key];
+            let skill_row = document.createElement('tr');
+            table.appendChild(skill_row);
+
+            header_cells.forEach((header_cell) => {
+                let cell = document.createElement(header_cell.type);
+                let img = document.createElement('img');
+                switch(header_cell.id) {
+                    case 'icon':
+                        img.src = repo_img_url + 'heroskill/' + skill[header_cell.id] + '.gif';
+                        cell.appendChild(img);
+                       break;
+                    case 'label':
+                    case 'description':
+                        cell.setAttribute('style', 'text-align: left');
+                        cell.innerText = skill[header_cell.id][lang];
+                        break;
+                    default:
+                        cell.setAttribute('style', 'text-align: center');
+                        cell.innerText = skill[header_cell.id];
+                        break;
+                }
+                skill_row.appendChild(cell);
+            })
+        }
+    } else {
+        getHeroSkills();
+        let interval = setInterval(() => {
+            if(hero_skills) {
+                displaySkills()
+                clearInterval(interval);
+            }
+        }, 500)
     }
+}
 
 /**
 * Crée un bouton d'aide
@@ -708,12 +782,12 @@ function createUpdateExternalToolsButton() {
 
         let btn = document.createElement('button');
 
-        btn.innerHTML = '<img src ="' + img_url + 'emotes/arrowright.7870eca6.gif">' + texts.update_external_tools_needed_btn_label[lang];
+        btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/arrowright.gif">' + texts.update_external_tools_needed_btn_label[lang];
         btn.id = mh_update_external_tools_id;
 
         btn.addEventListener('click', () => {
             /** Au clic sur le bouton, on appelle la fonction de mise à jour */
-            btn.innerHTML = '<img src ="' + img_url + 'emotes/middot.d673b4c1.gif">' + texts.update_external_tools_pending_btn_label[lang];
+            btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/middot.gif">' + texts.update_external_tools_pending_btn_label[lang];
             updateExternalTools();
         })
 
@@ -817,7 +891,7 @@ function createStyles() {
     + '}';
 
     const mh_optimizer_window_style = '#' + mh_optimizer_window_id + '{'
-    + 'background: url(' + img_url + 'assets/img/background/mask.cc224a56..png);'
+    + 'background: url(' + repo_img_url + 'background/mask.png);'
     + 'height: 100%;'
     + 'opacity: 1;'
     + 'position: fixed;'
@@ -837,7 +911,7 @@ function createStyles() {
     + '}';
 
     const mh_optimizer_window_box_style = '#' + mh_optimizer_window_id + ' #' + mh_optimizer_window_id + '-box {'
-    + 'background: url(' + img_url + 'assets/img/background/bg_content2.a1aebb41..jpg) repeat-y 0 0/900px 263px,url(' + img_url + 'assets/img/background/bg_content2.a1aebb41..jpg) repeat-y 100% 0/900px 263px;'
+    + 'background: url(' + repo_img_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
     + 'border-radius: 8px;'
     + 'box-shadow: 0 0 10px #000;'
     + 'left: calc(50% - 750px);'
@@ -878,7 +952,7 @@ function createStyles() {
     + 'position: absolute;'
     + 'right: 0;'
     + 'top: 0;'
-    + 'background: url(' + img_url + 'assets/img/background/box/panel_00.3c3a07be..gif) 0 0 no-repeat,url(' + img_url + 'assets/img/background/box/panel_02.985cb8e3..gif) 100% 0 no-repeat,url(' + img_url + 'assets/img/background/box/panel_20.b16ec47b..gif) 0 100% no-repeat,url(' + img_url + 'assets/img/background/box/panel_22.7f7fb6bf..gif) 100% 100% no-repeat,url(' + img_url + 'assets/img/background/box/panel_01.a438e03f..gif) 0 0 repeat-x,url(' + img_url + 'assets/img/background/box/panel_10.20fda3cc..gif) 0 0 repeat-y,url(' + img_url + 'assets/img/background/box/panel_12.1babce5e..gif) 100% 0 repeat-y,url(' + img_url + 'assets/img/background/box/panel_21.347bf032..gif) 0 100% repeat-x,#7e4d2a;'
+    + 'background: url(' + repo_img_url + 'background/box/panel_00.gif) 0 0 no-repeat,url(' + repo_img_url + 'background/box/panel_02.gif) 100% 0 no-repeat,url(' + repo_img_url + 'background/box/panel_20.gif) 0 100% no-repeat,url(' + repo_img_url + 'background/box/panel_22.gif) 100% 100% no-repeat,url(' + repo_img_url + 'background/box/panel_01.gif) 0 0 repeat-x,url(' + repo_img_url + 'background/box/panel_10.gif) 0 0 repeat-y,url(' + repo_img_url + 'background/box/panel_12.gif) 100% 0 repeat-y,url(' + repo_img_url + 'background/box/panel_21.gif) 0 100% repeat-x,#7e4d2a;'
     + 'border-radius: 12px;'
     + 'left: 18px;'
     + 'padding: 8px;'
@@ -898,7 +972,7 @@ function createStyles() {
     + 'display: flex;'
     + 'flex-wrap: wrap;'
     + 'padding: 0;'
-    + 'background: url(' + img_url + 'assets/img/background/tabs-header-plain.5535ca39..gif) 0 100% round;'
+    + 'background: url(' + repo_img_url + 'background/tabs-header-plain.gif) 0 100% round;'
     + 'background-size: cover;'
     + 'height: 24px;'
     + 'margin-top: 2px;'
@@ -919,7 +993,7 @@ function createStyles() {
     + '}'
 
     const tabs_ul_li_div_style = '#tabs ul li div {'
-    + 'background-image: url(' + img_url + 'assets/img/background/tab.1d5bcab7..gif);'
+    + 'background-image: url(' + repo_img_url + 'background/tab.gif);'
     + 'background-position: 0 0;'
     + 'background-repeat: no-repeat;'
     + 'border-left: 1px solid #694023;'
@@ -991,12 +1065,42 @@ function createStyles() {
     + 'list-style: none;'
     + '}';
 
+    const mho_table_style = '.mho-table {'
+    + 'border-collapse: collapse;'
+    + 'border-bottom: 1px solid #ddab76;'
+    + '}';
+
+    const mho_table_header_style = '.mho-table tr.header {'
+    + 'font-size: 10pt;'
+    + 'background: linear-gradient(0deg,#643b25 0,rgba(100,59,37,0) 50%,rgba(100,59,37,0)) !important;'
+    + 'border-bottom: 2px solid #f0d79e;'
+    + 'color: #fff;'
+    + 'font-family: Trebuchet MS,Arial,Verdana,sans-serif;'
+    + 'font-weight: 700;'
+    + '}';
+
+    const mho_table_row_style = '.mho-table tr:not(.header) {'
+    + 'background-color: #5c2b20;'
+    + 'border-bottom: 1px solid #7e4d2a;'
+    + '}';
+
+    const mho_table_cells_style = '.mho-table tr th, .mho-table tr td {'
+    + 'padding: 0.25em;'
+    + '}';
+
+    const mho_table_cells_td_style = '.mho-table tr td {'
+    + 'border-left: 1px solid #7e4d2a;'
+    + 'color: #f0d79e;'
+    + 'font-size: 9pt;'
+    + '}'
+
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
     + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
     + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
     + tabs_style + tabs_ul_style + tabs_ul_li_style + tabs_ul_li_spacing_style + tabs_ul_li_div_style + tabs_ul_li_div_hover_style + tabs_ul_li_selected_style
     + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_img_style + item_category
-    + parameters_ul_style + parameters_ul_li_style;
+    + parameters_ul_style + parameters_ul_li_style
+    + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style;
 
     let style = document.createElement('style');
 
@@ -1077,12 +1181,33 @@ function updateExternalTools() {
                 let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
                 let nb_tools_success = Object.keys(response.response).map((key) => response.response[key]).filter((tool_response) => tool_response.toLowerCase() === 'ok').length;
                 btn.innerHTML = nb_tools_to_update === nb_tools_success
-                    ? '<img src ="' + img_url + 'professions/hero.0cdc29a3.gif">' + texts.update_external_tools_success_btn_label[lang]
-                : '<img src ="' + img_url + 'emotes/warning.8e2e7b6f.gif">' + texts.update_external_tools_errors_btn_label[lang];
+                    ? '<img src ="' + repo_img_url + 'professions/hero.gif">' + texts.update_external_tools_success_btn_label[lang]
+                : '<img src ="' + repo_img_url + 'emotes/warning.gif">' + texts.update_external_tools_errors_btn_label[lang];
             } else {
                 console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
-                btn.innerHTML = '<img src ="' + img_url + 'professions/death.34e3288c.gif">' + texts.update_external_tools_fail_btn_label[lang];
+                btn.innerHTML = '<img src ="' + repo_img_url + 'professions/death.gif">' + texts.update_external_tools_fail_btn_label[lang];
             }
+        }
+    });
+}
+
+/** Récupère la liste complète des pouvoirs héros */
+function getHeroSkills() {
+    startLoading();
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: api_url + 'myhordesfetcher/heroSkills',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        responseType: 'json',
+        onload: function(response){
+            if (response.status === 200) {
+                hero_skills = response.response.sort((a, b) => a.daysNeeded > b.daysNeeded);
+            } else {
+                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+            }
+            endLoading();
         }
     });
 }

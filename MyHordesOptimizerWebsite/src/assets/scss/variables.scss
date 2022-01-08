@@ -8,3 +8,4 @@ $primary: mat.get-color-from-palette(map.get($color-config, 'primary'));
 $accent: mat.get-color-from-palette(map.get($color-config, 'accent'));
 $warn: mat.get-color-from-palette(map.get($color-config, 'warn'));
 $is-dark-theme: map.get($color-config, 'is-dark');
+$sidenav_bg_color: mat.get-color-from-palette(map.get($color-config, 'primary'), 'lighter');

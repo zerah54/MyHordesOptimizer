@@ -5,7 +5,6 @@ using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordes.Import;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
-using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Controllers
 {
@@ -15,7 +14,7 @@ namespace MyHordesOptimizerApi.Controllers
     public class MyHordesDataImportController : AbstractMyHordesOptimizerControllerBase
     {
         protected IMyHordesImportService MyHordesImportService { get; private set; }
-        public MyHordesDataImportController(ILogger<AbstractMyHordesOptimizerControllerBase> logger, 
+        public MyHordesDataImportController(ILogger<AbstractMyHordesOptimizerControllerBase> logger,
             IUserKeyProvider userKeyProvider,
             IMyHordesImportService myHordesImportService) : base(logger, userKeyProvider)
         {
@@ -24,7 +23,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("HeroSkill")]
-        public async Task<ActionResult> ImportHeroSkill(ImportHeroSkillRequestDto request)
+        public ActionResult ImportHeroSkill(ImportHeroSkillRequestDto request)
         {
             if (string.IsNullOrEmpty(request.HeroSkill))
             {
