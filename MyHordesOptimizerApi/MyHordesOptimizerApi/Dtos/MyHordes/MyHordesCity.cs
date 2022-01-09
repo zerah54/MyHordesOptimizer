@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordes
 {
@@ -27,5 +28,14 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
 
         [JsonProperty("devast")]
         public bool Devast { get; set; }
+
+        [JsonProperty("bank")]
+        public List<MyHordesBank> Bank { get; set; }
+
+        [JsonProperty("chantiers")]
+        public List<MyHordesChantier> Chantiers { get; set; }
+
+        [JsonProperty("buildings")]
+        public List<MyHordesBuilding> Buildings { get; set; }
     }
 }
