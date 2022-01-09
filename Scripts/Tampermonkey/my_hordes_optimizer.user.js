@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.4
+// @version      1.0.0-alpha.5
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -51,7 +51,6 @@ const hordes_img_url = '/build/images/';
 const repo_img_url = 'https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/hordes_img/';
 
 const mh_optimizer_icon = repo_img_url + 'icons/small_archive.gif';
-const close_icon = repo_img_url + 'icons/b_close.png';
 
 const mho_title = 'MH Optimizer';
 const mh_optimizer_window_id = 'optimizer-window';
@@ -218,6 +217,11 @@ const categories_mapping = {
     }
 }
 
+const action_types = [
+    {id: 'Manual', label: {en: 'Citizen actions', fr: 'Actions du citoyen', de: '', es: ''}, ordering: 1},
+    {id: 'Workshop', label: {en: 'Workshop', fr: 'Atelier', de: '', es: ''}, ordering: 0},
+];
+
 //////////////////////////////////
 // La liste des onglets du wiki //
 //////////////////////////////////
@@ -234,13 +238,13 @@ let tabs_list = {
             ordering: 1,
             id: 'recipes',
             label: {en: 'Recipes', fr: 'Recettes', de: 'TODO', es: 'TODO'},
-            icon: repo_img_url + 'icons/home.gif'
+            icon: repo_img_url + 'building/small_refine.gif'
         },
         {
             ordering: 2,
             id: 'skills',
             label: {en: 'Hero Skills', fr: 'Pouvoirs', de: 'TODO', es: 'TODO'},
-            icon: repo_img_url + 'icons/home.gif'
+            icon: repo_img_url + '/professions/hero.gif'
         }
     ],
     tools: [
@@ -506,7 +510,7 @@ function createWindow() {
 
     let window_overlay_img = document.createElement('img');
     window_overlay_img.alt = '(X)';
-    window_overlay_img.src = close_icon;
+    window_overlay_img.src = repo_img_url + 'icons/b_close.png';
     let window_overlay_li = document.createElement('li');
     window_overlay_li.appendChild(window_overlay_img);
     let window_overlay_ul = document.createElement('ul');
@@ -606,13 +610,13 @@ function createTabContent(window_type) {
     let window_content = document.getElementById(mh_optimizer_window_id + '-content');
 
     let tab_content = document.getElementById('tab-content');
-    if(!tab_content) {
-
-        tab_content = document.createElement('div');
-        tab_content.id = 'tab-content';
-
-        window_content.appendChild(tab_content);
+    if (tab_content) {
+        tab_content.remove();
     }
+    tab_content = document.createElement('div');
+    tab_content.id = 'tab-content';
+
+    window_content.appendChild(tab_content);
 }
 
 /**
@@ -633,6 +637,7 @@ function dispatchContent(window_type, tab) {
             displayItems(items);
             break;
         case 'recipes':
+            displayRecipes();
             break;
         case 'skills':
             displaySkills();
@@ -662,7 +667,7 @@ function displayBank() {
             clearInterval(interval);
         }
     }, 500)
-}
+    }
 
 /**
 * Affiche la liste des objets
@@ -670,7 +675,6 @@ function displayBank() {
 */
 function displayItems(filtered_items) {
     let tab_content = document.getElementById('tab-content');
-    tab_content.innerHTML = '';
 
     let item_list = document.createElement('ul');
     item_list.id = 'item-list';
@@ -686,7 +690,7 @@ function displayItems(filtered_items) {
             category_text.innerText = item.category.label[lang];
 
             let category_container = document.createElement('div');
-            category_container.classList.add('item-category');
+            category_container.classList.add('category');
             category_container.classList.add('header');
             category_container.appendChild(category_img);
             category_container.appendChild(category_text);
@@ -703,6 +707,7 @@ function displayItems(filtered_items) {
             item_title_container.appendChild(item_count);
         }
         let item_icon = document.createElement('img');
+        item_icon.setAttribute('style', 'margin-right: 0.5em');
         item_icon.src = hordes_img_url + item.img;
         item_title_container.appendChild(item_icon);
 
@@ -832,7 +837,7 @@ function displaySkills() {
                     case 'icon':
                         img.src = repo_img_url + 'heroskill/' + skill[header_cell.id] + '.gif';
                         cell.appendChild(img);
-                       break;
+                        break;
                     case 'label':
                     case 'description':
                         cell.setAttribute('style', 'text-align: left');
@@ -851,6 +856,100 @@ function displaySkills() {
         let interval = setInterval(() => {
             if(hero_skills) {
                 displaySkills()
+                clearInterval(interval);
+            }
+        }, 500)
+    }
+}
+
+/** Affiche la liste des recettes */
+function displayRecipes() {
+    if (recipes) {
+        let tab_content = document.getElementById('tab-content');
+
+        let recipes_list = document.createElement('ul');
+        recipes_list.id = 'recipes-list';
+
+        tab_content.appendChild(recipes_list);
+
+        recipes.forEach((recipe, index) => {
+            if (index === 0 || recipes[index - 1].type.id !== recipe.type.id) {
+                let category_text = document.createElement('span');
+                category_text.innerText = recipe.type.label[lang];
+
+                let category_container = document.createElement('div');
+                category_container.classList.add('category');
+                category_container.classList.add('header');
+                category_container.appendChild(category_text);
+
+                recipes_list.appendChild(category_container);
+            }
+
+            let recipe_container = document.createElement('li');
+            recipe_container.classList.add('recipe');
+
+            let compos_container = document.createElement('ul');
+            compos_container.setAttribute('style', 'padding: 0; min-width: 200px; width: 25%;');
+            recipe.components.forEach((compo) => {
+                let compo_container = document.createElement('li');
+
+                let component_img = document.createElement('img');
+                component_img.setAttribute('style', 'margin-right: 0.5em');
+                component_img.src = hordes_img_url + compo.img;
+                compo_container.appendChild(component_img);
+
+                let component_label = document.createElement('span');
+                component_label.innerText = compo.label[lang];
+                compo_container.appendChild(component_label);
+
+                compos_container.appendChild(compo_container);
+            })
+            recipe_container.appendChild(compos_container);
+
+            let transform_img_container = document.createElement('div');
+            recipe_container.appendChild(transform_img_container);
+
+
+            let transform_img = document.createElement('img');
+            transform_img.alt = '=>';
+            transform_img.src = repo_img_url + 'icons/small_move.gif';
+            transform_img.setAttribute('style', 'margin-left: 0.5em; margin-right: 0.5em');
+            transform_img_container.appendChild(transform_img);
+
+            let results_container = document.createElement('ul');
+            results_container.setAttribute('style', 'padding: 0');
+            recipe.result.forEach((result) => {
+                let result_container = document.createElement('li');
+
+                let result_img = document.createElement('img');
+                result_img.setAttribute('style', 'margin-right: 0.5em');
+                result_img.src = hordes_img_url + result.item.img;
+                result_container.appendChild(result_img);
+
+                let result_label = document.createElement('span');
+                result_label.innerText = result.item.label[lang];
+                result_container.appendChild(result_label);
+
+                if (result.probability !== 1) {
+                    let result_proba = document.createElement('span');
+                    result_proba.setAttribute('style', 'font-style: italic; color: #ddab76;');
+                    result_proba.innerText = ' (' + Math.round(result.probability * 100) + '%)';
+                    result_container.appendChild(result_proba);
+                }
+
+                results_container.appendChild(result_container);
+            })
+            recipe_container.appendChild(results_container);
+            recipes_list.appendChild(recipe_container);
+        });
+
+
+
+    } else {
+        getRecipes();
+        let interval = setInterval(() => {
+            if(recipes) {
+                displayRecipes()
                 clearInterval(interval);
             }
         }, 500)
@@ -1139,7 +1238,6 @@ function createStyles() {
     const mh_optimizer_window_overlay_ul_li_style = '#' + mh_optimizer_window_id + ' #' + mh_optimizer_window_id + '-box #' + mh_optimizer_window_id + '-overlay ul li {'
     + 'cursor: pointer;'
     + 'display: inline-block;'
-    + 'list-style: none;'
     + '}'
 
     const mh_optimizer_window_content = '#' + mh_optimizer_window_id + '-content {'
@@ -1181,19 +1279,18 @@ function createStyles() {
     + 'padding-left: 0.5em;'
     + '}';
 
-    const tabs_ul_li_style = '#tabs ul li {'
+    const tabs_ul_li_style = '#tabs > ul > li {'
     + 'cursor: pointer;'
     + 'display: inline-block;'
-    + 'list-style: none;'
     + 'margin-top: auto;'
     + 'margin-bottom: auto;'
     + '}';
 
-    const tabs_ul_li_spacing_style = '#tabs ul li div img {'
+    const tabs_ul_li_spacing_style = '#tabs > ul > li > div > img {'
     + 'margin-right: 0.5em;'
     + '}';
 
-    const tabs_ul_li_div_style = '#tabs ul li div {'
+    const tabs_ul_li_div_style = '#tabs > ul > li > div {'
     + 'background-image: url(' + repo_img_url + 'background/tab.gif);'
     + 'background-position: 0 0;'
     + 'background-repeat: no-repeat;'
@@ -1214,12 +1311,12 @@ function createStyles() {
     + 'white-space: nowrap;'
     + '}';
 
-    const tabs_ul_li_div_hover_style = '#tabs ul li div:hover {'
+    const tabs_ul_li_div_hover_style = '#tabs > ul > li > div:hover {'
     + 'outline: 1px solid #f0d79e;'
     + 'text-decoration: underline;'
     + '}';
 
-    const tabs_ul_li_selected_style = '#tabs ul li.selected {'
+    const tabs_ul_li_selected_style = '#tabs > ul > li.selected {'
     + 'position: relative;'
     + 'top: 2px;'
     + '}';
@@ -1233,37 +1330,31 @@ function createStyles() {
     + 'overflow: auto;'
     + '}';
 
-    const tab_content_item_list_style = '#tab-content ul {'
+    const tab_content_item_list_style = '#tab-content > ul {'
     + 'display: flex;'
     + 'flex-wrap: wrap;'
     + 'padding: 0;'
     + 'margin: 0 0.5em;'
     + '}';
 
-    const tab_content_item_list_item_style = '#tab-content ul li {'
+    const tab_content_item_list_item_style = '#tab-content > ul > li {'
     + 'min-width: 300px;'
-    + 'list-style: none;'
     + 'flex-basis: min-content;'
     + 'cursor: pointer;'
     + '}';
 
-    const tab_content_item_list_item_selected_style = '#tab-content ul li.selected {'
+    const tab_content_item_list_item_selected_style = '#tab-content > ul > li.selected {'
     + 'flex-basis: 100%;'
     + 'border: 1px solid;'
     + 'padding: 0.25em;'
     + 'background-color: #5c2b20;'
     + '}';
 
-    const tab_content_item_list_item_not_selected_properties_style = '#tab-content ul li:not(.selected) .properties {'
+    const tab_content_item_list_item_not_selected_properties_style = '#tab-content > ul > li:not(.selected) .properties {'
     + 'display: none;'
     + '}';
 
-
-    const tab_content_item_list_img_style = '#tab-content ul li div img {'
-    + 'margin-right: 0.5em;'
-    + '}';
-
-    const item_category = '#tab-content ul div.item-category {'
+    const item_category = '#tab-content > ul div.category {'
     + 'width: 100%;'
     + 'border-bottom: 1px solid;'
     + 'margin: 0.5em 0;'
@@ -1273,13 +1364,13 @@ function createStyles() {
     + 'margin-top: 0.5em;'
     + '}';
 
-    const parameters_informations_ul_style = '#parameters ul, #informations ul {'
+    const parameters_informations_ul_style = '#parameters > ul, #informations > ul {'
     + 'padding: 0;'
     + 'margin: 0;'
     + 'color: #f0d79e;'
     + '}';
 
-    const parameters_informations_ul_li_style = '#parameters ul li, #informations ul li {'
+    const li_style = 'ul > li {'
     + 'list-style: none;'
     + '}';
 
@@ -1312,12 +1403,18 @@ function createStyles() {
     + 'font-size: 9pt;'
     + '}';
 
+    const recipe_style = '#tab-content .recipe {'
+    + 'min-width: 100%;'
+    + 'display: flex;'
+    + 'border-bottom: 1px dotted;'
+    + '}';
+
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
     + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
     + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
     + tabs_style + tabs_ul_style + tabs_ul_li_style + tabs_ul_li_spacing_style + tabs_ul_li_div_style + tabs_ul_li_div_hover_style + tabs_ul_li_selected_style
-    + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + tab_content_item_list_img_style + item_category
-    + parameters_informations_style + parameters_informations_ul_style + parameters_informations_ul_li_style
+    + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
+    + parameters_informations_style + parameters_informations_ul_style + li_style + recipe_style
     + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style;
 
     let style = document.createElement('style');
@@ -1502,6 +1599,31 @@ function getHeroSkills(hide_loader_on_finish) {
             if(hide_loader_on_finish) {
                 endLoading();
             }
+        }
+    });
+}
+
+/** Récupère la liste complète des recettes */
+function getRecipes() {
+    startLoading();
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: api_url + 'myhordesfetcher/recipes',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        responseType: 'json',
+        onload: function(response){
+            if (response.status === 200) {
+                recipes = response.response.map((recipe) => {
+                    recipe.type = action_types.find((type) => type.id === recipe.type);
+                    return recipe;
+                })
+                    .sort((a, b) => a.type.ordering > b.type.ordering);
+            } else {
+                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+            }
+            endLoading();
         }
     });
 }
