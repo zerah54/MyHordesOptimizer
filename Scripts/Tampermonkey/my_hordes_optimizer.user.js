@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.2
-// @namespace    https://github.com/zerah54/MyHordesOptimizer
+// @version      1.0.0-alpha.3
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
-// @downloadURL  https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.js
-// @updateURL    https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.js
+// @downloadURL  https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
+// @updateURL    https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
+// @homepageURL  https://myhordes-optimizer.web.app/script
+// @supportURL   lenoune38@gmail.com
 //
 // @match        https://zombvival.de/myhordes/*
 // @match        https://myhordes.de/*
@@ -29,11 +30,11 @@ const gm_gh_updated_key = 'gh_updated';
 const gm_fata_updated_key = 'fata_updated';
 const gm_mh_external_app_id_key = 'mh_external_app_id';
 const gm_parameters_key = 'mh_optimizer_parameters';
-const mh_user_id_key = 'mh_user_id';
+const mh_user_key = 'mh_user';
 
 let mho_parameters = GM_getValue(gm_parameters_key);
 let external_app_id = GM_getValue(gm_mh_external_app_id_key);
-let mh_user_id = GM_getValue(mh_user_id_key);
+let mh_user = GM_getValue(mh_user_key);
 
 
 ////////////////////
@@ -52,11 +53,12 @@ const repo_img_url = 'https://github.com/zerah54/MyHordesOptimizer/raw/main/asse
 const mh_optimizer_icon = repo_img_url + 'icons/small_archive.gif';
 const close_icon = repo_img_url + 'icons/b_close.png';
 
-const mho_title = "MH Optimizer";
+const mho_title = 'MH Optimizer';
 const mh_optimizer_window_id = 'optimizer-window';
 const btn_id = 'optimizer-btn';
 const mh_header_id = 'header-reload-area';
 const mh_update_external_tools_id = 'mh-update-external-tools';
+const wiki_btn_id = 'wiki-btn-id';
 
 const texts = {
     save_external_app_id: {
@@ -82,6 +84,18 @@ const texts = {
         fr: `Outils`,
         de: `Werkzeugen`,
         es: `Herramientas`
+    },
+    parameters_section_label: {
+        en: `Parameters`,
+        fr: `Paramètres`,
+        de: `TODO`,
+        es: `TODO`
+    },
+    informations_section_label: {
+        en: `Informations`,
+        fr: `Informations`,
+        de: `TODO`,
+        es: `TODO`
     },
     update_external_tools_needed_btn_label: {
         en: `Update external tools`,
@@ -112,87 +126,93 @@ const texts = {
         fr: `Impossible de mettre à jour.`,
         de: `TODO`,
         es: `TODO`
+    },
+    prevent_from_leaving_information: {
+        en: `TODO`,
+        fr: `Vous avez demandé à être prévenu avant de quitter la page si vous n'êtes pas en attente d'escorte.`,
+        de: `TODO`,
+        es: `TODO`
     }
 };
 
 const categories_mapping = {
     armor : {
-        img : "",
+        img : '',
         label : {
-            de : "Verteidigung",
-            en : "Defences",
-            es : "Defensas",
-            fr : "Défenses"
+            de : 'Verteidigung',
+            en : 'Defences',
+            es : 'Defensas',
+            fr : 'Défenses'
         },
         ordering : 4
     },
     box : {
-        img : "",
+        img : '',
         label : {
-            de : "Taschen und Behälter",
-            en : "Containers and boxes",
-            es : "Contenedores y cajas",
-            fr : "Conteneurs et boîtes"
+            de : 'Taschen und Behälter',
+            en : 'Containers and boxes',
+            es : 'Contenedores y cajas',
+            fr : 'Conteneurs et boîtes'
         },
         ordering : 3
     },
     drug : {
-        img : "",
+        img : '',
         label : {
-            de : "Apotheke und Labor",
-            en : "Pharmacy",
-            es : "Farmacia",
-            fr : "Pharmacie"
+            de : 'Apotheke und Labor',
+            en : 'Pharmacy',
+            es : 'Farmacia',
+            fr : 'Pharmacie'
         },
         ordering : 5
     },
     food : {
-        img : "",
+        img : '',
         label : {
-            de : "Grundnahrungsmittel",
-            en : "Food",
-            es : "Provisiones",
-            fr : "Provisions"
+            de : 'Grundnahrungsmittel',
+            en : 'Food',
+            es : 'Provisiones',
+            fr : 'Provisions'
         },
         ordering : 6
     },
     furniture : {
-        img : "",
+        img : '',
         label : {
-            de : "Einrichtungen",
-            en : "Facilities",
-            es : "Objetos caseros",
-            fr : "Aménagements"
+            de : 'Einrichtungen',
+            en : 'Facilities',
+            es : 'Objetos caseros',
+            fr : 'Aménagements'
         },
         ordering : 1
     },
     misc : {
-        img : "",
+        img : '',
         label : {
-            de : "Sonstiges",
-            en : "Miscellaneous",
-            es : "Otros",
-            fr : "Divers"
+            de : 'Sonstiges',
+            en : 'Miscellaneous',
+            es : 'Otros',
+            fr : 'Divers'
         },
         ordering : 7
     },
     rsc : {
-        img : "",
+        img : '',
         label : {
-            de : "Baustoffe",
-            en : "Resources",
-            es : "Recursos",
-            fr : "Ressources"
+            de : 'Baustoffe',
+            en : 'Resources',
+            es : 'Recursos',
+            fr : 'Ressources'
         },
         ordering : 0
     },
     weapon : {
-        img : "",
+        img : '',
         label : {
-            de : "Waffenarsenal",
-            en : "Armoury",
-            es : "Armería",
-            fr : "Armurerie"
+            de : 'Waffenarsenal',
+            en : 'Armoury',
+            es : 'Armería',
+            fr : 'Armurerie'
         },
         ordering : 2
     }
@@ -226,6 +246,12 @@ let tabs_list = {
     tools: [
         {
             ordering: 0,
+            id: 'bank',
+            label: {en: 'Bank', fr: 'Banque', de: 'TODO', es: 'TODO'},
+            icon: repo_img_url + 'icons/home.gif'
+        },
+        {
+            ordering: 1,
             id: 'citizens',
             label: {en: 'Citizens', fr: 'Citoyens', de: 'TODO', es: 'TODO'},
             icon: repo_img_url + 'icons/small_human.gif'
@@ -240,8 +266,13 @@ let params = [
     {id: 'update_bbh', label: {en: 'TODO', fr: `Mettre à jour BigBroth'Hordes`, de: 'TODO', es: 'TODO'}},
     {id: 'update_gh', label: {en: 'TODO', fr: `Mettre à jour Gest'Hordes`, de: 'TODO', es: 'TODO'}},
     {id: 'update_fata', label: {en: 'TODO', fr: `Mettre à jour Fata Morgana`, de: 'TODO', es: 'TODO'}},
-    //{id: 'enhanced_tooltips', label: {en: 'TODO', fr: `Afficher des tooltips détaillés`, de: 'TODO', es: 'TODO'}},
+    {id: 'enhanced_tooltips', label: {en: 'TODO', fr: `Afficher des tooltips détaillés`, de: 'TODO', es: 'TODO'}},
     {id: 'click_on_voted', label: {en: 'TODO', fr: `Navigation rapide vers le chantier recommandé`, de: 'TODO', es: 'TODO'}},
+    {id: 'prevent_from_leaving', label: {en: 'TODO', fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`, de: 'TODO', es: 'TODO'}}
+];
+
+let informations = [
+    {id: 'website', label: {en: `Website`, fr: `Site web`, de: 'TODO', es: 'TODO'}, src: 'https://myhordes-optimizer.web.app/'},
 ];
 
 //////////////////////////////////////
@@ -252,6 +283,7 @@ let items;
 let recipes;
 let citizens;
 let hero_skills;
+let bank;
 
 /////////////////////////////////////////
 // Fonctions utiles / Useful functions //
@@ -259,12 +291,34 @@ let hero_skills;
 
 /** @return {string}     website language */
 function getWebsiteLanguage() {
-    return document.getElementsByTagName("html")[0].attributes.lang.value;
+    return document.getElementsByTagName('html')[0].attributes.lang.value;
 }
 
 /** @return {boolean}     true if button exists */
 function buttonOptimizerExists() {
     return document.getElementById(btn_id);
+}
+
+/** @return {boolean}    true si la page de l'utilisateur est la page de la ville */
+function pageIsTown() {
+    return document.URL.indexOf('town')
+}
+
+/** @return {boolean}    true si la page de l'utilisateur est la page du désert */
+function pageIsDesert() {
+    return document.URL.indexOf('desert')
+}
+
+/** Affiche la page de chargement de MyHordes */
+function startLoading() {
+    let loadzone = document.getElementById('loadzone');
+    loadzone.setAttribute('x-stack', 1);
+}
+
+/** Masque la page de chargement de MyHordes */
+function endLoading() {
+    let loadzone = document.getElementById('loadzone');
+    loadzone.setAttribute('x-stack', 0);
 }
 
 /**
@@ -297,14 +351,14 @@ function createOptimizerBtn() {
         optimizer_btn.appendChild(title);
         optimizer_btn.id = btn_id;
         optimizer_btn.setAttribute('style', 'left: ' + left_position + 'px');
-        optimizer_btn.addEventListener("click", (event) => {
+        optimizer_btn.addEventListener('click', (event) => {
             event.stopPropagation();
         });
 
         header_zone.appendChild(optimizer_btn);
 
         createOptimizerButtonContent()
-    }, 1000);
+    }, 2000);
 
 }
 
@@ -315,9 +369,16 @@ function createOptimizerButtonContent() {
     content.innerHTML = '';
 
     if (external_app_id && external_app_id !== '') {
+        /////////////////////
+        // SECTION BOUTONS //
+        /////////////////////
         let wiki_btn = document.createElement('a');
         wiki_btn.classList.add('button');
         wiki_btn.innerHTML = 'Wiki';
+        wiki_btn.id = wiki_btn_id;
+        if (!items) {
+            wiki_btn.setAttribute('style', 'display: none');
+        }
         wiki_btn.addEventListener('click', () => {
             displayWindow('wiki');
         });
@@ -333,8 +394,11 @@ function createOptimizerButtonContent() {
 
         content.appendChild(tools_btn);
 
+        ////////////////////////
+        // SECTION PARAMETRES //
+        ////////////////////////
         let params_title = document.createElement('h1');
-        params_title.innerText = 'Paramètres';
+        params_title.innerText = texts.parameters_section_label[lang];
 
         let params_list = document.createElement('ul');
 
@@ -375,6 +439,40 @@ function createOptimizerButtonContent() {
         });
 
         content.appendChild(params_container);
+
+        //////////////////////////
+        // SECTION INFORMATIONS //
+        //////////////////////////
+
+        let informations_title = document.createElement('h1');
+        informations_title.innerText = texts.informations_section_label[lang];
+
+        let informations_list = document.createElement('ul');
+
+        let infomations_container = document.createElement('div');
+        infomations_container.id = 'informations';
+
+        infomations_container.appendChild(informations_title);
+        infomations_container.appendChild(informations_list);
+
+        informations.forEach((information) => {
+            let information_link = document.createElement('a');
+            information_link.id = information.id;
+            information_link.innerText = information.label[lang];
+            information_link.href = information.src;
+
+            information_link.addEventListener('click', (event) => {
+
+            });
+
+            let information_container = document.createElement('li');
+            information_container.appendChild(information_link);
+
+            informations_list.appendChild(information_container);
+        });
+
+        content.appendChild(infomations_container);
+
     } else {
         let help_button = createHelpButton();
         content.appendChild(help_button);
@@ -388,6 +486,9 @@ function createOptimizerButtonContent() {
         keysend.addEventListener('click', () => {
             GM_setValue(gm_mh_external_app_id_key, keytext.value);
             external_app_id = GM_getValue(gm_mh_external_app_id_key);
+            if (!items) {
+                getItems();
+            }
             content.innerHTML = '';
             createOptimizerButtonContent();
         });
@@ -529,36 +630,19 @@ function dispatchContent(window_type, tab) {
     }
     switch(tab.id) {
         case 'items':
-            if (!items) {
-                GM_xmlhttpRequest({
-                    method: 'GET',
-                    url: api_url + 'myhordesfetcher/items?userKey=' + external_app_id,
-                    responseType: 'json',
-                    onload: function(response){
-                        if (response.status === 200) {
-                            items = response.response
-                                .map((item) => {
-                                item.category = getCategory(item.category)
-                                return item;
-                            })
-                                .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);
-                            displayItems(items);
-                        } else {
-                            console.error(`Une erreur s'est produite (Erreur ` + response.status + `). Vérifiez que votre identifiant d'app externe est bien renseigné dans les paramètres de MH Optimizer`);
-                        }
-                    }
-                });
-            } else {
-                displayItems(items);
-            }
+            displayItems(items);
             break;
         case 'recipes':
             break;
         case 'skills':
-            displaySkills()
+            displaySkills();
             break;
         case 'citizens':
             displayCitizens();
+            break;
+        case 'bank':
+            getBank();
+            displayBank();
             break;
         default:
             break;
@@ -566,8 +650,19 @@ function dispatchContent(window_type, tab) {
 }
 
 /** Filtre la liste des objets */
-function filterItems() {
-    return items;
+function filterItems(source_items) {
+    return source_items;
+}
+
+function displayBank() {
+    bank = undefined;
+    getBank();
+    let interval = setInterval(() => {
+        if (bank) {
+            displayItems(bank);
+            clearInterval(interval);
+        }
+    }, 500)
 }
 
 /**
@@ -575,7 +670,6 @@ function filterItems() {
 * @param filtered_items
 */
 function displayItems(filtered_items) {
-    console.log('items', items);
     let tab_content = document.getElementById('tab-content');
     tab_content.innerHTML = '';
 
@@ -594,26 +688,51 @@ function displayItems(filtered_items) {
 
             let category_container = document.createElement('div');
             category_container.classList.add('item-category');
+            category_container.classList.add('header');
             category_container.appendChild(category_img);
             category_container.appendChild(category_text);
 
             item_list.appendChild(category_container);
         }
-        let item_icon = document.createElement('img');
-        item_icon.src = hordes_img_url + item.img;
-
-        let item_title = document.createElement('span');
-        item_title.innerText = item.labels[lang];
 
         let item_title_container = document.createElement('div');
+
+        if (item.count) {
+            let item_count = document.createElement('span');
+            item_count.innerText = '(x' + item.count + ')';
+            item_count.setAttribute('style', 'margin-right: 0.5em');
+            item_title_container.appendChild(item_count);
+        }
+        let item_icon = document.createElement('img');
+        item_icon.src = hordes_img_url + item.img;
         item_title_container.appendChild(item_icon);
+
+        let item_title = document.createElement('span');
+        item_title.innerText = item.label[lang];
         item_title_container.appendChild(item_title);
 
         let item_properties_container = document.createElement('div');
+        item_properties_container.classList.add('properties');
+
+
+        item_properties_container.innerHTML = '<p>' + item.description[lang] + '</p>';
+        if (item.properties) {
+            let item_properties = item.properties.map((property) => '<span style="padding: 0 8px">' + property + '</span>').reduce((a, b) => a + b);
+            item_properties_container.innerHTML += '<p>' + item_properties + '</p>';
+        }
+        if (item.actions) {
+            let item_actions = item.actions.map((action) => '<span style="padding: 0 8px">' + action + '</span>').reduce((a, b) => a + b);
+            item_properties_container.innerHTML += '<p>' + item_actions + '</p>';
+        }
 
         let item_container = document.createElement('li');
         item_container.appendChild(item_title_container);
         item_container.appendChild(item_properties_container);
+
+        item_container.addEventListener('click', () => {
+            let selected_items = document.getElementsByClassName('selected');
+            item_container.classList.toggle('selected');
+        });
 
         item_list.appendChild(item_container);
     });
@@ -621,21 +740,35 @@ function displayItems(filtered_items) {
 
 function displayCitizens() {
     citizens = undefined;
-    getTown();
+    getCitizens();
     let tab_content = document.getElementById('tab-content');
-
-    let header_cells = [
-        {id: 'name', label: {en: '', fr: 'Nom', de: '', es: ''}, type: 'th'},
-        {id: 'nombreJourHero', label: {en: '', fr: 'Nombre de jours héros', de: '', es: ''}, type: 'td'}
-    ];
     let interval = setInterval(() => {
-        if (citizens) {
+        if (citizens && hero_skills) {
+            console.log('heroskills', hero_skills);
+
+            let header_cells = [
+                {id: 'name', label: {en: 'Name', fr: 'Nom', de: '', es: ''}, type: 'th'},
+                {id: 'nombreJourHero', label: {en: '', fr: 'Nombre de jours héros', de: '', es: ''}, type: 'td'}
+            ];
+
+            let skills_with_uses = hero_skills
+            .filter((skill) => skill.nbUses > 0)
+            .map((skill) => {
+                return {id: skill.name, label: skill.label, type: 'td', img: skill.icon}
+            });
+            console.log('skills_with_uses', skills_with_uses);
+            header_cells.push(...skills_with_uses);
+
             let header_row = document.createElement('tr');
             header_row.classList.add('header');
 
             header_cells.forEach((header_cell) => {
                 let cell = document.createElement('th');
-                cell.innerText = header_cell.label[lang];
+                if (cell.img) {
+                    cell.innerHTML = '<img src="' + repo_img_url + header_cell.img + '.gif"></img>'
+                } else {
+                    cell.innerText = header_cell.label[lang];
+                }
                 header_row.appendChild(cell);
             })
 
@@ -713,7 +846,7 @@ function displaySkills() {
             })
         }
     } else {
-        getHeroSkills();
+        getHeroSkills(true);
         let interval = setInterval(() => {
             if(hero_skills) {
                 displaySkills()
@@ -799,7 +932,7 @@ function createUpdateExternalToolsButton() {
 
 /** Si l'option associée est activée, un clic sur le chantier recommandé permet de rediriger vers la ligne du chantier en question */
 function clickOnVotedToRedirect() {
-    if (mho_parameters.click_on_voted && document.URL.indexOf('town')) {
+    if (mho_parameters.click_on_voted && pageIsTown()) {
         let voted_building = document.getElementsByClassName('voted-building')[0];
         if (voted_building) {
             voted_building.setAttribute('style', 'cursor: pointer');
@@ -812,16 +945,83 @@ function clickOnVotedToRedirect() {
     }
 }
 
-/** Affiche la page de chargement de MyHordes */
-function startLoading() {
-    let loadzone = document.getElementById('loadzone');
-    loadzone.setAttribute('x-stack', 1);
+/** Affiche les tooltips avancés */
+function displayAdvancedTooltips() {
+    if (mho_parameters.enhanced_tooltips) {
+        let tooltip_container = document.getElementById('tooltip_container');
+        let advanced_tooltip_container = document.getElementById('mho-advanced-tooltip');
+        if (tooltip_container.innerHTML) {
+            let hovered = document.querySelectorAll(":hover");
+            let hovered_item;
+            for (let item of hovered) {
+                if (item.classList.contains('item-icon')) {
+                    let hovered_item_img = item.firstElementChild.src;
+                    let index = hovered_item_img.indexOf(hordes_img_url);
+                    hovered_item_img = hovered_item_img.slice(index).replace(hordes_img_url, '');
+                    hovered_item = items.find((item) => item.img === hovered_item_img);
+                }
+            }
+            if (!advanced_tooltip_container && hovered_item && (hovered_item.actions || hovered_item.properties)) {
+                advanced_tooltip_container = document.createElement('div');
+                advanced_tooltip_container.id = 'mho-advanced-tooltip';
+                advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
+                let tooltip_content = tooltip_container.firstElementChild;
+                tooltip_content.appendChild(advanced_tooltip_container);
+
+                advanced_tooltip_container.innerHtml = '';
+                if (hovered_item.properties) {
+                    let item_properties = hovered_item.properties.map((property) => '<span style="padding: 0 8px">' + property + '</span>').reduce((a, b) => a + b);
+                    advanced_tooltip_container.innerHTML += '<p>' + item_properties + '</p>';
+                }
+                if (hovered_item.actions) {
+                    let item_actions = hovered_item.actions.map((action) => '<span style="padding: 0 8px">' + action + '</span>').reduce((a, b) => a + b);
+                    advanced_tooltip_container.innerHTML += '<p>' + item_actions + '</p>';
+                }
+                console.log('hovered_item', hovered_item);
+            }
+        } else if (advanced_tooltip_container) {
+            advanced_tooltip_container.remove();
+        }
+    }
 }
 
-/** Masque la page de chargement de MyHordes */
-function endLoading() {
-    let loadzone = document.getElementById('loadzone');
-    loadzone.setAttribute('x-stack', 0);
+/** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
+function preventFromLeaving() {
+    if (mho_parameters.prevent_from_leaving && pageIsDesert()) {
+        let prevent_function = (event) => {
+            let e = event || window.event;
+
+            let buttons = document.getElementsByTagName('button');
+            let ae_button;
+            for (let button of buttons) {
+                if (button.getAttribute('x-toggle-escort') === '1') {
+                    console.log('button.getAttribute("x-toggle-escort")', button.getAttribute('x-toggle-escort'));
+                    ae_button = button;
+
+                    let mho_leaving_info = document.getElementById('mho-leaving-info');
+                    if (!mho_leaving_info) {
+                        mho_leaving_info = document.createElement('div');
+                        mho_leaving_info.id = 'mho-leaving-info';
+                        mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
+                        mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[lang];
+                        button.parentNode.insertBefore(mho_leaving_info, button.nextSibling);
+                    }
+
+                }
+            }
+            console.log('buttons', ae_button);
+            if (ae_button) {
+                if (e) {
+                    e.returnValue = '';
+                    e.preventDefault();
+                }
+
+                return '';
+            }
+        }
+
+        window.addEventListener('beforeunload', prevent_function, false);
+    }
 }
 
 ///////////
@@ -978,7 +1178,7 @@ function createStyles() {
     + 'margin-top: 2px;'
     + 'margin-right: 20px;'
     + 'padding-left: 0.5em;'
-    + '}'
+    + '}';
 
     const tabs_ul_li_style = '#tabs ul li {'
     + 'cursor: pointer;'
@@ -986,11 +1186,11 @@ function createStyles() {
     + 'list-style: none;'
     + 'margin-top: auto;'
     + 'margin-bottom: auto;'
-    + '}'
+    + '}';
 
     const tabs_ul_li_spacing_style = '#tabs ul li div img {'
     + 'margin-right: 0.5em;'
-    + '}'
+    + '}';
 
     const tabs_ul_li_div_style = '#tabs ul li div {'
     + 'background-image: url(' + repo_img_url + 'background/tab.gif);'
@@ -1043,7 +1243,20 @@ function createStyles() {
     + 'min-width: 300px;'
     + 'list-style: none;'
     + 'flex-basis: min-content;'
+    + 'cursor: pointer;'
     + '}';
+
+    const tab_content_item_list_item_selected_style = '#tab-content ul li.selected {'
+    + 'flex-basis: 100%;'
+    + 'border: 1px solid;'
+    + 'padding: 0.25em;'
+    + 'background-color: #5c2b20;'
+    + '}';
+
+    const tab_content_item_list_item_not_selected_properties_style = '#tab-content ul li:not(.selected) .properties {'
+    + 'display: none;'
+    + '}';
+
 
     const tab_content_item_list_img_style = '#tab-content ul li div img {'
     + 'margin-right: 0.5em;'
@@ -1055,13 +1268,17 @@ function createStyles() {
     + 'margin: 0.5em 0;'
     + '}';
 
-    const parameters_ul_style = '#parameters ul {'
+    const parameters_informations_style = '#parameters, #informations {'
+    + 'margin-top: 0.5em;'
+    + '}';
+
+    const parameters_informations_ul_style = '#parameters ul, #informations ul {'
     + 'padding: 0;'
     + 'margin: 0;'
     + 'color: #f0d79e;'
     + '}';
 
-    const parameters_ul_li_style = '#parameters ul li {'
+    const parameters_informations_ul_li_style = '#parameters ul li, #informations ul li {'
     + 'list-style: none;'
     + '}';
 
@@ -1070,7 +1287,7 @@ function createStyles() {
     + 'border-bottom: 1px solid #ddab76;'
     + '}';
 
-    const mho_table_header_style = '.mho-table tr.header {'
+    const mho_table_header_style = '.header {'
     + 'font-size: 10pt;'
     + 'background: linear-gradient(0deg,#643b25 0,rgba(100,59,37,0) 50%,rgba(100,59,37,0)) !important;'
     + 'border-bottom: 2px solid #f0d79e;'
@@ -1092,14 +1309,14 @@ function createStyles() {
     + 'border-left: 1px solid #7e4d2a;'
     + 'color: #f0d79e;'
     + 'font-size: 9pt;'
-    + '}'
+    + '}';
 
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
     + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
     + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
     + tabs_style + tabs_ul_style + tabs_ul_li_style + tabs_ul_li_spacing_style + tabs_ul_li_div_style + tabs_ul_li_div_hover_style + tabs_ul_li_selected_style
-    + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_img_style + item_category
-    + parameters_ul_style + parameters_ul_li_style
+    + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + tab_content_item_list_img_style + item_category
+    + parameters_informations_style + parameters_informations_ul_style + parameters_informations_ul_li_style
     + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style;
 
     let style = document.createElement('style');
@@ -1118,6 +1335,28 @@ function createStyles() {
 ////////////////
 
 function getItems() {
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: api_url + 'myhordesfetcher/items?userKey=' + external_app_id,
+        responseType: 'json',
+        onload: function(response){
+            if (response.status === 200) {
+                items = response.response
+                    .map((item) => {
+                    item.category = getCategory(item.category)
+                    return item;
+                })
+                    .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);
+                console.log('items', items);
+                let wiki_btn = document.getElementById(wiki_btn_id);
+                if (wiki_btn) {
+                    wiki_btn.setAttribute('style', 'display: inherit');
+                }
+            } else {
+                console.error(`Une erreur s'est produite (Erreur ` + response.status + `). Vérifiez que votre identifiant d'app externe est bien renseigné dans les paramètres de MH Optimizer`);
+            }
+        }
+    });
 }
 
 /** Récupère les informations de la ville */
@@ -1129,8 +1368,8 @@ function getMe() {
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
-                mh_user_id = response.response.id;
-                GM_setValue(mh_user_id_key, mh_user_id);
+                mh_user = response.response;
+                GM_setValue(mh_user_key, mh_user);
             } else {
                 console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
             }
@@ -1142,13 +1381,63 @@ function getMe() {
 /** Récupère les informations de la ville */
 function getTown() {
     startLoading();
+    if(!hero_skills) {
+        getHeroSkills(false);
+    }
     GM_xmlhttpRequest({
         method: 'GET',
         url: api_url + 'myhordesfetcher/town?userKey=' + external_app_id,
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
-                citizens = response.response.citizens;
+                console.log('town', response.response);
+            } else {
+                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+            }
+            endLoading();
+        }
+    });
+}
+
+
+/** Récupère les informations de la ville */
+function getCitizens() {
+    startLoading();
+    if(!hero_skills) {
+        getHeroSkills(false);
+    }
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: api_url + 'myhordesfetcher/citizens?userKey=' + external_app_id,
+        responseType: 'json',
+        onload: function(response){
+            if (response.status === 200) {
+                citizens = response.response;
+            } else {
+                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+            }
+            endLoading();
+        }
+    });
+}
+
+/** Récupère les informations de la banque */
+function getBank() {
+    startLoading();
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: api_url + 'myhordesfetcher/bank?userKey=' + external_app_id,
+        responseType: 'json',
+        onload: function(response){
+            if (response.status === 200) {
+                bank = response.response
+                    .map((bank_item) => {
+                    bank_item.item.category = getCategory(bank_item.item.category)
+                    bank_item.item.count = bank_item.count;
+                    bank_item = bank_item.item;
+                    return bank_item;
+                })
+                    .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);;
             } else {
                 console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
             }
@@ -1166,10 +1455,10 @@ function updateExternalTools() {
     let btn = document.getElementById(mh_update_external_tools_id);
     GM_xmlhttpRequest({
         method: 'POST',
-        url: api_url + 'externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user_id,
+        url: api_url + 'externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id,
         data: JSON.stringify (tools_to_update),
         headers: {
-            "Content-Type": "application/json"
+            'Content-Type': 'application/json'
         },
         responseType: 'json',
         onload: function(response){
@@ -1192,13 +1481,13 @@ function updateExternalTools() {
 }
 
 /** Récupère la liste complète des pouvoirs héros */
-function getHeroSkills() {
+function getHeroSkills(hide_loader_on_finish) {
     startLoading();
     GM_xmlhttpRequest({
         method: 'GET',
         url: api_url + 'myhordesfetcher/heroSkills',
         headers: {
-            "Content-Type": "application/json"
+            'Content-Type': 'application/json'
         },
         responseType: 'json',
         onload: function(response){
@@ -1207,7 +1496,9 @@ function getHeroSkills() {
             } else {
                 console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
             }
-            endLoading();
+            if(hide_loader_on_finish) {
+                endLoading();
+            }
         }
     });
 }
@@ -1217,20 +1508,20 @@ function getHeroSkills() {
 //     MAIN FUNCTION     //
 ///////////////////////////
 (function() {
-    "use strict";
+    'use strict';
 
-    if(document.URL.startsWith("https://bbh.fred26.fr/") || document.URL.startsWith("https://gest-hordes2.eragaming.fr/") || document.URL.startsWith("https://fatamorgana.md26.eu/")) {
+    if(document.URL.startsWith('https://bbh.fred26.fr/') || document.URL.startsWith('https://gest-hordes2.eragaming.fr/') || document.URL.startsWith('https://fatamorgana.md26.eu/')) {
         let current_key = '';
-        if (document.URL.startsWith("https://bbh.fred26.fr/")) {
+        if (document.URL.startsWith('https://bbh.fred26.fr/')) {
             current_key = gm_bbh_updated_key
-        } else if (document.URL.startsWith("https://gest-hordes2.eragaming.fr/")) {
+        } else if (document.URL.startsWith('https://gest-hordes2.eragaming.fr/')) {
             current_key = gm_gh_updated_key;
         } else {
             current_key = gm_fata_updated_key;
         }
 
         // Si on est sur le site de BBH ou GH ou Fata et que BBH ou GH ou Fata a été mis à jour depuis MyHordes, alors on recharge BBH ou GH ou Fata au moment de revenir sur l'onglet
-        document.addEventListener("visibilitychange", function() {
+        document.addEventListener('visibilitychange', function() {
             if (GM_getValue(current_key) && !document.hidden) {
                 GM_setValue(current_key, false);
                 location.reload();
@@ -1243,14 +1534,19 @@ function getHeroSkills() {
             createWindow();
         }
 
-        if (!mh_user_id) {
-            getMe();
-        }
+        getMe();
+        getItems();
+
+        preventFromLeaving();
 
         setInterval(() => {
             createUpdateExternalToolsButton();
             clickOnVotedToRedirect();
         }, 500);
+
+        setInterval(() => {
+            displayAdvancedTooltips();
+        }, 100);
     }
 
 })();
