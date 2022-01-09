@@ -40,7 +40,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.NombreJourHero, opt => opt.Ignore());
 
             CreateMap<MyHordesMeResponseDto, SimpleMe>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.TownId, opt => { opt.MapFrom(src => src.Map.Id); opt.Condition(src => src.Map != null);} );
         }
     }
 }
