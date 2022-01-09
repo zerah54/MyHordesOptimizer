@@ -65,23 +65,27 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         private IEnumerable<HeroSkill> GetHeroSkillInDeutch(string heroSkillStr)
         {
-            var strSplitOnCommaNotInBrace = SplitOnStringNotInBraces(heroSkillStr, ",");
+            heroSkillStr = RemoveComments(heroSkillStr);
+            var heroSkillStrSplit = Regex.Split(heroSkillStr, "\\n");
             var listOfDictionnary = new List<Dictionary<string, string>>();
-            foreach (var line in strSplitOnCommaNotInBrace)
+            foreach (var line in heroSkillStrSplit)
             {
-                var workingLine = line;
-                workingLine = workingLine.TrimEnd();
-                if (workingLine.EndsWith(","))
+                if (!string.IsNullOrWhiteSpace(line))
                 {
-                    workingLine = workingLine.Remove(workingLine.Length - 1);
-                }
-                workingLine = workingLine.Replace("[", "");
-                workingLine = workingLine.Replace("]", "");
+                    var workingLine = line;
+                    workingLine = workingLine.TrimEnd();
+                    if (workingLine.EndsWith(","))
+                    {
+                        workingLine = workingLine.Remove(workingLine.Length - 1);
+                    }
+                    workingLine = workingLine.Replace("[", "");
+                    workingLine = workingLine.Replace("]", "");
 
-                var items = SplitOnCommaNotInString(workingLine, "'");
+                    var items = SplitOnCommaNotInString(workingLine, "'");
 
-                Dictionary<string, string> dico = GenerateDictionnaryFromItem(items);
-                listOfDictionnary.Add(dico);
+                    Dictionary<string, string> dico = GenerateDictionnaryFromItem(items);
+                    listOfDictionnary.Add(dico);
+                }         
             }
 
             foreach (var workingHeroSkill in listOfDictionnary)
@@ -124,7 +128,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     var recipeNameSplit = SplitOnStringNotInBraces(line, "=>");
-                    var recipeName = recipeNameSplit[0].Replace("'","").Trim();
+                    var recipeName = recipeNameSplit[0].Replace("'", "").Trim();
                     var recipeProperties = recipeNameSplit[1].ReplaceFirstOccurrence("[", "").ReplaceLastOccurrence("]", "").Trim(); // A partir de la on ça soit 'type' => Recipe::WorkshopType, 'in' => 'metal_beam_#00',      'out' => 'metal_#00', 'action' => 'Wandeln'
                                                                                                                                      // Soit 'type' => Recipe::WorkshopType, 'in' => 'electro_box_#00',     'out' => [ ['pile_#00', 15], ['pilegun_empty_#00', 16], ['electro_#00', 23], ['meca_parts_#00', 18], ['tagger_#00', 14], ['deto_#00', 14] ], 'action' => 'Zerlegen' 
                                                                                                                                      // Il faut gérer le out avec des braces
@@ -188,32 +192,29 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         private static void ParseItemInfo(string strToParse, List<Item> items, string propertieName)
         {
-            var strSplitOnCommaNotInBrace = SplitOnStringNotInBraces(strToParse, ",");
-            foreach (var line in strSplitOnCommaNotInBrace)
+            strToParse = RemoveComments(strToParse);
+            var strSplit = Regex.Split(strToParse, "\\n");
+            foreach (var line in strSplit)
             {
                 if (!string.IsNullOrWhiteSpace(line))
                 {
-                    try
+                    var splited = Regex.Split(line, "=>");
+                    var key = splited[0].Replace("'", "").Trim(); // On récupère un truc du genre saw_tool_#00
+                    key = key.Remove(key.Length - 4); // On retire le _#00
+                    var properties = splited[1].Replace("[", "").Replace("]", "").Trim(); // On récupère un truc du genre 'impoundable', 'can_opener', 'box_opener'
+                    var list = new List<string>();
+                    foreach (var propertie in properties.Split(','))
                     {
-                        var splited = Regex.Split(line, "=>");
-                        var key = splited[0].Replace("'", "").Trim(); // On récupère un truc du genre saw_tool_#00
-                        key = key.Remove(key.Length - 4); // On retire le _#00
-                        var properties = splited[1].Replace("[", "").Replace("]", "").Trim(); // On récupère un truc du genre 'impoundable', 'can_opener', 'box_opener'
-                        var list = new List<string>();
-                        foreach (var propertie in properties.Split(','))
+                        var propertieValue = propertie.Replace("'", "").Trim();
+                        if (!string.IsNullOrWhiteSpace(propertieValue))
                         {
-                            list.Add(propertie.Replace("'", "").Trim());
-                        }
-
-                        Item item = items.FirstOrDefault(item => item.JsonIdName == key);
-                        if (item != null)
-                        {
-                            typeof(Item).GetProperty(propertieName).SetValue(item, list);
+                            list.Add(propertieValue);
                         }
                     }
-                    catch (IndexOutOfRangeException)
+                    Item item = items.FirstOrDefault(item => item.JsonIdName == key);
+                    if (item != null)
                     {
-                        // Pour ne pas exploser sur les commentaires
+                        typeof(Item).GetProperty(propertieName).SetValue(item, list);
                     }
                 }
             }
@@ -276,7 +277,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             return $"(?!\\B{englobingStr}[^{englobingStr}]*){searchedStr}(?![^{englobingStr}]*{englobingStr}\\B)";
         }
 
-        private string RemoveComments(string recipeStr)
+        private static string RemoveComments(string recipeStr)
         {
             var blockComments = @"/\*(.*?)\*/";
             var lineComments = @"//(.*?)\r?\n";
