@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.3
+// @version      1.0.0-alpha.4
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -641,7 +641,6 @@ function dispatchContent(window_type, tab) {
             displayCitizens();
             break;
         case 'bank':
-            getBank();
             displayBank();
             break;
         default:
@@ -659,7 +658,7 @@ function displayBank() {
     getBank();
     let interval = setInterval(() => {
         if (bank) {
-            displayItems(bank);
+            displayItems(bank.bank);
             clearInterval(interval);
         }
     }, 500)
@@ -748,7 +747,9 @@ function displayCitizens() {
 
             let header_cells = [
                 {id: 'name', label: {en: 'Name', fr: 'Nom', de: '', es: ''}, type: 'th'},
-                {id: 'nombreJourHero', label: {en: '', fr: 'Nombre de jours héros', de: '', es: ''}, type: 'td'}
+                {id: 'nombreJourHero', label: {en: '', fr: 'Nombre de jours héros', de: '', es: ''}, type: 'td'},
+                {id: 'uppercut', label: {en: '', fr: 'Uppercut Sauvage', de: '', es: ''}, type: 'td', img: ''},
+                {id: 'rescue', label: {en: 'Rescue', fr: 'Sauvetage', de: '', es: ''}, type: 'td', img: ''}
             ];
 
             let skills_with_uses = hero_skills
@@ -777,8 +778,8 @@ function displayCitizens() {
             table.appendChild(header_row);
 
             tab_content.appendChild(table);
-            for (let citizen_key in citizens) {
-                let citizen = citizens[citizen_key];
+            for (let citizen_key in citizens.citizens) {
+                let citizen = citizens.citizens[citizen_key];
                 let citizen_row = document.createElement('tr');
                 table.appendChild(citizen_row);
 
@@ -1413,6 +1414,7 @@ function getCitizens() {
         onload: function(response){
             if (response.status === 200) {
                 citizens = response.response;
+                citizens.citizens = Object.keys(citizens.citizens).map((key) => citizens.citizens[key])
             } else {
                 console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
             }
@@ -1430,14 +1432,15 @@ function getBank() {
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
-                bank = response.response
-                    .map((bank_item) => {
-                    bank_item.item.category = getCategory(bank_item.item.category)
-                    bank_item.item.count = bank_item.count;
-                    bank_item = bank_item.item;
-                    return bank_item;
+                bank = response.response;
+                bank.bank = Object.keys(bank.bank).map((key) => bank.bank[key])
+                    .map((bank_info) => {
+                    bank_info.item.category = getCategory(bank_info.item.category)
+                    bank_info.item.count = bank_info.count;
+                    bank_info = bank_info.item;
+                    return bank_info;
                 })
-                    .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);;
+                    .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);
             } else {
                 console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
             }
