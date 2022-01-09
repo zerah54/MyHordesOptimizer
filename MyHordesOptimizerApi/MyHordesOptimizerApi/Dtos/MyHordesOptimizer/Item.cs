@@ -13,7 +13,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
         public bool IsHeaver { get; set; }
         public int Guard { get; set; }
         public string XmlName { get; set; }
-        public IDictionary<string,string> Description { get; set; }
+        public IDictionary<string, string> Description { get; set; }
 
         public IEnumerable<string> Properties { get; set; }
         public IEnumerable<string> Actions { get; set; }
@@ -22,5 +22,11 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
         {
             Description = new Dictionary<string, string>();
         }
+    }
+
+    public class ItemResult
+    {
+        public double Probability { get; set; }
+        public Item Item { get; set; }
     }
 }

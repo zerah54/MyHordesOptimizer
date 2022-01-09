@@ -29,6 +29,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         private const string _townCollection = "towns";
         private const string _heroSkillCollection = "Wiki/heroSkills";
         private const string _itemCollection = "Wiki/items";
+        private const string _recipeCollection = "Wiki/recipes";
         private const string _parameterAuth = "auth";
 
         public MyHordesOptimizerFirebaseRepository(ILogger<AbstractWebApiRepositoryBase> logger,
@@ -87,7 +88,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             var url = $"{Configuration.Url}/{_heroSkillCollection}.json";
             url = AddAuthentication(url);
-            return base.Get<Dictionary<string,HeroSkill>>(url);
+            return base.Get<Dictionary<string, HeroSkill>>(url);
         }
 
 
@@ -96,8 +97,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
         #region Items
 
         public void PatchItems(List<Item> items)
-        {    
-            foreach(var item in items)
+        {
+            foreach (var item in items)
             {
                 var url = $"{Configuration.Url}/{_itemCollection}/{item.JsonIdName}.json";
                 url = AddAuthentication(url);
@@ -112,7 +113,36 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return base.Get<Dictionary<string, Item>>(url);
         }
 
+        public Item GetItemByJsonIdName(string jsonIdName)
+        {
+            var url = $"{Configuration.Url}/{_itemCollection}/{jsonIdName}.json";
+            url = AddAuthentication(url);
+            return base.Get<Item>(url);
+        }
+
         #endregion
+
+        #region Recipes
+
+        public void PatchRecipes(List<ItemRecipe> recipes)
+        {
+            foreach (var recipe in recipes)
+            {
+                var url = $"{Configuration.Url}/{_recipeCollection}/{recipe.Name}.json";
+                url = AddAuthentication(url);
+                base.Patch(url: url, body: recipe);
+            }
+        }
+
+        public Dictionary<string, ItemRecipe> GetRecipes()
+        {
+            var url = $"{Configuration.Url}/{_recipeCollection}.json";
+            url = AddAuthentication(url);
+            return base.Get<Dictionary<string, ItemRecipe>>(url);
+        }
+
+        #endregion
+
         private string AddAuthentication(string url)
         {
             url = AddParameterToQuery(url, _parameterAuth, Configuration.Secret);
@@ -122,6 +152,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         // Ne marche pas
         #region tentative de token
+
         private string GenerateToken()
         {
             using RSA rsa = RSA.Create();
