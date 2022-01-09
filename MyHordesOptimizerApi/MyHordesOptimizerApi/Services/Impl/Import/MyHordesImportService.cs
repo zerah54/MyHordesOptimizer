@@ -139,7 +139,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     var @in = dico["in"]; // On récupère soit un truc du genre 'catbox_#00' soit ['music_part_#00', 'pile_#00', 'electro_#00']
                     @in = @in.Replace("[", "").Replace("]", "").Trim();
                     var ins = SplitOnCommaNotInString(@in, "'");
-                    var @out = dico["out"].Remove(dico["out"].Length - 4); // On récupère un truc du genre saw_tool_#00, du coup on enlève le _#00;
+                    var @out = dico["out"];
                     dico.TryGetValue("action", out var action);
 
                     var recipe = new ItemRecipe();
@@ -159,7 +159,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     recipe.IsShamanOnly = type == "Recipe::WorkshopTypeShamanSpecific";
                     recipe.Actions["de"] = action;
                     if (@out.IndexOf("[") < 0) // si on a qu'un seul objet
+                                               // 'out' => 'metal_#00'
                     {
+                        @out = @out.Replace("'","").Remove(dico["out"].Length - 4);
                         var item = FirebaseRepository.GetItemByJsonIdName(@out);
                         var itemResult = new ItemResult()
                         {
@@ -169,8 +171,28 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                         recipe.Result.Add(itemResult);
                     }
                     else // On peut avoir plusieurs résultat
+                         // 'out' => [ ['pile_#00', 15], ['pilegun_empty_#00', 16], ['electro_#00', 23], ['meca_parts_#00', 18], ['tagger_#00', 14], ['deto_#00', 14] ]
                     {
+                        @out = @out.ReplaceFirstOccurrence("[", "").ReplaceLastOccurrence("]", "");
+                        var splitedOuts = SplitOnStringNotInBracesAndString(@out, ",", "'");
+                        foreach(var outLine in splitedOuts) // ['pile_#00', 15]
+                        {
+                            var workingItem = outLine.Replace("[", "").Replace("]", "").Trim();
+                            var splitedWorkingItem = workingItem.Split(",");
+                            var itemName = splitedWorkingItem[0].Replace("'", "");
+                            itemName = itemName.Remove(itemName.Length - 4);
+                            var weight = int.Parse(splitedWorkingItem[1]);
 
+                            var item = FirebaseRepository.GetItemByJsonIdName(itemName);
+                            var itemResult = new ItemResult()
+                            {
+                                Item = item,
+                                Weight = weight
+                            };
+                            recipe.Result.Add(itemResult);
+                        }
+                        var totalWeight = recipe.Result.Sum(x => x.Weight);
+                        recipe.Result.ForEach(x => x.Probability = (double) x.Weight / totalWeight);
                     }
                     foreach (var itemIn in ins)
                     {

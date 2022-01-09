@@ -27,6 +27,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
     public class ItemResult
     {
         public double Probability { get; set; }
+        public int Weight { get; set; }
         public Item Item { get; set; }
     }
 }
