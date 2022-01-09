@@ -70,5 +70,13 @@ namespace MyHordesOptimizerApi.Controllers
             var heroSkills = _myHordesFetcherService.GetHeroSkills().ToList();
             return heroSkills;
         }
+
+        [HttpGet]
+        [Route("Recipes")]
+        public ActionResult<IEnumerable<ItemRecipe>> GetRecipes()
+        {
+            var heroSkills = _myHordesFetcherService.GetRecipes().ToList();
+            return heroSkills;
+        }
     }
 }

@@ -62,5 +62,11 @@ namespace MyHordesOptimizerApi.Services.Impl
             var heroSkills = FirebaseRepository.GetHeroSkills();
             return heroSkills.Values;
         }
+
+        public IEnumerable<ItemRecipe> GetRecipes()
+        {
+            var recipes = FirebaseRepository.GetRecipes();
+            return recipes.Values;
+        }
     }
 }
