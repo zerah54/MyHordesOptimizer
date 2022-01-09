@@ -18,5 +18,27 @@ namespace MyHordesOptimizerApi.Extensions
 
             return offset;
         }
+
+        public static string ReplaceFirstOccurrence(this string source, string find, string replace)
+        {
+            int place = source.IndexOfNth(find);
+
+            if (place == -1)
+                return source;
+
+            string result = source.Remove(place, find.Length).Insert(place, replace);
+            return result;
+        }
+
+        public static string ReplaceLastOccurrence(this string source, string find, string replace)
+        {
+            int place = source.LastIndexOf(find);
+
+            if (place == -1)
+                return source;
+
+            string result = source.Remove(place, find.Length).Insert(place, replace);
+            return result;
+        }
     }
 }

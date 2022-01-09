@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using MyHordesOptimizerApi.Attributes.Firebase;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Repository.Abstract;
@@ -29,6 +30,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         private const string _townCollection = "towns";
         private const string _heroSkillCollection = "Wiki/heroSkills";
         private const string _itemCollection = "Wiki/items";
+        private const string _recipeCollection = "Wiki/recipes";
         private const string _parameterAuth = "auth";
 
         public MyHordesOptimizerFirebaseRepository(ILogger<AbstractWebApiRepositoryBase> logger,
@@ -46,12 +48,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
             url = AddAuthentication(url);
             base.Patch(url: url, body: town.MyHordesMap);
 
-            foreach (var citizen in town.MyHordesMap.Citizens)
-            {
-                url = $"{Configuration.Url}/{_townCollection}/{town.Id}/{nameof(town.Citizens)}/{citizen.Name}.json";
-                url = AddParameterToQuery(url, "auth", Configuration.Secret);
-                base.Patch(url: url, body: citizen);
-            }
+            PatchCitizen(town.Id, town.MyHordesMap.Citizens);
+            PutBank(town.Id, town.Bank);
         }
 
         public Town GetTown(int townId)
@@ -87,7 +85,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             var url = $"{Configuration.Url}/{_heroSkillCollection}.json";
             url = AddAuthentication(url);
-            return base.Get<Dictionary<string,HeroSkill>>(url);
+            return base.Get<Dictionary<string, HeroSkill>>(url);
         }
 
 
@@ -96,8 +94,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
         #region Items
 
         public void PatchItems(List<Item> items)
-        {    
-            foreach(var item in items)
+        {
+            foreach (var item in items)
             {
                 var url = $"{Configuration.Url}/{_itemCollection}/{item.JsonIdName}.json";
                 url = AddAuthentication(url);
@@ -112,7 +110,61 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return base.Get<Dictionary<string, Item>>(url);
         }
 
+        public Item GetItemByJsonIdName(string jsonIdName)
+        {
+            var url = $"{Configuration.Url}/{_itemCollection}/{jsonIdName}.json";
+            url = AddAuthentication(url);
+            return base.Get<Item>(url);
+        }
+
         #endregion
+
+        #region Recipes
+
+        public void PatchRecipes(List<ItemRecipe> recipes)
+        {
+            foreach (var recipe in recipes)
+            {
+                var url = $"{Configuration.Url}/{_recipeCollection}/{recipe.Name}.json";
+                url = AddAuthentication(url);
+                base.Patch(url: url, body: recipe);
+            }
+        }
+
+        public Dictionary<string, ItemRecipe> GetRecipes()
+        {
+            var url = $"{Configuration.Url}/{_recipeCollection}.json";
+            url = AddAuthentication(url);
+            return base.Get<Dictionary<string, ItemRecipe>>(url);
+        }
+
+        #endregion
+
+        #region Bank
+
+        public void PutBank(int townId, Dictionary<string, BankItem> bank)
+        {
+            var url = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(Town.Bank)}.json";
+            url = AddParameterToQuery(url, "auth", Configuration.Secret);
+            base.Put(url: url, body: bank);
+        }
+
+        #endregion
+
+        #region Citizens
+
+        public void PatchCitizen(int townId, List<MyHordesCitizen> citizens)
+        {
+            foreach (var citizen in citizens)
+            {
+                var url = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(Town.Citizens)}/{citizen.Name}.json";
+                url = AddParameterToQuery(url, "auth", Configuration.Secret);
+                base.Patch(url: url, body: citizen);
+            }
+        }
+
+        #endregion
+
         private string AddAuthentication(string url)
         {
             url = AddParameterToQuery(url, _parameterAuth, Configuration.Secret);
@@ -122,6 +174,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         // Ne marche pas
         #region tentative de token
+
         private string GenerateToken()
         {
             using RSA rsa = RSA.Create();

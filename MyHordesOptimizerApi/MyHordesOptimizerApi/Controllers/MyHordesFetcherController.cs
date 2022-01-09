@@ -70,5 +70,40 @@ namespace MyHordesOptimizerApi.Controllers
             var heroSkills = _myHordesFetcherService.GetHeroSkills().ToList();
             return heroSkills;
         }
+
+        [HttpGet]
+        [Route("Recipes")]
+        public ActionResult<IEnumerable<ItemRecipe>> GetRecipes()
+        {
+            var heroSkills = _myHordesFetcherService.GetRecipes().ToList();
+            return heroSkills;
+        }
+
+        [HttpGet]
+        [Route("Bank")]
+        public ActionResult<IEnumerable<BankItem>> GetBank(string userKey)
+        {
+            if (string.IsNullOrWhiteSpace(userKey))
+            {
+                return BadRequest($"{nameof(userKey)} cannot be empty");
+            }
+            UserKeyProvider.UserKey = userKey;
+            var bank = _myHordesFetcherService.GetBank().ToList();
+            return bank;
+        }
+
+
+        [HttpGet]
+        [Route("Citizens")]
+        public ActionResult<IEnumerable<Citizen>> GetCitizens(string userKey)
+        {
+            if (string.IsNullOrWhiteSpace(userKey))
+            {
+                return BadRequest($"{nameof(userKey)} cannot be empty");
+            }
+            UserKeyProvider.UserKey = userKey;
+            var citizens = _myHordesFetcherService.GetCitizens().ToList();
+            return citizens;
+        }
     }
 }

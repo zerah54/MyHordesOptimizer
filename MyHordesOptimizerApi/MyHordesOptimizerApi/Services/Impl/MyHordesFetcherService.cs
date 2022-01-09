@@ -5,7 +5,6 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyHordesOptimizerApi.Services.Impl
 {
@@ -61,6 +60,38 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var heroSkills = FirebaseRepository.GetHeroSkills();
             return heroSkills.Values;
+        }
+
+        public IEnumerable<ItemRecipe> GetRecipes()
+        {
+            var recipes = FirebaseRepository.GetRecipes();
+            return recipes.Values;
+        }
+
+        public IEnumerable<BankItem> GetBank()
+        {
+            var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
+            var town = Mapper.Map<Town>(myHordeMeResponse.Map);
+
+            // Enregistrer en base
+            FirebaseRepository.PutBank(town.Id, town.Bank);
+            town = FirebaseRepository.GetTown(town.Id);
+            var bank = town.Bank.Values;
+
+            return bank;
+        }
+
+        public IEnumerable<Citizen> GetCitizens()
+        {
+            var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
+            var town = Mapper.Map<Town>(myHordeMeResponse.Map);
+
+            // Enregistrer en base
+            FirebaseRepository.PatchCitizen(town.Id, town.MyHordesMap.Citizens);
+            town = FirebaseRepository.GetTown(town.Id);
+            var citizens = town.Citizens.Values;
+
+            return citizens;
         }
     }
 }

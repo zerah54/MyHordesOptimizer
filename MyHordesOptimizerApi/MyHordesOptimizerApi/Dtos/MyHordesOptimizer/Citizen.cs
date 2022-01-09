@@ -25,7 +25,5 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         #endregion
 
         public int NombreJourHero { get; set; }
-
-        public List<PouvoirHero> PouvoirsHero { get; set; } 
     }
 }
