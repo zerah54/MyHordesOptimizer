@@ -53,6 +53,13 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 url = AddParameterToQuery(url, "auth", Configuration.Secret);
                 base.Patch(url: url, body: citizen);
             }
+
+            foreach(var bankItem in town.Bank)
+            {
+                url = $"{Configuration.Url}/{_townCollection}/{town.Id}/{nameof(town.Bank)}/{bankItem.Key}.json";
+                url = AddParameterToQuery(url, "auth", Configuration.Secret);
+                base.Patch(url: url, body: bankItem.Value);
+            }
         }
 
         public Town GetTown(int townId)

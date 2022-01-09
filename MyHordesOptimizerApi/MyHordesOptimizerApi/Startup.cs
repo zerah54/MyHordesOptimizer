@@ -24,6 +24,7 @@ using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using System.Net.Http;
+using System.Reflection;
 
 namespace MyHordesOptimizerApi
 {
@@ -53,7 +54,8 @@ namespace MyHordesOptimizerApi
                     UseCookies = false,
                 };
             });
-            services.AddSingleton(BuildAutoMapper());
+           // services.AddSingleton(BuildAutoMapper());
+            services.AddAutoMapper(Assembly.GetAssembly(this.GetType()));
 
             // Providers
             services.AddScoped<IUserKeyProvider, UserKeyProvider>();
@@ -103,6 +105,7 @@ namespace MyHordesOptimizerApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -6,7 +6,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
     {
         public string JsonIdName { get; set; }
         public string Img { get; set; }
-        public IDictionary<string, string> Labels { get; set; }
+        public IDictionary<string, string> Label { get; set; }
         public int XmlId { get; set; }
         public string Category { get; set; }
         public int Deco { get; set; }

@@ -10,5 +10,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public MyHordesMap MyHordesMap { get; set; }
 
         public Dictionary<string, Citizen> Citizens { get; set; }
+
+        public Dictionary<string, BankItem> Bank { get; set; }
     }
 }

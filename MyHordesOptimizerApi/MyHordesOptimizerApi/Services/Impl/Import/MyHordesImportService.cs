@@ -256,7 +256,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 if (miror != null)
                 {
                     item.JsonIdName = miror.JsonIdName;
-                    item.Labels = miror.Labels;
+                    item.Label = miror.Label;
                 }
             }
 
