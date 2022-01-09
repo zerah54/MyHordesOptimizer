@@ -21,7 +21,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         public MyHordesJsonApiRepository(ILogger<MyHordesJsonApiRepository> logger,
             IHttpClientFactory httpClientFactory,
             IMyHordesApiConfiguration myHordesApiConfiguration,
-            IUserKeyProvider userKeyProvider) : base(logger, httpClientFactory, myHordesApiConfiguration, userKeyProvider)
+            IUserInfoProvider userKeyProvider) : base(logger, httpClientFactory, myHordesApiConfiguration, userKeyProvider)
         {
         }
 
@@ -34,8 +34,10 @@ namespace MyHordesOptimizerApi.Repository.Impl
         public MyHordesMeResponseDto GetMe()
         {
             var url = GenerateUrl(EndpointMe);
-            url = AddParameterToQuery(url, _parameterFields, "id,map.fields(id, city.fields(bank, chantiers, buildings, name, water, x, y, door, chaos, hard, devast), citizens, wid, hei, consiparcy, cadavers)");
+            url = AddParameterToQuery(url, _parameterFields, "id,name,map.fields(id, city.fields(bank, chantiers, buildings, name, water, x, y, door, chaos, hard, devast), citizens, wid, hei, consiparcy, cadavers)");
             var response = base.Get<MyHordesMeResponseDto>(url);
+            UserKeyProvider.UserId = response.Id.ToString();
+            UserKeyProvider.UserName = response.Name;
             return response;
         }
     }

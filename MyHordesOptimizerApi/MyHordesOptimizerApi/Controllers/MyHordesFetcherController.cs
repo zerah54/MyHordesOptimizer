@@ -19,7 +19,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         public MyHordesFetcherController(ILogger<MyHordesFetcherController> logger,
             IMyHordesFetcherService myHordesFetcherService,
-            IUserKeyProvider userKeyProvider) : base(logger, userKeyProvider)
+            IUserInfoProvider userKeyProvider) : base(logger, userKeyProvider)
         {
             _myHordesFetcherService = myHordesFetcherService;
         }
@@ -81,28 +81,28 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Bank")]
-        public ActionResult<IEnumerable<BankItem>> GetBank(string userKey)
+        public ActionResult<BankWrapper> GetBank(string userKey)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
             UserKeyProvider.UserKey = userKey;
-            var bank = _myHordesFetcherService.GetBank().ToList();
+            var bank = _myHordesFetcherService.GetBank();
             return bank;
         }
 
 
         [HttpGet]
         [Route("Citizens")]
-        public ActionResult<IEnumerable<Citizen>> GetCitizens(string userKey)
+        public ActionResult<CitizensWrapper> GetCitizens(string userKey)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
             UserKeyProvider.UserKey = userKey;
-            var citizens = _myHordesFetcherService.GetCitizens().ToList();
+            var citizens = _myHordesFetcherService.GetCitizens();
             return citizens;
         }
     }

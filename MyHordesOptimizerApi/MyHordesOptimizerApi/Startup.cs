@@ -58,7 +58,7 @@ namespace MyHordesOptimizerApi
             services.AddAutoMapper(Assembly.GetAssembly(this.GetType()));
 
             // Providers
-            services.AddScoped<IUserKeyProvider, UserKeyProvider>();
+            services.AddScoped<IUserInfoProvider, UserInfoProvider>();
 
             // Configuration
             services.AddSingleton<IMyHordesApiConfiguration, MyHordesApiConfiguration>();

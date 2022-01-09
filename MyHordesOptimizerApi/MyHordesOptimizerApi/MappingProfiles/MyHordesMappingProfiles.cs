@@ -6,7 +6,6 @@ using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.MappingProfiles.Resolvers;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
@@ -41,7 +40,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<MyHordesMap, Town>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.MyHordesMap, opt => opt.MapFrom(src => src))
-                .ForMember(dest => dest.Citizens, opt => opt.MapFrom(src => src.Citizens.ToDictionary(citizen => citizen.Name, citizen => citizen)))
+                //.ForMember(dest => dest.Citizens, opt => opt.MapFrom(src => src.Citizens.ToDictionary(citizen => citizen.Name, citizen => citizen)))
+                .ForMember(dest => dest.Citizens, opt => opt.MapFrom<TownCitizensResolver>())
                 .ForMember(dest => dest.Bank, opt => opt.MapFrom<TownBankResolver>());
 
             CreateMap<MyHordesCitizen, Citizen>()
@@ -49,7 +49,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             CreateMap<MyHordesMeResponseDto, SimpleMe>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.TownId, opt => { opt.MapFrom(src => src.Map.Id); opt.Condition(src => src.Map != null);} );
+                .ForMember(dest => dest.TownId, opt => { opt.MapFrom(src => src.Map.Id); opt.Condition(src => src.Map != null); });
         }
     }
 }

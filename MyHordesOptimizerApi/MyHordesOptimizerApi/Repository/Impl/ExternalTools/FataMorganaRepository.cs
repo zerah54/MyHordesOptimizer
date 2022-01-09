@@ -10,7 +10,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
     public class FataMorganaRepository : AbstractWebApiRepositoryBase, IFataMorganaRepository
     {
         public override string HttpClientName => nameof(FataMorganaRepository);
-        protected IUserKeyProvider UserKeyProvider { get; private set; }
+        protected IUserInfoProvider UserKeyProvider { get; private set; }
         protected IFataMorganaConfiguration FataMorganaConfiguration { get; private set; }
 
         private string _parameterUserKey = "key";
@@ -20,7 +20,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
 
         public FataMorganaRepository(ILogger<FataMorganaRepository> logger,
             IHttpClientFactory httpClientFactory,
-            IUserKeyProvider userKeyProvider,
+            IUserInfoProvider userKeyProvider,
             IFataMorganaConfiguration fataMorganaConfiguration
             ) : base(logger, httpClientFactory)
         {

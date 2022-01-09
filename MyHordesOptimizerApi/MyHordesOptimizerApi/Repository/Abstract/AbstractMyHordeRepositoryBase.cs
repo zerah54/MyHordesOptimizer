@@ -11,7 +11,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
     {
         protected abstract string BaseEndpoint { get; }
         protected IMyHordesApiConfiguration MyHordesApiConfiguration { get; set; }
-        protected IUserKeyProvider UserKeyProvider { get; set; }
+        protected IUserInfoProvider UserKeyProvider { get; set; }
 
         protected const string _parameterAppKey = "appkey";
         protected const string _parameterUserKey = "userkey";
@@ -24,7 +24,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         protected AbstractMyHordeRepositoryBase(ILogger<AbstractMyHordeRepositoryBase> logger,
           IHttpClientFactory httpClientFactory,
           IMyHordesApiConfiguration myHordesApiConfiguration,
-          IUserKeyProvider userKeyProvider) : base(logger, httpClientFactory)
+          IUserInfoProvider userKeyProvider) : base(logger, httpClientFactory)
         {
             MyHordesApiConfiguration = myHordesApiConfiguration;
             UserKeyProvider = userKeyProvider;

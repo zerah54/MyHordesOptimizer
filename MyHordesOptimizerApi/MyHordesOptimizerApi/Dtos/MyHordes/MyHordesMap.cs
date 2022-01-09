@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordes
@@ -22,5 +23,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
 
         [JsonProperty("conspiracy")]
         public bool Conspiracy { get; set; }
+
+        public LastUpadteInfo LastUpdateInfo { get; set; }
     }
 }

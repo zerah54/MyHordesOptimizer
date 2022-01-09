@@ -18,7 +18,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         public MyHordesXmlApiRepository(ILogger<MyHordesXmlApiRepository> logger,
             IHttpClientFactory httpClientFactory,
             IMyHordesApiConfiguration myHordesApiConfiguration,
-            IUserKeyProvider userKeyProvider) : base(logger, httpClientFactory, myHordesApiConfiguration, userKeyProvider)
+            IUserInfoProvider userKeyProvider) : base(logger, httpClientFactory, myHordesApiConfiguration, userKeyProvider)
         {
         }
 

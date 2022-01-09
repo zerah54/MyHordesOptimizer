@@ -48,7 +48,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             url = AddAuthentication(url);
             base.Patch(url: url, body: town.MyHordesMap);
 
-            PatchCitizen(town.Id, town.MyHordesMap.Citizens);
+            PatchCitizen(town.Id, town.Citizens);
             PutBank(town.Id, town.Bank);
         }
 
@@ -142,7 +142,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #region Bank
 
-        public void PutBank(int townId, Dictionary<string, BankItem> bank)
+        public void PutBank(int townId, BankWrapper bank)
         {
             var url = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(Town.Bank)}.json";
             url = AddParameterToQuery(url, "auth", Configuration.Secret);
@@ -153,14 +153,18 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #region Citizens
 
-        public void PatchCitizen(int townId, List<MyHordesCitizen> citizens)
+        public void PatchCitizen(int townId, CitizensWrapper wrapper)
         {
-            foreach (var citizen in citizens)
+            foreach (var citizen in wrapper.Citizens)
             {
-                var url = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(Town.Citizens)}/{citizen.Name}.json";
+                var url = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(Town.Citizens)}/{nameof(CitizensWrapper.Citizens)}/{citizen.Value.Name}.json";
                 url = AddParameterToQuery(url, "auth", Configuration.Secret);
-                base.Patch(url: url, body: citizen);
+                base.Patch(url: url, body: citizen.Value);
             }
+
+            var urlLastUpdate = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(Town.Citizens)}/{nameof(CitizensWrapper.LastUpadteInfo)}.json";
+            urlLastUpdate = AddParameterToQuery(urlLastUpdate, "auth", Configuration.Secret);
+            base.Patch(url: urlLastUpdate, body: wrapper.LastUpadteInfo);
         }
 
         #endregion

@@ -15,7 +15,7 @@ namespace MyHordesOptimizerApi.Controllers
     {
         protected IMyHordesImportService MyHordesImportService { get; private set; }
         public MyHordesDataImportController(ILogger<AbstractMyHordesOptimizerControllerBase> logger,
-            IUserKeyProvider userKeyProvider,
+            IUserInfoProvider userKeyProvider,
             IMyHordesImportService myHordesImportService) : base(logger, userKeyProvider)
         {
             MyHordesImportService = myHordesImportService;

@@ -20,8 +20,8 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PatchRecipes(List<ItemRecipe> recipes);
         Dictionary<string, ItemRecipe> GetRecipes();
 
-        void PutBank(int townId, Dictionary<string, BankItem> bank);
+        void PutBank(int townId, BankWrapper bank);
 
-        void PatchCitizen(int townId, List<MyHordesCitizen> citizens);
+        void PatchCitizen(int townId, CitizensWrapper citizens);
     }
 }

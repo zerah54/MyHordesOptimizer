@@ -1,24 +1,28 @@
 ﻿using AutoMapper;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
 {
-    public class TownBankResolver : IValueResolver<MyHordesMap, Town, Dictionary<string, BankItem>>
+    public class TownBankResolver : IValueResolver<MyHordesMap, Town, BankWrapper>
     {
         protected IMyHordesOptimizerFirebaseRepository FirebaseRepository { get; set; }
+        protected IUserInfoProvider UserInfoProvider { get; set; }
 
-        public TownBankResolver(IMyHordesOptimizerFirebaseRepository firebaseRepository)
+
+        public TownBankResolver(IMyHordesOptimizerFirebaseRepository firebaseRepository,
+            IUserInfoProvider userInfoProvider)
         {
             FirebaseRepository = firebaseRepository;
+            UserInfoProvider = userInfoProvider;
         }
 
-        public Dictionary<string, BankItem> Resolve(MyHordesMap source, Town destination, Dictionary<string, BankItem> destMember, ResolutionContext context)
+        public BankWrapper Resolve(MyHordesMap source, Town destination, BankWrapper destMember, ResolutionContext context)
         {
-            var bank = new Dictionary<string, BankItem>();
+            var wrapper = new BankWrapper();
             var items = FirebaseRepository.GetItems();
             foreach (var bankItem in source.City.Bank)
             {
@@ -28,9 +32,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
                     Item = item,
                     Count = bankItem.Count
                 };
-                bank[item.JsonIdName] = destinationBankItem;
+                wrapper.Bank[item.JsonIdName] = destinationBankItem;
             }
-            return bank;
+            wrapper.LastUpadteInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            return wrapper;
         }
     }
 }

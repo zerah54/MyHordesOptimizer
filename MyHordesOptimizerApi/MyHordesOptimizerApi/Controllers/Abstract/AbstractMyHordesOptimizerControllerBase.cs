@@ -8,11 +8,11 @@ namespace MyHordesOptimizerApi.Controllers.Abstract
     [Route("[controller]")]
     public class AbstractMyHordesOptimizerControllerBase : ControllerBase
     {
-        protected readonly IUserKeyProvider UserKeyProvider;
+        protected readonly IUserInfoProvider UserKeyProvider;
         protected readonly ILogger<AbstractMyHordesOptimizerControllerBase> Logger;
 
         public AbstractMyHordesOptimizerControllerBase(ILogger<AbstractMyHordesOptimizerControllerBase> logger,
-            IUserKeyProvider userKeyProvider
+            IUserInfoProvider userKeyProvider
             )
         {
             UserKeyProvider = userKeyProvider;

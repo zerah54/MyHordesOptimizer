@@ -10,7 +10,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
     public class GestHordesRepository : AbstractWebApiRepositoryBase, IGestHordesRepository
     {
         public override string HttpClientName => nameof(GestHordesRepository);
-        protected IUserKeyProvider UserKeyProvider { get; private set; }
+        protected IUserInfoProvider UserKeyProvider { get; private set; }
         protected IGestHordesConfiguration GestHordesConfiguration { get; private set; }
 
         private const string Cookie_MyHordesKey_Key = "myHordesKey";
@@ -19,7 +19,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
 
         public GestHordesRepository(ILogger<GestHordesRepository> logger,
            IHttpClientFactory httpClientFactory,
-           IUserKeyProvider userKeyProvider,
+           IUserInfoProvider userKeyProvider,
            IGestHordesConfiguration gestHordesConfiguration
            ) : base(logger, httpClientFactory)
         {

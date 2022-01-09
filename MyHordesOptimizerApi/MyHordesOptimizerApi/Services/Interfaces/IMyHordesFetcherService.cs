@@ -11,7 +11,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         SimpleMe GetSimpleMe();
         IEnumerable<HeroSkill> GetHeroSkills();
         IEnumerable<ItemRecipe> GetRecipes();
-        IEnumerable<BankItem> GetBank();
-        IEnumerable<Citizen> GetCitizens();
+        BankWrapper GetBank();
+        CitizensWrapper GetCitizens();
     }
 }

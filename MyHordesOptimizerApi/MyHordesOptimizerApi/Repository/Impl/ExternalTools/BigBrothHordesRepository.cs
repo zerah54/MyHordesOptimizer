@@ -12,7 +12,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
     public class BigBrothHordesRepository : AbstractWebApiRepositoryBase, IBigBrothHordesRepository
     {
         public override string HttpClientName => nameof(BigBrothHordesRepository);
-        protected IUserKeyProvider UserKeyProvider { get; private set; }
+        protected IUserInfoProvider UserKeyProvider { get; private set; }
         protected IBigBrothHordesConfiguration BigBrothHordesConfiguration { get; private set; }
 
         private const string _parameterUserKey = "key";
@@ -21,7 +21,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
 
         public BigBrothHordesRepository(ILogger<BigBrothHordesRepository> logger,
             IHttpClientFactory httpClientFactory,
-            IUserKeyProvider userKeyProvider,
+            IUserInfoProvider userKeyProvider,
             IBigBrothHordesConfiguration bigBrothHordesConfiguration
             ) : base(logger, httpClientFactory)
         {
