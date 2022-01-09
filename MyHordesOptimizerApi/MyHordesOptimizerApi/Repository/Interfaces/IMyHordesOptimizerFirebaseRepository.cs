@@ -1,4 +1,5 @@
-﻿using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
+﻿using MyHordesOptimizerApi.Dtos.MyHordes;
+using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using System.Collections.Generic;
 
@@ -18,5 +19,9 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
 
         void PatchRecipes(List<ItemRecipe> recipes);
         Dictionary<string, ItemRecipe> GetRecipes();
+
+        void PutBank(int townId, Dictionary<string, BankItem> bank);
+
+        void PatchCitizen(int townId, List<MyHordesCitizen> citizens);
     }
 }

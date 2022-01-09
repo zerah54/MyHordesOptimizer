@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using MyHordesOptimizerApi.Attributes.Firebase;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Repository.Abstract;
@@ -47,16 +48,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
             url = AddAuthentication(url);
             base.Patch(url: url, body: town.MyHordesMap);
 
-            foreach (var citizen in town.MyHordesMap.Citizens)
-            {
-                url = $"{Configuration.Url}/{_townCollection}/{town.Id}/{nameof(town.Citizens)}/{citizen.Name}.json";
-                url = AddParameterToQuery(url, "auth", Configuration.Secret);
-                base.Patch(url: url, body: citizen);
-            }
-
-            url = $"{Configuration.Url}/{_townCollection}/{town.Id}/{nameof(town.Bank)}.json";
-            url = AddParameterToQuery(url, "auth", Configuration.Secret);
-            base.Put(url: url, body: town.Bank);
+            PatchCitizen(town.Id, town.MyHordesMap.Citizens);
+            PutBank(town.Id, town.Bank);
         }
 
         public Town GetTown(int townId)
@@ -143,6 +136,31 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var url = $"{Configuration.Url}/{_recipeCollection}.json";
             url = AddAuthentication(url);
             return base.Get<Dictionary<string, ItemRecipe>>(url);
+        }
+
+        #endregion
+
+        #region Bank
+
+        public void PutBank(int townId, Dictionary<string, BankItem> bank)
+        {
+            var url = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(Town.Bank)}.json";
+            url = AddParameterToQuery(url, "auth", Configuration.Secret);
+            base.Put(url: url, body: bank);
+        }
+
+        #endregion
+
+        #region Citizens
+
+        public void PatchCitizen(int townId, List<MyHordesCitizen> citizens)
+        {
+            foreach (var citizen in citizens)
+            {
+                var url = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(Town.Citizens)}/{citizen.Name}.json";
+                url = AddParameterToQuery(url, "auth", Configuration.Secret);
+                base.Patch(url: url, body: citizen);
+            }
         }
 
         #endregion
