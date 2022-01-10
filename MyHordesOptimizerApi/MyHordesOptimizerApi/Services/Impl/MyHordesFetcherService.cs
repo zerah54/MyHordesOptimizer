@@ -39,7 +39,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         public IEnumerable<Item> GetItems()
         {
             var items = FirebaseRepository.GetItems();
-            return items.Values;
+            return items;
         }
 
         public Town GetTown()

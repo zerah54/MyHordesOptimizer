@@ -26,7 +26,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
             var items = FirebaseRepository.GetItems();
             foreach (var bankItem in source.City.Bank)
             {
-                var item = items.Values.First(x => x.XmlId == bankItem.Id);
+                var item = items.First(x => x.XmlId == bankItem.Id);
                 var destinationBankItem = new BankItem()
                 {
                     Item = item,

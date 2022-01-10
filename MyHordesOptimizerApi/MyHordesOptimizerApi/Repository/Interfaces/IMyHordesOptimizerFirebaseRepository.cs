@@ -14,8 +14,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         Dictionary<string, HeroSkill> GetHeroSkills();
 
         void PatchItems(List<Item> items);
-        Dictionary<string, Item> GetItems();
-        Item GetItemByJsonIdName(string jsonIdName);
+        List<Item> GetItems();
 
         void PatchRecipes(List<ItemRecipe> recipes);
         Dictionary<string, ItemRecipe> GetRecipes();

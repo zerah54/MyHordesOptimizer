@@ -97,24 +97,19 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             foreach (var item in items)
             {
-                var url = $"{Configuration.Url}/{_itemCollection}/{item.JsonIdName}.json";
+                var url = $"{Configuration.Url}/{_itemCollection}/{item.XmlId}.json";
                 url = AddAuthentication(url);
                 base.Patch(url: url, body: item);
             }
         }
 
-        public Dictionary<string, Item> GetItems()
+        public List<Item> GetItems()
         {
             var url = $"{Configuration.Url}/{_itemCollection}.json";
             url = AddAuthentication(url);
-            return base.Get<Dictionary<string, Item>>(url);
-        }
-
-        public Item GetItemByJsonIdName(string jsonIdName)
-        {
-            var url = $"{Configuration.Url}/{_itemCollection}/{jsonIdName}.json";
-            url = AddAuthentication(url);
-            return base.Get<Item>(url);
+            var list = base.Get<List<Item>>(url);
+            list.RemoveAll(x => x == null);
+            return list;
         }
 
         #endregion

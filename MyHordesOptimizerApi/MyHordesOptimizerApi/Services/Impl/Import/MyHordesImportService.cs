@@ -85,7 +85,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
                     Dictionary<string, string> dico = GenerateDictionnaryFromItem(items);
                     listOfDictionnary.Add(dico);
-                }         
+                }
             }
 
             foreach (var workingHeroSkill in listOfDictionnary)
@@ -123,6 +123,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var recipeStr = RemoveComments(request.Recipes);
             var recipesLine = Regex.Split(recipeStr, "\\n");
             var recipes = new List<ItemRecipe>();
+            var firebaseItems = FirebaseRepository.GetItems().ToList();
             foreach (var line in recipesLine)
             {
                 if (!string.IsNullOrWhiteSpace(line))
@@ -161,48 +162,61 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     if (@out.IndexOf("[") < 0) // si on a qu'un seul objet
                                                // 'out' => 'metal_#00'
                     {
-                        @out = @out.Replace("'","").Remove(dico["out"].Length - 4);
-                        var item = FirebaseRepository.GetItemByJsonIdName(@out);
-                        var itemResult = new ItemResult()
+                        @out = @out.Replace("'", "").Remove(dico["out"].Length - 4);
+                        foreach (var item in firebaseItems.Where(x => x.JsonIdName == @out))
                         {
-                            Item = item,
-                            Probability = 1
-                        };
-                        recipe.Result.Add(itemResult);
+                            var itemResult = new ItemResult()
+                            {
+                                Item = item,
+                                Probability = 1
+                            };
+                            recipe.Result.Add(itemResult);
+                        }
                     }
                     else // On peut avoir plusieurs résultat
                          // 'out' => [ ['pile_#00', 15], ['pilegun_empty_#00', 16], ['electro_#00', 23], ['meca_parts_#00', 18], ['tagger_#00', 14], ['deto_#00', 14] ]
                     {
                         @out = @out.ReplaceFirstOccurrence("[", "").ReplaceLastOccurrence("]", "");
                         var splitedOuts = SplitOnStringNotInBracesAndString(@out, ",", "'");
-                        foreach(var outLine in splitedOuts) // ['pile_#00', 15]
+                        foreach (var outLine in splitedOuts) // ['pile_#00', 15]
                         {
                             var workingItem = outLine.Replace("[", "").Replace("]", "").Trim();
                             var splitedWorkingItem = workingItem.Split(",");
                             var itemName = splitedWorkingItem[0].Replace("'", "");
                             itemName = itemName.Remove(itemName.Length - 4);
                             var weight = int.Parse(splitedWorkingItem[1]);
-
-                            var item = FirebaseRepository.GetItemByJsonIdName(itemName);
-                            var itemResult = new ItemResult()
+                            foreach (var item in firebaseItems.Where(x => x.JsonIdName == itemName))
                             {
-                                Item = item,
-                                Weight = weight
-                            };
-                            recipe.Result.Add(itemResult);
+                                var itemResult = new ItemResult()
+                                {
+                                    Item = item,
+                                    Weight = weight
+                                };
+                                recipe.Result.Add(itemResult);
+                            }
                         }
                         var totalWeight = recipe.Result.Sum(x => x.Weight);
-                        recipe.Result.ForEach(x => x.Probability = (double) x.Weight / totalWeight);
+                        recipe.Result.ForEach(x => x.Probability = (double)x.Weight / totalWeight);
                     }
+
                     foreach (var itemIn in ins)
                     {
-                        var itemName = itemIn.Remove(itemIn.Length - 4).Trim();
-                        Item item = FirebaseRepository.GetItemByJsonIdName(itemName);
-                        recipe.Components.Add(item);// On manipule un truc du genre saw_tool_#00, du coup on enlève le _#00;
+                        var xmlNumber = int.Parse(itemIn.Substring(itemIn.Length - 2)); // On récupère juste le numéro
+                        var itemName = itemIn.Remove(itemIn.Length - 4).Trim(); // On manipule un truc du genre saw_tool_#00, du coup on enlève le _#00;
+                        var componentItemsFromFirebase = firebaseItems.Where(x => x.JsonIdName == itemName).ToList();
+                        if (componentItemsFromFirebase.Count == 1) // Si un seul item correspond au json name, alors on l'ajoute à la liste des composant
+                        {
+                            recipe.Components.Add(componentItemsFromFirebase.First());
+                        }
+                        else // Sinon, ça veut dire que pour le même JsonName on a potentiellement plusière item (prints, soul_bleu), du coup on le récupère à partir du xmlId et du numéro _#01 (ou _#02, etc)
+                        {
+                            recipe.Components.Add(firebaseItems.Where(x => x.XmlId == componentItemsFromFirebase.First().XmlId + xmlNumber).First());
+                        }
                     }
                     recipes.Add(recipe);
                 }
             }
+            //
 
             // On ajoute les traduction
             GetTranslationFromSource(items: recipes, translationFile: translationFileFr, targetLocale: "fr", "de", nameof(ItemRecipe.Actions));
@@ -259,7 +273,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     item.Label = miror.Label;
                 }
             }
-
             return xmlItems;
         }
 
