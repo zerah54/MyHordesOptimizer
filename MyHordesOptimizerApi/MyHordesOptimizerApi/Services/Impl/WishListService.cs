@@ -19,8 +19,8 @@ namespace MyHordesOptimizerApi.Services.Impl
         private int _townId; // On est dans de l'injection de dépendance Scoped, on peut se permettre de stocker des infos
 
         public WishListService(ILogger<MyHordesFetcherService> logger,
-            IUserInfoProvider userInfoProvider, 
-            IMyHordesJsonApiRepository myHordesJsonApiRepository, 
+            IUserInfoProvider userInfoProvider,
+            IMyHordesJsonApiRepository myHordesJsonApiRepository,
             IMyHordesOptimizerFirebaseRepository firebaseRepository)
         {
             Logger = logger;
@@ -37,7 +37,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             // Enregistrer en base
             var town = FirebaseRepository.GetTown(myHordeMeResponse.Map.Id);
             var wishList = town.WishList;
-            if(wishList == null)
+            if (wishList == null)
             {
                 return new WishListWrapper();
             }
@@ -78,14 +78,8 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var item = FirebaseRepository.GetItemsById(itemId);
             var wishList = GetWishList();
-            if (wishList == null)
-            {
-                wishList = new WishListWrapper()
-                {
-                    LastUpadteInfo = UserInfoProvider.GenerateLastUpdateInfo()
-                };
-            }
-            else if (wishList.WishList.TryGetValue(item.XmlId.ToString(), out var @out)) // Si l'item est déjà dans la wishlist, on ne fait rien
+            wishList.LastUpadteInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            if (wishList.WishList.TryGetValue(item.XmlId.ToString(), out var @out)) // Si l'item est déjà dans la wishlist, on ne fait rien
             {
                 return;
             }
