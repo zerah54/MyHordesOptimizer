@@ -38,6 +38,39 @@ namespace MyHordesOptimizerApi.Services.Impl
         public IEnumerable<Item> GetItems()
         {
             var items = FirebaseRepository.GetItems();
+            var recipes = FirebaseRepository.GetRecipes();
+            foreach(var item in items)
+            {
+                var recipesToAdd = recipes.Values.Where(recipe => recipe.Components.Any(component => component.XmlId == item.XmlId)).ToList();
+                recipesToAdd.AddRange(recipes.Values.Where(recipes => recipes.Result.Any(result => result.Item.XmlId == item.XmlId)));
+                item.Recipes = recipesToAdd;
+            }
+
+            var me = MyHordesJsonApiRepository.GetMe();
+            if(me.Map != null) // On ne récupère les info propres à la ville uniquement si on est incarné
+            {
+                var town = FirebaseRepository.GetTown(me.Map.Id);
+
+                foreach (var item in items)
+                {
+                    if (town.WishList.WishList.TryGetValue(item.XmlId.ToString(), out var wishListItem))
+                    {
+                        item.WishListCount = wishListItem.Count;
+                    }
+                    else
+                    {
+                        item.WishListCount = 0;
+                    }
+                    if (town.Bank.Bank.TryGetValue(item.XmlId.ToString(), out var bankItem))
+                    {
+                        item.BankCount = bankItem.Count;
+                    }
+                    else
+                    {
+                        item.BankCount = 0;
+                    }
+                }
+            }
             return items;
         }
 
