@@ -2,7 +2,7 @@
 
 namespace MyHordesOptimizerApi.Attributes.Firebase
 {
-    public class FirebaseIgnore : Attribute
+    public class FirebaseSerializeIgnore : Attribute
     {
     }
 }

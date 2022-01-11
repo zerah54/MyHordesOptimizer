@@ -247,13 +247,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             {
                 case MediaTypeNames.Application.Json:
                     {
-                        var stringBody = body?.ToJson();
-                        if (stringBody == null)
-                        {
-                            stringBody = string.Empty;
-                        }
-                        Logger.LogDebug($"Request [HttpBody={stringBody}]");
-                        return new StringContent(stringBody, Encoding.UTF8, mediaTypeName);
+                        return GenerateJsonContent(body);
                     }
                 case "application/x-www-form-urlencoded":
                     {
@@ -273,16 +267,21 @@ namespace MyHordesOptimizerApi.Repository.Abstract
                     }
                 default:
                     {
-                        var stringBody = body?.ToJson();
-                        if (stringBody == null)
-                        {
-                            stringBody = string.Empty;
-                        }
-                        Logger.LogDebug($"Request [HttpBody={stringBody}]");
-                        return new StringContent(stringBody, Encoding.UTF8, MediaTypeNames.Application.Json);
+                        return GenerateJsonContent(body);
                     }
             }
 
+        }
+
+        protected virtual HttpContent GenerateJsonContent(object body)
+        {
+            var stringBody = body?.ToJson();
+            if (stringBody == null)
+            {
+                stringBody = string.Empty;
+            }
+            Logger.LogDebug($"Request [HttpBody={stringBody}]");
+            return new StringContent(stringBody, Encoding.UTF8, MediaTypeNames.Application.Json);
         }
     }
 

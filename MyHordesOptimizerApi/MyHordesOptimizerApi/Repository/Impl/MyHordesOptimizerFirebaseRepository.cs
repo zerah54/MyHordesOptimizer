@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Repository.Abstract;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -15,6 +16,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -189,6 +191,16 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return url;
         }
 
+        protected override HttpContent GenerateJsonContent(object body)
+        {
+            var stringBody = body?.ToFirebaseJson();
+            if (stringBody == null)
+            {
+                stringBody = string.Empty;
+            }
+            Logger.LogDebug($"Request [HttpBody={stringBody}]");
+            return new StringContent(stringBody, Encoding.UTF8, MediaTypeNames.Application.Json);
+        }
 
         // Ne marche pas
         #region tentative de token

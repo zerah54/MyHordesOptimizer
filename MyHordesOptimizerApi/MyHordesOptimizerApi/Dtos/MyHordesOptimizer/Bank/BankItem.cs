@@ -7,7 +7,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     {
         public Item Item { get; set; }
         public int Count { get; set; }
-        [FirebaseIgnore]
+        [FirebaseSerializeIgnore]
         public int WishListCount { get; set; }
     }
 }

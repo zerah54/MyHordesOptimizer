@@ -37,6 +37,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             // Enregistrer en base
             var town = FirebaseRepository.GetTown(myHordeMeResponse.Map.Id);
             var wishList = town.WishList;
+            if(wishList == null)
+            {
+                return new WishListWrapper();
+            }
 
             foreach (var kvp in wishList.WishList)
             {
