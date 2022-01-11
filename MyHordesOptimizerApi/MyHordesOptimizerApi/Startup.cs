@@ -84,6 +84,7 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IMyHordesFetcherService, MyHordesFetcherService>();
             services.AddScoped<IExternalToolsService, ExternalToolsService>();
             services.AddScoped<IMyHordesImportService, MyHordesImportService>();
+            services.AddScoped<IWishListService, WishListService>();
 
 
             services.AddApplicationInsightsTelemetry();

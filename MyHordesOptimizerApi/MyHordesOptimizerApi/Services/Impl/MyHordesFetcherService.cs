@@ -5,8 +5,8 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyHordesOptimizerApi.Services.Impl
 {
@@ -18,7 +18,6 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IMyHordesOptimizerFirebaseRepository FirebaseRepository { get; set; }
         protected readonly IMapper Mapper;
         protected IUserInfoProvider UserInfoProvider { get; set; }
-
 
 
         public MyHordesFetcherService(ILogger<MyHordesFetcherService> logger,
@@ -83,9 +82,22 @@ namespace MyHordesOptimizerApi.Services.Impl
             // Enregistrer en base
             FirebaseRepository.PutBank(town.Id, town.Bank);
             town = FirebaseRepository.GetTown(town.Id);
-            var bank = town.Bank;
+            var bankWrapper = town.Bank;
 
-            return bank;
+            foreach (var kvp in bankWrapper.Bank)
+            {
+                var bankItem = kvp.Value;
+                if (town.WishList.WishList.TryGetValue(bankItem.Item.XmlId.ToString(), out var wishListItem))
+                {
+                    bankItem.WishListCount = wishListItem.Count;
+                }
+                else
+                {
+                    bankItem.WishListCount = 0;
+                }
+            }
+
+            return bankWrapper;
         }
 
         public CitizensWrapper GetCitizens()

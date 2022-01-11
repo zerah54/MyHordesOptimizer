@@ -32,7 +32,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
                     Item = item,
                     Count = bankItem.Count
                 };
-                wrapper.Bank[item.JsonIdName] = destinationBankItem;
+                wrapper.Bank[item.XmlId.ToString()] = destinationBankItem;
             }
             wrapper.LastUpadteInfo = UserInfoProvider.GenerateLastUpdateInfo();
             return wrapper;

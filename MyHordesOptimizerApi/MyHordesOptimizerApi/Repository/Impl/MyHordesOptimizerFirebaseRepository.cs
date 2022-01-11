@@ -112,6 +112,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return list;
         }
 
+        public Item GetItemsById(int itemId)
+        {
+            var url = $"{Configuration.Url}/{_itemCollection}/{itemId}.json";
+            url = AddAuthentication(url);
+            var item = base.Get<Item>(url);
+            return item;
+        }
+
         #endregion
 
         #region Recipes
@@ -142,6 +150,17 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var url = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(Town.Bank)}.json";
             url = AddParameterToQuery(url, "auth", Configuration.Secret);
             base.Put(url: url, body: bank);
+        }
+
+        #endregion
+
+        #region WishList
+
+        public void PutWishList(int townId, WishListWrapper wishList)
+        {
+            var url = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(WishListWrapper.WishList)}.json";
+            url = AddParameterToQuery(url, "auth", Configuration.Secret);
+            base.Put(url: url, body: wishList);
         }
 
         #endregion

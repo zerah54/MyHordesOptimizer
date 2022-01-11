@@ -1,5 +1,4 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordes;
-using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
@@ -12,5 +11,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public CitizensWrapper Citizens { get; set; }
 
         public BankWrapper Bank { get; set; }
+
+        public WishListWrapper WishList { get; set; }
     }
 }
