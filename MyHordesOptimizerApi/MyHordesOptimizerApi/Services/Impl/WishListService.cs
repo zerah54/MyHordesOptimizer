@@ -61,7 +61,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             return wishList;
         }
 
-        public void PutWishList(List<WishListPutResquestDto> wishListPutRequest)
+        public WishListWrapper PutWishList(List<WishListPutResquestDto> wishListPutRequest)
         {
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
             var items = FirebaseRepository.GetItems();
@@ -81,6 +81,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 wishListWrapper.WishList[itemId.ToString()] = wishLiteItem;
             }
             FirebaseRepository.PutWishList(myHordeMeResponse.Map.Id, wishListWrapper);
+            return wishListWrapper;
         }
 
         public void AddItemToWishList(int itemId)

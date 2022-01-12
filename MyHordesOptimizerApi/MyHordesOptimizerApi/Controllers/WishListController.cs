@@ -35,7 +35,7 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpPut]
-        public ActionResult PutWishList(string userKey, List<WishListPutResquestDto> request)
+        public ActionResult<WishListWrapper> PutWishList(string userKey, List<WishListPutResquestDto> request)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
@@ -46,8 +46,8 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(request)} cannot be null");
             }
             UserKeyProvider.UserKey = userKey;
-            _wishListService.PutWishList(request);
-            return Ok();
+            var wishList = _wishListService.PutWishList(request);
+            return Ok(wishList);
         }
 
         [HttpPost]
