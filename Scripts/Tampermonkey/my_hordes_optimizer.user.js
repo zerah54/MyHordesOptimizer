@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.5
+// @version      1.0.0-alpha.6
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -8,6 +8,9 @@
 // @updateURL    https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
 // @homepageURL  https://myhordes-optimizer.web.app/script
 // @supportURL   lenoune38@gmail.com
+//
+// @connect      https://myhordesoptimizerapi.azurewebsites.net/
+// @connect      *
 //
 // @match        https://zombvival.de/myhordes/*
 // @match        https://myhordes.de/*
@@ -131,6 +134,18 @@ const texts = {
         fr: `Vous avez demandé à être prévenu avant de quitter la page si vous n'êtes pas en attente d'escorte.`,
         de: `TODO`,
         es: `TODO`
+    },
+    save: {
+        en: `Save`,
+        fr: `Enregistrer`,
+        de: `TODO`,
+        es: `TODO`
+    },
+    update: {
+        en: `Update`,
+        fr: `Mettre à jour`,
+        de: `TODO`,
+        es: `TODO`
     }
 };
 
@@ -222,6 +237,23 @@ const action_types = [
     {id: 'Workshop', label: {en: 'Workshop', fr: 'Atelier', de: '', es: ''}, ordering: 0},
 ];
 
+const wishlist_priorities = [
+    {value: 0, label: {en: 'Not defined', fr: 'Non définie', es: '', de: ''}},
+    {value: 10, label: {en: 'Low', fr: 'Basse', es: '', de: ''}},
+    {value: 20, label: {en: 'Medium', fr: 'Moyenne', es: '', de: ''}},
+    {value: 30, label: {en: 'High', fr: 'Haute', es: '', de: ''}},
+];
+
+const wishlist_headers = [
+    {label: {en: 'Item', fr: 'Objet', es: '', de: ''}, id: 'label'},
+    {label: {en: 'Prioriry', fr: 'Priorité', es: '', de: ''}, id: 'priority'},
+    {label: {en: '', fr: 'Stock en banque', es: '', de: ''}, id: 'bank_count'},
+    {label: {en: '', fr: 'Stock souhaité', es: '', de: ''}, id: 'bank_needed'},
+    {label: {en: '', fr: 'Quantité manquante', es: '', de: ''}, id: 'diff'},
+    {label: {en: '', fr: '', es: '', de: ''}, id: 'delete'},
+];
+
+
 //////////////////////////////////
 // La liste des onglets du wiki //
 //////////////////////////////////
@@ -256,6 +288,12 @@ let tabs_list = {
         },
         {
             ordering: 1,
+            id: 'wishlist',
+            label: {en: 'Wishlist', fr: 'Liste de courses', de: 'TODO', es: 'TODO'},
+            icon: repo_img_url + 'item/item_cart.gif'
+        },
+        {
+            ordering: 2,
             id: 'citizens',
             label: {en: 'Citizens', fr: 'Citoyens', de: 'TODO', es: 'TODO'},
             icon: repo_img_url + 'icons/small_human.gif'
@@ -272,7 +310,8 @@ let params = [
     {id: 'update_fata', label: {en: 'TODO', fr: `Mettre à jour Fata Morgana`, de: 'TODO', es: 'TODO'}},
     {id: 'enhanced_tooltips', label: {en: 'TODO', fr: `Afficher des tooltips détaillés`, de: 'TODO', es: 'TODO'}},
     {id: 'click_on_voted', label: {en: 'TODO', fr: `Navigation rapide vers le chantier recommandé`, de: 'TODO', es: 'TODO'}},
-    {id: 'prevent_from_leaving', label: {en: 'TODO', fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`, de: 'TODO', es: 'TODO'}}
+    {id: 'prevent_from_leaving', label: {en: 'TODO', fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`, de: 'TODO', es: 'TODO'}},
+    {id: 'display_wishlist', label: {en: 'TODO', fr: `Afficher la liste de courses dans l'interface`, de: 'TODO', es: 'TODO'}}
 ];
 
 let informations = [
@@ -288,6 +327,7 @@ let recipes;
 let citizens;
 let hero_skills;
 let bank;
+let wishlist;
 
 /////////////////////////////////////////
 // Fonctions utiles / Useful functions //
@@ -305,12 +345,23 @@ function buttonOptimizerExists() {
 
 /** @return {boolean}    true si la page de l'utilisateur est la page de la ville */
 function pageIsTown() {
-    return document.URL.indexOf('town')
+    return document.URL.indexOf('town') > -1;
+}
+
+/** @return {boolean}    true si la page de l'utilisateur est la page de l'atelier */
+function pageIsWorkshop() {
+    return document.URL.endsWith('workshop');
+}
+
+
+/** @return {boolean}    true si la page de l'utilisateur est la page des chantiers */
+function pageIsConstructions() {
+    return document.URL.endsWith('constructions');
 }
 
 /** @return {boolean}    true si la page de l'utilisateur est la page du désert */
 function pageIsDesert() {
-    return document.URL.indexOf('desert')
+    return document.URL.indexOf('desert') > -1;
 }
 
 /** Affiche la page de chargement de MyHordes */
@@ -634,7 +685,7 @@ function dispatchContent(window_type, tab) {
     }
     switch(tab.id) {
         case 'items':
-            displayItems(items);
+            displayItems(items, tab.id);
             break;
         case 'recipes':
             displayRecipes();
@@ -646,7 +697,10 @@ function dispatchContent(window_type, tab) {
             displayCitizens();
             break;
         case 'bank':
-            displayBank();
+            displayBank(tab.id);
+            break;
+        case 'wishlist':
+            displayWishlist();
             break;
         default:
             break;
@@ -658,22 +712,153 @@ function filterItems(source_items) {
     return source_items;
 }
 
-function displayBank() {
+/**
+ * Affiche les éléments présents dans la banque
+ * @param {string} tab_id
+ */
+function displayBank(tab_id) {
     bank = undefined;
     getBank();
     let interval = setInterval(() => {
         if (bank) {
-            displayItems(bank.bank);
+            displayItems(bank.bank, tab_id);
             clearInterval(interval);
         }
-    }, 500)
-    }
+    }, 500);
+}
+
+/** Affiche les éléments présents dans la liste de courses */
+function displayWishlist() {
+    wishlist = undefined;
+    getWishlist();
+    let interval = setInterval(() => {
+        if (wishlist) {
+            clearInterval(interval);
+            let tab_content = document.getElementById('tab-content');
+
+            let tab_content_header = document.createElement('div');
+            tab_content.appendChild(tab_content_header);
+
+            let save_button = document.createElement('button');
+            save_button.innerText = texts.save[lang];
+            save_button.addEventListener('click', () => {
+                updateWishlist();
+            });
+            tab_content_header.appendChild(save_button);
+
+            let wishlist_list = document.createElement('ul');
+            wishlist_list.id = 'wishlist';
+            tab_content.appendChild(wishlist_list);
+
+            let list_header = document.createElement('div');
+            list_header.classList.add('header');
+            wishlist_list.appendChild(list_header);
+
+            wishlist_headers.forEach((header) => {
+                let header_cell = document.createElement('div');
+                header_cell.innerText = header.label[lang];
+                header_cell.classList.add(header.id);
+                list_header.appendChild(header_cell);
+            });
+
+
+            wishlist.wishList
+                .filter((item) => item.count > 0)
+                .forEach((item, index) => {
+
+                let item_element = document.createElement('li');
+                wishlist_list.appendChild(item_element);
+
+                let item_title_container = document.createElement('div');
+                item_title_container.classList.add('label');
+                item_element.appendChild(item_title_container);
+
+                let item_icon = document.createElement('img');
+                item_icon.setAttribute('style', 'margin-right: 0.5em');
+                item_icon.src = hordes_img_url + item.item.img;
+                item_title_container.appendChild(item_icon);
+
+                let item_title = document.createElement('span');
+                item_title.innerText = item.item.label[lang];
+                item_title_container.appendChild(item_title);
+
+                let item_priority_container = document.createElement('div');
+                item_priority_container.classList.add('priority');
+                item_element.appendChild(item_priority_container);
+
+                let item_priority_select = document.createElement('select');
+                item_priority_select.value = item.priority;
+                item_priority_select.addEventListener('change', () => {
+                    item.priority = +item_priority_select.value;
+                });
+                item_priority_container.appendChild(item_priority_select);
+
+                wishlist_priorities.forEach((priority) => {
+                    let item_priority_option = document.createElement('option');
+                    item_priority_option.value = priority.value;
+                    item_priority_option.innerText = priority.label[lang];
+                    item_priority_select.appendChild(item_priority_option);
+                });
+
+                let item_bank_count = document.createElement('div');
+                item_bank_count.innerText = item.bankCount;
+                item_bank_count.classList.add('bank_count');
+                item_element.appendChild(item_bank_count);
+
+                let item_bank_needed = document.createElement('div');
+                item_bank_needed.classList.add('bank_needed');
+                item_element.appendChild(item_bank_needed);
+
+                let item_bank_needed_input = document.createElement('input');
+                item_bank_needed_input.type = 'number';
+                item_bank_needed_input.value = item.count;
+                item_bank_needed_input.addEventListener('change', (event) => {
+                    item_bank_needed_input.value = +event.target.value;
+                    item.count = +event.target.value;
+                    item_diff_input.value = item.count - item.bankCount;
+                });
+                item_bank_needed.appendChild(item_bank_needed_input);
+
+                let item_diff = document.createElement('div');
+                item_diff.classList.add('diff');
+                item_element.appendChild(item_diff);
+
+                let item_diff_input = document.createElement('input');
+                item_diff_input.type = 'number';
+                item_diff_input.value = item.count - item.bankCount;
+                item_diff_input.addEventListener('change', (event) => {
+                    item_diff_input.value = +event.target.value;
+                    item.count = +item.bankCount + +item_diff_input.value;
+                    item_bank_needed_input.value = item.count;
+                });
+                item_diff.appendChild(item_diff_input);
+
+                let item_remove = document.createElement('div');
+                item_remove.classList.add('delete');
+                item_element.appendChild(item_remove);
+
+                let item_remove_img = document.createElement('img');
+                item_remove_img.alt = '(X)';
+                item_remove_img.src = repo_img_url + 'icons/b_close.png';
+                item_remove_img.addEventListener('click', () => {
+                    item.count = undefined;
+                    item_bank_needed_input.value = item.bankCount;
+                    item_diff_input.value = 0;
+                    item_element.remove();
+                })
+                item_remove.appendChild(item_remove_img);
+
+            });
+        }
+    }, 500);
+}
 
 /**
 * Affiche la liste des objets
 * @param filtered_items
+* @param {string} tab_id l'onglet dans lequel on se trouve
 */
-function displayItems(filtered_items) {
+function displayItems(filtered_items, tab_id) {
     let tab_content = document.getElementById('tab-content');
 
     let item_list = document.createElement('ul');
@@ -690,22 +875,41 @@ function displayItems(filtered_items) {
             category_text.innerText = item.category.label[lang];
 
             let category_container = document.createElement('div');
-            category_container.classList.add('category');
-            category_container.classList.add('header');
+            category_container.classList.add('category', 'header');
             category_container.appendChild(category_img);
             category_container.appendChild(category_text);
 
             item_list.appendChild(category_container);
         }
 
-        let item_title_container = document.createElement('div');
+        let item_title_and_add_container = document.createElement('div');
+        item_title_and_add_container.classList.add('item-title');
 
-        if (item.count) {
+        let item_title_container = document.createElement('div');
+        item_title_container.setAttribute('style', 'flex: 1; cursor: pointer;');
+        item_title_and_add_container.appendChild(item_title_container)
+
+        if ((tab_id === 'bank' || tab_id === 'items') && item.wishListCount === 0 && mh_user.townId) {
+            let item_add_to_wishlist = document.createElement('div');
+            item_add_to_wishlist.classList.add('add-to-wishlist');
+            item_title_and_add_container.appendChild(item_add_to_wishlist);
+
+            let add_to_wishlist_button = document.createElement('button');
+            add_to_wishlist_button.classList.add('inline');
+            add_to_wishlist_button.innerHTML = '<img src="' + repo_img_url + 'item/item_cart.gif""></img>';
+            add_to_wishlist_button.addEventListener('click', () => {
+                addItemToWishlist(item, item_add_to_wishlist);
+            })
+            item_add_to_wishlist.appendChild(add_to_wishlist_button);
+        }
+
+        if (tab_id === 'bank' && item.count) {
             let item_count = document.createElement('span');
             item_count.innerText = '(x' + item.count + ')';
             item_count.setAttribute('style', 'margin-right: 0.5em');
             item_title_container.appendChild(item_count);
         }
+
         let item_icon = document.createElement('img');
         item_icon.setAttribute('style', 'margin-right: 0.5em');
         item_icon.src = hordes_img_url + item.img;
@@ -730,10 +934,10 @@ function displayItems(filtered_items) {
         }
 
         let item_container = document.createElement('li');
-        item_container.appendChild(item_title_container);
+        item_container.appendChild(item_title_and_add_container);
         item_container.appendChild(item_properties_container);
 
-        item_container.addEventListener('click', () => {
+        item_title_container.addEventListener('click', () => {
             let selected_items = document.getElementsByClassName('selected');
             item_container.classList.toggle('selected');
         });
@@ -793,12 +997,12 @@ function displayCitizens() {
                     cell.innerText = citizen[header_cell.id];
                     citizen_row.appendChild(cell);
                 })
-                console.log('citizen', citizen);
+                // console.log('citizen', citizen);
             }
 
             clearInterval(interval);
         }
-    }, 500)
+    }, 500);
 }
 
 /** Affiche la liste des pouvoirs */
@@ -858,7 +1062,7 @@ function displaySkills() {
                 displaySkills()
                 clearInterval(interval);
             }
-        }, 500)
+        }, 500);
     }
 }
 
@@ -886,7 +1090,6 @@ function displayRecipes() {
             }
 
             let recipe_container = document.createElement('li');
-            recipe_container.classList.add('recipe');
 
             let compos_container = document.createElement('ul');
             compos_container.setAttribute('style', 'padding: 0; min-width: 200px; width: 25%;');
@@ -952,7 +1155,7 @@ function displayRecipes() {
                 displayRecipes()
                 clearInterval(interval);
             }
-        }, 500)
+        }, 500);
     }
 }
 
@@ -1032,7 +1235,7 @@ function createUpdateExternalToolsButton() {
 
 /** Si l'option associée est activée, un clic sur le chantier recommandé permet de rediriger vers la ligne du chantier en question */
 function clickOnVotedToRedirect() {
-    if (mho_parameters.click_on_voted && pageIsTown()) {
+    if (mho_parameters.click_on_voted && pageIsConstructions()) {
         let voted_building = document.getElementsByClassName('voted-building')[0];
         if (voted_building) {
             voted_building.setAttribute('style', 'cursor: pointer');
@@ -1042,6 +1245,120 @@ function clickOnVotedToRedirect() {
                 voted_row.scrollIntoView();
             });
         }
+    }
+}
+
+function displayWishlistInApp() {
+    let wishlist_section = document.getElementById('wishlist-section');
+
+    if (wishlist && mho_parameters.display_wishlist && (pageIsWorkshop() || pageIsDesert())) {
+        if (wishlist_section) return;
+
+        let list_to_display = wishlist.wishList.filter((item) => {
+            if (pageIsWorkshop()) {
+                return item.isWorkshop;
+            } else {
+                return item.count - item.bankCount > 0
+            }
+        });
+        if (pageIsWorkshop() && list_to_display.length === 0) return;
+
+        let refreshWishlist = (header, content) => {
+            let update_section = document.createElement('div');
+            header.appendChild(update_section);
+
+            let last_update = document.createElement('span');
+            last_update.classList.add('small');
+            last_update.setAttribute('style', 'margin-right: 0.5em;');
+            last_update.innerText = new Intl.DateTimeFormat('default', { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
+            update_section.appendChild(last_update);
+
+            let update_btn = document.createElement('button');
+            update_btn.classList.add('inline');
+            update_btn.innerText = texts.update[lang];
+            update_btn.addEventListener('click', () => {
+                wishlist = undefined;
+                getWishlist();
+            });
+            update_section.appendChild(update_btn);
+
+            let list = document.createElement('div');
+            list.classList.add('row-table');
+            content.appendChild(list);
+
+            let list_header = document.createElement('div');
+            list_header.classList.add('row-flex', 'header', 'bottom');
+            list.appendChild(list_header);
+
+            wishlist_headers
+                .filter((header_cell_item) => header_cell_item.id !== 'delete')
+                .forEach((header_cell_item) => {
+                let header_cell = document.createElement('div');
+                header_cell.classList.add('padded', 'cell');
+                header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : (header_cell_item.id === 'priority' ? 'rw-3' : 'rw-2'));
+                header_cell.innerText = header_cell_item.label[lang];
+                list_header.appendChild(header_cell);
+            });
+
+            list_to_display
+                .forEach((item) => {
+                let list_item = document.createElement('div');
+                list_item.classList.add('row-flex');
+                list.appendChild(list_item);
+
+                let title = document.createElement('div');
+                title.classList.add('padded', 'cell', 'rw-5');
+                title.innerHTML = `<img src="${hordes_img_url + item.item.img}" style="margin-right: 5px"></img><span class="small">${item.item.label[lang]}</span>`;
+                list_item.appendChild(title);
+
+                let item_priority = document.createElement('span');
+                item_priority.classList.add('padded', 'cell', 'rw-3');
+                item_priority.innerHTML = `<span class="small">${wishlist_priorities.find((priority) => item.priority === priority.value).label[lang]}</span}`;
+                list_item.appendChild(item_priority);
+
+                let bank_count = document.createElement('span');
+                bank_count.classList.add('padded', 'cell', 'rw-2');
+                bank_count.innerHTML = `<span class="small">${item.bankCount}</span}`;
+                list_item.appendChild(bank_count);
+
+                let bank_need = document.createElement('span');
+                bank_need.classList.add('padded', 'cell', 'rw-2');
+                bank_need.innerHTML = `<span class="small">${item.count}</span}`;
+                list_item.appendChild(bank_need);
+
+                let needed = document.createElement('span');
+                needed.classList.add('padded', 'cell', 'rw-2');
+                needed.innerHTML = `<span class="small">${item.count - item.bankCount}</span}`;
+                list_item.appendChild(needed);
+            });
+        };
+
+        wishlist_section = document.createElement('div');
+        wishlist_section.id = 'wishlist-section';
+        wishlist_section.classList.add('row');
+
+        if (pageIsWorkshop()) {
+            let worshop_table = document.getElementsByClassName('row-table')[0];
+            worshop_table.parentNode.insertBefore(wishlist_section, worshop_table.nextSibling);
+        } else {
+            let other_citizens = document.getElementsByClassName('other_citizens')[0];
+            other_citizens.parentNode.insertBefore(wishlist_section, other_citizens.previousSibling);
+        }
+
+        let cell = document.createElement('div');
+        wishlist_section.appendChild(cell);
+
+        let header = document.createElement('h5');
+        header.setAttribute('style', 'display: flex; justify-content: space-between;');
+        header.innerHTML = `<span style="margin-top: auto;">${tabs_list.tools.find((tool) => tool.id === 'wishlist').label[lang]}</span>`;
+        cell.appendChild(header);
+
+        let content = document.createElement('div');
+        cell.appendChild(content);
+
+        refreshWishlist(header, content);
+    } else if (wishlist_section) {
+        wishlist_section.remove();
     }
 }
 
@@ -1340,7 +1657,8 @@ function createStyles() {
     const tab_content_item_list_item_style = '#tab-content > ul > li {'
     + 'min-width: 300px;'
     + 'flex-basis: min-content;'
-    + 'cursor: pointer;'
+    + 'padding: 0 0.5em;'
+    + 'margin: 0.125em 0;'
     + '}';
 
     const tab_content_item_list_item_selected_style = '#tab-content > ul > li.selected {'
@@ -1403,10 +1721,64 @@ function createStyles() {
     + 'font-size: 9pt;'
     + '}';
 
-    const recipe_style = '#tab-content .recipe {'
-    + 'min-width: 100%;'
+    const recipe_style = '#tab-content #recipes-list > li, #wishlist > li {'
+    + 'min-width: 100% !important;'
     + 'display: flex;'
     + 'border-bottom: 1px dotted;'
+    + '}';
+
+    const item_title_style = '.item-title {'
+    + 'display: flex;'
+    + 'justify-content: space-between;'
+    + '}';
+
+    const add_to_wishlist_button_img_style = '.add-to-wishlist > button > img {'
+    + 'margin-right: 0;'
+    + '}';
+
+    const input_number_webkit_style = 'input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {'
+    + '-webkit-appearance: none;'
+    + 'margin: 0;'
+    + '}';
+
+    const input_number_firefox_style = 'input[type=number] {'
+    + '-moz-appearance: textfield;'
+    + '}';
+
+    const wishlist_header = '#wishlist .header, #wishlist > li {'
+    + 'padding: 0 8px;'
+    + 'margin: 0.125em 0;'
+    + 'width: 100%;'
+    + '}';
+
+    const wishlist_header_cell = '#wishlist .header > div {'
+    + 'display: inline-block;'
+    + 'vertical-align: middle;'
+    + '}'
+
+    const wishlist_label = '#wishlist .label {'
+    + 'width: calc(100% - 425px);'
+    + 'min-width: 200px;'
+    + 'padding: 0 4px;'
+    + '}';
+
+    const wishlist_cols = '#wishlist .priority, #wishlist .bank_count, #wishlist .bank_needed, #wishlist .diff {'
+    + 'width: 100px;'
+    + 'padding: 0 4px;'
+    + '}';
+
+    const wishlist_delete = '#wishlist .delete {'
+    + 'width: 25px;'
+    + 'text-align: center;'
+    + '}';
+
+    const wishlist_in_app = '#wishlist-section ul {'
+    + 'padding-left: 0;'
+    + '}';
+
+    const wishlist_in_app_item = '#wishlist-section ul > li {'
+    + 'display: flex;'
+    + 'justify-content: space-between;'
     + '}';
 
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
@@ -1414,8 +1786,10 @@ function createStyles() {
     + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
     + tabs_style + tabs_ul_style + tabs_ul_li_style + tabs_ul_li_spacing_style + tabs_ul_li_div_style + tabs_ul_li_div_hover_style + tabs_ul_li_selected_style
     + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
-    + parameters_informations_style + parameters_informations_ul_style + li_style + recipe_style
-    + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style;
+    + parameters_informations_style + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
+    + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style
+    + item_title_style + add_to_wishlist_button_img_style
+    + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item;
 
     let style = document.createElement('style');
 
@@ -1532,8 +1906,9 @@ function getBank() {
                 bank = response.response;
                 bank.bank = Object.keys(bank.bank).map((key) => bank.bank[key])
                     .map((bank_info) => {
-                    bank_info.item.category = getCategory(bank_info.item.category)
+                    bank_info.item.category = getCategory(bank_info.item.category);
                     bank_info.item.count = bank_info.count;
+                    bank_info.item.wishListCount = bank_info.wishListCount;
                     bank_info = bank_info.item;
                     return bank_info;
                 })
@@ -1546,7 +1921,82 @@ function getBank() {
     });
 }
 
+/** Récupère les informations de liste de course */
+function getWishlist() {
+    startLoading();
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: api_url + 'wishlist?userKey=' + external_app_id,
+        responseType: 'json',
+        onload: function(response){
+            if (response.status === 200) {
+                wishlist = response.response;
+                wishlist.wishList = Object.keys(wishlist.wishList).map((key) => wishlist.wishList[key]);
+            } else {
+                wishlist = [];
+                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+            }
+            endLoading();
+        }
+    });
+}
+
+/**
+  * Ajoute un élément à la wishlist
+  * @param item l'élément à ajouter à la wishlist
+  */
+function addItemToWishlist(item, cart_button) {
+    startLoading();
+    GM_xmlhttpRequest({
+        method: 'POST',
+        url: api_url + 'wishlist/add/' + item.xmlId + '?userKey=' + external_app_id,
+        responseType: 'json',
+        onload: function(response){
+            if (response.status === 200) {
+                item.wishListCount = 1;
+                cart_button.remove();
+                // TODO SNACKBAR
+            } else {
+                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+            }
+            endLoading();
+        }
+    });
+}
+
+/** Met à jour les données de la wishlist */
+function updateWishlist() {
+    let item_list = wishlist.wishList
+    .filter((item) => item.count)
+    .map((item) => {
+        return {id: item.item.xmlId, priority: item.priority, count: item.count};
+    });
+    startLoading();
+    GM_xmlhttpRequest({
+        method: 'PUT',
+        url: api_url + 'wishlist?userKey=' + external_app_id,
+        data: JSON.stringify(item_list),
+        responseType: 'json',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        onload: function(response){
+            if (response.status === 200) {
+                // TODO SNACKBAR
+                wishlist = response.response;
+                wishlist.wishList = Object.keys(wishlist.wishList).map((key) => wishlist.wishList[key]);
+            } else {
+                console.error(`response`, response);
+                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+            }
+            endLoading();
+        }
+    });
+}
+
+/** Met à jour les outils externes (BBH, GH et Fata) en fonction des paramètres sélectionnés */
 function updateExternalTools() {
+    startLoading();
     let tools_to_update = {
         isBigBrothHordes: mho_parameters ? mho_parameters.update_bbh : false,
         isFataMorgana: mho_parameters ? mho_parameters.update_fata : false,
@@ -1556,7 +2006,7 @@ function updateExternalTools() {
     GM_xmlhttpRequest({
         method: 'POST',
         url: api_url + 'externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id,
-        data: JSON.stringify (tools_to_update),
+        data: JSON.stringify(tools_to_update),
         headers: {
             'Content-Type': 'application/json'
         },
@@ -1576,6 +2026,7 @@ function updateExternalTools() {
                 console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
                 btn.innerHTML = '<img src ="' + repo_img_url + 'professions/death.gif">' + texts.update_external_tools_fail_btn_label[lang];
             }
+            endLoading();
         }
     });
 }
@@ -1586,9 +2037,6 @@ function getHeroSkills(hide_loader_on_finish) {
     GM_xmlhttpRequest({
         method: 'GET',
         url: api_url + 'myhordesfetcher/heroSkills',
-        headers: {
-            'Content-Type': 'application/json'
-        },
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
@@ -1609,9 +2057,6 @@ function getRecipes() {
     GM_xmlhttpRequest({
         method: 'GET',
         url: api_url + 'myhordesfetcher/recipes',
-        headers: {
-            'Content-Type': 'application/json'
-        },
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
@@ -1661,12 +2106,14 @@ function getRecipes() {
 
         getMe();
         getItems();
+        getWishlist();
 
         preventFromLeaving();
 
         setInterval(() => {
             createUpdateExternalToolsButton();
             clickOnVotedToRedirect();
+            displayWishlistInApp();
         }, 500);
 
         setInterval(() => {
