@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -34,7 +35,6 @@ namespace MyHordesOptimizerApi.Services.Impl
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
             _townId = myHordeMeResponse.Map.Id;
 
-            // Enregistrer en base
             var town = FirebaseRepository.GetTown(myHordeMeResponse.Map.Id);
             var wishList = town.WishList;
             if (wishList == null)
@@ -42,6 +42,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 return new WishListWrapper();
             }
 
+            var recipes = FirebaseRepository.GetRecipes();
             foreach (var kvp in wishList.WishList)
             {
                 var wishlistItem = kvp.Value;
@@ -53,6 +54,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     wishlistItem.BankCount = 0;
                 }
+                wishlistItem.IsWorkshop = recipes.Values.Any(x => x.Type == ItemRecipeType.Workshop.GetDescription() 
+                                                             && (x.Components.Any(component => component.XmlId == wishlistItem.Item.XmlId) || x.Result.Any(result => result.Item.XmlId == wishlistItem.Item.XmlId)));
             }
             return wishList;
         }
