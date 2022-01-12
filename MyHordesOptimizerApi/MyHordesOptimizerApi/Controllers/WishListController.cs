@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
@@ -34,18 +35,18 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpPut]
-        public ActionResult PutWishList(string userKey, Dictionary<string, WishListItem> wishList)
+        public ActionResult PutWishList(string userKey, List<WishListPutResquestDto> request)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
-            if(wishList == null)
+            if(request == null)
             {
-                return BadRequest($"{nameof(wishList)} cannot be null");
+                return BadRequest($"{nameof(request)} cannot be null");
             }
             UserKeyProvider.UserKey = userKey;
-            _wishListService.PutWishList(wishList);
+            _wishListService.PutWishList(request);
             return Ok();
         }
 

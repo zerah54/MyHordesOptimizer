@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -54,26 +55,31 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     wishlistItem.BankCount = 0;
                 }
-                wishlistItem.IsWorkshop = recipes.Values.Any(x => x.Type == ItemRecipeType.Workshop.GetDescription() 
+                wishlistItem.IsWorkshop = recipes.Values.Any(x => x.Type == ItemRecipeType.Workshop.GetDescription()
                                                              && (x.Components.Any(component => component.XmlId == wishlistItem.Item.XmlId) || x.Result.Any(result => result.Item.XmlId == wishlistItem.Item.XmlId)));
             }
             return wishList;
         }
 
-        public void PutWishList(Dictionary<string, WishListItem> wishList)
+        public void PutWishList(List<WishListPutResquestDto> wishListPutRequest)
         {
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
             var items = FirebaseRepository.GetItems();
-            foreach (var itemId in wishList.Keys)
-            {
-                wishList[itemId].Item = items.First(x => x.XmlId == int.Parse(itemId));
-            }
             var wishListWrapper = new WishListWrapper()
             {
-                WishList = wishList,
                 LastUpadteInfo = UserInfoProvider.GenerateLastUpdateInfo()
             };
-
+            foreach (var request in wishListPutRequest)
+            {
+                var itemId = request.Id;
+                var wishLiteItem = new WishListItem()
+                {
+                    Item = items.First(x => x.XmlId == itemId),
+                    Count = request.Count,
+                    Priority = request.Priority
+                };
+                wishListWrapper.WishList[itemId.ToString()] = wishLiteItem;
+            }
             FirebaseRepository.PutWishList(myHordeMeResponse.Map.Id, wishListWrapper);
         }
 
