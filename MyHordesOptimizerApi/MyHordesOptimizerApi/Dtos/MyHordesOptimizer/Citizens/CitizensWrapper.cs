@@ -4,7 +4,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
     public class CitizensWrapper
     {
-        public LastUpadteInfo LastUpadteInfo { get; set; }
+        public LastUpdateInfo LastUpdateInfo { get; set; }
 
         public Dictionary<string, Citizen> Citizens { get; set; }
 

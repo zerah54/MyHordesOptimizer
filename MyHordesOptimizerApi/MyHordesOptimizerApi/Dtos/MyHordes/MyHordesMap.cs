@@ -24,6 +24,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         [JsonProperty("conspiracy")]
         public bool Conspiracy { get; set; }
 
-        public LastUpadteInfo LastUpdateInfo { get; set; }
+        public LastUpdateInfo LastUpdateInfo { get; set; }
     }
 }

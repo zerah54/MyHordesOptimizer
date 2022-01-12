@@ -178,9 +178,9 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 base.Patch(url: url, body: citizen.Value);
             }
 
-            var urlLastUpdate = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(Town.Citizens)}/{nameof(CitizensWrapper.LastUpadteInfo)}.json";
+            var urlLastUpdate = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(Town.Citizens)}/{nameof(CitizensWrapper.LastUpdateInfo)}.json";
             urlLastUpdate = AddParameterToQuery(urlLastUpdate, "auth", Configuration.Secret);
-            base.Patch(url: urlLastUpdate, body: wrapper.LastUpadteInfo);
+            base.Patch(url: urlLastUpdate, body: wrapper.LastUpdateInfo);
         }
 
         #endregion

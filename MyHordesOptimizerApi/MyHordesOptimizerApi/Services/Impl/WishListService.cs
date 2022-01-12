@@ -67,7 +67,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var items = FirebaseRepository.GetItems();
             var wishListWrapper = new WishListWrapper()
             {
-                LastUpadteInfo = UserInfoProvider.GenerateLastUpdateInfo()
+                LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo()
             };
             foreach (var request in wishListPutRequest)
             {
@@ -87,7 +87,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var item = FirebaseRepository.GetItemsById(itemId);
             var wishList = GetWishList();
-            wishList.LastUpadteInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            wishList.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             if (wishList.WishList.TryGetValue(item.XmlId.ToString(), out var @out)) // Si l'item est déjà dans la wishlist, on ne fait rien
             {
                 return;

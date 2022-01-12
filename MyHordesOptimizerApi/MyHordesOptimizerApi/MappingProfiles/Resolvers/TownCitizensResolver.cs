@@ -23,7 +23,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
         {
             var dictionary = source.Citizens.ToDictionary(citizen => citizen.Name, citizen => citizen);
             var wrapper = new CitizensWrapper(Mapper.Map<Dictionary<string,Citizen>>(dictionary));
-            wrapper.LastUpadteInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            wrapper.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             return wrapper;
         }
     }

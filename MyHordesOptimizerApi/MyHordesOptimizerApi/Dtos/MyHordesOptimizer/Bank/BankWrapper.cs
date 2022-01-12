@@ -5,7 +5,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     public class BankWrapper
     {
         public Dictionary<string, BankItem> Bank { get; set; }
-        public LastUpadteInfo LastUpadteInfo { get; set; }
+        public LastUpdateInfo LastUpdateInfo { get; set; }
 
         public BankWrapper()
         {

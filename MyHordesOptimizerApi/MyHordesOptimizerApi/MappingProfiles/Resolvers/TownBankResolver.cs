@@ -34,7 +34,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
                 };
                 wrapper.Bank[item.XmlId.ToString()] = destinationBankItem;
             }
-            wrapper.LastUpadteInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            wrapper.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             return wrapper;
         }
     }

@@ -8,6 +8,6 @@ namespace MyHordesOptimizerApi.Providers.Interfaces
         string UserId { get; set; }
         string UserName { get; set; }
 
-        LastUpadteInfo GenerateLastUpdateInfo();
+        LastUpdateInfo GenerateLastUpdateInfo();
     }
 }
