@@ -1,3 +1,18 @@
-<div class="mho-wiki">
+<div #mhoWiki class="mho-wiki" [ngStyle]="{'height': mhoWiki.parentElement?.parentElement?.clientHeight + 'px'}">
+    <mat-drawer-container [style.height]="'100%'">
+        <mat-drawer class="sidenav" mode="side" opened>
+            <mat-list>
+                <a mat-list-item *ngFor="let tool of wiki_list" (click)="changeSelected(tool)">{{tool.label}}</a>
+            </mat-list>
+        </mat-drawer>
 
+        <div class="sidenav-content">
+            <ng-container *ngFor="let wiki of wiki_list">
+                <ng-container *ngIf="wiki.selected">
+                    <ng-container *ngComponentOutlet="wiki.component"></ng-container>
+                </ng-container>
+            </ng-container>
+        </div>
+
+    </mat-drawer-container>
 </div>
