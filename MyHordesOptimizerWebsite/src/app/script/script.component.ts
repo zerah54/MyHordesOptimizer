@@ -1,6 +1,6 @@
-import { skip } from 'rxjs';
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewContainerRef } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
+import { skip } from 'rxjs';
 import { SidenavService } from './../shared/services/sidenav.service';
 
 @Component({
@@ -15,7 +15,7 @@ export class ScriptComponent implements OnInit, AfterViewInit {
     /** Le sommaire de la page */
     public titles: Title[] = [];
 
-    constructor(public media: MediaObserver, private sidenav: SidenavService) { }
+    constructor(public media: MediaObserver, private sidenav: SidenavService, private element : ElementRef) { }
 
     public ngOnInit(): void {
         this.sidenav.toggle_sidenav_obs
@@ -43,7 +43,8 @@ export class ScriptComponent implements OnInit, AfterViewInit {
 
     /** Récupère la liste des titres de la page et la transforme en objet pour faire un sommaire cliquable */
     private getAllTitles(): void {
-        this.titles = (<HTMLHeadingElement[]>Array.from(document.querySelectorAll('h1,h2,h3,h4,h5')))
+        this.titles = (<HTMLHeadingElement[]>Array.from(this.element.nativeElement.querySelectorAll('h1,h2,h3,h4,h5')))
+            .filter((title: HTMLHeadingElement) => title.id)
             .map((title: HTMLHeadingElement) => {
                 return {
                     id: title.id,

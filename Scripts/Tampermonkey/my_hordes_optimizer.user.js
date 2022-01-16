@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.7
+// @version      1.0.0-alpha.8
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -432,7 +432,7 @@ function createOptimizerButtonContent() {
         wiki_btn.innerHTML = 'Wiki';
         wiki_btn.id = wiki_btn_id;
         if (!items) {
-            wiki_btn.setAttribute('style', 'display: none');
+            wiki_btn.classList.add('hidden');
         }
         wiki_btn.addEventListener('click', () => {
             displayWindow('wiki');
@@ -992,11 +992,40 @@ function displayCitizens() {
             for (let citizen_key in citizens.citizens) {
                 let citizen = citizens.citizens[citizen_key];
                 let citizen_row = document.createElement('tr');
+                let is_me = citizen.id === mh_user.id;
+                if (is_me) {
+                    citizen_row.setAttribute('style', 'background-color: rgba(255, 255, 255, 0.1)');
+                }
                 table.appendChild(citizen_row);
 
                 header_cells.forEach((header_cell) => {
                     let cell = document.createElement(header_cell.type);
-                    cell.innerText = citizen[header_cell.id];
+                    if (is_me) {
+                        switch(header_cell.id) {
+                            case 'name':
+                                cell.innerText = citizen[header_cell.id];
+                                break;
+                            case 'nombreJourHero':
+                                var input = document.createElement('input');
+                                input.type = 'number';
+                                input.value = citizen[header_cell.id]
+                                cell.appendChild(input);
+                                break;
+                            default:
+                                console.log(header_cell);
+                                break;
+                        }
+                    } else {
+                        switch(header_cell.id) {
+                            case 'name':
+                            case 'nombreJourHero':
+                                cell.innerText = citizen[header_cell.id];
+                                break;
+                            default:
+                                cell.innerText = '';
+                                break;
+                        }
+                    }
                     citizen_row.appendChild(cell);
                 })
                 // console.log('citizen', citizen);
@@ -1174,17 +1203,15 @@ function createHelpButton(text_to_display) {
     help_button.classList.add('help-button');
 
     let help_tooltip = document.createElement('div')
-    help_tooltip.setAttribute('style', 'display: none');
-    help_tooltip.classList.add('tooltip');
-    help_tooltip.classList.add('help');
+    help_tooltip.classList.add('tooltip', 'help', 'hidden');
     help_tooltip.innerHTML = texts.external_app_id_help[lang];
     help_button.appendChild(help_tooltip);
 
     help_button.addEventListener('mouseenter', function() {
-        help_tooltip.setAttribute('style', 'display: block; text-transform: initial');
+        help_tooltip.classList.remove('hidden');
     })
     help_button.addEventListener('mouseleave', function() {
-        help_tooltip.setAttribute('style', 'display: none');
+        help_tooltip.classList.add('hidden');
     })
 
     return help_button
@@ -1268,7 +1295,7 @@ function displayWishlistInApp() {
         });
         if (pageIsWorkshop() && list_to_display.length === 0) return;
 
-        let refreshWishlist = (header, content) => {
+        let refreshWishlist = () => {
             let update_section = document.createElement('div');
             header.appendChild(update_section);
 
@@ -1336,6 +1363,18 @@ function displayWishlistInApp() {
                 needed.innerHTML = `<span class="small">${item.count - item.bankCount}</span}`;
                 list_item.appendChild(needed);
             });
+
+            header_title.addEventListener('click', () => {
+                if (header_title.show) {
+                    hide_state.innerText = '˅';
+                } else {
+                    hide_state.innerText = '˃';
+
+                }
+                list.classList.toggle('hidden');
+                update_section.classList.toggle('hidden');
+                header_title.show = !header_title.show;
+            });
         };
 
         wishlist_section = document.createElement('div');
@@ -1356,13 +1395,26 @@ function displayWishlistInApp() {
 
         let header = document.createElement('h5');
         header.setAttribute('style', 'display: flex; justify-content: space-between;');
-        header.innerHTML = `<span style="margin-top: auto;">${tabs_list.tools.find((tool) => tool.id === 'wishlist').label[lang]}</span>`;
         cell.appendChild(header);
+
+        let header_title = document.createElement('span');
+        header_title.setAttribute('style', 'margin-top: 7px; cursor: pointer;')
+        header.appendChild(header_title);
+
+        let hide_state = document.createElement('span');
+        hide_state.setAttribute('style', 'margin-right: 0.5em');
+        hide_state.innerText = '˅';
+        hide_state.show = true;
+        header_title.appendChild(hide_state);
+
+        let header_label = document.createElement('span');
+        header_label.innerText = tabs_list.tools.find((tool) => tool.id === 'wishlist').label[lang];
+        header_title.appendChild(header_label);
 
         let content = document.createElement('div');
         cell.appendChild(content);
 
-        refreshWishlist(header, content);
+        refreshWishlist();
     } else if (wishlist_section) {
         wishlist_section.remove();
     }
@@ -1695,8 +1747,8 @@ function createStyles() {
     const tab_content_item_list_item_style = '#tab-content > ul > li {'
     + 'min-width: 300px;'
     + 'flex-basis: min-content;'
-    + 'padding: 0 0.5em;'
-    + 'margin: 0.125em 0;'
+    + 'padding: 0.125em 0.5em;'
+    + 'margin: 0;'
     + '}';
 
     const tab_content_item_list_item_selected_style = '#tab-content > ul > li.selected {'
@@ -1789,6 +1841,10 @@ function createStyles() {
     + 'width: 100%;'
     + '}';
 
+    const wishlist_odd = '#wishlist > li:nth-child(odd) {'
+    + 'background-color: rgba(255, 255, 255, 0.1);'
+    + '}';
+
     const wishlist_header_cell = '#wishlist .header > div {'
     + 'display: inline-block;'
     + 'vertical-align: middle;'
@@ -1852,7 +1908,7 @@ function createStyles() {
     + parameters_informations_style + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
     + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style
     + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip
-    + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item
+    + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_odd
     + item_priority_10 + item_priority_20 + item_priority_30;
 
     let style = document.createElement('style');
@@ -1995,7 +2051,9 @@ function getWishlist() {
         onload: function(response){
             if (response.status === 200) {
                 wishlist = response.response;
-                wishlist.wishList = Object.keys(wishlist.wishList).map((key) => wishlist.wishList[key]);
+                wishlist.wishList = Object.keys(wishlist.wishList)
+                    .map((key) => wishlist.wishList[key])
+                    .sort((item_a, item_b) => item_b.priority > item_a.priority);
             } else {
                 wishlist = [];
                 console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
@@ -2084,7 +2142,7 @@ function updateExternalTools() {
                 let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
                 let nb_tools_success = Object.keys(response.response).map((key) => response.response[key]).filter((tool_response) => tool_response.toLowerCase() === 'ok').length;
                 btn.innerHTML = nb_tools_to_update === nb_tools_success
-                    ? '<img src ="' + repo_img_url + 'professions/hero.gif">' + texts.update_external_tools_success_btn_label[lang]
+                    ? '<img src ="' + repo_img_url + 'item/done.png">' + texts.update_external_tools_success_btn_label[lang]
                 : '<img src ="' + repo_img_url + 'emotes/warning.gif">' + texts.update_external_tools_errors_btn_label[lang];
             } else {
                 console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
