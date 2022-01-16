@@ -1,0 +1,18 @@
+<div #mhoTools class="mho-tools" [ngStyle]="{'height': mhoTools.parentElement?.parentElement?.clientHeight + 'px'}">
+    <mat-drawer-container [style.height]="'100%'">
+        <mat-drawer class="sidenav" mode="side" opened>
+            <mat-list>
+                <a mat-list-item *ngFor="let tool of tools_list" (click)="changeSelected(tool)">{{tool.label}}</a>
+            </mat-list>
+        </mat-drawer>
+
+        <div class="sidenav-content">
+            <ng-container *ngFor="let tool of tools_list">
+                <ng-container *ngIf="tool.selected">
+                    <ng-container *ngComponentOutlet="tool.component"></ng-container>
+                </ng-container>
+            </ng-container>
+        </div>
+
+    </mat-drawer-container>
+</div>

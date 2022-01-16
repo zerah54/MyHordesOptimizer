@@ -1,0 +1,8 @@
+<div class="mho-bank">
+    <h1>Banque</h1>
+    <ul *ngIf="bank">
+        <li *ngFor="let bank_item of bank.bank_items">
+            {{bank_item.item.label.fr}}
+        </li>
+    </ul>
+</div>

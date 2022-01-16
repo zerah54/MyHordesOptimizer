@@ -23,6 +23,7 @@ export class NavbarComponent {
     /** La liste des onglets à afficher */
     public tabs: Tabs[] = [
         { label: 'Script', url: 'script' },
+        { label: 'Outils', url: 'tools' },
         { label: 'Wiki', url: 'wiki' }
     ]
 

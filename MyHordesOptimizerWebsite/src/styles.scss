@@ -1,4 +1,4 @@
-@import 'variables.scss';
+@import "variables.scss";
 
 html,
 body {
@@ -7,5 +7,18 @@ body {
 body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
-    color: $primary
+    color: $primary;
+}
+
+.sidenav {
+    width: 250px;
+    background-color: $sidenav_bg_color !important;
+
+    .mat-list-item:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+}
+
+.sidenav-content {
+    padding: 1em;
 }

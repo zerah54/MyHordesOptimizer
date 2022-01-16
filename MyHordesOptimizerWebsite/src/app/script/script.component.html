@@ -32,8 +32,16 @@
                     mettre à jour en un clic. Une fois sorti de la ville, vous pourrez cliquer sur un nouveau bouton qui
                     mettra à jour tous les outils externes que vous avez sélectionnés dans vos options.
                     <br />
+                    <br />
                     Si vous avez l'un des outils en question ouvert dans votre navigateur, alors la prochaine fois que
                     vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.
+                </p>
+            </li>
+            <li>
+                <h2 id="detailed-tooltips">Affichage des tooltips détaillés</h2>
+                <p>
+                    Modifie les tooltips natifs de l'application pour afficher en plus la liste des recettes dans
+                    lesquelles l'objet survolé apparait.
                 </p>
             </li>
             <li>
@@ -55,18 +63,41 @@
                 </p>
             </li>
             <li>
+                <h2 id="display-wishlist">Affichage de la liste de courses dans la page</h2>
+                <p>
+                    En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert
+                    ou dans l'atelier. Cette liste contient des informations de priorité, de quantité en banque, de
+                    quantité totale requise, et de quantité manquante.
+                    <br />
+                    <br />
+                    La liste de courses dans l'atelier ne présentera que les éléments pouvant obtenus à l'atelier si la
+                    quantité manquante est positive. Celle dans le désert affichera tous les éléments sans
+                    distinction si la quantité manquante est positive.
+                    <br />
+                    <br />
+                    Dans le désert, les objets dans le sac ou au sol également présents dans la liste de course se
+                    verront attribuer une bordure dont la couleur indique la priorité de l'élément, et ce sans tenir
+                    compte de la quantité manquante.
+                </p>
+            </li>
+            <li>
                 <h2 id="wiki">Wiki</h2>
                 <ul>
                     <li>
-                        <h3 id="items-list">(en cours) Liste des objets</h3>
+                        <h3 id="items-list">(En cours) Liste des objets</h3>
                         <p>
-                            Affiche la liste de tous les objets existant dans MyHordes ainsi que des informations complémentaires à leur sujet.
+                            Affiche la liste de tous les objets existant dans MyHordes (à venir : ainsi que des
+                            informations complémentaires à leur sujet).
+                            <br />
+                            <br />
+                            Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d'un
+                            bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
                         </p>
                     </li>
                     <li>
-                        <h3 id="items-list">(à venir) Liste des recettes</h3>
+                        <h3 id="items-list">Liste des recettes</h3>
                         <p>
-
+                            Affiche la liste de toutes les recettes de l'application.
                         </p>
                         <h3 id="heroskills">Pouvoirs</h3>
                         <p>
@@ -80,15 +111,33 @@
                 <h2 id="tools">Outils</h2>
                 <ul>
                     <h3 id="citizens-list">Banque</h3>
-                    <p>Affiche la liste des objets de la banque et leur quantité.</p>
+                    <p>
+                        Affiche la liste des objets de la banque et leur quantité.
+                        <br />
+                        <br />
+                        Si vous êtes incarnés, les objets qui ne sont pas dans la liste de courses sont suivis d'un
+                        bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
+                    </p>
                 </ul>
                 <ul>
-                    <h3 id="citizens-list">(À venir) Liste de courses</h3>
-                    <p></p>
+                    <h3 id="citizens-list">Liste de courses</h3>
+                    <p>
+                        Affiche une liste de courses contenant les objets ajoutés via les pages de liste d'objets et de
+                        banque.
+                        <br />
+                        <br />
+                        Vous pouvez modifier la priorité de chaque objet, ainsi que la quantité requise.
+                    </p>
                 </ul>
                 <ul>
-                    <h3 id="citizens-list">(À venir) Liste des citoyens</h3>
-                    <p></p>
+                    <h3 id="citizens-list">(En cours) Liste des citoyens</h3>
+                    <p>
+                        Affiche une liste des citoyens de la ville, ainsi qu'une liste des pouvoirs héros disponibles
+                        pour lesquels il existe une action héroïque associée.
+                        <br />
+                        (à venir) Permet de changer son nombre de jours héros et de recalculer automatiquement le
+                        dernier pouvoir gagné, ainsi que de modifier ses actions disponibles.
+                    </p>
                 </ul>
             </li>
         </ul>

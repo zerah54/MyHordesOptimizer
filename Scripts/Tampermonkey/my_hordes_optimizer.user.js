@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.6
+// @version      1.0.0-alpha.7
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -787,7 +787,6 @@ function displayWishlist() {
                 item_element.appendChild(item_priority_container);
 
                 let item_priority_select = document.createElement('select');
-                item_priority_select.value = item.priority;
                 item_priority_select.addEventListener('change', () => {
                     item.priority = +item_priority_select.value;
                 });
@@ -798,6 +797,9 @@ function displayWishlist() {
                     item_priority_option.value = priority.value;
                     item_priority_option.innerText = priority.label[lang];
                     item_priority_select.appendChild(item_priority_option);
+                    if (item.priority === priority.value) {
+                        item_priority_option.selected = true;
+                    }
                 });
 
                 let item_bank_count = document.createElement('div');
@@ -922,16 +924,15 @@ function displayItems(filtered_items, tab_id) {
         let item_properties_container = document.createElement('div');
         item_properties_container.classList.add('properties');
 
-
         item_properties_container.innerHTML = '<p>' + item.description[lang] + '</p>';
-        if (item.properties) {
-            let item_properties = item.properties.map((property) => '<span style="padding: 0 8px">' + property + '</span>').reduce((a, b) => a + b);
-            item_properties_container.innerHTML += '<p>' + item_properties + '</p>';
-        }
-        if (item.actions) {
-            let item_actions = item.actions.map((action) => '<span style="padding: 0 8px">' + action + '</span>').reduce((a, b) => a + b);
-            item_properties_container.innerHTML += '<p>' + item_actions + '</p>';
-        }
+        // if (item.properties) {
+        //     let item_properties = item.properties.map((property) => '<span style="padding: 0 8px">' + property + '</span>').reduce((a, b) => a + b);
+        //     item_properties_container.innerHTML += '<p>' + item_properties + '</p>';
+        // }
+        // if (item.actions) {
+        //     let item_actions = item.actions.map((action) => '<span style="padding: 0 8px">' + action + '</span>').reduce((a, b) => a + b);
+        //     item_properties_container.innerHTML += '<p>' + item_actions + '</p>';
+        // }
 
         let item_container = document.createElement('li');
         item_container.appendChild(item_title_and_add_container);
@@ -946,6 +947,7 @@ function displayItems(filtered_items, tab_id) {
     });
 }
 
+/** Affiche la liste des citoyens */
 function displayCitizens() {
     citizens = undefined;
     getCitizens();
@@ -1089,64 +1091,8 @@ function displayRecipes() {
                 recipes_list.appendChild(category_container);
             }
 
-            let recipe_container = document.createElement('li');
-
-            let compos_container = document.createElement('ul');
-            compos_container.setAttribute('style', 'padding: 0; min-width: 200px; width: 25%;');
-            recipe.components.forEach((compo) => {
-                let compo_container = document.createElement('li');
-
-                let component_img = document.createElement('img');
-                component_img.setAttribute('style', 'margin-right: 0.5em');
-                component_img.src = hordes_img_url + compo.img;
-                compo_container.appendChild(component_img);
-
-                let component_label = document.createElement('span');
-                component_label.innerText = compo.label[lang];
-                compo_container.appendChild(component_label);
-
-                compos_container.appendChild(compo_container);
-            })
-            recipe_container.appendChild(compos_container);
-
-            let transform_img_container = document.createElement('div');
-            recipe_container.appendChild(transform_img_container);
-
-
-            let transform_img = document.createElement('img');
-            transform_img.alt = '=>';
-            transform_img.src = repo_img_url + 'icons/small_move.gif';
-            transform_img.setAttribute('style', 'margin-left: 0.5em; margin-right: 0.5em');
-            transform_img_container.appendChild(transform_img);
-
-            let results_container = document.createElement('ul');
-            results_container.setAttribute('style', 'padding: 0');
-            recipe.result.forEach((result) => {
-                let result_container = document.createElement('li');
-
-                let result_img = document.createElement('img');
-                result_img.setAttribute('style', 'margin-right: 0.5em');
-                result_img.src = hordes_img_url + result.item.img;
-                result_container.appendChild(result_img);
-
-                let result_label = document.createElement('span');
-                result_label.innerText = result.item.label[lang];
-                result_container.appendChild(result_label);
-
-                if (result.probability !== 1) {
-                    let result_proba = document.createElement('span');
-                    result_proba.setAttribute('style', 'font-style: italic; color: #ddab76;');
-                    result_proba.innerText = ' (' + Math.round(result.probability * 100) + '%)';
-                    result_container.appendChild(result_proba);
-                }
-
-                results_container.appendChild(result_container);
-            })
-            recipe_container.appendChild(results_container);
-            recipes_list.appendChild(recipe_container);
+            recipes_list.appendChild(getRecipeElement(recipe));
         });
-
-
 
     } else {
         getRecipes();
@@ -1157,6 +1103,64 @@ function displayRecipes() {
             }
         }, 500);
     }
+}
+
+function getRecipeElement(recipe) {
+    let recipe_container = document.createElement('li');
+
+    let compos_container = document.createElement('ul');
+    compos_container.setAttribute('style', 'padding: 0; min-width: 200px; width: 25%;');
+    recipe.components.forEach((compo) => {
+        let compo_container = document.createElement('li');
+
+        let component_img = document.createElement('img');
+        component_img.setAttribute('style', 'margin-right: 0.5em');
+        component_img.src = hordes_img_url + compo.img;
+        compo_container.appendChild(component_img);
+
+        let component_label = document.createElement('span');
+        component_label.innerText = compo.label[lang];
+        compo_container.appendChild(component_label);
+
+        compos_container.appendChild(compo_container);
+    })
+    recipe_container.appendChild(compos_container);
+
+    let transform_img_container = document.createElement('div');
+    recipe_container.appendChild(transform_img_container);
+
+
+    let transform_img = document.createElement('img');
+    transform_img.alt = '=>';
+    transform_img.src = repo_img_url + 'icons/small_move.gif';
+    transform_img.setAttribute('style', 'margin-left: 0.5em; margin-right: 0.5em');
+    transform_img_container.appendChild(transform_img);
+
+    let results_container = document.createElement('ul');
+    results_container.setAttribute('style', 'padding: 0');
+    recipe.result.forEach((result) => {
+        let result_container = document.createElement('li');
+
+        let result_img = document.createElement('img');
+        result_img.setAttribute('style', 'margin-right: 0.5em');
+        result_img.src = hordes_img_url + result.item.img;
+        result_container.appendChild(result_img);
+
+        let result_label = document.createElement('span');
+        result_label.innerText = result.item.label[lang];
+        result_container.appendChild(result_label);
+
+        if (result.probability !== 1) {
+            let result_proba = document.createElement('span');
+            result_proba.setAttribute('style', 'font-style: italic; color: #ddab76;');
+            result_proba.innerText = ' (' + Math.round(result.probability * 100) + '%)';
+            result_container.appendChild(result_proba);
+        }
+
+        results_container.appendChild(result_container);
+    })
+    recipe_container.appendChild(results_container);
+    return recipe_container;
 }
 
 /**
@@ -1248,6 +1252,7 @@ function clickOnVotedToRedirect() {
     }
 }
 
+/** Affiche la liste de courses dans le désert et l'atelier */
 function displayWishlistInApp() {
     let wishlist_section = document.getElementById('wishlist-section');
 
@@ -1341,8 +1346,9 @@ function displayWishlistInApp() {
             let worshop_table = document.getElementsByClassName('row-table')[0];
             worshop_table.parentNode.insertBefore(wishlist_section, worshop_table.nextSibling);
         } else {
-            let other_citizens = document.getElementsByClassName('other_citizens')[0];
-            other_citizens.parentNode.insertBefore(wishlist_section, other_citizens.previousSibling);
+            let actions_box = document.getElementsByClassName('actions-box')[0];
+            let main_actions = actions_box.parentNode;
+            main_actions.parentNode.insertBefore(wishlist_section, main_actions.nextSibling);
         }
 
         let cell = document.createElement('div');
@@ -1362,6 +1368,28 @@ function displayWishlistInApp() {
     }
 }
 
+/** Affiche la priorité directement sur les éléments si l'option associée est cochée */
+function displayPriorityOnItems() {
+    if (mho_parameters.display_wishlist && pageIsDesert() && wishlist) {
+        let present_items = [];
+        let inventories = document.getElementsByClassName('inventory');
+        if (inventories) {
+            for (let inventory of inventories) {
+                present_items.push(...inventory.getElementsByTagName('img'));
+            };
+        }
+        wishlist.wishList
+            .filter((wishlist_item) => wishlist_item.priority > 0)
+            .forEach((wishlist_item) => {
+            present_items
+                .filter((present_item) => present_item.src.indexOf(wishlist_item.item.img) > 0)
+                .forEach((present_item) => {
+                present_item.parentElement.parentElement.classList.add('priority_' + wishlist_item.priority);
+            });
+        });
+    }
+}
+
 /** Affiche les tooltips avancés */
 function displayAdvancedTooltips() {
     if (mho_parameters.enhanced_tooltips) {
@@ -1378,7 +1406,8 @@ function displayAdvancedTooltips() {
                     hovered_item = items.find((item) => item.img === hovered_item_img);
                 }
             }
-            if (!advanced_tooltip_container && hovered_item && (hovered_item.actions || hovered_item.properties)) {
+            if (!advanced_tooltip_container && hovered_item && (hovered_item.recipes.length > 0/* || hovered_item.actions || hovered_item.properties*/)) {
+                tooltip_container.firstElementChild.classList.add('large-tooltip');
                 advanced_tooltip_container = document.createElement('div');
                 advanced_tooltip_container.id = 'mho-advanced-tooltip';
                 advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
@@ -1386,15 +1415,24 @@ function displayAdvancedTooltips() {
                 tooltip_content.appendChild(advanced_tooltip_container);
 
                 advanced_tooltip_container.innerHtml = '';
-                if (hovered_item.properties) {
-                    let item_properties = hovered_item.properties.map((property) => '<span style="padding: 0 8px">' + property + '</span>').reduce((a, b) => a + b);
-                    advanced_tooltip_container.innerHTML += '<p>' + item_properties + '</p>';
+                if (hovered_item.recipes.length > 0) {
+                    let item_recipes = document.createElement('div');
+                    item_recipes.classList.add('recipe');
+                    advanced_tooltip_container.appendChild(item_recipes);
+
+                    hovered_item.recipes.forEach((recipe) => {
+                        item_recipes.appendChild(getRecipeElement(recipe));
+                    });
                 }
-                if (hovered_item.actions) {
-                    let item_actions = hovered_item.actions.map((action) => '<span style="padding: 0 8px">' + action + '</span>').reduce((a, b) => a + b);
-                    advanced_tooltip_container.innerHTML += '<p>' + item_actions + '</p>';
-                }
-                console.log('hovered_item', hovered_item);
+                // if (hovered_item.properties) {
+                //     let item_properties = hovered_item.properties.map((property) => '<span style="padding: 0 8px">' + property + '</span>').reduce((a, b) => a + b);
+                //     advanced_tooltip_container.innerHTML += '<p>' + item_properties + '</p>';
+                // }
+                // if (hovered_item.actions) {
+                //     let item_actions = hovered_item.actions.map((action) => '<span style="padding: 0 8px">' + action + '</span>').reduce((a, b) => a + b);
+                //     advanced_tooltip_container.innerHTML += '<p>' + item_actions + '</p>';
+                // }
+                // console.log('hovered_item', hovered_item);
             }
         } else if (advanced_tooltip_container) {
             advanced_tooltip_container.remove();
@@ -1781,6 +1819,31 @@ function createStyles() {
     + 'justify-content: space-between;'
     + '}';
 
+    const advanced_tooltip_recipe_li = '#mho-advanced-tooltip > div.recipe > li {'
+    + 'display: flex;'
+    + 'padding: 0.25em 0;'
+    + '}';
+
+    const advanced_tooltip_recipe_li_ul = '#mho-advanced-tooltip > div.recipe > li > ul {'
+    + 'min-width: 0 !important;'
+    + 'width: calc(100% - 15px) !important;'
+    + '}';
+
+    const large_tooltip = 'div.large-tooltip {'
+    + 'width: 400px !important;'
+    + 'max-width: 400px; !important'
+    + '}';
+
+    const item_priority_30 = 'li.item.priority_30 {'
+    + 'box-shadow: inset 0 0 0.30em red, 0 0 0.5em red;'
+    + '}';
+    const item_priority_20 = 'li.item.priority_20 {'
+    + 'box-shadow: inset 0 0 0.30em orangered, 0 0 0.5em orangered;'
+    + '}';
+    const item_priority_10 = 'li.item.priority_10 {'
+    + 'box-shadow: inset 0 0 0.30em yellow, 0 0 0.5em yellow;'
+    + '}';
+
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
     + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
     + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
@@ -1788,8 +1851,9 @@ function createStyles() {
     + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
     + parameters_informations_style + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
     + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style
-    + item_title_style + add_to_wishlist_button_img_style
-    + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item;
+    + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip
+    + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item
+    + item_priority_10 + item_priority_20 + item_priority_30;
 
     let style = document.createElement('style');
 
@@ -2114,6 +2178,7 @@ function getRecipes() {
             createUpdateExternalToolsButton();
             clickOnVotedToRedirect();
             displayWishlistInApp();
+            displayPriorityOnItems();
         }, 500);
 
         setInterval(() => {
