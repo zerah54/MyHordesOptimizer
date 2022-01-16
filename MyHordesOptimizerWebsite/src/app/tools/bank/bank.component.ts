@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { BankItem } from 'src/app/_abstract_model/types/bank-item.class';
+import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { ApiServices } from './../../_abstract_model/services/api.services';
 import { BankInfo } from './../../_abstract_model/types/bank-info.class';
-
 @Component({
     selector: 'mho-bank',
     templateUrl: './bank.component.html',
@@ -9,7 +10,10 @@ import { BankInfo } from './../../_abstract_model/types/bank-info.class';
 })
 export class BankComponent implements OnInit {
 
+    /** La banque remontée par l'appel */
     public bank!: BankInfo;
+    /** Les objets en banque triés par catégorie */
+    public bank_by_categories!: Dictionary<unknown>;
 
     constructor(private api: ApiServices) {
 
@@ -18,17 +22,11 @@ export class BankComponent implements OnInit {
     ngOnInit(): void {
         this.api.getBank().subscribe((bank: BankInfo) => {
             this.bank = bank;
-            console.log('this.bank', this.bank);
-            // bank.bank = Object.keys(bank.bank).map((key) => bank.bank[key])
-            //     .map((bank_info) => {
-            //     bank_info.item.category = getCategory(bank_info.item.category);
-            //     bank_info.item.count = bank_info.count;
-            //     bank_info.item.wishListCount = bank_info.wishListCount;
-            //     bank_info = bank_info.item;
-            //     return bank_info;
-            // })
-            //     .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);
-
+            if (this.bank) {
+                this.bank.bank_items = this.bank?.bank_items
+                    .sort((bank_item_a: BankItem, bank_item_b: BankItem) => bank_item_a.item.category.localeCompare(bank_item_b.item.category))
+                console.log('this.bank', this.bank);
+            }
         });
     }
 }

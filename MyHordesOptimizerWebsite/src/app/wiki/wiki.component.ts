@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { MediaObserver } from '@angular/flex-layout';
+import { skip } from 'rxjs';
 import { SidenavLinks } from '../_abstract_model/types/_types';
+import { SidenavService } from './../shared/services/sidenav.service';
 import { HeroSkillsComponent } from './hero-skills/hero-skills.component';
 import { ItemsComponent } from './items/items.component';
 import { RecipesComponent } from './recipes/recipes.component';
@@ -9,13 +12,26 @@ import { RecipesComponent } from './recipes/recipes.component';
     templateUrl: './wiki.component.html',
     styleUrls: ['./wiki.component.scss']
 })
-export class WikiComponent {
+export class WikiComponent implements OnInit {
+    /** L'état d'ouverture de la sidenav */
+    public opened_sidenav: boolean = true;
+
     /** La liste des pages du wiki */
     public wiki_list: SidenavLinks[] = [
         { label: 'Objets', id: 'items', component: ItemsComponent, selected: true },
         { label: 'Recettes', id: 'recipes', component: RecipesComponent, selected: false },
         { label: 'Pouvoirs', id: 'hero-skills', component: HeroSkillsComponent, selected: false }
     ]
+
+    constructor(public media: MediaObserver, private sidenav: SidenavService) { }
+
+    public ngOnInit(): void {
+        this.sidenav.toggle_sidenav_obs
+            .pipe(skip(1))
+            .subscribe(() => {
+                this.opened_sidenav = !this.opened_sidenav;
+            })
+    }
 
     /**
      * Change l'outil affiché

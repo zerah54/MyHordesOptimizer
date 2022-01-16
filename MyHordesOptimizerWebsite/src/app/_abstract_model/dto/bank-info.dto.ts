@@ -1,18 +1,19 @@
 import { BankInfo } from './../types/bank-info.class';
+import { Dictionary } from './../types/_types';
 import { BankItemDTO, BankItemDtoTransform } from './bank-item.dto';
 import { UpdateInfoDTO, UpdateInfoDtoTransform } from './update-info.dto';
 
 export class BankInfoDtoTransform {
 
-    public static dtoToClass(dto: BankInfoDTO): BankInfo {
+    public static dtoToClass(dto: BankInfoDTO | null): BankInfo {
         return {
-            bank_items: BankItemDtoTransform.transformDtoArray(dto.bank),
-            update_info: UpdateInfoDtoTransform.dtoToClass(dto.lastUpdateInfo)
+            bank_items: dto ? BankItemDtoTransform.transformDtoDictionary(dto.bank) : [],
+            update_info: dto ? UpdateInfoDtoTransform.dtoToClass(dto.lastUpdateInfo ? dto.lastUpdateInfo : null) : null
         };
     }
 }
 
 export interface BankInfoDTO {
-    bank: BankItemDTO[];
-    lastUpdateInfo: UpdateInfoDTO;
+    bank: Dictionary<BankItemDTO>;
+    lastUpdateInfo: UpdateInfoDTO | null;
 }

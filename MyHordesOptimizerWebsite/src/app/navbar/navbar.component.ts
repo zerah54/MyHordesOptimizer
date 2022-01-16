@@ -1,8 +1,11 @@
-import { ApiServices } from './../_abstract_model/services/api.services';
-import { getExternalAppId, setExternalAppId } from 'src/app/shared/utilities/localstorage-utilities';
-import { Component, ViewChild } from '@angular/core';
+import { SidenavService } from './../shared/services/sidenav.service';
+import { Component, EventEmitter, ViewChild } from '@angular/core';
+import { MediaObserver } from '@angular/flex-layout';
+import { MatButton } from '@angular/material/button';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Title } from '@angular/platform-browser';
+import { getExternalAppId, setExternalAppId } from 'src/app/shared/utilities/localstorage.util';
+import { ApiServices } from './../_abstract_model/services/api.services';
 
 @Component({
     selector: 'mho-navbar',
@@ -20,6 +23,9 @@ export class NavbarComponent {
     /** L'idendifiant d'app externe si il existe */
     public saved_external_app_id: string | null = getExternalAppId();
 
+    /** Informe d'un clic sur le bouton d'ouverture / fermeture de la sidenav */
+    public toggle_sidenav_event: EventEmitter<void> = new EventEmitter();
+
     /** La liste des onglets à afficher */
     public tabs: Tabs[] = [
         { label: 'Script', url: 'script' },
@@ -27,7 +33,7 @@ export class NavbarComponent {
         { label: 'Wiki', url: 'wiki' }
     ]
 
-    public constructor(private title_service: Title, private api: ApiServices) {
+    public constructor(public media: MediaObserver, public sidenav: SidenavService, private title_service: Title, private api: ApiServices) {
         this.title = this.title_service.getTitle();
     }
 

@@ -1,10 +1,15 @@
 <mat-toolbar class="mho-navbar" color="primary">
-    <div class="title">{{title}}</div>
-    <ng-container *ngFor="let tab of tabs">
-        <a mat-button [routerLink]="[tab.url]" [routerLinkActive]="['is-active']"
-            [routerLinkActiveOptions]="{exact: true}">
-            {{tab.label}}
-        </a>
+    <button mat-icon-button type="button" (click)="sidenav.changeSidenavStatus();">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <div class="title">{{media.isActive('gt-sm') ? title : 'MHO'}}</div>
+    <ng-container *ngIf="media.isActive('gt-sm')">
+        <ng-container *ngFor="let tab of tabs">
+            <a mat-button [routerLink]="[tab.url]" [routerLinkActive]="['is-active']"
+                [routerLinkActiveOptions]="{exact: true}">
+                {{tab.label}}
+            </a>
+        </ng-container>
     </ng-container>
     <!-- <span *ngIf="!external_app_id_field_value"> -->
     <span class="spacer"></span>
@@ -16,4 +21,15 @@
         </button>
     </mat-form-field>
     <a mat-button *ngIf="saved_external_app_id" (click)="updateExternalTools()">Mettre à jour les outils externes</a>
+    <button mat-icon-button *ngIf="!media.isActive('gt-sm')" [matMenuTriggerFor]="linksMenu">
+        <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #linksMenu>
+        <ng-container *ngFor="let tab of tabs">
+            <a mat-menu-item [routerLink]="[tab.url]" [routerLinkActive]="['is-active']"
+                [routerLinkActiveOptions]="{exact: true}">
+                {{tab.label}}
+            </a>
+        </ng-container>
+    </mat-menu>
 </mat-toolbar>

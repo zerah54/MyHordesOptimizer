@@ -7,3 +7,8 @@
     </div>
     <mho-footer #footer></mho-footer>
 </div>
+<ng-container *ngIf="loading_service.is_loading_obs | async">
+    <div class="mho-loading">
+        <mat-spinner [color]="'accent'"></mat-spinner>
+    </div>
+</ng-container>

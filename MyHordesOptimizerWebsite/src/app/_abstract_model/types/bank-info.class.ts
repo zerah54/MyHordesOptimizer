@@ -3,5 +3,5 @@ import { UpdateInfo } from './update-info.class';
 
 export interface BankInfo {
     bank_items: BankItem[];
-    update_info: UpdateInfo;
+    update_info: UpdateInfo | null;
 }

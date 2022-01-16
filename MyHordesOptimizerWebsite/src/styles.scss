@@ -22,3 +22,23 @@ body {
 .sidenav-content {
     padding: 1em;
 }
+
+.snackbar-success{
+    background-color: darkseagreen !important;
+    color: black !important;
+}
+
+.snackbar-warning {
+    background-color: coral !important;
+    color: black !important;
+}
+
+.snackbar-error {
+    background-color: firebrick !important;
+    color: black !important;
+}
+
+.snackbar-information {
+    background-color: cadetblue !important;
+    color: black !important;
+}

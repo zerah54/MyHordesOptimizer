@@ -1,0 +1,26 @@
+.mho-item {
+    height: 40px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    max-width: 25%;
+    min-width: 250px;
+    width: 25%;
+    .item_title {
+        margin: auto 0;
+
+        .item_img {
+            width: 35px;
+            display: inline-block;
+
+            img {
+                vertical-align: middle;
+            }
+
+            .item_count {
+                vertical-align: sub;
+                font-size: 0.75em;
+            }
+        }
+    }
+}

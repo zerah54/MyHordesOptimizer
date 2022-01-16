@@ -11,9 +11,8 @@ export interface SidenavLinks {
     selected: boolean;
 }
 
-export interface I18nLabels {
-    de: string;
-    en: string;
-    es: string;
-    fr: string;
+export type I18nLabels = Dictionary<string>;
+
+export interface Dictionary<T> {
+    [key: string | number]: T;
 }

@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { getExternalAppId, getUserId } from 'src/app/shared/utilities/localstorage-utilities';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import * as moment from 'moment';
+import { getExternalAppId, getUserId } from 'src/app/shared/utilities/localstorage.util';
+import { NavbarComponent } from './navbar/navbar.component';
+import { LoadingOverlayService } from './shared/services/loading-overlay.service';
 import { ApiServices } from './_abstract_model/services/api.services';
 
 @Component({
@@ -9,11 +12,14 @@ import { ApiServices } from './_abstract_model/services/api.services';
 })
 export class AppComponent implements OnInit {
 
-    constructor(private api: ApiServices) {
+    @ViewChild(NavbarComponent) navbar!: NavbarComponent;
+
+    constructor(public loading_service: LoadingOverlayService, private api: ApiServices) {
 
     }
 
     public ngOnInit(): void {
+        moment.locale(navigator.language);
         this.checkUserId();
     }
 

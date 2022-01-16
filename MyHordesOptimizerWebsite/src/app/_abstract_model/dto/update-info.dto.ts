@@ -3,11 +3,11 @@ import { UpdateInfo } from './../types/update-info.class';
 
 export class UpdateInfoDtoTransform {
 
-    public static dtoToClass(dto: UpdateInfoDTO): UpdateInfo {
+    public static dtoToClass(dto: UpdateInfoDTO | null): UpdateInfo {
         return {
-            update_time: moment(dto.updateTime),
-            user_id: +dto.userId,
-            username: dto.userName
+            update_time: dto ? moment(dto.updateTime) : null,
+            user_id: dto ? +dto.userId : null,
+            username: dto ? dto.userName : null
         };
     }
 }

@@ -1,0 +1,14 @@
+<li class="mho-item">
+    <div class="item_title">
+        <div class="item_img">
+            <img [src]="HORDES_IMG_REPO + item.item.img" /><span class="item_count"
+                *ngIf="item.count > 1">{{item.count}}</span>
+        </div>
+        <span class="item_label">{{item.item.label[locale]}}</span>
+    </div>
+    <div class="add_to_wishlist" *ngIf="item.wishlist_count === 0">
+        <button mat-icon-button type="button" (click)="addItemToWishlist(item)">
+            <img [src]="HORDES_IMG_REPO + 'item/item_cart.gif'">
+        </button>
+    </div>
+</li>

@@ -1,10 +1,12 @@
+import { DictionaryUtils } from './../../shared/utilities/dictionary.util';
+import { Dictionary } from './../types/_types';
 import { BankItem } from '../types/bank-item.class';
 import { ItemDTO, ItemDtoTransform } from './item.dto';
 
 export class BankItemDtoTransform {
 
-    public static transformDtoArray(array: BankItemDTO[]): BankItem[] {
-        return array.map((dto: BankItemDTO) => this.dtoToClass(dto))
+    public static transformDtoDictionary(dictionary: Dictionary<BankItemDTO>): BankItem[] {
+        return (<BankItemDTO[]>DictionaryUtils.getValues(dictionary)).map((dto: BankItemDTO) => this.dtoToClass(dto));
     }
 
     public static dtoToClass(dto: BankItemDTO): BankItem {

@@ -1,6 +1,6 @@
 <div #mhoScript class="mho-script" [ngStyle]="{'height': mhoScript.parentElement?.parentElement?.clientHeight + 'px'}">
     <mat-drawer-container [style.height]="'100%'">
-        <mat-drawer class="sidenav" mode="side" opened>
+        <mat-drawer class="sidenav" [mode]="media.isActive('gt-xs') ? 'side' : 'over'" [opened]="opened_sidenav">
             <mat-list>
                 <a mat-list-item (click)="scrollToTitle(title.id)" [routerLink]="['./']" [fragment]="title.id"
                     [ngClass]="'level-' + title.level" *ngFor="let title of titles">{{title.label}}</a>

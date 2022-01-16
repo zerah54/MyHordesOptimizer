@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
+import { MediaObserver } from '@angular/flex-layout';
+import { skip } from 'rxjs';
 import { SidenavLinks } from '../_abstract_model/types/_types';
+import { SidenavService } from './../shared/services/sidenav.service';
 import { BankComponent } from './bank/bank.component';
 import { CitizensComponent } from './citizens/citizens.component';
 import { WishlistComponent } from './wishlist/wishlist.component';
@@ -10,12 +13,25 @@ import { WishlistComponent } from './wishlist/wishlist.component';
     styleUrls: ['./tools.component.scss']
 })
 export class ToolsComponent {
+    /** L'état d'ouverture de la sidenav */
+    public opened_sidenav: boolean = true;
+
     /** La liste des outils */
     public tools_list: SidenavLinks[] = [
         { label: 'Banque', id: 'bank', component: BankComponent, selected: true },
         { label: 'Liste de courses', id: 'wishlist', component: WishlistComponent, selected: false },
         { label: 'Citoyens', id: 'citizens', component: CitizensComponent, selected: false }
     ]
+
+    constructor(public media: MediaObserver, private sidenav: SidenavService) {}
+
+    public ngOnInit(): void {
+        this.sidenav.toggle_sidenav_obs
+            .pipe(skip(1))
+            .subscribe(() => {
+                this.opened_sidenav = !this.opened_sidenav;
+            })
+    }
 
     /**
      * Change l'outil affiché

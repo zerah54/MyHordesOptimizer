@@ -1,17 +1,31 @@
-import { AfterViewInit, Component, OnChanges, QueryList, SimpleChanges, ViewChildren } from '@angular/core';
-import { Router } from '@angular/router';
+import { skip } from 'rxjs';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { MediaObserver } from '@angular/flex-layout';
+import { SidenavService } from './../shared/services/sidenav.service';
 
 @Component({
     selector: 'mho-script',
     templateUrl: './script.component.html',
     styleUrls: ['./script.component.scss']
 })
-export class ScriptComponent implements AfterViewInit {
+export class ScriptComponent implements OnInit, AfterViewInit {
+    /** L'état d'ouverture de la sidenav */
+    public opened_sidenav: boolean = this.media.isActive('gt-xs');
 
     /** Le sommaire de la page */
     public titles: Title[] = [];
 
-    ngAfterViewInit(): void {
+    constructor(public media: MediaObserver, private sidenav: SidenavService) { }
+
+    public ngOnInit(): void {
+        this.sidenav.toggle_sidenav_obs
+            .pipe(skip(1))
+            .subscribe(() => {
+                this.opened_sidenav = !this.opened_sidenav;
+            })
+    }
+
+    public ngAfterViewInit(): void {
         this.getAllTitles();
     }
 

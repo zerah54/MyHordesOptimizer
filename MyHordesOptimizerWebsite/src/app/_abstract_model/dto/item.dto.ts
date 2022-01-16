@@ -4,8 +4,8 @@ import { RecipeDTO, RecipeDtoTransform } from './recipe.dto';
 
 export class ItemDtoTransform {
 
-    public static transformDtoArray(array: ItemDTO[]): Item[] {
-        return array.map((dto: ItemDTO) => this.dtoToClass(dto))
+    public static transformDtoArray(array: ItemDTO[] | null): Item[] {
+        return array ? array.map((dto: ItemDTO) => this.dtoToClass(dto)) : [];
     }
 
     public static dtoToClass(dto: ItemDTO): Item {
@@ -16,7 +16,7 @@ export class ItemDtoTransform {
             deco: dto.deco,
             description: dto.description,
             guard: dto.guard,
-            img: dto.img,
+            img: dto.img.replace(/\..*\./, '.'),
             is_heaver: dto.isHeaver,
             json_id_name: dto.jsonIdName,
             label: dto.label,
