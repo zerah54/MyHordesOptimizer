@@ -39,7 +39,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var items = FirebaseRepository.GetItems();
             var recipes = FirebaseRepository.GetRecipes();
-            foreach(var item in items)
+            foreach (var item in items)
             {
                 var recipesToAdd = recipes.Values.Where(recipe => recipe.Components.Any(component => component.XmlId == item.XmlId)).ToList();
                 recipesToAdd.AddRange(recipes.Values.Where(recipes => recipes.Result.Any(result => result.Item.XmlId == item.XmlId)));
@@ -47,20 +47,24 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
 
             var me = MyHordesJsonApiRepository.GetMe();
-            if(me.Map != null) // On ne récupère les info propres à la ville uniquement si on est incarné
+            if (me.Map != null) // On ne récupère les info propres à la ville uniquement si on est incarné
             {
                 var town = FirebaseRepository.GetTown(me.Map.Id);
 
                 foreach (var item in items)
                 {
-                    if (town.WishList.WishList.TryGetValue(item.XmlId.ToString(), out var wishListItem))
+                    if (town.WishList != null && town.WishList.WishList != null)
                     {
-                        item.WishListCount = wishListItem.Count;
+                        if (town.WishList.WishList.TryGetValue(item.XmlId.ToString(), out var wishListItem))
+                        {
+                            item.WishListCount = wishListItem.Count;
+                        }
+                        else
+                        {
+                            item.WishListCount = 0;
+                        }
                     }
-                    else
-                    {
-                        item.WishListCount = 0;
-                    }
+
                     if (town.Bank.Bank.TryGetValue(item.XmlId.ToString(), out var bankItem))
                     {
                         item.BankCount = bankItem.Count;
@@ -117,19 +121,21 @@ namespace MyHordesOptimizerApi.Services.Impl
             town = FirebaseRepository.GetTown(town.Id);
             var bankWrapper = town.Bank;
 
-            foreach (var kvp in bankWrapper.Bank)
+            if (town.WishList != null && town.WishList.WishList != null)
             {
-                var bankItem = kvp.Value;
-                if (town.WishList.WishList.TryGetValue(bankItem.Item.XmlId.ToString(), out var wishListItem))
+                foreach (var kvp in bankWrapper.Bank)
                 {
-                    bankItem.WishListCount = wishListItem.Count;
-                }
-                else
-                {
-                    bankItem.WishListCount = 0;
+                    var bankItem = kvp.Value;
+                    if (town.WishList.WishList.TryGetValue(bankItem.Item.XmlId.ToString(), out var wishListItem))
+                    {
+                        bankItem.WishListCount = wishListItem.Count;
+                    }
+                    else
+                    {
+                        bankItem.WishListCount = 0;
+                    }
                 }
             }
-
             return bankWrapper;
         }
 
