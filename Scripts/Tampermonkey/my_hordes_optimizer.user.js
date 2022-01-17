@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.9
+// @version      1.0.0-alpha.10
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -232,6 +232,27 @@ const categories_mapping = {
     }
 }
 
+const api_texts = {
+    error: {
+        en: `TODO`,
+        fr: `Une erreur s'est produite. (Erreur : $error$)`,
+        de: `TODO`,
+        es: `TODO`
+    },
+    update_wishlist_success: {
+        en: `TODO`,
+        fr: `La liste de courses a bien été mise à jour.`,
+        de: `TODO`,
+        es: `TODO`
+    },
+    add_to_wishlist_success: {
+        en: `TODO`,
+        fr: `L'objet a bien été ajouté à la liste de courses.`,
+        de: `TODO`,
+        es: `TODO`
+    },
+};
+
 const action_types = [
     {id: 'Manual', label: {en: 'Citizen actions', fr: 'Actions du citoyen', de: '', es: ''}, ordering: 1},
     {id: 'Workshop', label: {en: 'Workshop', fr: 'Atelier', de: '', es: ''}, ordering: 0},
@@ -379,6 +400,52 @@ function endLoading() {
     loadzone.setAttribute('x-stack', 0);
 }
 
+/** Affiche une notification de réussite */
+function addSuccess(message) {
+    let notifications = document.getElementById('notifications');
+    let notification = document.createElement('div');
+    notification.classList.add('notice', 'show');
+    notification.innerText = 'MyHordes Optimizer : ' + message;
+    notifications.appendChild(notification);
+    notification.addEventListener('click', () => {
+        notification.remove();
+    });
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+
+/** Affiche une notification de warning */
+function addWarning(message) {
+    let notifications = document.getElementById('notifications');
+    let notification = document.createElement('div');
+    notification.classList.add('warning', 'show');
+    notification.innerText = 'MyHordes Optimizer : ' + message;
+    notifications.appendChild(notification);
+    notification.addEventListener('click', () => {
+        notification.remove();
+    });
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+}
+
+/** Affiche une notification d'erreur */
+function addError(error) {
+    let notifications = document.getElementById('notifications');
+    let notification = document.createElement('div');
+    notification.classList.add('error', 'show');
+    notification.innerText = 'MyHordes Optimizer : ' + api_texts.error[lang].replace('$error$', error.status);
+    notifications.appendChild(notification);
+    notification.addEventListener('click', () => {
+        notification.remove();
+    });
+    setTimeout(() => {
+        notification.remove();
+    }, 5000);
+    console.error(`MyHordes Optimizer : Une erreur s'est produite : \n`, error);
+}
+
 /**
 * TODO Supprimer une fois les données remontées proprement de la base
 * @param {string} category
@@ -399,6 +466,7 @@ function createOptimizerBtn() {
         img.src = mh_optimizer_icon;
 
         let title_hidden = document.createElement('span');
+        title_hidden.classList.add('label_text');
         title_hidden.innerHTML = mho_title;
 
         let title = document.createElement('h1');
@@ -505,9 +573,9 @@ function createOptimizerButtonContent() {
             param_container.appendChild(param_input);
             param_container.appendChild(param_label);
             /** Si l'option a un parent, alors on ajoute une marge et on l'affiche uniquement si elle est cochée */
-            if (param.parent) {
+            if (param.parent_id) {
                 param_container.setAttribute('style', 'margin-left: 1em;');
-                if (!document.getElementById(param.parent).firstElementChild.value) {
+                if (!mho_parameters || !mho_parameters[param.parent_id]) {
                     param_container.classList.add('hidden');
                 }
             }
@@ -927,26 +995,30 @@ function displayItems(filtered_items, tab_id) {
             item_add_to_wishlist.appendChild(add_to_wishlist_button);
         }
 
-        if (tab_id === 'bank' && item.count) {
-            let item_count = document.createElement('span');
-            item_count.innerText = '(x' + item.count + ')';
-            item_count.setAttribute('style', 'margin-right: 0.5em');
-            item_title_container.appendChild(item_count);
-        }
+        let icon_container = document.createElement('span');
+        icon_container.setAttribute('style', 'margin-right: 0.5em');
+        item_title_container.appendChild(icon_container);
 
         let item_icon = document.createElement('img');
-        item_icon.setAttribute('style', 'margin-right: 0.5em');
         item_icon.src = hordes_img_url + item.img;
-        item_title_container.appendChild(item_icon);
+        icon_container.appendChild(item_icon);
+
+        if (tab_id === 'bank' && item.count > 1) {
+            let item_count = document.createElement('span');
+            item_count.setAttribute('style', 'vertical-align: sub; font-size: 10px;')
+            item_count.innerText = item.count;
+            icon_container.appendChild(item_count);
+        }
 
         let item_title = document.createElement('span');
+        item_title.classList.add('label_text');
         item_title.innerText = item.label[lang];
         item_title_container.appendChild(item_title);
 
         let item_properties_container = document.createElement('div');
         item_properties_container.classList.add('properties');
 
-        item_properties_container.innerHTML = '<p>' + item.description[lang] + '</p>';
+        item_properties_container.innerHTML = `<span class="small">${item.description[lang]}</span>`;
         // if (item.properties) {
         //     let item_properties = item.properties.map((property) => '<span style="padding: 0 8px">' + property + '</span>').reduce((a, b) => a + b);
         //     item_properties_container.innerHTML += '<p>' + item_properties + '</p>';
@@ -1170,6 +1242,7 @@ function getRecipeElement(recipe) {
         compo_container.appendChild(component_img);
 
         let component_label = document.createElement('span');
+        component_label.classList.add('label_text');
         component_label.innerText = compo.label[lang];
         compo_container.appendChild(component_label);
 
@@ -1198,12 +1271,14 @@ function getRecipeElement(recipe) {
         result_container.appendChild(result_img);
 
         let result_label = document.createElement('span');
+        result_label.classList.add('label_text');
         result_label.innerText = result.item.label[lang];
         result_container.appendChild(result_label);
 
         if (result.probability !== 1) {
             let result_proba = document.createElement('span');
             result_proba.setAttribute('style', 'font-style: italic; color: #ddab76;');
+            result_proba.classList.add('label_text');
             result_proba.innerText = ' (' + Math.round(result.probability * 100) + '%)';
             result_container.appendChild(result_proba);
         }
@@ -1614,8 +1689,6 @@ function createStyles() {
     + 'color: #f0d79e;'
     + 'cursor: help;'
     + 'font-family: Trebuchet MS,Arial,Verdana,sans-serif;'
-    + 'font-size: 1.2rem;'
-    + 'font-variant: small-caps;'
     + 'letter-spacing: 1px;'
     + 'line-height: 17px;'
     + 'text-align: left;'
@@ -1787,9 +1860,8 @@ function createStyles() {
 
     const tab_content_item_list_item_selected_style = '#tab-content > ul > li.selected {'
     + 'flex-basis: 100%;'
-    + 'border: 1px solid;'
     + 'padding: 0.25em;'
-    + 'background-color: #5c2b20;'
+    + 'margin: 0.25em 1px;'
     + '}';
 
     const tab_content_item_list_item_not_selected_properties_style = '#tab-content > ul > li:not(.selected) .properties {'
@@ -1799,7 +1871,7 @@ function createStyles() {
     const item_category = '#tab-content > ul div.category {'
     + 'width: 100%;'
     + 'border-bottom: 1px solid;'
-    + 'margin: 0.5em 0;'
+    + 'margin: 1em 0 0.5em;'
     + '}';
 
     const parameters_informations_style = '#parameters, #informations {'
@@ -1848,12 +1920,17 @@ function createStyles() {
     const recipe_style = '#tab-content #recipes-list > li, #wishlist > li {'
     + 'min-width: 100% !important;'
     + 'display: flex;'
-    + 'border-bottom: 1px dotted;'
     + '}';
 
     const item_title_style = '.item-title {'
     + 'display: flex;'
     + 'justify-content: space-between;'
+    + '}';
+
+    const item_list_element_style = 'ul#item-list > li {'
+    + 'background-color: #5c2b20;'
+    + 'margin: 1px 1px;'
+    + 'padding: 0.25em 0.5em;'
     + '}';
 
     const add_to_wishlist_button_img_style = '.add-to-wishlist > button > img {'
@@ -1875,8 +1952,8 @@ function createStyles() {
     + 'width: 100%;'
     + '}';
 
-    const wishlist_odd = '#wishlist > li:nth-child(odd) {'
-    + 'background-color: rgba(255, 255, 255, 0.1);'
+    const wishlist_even = '#tab-content #recipes-list > li:nth-child(even), #wishlist > li:nth-child(even) {'
+    + 'background-color: #5c2b20;'
     + '}';
 
     const wishlist_header_cell = '#wishlist .header > div {'
@@ -1888,6 +1965,11 @@ function createStyles() {
     + 'width: calc(100% - 425px);'
     + 'min-width: 200px;'
     + 'padding: 0 4px;'
+    + '}';
+
+    const label_text = '.label_text {'
+    + 'font-size: 1.2rem;'
+    + 'font-variant: small-caps;'
     + '}';
 
     const wishlist_cols = '#wishlist .priority, #wishlist .bank_count, #wishlist .bank_needed, #wishlist .diff {'
@@ -1940,9 +2022,9 @@ function createStyles() {
     + tabs_style + tabs_ul_style + tabs_ul_li_style + tabs_ul_li_spacing_style + tabs_ul_li_div_style + tabs_ul_li_div_hover_style + tabs_ul_li_selected_style
     + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
     + parameters_informations_style + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
-    + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style
-    + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip
-    + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_odd
+    + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style + label_text
+    + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
+    + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
     + item_priority_10 + item_priority_20 + item_priority_30;
 
     let style = document.createElement('style');
@@ -1979,7 +2061,7 @@ function getItems() {
                     wiki_btn.setAttribute('style', 'display: inherit');
                 }
             } else {
-                console.error(`Une erreur s'est produite (Erreur ` + response.status + `). Vérifiez que votre identifiant d'app externe est bien renseigné dans les paramètres de MH Optimizer`);
+                addError(response);
             }
         }
     });
@@ -1996,8 +2078,11 @@ function getMe() {
             if (response.status === 200) {
                 mh_user = response.response;
                 GM_setValue(mh_user_key, mh_user);
+
+                getItems();
+                getWishlist();
             } else {
-                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+                addError(response);
             }
             endLoading();
         }
@@ -2018,7 +2103,7 @@ function getTown() {
             if (response.status === 200) {
                 console.log('town', response.response);
             } else {
-                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+                addError(response);
             }
             endLoading();
         }
@@ -2041,7 +2126,7 @@ function getCitizens() {
                 citizens = response.response;
                 citizens.citizens = Object.keys(citizens.citizens).map((key) => citizens.citizens[key])
             } else {
-                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+                addError(response);
             }
             endLoading();
         }
@@ -2068,7 +2153,7 @@ function getBank() {
                 })
                     .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);
             } else {
-                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+                addError(response);
             }
             endLoading();
         }
@@ -2089,8 +2174,8 @@ function getWishlist() {
                     .map((key) => wishlist.wishList[key])
                     .sort((item_a, item_b) => item_b.priority > item_a.priority);
             } else {
-                wishlist = [];
-                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+                wishlist;
+                addError(response);
             }
             endLoading();
         }
@@ -2111,9 +2196,9 @@ function addItemToWishlist(item, cart_button) {
             if (response.status === 200) {
                 item.wishListCount = 1;
                 cart_button.remove();
-                // TODO SNACKBAR
+                addSuccess(api_texts.add_to_wishlist[lang]);
             } else {
-                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+                addError(response);
             }
             endLoading();
         }
@@ -2141,9 +2226,10 @@ function updateWishlist() {
                 // TODO SNACKBAR
                 wishlist = response.response;
                 wishlist.wishList = Object.keys(wishlist.wishList).map((key) => wishlist.wishList[key]);
+
+                addSuccess(api_texts.update_wishlist_success[lang]);
             } else {
-                console.error(`response`, response);
-                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+                addError(response);
             }
             endLoading();
         }
@@ -2179,7 +2265,7 @@ function updateExternalTools() {
                     ? '<img src ="' + repo_img_url + 'icons/done.png">' + texts.update_external_tools_success_btn_label[lang]
                 : '<img src ="' + repo_img_url + 'emotes/warning.gif">' + texts.update_external_tools_errors_btn_label[lang];
             } else {
-                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+                addError(response);
                 btn.innerHTML = '<img src ="' + repo_img_url + 'professions/death.gif">' + texts.update_external_tools_fail_btn_label[lang];
             }
             endLoading();
@@ -2198,7 +2284,7 @@ function getHeroSkills(hide_loader_on_finish) {
             if (response.status === 200) {
                 hero_skills = response.response.sort((a, b) => a.daysNeeded > b.daysNeeded);
             } else {
-                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+                addError(response);
             }
             if(hide_loader_on_finish) {
                 endLoading();
@@ -2222,7 +2308,7 @@ function getRecipes() {
                 })
                     .sort((a, b) => a.type.ordering > b.type.ordering);
             } else {
-                console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
+                addError(response);
             }
             endLoading();
         }
@@ -2261,8 +2347,6 @@ function getRecipes() {
         }
 
         getMe();
-        getItems();
-        getWishlist();
 
         preventFromLeaving();
 
