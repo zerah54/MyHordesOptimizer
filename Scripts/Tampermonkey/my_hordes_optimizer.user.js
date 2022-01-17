@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.8
+// @version      1.0.0-alpha.9
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -305,13 +305,14 @@ let tabs_list = {
 // La liste des paramètres de l'application //
 //////////////////////////////////////////////
 let params = [
-    {id: 'update_bbh', label: {en: 'TODO', fr: `Mettre à jour BigBroth'Hordes`, de: 'TODO', es: 'TODO'}},
-    {id: 'update_gh', label: {en: 'TODO', fr: `Mettre à jour Gest'Hordes`, de: 'TODO', es: 'TODO'}},
-    {id: 'update_fata', label: {en: 'TODO', fr: `Mettre à jour Fata Morgana`, de: 'TODO', es: 'TODO'}},
-    {id: 'enhanced_tooltips', label: {en: 'TODO', fr: `Afficher des tooltips détaillés`, de: 'TODO', es: 'TODO'}},
-    {id: 'click_on_voted', label: {en: 'TODO', fr: `Navigation rapide vers le chantier recommandé`, de: 'TODO', es: 'TODO'}},
-    {id: 'prevent_from_leaving', label: {en: 'TODO', fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`, de: 'TODO', es: 'TODO'}},
-    {id: 'display_wishlist', label: {en: 'TODO', fr: `Afficher la liste de courses dans l'interface`, de: 'TODO', es: 'TODO'}}
+    {id: 'update_bbh', label: {en: 'TODO', fr: `Mettre à jour BigBroth'Hordes`, de: 'TODO', es: 'TODO'}, parent_id: null},
+    {id: 'update_gh', label: {en: 'TODO', fr: `Mettre à jour Gest'Hordes`, de: 'TODO', es: 'TODO'}, parent_id: null},
+    {id: 'update_fata', label: {en: 'TODO', fr: `Mettre à jour Fata Morgana`, de: 'TODO', es: 'TODO'}, parent_id: null},
+    {id: 'enhanced_tooltips', label: {en: 'TODO', fr: `Afficher des tooltips détaillés`, de: 'TODO', es: 'TODO'}, parent_id: null},
+    {id: 'click_on_voted', label: {en: 'TODO', fr: `Navigation rapide vers le chantier recommandé`, de: 'TODO', es: 'TODO'}, parent_id: null},
+    {id: 'prevent_from_leaving', label: {en: 'TODO', fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`, de: 'TODO', es: 'TODO'}, parent_id: null},
+    {id: 'display_wishlist', label: {en: 'TODO', fr: `Afficher la liste de courses dans l'interface`, de: 'TODO', es: 'TODO'}, parent_id: null},
+    {id: 'display_wishlist_closed', label: {en: 'TODO', fr: `Liste de courses repliée par défaut`, de: 'TODO', es: 'TODO'}, parent_id: 'display_wishlist'}
 ];
 
 let informations = [
@@ -328,6 +329,8 @@ let citizens;
 let hero_skills;
 let bank;
 let wishlist;
+
+let is_refresh_wishlist;
 
 /////////////////////////////////////////
 // Fonctions utiles / Useful functions //
@@ -431,9 +434,7 @@ function createOptimizerButtonContent() {
         wiki_btn.classList.add('button');
         wiki_btn.innerHTML = 'Wiki';
         wiki_btn.id = wiki_btn_id;
-        if (!items) {
-            wiki_btn.classList.add('hidden');
-        }
+
         wiki_btn.addEventListener('click', () => {
             displayWindow('wiki');
         });
@@ -465,13 +466,14 @@ function createOptimizerButtonContent() {
 
 
         params.forEach((param) => {
+            let param_children = params.filter((param_child) => param_child.parent_id === param.id);
             let param_input = document.createElement('input');
-            param_input.setAttribute('type', 'checkbox');
-            param_input.id = param.id;
+            param_input.type = 'checkbox';
+            param_input.id = param.id + '-intput';
             param_input.checked = mho_parameters && mho_parameters[param.id] ? mho_parameters[param.id] : false;
 
             let param_label = document.createElement('label');
-            param_label.htmlFor = param.id;
+            param_label.htmlFor = param.id + '-input';
             param_label.innerText = param.label[lang];
 
             param_input.addEventListener('change', (event) => {
@@ -484,12 +486,31 @@ function createOptimizerButtonContent() {
                 new_params[param.id] = event.target.checked;
                 GM_setValue(gm_parameters_key, new_params);
                 mho_parameters = GM_getValue(gm_parameters_key);
+
+                /** Si l'option a des "enfants" alors on les affiche uniquement si elle est cochée */
+                if (param_children.length > 0) {
+                    param_children.forEach((param_child) => {
+                        let child = document.getElementById(param_child.id);
+                        if (event.target.checked) {
+                            child.classList.remove('hidden');
+                        } else {
+                            child.classList.add('hidden');
+                        }
+                    });
+                }
             });
 
             let param_container = document.createElement('li');
+            param_container.id = param.id;
             param_container.appendChild(param_input);
             param_container.appendChild(param_label);
-
+            /** Si l'option a un parent, alors on ajoute une marge et on l'affiche uniquement si elle est cochée */
+            if (param.parent) {
+                param_container.setAttribute('style', 'margin-left: 1em;');
+                if (!document.getElementById(param.parent).firstElementChild.value) {
+                    param_container.classList.add('hidden');
+                }
+            }
             params_list.appendChild(param_container);
         });
 
@@ -576,13 +597,14 @@ function createWindow() {
     window_box.appendChild(window_content);
     window_box.appendChild(window_overlay);
 
-    let post_office = document.getElementById('post-office');
-
     let window = document.createElement('div');
     window.id = mh_optimizer_window_id;
     window.appendChild(window_box);
-    post_office.parentNode.insertBefore(window, post_office.nextSibling);
 
+    let post_office = document.getElementById('post-office');
+    if (post_office) {
+        post_office.parentNode.insertBefore(window, post_office.nextSibling);
+    }
     window_overlay_li.addEventListener('click', () => {
         window.classList.remove('visible');
         let body = document.getElementsByTagName('body')[0];
@@ -1309,6 +1331,7 @@ function displayWishlistInApp() {
             update_btn.classList.add('inline');
             update_btn.innerText = texts.update[lang];
             update_btn.addEventListener('click', () => {
+                is_refresh_wishlist = true;
                 wishlist = undefined;
                 getWishlist();
             });
@@ -1364,17 +1387,28 @@ function displayWishlistInApp() {
                 list_item.appendChild(needed);
             });
 
+
+            if (mho_parameters.display_wishlist_closed && !is_refresh_wishlist) {
+                hide_state.innerText = '>';
+                header_title.show = false;
+
+                list.classList.add('hidden');
+                update_section.classList.add('hidden');
+            } else {
+                hide_state.innerText = '˅';
+                header_title.show = true;
+            }
             header_title.addEventListener('click', () => {
                 if (header_title.show) {
-                    hide_state.innerText = '˅';
-                } else {
                     hide_state.innerText = '˃';
-
+                } else {
+                    hide_state.innerText = '˅';
                 }
                 list.classList.toggle('hidden');
                 update_section.classList.toggle('hidden');
                 header_title.show = !header_title.show;
             });
+            is_refresh_wishlist = false
         };
 
         wishlist_section = document.createElement('div');
@@ -1382,8 +1416,10 @@ function displayWishlistInApp() {
         wishlist_section.classList.add('row');
 
         if (pageIsWorkshop()) {
-            let worshop_table = document.getElementsByClassName('row-table')[0];
-            worshop_table.parentNode.insertBefore(wishlist_section, worshop_table.nextSibling);
+            let workshop_table = document.getElementsByClassName('row-table')[0];
+            if (workshop_table) {
+                workshop_table.parentNode.insertBefore(wishlist_section, workshop_table.nextSibling);
+            }
         } else {
             let actions_box = document.getElementsByClassName('actions-box')[0];
             let main_actions = actions_box.parentNode;
@@ -1403,8 +1439,6 @@ function displayWishlistInApp() {
 
         let hide_state = document.createElement('span');
         hide_state.setAttribute('style', 'margin-right: 0.5em');
-        hide_state.innerText = '˅';
-        hide_state.show = true;
         header_title.appendChild(hide_state);
 
         let header_label = document.createElement('span');
@@ -2142,7 +2176,7 @@ function updateExternalTools() {
                 let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
                 let nb_tools_success = Object.keys(response.response).map((key) => response.response[key]).filter((tool_response) => tool_response.toLowerCase() === 'ok').length;
                 btn.innerHTML = nb_tools_to_update === nb_tools_success
-                    ? '<img src ="' + repo_img_url + 'item/done.png">' + texts.update_external_tools_success_btn_label[lang]
+                    ? '<img src ="' + repo_img_url + 'icons/done.png">' + texts.update_external_tools_success_btn_label[lang]
                 : '<img src ="' + repo_img_url + 'emotes/warning.gif">' + texts.update_external_tools_errors_btn_label[lang];
             } else {
                 console.error(`Une erreur s'est produite (Erreur ` + response.status + `)`);
