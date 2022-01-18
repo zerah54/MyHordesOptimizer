@@ -8,9 +8,11 @@
         </mat-drawer>
 
         <div class="sidenav-content">
-            <ng-container *ngTemplateOutlet="overview"></ng-container>
-            <ng-container *ngTemplateOutlet="features"></ng-container>
-            <ng-container *ngTemplateOutlet="install"></ng-container>
+            <mat-card>
+                <ng-container *ngTemplateOutlet="overview"></ng-container>
+                <ng-container *ngTemplateOutlet="features"></ng-container>
+                <ng-container *ngTemplateOutlet="install"></ng-container>
+            </mat-card>
         </div>
 
     </mat-drawer-container>

@@ -1,4 +1,4 @@
-@import 'variables.scss';
+@import "variables.scss";
 
 .mho-script {
     .sidenav {
@@ -18,7 +18,9 @@
     }
 
     .sidenav-content {
-
+        .mat-card {
+            overflow: auto;
+        }
         @for $i from 1 through 5 {
             h#{$i} {
                 scroll-margin: 100px;

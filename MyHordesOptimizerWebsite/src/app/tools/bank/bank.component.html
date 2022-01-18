@@ -1,7 +1,11 @@
-<div class="mho-bank">
-    <h1>Banque</h1>
-    <ul *ngIf="bank">
-        <mho-item *ngFor="let bank_item of bank.bank_items" [item]="bank_item" [displayDetails]="false">
-        </mho-item>
-    </ul>
-</div>
+<mat-card class="mho-bank">
+    <mat-card-header>
+        <mat-card-title>Banque</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <ul *ngIf="bank">
+            <mho-item *ngFor="let bank_item of bank.bank_items" [item]="bank_item" [displayDetails]="false">
+            </mho-item>
+        </ul>
+    </mat-card-content>
+</mat-card>

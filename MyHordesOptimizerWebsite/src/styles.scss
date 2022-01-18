@@ -10,20 +10,34 @@ body {
     color: $primary;
 }
 
-.sidenav {
+.mat-drawer.sidenav {
     width: 250px;
     background-color: $sidenav_bg_color !important;
+    border-right: none !important;
 
     .mat-list-item:hover {
         background-color: rgba(0, 0, 0, 0.2);
     }
 }
 
-.sidenav-content {
-    padding: 1em;
+.mat-drawer-content {
+    background-color: $sidenav_bg_color !important;
+    .sidenav-content {
+        padding: 0.5em;
+        height: calc(100% - 1em);
+
+        .mat-card {
+            height: calc(100% - 32px);
+
+            .mat-card-content {
+                overflow: auto;
+                height: calc(100% - 2em);
+            }
+        }
+    }
 }
 
-.snackbar-success{
+.snackbar-success {
     background-color: darkseagreen !important;
     color: black !important;
 }
