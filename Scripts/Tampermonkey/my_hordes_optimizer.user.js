@@ -131,7 +131,19 @@ const texts = {
     },
     prevent_from_leaving_information: {
         en: `TODO`,
-        fr: `Vous avez demandé à être prévenu avant de quitter la page si vous n'êtes pas en attente d'escorte.`,
+        fr: `Vous avez demandé à être prévenu avant de quitter la page si vos options d'escorte ne sont pas les bonnes : `,
+        de: `TODO`,
+        es: `TODO`
+    },
+    prevent_not_in_ae: {
+        en: `TODO`,
+        fr: `vous n'êtes pas en attente d'escorte.`,
+        de: `TODO`,
+        es: `TODO`
+    },
+    escort_not_released: {
+        en: `TODO`,
+        fr: `vous n'avez pas relâché votre escorte.`,
         de: `TODO`,
         es: `TODO`
     },
@@ -1497,8 +1509,10 @@ function displayWishlistInApp() {
             }
         } else {
             let actions_box = document.getElementsByClassName('actions-box')[0];
-            let main_actions = actions_box.parentNode;
-            main_actions.parentNode.insertBefore(wishlist_section, main_actions.nextSibling);
+            if (actions_box) {
+                let main_actions = actions_box.parentNode;
+                main_actions.parentNode.insertBefore(wishlist_section, main_actions.nextSibling);
+            }
         }
 
         let cell = document.createElement('div');
@@ -1610,23 +1624,37 @@ function preventFromLeaving() {
             let buttons = document.getElementsByTagName('button');
             let ae_button;
             for (let button of buttons) {
-                if (button.getAttribute('x-toggle-escort') === '1') {
-                    console.log('button.getAttribute("x-toggle-escort")', button.getAttribute('x-toggle-escort'));
-                    ae_button = button;
+                if (button.getAttribute('x-toggle-escort') && !button.classList.contains('inline') && button.getAttribute('x-toggle-escort') === '1') {
+                   ae_button = button;
 
                     let mho_leaving_info = document.getElementById('mho-leaving-info');
                     if (!mho_leaving_info) {
                         mho_leaving_info = document.createElement('div');
                         mho_leaving_info.id = 'mho-leaving-info';
                         mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                        mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[lang];
+                        mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[lang] + texts.prevent_not_in_ae[lang];
                         button.parentNode.insertBefore(mho_leaving_info, button.nextSibling);
                     }
 
                 }
             }
             console.log('buttons', ae_button);
-            if (ae_button) {
+
+            let is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
+
+            if (is_escorting) {
+                let mho_leaving_info = document.getElementById('mho-leaving-info');
+                if (!mho_leaving_info) {
+                    mho_leaving_info = document.createElement('div');
+                    mho_leaving_info.id = 'mho-leaving-info';
+                    mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
+                    mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[lang] + texts.escort_not_released[lang];
+                    is_escorting.parentNode.insertBefore(mho_leaving_info, is_escorting.nextSibling);
+                }
+            }
+
+            /** Si est en AE ou qu'on n'a pas reposé l'escorte */
+            if (ae_button || is_escorting) {
                 if (e) {
                     e.returnValue = '';
                     e.preventDefault();
