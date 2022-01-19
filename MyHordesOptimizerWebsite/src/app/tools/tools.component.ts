@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { skip } from 'rxjs';
 import { SidenavLinks } from '../_abstract_model/types/_types';
@@ -12,7 +12,7 @@ import { WishlistComponent } from './wishlist/wishlist.component';
     templateUrl: './tools.component.html',
     styleUrls: ['./tools.component.scss']
 })
-export class ToolsComponent {
+export class ToolsComponent implements OnInit {
     /** L'état d'ouverture de la sidenav */
     public opened_sidenav: boolean = true;
 

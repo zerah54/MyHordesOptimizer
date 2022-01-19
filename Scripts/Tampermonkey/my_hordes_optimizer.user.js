@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.11
+// @version      1.0.0-alpha.12
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -25,6 +25,12 @@
 // @grant        GM_getValue
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
+
+const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
++ `[nouveau] Affichage de la version\n`
++ `[nouveau] Affichage du changelog après une mise à jour\n\n`
++ `[amélioration] Affichage des paramètre\n\n`
++ `[correctif] Ajout à la liste de courses depuis la liste d'objets`;
 
 const lang = document.documentElement.lang;
 
@@ -344,12 +350,15 @@ let params = [
     {id: 'enhanced_tooltips', label: {en: 'TODO', fr: `Afficher des tooltips détaillés`, de: 'TODO', es: 'TODO'}, parent_id: null},
     {id: 'click_on_voted', label: {en: 'TODO', fr: `Navigation rapide vers le chantier recommandé`, de: 'TODO', es: 'TODO'}, parent_id: null},
     {id: 'prevent_from_leaving', label: {en: 'TODO', fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`, de: 'TODO', es: 'TODO'}, parent_id: null},
+    // {id: 'prevent_dangerous_actions', label: {en: 'TODO', fr: `Demander confirmation avant d'effectuer des actions dangereuses`, de: 'TODO', es: 'TODO'}, parent_id: null},
     {id: 'display_wishlist', label: {en: 'TODO', fr: `Afficher la liste de courses dans l'interface`, de: 'TODO', es: 'TODO'}, parent_id: null},
     {id: 'display_wishlist_closed', label: {en: 'TODO', fr: `Liste de courses repliée par défaut`, de: 'TODO', es: 'TODO'}, parent_id: 'display_wishlist'}
 ];
 
 let informations = [
-    {id: 'website', label: {en: `Website`, fr: `Site web`, de: 'TODO', es: 'TODO'}, src: 'https://myhordes-optimizer.web.app/'},
+    {id: 'website', label: {en: `Website`, fr: `Site web`, de: 'TODO', es: 'TODO'}, src: 'https://myhordes-optimizer.web.app/', action: () => {}, img: 'emotes/explo.gif'},
+    {id: 'version', label: {en: `Changelog ${GM_info.script.version}`, fr: `Notes de version ${GM_info.script.version}`, de: 'TODO', es: 'TODO'}, src: undefined, action: () => {alert(changelog)}, img: 'emotes/rptext.gif'},
+    {id: 'contact', label: {en: `Contact`, fr: `Contact`, de: 'TODO', es: 'TODO'}, src: `mailto:lenoune38@gmail.com?Subject=[${GM_info.script.name}]`, action: () => {}, img: 'icons/small_mail.gif'},
 ];
 
 //////////////////////////////////////
@@ -417,7 +426,7 @@ function addSuccess(message) {
     let notifications = document.getElementById('notifications');
     let notification = document.createElement('div');
     notification.classList.add('notice', 'show');
-    notification.innerText = 'MyHordes Optimizer : ' + message;
+    notification.innerText = `{GM_info.script.name} : ${message}`;
     notifications.appendChild(notification);
     notification.addEventListener('click', () => {
         notification.remove();
@@ -432,7 +441,7 @@ function addWarning(message) {
     let notifications = document.getElementById('notifications');
     let notification = document.createElement('div');
     notification.classList.add('warning', 'show');
-    notification.innerText = 'MyHordes Optimizer : ' + message;
+    notification.innerText = `${GM_info.script.name} : ${message}`;
     notifications.appendChild(notification);
     notification.addEventListener('click', () => {
         notification.remove();
@@ -447,7 +456,7 @@ function addError(error) {
     let notifications = document.getElementById('notifications');
     let notification = document.createElement('div');
     notification.classList.add('error', 'show');
-    notification.innerText = 'MyHordes Optimizer : ' + api_texts.error[lang].replace('$error$', error.status);
+    notification.innerText = '${GM_info.script.name} : ' + api_texts.error[lang].replace('$error$', error.status);
     notifications.appendChild(notification);
     notification.addEventListener('click', () => {
         notification.remove();
@@ -455,7 +464,7 @@ function addError(error) {
     setTimeout(() => {
         notification.remove();
     }, 5000);
-    console.error(`MyHordes Optimizer : Une erreur s'est produite : \n`, error);
+    console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
 }
 
 /**
@@ -553,6 +562,7 @@ function createOptimizerButtonContent() {
             param_input.checked = mho_parameters && mho_parameters[param.id] ? mho_parameters[param.id] : false;
 
             let param_label = document.createElement('label');
+            param_label.classList.add('small');
             param_label.htmlFor = param.id + '-input';
             param_label.innerText = param.label[lang];
 
@@ -614,12 +624,16 @@ function createOptimizerButtonContent() {
         informations.forEach((information) => {
             let information_link = document.createElement('a');
             information_link.id = information.id;
-            information_link.innerText = information.label[lang];
+            information_link.innerHTML = (information.img ? `<img src="${repo_img_url + information.img}" style="margin: 0 4px 0 3px">` : ``)+ `<span class=small>${information.label[lang]}</span>`;
             information_link.href = information.src;
+            information_link.target = '_blank';
 
-            information_link.addEventListener('click', (event) => {
-
-            });
+            if (!information.src) {
+                information_link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    information.action();
+                });
+            }
 
             let information_container = document.createElement('li');
             information_container.appendChild(information_link);
@@ -1064,7 +1078,8 @@ function displayCitizens() {
 
             let header_cells = [
                 {id: 'name', label: {en: 'Name', fr: 'Nom', de: '', es: ''}, type: 'th'},
-                {id: 'nombreJourHero', label: {en: '', fr: 'Nombre de jours héros', de: '', es: ''}, type: 'td'},
+                {id: 'nombreJourHero', label: {en: '', fr: 'Jours héros', de: '', es: ''}, type: 'td'},
+                {id: 'lastSkill', label: {en: '', fr: 'Dernier pouvoir gagné', de: '', es: ''}, type: 'td'},
                 {id: 'uppercut', label: {en: '', fr: 'Uppercut Sauvage', de: '', es: ''}, type: 'td', img: ''},
                 {id: 'rescue', label: {en: 'Rescue', fr: 'Sauvetage', de: '', es: ''}, type: 'td', img: ''}
             ];
@@ -1117,6 +1132,9 @@ function displayCitizens() {
                                 input.value = citizen[header_cell.id]
                                 cell.appendChild(input);
                                 break;
+                            case 'lastSkill':
+                                cell.innerText = hero_skills.find((skill) => skill.daysNeeded >= citizen.nombreJourHero).label[lang];
+                                break;
                             default:
                                 console.log(header_cell);
                                 break;
@@ -1126,6 +1144,9 @@ function displayCitizens() {
                             case 'name':
                             case 'nombreJourHero':
                                 cell.innerText = citizen[header_cell.id];
+                                break;
+                            case 'lastSkill':
+                                cell.innerText = hero_skills.find((skill) => skill.daysNeeded >= citizen.nombreJourHero).label[lang];
                                 break;
                             default:
                                 cell.innerText = '';
@@ -1353,7 +1374,7 @@ function createUpdateExternalToolsButton() {
         let updater_bloc = document.createElement('div');
         el.appendChild(updater_bloc);
         let updater_title = document.createElement('h5');
-        updater_title.innerHTML = 'MyHordes Optimizer';
+        updater_title.innerHTML = GM_info.script.name;
         updater_bloc.appendChild(updater_title);
 
         let btn = document.createElement('button');
@@ -1567,7 +1588,7 @@ function displayPriorityOnItems() {
 
 /** Affiche les tooltips avancés */
 function displayAdvancedTooltips() {
-    if (mho_parameters.enhanced_tooltips) {
+    if (mho_parameters.enhanced_tooltips && items) {
         let tooltip_container = document.getElementById('tooltip_container');
         let advanced_tooltip_container = document.getElementById('mho-advanced-tooltip');
         if (tooltip_container.innerHTML) {
@@ -1666,6 +1687,40 @@ function preventFromLeaving() {
 
         window.addEventListener('beforeunload', prevent_function, false);
     }
+}
+
+function preventDangerousActions() {
+    let interval = setInterval(() => {
+        if(mho_parameters.prevent_dangerous_actions && items) {
+
+            let actions = Array.from(document.getElementsByClassName('action'));
+
+            if (actions && actions.length > 0) {
+
+                let drugs = items.filter((item) => item.properties && item.properties.indexOf('drug') > -1);
+                let dead = items.filter((item) => item.actions && item.actions.indexOf('cyanide') > -1);
+
+                let filtered_actions = Array.from(actions).filter((action) => {
+                    let action_img = action.firstElementChild.src;
+                    return action_img === drugs.some((item) => item.icon === action_img) || action_img === dead.some((item) => item.icon === action_img);
+                });
+                console.log('actions', actions);
+                actions.forEach((action) => {
+                    action.addEventListener('click', (event) => {
+                        if (!confirm(`${GM_info.script.name}\n\nÊtes-vous sûr de vouloir effectuer cette action ?`)) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            event.stopImmediatePropagation();
+                        } else {
+                            preventDangerousActions();
+                        }
+                    }, true);
+                });
+
+                clearInterval(interval);
+            }
+        }
+    }, 500);
 }
 
 ///////////
@@ -2083,6 +2138,7 @@ function getItems() {
                     return item;
                 })
                     .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);
+                // console.log('items', items.filter((item) => (item.actions && item.actions.indexOf('cyanide') > -1) || (item.properties && item.properties.indexOf('drug') > -1)));
                 console.log('items', items);
                 let wiki_btn = document.getElementById(wiki_btn_id);
                 if (wiki_btn) {
@@ -2224,7 +2280,7 @@ function addItemToWishlist(item, cart_button) {
             if (response.status === 200) {
                 item.wishListCount = 1;
                 cart_button.remove();
-                addSuccess(api_texts.add_to_wishlist[lang]);
+                addSuccess(api_texts.add_to_wishlist_success[lang]);
             } else {
                 addError(response);
             }
@@ -2368,15 +2424,29 @@ function getRecipes() {
             }
         });
     } else {
+
+        /** Affiche le changelog de la version au premier chargement après la mise à jour */
+        let version = GM_getValue('version');
+        if (!version || !version[GM_info.script.version]) {
+            if (!version) {
+                version = {};
+            }
+
+            version[GM_info.script.version] = confirm(changelog);
+            GM_setValue('version', version);
+        }
+
+        getMe();
+
+        /** Gère le bouton de mise à jour des outils externes) */
         if (!buttonOptimizerExists()) {
             createStyles();
             createOptimizerBtn();
             createWindow();
         }
 
-        getMe();
-
         preventFromLeaving();
+        preventDangerousActions();
 
         setInterval(() => {
             createUpdateExternalToolsButton();

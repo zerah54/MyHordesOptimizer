@@ -24,7 +24,7 @@
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>Priorité</th>
                         <td mat-cell *matCellDef="let row">
                             <mat-form-field>
-                                <mat-select [value]="row.priority">
+                                <mat-select [(value)]="row.priority">
                                     <mat-option *ngFor="let priority of priorities" [value]="priority.count">
                                         {{priority.label}}
                                     </mat-option>
