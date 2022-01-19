@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.12
+// @version      1.0.0-alpha.13
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -27,10 +27,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[nouveau] Affichage de la version\n`
-+ `[nouveau] Affichage du changelog après une mise à jour\n\n`
-+ `[amélioration] Affichage des paramètre\n\n`
-+ `[correctif] Ajout à la liste de courses depuis la liste d'objets`;
++ `[correctif] Correctif affichage nom du script`;
 
 const lang = document.documentElement.lang;
 
@@ -426,7 +423,7 @@ function addSuccess(message) {
     let notifications = document.getElementById('notifications');
     let notification = document.createElement('div');
     notification.classList.add('notice', 'show');
-    notification.innerText = `{GM_info.script.name} : ${message}`;
+    notification.innerText = `${GM_info.script.name} : ${message}`;
     notifications.appendChild(notification);
     notification.addEventListener('click', () => {
         notification.remove();
@@ -456,7 +453,7 @@ function addError(error) {
     let notifications = document.getElementById('notifications');
     let notification = document.createElement('div');
     notification.classList.add('error', 'show');
-    notification.innerText = '${GM_info.script.name} : ' + api_texts.error[lang].replace('$error$', error.status);
+    notification.innerText = `${GM_info.script.name} : ${api_texts.error[lang].replace('$error$', error.status)}`;
     notifications.appendChild(notification);
     notification.addEventListener('click', () => {
         notification.remove();
