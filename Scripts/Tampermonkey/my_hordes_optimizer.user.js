@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.13
+// @version      1.0.0-alpha.14
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -24,10 +24,15 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_xmlhttpRequest
+// @grant        GM_notification
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[correctif] Correctif affichage nom du script`;
++ `[nouveauté] [expérimental] Ajout d'une option pour demander une confirmation avant de faire des actions "dangereuses" (consomation de cyanure, consomation de drogue si déjà drogué)\n\n`
++ `[amélioration] Ajout d'un niveau "trashlist" à la liste de courses, qui s'affiche en gris\n`
++ `[amélioration] Changement dans les couleurs des éléments de la liste de courses\n`
++ `[amélioration] Les couleurs des priorités d'affichent également sur l'image de l'objet dans la liste de courses intégrée\n`
++ `[amélioration] Affichage de certaines propriétés sur les tooltips des objets si l'option "afficher les tooltips détaillés" est activée`
 
 const lang = document.documentElement.lang;
 
@@ -161,11 +166,18 @@ const texts = {
         fr: `Mettre à jour`,
         de: `TODO`,
         es: `TODO`
+    },
+    search_ended: {
+        en: `TODO`,
+        fr: `La fouille est terminée`,
+        de: `TODO`,
+        es: `TODO`
     }
 };
 
 const categories_mapping = {
     armor : {
+        id: 'armor',
         img : '',
         label : {
             de : 'Verteidigung',
@@ -176,6 +188,7 @@ const categories_mapping = {
         ordering : 4
     },
     box : {
+        id: 'box',
         img : '',
         label : {
             de : 'Taschen und Behälter',
@@ -186,6 +199,7 @@ const categories_mapping = {
         ordering : 3
     },
     drug : {
+        id: 'drug',
         img : '',
         label : {
             de : 'Apotheke und Labor',
@@ -196,6 +210,7 @@ const categories_mapping = {
         ordering : 5
     },
     food : {
+        id: 'food',
         img : '',
         label : {
             de : 'Grundnahrungsmittel',
@@ -206,6 +221,7 @@ const categories_mapping = {
         ordering : 6
     },
     furniture : {
+        id: 'furniture',
         img : '',
         label : {
             de : 'Einrichtungen',
@@ -216,6 +232,7 @@ const categories_mapping = {
         ordering : 1
     },
     misc : {
+        id: 'misc',
         img : '',
         label : {
             de : 'Sonstiges',
@@ -226,6 +243,7 @@ const categories_mapping = {
         ordering : 7
     },
     rsc : {
+        id: 'rsc',
         img : '',
         label : {
             de : 'Baustoffe',
@@ -236,6 +254,7 @@ const categories_mapping = {
         ordering : 0
     },
     weapon : {
+        id: 'weapon',
         img : '',
         label : {
             de : 'Waffenarsenal',
@@ -274,10 +293,11 @@ const action_types = [
 ];
 
 const wishlist_priorities = [
+    {value: -1000, label: {en: 'TODO', fr: 'Ne pas ramener', es: '', de: ''}},
     {value: 0, label: {en: 'Not defined', fr: 'Non définie', es: '', de: ''}},
-    {value: 10, label: {en: 'Low', fr: 'Basse', es: '', de: ''}},
-    {value: 20, label: {en: 'Medium', fr: 'Moyenne', es: '', de: ''}},
-    {value: 30, label: {en: 'High', fr: 'Haute', es: '', de: ''}},
+    {value: 1000, label: {en: 'Low', fr: 'Basse', es: '', de: ''}},
+    {value: 2000, label: {en: 'Medium', fr: 'Moyenne', es: '', de: ''}},
+    {value: 3000, label: {en: 'High', fr: 'Haute', es: '', de: ''}},
 ];
 
 const wishlist_headers = [
@@ -347,9 +367,15 @@ let params = [
     {id: 'enhanced_tooltips', label: {en: 'TODO', fr: `Afficher des tooltips détaillés`, de: 'TODO', es: 'TODO'}, parent_id: null},
     {id: 'click_on_voted', label: {en: 'TODO', fr: `Navigation rapide vers le chantier recommandé`, de: 'TODO', es: 'TODO'}, parent_id: null},
     {id: 'prevent_from_leaving', label: {en: 'TODO', fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`, de: 'TODO', es: 'TODO'}, parent_id: null},
-    // {id: 'prevent_dangerous_actions', label: {en: 'TODO', fr: `Demander confirmation avant d'effectuer des actions dangereuses`, de: 'TODO', es: 'TODO'}, parent_id: null},
+    {id: 'prevent_dangerous_actions', label: {en: 'TODO', fr: `[Expérimental] Demander confirmation avant d'effectuer des actions dangereuses`, de: 'TODO', es: 'TODO'}, parent_id: null},
     {id: 'display_wishlist', label: {en: 'TODO', fr: `Afficher la liste de courses dans l'interface`, de: 'TODO', es: 'TODO'}, parent_id: null},
-    {id: 'display_wishlist_closed', label: {en: 'TODO', fr: `Liste de courses repliée par défaut`, de: 'TODO', es: 'TODO'}, parent_id: 'display_wishlist'}
+    {id: 'display_wishlist_closed', label: {en: 'TODO', fr: `Liste de courses repliée par défaut`, de: 'TODO', es: 'TODO'}, parent_id: 'display_wishlist'},
+    // {
+    //     id: 'notify_on_search_end',
+    //     label: {en: 'TODO', fr: `Me notifier à la fin de la fouille`, de: 'TODO', es: 'TODO'},
+    //     help: {en: 'TODO', fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`, de: 'TODO', es: 'TODO'},
+    //     parent_id: null
+    // }
 ];
 
 let informations = [
@@ -361,6 +387,8 @@ let informations = [
 //////////////////////////////////////
 // Les éléments récupérés via l'API //
 //////////////////////////////////////
+
+let loading_count = 0;
 
 let items;
 let recipes;
@@ -406,16 +434,26 @@ function pageIsDesert() {
     return document.URL.indexOf('desert') > -1;
 }
 
+/** Affiche ou masque la page de chargement de MyHordes en fonction du nombre d'appels en cours */
+function displayLoading() {
+    let loadzone = document.getElementById('loadzone');
+    if (loading_count > 0) {
+        loadzone.setAttribute('x-stack', 1);
+    } else {
+        loadzone.setAttribute('x-stack', 0);
+    }
+}
+
 /** Affiche la page de chargement de MyHordes */
 function startLoading() {
-    let loadzone = document.getElementById('loadzone');
-    loadzone.setAttribute('x-stack', 1);
+    loading_count += 1;
+    displayLoading();
 }
 
 /** Masque la page de chargement de MyHordes */
 function endLoading() {
-    let loadzone = document.getElementById('loadzone');
-    loadzone.setAttribute('x-stack', 0);
+    loading_count -= 1;
+    displayLoading();
 }
 
 /** Affiche une notification de réussite */
@@ -591,6 +629,13 @@ function createOptimizerButtonContent() {
             param_container.id = param.id;
             param_container.appendChild(param_input);
             param_container.appendChild(param_label);
+
+            if (param.help) {
+                let param_help = createHelpButton(param.help[lang]);
+                param_help.setAttribute('style', 'float: right; margin-top: 4px');
+                param_container.appendChild(param_help);
+            }
+
             /** Si l'option a un parent, alors on ajoute une marge et on l'affiche uniquement si elle est cochée */
             if (param.parent_id) {
                 param_container.setAttribute('style', 'margin-left: 1em;');
@@ -641,7 +686,7 @@ function createOptimizerButtonContent() {
         content.appendChild(infomations_container);
 
     } else {
-        let help_button = createHelpButton();
+        let help_button = createHelpButton(texts.external_app_id_help[lang]);
         content.appendChild(help_button);
 
         let keytext = document.createElement('input');
@@ -910,7 +955,7 @@ function displayWishlist() {
                     item_priority_option.value = priority.value;
                     item_priority_option.innerText = priority.label[lang];
                     item_priority_select.appendChild(item_priority_option);
-                    if (item.priority === priority.value) {
+                    if (item.priority.toString().slice(0, 1) === priority.value.toString().slice(0,1)) {
                         item_priority_option.selected = true;
                     }
                 });
@@ -1042,14 +1087,23 @@ function displayItems(filtered_items, tab_id) {
         item_properties_container.classList.add('properties');
 
         item_properties_container.innerHTML = `<span class="small">${item.description[lang]}</span>`;
-        // if (item.properties) {
-        //     let item_properties = item.properties.map((property) => '<span style="padding: 0 8px">' + property + '</span>').reduce((a, b) => a + b);
-        //     item_properties_container.innerHTML += '<p>' + item_properties + '</p>';
-        // }
-        // if (item.actions) {
-        //     let item_actions = item.actions.map((action) => '<span style="padding: 0 8px">' + action + '</span>').reduce((a, b) => a + b);
-        //     item_properties_container.innerHTML += '<p>' + item_actions + '</p>';
-        // }
+
+        if (item.properties) {
+            let item_properties = document.createElement('div');
+            item_properties_container.appendChild(item_properties);
+            item.properties.forEach((property) => {
+                let item_action = displayPropertiesOrActions(property, item);
+                item_properties.appendChild(item_action);
+            });
+        }
+        if (item.actions) {
+            let item_actions = document.createElement('div');
+            item_properties_container.appendChild(item_actions);
+            item.actions.forEach((action) => {
+                let item_action = displayPropertiesOrActions(action, item);
+                item_actions.appendChild(item_action);
+            });
+        }
 
         let item_container = document.createElement('li');
         item_container.appendChild(item_title_and_add_container);
@@ -1100,7 +1154,7 @@ function displayCitizens() {
                     cell.innerText = header_cell.label[lang];
                 }
                 header_row.appendChild(cell);
-            })
+            });
 
             let table = document.createElement('table');
             table.classList.add('mho-table');
@@ -1151,7 +1205,7 @@ function displayCitizens() {
                         }
                     }
                     citizen_row.appendChild(cell);
-                })
+                });
                 // console.log('citizen', citizen);
             }
 
@@ -1211,9 +1265,9 @@ function displaySkills() {
             })
         }
     } else {
-        getHeroSkills(true);
+        getHeroSkills();
         let interval = setInterval(() => {
-            if(hero_skills) {
+            if (hero_skills) {
                 displaySkills()
                 clearInterval(interval);
             }
@@ -1250,7 +1304,7 @@ function displayRecipes() {
     } else {
         getRecipes();
         let interval = setInterval(() => {
-            if(recipes) {
+            if (recipes) {
                 displayRecipes()
                 clearInterval(interval);
             }
@@ -1331,7 +1385,8 @@ function createHelpButton(text_to_display) {
 
     let help_tooltip = document.createElement('div')
     help_tooltip.classList.add('tooltip', 'help', 'hidden');
-    help_tooltip.innerHTML = texts.external_app_id_help[lang];
+    help_tooltip.setAttribute('style', 'text-transform: initial;');
+    help_tooltip.innerHTML = text_to_display;
     help_button.appendChild(help_tooltip);
 
     help_button.addEventListener('mouseenter', function() {
@@ -1364,7 +1419,7 @@ function createUpdateExternalToolsButton() {
 
     /** Cette fonction ne doit s'exécuter que si on a un id d'app externe ET au moins l'une des options qui est cochée dans les paramètres ET qu'on est hors de la ville */
     if (nb_tools_to_update > 0 && external_app_id && zone_marker) {
-        if(update_external_tools_btn) return;
+        if (update_external_tools_btn) return;
 
         let el = zone_marker.parentElement;
 
@@ -1468,12 +1523,12 @@ function displayWishlistInApp() {
 
                 let title = document.createElement('div');
                 title.classList.add('padded', 'cell', 'rw-5');
-                title.innerHTML = `<img src="${hordes_img_url + item.item.img}" style="margin-right: 5px"></img><span class="small">${item.item.label[lang]}</span>`;
+                title.innerHTML = `<img src="${hordes_img_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px"></img><span class="small">${item.item.label[lang]}</span>`;
                 list_item.appendChild(title);
 
                 let item_priority = document.createElement('span');
                 item_priority.classList.add('padded', 'cell', 'rw-3');
-                item_priority.innerHTML = `<span class="small">${wishlist_priorities.find((priority) => item.priority === priority.value).label[lang]}</span}`;
+                item_priority.innerHTML = `<span class="small">${wishlist_priorities.find((priority) => item.priority.toString().slice(0, 1) === priority.value.toString().slice(0, 1)).label[lang]}</span}`;
                 list_item.appendChild(item_priority);
 
                 let bank_count = document.createElement('span');
@@ -1572,7 +1627,7 @@ function displayPriorityOnItems() {
             };
         }
         wishlist.wishList
-            .filter((wishlist_item) => wishlist_item.priority > 0)
+            .filter((wishlist_item) => wishlist_item.priority !== 0)
             .forEach((wishlist_item) => {
             present_items
                 .filter((present_item) => present_item.src.indexOf(wishlist_item.item.img) > 0)
@@ -1599,7 +1654,7 @@ function displayAdvancedTooltips() {
                     hovered_item = items.find((item) => item.img === hovered_item_img);
                 }
             }
-            if (!advanced_tooltip_container && hovered_item && (hovered_item.recipes.length > 0/* || hovered_item.actions || hovered_item.properties*/)) {
+            if (!advanced_tooltip_container && hovered_item && (hovered_item.recipes.length > 0 || hovered_item.actions|| hovered_item.properties)) {
                 tooltip_container.firstElementChild.classList.add('large-tooltip');
                 advanced_tooltip_container = document.createElement('div');
                 advanced_tooltip_container.id = 'mho-advanced-tooltip';
@@ -1617,20 +1672,354 @@ function displayAdvancedTooltips() {
                         item_recipes.appendChild(getRecipeElement(recipe));
                     });
                 }
-                // if (hovered_item.properties) {
-                //     let item_properties = hovered_item.properties.map((property) => '<span style="padding: 0 8px">' + property + '</span>').reduce((a, b) => a + b);
-                //     advanced_tooltip_container.innerHTML += '<p>' + item_properties + '</p>';
-                // }
-                // if (hovered_item.actions) {
-                //     let item_actions = hovered_item.actions.map((action) => '<span style="padding: 0 8px">' + action + '</span>').reduce((a, b) => a + b);
-                //     advanced_tooltip_container.innerHTML += '<p>' + item_actions + '</p>';
-                // }
-                // console.log('hovered_item', hovered_item);
+                if (hovered_item.properties) {
+                    let item_properties = document.createElement('div');
+                    advanced_tooltip_container.appendChild(item_properties);
+                    hovered_item.properties.forEach((property) => {
+                        let item_action = displayPropertiesOrActions(property, hovered_item);
+                        item_properties.appendChild(item_action);
+                    });
+                }
+                if (hovered_item.actions) {
+                    let item_actions = document.createElement('div');
+                    advanced_tooltip_container.appendChild(item_actions);
+                    hovered_item.actions.forEach((action) => {
+                        let item_action = displayPropertiesOrActions(action, hovered_item);
+                        item_actions.appendChild(item_action);
+                    });
+                }
             }
         } else if (advanced_tooltip_container) {
             advanced_tooltip_container.remove();
         }
     }
+}
+
+/** Affiche les propriétés ou les actions associées à l'objet survolé */
+function displayPropertiesOrActions(property_or_action, hovered_item) {
+    let item_action = document.createElement('div');
+    // TODO MAPPING BACK
+    item_action.classList.add('item-tag');
+    switch (property_or_action) {
+        case 'eat_6ap':
+        case 'eat_7ap':
+            item_action.classList.add(`item-tag-${hovered_item.category.id.toLowerCase()}`);
+            item_action.innerHTML = `+${property_or_action.slice(4,5)}<img src="${repo_img_url}emotes/ap.${lang}.gif">`;
+            break;
+        case 'cyanide':
+            item_action.innerHTML = `<img src="${repo_img_url}emotes/death.gif">`;
+            break;
+        case 'hero_find':
+            item_action.innerHTML = `Trouvaille`;
+            break;
+        case 'hero_find_lucky':
+            item_action.innerHTML = `Trouvaille améliorée`;
+            break;
+        case 'ressource':
+            item_action.innerHTML = `Ressource`;
+            break;
+        case 'flash_photo_1':
+            var fail_1 = Math.round(60/90*100);
+            item_action.innerHTML = `${100-fail_1}% de chances de pouvoir fuir pendant 30 secondes`;
+            break;
+        case 'flash_photo_2':
+            var fail_2 = Math.round(30/90*100);
+            item_action.innerHTML = `${100-fail_2}% de chances de pouvoir fuir pendant 60 secondes`;
+            break;
+        case 'flash_photo_3':
+            var fail_3 = 1;
+            item_action.innerHTML = `Succès : ${100-fail_3}% de chances de pouvoir fuir pendant 120 secondes`;
+            break;
+        case 'can_cook':
+            item_action.innerHTML = `Peut être cuisiné`;
+            break;
+        case 'pet':
+            item_action.innerHTML = `Animal`;
+            break;
+        case 'defence':
+            item_action.innerHTML = `Objet de défense`;
+            break;
+        case 'can_poison':
+            item_action.innerHTML = `Peut être empoisonné`;
+            break;
+        case 'box_opener':
+        case 'can_opener':
+        case 'parcel_opener':
+        case 'impoundable':
+        case 'nw_ikea':
+        case 'nw_armory':
+        case 'hero_surv_1':
+        case 'food':
+        case 'weapon':
+        case 'drug':
+        case 'alcohol':
+        case 'nw_trebuchet':
+        case 'esc_fixed':
+        case 'load_lamp':
+        case 'slaughter_2xs':
+        case 'throw_animal_cat':
+        case 'prevent_night':
+        case 'parcel_opener_h':
+        case 'hero_tamer_3':
+        case 'throw_b_chair_basic':
+        case 'throw_b_machine_1':
+        case 'throw_b_machine_2':
+        case 'throw_b_machine_3':
+        case 'cuddle_teddy_2':
+        case 'lock':
+        case 'home_store_plus2':
+        case 'home_store_plus':
+        case 'home_def_plus':
+        case 'throw_b_pc':
+        case 'load_maglite':
+        case 'slaughter_bmb':
+        case 'throw_animal_angryc':
+        case 'special_guitar':
+        case 'fire_pilegun':
+        case 'fire_taser':
+        case 'fill_asplash1':
+        case 'fill_asplash2':
+        case 'throw_b_screw':
+        case 'throw_b_wrench':
+        case 'throw_b_staff':
+        case 'throw_b_knife':
+        case 'throw_b_small_knife':
+        case 'throw_b_cutter':
+        case 'throw_b_can_opener':
+        case 'fill_grenade1':
+        case 'fill_grenade2':
+        case 'fill_splash1':
+        case 'fill_splash2':
+        case 'load_pilegun':
+        case 'fire_pilegun3':
+        case 'throw_b_chain':
+        case 'nw_shooting':
+        case 'fire_splash3':
+        case 'throw_b_torch_off':
+        case 'throw_boomfruit':
+        case 'improve':
+        case 'throw_animal_dog':
+        case 'throw_b_concrete_wall':
+        case 'drug_xana1':
+        case 'drug_xana2':
+        case 'drug_xana3':
+        case 'drug_xana4':
+        case 'drug_6ap_1':
+        case 'drug_6ap_2':
+        case 'bandage':
+        case 'drug_8ap_1':
+        case 'drug_8ap_2':
+        case 'drug_hyd_1':
+        case 'drug_hyd_2':
+        case 'drug_hyd_3':
+        case 'drug_hyd_4':
+        case 'drug_hyd_5':
+        case 'drug_hyd_6':
+        case 'drug_rand_1':
+        case 'drug_rand_2':
+        case 'drug_par_1':
+        case 'drug_par_2':
+        case 'drug_par_3':
+        case 'drug_par_4':
+        case 'prevent_terror':
+        case 'read_rp_cover':
+        case 'found_poisoned':
+        case 'is_water':
+        case 'water_tl0':
+        case 'water_tl1a':
+        case 'water_tl1b':
+        case 'water_tl2':
+        case 'water_g':
+        case 'can':
+        case 'can_t1':
+        case 'can_t2':
+        case 'open_doggybag':
+        case 'special_dice':
+        case 'slaughter_2x':
+        case 'throw_animal':
+        case 'slaughter_4xs':
+        case 'load_radio':
+        case 'repair_2':
+        case 'zonemarker_1':
+        case 'nessquick':
+        case 'load_dildo':
+        case 'bomb_2':
+        case 'repair_1':
+        case 'light_cig':
+        case 'poison_1':
+        case 'smokebomb':
+        case 'bp_bunker_2':
+        case 'fire_mixergun':
+        case 'fire_chainsaw':
+        case 'throw_b_lawn':
+        case 'throw_b_cutcut':
+        case 'throw_b_swiss_knife':
+        case 'fill_jsplash':
+        case 'throw_grenade':
+        case 'throw_projector':
+        case 'load_mixergun':
+        case 'throw_exgrenade':
+        case 'fill_exgrenade1':
+        case 'fill_exgrenade2':
+        case 'fire_asplash3':
+        case 'fire_asplash2':
+        case 'fire_asplash1':
+        case 'load_taser':
+        case 'load_chainsaw':
+        case 'load_pilegun3':
+        case 'throw_jerrygun':
+        case 'throw_b_bone':
+        case 'fire_splash2':
+        case 'fire_splash1':
+        case 'fire_asplash5':
+        case 'fire_asplash4':
+        case 'load_pilegun2':
+        case 'fire_pilegun2':
+        case 'throw_phone':
+        case 'fire_ksplash':
+        case 'fire_lpointer4':
+        case 'fire_lpointer3':
+        case 'fire_lpointer2':
+        case 'fire_lpointer1':
+        case 'load_lpointer':
+        case 'throw_hurling_stick':
+        case 'open_metalbox':
+        case 'open_metalbox_t1':
+        case 'open_metalbox_t2':
+        case 'open_metalbox2':
+        case 'open_metalbox2_t1':
+        case 'open_metalbox2_t2':
+        case 'open_toolbox':
+        case 'open_toolbox_t1':
+        case 'open_toolbox_t2':
+        case 'open_c_chest':
+        case 'open_gamebox':
+        case 'open_letterbox':
+        case 'open_justbox':
+        case 'open_matbox3':
+        case 'open_matbox2':
+        case 'open_matbox1':
+        case 'open_h_chest':
+        case 'open_postbox':
+        case 'open_lunchbag':
+        case 'open_safe':
+        case 'open_abox':
+        case 'open_asafe':
+        case 'open_catbox':
+        case 'open_catbox_t1':
+        case 'open_catbox_t2':
+        case 'open_xmasbox3':
+        case 'open_xmasbox2':
+        case 'open_xmasbox1':
+        case 'open_postbox_xl':
+        case 'throw_b_torch':
+        case 'pumpkin':
+        case 'drug_beta_bad_1':
+        case 'drug_beta_bad_2':
+        case 'drug_beta':
+        case 'ghoul_serum':
+        case 'drug_lsd_1':
+        case 'drug_lsd_2':
+        case 'drug_april_1':
+        case 'drug_april_2':
+        case 'eat_meat_1':
+        case 'eat_meat_2':
+        case 'coffee':
+        case 'open_foodbox_in':
+        case 'open_foodbox_out':
+        case 'open_foodbox_in_t1':
+        case 'open_foodbox_out_t1':
+        case 'open_foodbox_in_t2':
+        case 'open_foodbox_out_t2':
+        case 'eat_bone_1':
+        case 'eat_bone_2':
+        case 'fill_watercan1':
+        case 'watercan1_tl0':
+        case 'watercan1_tl1a':
+        case 'watercan1_tl1b':
+        case 'watercan1_tl2':
+        case 'watercan1_g':
+        case 'fill_watercan2':
+        case 'watercan2_tl0':
+        case 'watercan2_tl1a':
+        case 'watercan2_tl1b':
+        case 'watercan2_tl2':
+        case 'watercan2_g':
+        case 'watercan3_tl0':
+        case 'watercan3_tl1a':
+        case 'watercan3_tl1b':
+        case 'watercan3_tl2':
+        case 'watercan3_g':
+        case 'eat_fleshroom_1':
+        case 'eat_fleshroom_2':
+        case 'eat_cadaver_1':
+        case 'eat_cadaver_2':
+        case 'alcohol_dx':
+        case 'water_no_effect':
+        case 'potion_tl0a':
+        case 'potion_tl0b':
+        case 'potion_tl1a':
+        case 'potion_tl1b':
+        case 'potion_tl2':
+        case 'potion_g':
+        case 'potion_tl0a_immune':
+        case 'potion_tl0b_immune':
+        case 'potion_tl1a_immune':
+        case 'potion_tl1b_immune':
+        case 'potion_tl2_immune':
+        case 'potion_g_immune':
+        case 'drug_rand_xmas':
+        case 'read_rp':
+        case 'slaughter_4x':
+        case 'vibrator':
+        case 'jerrycan_1':
+        case 'jerrycan_1b':
+        case 'jerrycan_2':
+        case 'jerrycan_3':
+        case 'load_emt':
+        case 'emt':
+        case 'special_card':
+        case 'flare':
+        case 'load_rmk2':
+        case 'zonemarker_2':
+        case 'fill_watercan0':
+        case 'bomb_1':
+        case 'watercup_1':
+        case 'watercup_1b':
+        case 'watercup_2':
+        case 'watercup_3':
+        case 'read_banned_note':
+        case 'throw_sandball':
+        case 'bp_generic_1':
+        case 'bp_generic_2':
+        case 'bp_generic_3':
+        case 'bp_generic_4':
+        case 'open_cbox':
+        case 'bp_hotel_2':
+        case 'bp_hotel_3':
+        case 'bp_hotel_4':
+        case 'bp_bunker_3':
+        case 'bp_bunker_4':
+        case 'bp_hospital_2':
+        case 'bp_hospital_3':
+        case 'bp_hospital_4':
+        case 'purify_soul':
+        case 'clean_clothes':
+        case 'hero_hunter_1':
+        case 'hero_hunter_2':
+        case 'hero_tamer_1':
+        case 'hero_tamer_1b':
+        case 'hero_tamer_2':
+        case 'hero_tamer_2b':
+        case 'hero_surv_2':
+        case 'alarm_clock':
+            item_action.classList.remove('item-tag');
+            break;
+        default:
+            console.log(property_or_action);
+            break;
+    }
+    return item_action;
 }
 
 /** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
@@ -1688,7 +2077,7 @@ function preventFromLeaving() {
 
 function preventDangerousActions() {
     let interval = setInterval(() => {
-        if(mho_parameters.prevent_dangerous_actions && items) {
+        if (mho_parameters.prevent_dangerous_actions && items) {
 
             let actions = Array.from(document.getElementsByClassName('action'));
 
@@ -1696,13 +2085,13 @@ function preventDangerousActions() {
 
                 let drugs = items.filter((item) => item.properties && item.properties.indexOf('drug') > -1);
                 let dead = items.filter((item) => item.actions && item.actions.indexOf('cyanide') > -1);
-
+                let status_drugged = Array.from(document.getElementsByClassName('status link')[0].getElementsByClassName('status')).some((status) => status.firstElementChild.src.indexOf('status_drugged') > -1);
                 let filtered_actions = Array.from(actions).filter((action) => {
                     let action_img = action.firstElementChild.src;
-                    return action_img === drugs.some((item) => item.icon === action_img) || action_img === dead.some((item) => item.icon === action_img);
+                    return (action_img === drugs.some((item) => item.icon === action_img) && status_drugged) || action_img === dead.some((item) => item.icon === action_img);
                 });
                 console.log('actions', actions);
-                actions.forEach((action) => {
+                filtered_actions.forEach((action) => {
                     action.addEventListener('click', (event) => {
                         if (!confirm(`${GM_info.script.name}\n\nÊtes-vous sûr de vouloir effectuer cette action ?`)) {
                             event.preventDefault();
@@ -1718,6 +2107,28 @@ function preventDangerousActions() {
             }
         }
     }, 500);
+}
+
+/** Affiche une notification 5 minutes avant la fin de la fouille en cours */
+function notifyOnSearchEnd() {
+    let interval = setInterval(() => {
+        if (mho_parameters.notify_on_search_end && pageIsDesert()) {
+            let count = document.querySelectorAll('span[x-countdown]')[0];
+            if (count) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    GM_notification(
+                        {
+                            text: texts.search_ended,
+                            title: GM_info.script.name,
+                            highlight: true,
+                            timeout: 0
+                        },
+                        () => {})
+                }, (count.getAttribute('x-countdown') - 5) * 1000);
+            }
+        }
+    }, 250);
 }
 
 ///////////
@@ -1865,7 +2276,7 @@ function createStyles() {
     + 'display: flex;'
     + 'flex-wrap: wrap;'
     + 'padding: 0;'
-    + 'background: url(' + repo_img_url + 'background/tabs-header-plain.gif) 0 100% round;'
+    + `background: url(${repo_img_url}background/tabs-header-plain.gif) 0 100% round;`
     + 'background-size: cover;'
     + 'height: 24px;'
     + 'margin-top: 2px;'
@@ -2042,7 +2453,7 @@ function createStyles() {
     + '}'
 
     const wishlist_label = '#wishlist .label {'
-    + 'width: calc(100% - 425px);'
+    + 'width: calc(100% - 525px);'
     + 'min-width: 200px;'
     + 'padding: 0 4px;'
     + '}';
@@ -2053,7 +2464,7 @@ function createStyles() {
     + '}';
 
     const wishlist_cols = '#wishlist .priority, #wishlist .bank_count, #wishlist .bank_needed, #wishlist .diff {'
-    + 'width: 100px;'
+    + 'width: 125px;'
     + 'padding: 0 4px;'
     + '}';
 
@@ -2086,14 +2497,21 @@ function createStyles() {
     + 'max-width: 400px; !important'
     + '}';
 
-    const item_priority_30 = 'li.item.priority_30 {'
-    + 'box-shadow: inset 0 0 0.30em red, 0 0 0.5em red;'
+    const item_priority_30 = `li.item[class^='priority_3'], li.item[class*=' priority_3'], img[class^='priority_3'], img[class*=' priority_3'] {`
+    + 'box-shadow: inset 0 0 0.30em springgreen, 0 0 0.5em springgreen;'
     + '}';
-    const item_priority_20 = 'li.item.priority_20 {'
-    + 'box-shadow: inset 0 0 0.30em orangered, 0 0 0.5em orangered;'
+    const item_priority_20 = `li.item[class^='priority_2'], li.item[class*=' priority_2'], img[class^='priority_2'], img[class*=' priority_2'] {`
+    + 'box-shadow: inset 0 0 0.30em yellowgreen, 0 0 0.5em yellowgreen;'
     + '}';
-    const item_priority_10 = 'li.item.priority_10 {'
-    + 'box-shadow: inset 0 0 0.30em yellow, 0 0 0.5em yellow;'
+    const item_priority_10 = `li.item[class^='priority_1'], li.item[class*=' priority_1'], img[class^='priority_1'], img[class*=' priority_1'] {`
+    + 'box-shadow: inset 0 0 0.30em darkgoldenrod, 0 0 0.5em darkgoldenrod;'
+    + '}';
+    const item_priority_trash = 'li.item.priority_-1000, img.priority_-1000 {'
+    + 'box-shadow: inset 0 0 0.30em darkslategrey, 0 0 0.5em darkslategrey;'
+    + '}';
+
+    const item_tag_food = 'div.item-tag-food::after {'
+    + `background: url(${repo_img_url}item/item_apple.gif) 50%/contain no-repeat;`
     + '}';
 
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
@@ -2105,7 +2523,7 @@ function createStyles() {
     + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style + label_text
     + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
     + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
-    + item_priority_10 + item_priority_20 + item_priority_30;
+    + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food;
 
     let style = document.createElement('style');
 
@@ -2123,6 +2541,7 @@ function createStyles() {
 ////////////////
 
 function getItems() {
+    startLoading();
     GM_xmlhttpRequest({
         method: 'GET',
         url: api_url + 'myhordesfetcher/items?userKey=' + external_app_id,
@@ -2144,6 +2563,7 @@ function getItems() {
             } else {
                 addError(response);
             }
+            endLoading();
         }
     });
 }
@@ -2173,8 +2593,8 @@ function getMe() {
 /** Récupère les informations de la ville */
 function getTown() {
     startLoading();
-    if(!hero_skills) {
-        getHeroSkills(false);
+    if (!hero_skills) {
+        getHeroSkills();
     }
     GM_xmlhttpRequest({
         method: 'GET',
@@ -2195,8 +2615,8 @@ function getTown() {
 /** Récupère les informations de la ville */
 function getCitizens() {
     startLoading();
-    if(!hero_skills) {
-        getHeroSkills(false);
+    if (!hero_skills) {
+        getHeroSkills();
     }
     GM_xmlhttpRequest({
         method: 'GET',
@@ -2355,7 +2775,7 @@ function updateExternalTools() {
 }
 
 /** Récupère la liste complète des pouvoirs héros */
-function getHeroSkills(hide_loader_on_finish) {
+function getHeroSkills() {
     startLoading();
     GM_xmlhttpRequest({
         method: 'GET',
@@ -2367,9 +2787,7 @@ function getHeroSkills(hide_loader_on_finish) {
             } else {
                 addError(response);
             }
-            if(hide_loader_on_finish) {
-                endLoading();
-            }
+            endLoading();
         }
     });
 }
@@ -2403,7 +2821,7 @@ function getRecipes() {
 (function() {
     'use strict';
 
-    if(document.URL.startsWith('https://bbh.fred26.fr/') || document.URL.startsWith('https://gest-hordes2.eragaming.fr/') || document.URL.startsWith('https://fatamorgana.md26.eu/')) {
+    if (document.URL.startsWith('https://bbh.fred26.fr/') || document.URL.startsWith('https://gest-hordes2.eragaming.fr/') || document.URL.startsWith('https://fatamorgana.md26.eu/')) {
         let current_key = '';
         if (document.URL.startsWith('https://bbh.fred26.fr/')) {
             current_key = gm_bbh_updated_key
@@ -2444,6 +2862,7 @@ function getRecipes() {
 
         preventFromLeaving();
         preventDangerousActions();
+        notifyOnSearchEnd();
 
         setInterval(() => {
             createUpdateExternalToolsButton();
