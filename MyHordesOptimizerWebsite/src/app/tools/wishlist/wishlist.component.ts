@@ -38,10 +38,11 @@ export class WishlistComponent {
 
     /** La liste des priorités */
     public readonly priorities: Priorities[] = [
+        { count: -1000, label: `Ne pas ramener` },
         { count: 0, label: `Non définie` },
-        { count: 10, label: `Basse` },
-        { count: 20, label: `Moyenne` },
-        { count: 30, label: `Haute` }
+        { count: 1000, label: `Basse` },
+        { count: 2000, label: `Moyenne` },
+        { count: 3000, label: `Haute` }
     ]
 
     constructor(private api: ApiServices) {

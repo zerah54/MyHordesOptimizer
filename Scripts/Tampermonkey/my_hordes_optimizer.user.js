@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.14
+// @version      1.0.0-alpha.15
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -12,7 +12,6 @@
 // @connect      https://myhordesoptimizerapi.azurewebsites.net/
 // @connect      *
 //
-// @match        https://zombvival.de/myhordes/*
 // @match        https://myhordes.de/*
 // @match        https://myhordes.eu/*
 // @match        https://myhord.es/*
@@ -28,11 +27,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[nouveauté] [expérimental] Ajout d'une option pour demander une confirmation avant de faire des actions "dangereuses" (consomation de cyanure, consomation de drogue si déjà drogué)\n\n`
-+ `[amélioration] Ajout d'un niveau "trashlist" à la liste de courses, qui s'affiche en gris\n`
-+ `[amélioration] Changement dans les couleurs des éléments de la liste de courses\n`
-+ `[amélioration] Les couleurs des priorités d'affichent également sur l'image de l'objet dans la liste de courses intégrée\n`
-+ `[amélioration] Affichage de certaines propriétés sur les tooltips des objets si l'option "afficher les tooltips détaillés" est activée`
++ `[nouveauté] Ajout d'une option pour être prévenu à la fin de la fouille`
++ `[amélioration] Ajout de certaines propriétés d'objets dans les tooltips améliorés\n`;
 
 const lang = document.documentElement.lang;
 
@@ -370,12 +366,12 @@ let params = [
     {id: 'prevent_dangerous_actions', label: {en: 'TODO', fr: `[Expérimental] Demander confirmation avant d'effectuer des actions dangereuses`, de: 'TODO', es: 'TODO'}, parent_id: null},
     {id: 'display_wishlist', label: {en: 'TODO', fr: `Afficher la liste de courses dans l'interface`, de: 'TODO', es: 'TODO'}, parent_id: null},
     {id: 'display_wishlist_closed', label: {en: 'TODO', fr: `Liste de courses repliée par défaut`, de: 'TODO', es: 'TODO'}, parent_id: 'display_wishlist'},
-    // {
-    //     id: 'notify_on_search_end',
-    //     label: {en: 'TODO', fr: `Me notifier à la fin de la fouille`, de: 'TODO', es: 'TODO'},
-    //     help: {en: 'TODO', fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`, de: 'TODO', es: 'TODO'},
-    //     parent_id: null
-    // }
+    {
+        id: 'notify_on_search_end',
+        label: {en: 'TODO', fr: `Me notifier à la fin de la fouille`, de: 'TODO', es: 'TODO'},
+        help: {en: 'TODO', fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`, de: 'TODO', es: 'TODO'},
+        parent_id: null
+    }
 ];
 
 let informations = [
@@ -398,6 +394,7 @@ let bank;
 let wishlist;
 
 let is_refresh_wishlist;
+let dragged = {item: undefined, element: undefined};
 
 /////////////////////////////////////////
 // Fonctions utiles / Useful functions //
@@ -922,9 +919,54 @@ function displayWishlist() {
 
             wishlist.wishList
                 .filter((item) => item.count > 0)
-                .forEach((item, index) => {
+                .forEach((item) => {
+
+
+                let getLi = (target) => {
+                    while (target.nodeName.toLowerCase() !== 'li' && target.nodeName.toLowerCase() !== 'body') {
+                        target = target.parentNode;
+                    }
+                    if (target.nodeName.toLowerCase() == 'body') {
+                        return false;
+                    } else {
+                        return target;
+                    }
+                };
 
                 let item_element = document.createElement('li');
+                item_element.draggable = true;
+                item_element.setAttribute('itemId', item.item.xmlId);
+                item_element.addEventListener('dragstart', (event) => {
+                    let target = getLi(event.target);
+                    dragged.element = target;
+                    dragged.item = item;
+                });
+                item_element.addEventListener('dragover', function(event) {
+                    event.preventDefault();
+                });
+                item_element.addEventListener('dragenter', (event) => {
+                    let target = getLi(event.target);
+                    if (target !== dragged.element) {
+                        target.style['border-bottom'] = '12px solid rgba(0, 0, 0, 0.25)';
+                    }
+                });
+                item_element.addEventListener('dragleave', (event) => {
+                    let target = getLi(event.target);
+                    target.style['border-bottom'] = '';
+                }, false);
+                item_element.addEventListener('drop', (event) => {
+                    event.preventDefault();
+                    let target = getLi(event.target);
+                    if (target !== dragged.element) {
+                        target.style['border-bottom'] = '';
+                        dragged.element.remove();
+                        target.parentNode.insertBefore(dragged.element, target.nextSibling);
+                        dragged.element = undefined;
+                        dragged.item = undefined;
+                        console.log('item', item);
+                        console.log('wishlist_list', wishlist_list.getElementsByTagName('li'));
+                    }
+                });
                 wishlist_list.appendChild(item_element);
 
                 let item_title_container = document.createElement('div');
@@ -1312,6 +1354,7 @@ function displayRecipes() {
     }
 }
 
+/** Affiche une recette */
 function getRecipeElement(recipe) {
     let recipe_container = document.createElement('li');
 
@@ -1404,6 +1447,7 @@ function saveParameters() {
     let parameters = document.getElementsByClassName('parameter');
 }
 
+/** Affiche le bouton de mise à jour des outils externes */
 function createUpdateExternalToolsButton() {
 
     let tools_to_update = {
@@ -1654,39 +1698,58 @@ function displayAdvancedTooltips() {
                     hovered_item = items.find((item) => item.img === hovered_item_img);
                 }
             }
-            if (!advanced_tooltip_container && hovered_item && (hovered_item.recipes.length > 0 || hovered_item.actions|| hovered_item.properties)) {
-                tooltip_container.firstElementChild.classList.add('large-tooltip');
-                advanced_tooltip_container = document.createElement('div');
-                advanced_tooltip_container.id = 'mho-advanced-tooltip';
-                advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
+
+            if (hovered_item) {
                 let tooltip_content = tooltip_container.firstElementChild;
-                tooltip_content.appendChild(advanced_tooltip_container);
 
-                advanced_tooltip_container.innerHtml = '';
-                if (hovered_item.recipes.length > 0) {
-                    let item_recipes = document.createElement('div');
-                    item_recipes.classList.add('recipe');
-                    advanced_tooltip_container.appendChild(item_recipes);
+                let item_deco = tooltip_content.getElementsByClassName('item-tag-deco')[0];
+                let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
+                if (should_display_advanced_tooltip) {
+                    if (!advanced_tooltip_container) {
+                        advanced_tooltip_container = document.createElement('div');
+                        advanced_tooltip_container.id = 'mho-advanced-tooltip';
+                        advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
 
-                    hovered_item.recipes.forEach((recipe) => {
-                        item_recipes.appendChild(getRecipeElement(recipe));
-                    });
-                }
-                if (hovered_item.properties) {
-                    let item_properties = document.createElement('div');
-                    advanced_tooltip_container.appendChild(item_properties);
-                    hovered_item.properties.forEach((property) => {
-                        let item_action = displayPropertiesOrActions(property, hovered_item);
-                        item_properties.appendChild(item_action);
-                    });
-                }
-                if (hovered_item.actions) {
-                    let item_actions = document.createElement('div');
-                    advanced_tooltip_container.appendChild(item_actions);
-                    hovered_item.actions.forEach((action) => {
-                        let item_action = displayPropertiesOrActions(action, hovered_item);
-                        item_actions.appendChild(item_action);
-                    });
+                        tooltip_content.appendChild(advanced_tooltip_container);
+                    } else if (!advanced_tooltip_container.innerHTML) {
+                        advanced_tooltip_container.innerHtml = '';
+
+                        console.log('hovered_item', hovered_item);
+                        if (item_deco && hovered_item.deco > 0) {
+                            let text = item_deco.innerText.replace(/ \(.*\)*/, '');
+                            item_deco.innerHTML = `<span>${text} <em>( +${hovered_item.deco} )</em></span>`;
+                        }
+
+                        if (hovered_item.properties) {
+                            let item_properties = document.createElement('div');
+                            advanced_tooltip_container.appendChild(item_properties);
+                            hovered_item.properties.forEach((property) => {
+                                let item_action = displayPropertiesOrActions(property, hovered_item);
+                                item_properties.appendChild(item_action);
+                            });
+                        }
+                        if (hovered_item.actions) {
+                            let item_actions = document.createElement('div');
+                            advanced_tooltip_container.appendChild(item_actions);
+                            hovered_item.actions.forEach((action) => {
+                                let item_action = displayPropertiesOrActions(action, hovered_item);
+                                item_actions.appendChild(item_action);
+                            });
+                        }
+
+                        if (hovered_item.recipes.length > 0) {
+                            tooltip_container.firstElementChild.classList.add('large-tooltip');
+                            let item_recipes = document.createElement('div');
+                            item_recipes.classList.add('recipe');
+                            advanced_tooltip_container.appendChild(item_recipes);
+
+                            hovered_item.recipes.forEach((recipe) => {
+                                item_recipes.appendChild(getRecipeElement(recipe));
+                            });
+                        }
+                    }
+                } else if (advanced_tooltip_container) {
+                    advanced_tooltip_container.remove();
                 }
             }
         } else if (advanced_tooltip_container) {
@@ -1703,16 +1766,31 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
     switch (property_or_action) {
         case 'eat_6ap':
         case 'eat_7ap':
-            item_action.classList.add(`item-tag-${hovered_item.category.id.toLowerCase()}`);
+            item_action.classList.add(`item-tag-food`);
             item_action.innerHTML = `+${property_or_action.slice(4,5)}<img src="${repo_img_url}emotes/ap.${lang}.gif">`;
+            break;
+        case 'drug_6ap_1':
+        case 'drug_8ap_1':
+            item_action.classList.add(`item-tag-drug`);
+            item_action.innerHTML = `+${property_or_action.slice(5,6)}<img src="${repo_img_url}emotes/ap.${lang}.gif">`;
+            break;
+        case 'alcohol':
+            item_action.classList.add(`item-tag-alcohol`);
+            item_action.innerHTML = `+6<img src="${repo_img_url}emotes/ap.${lang}.gif">`;
             break;
         case 'cyanide':
             item_action.innerHTML = `<img src="${repo_img_url}emotes/death.gif">`;
             break;
         case 'hero_find':
-            item_action.innerHTML = `Trouvaille`;
+            if (!(hovered_item.properties && hovered_item.properties.some((property) => property === 'hero_find_lucky')) && !(hovered_item.actions && hovered_item.actions.some((property) => property === 'hero_find_lucky'))) {
+                item_action.classList.add(`item-tag-hero`);
+                item_action.innerHTML = `Trouvaille`;
+            } else {
+                item_action.classList.remove('item-tag');
+            }
             break;
         case 'hero_find_lucky':
+            item_action.classList.add(`item-tag-hero`);
             item_action.innerHTML = `Trouvaille améliorée`;
             break;
         case 'ressource':
@@ -1736,11 +1814,37 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'pet':
             item_action.innerHTML = `Animal`;
             break;
-        case 'defence':
-            item_action.innerHTML = `Objet de défense`;
-            break;
         case 'can_poison':
             item_action.innerHTML = `Peut être empoisonné`;
+            break;
+        case 'load_maglite':
+        case 'load_lamp':
+        case 'load_pilegun':
+        case 'load_radio':
+        case 'load_dildo':
+        case 'load_lpointer':
+        case 'load_mixergun':
+        case 'load_taser':
+        case 'load_chainsaw':
+        case 'load_pilegun3':
+        case 'load_pilegun2':
+        case 'load_emt':
+        case 'load_rmk2':
+            item_action.classList.add(`item-tag-load`);
+            item_action.innerHTML = `Peut être rechargé`;
+            break;
+        case 'smokebomb':
+            item_action.classList.add(`item-tag-smokebomb`);
+            item_action.innerHTML = `Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)`
+            break;
+        case 'defence':
+            // déjà affichés par le jeu
+            item_action.classList.remove('item-tag');
+            break;
+        case 'drug_6ap_2':
+        case 'drug_8ap_2':
+            // ne pas afficher
+            item_action.classList.remove('item-tag');
             break;
         case 'box_opener':
         case 'can_opener':
@@ -1752,10 +1856,8 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'food':
         case 'weapon':
         case 'drug':
-        case 'alcohol':
         case 'nw_trebuchet':
         case 'esc_fixed':
-        case 'load_lamp':
         case 'slaughter_2xs':
         case 'throw_animal_cat':
         case 'prevent_night':
@@ -1771,7 +1873,6 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'home_store_plus':
         case 'home_def_plus':
         case 'throw_b_pc':
-        case 'load_maglite':
         case 'slaughter_bmb':
         case 'throw_animal_angryc':
         case 'special_guitar':
@@ -1790,7 +1891,6 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'fill_grenade2':
         case 'fill_splash1':
         case 'fill_splash2':
-        case 'load_pilegun':
         case 'fire_pilegun3':
         case 'throw_b_chain':
         case 'nw_shooting':
@@ -1804,11 +1904,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'drug_xana2':
         case 'drug_xana3':
         case 'drug_xana4':
-        case 'drug_6ap_1':
-        case 'drug_6ap_2':
         case 'bandage':
-        case 'drug_8ap_1':
-        case 'drug_8ap_2':
         case 'drug_hyd_1':
         case 'drug_hyd_2':
         case 'drug_hyd_3':
@@ -1838,16 +1934,13 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'slaughter_2x':
         case 'throw_animal':
         case 'slaughter_4xs':
-        case 'load_radio':
         case 'repair_2':
         case 'zonemarker_1':
         case 'nessquick':
-        case 'load_dildo':
         case 'bomb_2':
         case 'repair_1':
         case 'light_cig':
         case 'poison_1':
-        case 'smokebomb':
         case 'bp_bunker_2':
         case 'fire_mixergun':
         case 'fire_chainsaw':
@@ -1857,23 +1950,18 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'fill_jsplash':
         case 'throw_grenade':
         case 'throw_projector':
-        case 'load_mixergun':
         case 'throw_exgrenade':
         case 'fill_exgrenade1':
         case 'fill_exgrenade2':
         case 'fire_asplash3':
         case 'fire_asplash2':
         case 'fire_asplash1':
-        case 'load_taser':
-        case 'load_chainsaw':
-        case 'load_pilegun3':
         case 'throw_jerrygun':
         case 'throw_b_bone':
         case 'fire_splash2':
         case 'fire_splash1':
         case 'fire_asplash5':
         case 'fire_asplash4':
-        case 'load_pilegun2':
         case 'fire_pilegun2':
         case 'throw_phone':
         case 'fire_ksplash':
@@ -1881,7 +1969,6 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'fire_lpointer3':
         case 'fire_lpointer2':
         case 'fire_lpointer1':
-        case 'load_lpointer':
         case 'throw_hurling_stick':
         case 'open_metalbox':
         case 'open_metalbox_t1':
@@ -1976,11 +2063,9 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'jerrycan_1b':
         case 'jerrycan_2':
         case 'jerrycan_3':
-        case 'load_emt':
         case 'emt':
         case 'special_card':
         case 'flare':
-        case 'load_rmk2':
         case 'zonemarker_2':
         case 'fill_watercan0':
         case 'bomb_1':
@@ -2075,6 +2160,7 @@ function preventFromLeaving() {
     }
 }
 
+/** Affiche une demande de confirmation avant d'effectuer une action dangereuse (drogue si état drogué / cyanure) */
 function preventDangerousActions() {
     let interval = setInterval(() => {
         if (mho_parameters.prevent_dangerous_actions && items) {
@@ -2116,17 +2202,19 @@ function notifyOnSearchEnd() {
             let count = document.querySelectorAll('span[x-countdown]')[0];
             if (count) {
                 clearInterval(interval);
+                let timeout_counter = (count.getAttribute('x-countdown') - 1) * 1000;
                 setTimeout(() => {
-                    GM_notification(
-                        {
-                            text: texts.search_ended,
-                            title: GM_info.script.name,
-                            highlight: true,
-                            timeout: 0
-                        },
-                        () => {})
-                }, (count.getAttribute('x-countdown') - 5) * 1000);
+                    GM_notification({
+                        text: texts.search_ended[lang],
+                        title: GM_info.script.name,
+                        highlight: true,
+                        timeout: 0
+                    })
+                    notifyOnSearchEnd();
+                }, timeout_counter);
             }
+        } else {
+            clearInterval(interval);
         }
     }, 250);
 }
@@ -2511,7 +2599,27 @@ function createStyles() {
     + '}';
 
     const item_tag_food = 'div.item-tag-food::after {'
-    + `background: url(${repo_img_url}item/item_apple.gif) 50%/contain no-repeat;`
+    + `background: url(${repo_img_url}status/status_haseaten.gif) 50%/contain no-repeat;`
+    + '}';
+
+    const item_tag_load = 'div.item-tag-load::after {'
+    + `background: url(${repo_img_url}item/item_pile.gif) 50%/contain no-repeat;`
+    + '}';
+
+    const item_tag_hero = 'div.item-tag-hero::after {'
+    + `background: url(${repo_img_url}icons/star.gif) 50%/contain no-repeat;`
+    + '}';
+
+    const item_tag_alcohol = 'div.item-tag-alcohol::after {'
+    + `background: url(${repo_img_url}status/status_drunk.gif) 50%/contain no-repeat;`
+    + '}';
+
+    const item_tag_drug = 'div.item-tag-drug::after {'
+    + `background: url(${repo_img_url}status/status_drugged.gif) 50%/contain no-repeat;`
+    + '}';
+
+    const item_tag_smokebomb = 'div.item-tag-smokebomb {'
+    + `height: 36px;`
     + '}';
 
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
@@ -2523,7 +2631,7 @@ function createStyles() {
     + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style + label_text
     + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
     + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
-    + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food;
+    + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug;
 
     let style = document.createElement('style');
 
