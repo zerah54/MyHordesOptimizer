@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.16
+// @version      1.0.0-alpha.17
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -27,8 +27,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[correctif] Erreur 500 au chargement du script quand on n'est pas en ville\n`
-+ `[correctif] Comportement de la notification de fouille terminée`;
++ `[Nouveauté] Affichage du nombre de zombies morts sur la case aujourd'hui`;
 
 const lang = document.documentElement.lang;
 
@@ -65,6 +64,8 @@ const btn_id = 'optimizer-btn';
 const mh_header_id = 'header-reload-area';
 const mh_update_external_tools_id = 'mh-update-external-tools';
 const wiki_btn_id = 'wiki-btn-id';
+const zone_dead_zombies_id = 'zone-dead-zombies';
+const nb_dead_zombies_id = 'nb-dead-zombies';
 
 const texts = {
     save_external_app_id: {
@@ -166,6 +167,12 @@ const texts = {
     search_ended: {
         en: `TODO`,
         fr: `La fouille est terminée`,
+        de: `TODO`,
+        es: `TODO`
+    },
+    nb_dead_zombies: {
+        en: `TODO`,
+        fr: `Nombre de zombies morts sur cette case aujourd'hui`,
         de: `TODO`,
         es: `TODO`
     }
@@ -370,6 +377,12 @@ let params = [
         id: 'notify_on_search_end',
         label: {en: 'TODO', fr: `Me notifier à la fin de la fouille`, de: 'TODO', es: 'TODO'},
         help: {en: 'TODO', fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`, de: 'TODO', es: 'TODO'},
+        parent_id: null
+    },
+    {
+        id: 'display_nb_dead_zombies',
+        label: {en: 'TODO', fr: `Afficher le nombre de zombies morts aujour'hui`, de: 'TODO', es: 'TODO'},
+        help: {en: 'TODO', fr: `Permet d'afficher le nombre de tâches de sang sur la carte`, de: 'TODO', es: 'TODO'},
         parent_id: null
     }
 ];
@@ -2219,6 +2232,35 @@ function notifyOnSearchEnd() {
     }, 250);
 }
 
+/** Affiche le nombre de zombies morts aujourd'hui */
+function displayNbDeadZombies() {
+    if (mho_parameters.display_nb_dead_zombies && pageIsDesert()) {
+        let zone_dist = document.getElementsByClassName('zone-dist')[0];
+        if (zone_dist) {
+            let zone_dead_zombies = document.getElementById(zone_dead_zombies_id);
+            let nb_dead_zombies = document.getElementsByClassName('splatter').length;
+
+            if (!zone_dead_zombies) {
+                zone_dead_zombies = document.createElement('div');
+                zone_dead_zombies.id = zone_dead_zombies_id;
+                zone_dead_zombies.classList.add('cell', 'rw-12', 'center');
+                zone_dead_zombies.innerHTML = `${texts.nb_dead_zombies[lang]} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`
+
+                let dist = zone_dist.firstElementChild;
+                dist.parentNode.insertBefore(zone_dead_zombies, dist);
+            } else {
+                let nb_dead_zombies_element = document.getElementById(nb_dead_zombies_id);
+                nb_dead_zombies.innerText = nb_dead_zombies;
+            }
+        }
+    } else {
+        let zone_dead_zombies = document.getElementById(zone_dead_zombies_id);
+        if (zone_dead_zombies) {
+            zone_dead_zombies.remove();
+        }
+    }
+}
+
 ///////////
 // STYLE //
 ///////////
@@ -2980,6 +3022,7 @@ function getRecipes() {
             clickOnVotedToRedirect();
             displayWishlistInApp();
             displayPriorityOnItems();
+            displayNbDeadZombies();
         }, 500);
 
         setInterval(() => {
