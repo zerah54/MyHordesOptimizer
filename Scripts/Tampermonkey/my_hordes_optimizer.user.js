@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.15
+// @version      1.0.0-alpha.16
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -27,8 +27,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[nouveauté] Ajout d'une option pour être prévenu à la fin de la fouille`
-+ `[amélioration] Ajout de certaines propriétés d'objets dans les tooltips améliorés\n`;
++ `[correctif] Erreur 500 au chargement du script quand on n'est pas en ville`
++ `[correctif] Comportement de la notification de fouille terminée`;
 
 const lang = document.documentElement.lang;
 
@@ -1604,7 +1604,7 @@ function displayWishlistInApp() {
             }
             header_title.addEventListener('click', () => {
                 if (header_title.show) {
-                    hide_state.innerText = '˃';
+                    hide_state.innerText = '>';
                 } else {
                     hide_state.innerText = '˅';
                 }
@@ -2213,7 +2213,7 @@ function notifyOnSearchEnd() {
                     notifyOnSearchEnd();
                 }, timeout_counter);
             }
-        } else {
+        } else if (pageIsTown()) {
             clearInterval(interval);
         }
     }, 250);
@@ -2689,7 +2689,10 @@ function getMe() {
                 GM_setValue(mh_user_key, mh_user);
 
                 getItems();
-                getWishlist();
+
+                if (mh_user.townId) {
+                    getWishlist();
+                }
             } else {
                 addError(response);
             }
