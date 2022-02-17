@@ -27,7 +27,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[correctif] Erreur 500 au chargement du script quand on n'est pas en ville`
++ `[correctif] Erreur 500 au chargement du script quand on n'est pas en ville\n`
 + `[correctif] Comportement de la notification de fouille terminée`;
 
 const lang = document.documentElement.lang;
