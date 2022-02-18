@@ -1,8 +1,11 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.17
+// @version      1.0.0-alpha.18
 // @description  Optimizer for MyHordes
 // @author       Zerah
+//
+// @icon         https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/logo/logo_mho_16x16.png
+// @icon64       https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/logo/logo_mho_64x64.png
 //
 // @downloadURL  https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
 // @updateURL    https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
@@ -27,7 +30,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Affichage du nombre de zombies morts sur la case aujourd'hui`;
++ `[Amélioration] Ajout de l'info "Objet de camping" dans le tooltip amélioré\n`
++ `[fix] Typo`;
 
 const lang = document.documentElement.lang;
 
@@ -56,7 +60,7 @@ const api_url = 'https://myhordesoptimizerapi.azurewebsites.net/';
 const hordes_img_url = '/build/images/';
 const repo_img_url = 'https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/hordes_img/';
 
-const mh_optimizer_icon = repo_img_url + 'icons/small_archive.gif';
+const mh_optimizer_icon = 'https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/logo/logo_mho_64x64_outlined.png';
 
 const mho_title = 'MH Optimizer';
 const mh_optimizer_window_id = 'optimizer-window';
@@ -530,6 +534,8 @@ function createOptimizerBtn() {
 
         let img = document.createElement('img');
         img.src = mh_optimizer_icon;
+        img.setAttribute('height', '16px');
+        img.setAttribute('width', '16px');
 
         let title_hidden = document.createElement('span');
         title_hidden.classList.add('label_text');
@@ -1850,6 +1856,9 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.classList.add(`item-tag-smokebomb`);
             item_action.innerHTML = `Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)`
             break;
+        case 'improve':
+            item_action.innerHTML = `Objet de camping`
+            break;
         case 'defence':
             // déjà affichés par le jeu
             item_action.classList.remove('item-tag');
@@ -1910,7 +1919,6 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'fire_splash3':
         case 'throw_b_torch_off':
         case 'throw_boomfruit':
-        case 'improve':
         case 'throw_animal_dog':
         case 'throw_b_concrete_wall':
         case 'drug_xana1':

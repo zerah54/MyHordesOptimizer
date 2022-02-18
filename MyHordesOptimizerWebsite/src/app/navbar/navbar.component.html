@@ -2,6 +2,7 @@
     <button mat-icon-button type="button" (click)="sidenav.changeSidenavStatus();">
         <mat-icon>menu</mat-icon>
     </button>
+    <img src="https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/logo/logo_mho_64x64.png" height="56px" width="56px">
     <div class="title">{{media.isActive('gt-sm') ? title : 'MHO'}}</div>
     <ng-container *ngIf="media.isActive('gt-sm')">
         <ng-container *ngFor="let tab of tabs">
