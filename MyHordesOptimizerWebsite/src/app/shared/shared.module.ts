@@ -1,3 +1,4 @@
+import { PageWithSidenav } from './page-with-sidenav/page-with-sidenav.component';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -13,6 +14,7 @@ import { SnackbarService } from './services/snackbar.service';
 
 let custom_modules: any[] = [MaterialModule, ElementsModule];
 let angular_modules: any[] = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule]
+let custom_components: any[] = [PageWithSidenav];
 
 @NgModule({
     imports: [
@@ -21,8 +23,10 @@ let angular_modules: any[] = [BrowserModule, BrowserAnimationsModule, RouterModu
     ],
     exports: [
         ...angular_modules,
-        ...custom_modules
+        ...custom_modules,
+        ...custom_components
     ],
+    declarations: custom_components,
     providers: [ApiServices, LoadingOverlayService, SnackbarService, SidenavService]
 })
 

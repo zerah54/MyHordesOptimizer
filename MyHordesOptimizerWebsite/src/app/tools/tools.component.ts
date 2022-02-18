@@ -1,3 +1,4 @@
+import { PageWithSidenav } from './../shared/page-with-sidenav/page-with-sidenav.component';
 import { Component, OnInit } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { skip } from 'rxjs';
@@ -12,7 +13,7 @@ import { WishlistComponent } from './wishlist/wishlist.component';
     templateUrl: './tools.component.html',
     styleUrls: ['./tools.component.scss']
 })
-export class ToolsComponent implements OnInit {
+export class ToolsComponent extends PageWithSidenav implements OnInit {
     /** L'état d'ouverture de la sidenav */
     public opened_sidenav: boolean = true;
 
@@ -23,7 +24,9 @@ export class ToolsComponent implements OnInit {
         { label: 'Citoyens', id: 'citizens', component: CitizensComponent, selected: false }
     ]
 
-    constructor(public media: MediaObserver, private sidenav: SidenavService) {}
+    constructor(public media: MediaObserver, private sidenav: SidenavService) {
+        super();
+    }
 
     public ngOnInit(): void {
         this.sidenav.toggle_sidenav_obs
