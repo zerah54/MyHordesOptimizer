@@ -1,0 +1,41 @@
+{
+    // "notificationContent": {
+    //     "message": "You clicked $URL$.",
+    //     "description": "Tells the user which link they clicked.",
+    //     "placeholders": {
+    //       "url" : {
+    //         "content" : "$1",
+    //         "example" : "https://developer.mozilla.org"
+    //       }
+    //     }
+    //   }
+    // "mdn_banner": {
+    //     "message": "For more information on web technologies, go to $MDN$.",
+    //     "description": "Tell the user about MDN",
+    //     "placeholders": {
+    //       "mdn": {
+    //         "content": "https://developer.mozilla.org/"
+    //       }
+    //     }
+    //   }
+    "EXTERNAL_APP_ID_LABEL": {
+        "message": "Identifiant externe",
+        "description": "Message à afficher dans la saisie de l'identifiant externe pour les applications"
+    },
+    "EXTERNAL_APP_ID_HELP": {
+        "message": "Vous devez renseigner votre identifiant externe pour les applications.\nCelui-ci se trouve dans \"Votre âme\" > \"Réglages\" > \"Avancés\" > \"Applications externes\"",
+        "description": "Le message décrit le moyen de récupération de l'identifiant"
+    },
+    "UPDATE_BBH_OPTION": {
+        "message": "Mettre à jour BigBroth'Hordes",
+        "description": "Message de l'option permettant d'activer la mise à jour de BigBroth'Hordes depuis l'extension"
+    },
+    "UPDATE_GH_OPTION": {
+        "message": "Mettre à jour Gest'Hordes",
+        "description": "Message de l'option permettant d'activer la mise à jour de Gest'Hordes depuis l'extension"
+    },
+    "UPDATE_FATA_OPTION": {
+        "message": "Mettre à jour Fata Morgana",
+        "description": "Message de l'option permettant d'activer la mise à jour de Fata Morgana depuis l'extension"
+    }
+}

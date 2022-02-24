@@ -1,0 +1,38 @@
+{
+    "manifest_version": 2,
+    "name": "MyHordes Optimizer",
+    "version": "1.0.0",
+    "description": "Outils pour améliorer l'expérience de jeu pour MyHordes",
+    "default_locale": "fr",
+    "icons": {
+        "16": "/assets/img/logo/logo_mho_16x16.png",
+        "64": "/assets/img/logo/logo_mho_64x64_outlined.png",
+        "256": "/assets/img/logo/logo_mho_256x256_outlined.png"
+    },
+    "homepage_url": "https://myhordes-optimizer.web.app/",
+    "browser_action": {
+        "default_icon": "/assets/img/logo/logo_mho_64x64.png",
+        "default_title": "MyHordes Optimizer",
+        "default_popup": "index.html?page=toolbox"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "*://myhordes.eu/*",
+                "*://myhordes.de/*",
+                "*://myhord.es/*"
+            ],
+            "js": [
+                "/content-script/main.js",
+                "/content-script/runtime.js",
+                "/content-script/polyfills.js"
+            ]
+        }
+    ],
+    "background": {
+        "page": "index.html?page=background"
+    },
+    "permissions": [
+        "activeTab"
+    ]
+}
