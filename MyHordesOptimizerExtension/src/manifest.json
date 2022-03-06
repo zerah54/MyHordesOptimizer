@@ -33,6 +33,8 @@
         "page": "index.html?page=background"
     },
     "permissions": [
-        "activeTab"
+        "activeTab",
+        "tabs",
+        "storage"
     ]
 }

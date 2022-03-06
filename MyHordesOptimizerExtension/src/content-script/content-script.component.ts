@@ -1,13 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
     selector: 'mho-content-script',
-    template: ''
+    template: '<mho-application-button-element></mho-application-button-element>'
 })
-export class ContentScriptComponent implements OnInit {
+export class ContentScriptComponent {
 
-    ngOnInit() {
-        console.log('ceci est un test');
-        document.body.style.border = '10px solid red';
+    constructor() {
     }
 }

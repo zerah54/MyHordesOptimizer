@@ -47,7 +47,7 @@ export class ScriptComponent extends PageWithSidenav implements OnInit, AfterVie
 
     /** Récupère la liste des titres de la page et la transforme en objet pour faire un sommaire cliquable */
     private getAllTitles(): void {
-        this.titles = (<HTMLHeadingElement[]>Array.from(this.element.nativeElement.querySelectorAll('h1,h2,h3,h4,h5')))
+        this.titles = (<HTMLHeadingElement[]>Array.from(this.element.nativeElement.querySelectorAll('h1,h2')))
             .filter((title: HTMLHeadingElement) => title.id)
             .map((title: HTMLHeadingElement) => {
                 return {

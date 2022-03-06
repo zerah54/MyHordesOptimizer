@@ -1,25 +1,39 @@
+@import "variables.scss";
+
 .mho-item {
     height: 40px;
     list-style: none;
-    display: flex;
-    justify-content: space-between;
-    max-width: 25%;
+    max-width: calc(25% - (2*0.15em));
     min-width: 250px;
-    width: 25%;
-    .item_title {
-        margin: auto 0;
+    width: calc(25% - (2*0.15em));
+    margin: 0.15em;
 
-        .item_img {
-            width: 35px;
-            display: inline-block;
+    > div {
+        background-color: rgba($primary, 0.25);
+        width: 100%;
+        height: 100%;
+        border-radius: 0.5em;
 
-            img {
-                vertical-align: middle;
-            }
+        display: flex;
+        justify-content: space-between;
+        .item_title {
+            margin: auto 0.5em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
 
-            .item_count {
-                vertical-align: sub;
-                font-size: 0.75em;
+            .item_img {
+                width: 35px;
+                display: inline-block;
+
+                img {
+                    vertical-align: middle;
+                }
+
+                .item_count {
+                    vertical-align: sub;
+                    font-size: 0.75em;
+                }
             }
         }
     }

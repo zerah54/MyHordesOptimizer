@@ -5,6 +5,7 @@
         "ng": "ng",
         "start": "ng serve",
         "build": "ng build && ng build --configuration content-script",
+        "build-dev": "ng build --configuration development && ng build --configuration content-script-dev",
         "watch": "ng build --watch --configuration development",
         "test": "ng test"
     },

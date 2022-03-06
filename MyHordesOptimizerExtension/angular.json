@@ -76,6 +76,19 @@
                             "extractLicenses": false,
                             "sourceMap": true,
                             "namedChunks": true
+                        },
+                        "content-script-dev": {
+                            "main": "src/main-content-script.ts",
+                            "polyfills": "src/polyfills.ts",
+                            "tsConfig": "tsconfig.content-script.json",
+                            "assets": ["src/assets", "src/_locales"],
+                            "index": "",
+                            "styles": [],
+                            "outputPath": "dist/my-hordes-optimizer-extension/content-script",
+                            "buildOptimizer": false,
+                            "optimization": false,
+                            "sourceMap": true,
+                            "namedChunks": true
                         }
                     },
                     "defaultConfiguration": "production"
