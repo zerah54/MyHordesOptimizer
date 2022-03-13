@@ -70,6 +70,9 @@ const mh_update_external_tools_id = 'mh-update-external-tools';
 const wiki_btn_id = 'wiki-btn-id';
 const zone_dead_zombies_id = 'zone-dead-zombies';
 const nb_dead_zombies_id = 'nb-dead-zombies';
+const mho_copy_map_id = 'mho-copy-map';
+const mho_display_map_id = 'mho-display-map';
+const mho_search_building_field_id = 'mho-search-building-field';
 
 const texts = {
     save_external_app_id: {
