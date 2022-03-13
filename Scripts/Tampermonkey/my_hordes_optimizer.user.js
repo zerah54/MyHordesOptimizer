@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.18
+// @version      1.0.0-alpha.19
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -30,10 +30,10 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Amélioration] Ajout de l'info "Objet de camping" dans le tooltip amélioré\n`
-+ `[fix] Typo`;
++ `[Amélioration] Refonte des paramètres pour plus de lisibilité\n`
++ `[Nouveauté] Ajout d'un champ de recherche dans la liste des chantiers`;
 
-const lang = document.documentElement.lang;
+const lang = document.documentElement.lang || navigator.language || navigator.userLanguage;
 
 const gm_bbh_updated_key = 'bbh_updated';
 const gm_gh_updated_key = 'gh_updated';
@@ -177,6 +177,18 @@ const texts = {
     nb_dead_zombies: {
         en: `TODO`,
         fr: `Nombre de zombies morts sur cette case aujourd'hui`,
+        de: `TODO`,
+        es: `TODO`
+    },
+    copy_map: {
+        en: `TODO`,
+        fr: `Copier la carte`,
+        de: `TODO`,
+        es: `TODO`
+    },
+    search_building: {
+        en: `TODO`,
+        fr: `Rechercher un chantier`,
         de: `TODO`,
         es: `TODO`
     }
@@ -367,28 +379,46 @@ let tabs_list = {
 //////////////////////////////////////////////
 // La liste des paramètres de l'application //
 //////////////////////////////////////////////
-let params = [
-    {id: 'update_bbh', label: {en: 'TODO', fr: `Mettre à jour BigBroth'Hordes`, de: 'TODO', es: 'TODO'}, parent_id: null},
-    {id: 'update_gh', label: {en: 'TODO', fr: `Mettre à jour Gest'Hordes`, de: 'TODO', es: 'TODO'}, parent_id: null},
-    {id: 'update_fata', label: {en: 'TODO', fr: `Mettre à jour Fata Morgana`, de: 'TODO', es: 'TODO'}, parent_id: null},
-    {id: 'enhanced_tooltips', label: {en: 'TODO', fr: `Afficher des tooltips détaillés`, de: 'TODO', es: 'TODO'}, parent_id: null},
-    {id: 'click_on_voted', label: {en: 'TODO', fr: `Navigation rapide vers le chantier recommandé`, de: 'TODO', es: 'TODO'}, parent_id: null},
-    {id: 'prevent_from_leaving', label: {en: 'TODO', fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`, de: 'TODO', es: 'TODO'}, parent_id: null},
-    {id: 'prevent_dangerous_actions', label: {en: 'TODO', fr: `[Expérimental] Demander confirmation avant d'effectuer des actions dangereuses`, de: 'TODO', es: 'TODO'}, parent_id: null},
-    {id: 'display_wishlist', label: {en: 'TODO', fr: `Afficher la liste de courses dans l'interface`, de: 'TODO', es: 'TODO'}, parent_id: null},
-    {id: 'display_wishlist_closed', label: {en: 'TODO', fr: `Liste de courses repliée par défaut`, de: 'TODO', es: 'TODO'}, parent_id: 'display_wishlist'},
-    {
-        id: 'notify_on_search_end',
-        label: {en: 'TODO', fr: `Me notifier à la fin de la fouille`, de: 'TODO', es: 'TODO'},
-        help: {en: 'TODO', fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`, de: 'TODO', es: 'TODO'},
-        parent_id: null
-    },
-    {
-        id: 'display_nb_dead_zombies',
-        label: {en: 'TODO', fr: `Afficher le nombre de zombies morts aujour'hui`, de: 'TODO', es: 'TODO'},
-        help: {en: 'TODO', fr: `Permet d'afficher le nombre de tâches de sang sur la carte`, de: 'TODO', es: 'TODO'},
-        parent_id: null
-    }
+
+let params_categories = [
+    {id: 'external_tools', label: {en: 'TODO', fr: 'Outils externes', de: '', es:''}, params: [
+        {id: 'update_bbh', label: {en: 'TODO', fr: `Mettre à jour BigBroth'Hordes`, de: 'TODO', es: 'TODO'}, parent_id: null},
+        {id: 'update_gh', label: {en: 'TODO', fr: `Mettre à jour Gest'Hordes`, de: 'TODO', es: 'TODO'}, parent_id: null},
+        {id: 'update_fata', label: {en: 'TODO', fr: `Mettre à jour Fata Morgana`, de: 'TODO', es: 'TODO'}, parent_id: null},
+        // {
+        //     id: 'display_map',
+        //     label: {en: 'TODO', fr: `Permettre d'afficher une carte issue des outils externes`, de: 'TODO', es: 'TODO'},
+        //     help: {en: 'TODO', fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`, de: 'TODO', es: 'TODO'},
+        //     parent_id: null
+        // }
+    ]},
+    {id: 'display', label: {en: 'TODO', fr: `Améliorations de l'interface`, de: '', es: ''}, params: [
+        {id: 'enhanced_tooltips', label: {en: 'TODO', fr: `Afficher des tooltips détaillés`, de: 'TODO', es: 'TODO'}, parent_id: null},
+        {id: 'click_on_voted', label: {en: 'TODO', fr: `Navigation rapide vers le chantier recommandé`, de: 'TODO', es: 'TODO'}, parent_id: null},
+        {
+            id: 'display_search_field_on_buildings',
+            label: {en: 'TODO', fr: `Afficher un champ de recherche pour les chantiers`, de: 'TODO', es: 'TODO'},
+            parent_id: null
+        },
+        {id: 'display_wishlist', label: {en: 'TODO', fr: `Afficher la liste de courses dans l'interface`, de: 'TODO', es: 'TODO'}, parent_id: null},
+        {id: 'display_wishlist_closed', label: {en: 'TODO', fr: `Liste de courses repliée par défaut`, de: 'TODO', es: 'TODO'}, parent_id: 'display_wishlist'},
+        {
+            id: 'display_nb_dead_zombies',
+            label: {en: 'TODO', fr: `Afficher le nombre de zombies morts aujour'hui`, de: 'TODO', es: 'TODO'},
+            help: {en: 'TODO', fr: `Permet d'afficher le nombre de tâches de sang sur la carte`, de: 'TODO', es: 'TODO'},
+            parent_id: null
+        },
+    ]},
+    {id: 'notifications', label: {en: 'TODO', fr: 'Notifications et avertissements', de: 'TODO', es: 'TODO'}, params: [
+        {id: 'prevent_from_leaving', label: {en: 'TODO', fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`, de: 'TODO', es: 'TODO'}, parent_id: null},
+        {id: 'prevent_dangerous_actions', label: {en: 'TODO', fr: `[Expérimental] Demander confirmation avant d'effectuer des actions dangereuses`, de: 'TODO', es: 'TODO'}, parent_id: null},
+        {
+            id: 'notify_on_search_end',
+            label: {en: 'TODO', fr: `Me notifier à la fin de la fouille`, de: 'TODO', es: 'TODO'},
+            help: {en: 'TODO', fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`, de: 'TODO', es: 'TODO'},
+            parent_id: null
+        }
+    ]}
 ];
 
 let informations = [
@@ -555,9 +585,8 @@ function createOptimizerBtn() {
 
         header_zone.appendChild(optimizer_btn);
 
-        createOptimizerButtonContent()
+        createOptimizerButtonContent();
     }, 2000);
-
 }
 
 /** Crée le contenu du bouton de l'optimizer (bouton de wiki, bouton de configuration, etc) */
@@ -593,76 +622,8 @@ function createOptimizerButtonContent() {
         ////////////////////////
         // SECTION PARAMETRES //
         ////////////////////////
-        let params_title = document.createElement('h1');
-        params_title.innerText = texts.parameters_section_label[lang];
 
-        let params_list = document.createElement('ul');
-
-        let params_container = document.createElement('div');
-        params_container.id = 'parameters';
-
-        params_container.appendChild(params_title);
-        params_container.appendChild(params_list);
-
-
-        params.forEach((param) => {
-            let param_children = params.filter((param_child) => param_child.parent_id === param.id);
-            let param_input = document.createElement('input');
-            param_input.type = 'checkbox';
-            param_input.id = param.id + '-intput';
-            param_input.checked = mho_parameters && mho_parameters[param.id] ? mho_parameters[param.id] : false;
-
-            let param_label = document.createElement('label');
-            param_label.classList.add('small');
-            param_label.htmlFor = param.id + '-input';
-            param_label.innerText = param.label[lang];
-
-            param_input.addEventListener('change', (event) => {
-                let new_params;
-                if (!mho_parameters) {
-                    new_params = {};
-                } else {
-                    new_params = mho_parameters;
-                }
-                new_params[param.id] = event.target.checked;
-                GM_setValue(gm_parameters_key, new_params);
-                mho_parameters = GM_getValue(gm_parameters_key);
-
-                /** Si l'option a des "enfants" alors on les affiche uniquement si elle est cochée */
-                if (param_children.length > 0) {
-                    param_children.forEach((param_child) => {
-                        let child = document.getElementById(param_child.id);
-                        if (event.target.checked) {
-                            child.classList.remove('hidden');
-                        } else {
-                            child.classList.add('hidden');
-                        }
-                    });
-                }
-            });
-
-            let param_container = document.createElement('li');
-            param_container.id = param.id;
-            param_container.appendChild(param_input);
-            param_container.appendChild(param_label);
-
-            if (param.help) {
-                let param_help = createHelpButton(param.help[lang]);
-                param_help.setAttribute('style', 'float: right; margin-top: 4px');
-                param_container.appendChild(param_help);
-            }
-
-            /** Si l'option a un parent, alors on ajoute une marge et on l'affiche uniquement si elle est cochée */
-            if (param.parent_id) {
-                param_container.setAttribute('style', 'margin-left: 1em;');
-                if (!mho_parameters || !mho_parameters[param.parent_id]) {
-                    param_container.classList.add('hidden');
-                }
-            }
-            params_list.appendChild(param_container);
-        });
-
-        content.appendChild(params_container);
+        content.appendChild(createParams());
 
         //////////////////////////
         // SECTION INFORMATIONS //
@@ -727,6 +688,88 @@ function createOptimizerButtonContent() {
     optimizer_btn.appendChild(content);
 }
 
+function createParams() {
+    let params_title = document.createElement('h1');
+    params_title.innerText = texts.parameters_section_label[lang];
+
+    let categories_list = document.createElement('ul');
+
+    let categories_container = document.createElement('div');
+    categories_container.id = 'categories';
+
+    categories_container.appendChild(params_title);
+    categories_container.appendChild(categories_list);
+
+    params_categories.forEach((category) => {
+        let category_container = document.createElement('li');
+        let category_title = document.createElement('h5');
+        category_title.innerText = category.label[lang];
+        categories_list.appendChild(category_container);
+        let category_content = document.createElement('ul');
+        category_content.classList.add('parameters');
+        category_container.appendChild(category_title);
+        category_container.appendChild(category_content);
+        category.params.forEach((param) => {
+            let param_children = category.params.filter((param_child) => param_child.parent_id === param.id);
+            let param_input = document.createElement('input');
+            param_input.type = 'checkbox';
+            param_input.id = param.id + '-intput';
+            param_input.checked = mho_parameters && mho_parameters[param.id] ? mho_parameters[param.id] : false;
+
+            let param_label = document.createElement('label');
+            param_label.classList.add('small');
+            param_label.htmlFor = param.id + '-input';
+            param_label.innerText = param.label[lang];
+
+            param_input.addEventListener('change', (event) => {
+                let new_params;
+                if (!mho_parameters) {
+                    new_params = {};
+                } else {
+                    new_params = mho_parameters;
+                }
+                new_params[param.id] = event.target.checked;
+                GM_setValue(gm_parameters_key, new_params);
+                mho_parameters = GM_getValue(gm_parameters_key);
+
+                /** Si l'option a des "enfants" alors on les affiche uniquement si elle est cochée */
+                if (param_children.length > 0) {
+                    param_children.forEach((param_child) => {
+                        let child = document.getElementById(param_child.id);
+                        if (event.target.checked) {
+                            child.classList.remove('hidden');
+                        } else {
+                            child.classList.add('hidden');
+                        }
+                    });
+                }
+            });
+
+            let param_container = document.createElement('li');
+            param_container.id = param.id;
+            param_container.appendChild(param_input);
+            param_container.appendChild(param_label);
+
+            if (param.help) {
+                let param_help = createHelpButton(param.help[lang]);
+                param_help.setAttribute('style', 'float: right; margin-top: 4px');
+                param_container.appendChild(param_help);
+            }
+
+            /** Si l'option a un parent, alors on ajoute une marge et on l'affiche uniquement si elle est cochée */
+            if (param.parent_id) {
+                param_container.setAttribute('style', 'margin-left: 1em;');
+                if (!mho_parameters || !mho_parameters[param.parent_id]) {
+                    param_container.classList.add('hidden');
+                }
+            }
+            category_content.appendChild(param_container);
+        });
+
+    });
+    return categories_container;
+}
+
 /** Crée la fenêtre de wiki */
 function createWindow() {
     let window_content = document.createElement('div');
@@ -757,7 +800,7 @@ function createWindow() {
     if (post_office) {
         post_office.parentNode.insertBefore(window, post_office.nextSibling);
     }
-    window_overlay_li.addEventListener('click', () => {
+    window_overlay_img.addEventListener('click', () => {
         window.classList.remove('visible');
         let body = document.getElementsByTagName('body')[0];
         body.removeAttribute('style', 'overflow: hidden');
@@ -1523,6 +1566,56 @@ function clickOnVotedToRedirect() {
         }
     }
 }
+
+/** Si l'option associée est activée, affiche un champ de recherche sur la page de chantiers */
+function displaySearchFieldOnBuildings() {
+    let search_field = document.getElementById(mho_search_building_field_id);
+    if (mho_parameters.display_search_field_on_buildings && pageIsConstructions()) {
+        if (search_field) return;
+
+        let tabs = document.querySelector('ul.buildings-tabs');
+        if (tabs) {
+            let tabs_block = tabs.parentElement;
+
+            let search_field_container = document.createElement('div');
+
+            search_field = document.createElement('input');
+            search_field.type = 'text';
+            search_field.id = mho_search_building_field_id;
+            search_field.placeholder = texts.search_building[lang];
+            search_field.classList.add('inline');
+            search_field.setAttribute('style', 'min-width: 250px; margin-top: 1em;');
+
+            let buidings_block = document.getElementsByClassName('clear')[0];
+            let buildings = Array.from(buidings_block.getElementsByClassName('buildings'));
+            let building_rows = Array.from(buidings_block.getElementsByClassName('row'));
+            search_field.addEventListener('keyup', (event) => {
+                building_rows.forEach((building_row) => {
+                    if (building_row.getElementsByTagName('span')[0].innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {
+                        building_row.classList.remove('hidden');
+                    } else {
+                        building_row.classList.add('hidden');
+                    }
+                });
+
+                buildings.forEach((building) => {
+                    if(Array.from(building.children).every((child) => child.classList.contains('hidden'))) {
+                       building.classList.add('hidden');
+                       } else {
+                           building.classList.remove('hidden');
+                       }
+                });
+            });
+
+            search_field_container.appendChild(search_field);
+            tabs_block.insertBefore(search_field_container, tabs);
+        }
+    } else if (search_field) {
+        search_field.parentElement.remove();
+    }
+}
+
+
 
 /** Affiche la liste de courses dans le désert et l'atelier */
 function displayWishlistInApp() {
@@ -2503,11 +2596,11 @@ function createStyles() {
     + 'margin: 1em 0 0.5em;'
     + '}';
 
-    const parameters_informations_style = '#parameters, #informations {'
+    const parameters_informations_style = '#categories, .parameters, #informations {'
     + 'margin-top: 0.5em;'
     + '}';
 
-    const parameters_informations_ul_style = '#parameters > ul, #informations > ul {'
+    const parameters_informations_ul_style = '#categories > ul, ul.parameters, #informations > ul {'
     + 'padding: 0;'
     + 'margin: 0;'
     + 'color: #f0d79e;'
@@ -3028,6 +3121,7 @@ function getRecipes() {
         setInterval(() => {
             createUpdateExternalToolsButton();
             clickOnVotedToRedirect();
+            displaySearchFieldOnBuildings();
             displayWishlistInApp();
             displayPriorityOnItems();
             displayNbDeadZombies();
