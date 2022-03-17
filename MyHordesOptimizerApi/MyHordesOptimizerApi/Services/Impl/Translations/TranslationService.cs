@@ -48,22 +48,22 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
             {
                 foreach (var translationFile in XlfFilesByLocale[locale])
                 {
-                    var descriptionUnit = translationFile.File.Unit.Where(unit => unit.Segment.Target == sourceString).Select(translationUnit => translationUnit.Segment.Source).ToList();
+                    var descriptionUnit = translationFile.File.Unit.Where(unit => unit.Segment.Target.ToLower() == sourceString.ToLower()).Select(translationUnit => translationUnit.Segment.Source).ToList();
                     result.De.AddRange(descriptionUnit);
 
                     if (descriptionUnit.Any())
                     {
                         var xlfName = translationFile.File.Id.Substring(0, translationFile.File.Id.LastIndexOf(".")); // Remove .locale
                         var file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.fr")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.fr");
-                        var newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x == unit.Segment.Source)).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                        var newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x.ToLower() == unit.Segment.Source.ToLower())).Select(translationUnit => translationUnit.Segment.Target).ToList();
                         result.Fr.AddRange(newDescriptionUnit);
 
                         file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.es")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.es");
-                        newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x == unit.Segment.Source)).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                        newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x.ToLower() == unit.Segment.Source.ToLower())).Select(translationUnit => translationUnit.Segment.Target).ToList();
                         result.Es.AddRange(newDescriptionUnit);
 
                         file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.en")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.en");
-                        newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x == unit.Segment.Source)).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                        newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x.ToLower() == unit.Segment.Source.ToLower())).Select(translationUnit => translationUnit.Segment.Target).ToList();
                         result.En.AddRange(newDescriptionUnit);
                     } 
                 }
@@ -72,22 +72,22 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
             {
                 foreach (var translationFile in XlfFilesByLocale[locale])
                 {
-                    var descriptionUnit = translationFile.File.Unit.Where(unit => unit.Segment.Source == sourceString).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                    var descriptionUnit = translationFile.File.Unit.Where(unit => unit.Segment.Source.ToLower() == sourceString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
                     result.De.AddRange(descriptionUnit);
 
                     if (descriptionUnit.Any())
                     {
                         var xlfName = translationFile.File.Id.Substring(0, translationFile.File.Id.LastIndexOf(".")); // Remove .locale
                         var file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.fr")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.fr");
-                        var newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x == unit.Segment.Source)).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                        var newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x.ToLower() == unit.Segment.Source.ToLower())).Select(translationUnit => translationUnit.Segment.Target).ToList();
                         result.Fr.AddRange(newDescriptionUnit);
 
                         file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.es")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.es");
-                        newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x == unit.Segment.Source)).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                        newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x.ToLower() == unit.Segment.Source.ToLower())).Select(translationUnit => translationUnit.Segment.Target).ToList();
                         result.Es.AddRange(newDescriptionUnit);
 
                         file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.en")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.en");
-                        newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x == unit.Segment.Source)).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                        newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x.ToLower() == unit.Segment.Source.ToLower())).Select(translationUnit => translationUnit.Segment.Target).ToList();
                         result.En.AddRange(newDescriptionUnit);
                     }
                 }
