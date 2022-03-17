@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.19
+// @version      1.0.0-alpha.20
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -30,8 +30,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Amélioration] Refonte des paramètres pour plus de lisibilité\n`
-+ `[Nouveauté] Ajout d'un champ de recherche dans la liste des chantiers`;
++ `[Amélioration] Ajout des traductions anglaises et allemandes, merci Katt et Shokolaw \n`;
 
 const lang = document.documentElement.lang || navigator.language || navigator.userLanguage;
 
@@ -76,15 +75,15 @@ const mho_search_building_field_id = 'mho-search-building-field';
 
 const texts = {
     save_external_app_id: {
-        en: `TODO`,
+        en: `Save your external ID for apps`,
         fr: `Enregistrez votre ID d'app externe`,
-        de: `TODO`,
+        de: `Speichern Sie Ihre externe ID für Apps`,
         es: `TODO`
     },
     external_app_id_help: {
-        en: `TODO`,
+        en: `You have to fill your external ID for apps. <br />You can find it by following “My soul” > “Settings” > “Advanced” > “External Applications” `,
         fr: `Vous devez renseigner votre ID externe pour les apps.<br />Celle-ci se trouve dans "Votre âme" > "Réglages" > "Avancés" > "Applications externes"`,
-        de: `TODO`,
+        de: `Sie müssen Ihre externe ID für Apps eingeben. <br /> Sie können es finden indem Sie folgen “Deine Seele” > “Einstellungen” > “Erweitert” > “Externe Anwendungen” `,
         es: `TODO`
     },
     external_app_id_help_label: {
@@ -102,97 +101,97 @@ const texts = {
     parameters_section_label: {
         en: `Parameters`,
         fr: `Paramètres`,
-        de: `TODO`,
+        de: `Einstellungen`,
         es: `TODO`
     },
     informations_section_label: {
         en: `Informations`,
         fr: `Informations`,
-        de: `TODO`,
+        de: `Informationen`,
         es: `TODO`
     },
     update_external_tools_needed_btn_label: {
         en: `Update external tools`,
         fr: `Mettre à jour les outils externes`,
-        de: `TODO`,
+        de: `Externe Tools Aktualisieren`,
         es: `TODO`
     },
     update_external_tools_pending_btn_label: {
-        en: `TODO`,
+        en: `Updating...`,
         fr: `Mise à jour en cours...`,
-        de: `TODO`,
+        de: `Aktualisierung…`,
         es: `TODO`
     },
     update_external_tools_success_btn_label: {
-        en: `TODO`,
+        en: `Update completed!`,
         fr: `Mise à jour terminée !`,
-        de: `TODO`,
+        de: `Aktualisierung abgeschlossen!`,
         es: `TODO`
     },
     update_external_tools_errors_btn_label: {
-        en: `TODO`,
+        en: `Update completed with errors.`,
         fr: `Mise à jour terminée avec des erreurs.`,
-        de: `TODO`,
+        de: `Aktualisierung mit Fehlern abgeschlossen.`,
         es: `TODO`
     },
     update_external_tools_fail_btn_label: {
-        en: `TODO`,
+        en: `Can not update.`,
         fr: `Impossible de mettre à jour.`,
-        de: `TODO`,
+        de: `Aktualisierung unmöglich`,
         es: `TODO`
     },
     prevent_from_leaving_information: {
-        en: `TODO`,
+        en: `You asked to be notified before leaving if your escort options were not good: `,
         fr: `Vous avez demandé à être prévenu avant de quitter la page si vos options d'escorte ne sont pas les bonnes : `,
-        de: `TODO`,
+        de: `Sie haben dafür gewählt vor der Abreise benachrichtigt zu werden wenn Ihre Eskorte-Optionen nicht gut waren:`,
         es: `TODO`
     },
     prevent_not_in_ae: {
-        en: `TODO`,
+        en: `you are not waiting for an escort.`,
         fr: `vous n'êtes pas en attente d'escorte.`,
-        de: `TODO`,
+        de: `Sie warten nicht auf eine Eskorte.`,
         es: `TODO`
     },
     escort_not_released: {
-        en: `TODO`,
+        en: `you did not let go of your escort`,
         fr: `vous n'avez pas relâché votre escorte.`,
-        de: `TODO`,
+        de: `Sie haben Ihre Eskorte nicht losgelassen`,
         es: `TODO`
     },
     save: {
         en: `Save`,
         fr: `Enregistrer`,
-        de: `TODO`,
+        de: `Speichern`,
         es: `TODO`
     },
     update: {
         en: `Update`,
         fr: `Mettre à jour`,
-        de: `TODO`,
+        de: `Aktualisieren`,
         es: `TODO`
     },
     search_ended: {
-        en: `TODO`,
+        en: `Search completed`,
         fr: `La fouille est terminée`,
-        de: `TODO`,
+        de: `Grabungsaktion fertig`,
         es: `TODO`
     },
     nb_dead_zombies: {
-        en: `TODO`,
+        en: `Number of zombies that died here today`,
         fr: `Nombre de zombies morts sur cette case aujourd'hui`,
-        de: `TODO`,
+        de: `Anzahl der Zombies die heute hier gestorben sind`,
         es: `TODO`
     },
     copy_map: {
-        en: `TODO`,
+        en: `Copy map`,
         fr: `Copier la carte`,
-        de: `TODO`,
+        de: `Karte kopieren`,
         es: `TODO`
     },
     search_building: {
-        en: `TODO`,
+        en: `Search for a construction site`,
         fr: `Rechercher un chantier`,
-        de: `TODO`,
+        de: `Baustelle suchen`,
         es: `TODO`
     }
 };
@@ -202,10 +201,10 @@ const categories_mapping = {
         id: 'armor',
         img : '',
         label : {
-            de : 'Verteidigung',
-            en : 'Defences',
-            es : 'Defensas',
-            fr : 'Défenses'
+            de : `Verteidigung`,
+            en : `Defences`,
+            es : `Defensas`,
+            fr : `Défenses`
         },
         ordering : 4
     },
@@ -213,10 +212,10 @@ const categories_mapping = {
         id: 'box',
         img : '',
         label : {
-            de : 'Taschen und Behälter',
-            en : 'Containers and boxes',
-            es : 'Contenedores y cajas',
-            fr : 'Conteneurs et boîtes'
+            de : `Taschen und Behälter`,
+            en : `Containers and boxes`,
+            es : `Contenedores y cajas`,
+            fr : `Conteneurs et boîtes`
         },
         ordering : 3
     },
@@ -224,10 +223,10 @@ const categories_mapping = {
         id: 'drug',
         img : '',
         label : {
-            de : 'Apotheke und Labor',
-            en : 'Pharmacy',
-            es : 'Farmacia',
-            fr : 'Pharmacie'
+            de : `Apotheke und Labor`,
+            en : `Pharmacy`,
+            es : `Farmacia`,
+            fr : `Pharmacie`
         },
         ordering : 5
     },
@@ -235,10 +234,10 @@ const categories_mapping = {
         id: 'food',
         img : '',
         label : {
-            de : 'Grundnahrungsmittel',
-            en : 'Food',
-            es : 'Provisiones',
-            fr : 'Provisions'
+            de : `Grundnahrungsmittel`,
+            en : `Food`,
+            es : `Provisiones`,
+            fr : `Provisions`
         },
         ordering : 6
     },
@@ -246,10 +245,10 @@ const categories_mapping = {
         id: 'furniture',
         img : '',
         label : {
-            de : 'Einrichtungen',
-            en : 'Facilities',
-            es : 'Objetos caseros',
-            fr : 'Aménagements'
+            de : `Einrichtungen`,
+            en : `Facilities`,
+            es : `Objetos caseros`,
+            fr : `Aménagements`
         },
         ordering : 1
     },
@@ -257,10 +256,10 @@ const categories_mapping = {
         id: 'misc',
         img : '',
         label : {
-            de : 'Sonstiges',
-            en : 'Miscellaneous',
-            es : 'Otros',
-            fr : 'Divers'
+            de : `Sonstiges`,
+            en : `Miscellaneous`,
+            es : `Otros`,
+            fr : `Divers`
         },
         ordering : 7
     },
@@ -268,10 +267,10 @@ const categories_mapping = {
         id: 'rsc',
         img : '',
         label : {
-            de : 'Baustoffe',
-            en : 'Resources',
-            es : 'Recursos',
-            fr : 'Ressources'
+            de : `Baustoffe`,
+            en : `Resources`,
+            es : `Recursos`,
+            fr : `Ressources`
         },
         ordering : 0
     },
@@ -279,10 +278,10 @@ const categories_mapping = {
         id: 'weapon',
         img : '',
         label : {
-            de : 'Waffenarsenal',
-            en : 'Armoury',
-            es : 'Armería',
-            fr : 'Armurerie'
+            de : `Waffenarsenal`,
+            en : `Armoury`,
+            es : `Armería`,
+            fr : `Armurerie`
         },
         ordering : 2
     }
@@ -290,47 +289,96 @@ const categories_mapping = {
 
 const api_texts = {
     error: {
-        en: `TODO`,
+        en: `An error occured. (Error : $error$)`,
         fr: `Une erreur s'est produite. (Erreur : $error$)`,
-        de: `TODO`,
+        de: `Fehler aufgetreten. (Fehler : $error$)`,
         es: `TODO`
     },
     update_wishlist_success: {
-        en: `TODO`,
+        en: `Shopping list updated.`,
         fr: `La liste de courses a bien été mise à jour.`,
-        de: `TODO`,
+        de: `Einkaufsliste aktualisiert.`,
         es: `TODO`
     },
     add_to_wishlist_success: {
-        en: `TODO`,
+        en: `Item has been added to the shopping list.`,
         fr: `L'objet a bien été ajouté à la liste de courses.`,
-        de: `TODO`,
+        de: `Gegenstand wurde der Einkaufsliste hinzugefügt.`,
         es: `TODO`
     },
 };
 
 const action_types = [
-    {id: 'Manual', label: {en: 'Citizen actions', fr: 'Actions du citoyen', de: '', es: ''}, ordering: 1},
-    {id: 'Workshop', label: {en: 'Workshop', fr: 'Atelier', de: '', es: ''}, ordering: 0},
+    {id: `Manual`, label: {en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `TODO`}, ordering: 1},
+    {id: `Workshop`, label: {en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `TODO`}, ordering: 0},
 ];
 
 const wishlist_priorities = [
-    {value: -1000, label: {en: 'TODO', fr: 'Ne pas ramener', es: '', de: ''}},
-    {value: 0, label: {en: 'Not defined', fr: 'Non définie', es: '', de: ''}},
-    {value: 1000, label: {en: 'Low', fr: 'Basse', es: '', de: ''}},
-    {value: 2000, label: {en: 'Medium', fr: 'Moyenne', es: '', de: ''}},
-    {value: 3000, label: {en: 'High', fr: 'Haute', es: '', de: ''}},
+    {value: -1000, label: {
+        en: `Do not bring to town`,
+        fr: `Ne pas ramener`,
+        de: `Nicht mitbringen`,
+        es: `TODO`
+    }},
+    {value: 0, label: {
+        en: `Not defined`,
+        fr: `Non définie`,
+        de: `Nicht definiert`,
+        es: `TODO`
+    }},
+    {value: 1000, label: {
+        en: `Low`,
+        fr: `Basse`,
+        de: `Niedrig`,
+        es: `TODO`
+    }},
+    {value: 2000, label: {
+        en: `Medium`,
+        fr: `Moyenne`,
+        de: `Mittel`,
+        es: `TODO`
+    }},
+    {value: 3000, label: {
+        en: `High`,
+        fr: `Haute`,
+        de: `Hoch`,
+        es: `TODO`
+    }},
 ];
 
 const wishlist_headers = [
-    {label: {en: 'Item', fr: 'Objet', es: '', de: ''}, id: 'label'},
-    {label: {en: 'Prioriry', fr: 'Priorité', es: '', de: ''}, id: 'priority'},
-    {label: {en: '', fr: 'Stock en banque', es: '', de: ''}, id: 'bank_count'},
-    {label: {en: '', fr: 'Stock souhaité', es: '', de: ''}, id: 'bank_needed'},
-    {label: {en: '', fr: 'Quantité manquante', es: '', de: ''}, id: 'diff'},
-    {label: {en: '', fr: '', es: '', de: ''}, id: 'delete'},
+    {label: {
+        en: `Item`,
+        fr: `Objet`,
+        de: `Gegenstand`,
+        es: `TODO`
+    }, id: `label`},
+    {label: {
+        en: `Prioriry`,
+        fr: `Priorité`,
+        de: `Priorität`,
+        es: `TODO`
+    }, id: `priority`},
+    {label: {
+        en: `Stock in bank`,
+        fr: `Stock en banque`,
+        de: `Bestand in der Bank`,
+        es: `TODO`
+    }, id: `bank_count`},
+    {label: {
+        en: `Desired stock`,
+        fr: `Stock souhaité`,
+        de: `Gewünschter Bestand`,
+        es: `TODO`
+    }, id: `bank_needed`},
+    {label: {
+        en: `Missing quantity`,
+        fr: `Quantité manquante`,
+        de: `Fehlende Menge`,
+        es: `TODO`
+    }, id: `diff`},
+    {label: {en: ``, fr: ``, es: ``, de: ``}, id: 'delete'},
 ];
-
 
 //////////////////////////////////
 // La liste des onglets du wiki //
@@ -340,95 +388,233 @@ let tabs_list = {
     wiki: [
         {
             ordering: 0,
-            id: 'items',
-            label: {en: 'Items', fr: 'Objets', de: 'TODO', es: 'TODO'},
-            icon: repo_img_url + 'emotes/bag.gif'
+            id: `items`,
+            label: {
+                en: `Items`,
+                fr: `Objets`,
+                de: `Gegenstände`,
+                es: `TODO`
+            },
+            icon: repo_img_url + `emotes/bag.gif`
         },
         {
             ordering: 1,
-            id: 'recipes',
-            label: {en: 'Recipes', fr: 'Recettes', de: 'TODO', es: 'TODO'},
-            icon: repo_img_url + 'building/small_refine.gif'
+            id: `recipes`,
+            label: {
+                en: `Recipes`,
+                fr: `Recettes`,
+                de: `Rezepte`,
+                es: `TODO`
+            },
+            icon: repo_img_url + `building/small_refine.gif`
         },
         {
             ordering: 2,
-            id: 'skills',
-            label: {en: 'Hero Skills', fr: 'Pouvoirs', de: 'TODO', es: 'TODO'},
-            icon: repo_img_url + '/professions/hero.gif'
+            id: `skills`,
+            label: {
+                en: `Hero Skills`,
+                fr: `Pouvoirs`,
+                de: `Heldentaten`,
+                es: `TODO`
+            },
+            icon: repo_img_url + `/professions/hero.gif`
         }
     ],
     tools: [
         {
             ordering: 0,
-            id: 'bank',
-            label: {en: 'Bank', fr: 'Banque', de: 'TODO', es: 'TODO'},
-            icon: repo_img_url + 'icons/home.gif'
+            id: `bank`,
+            label: {
+                en: `Bank`,
+                fr: `Banque`,
+                de: `Bank`,
+                es: `TODO`
+            },
+            icon: repo_img_url + `icons/home.gif`
         },
         {
             ordering: 1,
-            id: 'wishlist',
-            label: {en: 'Wishlist', fr: 'Liste de courses', de: 'TODO', es: 'TODO'},
-            icon: repo_img_url + 'item/item_cart.gif'
+            id: `wishlist`,
+            label: {
+                en: `Wishlist`,
+                fr: `Liste de courses`,
+                de: `Wunschzettel`,
+                es: `TODO`
+            },
+            icon: repo_img_url + `item/item_cart.gif`
         },
         {
             ordering: 2,
-            id: 'citizens',
-            label: {en: 'Citizens', fr: 'Citoyens', de: 'TODO', es: 'TODO'},
-            icon: repo_img_url + 'icons/small_human.gif'
+            id: `citizens`,
+            label: {
+                en: `Citizens`,
+                fr: `Citoyens`,
+                de: `Bürger`,
+                es: `TODO`
+            },
+            icon: repo_img_url + `icons/small_human.gif`
         }
     ]
 };
+
 
 //////////////////////////////////////////////
 // La liste des paramètres de l'application //
 //////////////////////////////////////////////
 
 let params_categories = [
-    {id: 'external_tools', label: {en: 'TODO', fr: 'Outils externes', de: '', es:''}, params: [
-        {id: 'update_bbh', label: {en: 'TODO', fr: `Mettre à jour BigBroth'Hordes`, de: 'TODO', es: 'TODO'}, parent_id: null},
-        {id: 'update_gh', label: {en: 'TODO', fr: `Mettre à jour Gest'Hordes`, de: 'TODO', es: 'TODO'}, parent_id: null},
-        {id: 'update_fata', label: {en: 'TODO', fr: `Mettre à jour Fata Morgana`, de: 'TODO', es: 'TODO'}, parent_id: null},
+    {id: `external_tools`, label: {
+        en: `External tools`,
+        fr: `Outils externes`,
+        de: `Externen Tool`,
+        es: `TODO`
+    }, params: [
+        {id: `update_bbh`, label: {
+            en: `Update BigBroth’Hordes`,
+            fr: `Mettre à jour BigBroth'Hordes`,
+            de: `BigBroth’Hordes Aktualisieren`,
+            es: `TODO`
+        }, parent_id: null},
+        {id: `update_gh`, label: {
+            en: `Update Gest’Hordes`,
+            fr: `Mettre à jour Gest'Hordes`,
+            de: `Gest’Hordes aktualisieren`,
+            es: `TODO`
+        }, parent_id: null},
+        {id: `update_fata`, label: {
+            en: `Update Fata Morgana`,
+            fr: `Mettre à jour Fata Morgana`,
+            de: `Fata Morgana aktualisieren`,
+            es: `TODO`
+        }, parent_id: null},
         // {
-        //     id: 'display_map',
-        //     label: {en: 'TODO', fr: `Permettre d'afficher une carte issue des outils externes`, de: 'TODO', es: 'TODO'},
-        //     help: {en: 'TODO', fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`, de: 'TODO', es: 'TODO'},
+        //     id: `display_map`,
+        //     label: {
+        //         en: `Allow to show a map from external tools`,
+        //         fr: `Permettre d'afficher une carte issue des outils externes`,
+        //         de: `Anzeigen einer Karte von externen Tools ermöglichen`,
+        //         es: `TODO`
+        //     },
+        //     help: {
+        //         en: `In any external tool, it will be possible to copy the town or ruin map and to paste it into MyHordes`,
+        //         fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`,
+        //         de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
+        //         es: `TODO`
+        //     },
         //     parent_id: null
         // }
     ]},
-    {id: 'display', label: {en: 'TODO', fr: `Améliorations de l'interface`, de: '', es: ''}, params: [
-        {id: 'enhanced_tooltips', label: {en: 'TODO', fr: `Afficher des tooltips détaillés`, de: 'TODO', es: 'TODO'}, parent_id: null},
-        {id: 'click_on_voted', label: {en: 'TODO', fr: `Navigation rapide vers le chantier recommandé`, de: 'TODO', es: 'TODO'}, parent_id: null},
+    {id: `display`, label: {
+        en: `Interface improvements`,
+        fr: `Améliorations de l'interface`,
+        de: `Benutzeroberfläche Verbesserungen`,
+        es: `TODO`
+    }, params: [
+        {id: `enhanced_tooltips`, label: {
+            en: `Show detailed tooltips`,
+            fr: `Afficher des tooltips détaillés`,
+            de: `Detaillierte Tooltips anzeigen`,
+            es: `TODO`
+        }, parent_id: null},
+        {id: `click_on_voted`, label: {
+            en: `Quick navigation to recommended construction site`,
+            fr: `Navigation rapide vers le chantier recommandé`,
+            de: `Schnelle Navigation zur empfohlenen Baustelle`,
+            es: `TODO`
+        }, parent_id: null},
+        {id: `display_search_field_on_buildings`, label: {
+            en: `Show a search field for construction sites`,
+            fr: `Afficher un champ de recherche pour les chantiers`,
+            de: `Ein Suchfeld für Baustellen anzeigen`,
+            es: `TODO`
+        }, parent_id: null},
+        {id: `display_wishlist`, label: {
+            en: `Display wishlist in interface`,
+            fr: `Afficher la liste de courses dans l'interface`,
+            de: `Wunschzettel in der Benutzeroberfläche anzeigen`,
+            es: `TODO`
+        }, parent_id: null},
+        {id: `display_wishlist_closed`, label: {
+            en: `Wishlish folded by default`,
+            fr: `Liste de courses repliée par défaut`,
+            de: `Wunschzettel standardmäßig gefaltet`,
+            es: `TODO`
+        }, parent_id: `display_wishlist`},
         {
-            id: 'display_search_field_on_buildings',
-            label: {en: 'TODO', fr: `Afficher un champ de recherche pour les chantiers`, de: 'TODO', es: 'TODO'},
-            parent_id: null
-        },
-        {id: 'display_wishlist', label: {en: 'TODO', fr: `Afficher la liste de courses dans l'interface`, de: 'TODO', es: 'TODO'}, parent_id: null},
-        {id: 'display_wishlist_closed', label: {en: 'TODO', fr: `Liste de courses repliée par défaut`, de: 'TODO', es: 'TODO'}, parent_id: 'display_wishlist'},
-        {
-            id: 'display_nb_dead_zombies',
-            label: {en: 'TODO', fr: `Afficher le nombre de zombies morts aujour'hui`, de: 'TODO', es: 'TODO'},
-            help: {en: 'TODO', fr: `Permet d'afficher le nombre de tâches de sang sur la carte`, de: 'TODO', es: 'TODO'},
+            id: `display_nb_dead_zombies`,
+            label: {
+                en: `Show the number of zombie that died today`,
+                fr: `Afficher le nombre de zombies morts aujourd'hui`,
+                de: `Anzahl der Zombies die heute hier gestorben sind anzeigen`,
+                es: `TODO`
+            },
+            help: {
+                en: `Allows to display the number of blood splatters on the map`,
+                fr: `Permet d'afficher le nombre de tâches de sang sur la carte`,
+                de: `Ermöglicht die Anzeige der Anzahl der Blutfleck auf der Karte`,
+                es: `TODO`
+            },
             parent_id: null
         },
     ]},
-    {id: 'notifications', label: {en: 'TODO', fr: 'Notifications et avertissements', de: 'TODO', es: 'TODO'}, params: [
-        {id: 'prevent_from_leaving', label: {en: 'TODO', fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`, de: 'TODO', es: 'TODO'}, parent_id: null},
-        {id: 'prevent_dangerous_actions', label: {en: 'TODO', fr: `[Expérimental] Demander confirmation avant d'effectuer des actions dangereuses`, de: 'TODO', es: 'TODO'}, parent_id: null},
+    {id: `notifications`, label: {
+        en: `Notices and warnings`,
+        fr: `Notifications et avertissements`,
+        de: `Hinweise und Warnungen`,
+        es: `TODO`
+    }, params: [
+        {id: `prevent_from_leaving`, label: {
+            en: `Request confirmation before leaving without automatic escort`,
+            fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`,
+            de: `Bestätigung anfordern bevor Abreise ohne automatische Eskorte`,
+            es: `TODO`
+        }, parent_id: null},
+        {id: `prevent_dangerous_actions`, label: {
+            en: `[Experimental] Request confirmation before performing hazardous actions`,
+            fr: `[Expérimental] Demander confirmation avant d'effectuer des actions dangereuses`,
+            de: `[Experimentell] Bestätigung anfordern, bevor Ausführung gefährliche Aktionen`,
+            es: `TODO`
+        }, parent_id: null},
         {
-            id: 'notify_on_search_end',
-            label: {en: 'TODO', fr: `Me notifier à la fin de la fouille`, de: 'TODO', es: 'TODO'},
-            help: {en: 'TODO', fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`, de: 'TODO', es: 'TODO'},
+            id: `notify_on_search_end`,
+            label: {
+                en: `Notify me at the end of a search `,
+                fr: `Me notifier à la fin de la fouille`,
+                de: `Mich Benachrichtigen am Ende einer Grabungsaktion`,
+                es: `TODO`
+            },
+            help: {
+                en: `Allows to receive a notification when a search ends if the page was not closed in the meantime`,
+                fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`,
+                de: `Ermöglicht den Erhalt einer Benachrichtigung wann eine Grabungsaktion endet wenn die Seite in der Zwischenzeit nicht geschlossen wurde`,
+                es: `TODO`
+            },
             parent_id: null
         }
     ]}
 ];
 
 let informations = [
-    {id: 'website', label: {en: `Website`, fr: `Site web`, de: 'TODO', es: 'TODO'}, src: 'https://myhordes-optimizer.web.app/', action: () => {}, img: 'emotes/explo.gif'},
-    {id: 'version', label: {en: `Changelog ${GM_info.script.version}`, fr: `Notes de version ${GM_info.script.version}`, de: 'TODO', es: 'TODO'}, src: undefined, action: () => {alert(changelog)}, img: 'emotes/rptext.gif'},
-    {id: 'contact', label: {en: `Contact`, fr: `Contact`, de: 'TODO', es: 'TODO'}, src: `mailto:lenoune38@gmail.com?Subject=[${GM_info.script.name}]`, action: () => {}, img: 'icons/small_mail.gif'},
+    {id: `website`, label: {
+        en: `Website`,
+        fr: `Site web`,
+        de: `Webseite`,
+        es: `TODO`
+    }, src: `https://myhordes-optimizer.web.app/`, action: () => {}, img: `emotes/explo.gif`},
+    {id: `version`, label: {
+        en: `Changelog ${GM_info.script.version}`,
+        fr: `Notes de version ${GM_info.script.version}`,
+        de: `Changelog ${GM_info.script.version}`,
+        es: `TODO`
+    }, src: undefined, action: () => {alert(changelog)}, img: `emotes/rptext.gif`},
+    {id: `contact`, label: {
+        en: `Bugs? Ideas?`,
+        fr: `Des bugs ? Des idées ?`,
+        de: `Fehler ? Ideen ?`,
+        es: `TODO`
+    }, src: `mailto:lenoune38@gmail.com?Subject=[${GM_info.script.name}]`, action: () => {}, img: `icons/small_mail.gif`},
 ];
+
 
 //////////////////////////////////////
 // Les éléments récupérés via l'API //
@@ -2247,7 +2433,6 @@ function preventFromLeaving() {
 
                 }
             }
-            console.log('buttons', ae_button);
 
             let is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
 
@@ -2293,7 +2478,6 @@ function preventDangerousActions() {
                     let action_img = action.firstElementChild.src;
                     return (action_img === drugs.some((item) => item.icon === action_img) && status_drugged) || action_img === dead.some((item) => item.icon === action_img);
                 });
-                console.log('actions', actions);
                 filtered_actions.forEach((action) => {
                     action.addEventListener('click', (event) => {
                         if (!confirm(`${GM_info.script.name}\n\nÊtes-vous sûr de vouloir effectuer cette action ?`)) {
@@ -2319,19 +2503,22 @@ function notifyOnSearchEnd() {
             let count = document.querySelectorAll('span[x-countdown]')[0];
             if (count) {
                 clearInterval(interval);
-                let timeout_counter = (count.getAttribute('x-countdown') - 1) * 1000;
+                let countdown = count.getAttribute('x-countdown');
+                let timeout_counter = (count.getAttribute('x-countdown') - 5) * 1000;
                 setTimeout(() => {
-                    GM_notification({
-                        text: texts.search_ended[lang],
-                        title: GM_info.script.name,
-                        highlight: true,
-                        timeout: 0
-                    })
+                    if (!pageIsTown()) {
+                        GM_notification({
+                            text: texts.search_ended[lang],
+                            title: GM_info.script.name,
+                            highlight: true,
+                            timeout: 0
+                        });
+                    }
                     notifyOnSearchEnd();
                 }, timeout_counter);
             }
         } else if (pageIsTown()) {
-            clearInterval(interval);
+            notifyOnSearchEnd();
         }
     }, 250);
 }
@@ -2440,16 +2627,16 @@ function createStyles() {
     + 'padding: 0;'
     + '}';
 
-    const mh_optimizer_window_hidden = '#' + mh_optimizer_window_id + ':not(.visible) {'
+    const mh_optimizer_window_hidden = `#${mh_optimizer_window_id}:not(.visible), #${mh_optimizer_map_window_id}:not(.visible) {`
     + 'opacity: 0;'
     + 'pointer-events: none;'
     + '}';
 
-    const mh_optimizer_window_box_style_hidden = '#' + mh_optimizer_window_id + ':not(.visible) #' + mh_optimizer_window_id + '-box {'
+    const mh_optimizer_window_box_style_hidden = `#${mh_optimizer_window_id}:not(.visible) #${mh_optimizer_window_id}-box, #${mh_optimizer_map_window_id}:not(.visible) #${mh_optimizer_map_window_id}-box {`
     + 'transform: scale(0) translateY(1000px);'
     + '}';
 
-    const mh_optimizer_window_box_style = '#' + mh_optimizer_window_id + ' #' + mh_optimizer_window_id + '-box {'
+    const mh_optimizer_window_box_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box {`
     + 'background: url(' + repo_img_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
     + 'border-radius: 8px;'
     + 'box-shadow: 0 0 10px #000;'
@@ -3123,6 +3310,7 @@ function getRecipes() {
 
         setInterval(() => {
             createUpdateExternalToolsButton();
+            createDisplayMapButton();
             clickOnVotedToRedirect();
             displaySearchFieldOnBuildings();
             displayWishlistInApp();
