@@ -2,4 +2,10 @@
     <mat-card-header>
         <mat-card-title>Objets</mat-card-title>
     </mat-card-header>
+    <mat-card-content>
+        <ul *ngIf="items">
+            <mho-item *ngFor="let item of items" [item]="item" [displayDetails]="true">
+            </mho-item>
+        </ul>
+    </mat-card-content>
 </mat-card>

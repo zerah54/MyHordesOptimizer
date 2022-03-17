@@ -4,7 +4,7 @@
     </mat-card-header>
     <mat-card-content>
         <ul *ngIf="bank">
-            <mho-item *ngFor="let bank_item of bank.bank_items" [item]="bank_item" [displayDetails]="false">
+            <mho-item *ngFor="let bank_item of bank.bank_items" [bank_item]="bank_item" [displayDetails]="false">
             </mho-item>
         </ul>
     </mat-card-content>

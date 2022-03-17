@@ -1,3 +1,4 @@
+import { Item } from './../../../_abstract_model/types/item.class';
 import { ApiServices } from './../../../_abstract_model/services/api.services';
 import { Component, HostBinding, Input } from '@angular/core';
 import * as moment from 'moment';
@@ -12,8 +13,10 @@ import { BankItem } from './../../../_abstract_model/types/bank-item.class';
 export class ItemComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    /** L'élément à afficher */
-    @Input() item!: BankItem;
+    /** L'élément à afficher si c'est un objet de banque */
+    @Input() bank_item!: BankItem;
+    /** L'élément à afficher si c'est un objet standard */
+    @Input() item!: Item;
     /** Doit-on afficher le détail au clic ? */
     @Input() displayDetails: boolean = false;
 
@@ -29,11 +32,15 @@ export class ItemComponent {
     /**
      * Ajoute un élément à la liste de souhaits
      *
-     * @param {BankItem} bank_item
+     * @param {Item} item
      */
-     public addItemToWishlist(bank_item: BankItem): void {
-        this.api.addItemToWishlist(bank_item.item).subscribe(() => {
-            bank_item.wishlist_count = 1;
+    public addItemToWishlist(item: Item): void {
+        this.api.addItemToWishlist(item).subscribe(() => {
+            if (this.bank_item) {
+                this.bank_item.wishlist_count = 1;
+            } else {
+                this.item.wishlist_count = 1;
+            }
         })
     }
 }
