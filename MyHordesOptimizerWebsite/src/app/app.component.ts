@@ -6,7 +6,7 @@ import { LoadingOverlayService } from './shared/services/loading-overlay.service
 import { ApiServices } from './_abstract_model/services/api.services';
 
 @Component({
-    selector: 'app-root',
+    selector: 'mho-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })

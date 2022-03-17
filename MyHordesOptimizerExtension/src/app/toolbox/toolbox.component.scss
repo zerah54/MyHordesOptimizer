@@ -1,0 +1,26 @@
+$border-color: rgba(125, 125, 125, 0.5);
+.toolbox {
+    .toolbox-title {
+        min-width: 350px;
+        height: 3em;
+        > img {
+            height: 90%;
+            margin: auto 0.5em auto 0;
+            vertical-align: middle;
+        }
+        > span {
+            font-size: 1.5em;
+        }
+    }
+    > div,
+    > div > * > div {
+        margin-left: -0.5em;
+        margin-right: -0.5em;
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+
+        &:not(:last-child) {
+            border-bottom: 1px solid $border-color;
+        }
+    }
+}

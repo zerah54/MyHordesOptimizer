@@ -1,10 +1,9 @@
-import { SidenavService } from './../shared/services/sidenav.service';
 import { Component, EventEmitter, ViewChild } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
-import { MatButton } from '@angular/material/button';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Title } from '@angular/platform-browser';
 import { getExternalAppId, setExternalAppId } from 'src/app/shared/utilities/localstorage.util';
+import { SidenavService } from './../shared/services/sidenav.service';
 import { ApiServices } from './../_abstract_model/services/api.services';
 
 @Component({

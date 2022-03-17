@@ -1,4 +1,8 @@
 .mho-wishlist {
+    .hidden {
+        display: none;
+    }
+
     table {
         width: 100%;
         tr {
@@ -7,6 +11,11 @@
                     margin-right: 0.5em;
                 }
             }
+        }
+
+        .table-filters {
+            display: flex;
+            justify-content: space-between;
         }
     }
 }

@@ -4,14 +4,32 @@
     </mat-card-header>
     <mat-card-content>
         <ng-container *ngIf="wishlist_info">
-            <mat-form-field appearance="standard">
-                <mat-label>Filtrer</mat-label>
-                <input matInput (keyup)="applyFilter($event)" #input>
-            </mat-form-field>
-            <button mat-button [color]="'accent'" (click)="updateWishlist()">Enregistrer</button>
-
             <div class="mat-elevation-z8">
                 <table mat-table [dataSource]="datasource" matSort>
+
+                    <ng-container matColumnDef="filters">
+                        <td mat-header-cell *matHeaderCellDef colspan="6">
+                            <div class="table-filters">
+                                <mat-form-field appearance="standard">
+                                    <mat-label>Filtrer</mat-label>
+                                    <input matInput (keyup)="applyFilter($event)" #filterInput>
+                                </mat-form-field>
+                                <mat-form-field appearance="standard">
+                                    <mat-label>Ajouter un objet</mat-label>
+                                    <mat-select #addItemSelect (valueChange)="addItemToWishlist($event)">
+                                        <mat-form-field class="mat-option">
+                                            <input matInput [placeholder]="'Rechercher un objet'" #addItemFilterInput>
+                                        </mat-form-field>
+                                        <mat-option>--</mat-option>
+                                        <mat-option *ngFor="let item of items" [value]="item"
+                                            [style.display]="isObjectDisplayed(item) ? 'inherit' : 'none'">
+                                            {{item.label[locale]}}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </td>
+                    </ng-container>
 
                     <ng-container matColumnDef="name" [sticky]="true">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom de l'objet</th>
@@ -66,12 +84,25 @@
                         </td>
                     </ng-container>
 
+                    <!-- Footer -->
+                    <ng-container matColumnDef="save">
+                        <td mat-footer-cell *matFooterCellDef style="text-align: right;" colspan="6">
+                            <button mat-button [color]="'accent'" (click)="updateWishlist()">Enregistrer</button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="['filters']; sticky: true"></tr>
                     <tr mat-header-row *matHeaderRowDef="columns_ids; sticky: true"></tr>
                     <tr mat-row *matRowDef="let row; columns: columns_ids;"></tr>
+                    <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr>
 
                     <!-- Row shown when there is no matching data. -->
                     <tr class="mat-row" *matNoDataRow>
-                        <td class="mat-cell" colspan="5">Aucun objet ne correspond au filtre "{{input.value}}"</td>
+                        <td class="mat-cell" colspan="6">
+                            <ng-container *ngIf="filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">Aucun
+                                objet ne correspond au filtre "{{filterInput.nativeElement.value}}"</ng-container>
+                            <ng-template #emptyTable>La liste est vide</ng-template>
+                        </td>
                     </tr>
                 </table>
             </div>

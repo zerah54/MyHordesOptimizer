@@ -1,4 +1,5 @@
-import { Component, ViewChild } from '@angular/core';
+import { Item } from './../../_abstract_model/types/item.class';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
@@ -6,6 +7,7 @@ import { HORDES_IMG_REPO } from './../../_abstract_model/const';
 import { ApiServices } from './../../_abstract_model/services/api.services';
 import { WishlistInfo } from './../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from './../../_abstract_model/types/wishlist-item.class';
+import { MatSelect } from '@angular/material/select';
 
 @Component({
     selector: 'mho-wishlist',
@@ -15,6 +17,9 @@ import { WishlistItem } from './../../_abstract_model/types/wishlist-item.class'
 export class WishlistComponent {
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<WishlistItem>;
+    @ViewChild('addItemFilterInput') add_item_filter_input!: ElementRef;
+    @ViewChild('filterInput') filterInput!: ElementRef;
+    @ViewChild('addItemSelect') add_item_select!: MatSelect;
 
     /** La wishlist */
     public wishlist_info!: WishlistInfo;
@@ -33,6 +38,8 @@ export class WishlistComponent {
         { id: 'needed', header: `Quantité manquante` },
         { id: 'delete', header: `` },
     ];
+    public items: Item[] = [];
+
     /** La liste des colonnes */
     public readonly columns_ids: string[] = ['name', 'priority', 'bank_count', 'count', 'needed', 'delete'];
 
@@ -50,11 +57,12 @@ export class WishlistComponent {
     }
 
     ngOnInit(): void {
-        this.api.getWishlist().subscribe((wishlist_info: WishlistInfo) => {
-            this.wishlist_info = wishlist_info;
-            this.datasource = new MatTableDataSource(this.wishlist_info.wishlist_items);
-            this.datasource.sort = this.sort;
-            this.datasource.filterPredicate = (data: WishlistItem, filter: string) => this.customFilter(data, filter);
+        this.datasource = new MatTableDataSource();
+        this.datasource.sort = this.sort;
+        this.datasource.filterPredicate = (data: WishlistItem, filter: string) => this.customFilter(data, filter);
+        this.getWishlist();
+        this.api.getItems().subscribe((items: Item[]) => {
+            this.items = items;
         });
     }
 
@@ -77,13 +85,36 @@ export class WishlistComponent {
     public remove(row: WishlistItem) {
         let index = this.wishlist_info.wishlist_items.findIndex((wishlist_item: WishlistItem) => wishlist_item.item.xml_id === row.item.xml_id);
         this.wishlist_info.wishlist_items.splice(index, 1);
-        this.table.renderRows();
+        this.datasource.data = [...this.wishlist_info.wishlist_items];
+    }
+
+    public isObjectDisplayed(item: Item): boolean {
+        let display_by_filter: boolean = item.label[this.locale].toLowerCase()
+        .indexOf(this.add_item_filter_input ? this.add_item_filter_input.nativeElement.value.toLowerCase() : '') > -1;
+        let not_in_wishlist: boolean = item.wishlist_count === 0;
+        return display_by_filter && not_in_wishlist;
+    }
+
+    public addItemToWishlist(item: Item) {
+        this.api.addItemToWishlist(item).subscribe(() => {
+            item.wishlist_count = 1;
+            this.add_item_select.value = undefined;
+            this.add_item_filter_input.nativeElement.value = '';
+            this.getWishlist();
+        })
     }
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: WishlistItem, filter: string): boolean {
-        if (data.item.label[this.locale].toLowerCase().indexOf(filter) > -1) return true;
+        if (data.item.label[this.locale].toLowerCase().indexOf(filter.toLowerCase()) > -1) return true;
         return false;
+    }
+
+    private getWishlist(): void {
+        this.api.getWishlist().subscribe((wishlist_info: WishlistInfo) => {
+            this.wishlist_info = wishlist_info;
+            this.datasource.data = [...wishlist_info.wishlist_items];
+        });
     }
 }
 

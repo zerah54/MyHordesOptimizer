@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpResponse } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { catchError, Observable, retry, throwError } from "rxjs";
 import { SnackbarService } from './../../shared/services/snackbar.service';
 
@@ -19,13 +19,8 @@ export class GlobalServices {
     }
 
     protected post<T>(url: string, params?: string): Observable<T> {
-        return this._http.post<T>(url, {
-            params: params ? params : undefined,
-            responseType: 'json',
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).pipe(
+        const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
+        return this._http.post<T>(url, params, {responseType: 'json', headers: headers}).pipe(
             retry(3),
             catchError(this.handleError)
         );

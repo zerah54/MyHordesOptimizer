@@ -34,7 +34,7 @@ export class ApiServices extends GlobalServices {
      */
     public getItems(): Observable<Item[]> {
         return new Observable((sub: Subscriber<Item[]>) => {
-            super.get<ItemDTO[]>(API_URL + 'myhordesfetcher/item?userKey=' + getExternalAppId())
+            super.get<ItemDTO[]>(API_URL + 'myhordesfetcher/items?userKey=' + getExternalAppId())
                 .subscribe({
                     next: (response: HttpResponse<ItemDTO[]>) => {
                         sub.next(ItemDtoTransform.transformDtoArray(response.body));

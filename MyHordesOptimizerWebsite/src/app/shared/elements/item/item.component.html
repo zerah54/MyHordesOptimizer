@@ -1,14 +1,16 @@
 <li class="mho-item">
-    <div class="item_title">
-        <div class="item_img">
-            <img [src]="HORDES_IMG_REPO + item.item.img" /><span class="item_count"
-                *ngIf="item.count > 1">{{item.count}}</span>
+    <div>
+        <div class="item_title">
+            <div class="item_img">
+                <img [src]="HORDES_IMG_REPO + (item ? item.img : bank_item.item.img)" /><span class="item_count"
+                    *ngIf="bank_item && bank_item.count > 1">{{bank_item.count}}</span>
+            </div>
+            <span class="item_label">{{item ? item.label[locale] : bank_item.item.label[locale]}}</span>
         </div>
-        <span class="item_label">{{item.item.label[locale]}}</span>
-    </div>
-    <div class="add_to_wishlist" *ngIf="item.wishlist_count === 0">
-        <button mat-icon-button type="button" (click)="addItemToWishlist(item)">
-            <img [src]="HORDES_IMG_REPO + 'item/item_cart.gif'">
-        </button>
+        <div class="add_to_wishlist" *ngIf="item ? item.wishlist_count === 0 : bank_item.wishlist_count === 0">
+            <button mat-icon-button type="button" (click)="addItemToWishlist(item ? item : bank_item.item)">
+                <img [src]="HORDES_IMG_REPO + 'item/item_cart.gif'">
+            </button>
+        </div>
     </div>
 </li>
