@@ -20,9 +20,11 @@ using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Impl;
 using MyHordesOptimizerApi.Services.Impl.ExternalTools;
 using MyHordesOptimizerApi.Services.Impl.Import;
+using MyHordesOptimizerApi.Services.Impl.Translations;
 using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
+using MyHordesOptimizerApi.Services.Interfaces.Translations;
 using System.Net.Http;
 using System.Reflection;
 
@@ -54,7 +56,7 @@ namespace MyHordesOptimizerApi
                     UseCookies = false,
                 };
             });
-           // services.AddSingleton(BuildAutoMapper());
+            // services.AddSingleton(BuildAutoMapper());
             services.AddAutoMapper(Assembly.GetAssembly(this.GetType()));
 
             // Providers
@@ -85,6 +87,7 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IExternalToolsService, ExternalToolsService>();
             services.AddScoped<IMyHordesImportService, MyHordesImportService>();
             services.AddScoped<IWishListService, WishListService>();
+            services.AddSingleton<ITranslationService, TranslationService>();
 
 
             services.AddApplicationInsightsTelemetry();
