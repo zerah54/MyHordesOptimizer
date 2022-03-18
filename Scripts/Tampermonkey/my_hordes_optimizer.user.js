@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.21
+// @version      1.0.0-alpha.22
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -40,6 +40,7 @@ const gm_fata_updated_key = 'fata_updated';
 const gm_mh_external_app_id_key = 'mh_external_app_id';
 const gm_parameters_key = 'mh_optimizer_parameters';
 const mh_user_key = 'mh_user';
+const mho_map_key = 'mho_map';
 
 let mho_parameters = GM_getValue(gm_parameters_key);
 let external_app_id = GM_getValue(gm_mh_external_app_id_key);
