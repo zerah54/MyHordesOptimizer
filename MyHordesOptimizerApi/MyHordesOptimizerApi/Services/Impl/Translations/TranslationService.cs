@@ -48,7 +48,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
                 {
                     var isExactMatch = false;
 
-                    var translatedDeutchStrings = translationFile.File.Unit.Where(unit => unit.Segment.Target.ToLower().IndexOf(sourceString.ToLower()) >= 0 || sourceString.ToLower().IndexOf(unit.Segment.Target.ToLower()) >= 0).Select(translationUnit => translationUnit.Segment.Source).ToList();
+                    var translatedDeutchStrings = translationFile.File.Unit.Where(unit => unit.Segment.Target.ToLower().IndexOf(sourceString.ToLower()) >= 0).Select(translationUnit => translationUnit.Segment.Source).ToList();
                     var exactDeutchString = translationFile.File.Unit.Where(unit => unit.Segment.Target.ToLower() == sourceString.ToLower()).Select(translationUnit => translationUnit.Segment.Source).FirstOrDefault();
                     if (exactDeutchString != null)
                     {
@@ -77,7 +77,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
                 {
                     var isExactMatch = false;
 
-                    var translatedDeutchStrings = translationFile.File.Unit.Where(unit => unit.Segment.Source.ToLower().IndexOf(sourceString.ToLower()) >= 0 || sourceString.ToLower().IndexOf(unit.Segment.Source.ToLower()) >= 0).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                    var translatedDeutchStrings = translationFile.File.Unit.Where(unit => unit.Segment.Source.ToLower().IndexOf(sourceString.ToLower()) >= 0).Select(translationUnit => translationUnit.Segment.Target).ToList();
                     var exactDeutchString = translationFile.File.Unit.Where(unit => unit.Segment.Source.ToLower() == sourceString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).FirstOrDefault();
                     if (exactDeutchString != null)
                     {
