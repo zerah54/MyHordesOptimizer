@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.24
+// @version      1.0.0-alpha.25
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -2579,6 +2579,12 @@ function displayTranslateTool() {
         if (mho_parameters.display_translate_tool) {
             if (display_translate_input) return;
 
+            let langs = [
+                {value: 'de', img: '🇩🇪'},
+                {value: 'en', img: '🇬🇧'},
+                {value: 'es', img: '🇪🇸'},
+                {value: 'fr', img: '🇫🇷'},
+            ]
             let ul = document.createElement('ul');
             ul.setAttribute('style', 'position: absolute; top: 42px; right: 8px');
             let li = document.createElement('li');
@@ -2586,17 +2592,21 @@ function displayTranslateTool() {
             let label = document.createElement('label');
             let select = document.createElement('select');
             select.classList.add('small');
-            select.setAttribute('style', 'height: 24px; width: 48px; font-size: 16px');
+            select.setAttribute('style', 'height: 25px; width: 35px; font-size: 12px');
             select.value = lang;
-            select.innerHTML = `
-            <option value="de" style="16px">🇩🇪</option>
-            <option value="en" style="16px">🇬🇧</option>
-            <option value="es" style="16px">🇪🇸</option>
-            <option value="fr" style="16px">🇫🇷</option>
-            `;
+
+            langs.forEach((lang_option) => {
+                let option = document.createElement('option');
+                option.value = lang_option.value;
+                option.setAttribute('style', 'font-size: 16px');
+                option.innerHTML = lang_option.img;
+                option.selected = lang_option.value === lang;
+                select.appendChild(option);
+            })
+
             let input = document.createElement('input');
             input.classList.add('inline');
-            input.setAttribute('style', 'width: calc(100% - 48px)');
+            input.setAttribute('style', 'width: calc(100% - 35px)');
             input.type = 'text';
             input.id = mho_display_translate_input_id;
 
@@ -3497,7 +3507,7 @@ function getRecipes() {
 
         setInterval(() => {
             createUpdateExternalToolsButton();
-            createDisplayMapButton();
+            //createDisplayMapButton();
             clickOnVotedToRedirect();
             displaySearchFieldOnBuildings();
             displayWishlistInApp();
