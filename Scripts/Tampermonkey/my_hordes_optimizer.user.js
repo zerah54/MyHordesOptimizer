@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.25
+// @version      1.0.0-alpha.26
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -30,7 +30,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Amélioration] Ajout d'une fonctionnalité de traduction des éléments de MyHordes\n`;
++ `[Amélioration] Amélioration de la fonctionnalité de traduction (copie d'un libellé, afficher les résultats inexacts)\n`;
 
 const lang = document.documentElement.lang || navigator.language || navigator.userLanguage;
 
@@ -196,6 +196,24 @@ const texts = {
         fr: `Rechercher un chantier`,
         de: `Baustelle suchen`,
         es: `TODO`
+    },
+    translation_file_context: {
+        en: `Context (translation file)`,
+        fr: `Contexte (fichier de traduction)`,
+        de: `TODO`,
+        es: `TODO`,
+    },
+    display_all_search_result: {
+        en: `Display all results`,
+        fr: `Afficher tous les résultats`,
+        de: `TODO`,
+        es: `TODO`
+    },
+    display_exact_search_result: {
+        en: `Only display exact results`,
+        fr: `Afficher uniquement les résultats exacts`,
+        de: `TODO`,
+        es: `TODO`
     }
 };
 
@@ -357,7 +375,7 @@ const wishlist_headers = [
         es: `TODO`
     }, id: `label`},
     {label: {
-        en: `Prioriry`,
+        en: `Priority`,
         fr: `Priorité`,
         de: `Priorität`,
         es: `TODO`
@@ -562,13 +580,13 @@ let params_categories = [
         {
             id: `display_translate_tool`,
             label: {
-                en: `TODO`,
+                en: `Show MyHordes' item translation bar`,
                 fr: `Afficher la barre de traduction des éléments de MyHordes`,
                 de: `TODO`,
                 es: `TODO`
             },
             help: {
-                en: `TODO`,
+                en: `Shows a translation bar. You must choose the initial language, then type the searched element to get the other translations.`,
                 fr: `Affiche une barre de traduction. Vous devez choisir la langue initiale, puis saisir l'élément recherché pour en récupérer les différentes traductions.`,
                 de: `TODO`,
                 es: `TODO`
@@ -752,6 +770,21 @@ function addError(error) {
         notification.remove();
     }, 5000);
     console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
+}
+
+/**
+ * Copie un texte
+ * @param {string} le texte à copier
+ */
+function copyToClipboard(text) {
+    let input = document.createElement('input');
+    input.value = text;
+
+    document.body.appendChild(input);
+    input.select();
+
+    document.execCommand('copy');
+    input.remove();
 }
 
 /**
@@ -2586,6 +2619,7 @@ function displayTranslateTool() {
                 {value: 'fr', img: '🇫🇷'},
             ]
             let ul = document.createElement('ul');
+            ul.id = mho_display_translate_input_id;
             ul.setAttribute('style', 'position: absolute; top: 42px; right: 8px');
             let li = document.createElement('li');
             li.setAttribute('style', 'width: 250px');
@@ -2606,9 +2640,8 @@ function displayTranslateTool() {
 
             let input = document.createElement('input');
             input.classList.add('inline');
-            input.setAttribute('style', 'width: calc(100% - 35px)');
+            input.setAttribute('style', 'width: calc(100% - 35px);');
             input.type = 'text';
-            input.id = mho_display_translate_input_id;
 
             let close = document.createElement('div');
             close.innerHTML = '&#128473';
@@ -2622,10 +2655,9 @@ function displayTranslateTool() {
             label.appendChild(input);
             label.appendChild(close);
 
-            console.log('lang', lang);
             let div = document.createElement('div');
             div.classList.add('hidden');
-            div.setAttribute('style', 'z-index: 9999; position: absolute; width: 100%; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76;');
+            div.setAttribute('style', 'z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
             input.addEventListener('keyup', (event) => {
                 if (event.key === 'Enter') {
                     div.classList.remove('hidden');
@@ -2804,9 +2836,10 @@ function createStyles() {
     + 'position: absolute;'
     + 'right: 12px;'
     + 'top: -6px;'
+    + 'text-align: right;'
     + '}'
 
-    const wiki_window_overlay_ul_style = '#' + mh_optimizer_window_id + ' #' + mh_optimizer_window_id + '-box #' + mh_optimizer_window_id + '-overlay ul {'
+    const wiki_window_overlay_ul_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box #${mh_optimizer_window_id}-overlay ul, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay ul {`
     + 'margin: 2px;'
     + 'padding: 0;'
     + '}'
@@ -3407,23 +3440,33 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                             let content_div = document.createElement('div');
                             let img = document.createElement('img');
                             img.src = `${repo_img_url}/lang/${lang_key}.png`
-                            img.setAttribute('style', 'margin-right: 4px');
-                            let text = document.createElement('text');
-                            text.innerText = result;
-                            let button_div = document.createElement('div');
-                            let button = document.createElement('button');
-                            button_div.appendChild(button);
-                            button.innerHTML = '&#x2398';
-                            button.setAttribute('style', 'font-size: 16px');
-                            button.addEventListener('click', () => {
-                                copyToClipboard(text);
+                                img.setAttribute('style', 'margin-right: 8px');
+
+                                let button_div = document.createElement('div');
+                                let button = document.createElement('button');
+                                button_div.appendChild(button);
+                                button.innerHTML = '&#10697';
+                                button.setAttribute('style', 'font-size: 16px');
+                                button.addEventListener('click', () => {
+                                    copyToClipboard(result);
+                                });
+                                content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px;');
+
+                                if (key_index === Object.keys(translation.value).length - 1) {
+                                    content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid;');
+                                }
+                                content_div.innerHTML = `<div>${img.outerHTML}${result}</div>`;
+                                content_div.appendChild(button_div);
+
+                                if (!translation.key.isExactMatch && show_exact_match) {
+                                    content_div.classList.add('not-exact','hidden');
+                                }
+                                block_to_display.appendChild(content_div);
                             });
-                            content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 8px;');
-                            content_div.innerHTML = `<div>${img.outerHTML}${text.outerHTML}</div>`;
-                            // content_div.appendChild(button_div);
-                            block_to_display.appendChild(content_div);
-                        });
-                    };
+                            key_index ++;
+                        };
+                    });
+
                 } else {
                     addError(response);
                 }
