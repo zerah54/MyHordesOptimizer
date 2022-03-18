@@ -6,7 +6,6 @@ using MyHordesOptimizerApi.Services.Interfaces.Translations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
-using System.Reflection;
 using System.Web;
 
 namespace MyHordesOptimizerApi.Services.Impl.Translations
@@ -43,52 +42,66 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
         public TranslationResultDto GetTranslation(string locale, string sourceString)
         {
             var result = new TranslationResultDto();
-
             if (locale != "de")
             {
                 foreach (var translationFile in XlfFilesByLocale[locale])
                 {
-                    var descriptionUnit = translationFile.File.Unit.Where(unit => unit.Segment.Target.ToLower() == sourceString.ToLower()).Select(translationUnit => translationUnit.Segment.Source).ToList();
-                    result.De.AddRange(descriptionUnit);
+                    var isExactMatch = false;
 
-                    if (descriptionUnit.Any())
+                    var translatedDeutchStrings = translationFile.File.Unit.Where(unit => unit.Segment.Target.ToLower().IndexOf(sourceString.ToLower()) >= 0 || sourceString.ToLower().IndexOf(unit.Segment.Target.ToLower()) >= 0).Select(translationUnit => translationUnit.Segment.Source).ToList();
+                    var exactDeutchString = translationFile.File.Unit.Where(unit => unit.Segment.Target.ToLower() == sourceString.ToLower()).Select(translationUnit => translationUnit.Segment.Source).FirstOrDefault();
+                    if (exactDeutchString != null)
+                    {
+                        translatedDeutchStrings = new List<string>() { exactDeutchString };
+                        isExactMatch = true;
+                    }
+                    foreach (var deutchString in translatedDeutchStrings)
                     {
                         var xlfName = translationFile.File.Id.Substring(0, translationFile.File.Id.LastIndexOf(".")); // Remove .locale
                         var file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.fr")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.fr");
-                        var newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x.ToLower() == unit.Segment.Source.ToLower())).Select(translationUnit => translationUnit.Segment.Target).ToList();
-                        result.Fr.AddRange(newDescriptionUnit);
+                        var translatedFrenchStrings = file.File.Unit.Where(unit => unit.Segment.Source.ToLower() == deutchString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
 
                         file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.es")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.es");
-                        newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x.ToLower() == unit.Segment.Source.ToLower())).Select(translationUnit => translationUnit.Segment.Target).ToList();
-                        result.Es.AddRange(newDescriptionUnit);
+                        var translatedSpanishStrings = file.File.Unit.Where(unit => unit.Segment.Source.ToLower() == deutchString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
 
                         file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.en")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.en");
-                        newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x.ToLower() == unit.Segment.Source.ToLower())).Select(translationUnit => translationUnit.Segment.Target).ToList();
-                        result.En.AddRange(newDescriptionUnit);
-                    } 
+                        var translatedEnglishStrings = file.File.Unit.Where(unit => unit.Segment.Source.ToLower() == deutchString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
+
+                        result.AddTranslation(de: deutchString, context: xlfName, isExactMatch: isExactMatch, fr: translatedFrenchStrings, es: translatedSpanishStrings, en: translatedEnglishStrings);
+                    }
                 }
             }
             else
             {
                 foreach (var translationFile in XlfFilesByLocale[locale])
                 {
-                    var descriptionUnit = translationFile.File.Unit.Where(unit => unit.Segment.Source.ToLower() == sourceString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
-                    result.De.AddRange(descriptionUnit);
+                    var isExactMatch = false;
 
-                    if (descriptionUnit.Any())
+                    var translatedDeutchStrings = translationFile.File.Unit.Where(unit => unit.Segment.Source.ToLower().IndexOf(sourceString.ToLower()) >= 0 || sourceString.ToLower().IndexOf(unit.Segment.Source.ToLower()) >= 0).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                    var exactDeutchString = translationFile.File.Unit.Where(unit => unit.Segment.Source.ToLower() == sourceString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).FirstOrDefault();
+                    if (exactDeutchString != null)
+                    {
+                        translatedDeutchStrings = new List<string>() { exactDeutchString };
+                        isExactMatch = true;
+                    }
+                    if (exactDeutchString != null)
+                    {
+                        translatedDeutchStrings = new List<string>() { exactDeutchString };
+                        isExactMatch = true;
+                    }
+                    foreach (var deutchString in translatedDeutchStrings)
                     {
                         var xlfName = translationFile.File.Id.Substring(0, translationFile.File.Id.LastIndexOf(".")); // Remove .locale
                         var file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.fr")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.fr");
-                        var newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x.ToLower() == unit.Segment.Source.ToLower())).Select(translationUnit => translationUnit.Segment.Target).ToList();
-                        result.Fr.AddRange(newDescriptionUnit);
+                        var translatedFrenchStrings = file.File.Unit.Where(unit => unit.Segment.Source.ToLower() == deutchString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
 
                         file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.es")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.es");
-                        newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x.ToLower() == unit.Segment.Source.ToLower())).Select(translationUnit => translationUnit.Segment.Target).ToList();
-                        result.Es.AddRange(newDescriptionUnit);
+                        var translatedSpanishStrings = file.File.Unit.Where(unit => unit.Segment.Source.ToLower() == deutchString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
 
                         file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.en")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.en");
-                        newDescriptionUnit = file.File.Unit.Where(unit => descriptionUnit.Any(x => x.ToLower() == unit.Segment.Source.ToLower())).Select(translationUnit => translationUnit.Segment.Target).ToList();
-                        result.En.AddRange(newDescriptionUnit);
+                        var translatedEnglishStrings = file.File.Unit.Where(unit => unit.Segment.Source.ToLower() == deutchString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
+
+                        result.AddTranslation(de: deutchString, context: xlfName, isExactMatch: isExactMatch, fr: translatedFrenchStrings, es: translatedSpanishStrings, en: translatedEnglishStrings);
                     }
                 }
             }
