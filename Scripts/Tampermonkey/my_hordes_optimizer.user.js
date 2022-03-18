@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.23
+// @version      1.0.0-alpha.24
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -64,6 +64,7 @@ const mh_optimizer_icon = 'https://github.com/zerah54/MyHordesOptimizer/raw/main
 
 const mho_title = 'MH Optimizer';
 const mh_optimizer_window_id = 'optimizer-window';
+const mh_optimizer_map_window_id = 'optimizer-map-window';
 const btn_id = 'optimizer-btn';
 const mh_header_id = 'header-reload-area';
 const mh_update_external_tools_id = 'mh-update-external-tools';
