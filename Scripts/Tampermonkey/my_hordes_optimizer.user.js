@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.22
+// @version      1.0.0-alpha.23
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
