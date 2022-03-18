@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.26
+// @version      1.0.0-alpha.27
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -3433,13 +3433,56 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
-                    let language_result = [];
-                    for (let lang_key in response.response) {
-                        let lang = response.response[lang_key];
-                        lang.forEach((result) => {
-                            let content_div = document.createElement('div');
-                            let img = document.createElement('img');
-                            img.src = `${repo_img_url}/lang/${lang_key}.png`
+                    console.log('response.response', response.response.translations);
+                    let show_exact_match = response.response.translations.some((translation) => translation.key.isExactMatch);
+
+                    if (show_exact_match) {
+                        let display_all = document.createElement('div');
+                        display_all.setAttribute('style', 'padding: 4px; border-bottom: 1px solid; cursor: pointer');
+                        let display_all_img = document.createElement('img');
+                        display_all_img.src = `${repo_img_url}/icons/small_more.gif`;
+                        display_all_img.setAttribute('style', 'margin-right: 8px');
+
+                        let display_all_text = document.createElement('text');
+                        display_all_text.innerText = texts.display_all_search_result[lang];
+
+                        display_all.appendChild(display_all_img);
+                        display_all.appendChild(display_all_text);
+                        block_to_display.appendChild(display_all);
+
+                        display_all.addEventListener('click', () => {
+                            show_exact_match = !show_exact_match;
+                            if (show_exact_match) {
+                                display_all_img.src = `${repo_img_url}/icons/small_more.gif`;
+                                display_all_text.innerHTML = texts.display_all_search_result[lang];
+                            } else {
+                                display_all_img.src = `${repo_img_url}/icons/small_less.gif`;
+                                display_all_text.innerHTML = texts.display_exact_search_result[lang];
+                            }
+                            let not_exact = Array.from(block_to_display.getElementsByClassName('not-exact'));
+                            not_exact.forEach((not_exact_item) => {
+                                not_exact_item.classList.toggle('hidden');
+                            })
+                        });
+                    }
+                    response.response.translations
+                        .forEach((translation) => {
+                        if (response.response.translations.length > 1) {
+                            let context_div = document.createElement('div');
+                            context_div.setAttribute('style', 'text-align: center; padding: 4px; font-variant: small-caps; font-size: 14px;');
+                            context_div.innerHTML = texts.translation_file_context[lang] + ` <img src="${repo_img_url}/emotes/arrowright.gif"> ` + translation.key.context;
+                            if (!translation.key.isExactMatch && show_exact_match) {
+                                context_div.classList.add('not-exact','hidden');
+                            }
+                            block_to_display.appendChild(context_div);
+                        }
+                        let key_index = 0;
+                        for (let lang_key in translation.value) {
+                            let lang = translation.value[lang_key];
+                            lang.forEach((result) => {
+                                let content_div = document.createElement('div');
+                                let img = document.createElement('img');
+                                img.src = `${repo_img_url}/lang/${lang_key}.png`
                                 img.setAttribute('style', 'margin-right: 8px');
 
                                 let button_div = document.createElement('div');
