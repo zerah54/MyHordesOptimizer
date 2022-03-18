@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.20
+// @version      1.0.0-alpha.21
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -30,7 +30,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Amélioration] Ajout des traductions anglaises et allemandes, merci Katt et Shokolaw \n`;
++ `[Amélioration] Ajout d'une fonctionnalité de traduction des éléments de MyHordes\n`;
 
 const lang = document.documentElement.lang || navigator.language || navigator.userLanguage;
 
@@ -72,6 +72,7 @@ const nb_dead_zombies_id = 'nb-dead-zombies';
 const mho_copy_map_id = 'mho-copy-map';
 const mho_display_map_id = 'mho-display-map';
 const mho_search_building_field_id = 'mho-search-building-field';
+const mho_display_translate_input_id = 'mho-display-translate-input';
 
 const texts = {
     save_external_app_id: {
@@ -552,6 +553,22 @@ let params_categories = [
                 en: `Allows to display the number of blood splatters on the map`,
                 fr: `Permet d'afficher le nombre de tâches de sang sur la carte`,
                 de: `Ermöglicht die Anzeige der Anzahl der Blutfleck auf der Karte`,
+                es: `TODO`
+            },
+            parent_id: null
+        },
+        {
+            id: `display_translate_tool`,
+            label: {
+                en: `TODO`,
+                fr: `Afficher la barre de traduction des éléments de MyHordes`,
+                de: `TODO`,
+                es: `TODO`
+            },
+            help: {
+                en: `TODO`,
+                fr: `Affiche une barre de traduction. Vous devez choisir la langue initiale, puis saisir l'élément recherché pour en récupérer les différentes traductions.`,
+                de: `TODO`,
                 es: `TODO`
             },
             parent_id: null
@@ -2552,6 +2569,127 @@ function displayNbDeadZombies() {
     }
 }
 
+function displayTranslateTool() {
+    setTimeout(() => {
+        let display_translate_input = document.getElementById(mho_display_translate_input_id);
+        const header = document.getElementById('header');
+
+        if (mho_parameters.display_translate_tool) {
+            if (display_translate_input) return;
+
+            let ul = document.createElement('ul');
+            ul.setAttribute('style', 'position: absolute; top: 42px; right: 8px');
+            let li = document.createElement('li');
+            li.setAttribute('style', 'width: 250px');
+            let label = document.createElement('label');
+            let select = document.createElement('select');
+            select.classList.add('small');
+            select.setAttribute('style', 'height: 24px; width: 48px; font-size: 16px');
+            select.value = lang;
+            select.innerHTML = `
+            <option value="de" style="16px">🇩🇪</option>
+            <option value="en" style="16px">🇬🇧</option>
+            <option value="es" style="16px">🇪🇸</option>
+            <option value="fr" style="16px">🇫🇷</option>
+            `;
+            let input = document.createElement('input');
+            input.classList.add('inline');
+            input.setAttribute('style', 'width: calc(100% - 48px)');
+            input.type = 'text';
+            input.id = mho_display_translate_input_id;
+
+            let close = document.createElement('div');
+            close.innerHTML = '&#128473';
+            close.setAttribute('style', 'position: absolute; top: 0; right: 0; color: #5c2b20;');
+            close.addEventListener('click', () => {
+                div.classList.add('hidden');
+                input.value = '';
+            });
+
+            label.appendChild(select);
+            label.appendChild(input);
+            label.appendChild(close);
+
+            console.log('lang', lang);
+            let div = document.createElement('div');
+            div.classList.add('hidden');
+            div.setAttribute('style', 'z-index: 9999; position: absolute; width: 100%; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76;');
+            input.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    div.classList.remove('hidden');
+                    getTranslation(input.value, select.value, div);
+                }
+            });
+            li.appendChild(label);
+            li.appendChild(div);
+            ul.appendChild(li);
+            let gma = document.getElementById('gma');
+            let game_bar = gma.getElementsByClassName('game-bar')[0];
+            game_bar.appendChild(ul);
+        } else if (display_translate_input) {
+            display_translate_input.remove();
+        }
+    }, 3000);
+}
+/////////////////////////////////////
+// BOUTONS SUR LES OUTILS EXTERNES //
+/////////////////////////////////////
+function createCopyButton(source, map_id, button_block_id) {
+    let copy_button = document.createElement('button');
+    copy_button.innerText = texts.copy_map[lang];
+    copy_button.id = mho_copy_map_id;
+    copy_button.addEventListener('click', () => {
+        let div = document.createElement('div');
+        div.innerHTML = document.getElementById(map_id);
+
+        let img = document.createElement('img');
+        img.src = htmlToCanvas(document.getElementById(map_id).outerHTML).toDataURL();
+        console.log('img', img);
+        html2canvas(document.getElementById(map_id).outerHTML).then((canvas) => {
+            console.log( 'test', canvas);
+            GM_setValue(mho_map_key, {
+                source: source,
+                block: canvas.toDataURL().outerHTML,
+            //style: styles
+            })
+
+            console.log(GM_getValue(mho_map_key));
+        });
+        // GM_setValue(mho_map_key, {
+        //     source: source,
+        //     block: img.outerHTML,
+        //     //style: styles
+        // });
+        // console.log(GM_getValue(mho_map_key));
+    });
+    let copy_button_parent = document.getElementById(button_block_id);
+    copy_button_parent.appendChild(copy_button);
+}
+
+function htmlToCanvas(html) {
+    html = '<svg><foreignObject>' + html + '</foreignObject></svg>';
+    let canvas = document.getElementById('mho-canvas');
+    if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.id = 'mho-canvas';
+    }
+    let ctx = canvas.getContext('2d');
+
+    let DOMURL = window.URL || window.webkitURL || window;
+
+    let img = new Image();
+    let svg = new Blob([html], {type: 'image/svg+xml;charset=utf-8'});
+    let url = DOMURL.createObjectURL(svg);
+
+    img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+        DOMURL.revokeObjectURL(url);
+    };
+
+    img.src = url;
+    return canvas;
+}
+
 ///////////
 // STYLE //
 ///////////
@@ -3236,6 +3374,53 @@ function getHeroSkills() {
     });
 }
 
+
+/** Récupère les traductions de la chaine de caractères */
+function getTranslation(string_to_translate, source_language, block_to_display) {
+    startLoading();
+    block_to_display.innerHTML = '';
+    let locale = 'locale=' + source_language;
+    let sourceString = 'sourceString=' + string_to_translate
+    if (string_to_translate && string_to_translate !== '') {
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: api_url + 'myhordestranslation?' + locale + '&' + sourceString,
+            responseType: 'json',
+            onload: function(response){
+                if (response.status === 200) {
+                    let language_result = [];
+                    for (let lang_key in response.response) {
+                        let lang = response.response[lang_key];
+                        lang.forEach((result) => {
+                            let content_div = document.createElement('div');
+                            let img = document.createElement('img');
+                            img.src = `${repo_img_url}/lang/${lang_key}.png`
+                            img.setAttribute('style', 'margin-right: 4px');
+                            let text = document.createElement('text');
+                            text.innerText = result;
+                            let button_div = document.createElement('div');
+                            let button = document.createElement('button');
+                            button_div.appendChild(button);
+                            button.innerHTML = '&#x2398';
+                            button.setAttribute('style', 'font-size: 16px');
+                            button.addEventListener('click', () => {
+                                copyToClipboard(text);
+                            });
+                            content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 8px;');
+                            content_div.innerHTML = `<div>${img.outerHTML}${text.outerHTML}</div>`;
+                            // content_div.appendChild(button_div);
+                            block_to_display.appendChild(content_div);
+                        });
+                    };
+                } else {
+                    addError(response);
+                }
+            }
+        });
+    }
+    endLoading();
+}
+
 /** Récupère la liste complète des recettes */
 function getRecipes() {
     startLoading();
@@ -3316,7 +3501,8 @@ function getRecipes() {
             displayWishlistInApp();
             displayPriorityOnItems();
             displayNbDeadZombies();
-        }, 500);
+            displayTranslateTool();
+        }, 1000);
 
         setInterval(() => {
             displayAdvancedTooltips();
