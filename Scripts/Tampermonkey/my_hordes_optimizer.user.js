@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.27
+// @version      1.0.0-alpha.28
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -30,7 +30,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Amélioration] Amélioration de la fonctionnalité de traduction (copie d'un libellé, afficher les résultats inexacts)\n`;
++ `[Correctif] Résout le problème d'affichage de la barre de menu du jeu quand l'option de traduction est activée\n`
++ `[Amélioration] Ajout des traductions allemandes pour l'affichage de l'outil de traduction\n`;
 
 const lang = document.documentElement.lang || navigator.language || navigator.userLanguage;
 
@@ -200,19 +201,19 @@ const texts = {
     translation_file_context: {
         en: `Context (translation file)`,
         fr: `Contexte (fichier de traduction)`,
-        de: `TODO`,
+        de: `Kontext (Übersetzungsdatei)`,
         es: `TODO`,
     },
     display_all_search_result: {
         en: `Display all results`,
         fr: `Afficher tous les résultats`,
-        de: `TODO`,
+        de: `Alle Ergebnisse anzeigen`,
         es: `TODO`
     },
     display_exact_search_result: {
         en: `Only display exact results`,
         fr: `Afficher uniquement les résultats exacts`,
-        de: `TODO`,
+        de: `Nur exakte Ergebnisse anzeigen`,
         es: `TODO`
     }
 };
@@ -582,13 +583,13 @@ let params_categories = [
             label: {
                 en: `Show MyHordes' item translation bar`,
                 fr: `Afficher la barre de traduction des éléments de MyHordes`,
-                de: `TODO`,
+                de: `Übersetzungsleiste für MyHordes Elemente anzeigen`,
                 es: `TODO`
             },
             help: {
                 en: `Shows a translation bar. You must choose the initial language, then type the searched element to get the other translations.`,
                 fr: `Affiche une barre de traduction. Vous devez choisir la langue initiale, puis saisir l'élément recherché pour en récupérer les différentes traductions.`,
-                de: `TODO`,
+                de: `Zeigt eine Übersetzungsleiste an. Sie müssen die Ausgangssprache auswählen, und dann die Zielelemente eingeben um die Übersetzungen zu generieren.`,
                 es: `TODO`
             },
             parent_id: null
@@ -2618,11 +2619,9 @@ function displayTranslateTool() {
                 {value: 'es', img: '🇪🇸'},
                 {value: 'fr', img: '🇫🇷'},
             ]
-            let ul = document.createElement('ul');
-            ul.id = mho_display_translate_input_id;
-            ul.setAttribute('style', 'position: absolute; top: 42px; right: 8px');
-            let li = document.createElement('li');
-            li.setAttribute('style', 'width: 250px');
+            let mho_display_translate_input_div = document.createElement('div');
+            mho_display_translate_input_div.id = mho_display_translate_input_id;
+            mho_display_translate_input_div.setAttribute('style', 'position: absolute; top: 45px; right: 8px; margin: 0; width: 250px;');
             let label = document.createElement('label');
             let select = document.createElement('select');
             select.classList.add('small');
@@ -2657,19 +2656,17 @@ function displayTranslateTool() {
 
             let div = document.createElement('div');
             div.classList.add('hidden');
-            div.setAttribute('style', 'z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
+            div.setAttribute('style', 'float: right; z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
             input.addEventListener('keyup', (event) => {
                 if (event.key === 'Enter') {
                     div.classList.remove('hidden');
                     getTranslation(input.value, select.value, div);
                 }
             });
-            li.appendChild(label);
-            li.appendChild(div);
-            ul.appendChild(li);
+            mho_display_translate_input_div.appendChild(label);
+            mho_display_translate_input_div.appendChild(div);
             let gma = document.getElementById('gma');
-            let game_bar = gma.getElementsByClassName('game-bar')[0];
-            game_bar.appendChild(ul);
+            gma.appendChild(mho_display_translate_input_div);
         } else if (display_translate_input) {
             display_translate_input.remove();
         }
@@ -3422,18 +3419,17 @@ function getHeroSkills() {
 
 /** Récupère les traductions de la chaine de caractères */
 function getTranslation(string_to_translate, source_language, block_to_display) {
-    startLoading();
     block_to_display.innerHTML = '';
-    let locale = 'locale=' + source_language;
-    let sourceString = 'sourceString=' + string_to_translate
     if (string_to_translate && string_to_translate !== '') {
+        let locale = 'locale=' + source_language;
+        let sourceString = 'sourceString=' + string_to_translate;
+        startLoading();
         GM_xmlhttpRequest({
             method: 'GET',
             url: api_url + 'myhordestranslation?' + locale + '&' + sourceString,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
-                    console.log('response.response', response.response.translations);
                     let show_exact_match = response.response.translations.some((translation) => translation.key.isExactMatch);
 
                     if (show_exact_match) {
@@ -3509,14 +3505,13 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                             key_index ++;
                         };
                     });
-
                 } else {
                     addError(response);
                 }
+                endLoading();
             }
         });
     }
-    endLoading();
 }
 
 /** Récupère la liste complète des recettes */
