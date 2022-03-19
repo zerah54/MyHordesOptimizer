@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.29
+// @version      1.0.0-alpha.30
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -774,7 +774,6 @@ function addError(error) {
 
 
 function initOptions() {
-    displayTranslateTool();
     preventDangerousActions();
     preventFromLeaving();
     createDisplayMapButton();
@@ -2733,77 +2732,70 @@ function displayNbDeadZombies() {
 }
 
 function displayTranslateTool() {
-    let interval = setInterval(() => {
-        let display_translate_input = document.getElementById(mho_display_translate_input_id);
-        if (mho_parameters.display_translate_tool) {
-            let gma = document.getElementById('gma');
-            if (!gma) return;
+    /** On doit laisser l'interval tourner quand l'option est activée, sinon l'input est supprimé lors de changements de page dans l'application */
+    let display_translate_input = document.getElementById(mho_display_translate_input_id);
+    if (mho_parameters.display_translate_tool) {
+        if (display_translate_input) return;
 
-            if (display_translate_input) {
-                clearInterval(interval);
-                return;
-            };
+        let gma = document.getElementById('gma');
+        if (!gma) return;
 
-            let langs = [
-                {value: 'de', img: '🇩🇪'},
-                {value: 'en', img: '🇬🇧'},
-                {value: 'es', img: '🇪🇸'},
-                {value: 'fr', img: '🇫🇷'},
-            ]
-            let mho_display_translate_input_div = document.createElement('div');
-            mho_display_translate_input_div.id = mho_display_translate_input_id;
-            mho_display_translate_input_div.setAttribute('style', 'position: absolute; top: 45px; right: 8px; margin: 0; width: 250px;');
-            let label = document.createElement('label');
-            let select = document.createElement('select');
-            select.classList.add('small');
-            select.setAttribute('style', 'height: 25px; width: 35px; font-size: 12px');
-            select.value = lang;
+        let langs = [
+            {value: 'de', img: '🇩🇪'},
+            {value: 'en', img: '🇬🇧'},
+            {value: 'es', img: '🇪🇸'},
+            {value: 'fr', img: '🇫🇷'},
+        ]
+        let mho_display_translate_input_div = document.createElement('div');
+        mho_display_translate_input_div.id = mho_display_translate_input_id;
+        mho_display_translate_input_div.setAttribute('style', 'position: absolute; top: 45px; right: 8px; margin: 0; width: 250px;');
+        let label = document.createElement('label');
+        let select = document.createElement('select');
+        select.classList.add('small');
+        select.setAttribute('style', 'height: 25px; width: 35px; font-size: 12px');
+        select.value = lang;
 
-            langs.forEach((lang_option) => {
-                let option = document.createElement('option');
-                option.value = lang_option.value;
-                option.setAttribute('style', 'font-size: 16px');
-                option.innerHTML = lang_option.img;
-                option.selected = lang_option.value === lang;
-                select.appendChild(option);
-            })
+        langs.forEach((lang_option) => {
+            let option = document.createElement('option');
+            option.value = lang_option.value;
+            option.setAttribute('style', 'font-size: 16px');
+            option.innerHTML = lang_option.img;
+            option.selected = lang_option.value === lang;
+            select.appendChild(option);
+        })
 
-            let input = document.createElement('input');
-            input.classList.add('inline');
-            input.setAttribute('style', 'width: calc(100% - 35px);');
-            input.type = 'text';
+        let input = document.createElement('input');
+        input.classList.add('inline');
+        input.setAttribute('style', 'width: calc(100% - 35px);');
+        input.type = 'text';
 
-            let close = document.createElement('div');
-            close.innerHTML = '&#128473';
-            close.setAttribute('style', 'position: absolute; top: 0; right: 0; color: #5c2b20;');
-            close.addEventListener('click', () => {
-                div.classList.add('hidden');
-                input.value = '';
-            });
-
-            label.appendChild(select);
-            label.appendChild(input);
-            label.appendChild(close);
-
-            let div = document.createElement('div');
+        let close = document.createElement('div');
+        close.innerHTML = '&#128473';
+        close.setAttribute('style', 'position: absolute; top: 0; right: 0; color: #5c2b20;');
+        close.addEventListener('click', () => {
             div.classList.add('hidden');
-            div.setAttribute('style', 'float: right; z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
-            input.addEventListener('keyup', (event) => {
-                if (event.key === 'Enter') {
-                    div.classList.remove('hidden');
-                    getTranslation(input.value, select.value, div);
-                }
-            });
-            mho_display_translate_input_div.appendChild(label);
-            mho_display_translate_input_div.appendChild(div);
-            gma.appendChild(mho_display_translate_input_div);
-        } else if (!mho_parameters.display_translate_tool && display_translate_input) {
-            display_translate_input.remove();
-            clearInterval(interval);
-        } else {
-            clearInterval(interval);
-        }
-    }, 500);
+            input.value = '';
+        });
+
+        label.appendChild(select);
+        label.appendChild(input);
+        label.appendChild(close);
+
+        let div = document.createElement('div');
+        div.classList.add('hidden');
+        div.setAttribute('style', 'float: right; z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
+        input.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                div.classList.remove('hidden');
+                getTranslation(input.value, select.value, div);
+            }
+        });
+        mho_display_translate_input_div.appendChild(label);
+        mho_display_translate_input_div.appendChild(div);
+        gma.appendChild(mho_display_translate_input_div);
+    } else if (display_translate_input) {
+        display_translate_input.remove();
+    }
 }
 /////////////////////////////////////
 // BOUTONS SUR LES OUTILS EXTERNES //
@@ -3748,7 +3740,8 @@ function getRecipes() {
             displayWishlistInApp();
             displayPriorityOnItems();
             displayNbDeadZombies();
-        }, 1000);
+            displayTranslateTool();
+        }, 500);
 
         setInterval(() => {
             displayAdvancedTooltips();
