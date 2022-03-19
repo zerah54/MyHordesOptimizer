@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.28
+// @version      1.0.0-alpha.29
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -30,8 +30,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Résout le problème d'affichage de la barre de menu du jeu quand l'option de traduction est activée\n`
-+ `[Amélioration] Ajout des traductions allemandes pour l'affichage de l'outil de traduction\n`;
++ `[Correctif] Corrige de gros ralentissements dans toute l'interface de l'application\n`;
 
 const lang = document.documentElement.lang || navigator.language || navigator.userLanguage;
 
@@ -773,6 +772,14 @@ function addError(error) {
     console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
 }
 
+
+function initOptions() {
+    displayTranslateTool();
+    preventDangerousActions();
+    preventFromLeaving();
+    createDisplayMapButton();
+}
+
 /**
  * Copie un texte
  * @param {string} le texte à copier
@@ -985,6 +992,9 @@ function createParams() {
                         }
                     });
                 }
+
+                // Quand on change une option, trigger à nouveau certaines vérifications pour ne pas avoir à les vérifier tout le temps (=> perf !)
+                initOptions();
             });
 
             let param_container = document.createElement('li');
@@ -1098,6 +1108,73 @@ function createTabs(window_type) {
     tabs_div.appendChild(tabs_ul)
 
     window_content.appendChild(tabs_div);
+
+}
+
+/** Crée la fenêtre de wiki */
+function createMapWindow() {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+    let window_content = document.createElement('div');
+    window_content.id = mh_optimizer_map_window_id + '-content';
+    window_content.setAttribute('style', 'height: 100%; position: initial;');
+    let window_overlay_img = document.createElement('img');
+    window_overlay_img.alt = '(X)';
+    window_overlay_img.src = repo_img_url + 'icons/b_close.png';
+    let window_overlay_li = document.createElement('li');
+    window_overlay_li.appendChild(window_overlay_img);
+    let window_overlay_ul = document.createElement('ul');
+    window_overlay_ul.appendChild(window_overlay_li);
+
+    let window_overlay = document.createElement('div');
+    window_overlay.id = mh_optimizer_map_window_id + '-overlay';
+    window_overlay.setAttribute('style', 'cursor: move; width: 100%;');
+
+    let window_box = document.createElement('div');
+    window_box.id = mh_optimizer_map_window_id + '-box';
+    window_box.draggable = true;
+
+    let window = document.createElement('div');
+    window.id = mh_optimizer_map_window_id;
+
+    window_overlay.onmousedown = (e) => {
+        e = e || window.event;
+        e.preventDefault();
+        // get the mouse cursor position at startup:
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = () => {
+            document.onmouseup = null;
+            document.onmousemove = null;
+        };
+        // call a function whenever the cursor moves:
+        document.onmousemove = (e) => {
+            e = e || window.event;
+            e.preventDefault();
+            // calculate the new cursor position:
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            // set the element's new position:
+            window_box.style.top = (window_box.offsetTop - pos2) + "px";
+            window_box.style.left = (window_box.offsetLeft - pos1) + "px";
+        };
+    }
+    window_overlay.appendChild(window_overlay_ul);
+
+    window_box.appendChild(window_content);
+    window_box.appendChild(window_overlay);
+
+    window.appendChild(window_box);
+
+    let post_office = document.getElementById('post-office');
+    if (post_office) {
+        post_office.parentNode.insertBefore(window, post_office.nextSibling);
+    }
+    window_overlay_img.addEventListener('click', () => {
+        window.classList.remove('visible');
+    });
 
 }
 
@@ -1267,8 +1344,6 @@ function displayWishlist() {
                         target.parentNode.insertBefore(dragged.element, target.nextSibling);
                         dragged.element = undefined;
                         dragged.item = undefined;
-                        console.log('item', item);
-                        console.log('wishlist_list', wishlist_list.getElementsByTagName('li'));
                     }
                 });
                 wishlist_list.appendChild(item_element);
@@ -1552,9 +1627,7 @@ function displayCitizens() {
                     }
                     citizen_row.appendChild(cell);
                 });
-                // console.log('citizen', citizen);
             }
-
             clearInterval(interval);
         }
     }, 500);
@@ -2463,6 +2536,58 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
     return item_action;
 }
 
+function createDisplayMapButton() {
+    let interval = setInterval(() => {
+        let display_map_btn = document.getElementById(mho_display_map_id);
+
+        if (mho_parameters.display_map) {
+            if (display_map_btn) return;
+
+            let btn_container = document.createElement('div');
+            btn_container.id = mho_display_map_id;
+            let postbox = document.getElementById('postbox');
+            let position = postbox.getBoundingClientRect().width + 15;
+            btn_container.setAttribute('style', `right: ${position}px`);
+
+            let btn = document.createElement('div');
+            btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/explo.gif">';
+            btn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                event.preventDefault();
+                displayMap();
+            })
+
+            btn_container.appendChild(btn);
+
+            const header = document.getElementById('header');
+            header.appendChild(btn_container);
+
+            createMapWindow();
+            clearInterval();
+        } else if (display_map_btn) {
+            display_map_btn.remove();
+            clearInterval(interval);
+        }
+    }, 2000);
+}
+
+function displayMap() {
+    let map_window = document.getElementById(mh_optimizer_map_window_id);
+    map_window.classList.add('visible');
+
+    let content = document.getElementById(mh_optimizer_map_window_id + '-content');
+    let map_to_display = GM_getValue(mho_map_key);
+    console.log('map_to_display', map_to_display);
+
+    console.log('id', map_to_display.style);
+    let style = document.getElementById(map_to_display.source + '-map');
+    if (!style) {
+        document.head.innerHTML += map_to_display.style;
+    }
+    content.innerHTML = map_to_display.block;
+}
+
+
 /** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
 function preventFromLeaving() {
     if (mho_parameters.prevent_from_leaving && pageIsDesert()) {
@@ -2549,7 +2674,7 @@ function preventDangerousActions() {
     }, 500);
 }
 
-/** Affiche une notification 5 minutes avant la fin de la fouille en cours */
+/** Affiche une notification 5 secondes avant la fin de la fouille en cours */
 function notifyOnSearchEnd() {
     let interval = setInterval(() => {
         if (mho_parameters.notify_on_search_end && pageIsDesert()) {
@@ -2567,10 +2692,12 @@ function notifyOnSearchEnd() {
                             timeout: 0
                         });
                     }
+                    clearInterval(interval);
                     notifyOnSearchEnd();
                 }, timeout_counter);
             }
         } else if (pageIsTown()) {
+            clearInterval(interval);
             notifyOnSearchEnd();
         }
     }, 250);
@@ -2606,12 +2733,16 @@ function displayNbDeadZombies() {
 }
 
 function displayTranslateTool() {
-    setTimeout(() => {
+    let interval = setInterval(() => {
         let display_translate_input = document.getElementById(mho_display_translate_input_id);
-        const header = document.getElementById('header');
-
         if (mho_parameters.display_translate_tool) {
-            if (display_translate_input) return;
+            let gma = document.getElementById('gma');
+            if (!gma) return;
+
+            if (display_translate_input) {
+                clearInterval(interval);
+                return;
+            };
 
             let langs = [
                 {value: 'de', img: '🇩🇪'},
@@ -2665,12 +2796,14 @@ function displayTranslateTool() {
             });
             mho_display_translate_input_div.appendChild(label);
             mho_display_translate_input_div.appendChild(div);
-            let gma = document.getElementById('gma');
             gma.appendChild(mho_display_translate_input_div);
-        } else if (display_translate_input) {
+        } else if (!mho_parameters.display_translate_tool && display_translate_input) {
             display_translate_input.remove();
+            clearInterval(interval);
+        } else {
+            clearInterval(interval);
         }
-    }, 3000);
+    }, 500);
 }
 /////////////////////////////////////
 // BOUTONS SUR LES OUTILS EXTERNES //
@@ -2685,7 +2818,6 @@ function createCopyButton(source, map_id, button_block_id) {
 
         let img = document.createElement('img');
         img.src = htmlToCanvas(document.getElementById(map_id).outerHTML).toDataURL();
-        console.log('img', img);
         html2canvas(document.getElementById(map_id).outerHTML).then((canvas) => {
             console.log( 'test', canvas);
             GM_setValue(mho_map_key, {
@@ -2829,7 +2961,19 @@ function createStyles() {
     + 'transition: transform .5s ease;'
     + '}';
 
-    const mh_optimizer_window_overlay_style = '#' + mh_optimizer_window_id + ' #' + mh_optimizer_window_id + '-box #' + mh_optimizer_window_id + '-overlay {'
+    const mh_optimizer_map_window_box_style = `#${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box {`
+    + 'background: url(' + repo_img_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
+    + 'border-radius: 8px;'
+    + 'box-shadow: 0 0 10px #000;'
+    + 'position: absolute;'
+    + 'transform: scale(1) translateY(0);'
+    + 'transition: transform .5s ease;'
+    + 'resize: both;'
+    + 'overflow: auto;'
+    + 'z-index: 9999;'
+    + '}';
+
+    const mh_optimizer_window_overlay_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box #${mh_optimizer_window_id}-overlay, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay {`
     + 'position: absolute;'
     + 'right: 12px;'
     + 'top: -6px;'
@@ -2841,12 +2985,12 @@ function createStyles() {
     + 'padding: 0;'
     + '}'
 
-    const mh_optimizer_window_overlay_ul_li_style = '#' + mh_optimizer_window_id + ' #' + mh_optimizer_window_id + '-box #' + mh_optimizer_window_id + '-overlay ul li {'
+    const mh_optimizer_window_overlay_ul_li_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box #${mh_optimizer_window_id}-overlay ul li, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay ul li {`
     + 'cursor: pointer;'
     + 'display: inline-block;'
     + '}'
 
-    const mh_optimizer_window_content = '#' + mh_optimizer_window_id + '-content {'
+    const mh_optimizer_window_content = `#${mh_optimizer_window_id}-content, #${mh_optimizer_map_window_id}-content {`
     + 'background: #7e4d2a;'
     + 'bottom: 0;'
     + 'color: #fff;'
@@ -3135,6 +3279,19 @@ function createStyles() {
     + `height: 36px;`
     + '}';
 
+    const display_map_btn = `#${mho_display_map_id} {`
+    + 'background-color: rgba(62,36,23,.75);'
+    + 'border-radius: 6px;'
+    + 'color: #ddab76;'
+    + 'cursor: pointer;'
+    + 'font-size: 10px;'
+    + 'padding: 3px 5px;'
+    + 'position: absolute;'
+    + 'right: 10px;'
+    + 'top: 100px;'
+    + 'transition: background-color .5s ease-in-out;'
+    + '}'
+
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
     + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
     + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
@@ -3144,7 +3301,8 @@ function createStyles() {
     + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style + label_text
     + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
     + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
-    + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug;
+    + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
+    + display_map_btn + mh_optimizer_map_window_box_style;
 
     let style = document.createElement('style');
 
@@ -3175,7 +3333,6 @@ function getItems() {
                     return item;
                 })
                     .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);
-                // console.log('items', items.filter((item) => (item.actions && item.actions.indexOf('cyanide') > -1) || (item.properties && item.properties.indexOf('drug') > -1)));
                 console.log('items', items);
                 let wiki_btn = document.getElementById(wiki_btn_id);
                 if (wiki_btn) {
@@ -3574,7 +3731,7 @@ function getRecipes() {
         }
 
         getMe();
-
+        initOptions();
         /** Gère le bouton de mise à jour des outils externes) */
         if (!buttonOptimizerExists()) {
             createStyles();
@@ -3582,19 +3739,15 @@ function getRecipes() {
             createWindow();
         }
 
-        preventFromLeaving();
-        preventDangerousActions();
         notifyOnSearchEnd();
 
         setInterval(() => {
             createUpdateExternalToolsButton();
-            //createDisplayMapButton();
             clickOnVotedToRedirect();
             displaySearchFieldOnBuildings();
             displayWishlistInApp();
             displayPriorityOnItems();
             displayNbDeadZombies();
-            displayTranslateTool();
         }, 1000);
 
         setInterval(() => {
