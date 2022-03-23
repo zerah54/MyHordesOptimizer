@@ -26,7 +26,6 @@ export class ItemComponent {
     public locale: string = moment.locale();
 
     constructor(private api: ApiServices) {
-
     }
 
     /**

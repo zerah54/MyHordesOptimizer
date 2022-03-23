@@ -19,9 +19,9 @@ export class ToolsComponent extends PageWithSidenav implements OnInit {
 
     /** La liste des outils */
     public tools_list: SidenavLinks[] = [
-        { label: 'Banque', id: 'bank', component: BankComponent, selected: true },
-        { label: 'Liste de courses', id: 'wishlist', component: WishlistComponent, selected: false },
-        { label: 'Citoyens', id: 'citizens', component: CitizensComponent, selected: false }
+        { label: $localize`Banque`, id: 'bank', component: BankComponent, selected: true },
+        { label: $localize`Liste de courses`, id: 'wishlist', component: WishlistComponent, selected: false },
+        { label: $localize`Citoyens`, id: 'citizens', component: CitizensComponent, selected: false }
     ]
 
     constructor(public media: MediaObserver, private sidenav: SidenavService) {

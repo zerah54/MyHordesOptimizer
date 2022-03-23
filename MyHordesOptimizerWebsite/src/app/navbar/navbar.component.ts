@@ -27,9 +27,9 @@ export class NavbarComponent {
 
     /** La liste des onglets à afficher */
     public tabs: Tabs[] = [
-        { label: 'Script', url: 'script' },
-        { label: 'Outils', url: 'tools' },
-        { label: 'Wiki', url: 'wiki' }
+        { label: $localize`Script`, url: 'script' },
+        { label: $localize`Outils`, url: 'tools' },
+        { label: $localize`Wiki`, url: 'wiki' }
     ]
 
     public constructor(public media: MediaObserver, public sidenav: SidenavService, private title_service: Title, private api: ApiServices) {

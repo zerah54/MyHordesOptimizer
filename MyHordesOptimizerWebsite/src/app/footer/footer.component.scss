@@ -17,6 +17,7 @@
             text-transform: capitalize;
             text-decoration: none;
             color: inherit;
+            cursor: pointer;
             &:hover {
                 color: $accent;
             }

@@ -18,52 +18,52 @@
     </mat-drawer-container>
 
     <ng-template #overview>
-        <h1 id="overview">Présentation du script</h1>
+        <h1 id="overview" i18n>Présentation du script</h1>
         <p>
-            Ce script pour MyHordes a pour objectif de simplifier la vie des joueurs au maximum. Plusieurs
-            fonctionnalités sont proposées.
+            <ng-container i18n>Ce script pour MyHordes a pour objectif de simplifier la vie des joueurs au maximum. Plusieurs
+            fonctionnalités sont proposées.</ng-container>
         </p>
     </ng-template>
     <ng-template #features>
-        <h1 id="features">Fonctionnalités</h1>
+        <h1 id="features" i18n>Fonctionnalités</h1>
         <ul>
             <li>
-                <h2 id="display">Affichage</h2>
+                <h2 id="display" i18n>Affichage</h2>
                 <ul>
                     <li>
-                        <h3 id="update-external-tools">Mise à jour des outils externes</h3>
+                        <h3 id="update-external-tools" i18n>Mise à jour des outils externes</h3>
                         <p>
-                            Dans l'interface, vous pouvez cocher les différents outils externes que vous souhaitez
+                            <ng-container i18n>Dans l'interface, vous pouvez cocher les différents outils externes que vous souhaitez
                             pouvoir mettre à jour en un clic. Une fois sorti de la ville, vous pourrez cliquer sur un
                             nouveau bouton qui mettra à jour tous les outils externes que vous avez sélectionnés dans
                             vos options.
                             <br />
                             <br />
                             Si vous avez l'un des outils en question ouvert dans votre navigateur, alors la prochaine
-                            fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.
+                            fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.</ng-container>
                         </p>
                     </li>
                     <li>
-                        <h3 id="detailed-tooltips">Affichage des tooltips détaillés</h3>
+                        <h3 id="detailed-tooltips" i18n>Affichage des tooltips détaillés</h3>
                         <p>
-                            Modifie les tooltips natifs de l'application pour afficher en plus la liste des recettes
+                            <ng-container i18n>Modifie les tooltips natifs de l'application pour afficher en plus la liste des recettes
                             dans lesquelles l'objet survolé apparait ainsi que quelques informations complémentaires
-                            (nombre de points d'action rendus par un aliment par exemple).
+                            (nombre de points d'action rendus par un aliment par exemple).</ng-container>
                         </p>
                     </li>
                     <li>
-                        <h3 id="quick-navigation">Navigation rapide vers le chantier recommandé</h3>
+                        <h3 id="quick-navigation" i18n>Navigation rapide vers le chantier recommandé</h3>
                         <p>
-                            Dans l'interface, vous pouvez cocher le bouton "Navigation rapide vers le chantier
+                            <ng-container i18n>Dans l'interface, vous pouvez cocher le bouton "Navigation rapide vers le chantier
                             recommandé", ce qui activera la fonctionnalité de navigation rapide. Il s'agit simplement,
                             lorsqu'il existe un chantier recommandé, de pouvoir cliquer dessus pour être automatiquement
-                            redirigé vers la ligne du chantier dans la liste.
+                            redirigé vers la ligne du chantier dans la liste.</ng-container>
                         </p>
                     </li>
                     <li>
-                        <h3 id="display-wishlist">Affichage de la liste de courses dans la page</h3>
+                        <h3 id="display-wishlist" i18n>Affichage de la liste de courses dans la page</h3>
                         <p>
-                            En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le
+                            <ng-container i18n>En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le
                             desert ou dans l'atelier. Cette liste contient des informations de priorité, de quantité en
                             banque, de quantité totale requise, et de quantité manquante.
                             <br />
@@ -75,124 +75,133 @@
                             <br />
                             Dans le désert, les objets dans le sac ou au sol également présents dans la liste de course
                             se verront attribuer une bordure dont la couleur indique la priorité de l'élément, et ce
-                            sans tenir compte de la quantité manquante.
+                            sans tenir compte de la quantité manquante.</ng-container>
                         </p>
                         <ul>
                             <li>
-                                <h3 id="display-wishlist-closed">Liste de courses repliée par défaut</h3>
+                                <h3 id="display-wishlist-closed" i18n>Liste de courses repliée par défaut</h3>
                                 <p>
-                                    En cochant cette option, la liste de courses apparaitra toujours mais sera repliée
-                                    par défaut pour prendre moins de place quand vous n'en avez pas besoin.
+                                    <ng-container i18n>En cochant cette option, la liste de courses apparaitra toujours mais sera repliée
+                                    par défaut pour prendre moins de place quand vous n'en avez pas besoin.</ng-container>
                                 </p>
                             </li>
                         </ul>
                     </li>
+                    <li>
+                        <h3 id="display-translate-tool" i18n>Affichage de l'outil de traduction</h3>
+                        <p>
+                            <ng-container i18n>En cochant cette option, un outil de traduction s'affichera dans l'interface. Vous pourrez
+                            désormais sélectionner une langue d'origine, puis saisir le texte à rechercher dans les
+                            autres langues. Le texte doit impérativement être un texte de MyHordes, puisque nous allons
+                            en chercher la traduction dans les fichiers de traduction du jeu.</ng-container>
+                        </p>
+                    </li>
                 </ul>
             </li>
 
             <li>
-                <h2 id="notifications">Notifications</h2>
+                <h2 id="notifications" i18n>Notifications</h2>
                 <ul>
                     <li>
-                        <h3 id="prevent-leaving">Avertissement en cas de fermeture de la page</h3>
+                        <h3 id="prevent-leaving" i18n>Avertissement en cas de fermeture de la page</h3>
                         <p>
-                            Dans l'interface, vous pouvez cocher le bouton "Demander confirmation avant de quitter en
+                            <ng-container i18n>Dans l'interface, vous pouvez cocher le bouton "Demander confirmation avant de quitter en
                             l'absence d'escorte automatique", ce qui activera la fonctionnalité. Une fois activée, si
                             vous êtesdans le désert et que votre attente d'escorte n'est pas activée, alors au moment de
                             fermer la fenêtre ou l'onglet vous verrez apparaitre un avertissement demandant de confirmer
-                            votre action.
+                            votre action.</ng-container>
                         </p>
                     </li>
                     <li>
-                        <h3 id="prevent-dig-end">Notification à la fin de la fouille</h3>
+                        <h3 id="prevent-dig-end" i18n>Notification à la fin de la fouille</h3>
                         <p>
-                            Si vous cochez le bouton "Me notifier à la fin de la fouille", vous recevrez une
-                            notification de votre navigateur quelques secondes avant la fin de votre fouille.
+                            <ng-container i18n>Si vous cochez le bouton "Me notifier à la fin de la fouille", vous recevrez une
+                            notification de votre navigateur quelques secondes avant la fin de votre fouille.</ng-container>
                         </p>
                     </li>
                     <li>
-                        <h3 id="prevent-dangerous-actions">[Expérimental] Avertissement en cas d'action dangereuse</h3>
+                        <h3 id="prevent-dangerous-actions" i18n>[Expérimental] Avertissement en cas d'action dangereuse</h3>
                         <p>
-                            Vous pouvez cocher le bouton "Demander confirmation avant d'effectuer des actions
+                            <ng-container i18n>Vous pouvez cocher le bouton "Demander confirmation avant d'effectuer des actions
                             dangeureuses". Si cette option est cochée, vous devriez recevoir une demande de confirmation
                             avant de consommer un cyanure, et avant de consommer une drogue si vous avez déjà consommé
-                            une droue aujourd'hui.
+                            une droue aujourd'hui.</ng-container>
                         </p>
                     </li>
                 </ul>
             </li>
 
             <li>
-                <h2 id="wiki">Wiki</h2>
+                <h2 id="wiki" i18n>Wiki</h2>
                 <ul>
                     <li>
-                        <h3 id="items-list">Liste des objets</h3>
+                        <h3 id="items-list" i18n>Liste des objets</h3>
                         <p>
-                            Affiche la liste de tous les objets existant dans MyHordes (ainsi que des
+                            <ng-container i18n>Affiche la liste de tous les objets existant dans MyHordes (ainsi que des
                             informations complémentaires à leur sujet).
                             <br />
                             <br />
                             Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d'un
-                            bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
+                            bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.</ng-container>
                         </p>
                     </li>
                     <li>
-                        <h3 id="items-list">Liste des recettes</h3>
+                        <h3 id="items-list" i18n>Liste des recettes</h3>
                         <p>
-                            Affiche la liste de toutes les recettes de l'application.
+                            <ng-container i18n>Affiche la liste de toutes les recettes de l'application.</ng-container>
                         </p>
-                        <h3 id="heroskills">Pouvoirs</h3>
+                        <h3 id="heroskills" i18n>Pouvoirs</h3>
                         <p>
-                            Présente tout simplement la liste des pouvoirs héros, leur description et le nombre de jours
-                            avant obtention.
+                            <ng-container i18n>Présente tout simplement la liste des pouvoirs héros, leur description et le nombre de jours
+                            avant obtention.</ng-container>
                         </p>
                     </li>
                 </ul>
             </li>
             <li>
-                <h2 id="tools">Outils</h2>
+                <h2 id="tools" i18n>Outils</h2>
                 <ul>
-                    <h3 id="citizens-list">Banque</h3>
+                    <h3 id="citizens-list" i18n>Banque</h3>
                     <p>
-                        Affiche la liste des objets de la banque et leur quantité.
+                        <ng-container i18n>Affiche la liste des objets de la banque et leur quantité.
                         <br />
                         <br />
                         Si vous êtes incarnés, les objets qui ne sont pas dans la liste de courses sont suivis d'un
-                        bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
+                        bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.</ng-container>
                     </p>
                 </ul>
                 <ul>
-                    <h3 id="citizens-list">Liste de courses</h3>
+                    <h3 id="citizens-list" i18n>Liste de courses</h3>
                     <p>
-                        Affiche une liste de courses contenant les objets ajoutés via les pages de liste d'objets et de
+                        <ng-container i18n>Affiche une liste de courses contenant les objets ajoutés via les pages de liste d'objets et de
                         banque.
                         <br />
                         <br />
-                        Vous pouvez modifier la priorité de chaque objet, ainsi que la quantité requise.
+                        Vous pouvez modifier la priorité de chaque objet, ainsi que la quantité requise.</ng-container>
                     </p>
                 </ul>
                 <ul>
-                    <h3 id="citizens-list">(En cours) Liste des citoyens</h3>
+                    <h3 id="citizens-list" i18n>(En cours) Liste des citoyens</h3>
                     <p>
-                        Affiche une liste des citoyens de la ville, ainsi qu'une liste des pouvoirs héros disponibles
+                        <ng-container i18n>Affiche une liste des citoyens de la ville, ainsi qu'une liste des pouvoirs héros disponibles
                         pour lesquels il existe une action héroïque associée.
                         <br />
                         (à venir) Permet de changer son nombre de jours héros et de recalculer automatiquement le
-                        dernier pouvoir gagné, ainsi que de modifier ses actions disponibles.
+                        dernier pouvoir gagné, ainsi que de modifier ses actions disponibles.</ng-container>
                     </p>
                 </ul>
             </li>
         </ul>
     </ng-template>
     <ng-template #install>
-        <h1 id="install">Installation</h1>
+        <h1 id="install" i18n>Installation</h1>
         <p>
-            Lien vers le script : <a mat-button color="accent"
+            <ng-container i18n>Lien vers le script : </ng-container><a mat-button color="accent"
                 href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js"
-                target="_blank">Installer le script</a>
+                target="_blank" i18n>Installer le script</a>
             <br />
             <br />
-            Ce fichier contient un script Tampermonkey. Pour le faire fonctionner, il faut que Tampermonkey soit
+            <ng-container i18n>Ce fichier contient un script Tampermonkey. Pour le faire fonctionner, il faut que Tampermonkey soit
             installé sur votre navigateur.
             <br />
             <br />
@@ -204,7 +213,7 @@
             <strong>Attention :</strong>
             <br />
             Vous allez d'abord devoir renseigner votre ID d'apps externes. Lors de la validation de l'ID d'apps, une
-            confirmation sera demandée. Il faut l'autoriser.
+            confirmation sera demandée. Il faut l'autoriser.</ng-container>
         </p>
     </ng-template>
 </div>

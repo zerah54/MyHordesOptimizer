@@ -19,9 +19,9 @@ export class WikiComponent extends PageWithSidenav implements OnInit {
 
     /** La liste des pages du wiki */
     public wiki_list: SidenavLinks[] = [
-        { label: 'Objets', id: 'items', component: ItemsComponent, selected: true },
-        { label: 'Recettes', id: 'recipes', component: RecipesComponent, selected: false },
-        { label: 'Pouvoirs', id: 'hero-skills', component: HeroSkillsComponent, selected: false }
+        { label: $localize`Objets`, id: 'items', component: ItemsComponent, selected: true },
+        { label: $localize`Recettes`, id: 'recipes', component: RecipesComponent, selected: false },
+        { label: $localize`Pouvoirs`, id: 'hero-skills', component: HeroSkillsComponent, selected: false }
     ]
 
     constructor(public media: MediaObserver, private sidenav: SidenavService) {

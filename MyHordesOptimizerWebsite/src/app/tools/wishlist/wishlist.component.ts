@@ -31,25 +31,25 @@ export class WishlistComponent {
     public locale: string = moment.locale();
     /** La liste des colonnes */
     public readonly columns: WishlistColumns[] = [
-        { id: 'name', header: `Nom de l'objet` },
-        { id: 'priority', header: `Priorité` },
-        { id: 'bank_count', header: `Stock en banque` },
-        { id: 'count', header: `Stock souhaité` },
-        { id: 'needed', header: `Quantité manquante` },
+        { id: 'name', header: $localize`Nom de l'objet` },
+        { id: 'priority', header: $localize`Priorité` },
+        { id: 'bank_count', header: $localize`Stock en banque` },
+        { id: 'count', header: $localize`Stock souhaité` },
+        { id: 'needed', header: $localize`Quantité manquante` },
         { id: 'delete', header: `` },
     ];
-    public items: Item[] = [];
-
     /** La liste des colonnes */
-    public readonly columns_ids: string[] = ['name', 'priority', 'bank_count', 'count', 'needed', 'delete'];
+    public readonly columns_ids: string[] = this.columns.map((column: WishlistColumns) => column.id);
+
+    public items: Item[] = [];
 
     /** La liste des priorités */
     public readonly priorities: Priorities[] = [
-        { count: -1000, label: `Ne pas ramener` },
-        { count: 0, label: `Non définie` },
-        { count: 1000, label: `Basse` },
-        { count: 2000, label: `Moyenne` },
-        { count: 3000, label: `Haute` }
+        { count: -1000, label: $localize`Ne pas ramener` },
+        { count: 0, label: $localize`Non définie` },
+        { count: 1000, label: $localize`Basse` },
+        { count: 2000, label: $localize`Moyenne` },
+        { count: 3000, label: $localize`Haute` }
     ]
 
     constructor(private api: ApiServices) {

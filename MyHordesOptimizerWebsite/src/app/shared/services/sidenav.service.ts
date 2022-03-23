@@ -1,6 +1,5 @@
-import { BehaviorSubject, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable()
 export class SidenavService {
@@ -15,7 +14,6 @@ export class SidenavService {
     }
 
     public changeSidenavStatus(): void {
-        console.log('changeSidenavStatus');
         this.toggle.next();
     }
 }

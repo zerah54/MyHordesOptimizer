@@ -1,16 +1,29 @@
 <mat-toolbar class="mho-footer" color="primary">
     <mat-toolbar-row>
-        {{title}}&nbsp;-&nbsp;Développé par&nbsp;<a color="accent" href="mailto:lenoune38@gmail.com">Zerah</a>
+        <div>
+            {{title}}&nbsp;-&nbsp;<ng-container i18n>Développé par&nbsp;<a color="accent" href="mailto:lenoune38@gmail.com">Zerah</a></ng-container>
+        </div>
+        <div style="margin-left: 50px;">
+            <a color="accent" (click)="openThanks()" i18n>Remerciements</a>
+        </div>
+        <div *ngIf="site_language" style="margin-left: 50px;">
+            <button mat-button [matMenuTriggerFor]="languageMenu">
+                <mat-icon>language</mat-icon>
+                {{site_language.label}}
+                <mat-icon>arrow_drop_down</mat-icon>
+            </button>
+            <mat-menu #languageMenu="matMenu">
+                <ng-container *ngFor="let language of language_list">
+                    <div mat-menu-item [disabled]="language.code === site_language.code"
+                        [class.warn-color]="language.code === site_language.code" (click)="changeLanguage(language)">
+                        {{language.label}}</div>
+                </ng-container>
+            </mat-menu>
+        </div>
     </mat-toolbar-row>
     <mat-toolbar-row>
-        Ce site n'est pas affilié à&nbsp;
-        <a color="accent" href="https://motion-twin.com/fr/" target="_blank">Motion Twin</a>
-        &nbsp;ou à&nbsp;
-        <a color="accent" href="https://myhord.es" target="_blank">MyHordes</a>.
+        <ng-container i18n>Ce site n'est pas affilié à&nbsp;<a color="accent" href="https://motion-twin.com/fr/" target="_blank">Motion Twin</a>&nbsp;ou à&nbsp;<a color="accent" href="https://myhord.es" target="_blank">MyHordes</a>.</ng-container>
         &nbsp;-&nbsp;
-        Certains éléments graphiques appartiennent à&nbsp;
-        <a color="accent" href="https://motion-twin.com/fr/" target="_blank">Motion Twin</a>
-        &nbsp;ou à&nbsp;
-        <a color="accent" href="https://myhord.es" target="_blank">MyHordes</a>.
+        <ng-container i18n>Certains éléments graphiques appartiennent à&nbsp;<a color="accent" href="https://motion-twin.com/fr/" target="_blank">Motion Twin</a>&nbsp;ou à&nbsp;<a color="accent" href="https://myhord.es" target="_blank">MyHordes</a>.</ng-container>
     </mat-toolbar-row>
 </mat-toolbar>

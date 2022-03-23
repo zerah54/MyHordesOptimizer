@@ -21,7 +21,14 @@
         "lib": [
             "es2020",
             "dom"
-        ]
+        ],
+        "types": [
+            "node"
+        ],
+        "typeRoots": [
+            "node_modules/@types",
+            "node_modules"
+        ],
     },
     "angularCompilerOptions": {
         "enableI18nLegacyMessageIdFormat": false,

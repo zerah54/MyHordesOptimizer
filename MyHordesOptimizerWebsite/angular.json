@@ -114,6 +114,14 @@
                         "scripts": []
                     }
                 }
+            },
+            "i18n": {
+                "sourceLocale": "fr",
+                "locales": {
+                    "de": "src/assets/i18n/xlf-files/messages.de.xlf",
+                    "en": "src/assets/i18n/xlf-files/messages.en.xlf",
+                    "es": "src/assets/i18n/xlf-files/messages.es.xlf"
+                }
             }
         }
     },
