@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.30
+// @version      1.0.0-alpha.31
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -27,10 +27,14 @@
 // @grant        GM_getValue
 // @grant        GM_xmlhttpRequest
 // @grant        GM_notification
+//
+// @require      http://html2canvas.hertzen.com/dist/html2canvas.min.js
+//
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Corrige de gros ralentissements dans toute l'interface de l'application\n`;
++ `[Nouveauté] Ajout d'un champ de sélection d'objets avec recherche dans la liste de courses\n`
++ `[Nouveauté] Ajout d'une fonctionnélité permettant de copier une carte d'outil externe (carte complète ou carte de ruine), puis de l'afficher dans MyHordes\n`;
 
 const lang = document.documentElement.lang || navigator.language || navigator.userLanguage;
 
@@ -508,22 +512,22 @@ let params_categories = [
             de: `Fata Morgana aktualisieren`,
             es: `TODO`
         }, parent_id: null},
-        // {
-        //     id: `display_map`,
-        //     label: {
-        //         en: `Allow to show a map from external tools`,
-        //         fr: `Permettre d'afficher une carte issue des outils externes`,
-        //         de: `Anzeigen einer Karte von externen Tools ermöglichen`,
-        //         es: `TODO`
-        //     },
-        //     help: {
-        //         en: `In any external tool, it will be possible to copy the town or ruin map and to paste it into MyHordes`,
-        //         fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`,
-        //         de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
-        //         es: `TODO`
-        //     },
-        //     parent_id: null
-        // }
+        {
+            id: `display_map`,
+            label: {
+                en: `Allow to show a map from external tools`,
+                fr: `Permettre d'afficher une carte issue des outils externes`,
+                de: `Anzeigen einer Karte von externen Tools ermöglichen`,
+                es: `TODO`
+            },
+            help: {
+                en: `In any external tool, it will be possible to copy the town or ruin map and to paste it into MyHordes`,
+                fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`,
+                de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
+                es: `TODO`
+            },
+            parent_id: null
+        }
     ]},
     {id: `display`, label: {
         en: `Interface improvements`,
@@ -741,6 +745,7 @@ function addSuccess(message) {
     }, 5000);
 }
 
+
 /** Affiche une notification de warning */
 function addWarning(message) {
     let notifications = document.getElementById('notifications');
@@ -792,6 +797,41 @@ function copyToClipboard(text) {
 
     document.execCommand('copy');
     input.remove();
+}
+
+function createSelectWithSearch() {
+
+    let select_complete = document.createElement('div');
+
+    let select = document.createElement('label');
+
+    let input = document.createElement('input');
+    input.type = 'text';
+
+    let close = document.createElement('div');
+    close.innerHTML = '&#128473';
+    close.setAttribute('style', 'position: relative; float: right; top: -25px; color: #5c2b20;');
+
+    select.appendChild(input);
+    select.appendChild(close);
+
+    select_complete.appendChild(select);
+
+    let options = document.createElement('div');
+    options.classList.add('hidden');
+    options.setAttribute('style', 'position: absolute; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
+
+    input.addEventListener('keyup', (event) => {
+        if (event.key === 'Enter') {
+            options.classList.remove('hidden');
+        }
+    });
+    close.addEventListener('click', () => {
+        options.classList.add('hidden');
+        input.value = '';
+    });
+    select_complete.appendChild(options);
+    return select_complete;
 }
 
 /**
@@ -1272,13 +1312,67 @@ function displayWishlist() {
             let tab_content = document.getElementById('tab-content');
 
             let tab_content_header = document.createElement('div');
+            tab_content_header.setAttribute('style', 'margin: 0 0.5em; display: flex; justify-content: space-between; height: 25px;');
             tab_content.appendChild(tab_content_header);
 
             let save_button = document.createElement('button');
+            save_button.setAttribute('style', 'width: 250px;');
+            save_button.classList.add('inline');
             save_button.innerText = texts.save[lang];
             save_button.addEventListener('click', () => {
                 updateWishlist();
             });
+
+            let add_item_with_search = createSelectWithSearch();
+            add_item_with_search.setAttribute('style', 'width: 350px; text-align: center;');
+            let label = add_item_with_search.firstElementChild;
+            let input = label.firstElementChild;
+            let close = label.lastElementChild;
+            input.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    let wishlist_items = Array.from(wishlist_list.getElementsByTagName('li')).map((wishlist_item) => wishlist_item.getElementsByClassName('label')[0].textContent);
+                    options.childNodes.forEach((option) => {
+                        let already_in_wishlist = wishlist_items.some((wishlist_item) => option.firstElementChild.textContent === wishlist_item);
+
+                        if (!already_in_wishlist && option.firstElementChild.textContent.toLowerCase().indexOf(input.value.toLowerCase()) > -1) {
+                            option.classList.remove('hidden');
+                        } else {
+                            option.classList.add('hidden');
+                        }
+                    })
+                }
+            });
+            let options = add_item_with_search.lastElementChild;
+            options.style.width = '350px';
+            items.forEach((item) => {
+                let content_div = document.createElement('div');
+                let img = document.createElement('img');
+                img.src = hordes_img_url + item.img;
+                img.setAttribute('style', 'margin-right: 8px');
+
+                let button_div = document.createElement('div');
+                let button = document.createElement('button');
+                button_div.appendChild(button);
+                button.innerHTML = '&#43;';
+                button.setAttribute('style', 'font-size: 16px');
+                button.addEventListener('click', () => {
+                    let wishlist_item = {
+                        item: item,
+                        priority: 0,
+                        count: 0,
+                        bankCount: item.bankCount,
+                    }
+                    wishlist_list.insertBefore(createWishlistItemElement(wishlist_item), wishlist_list.firstElementChild.nextSibling);
+                    close.click();
+                });
+                content_div.setAttribute('style', 'text-align: left; display: flex; justify-content: space-between; padding: 6px;');
+
+                content_div.innerHTML = `<div>${img.outerHTML}${item.label[lang]}</div>`;
+                content_div.appendChild(button_div);
+                options.appendChild(content_div);
+
+            });
+            tab_content_header.appendChild(add_item_with_search);
             tab_content_header.appendChild(save_button);
 
             let wishlist_list = document.createElement('ul');
@@ -1296,141 +1390,142 @@ function displayWishlist() {
                 list_header.appendChild(header_cell);
             });
 
-
             wishlist.wishList
                 .filter((item) => item.count > 0)
                 .forEach((item) => {
-
-
-                let getLi = (target) => {
-                    while (target.nodeName.toLowerCase() !== 'li' && target.nodeName.toLowerCase() !== 'body') {
-                        target = target.parentNode;
-                    }
-                    if (target.nodeName.toLowerCase() == 'body') {
-                        return false;
-                    } else {
-                        return target;
-                    }
-                };
-
-                let item_element = document.createElement('li');
-                item_element.draggable = true;
-                item_element.setAttribute('itemId', item.item.xmlId);
-                item_element.addEventListener('dragstart', (event) => {
-                    let target = getLi(event.target);
-                    dragged.element = target;
-                    dragged.item = item;
-                });
-                item_element.addEventListener('dragover', function(event) {
-                    event.preventDefault();
-                });
-                item_element.addEventListener('dragenter', (event) => {
-                    let target = getLi(event.target);
-                    if (target !== dragged.element) {
-                        target.style['border-bottom'] = '12px solid rgba(0, 0, 0, 0.25)';
-                    }
-                });
-                item_element.addEventListener('dragleave', (event) => {
-                    let target = getLi(event.target);
-                    target.style['border-bottom'] = '';
-                }, false);
-                item_element.addEventListener('drop', (event) => {
-                    event.preventDefault();
-                    let target = getLi(event.target);
-                    if (target !== dragged.element) {
-                        target.style['border-bottom'] = '';
-                        dragged.element.remove();
-                        target.parentNode.insertBefore(dragged.element, target.nextSibling);
-                        dragged.element = undefined;
-                        dragged.item = undefined;
-                    }
-                });
-                wishlist_list.appendChild(item_element);
-
-                let item_title_container = document.createElement('div');
-                item_title_container.classList.add('label');
-                item_element.appendChild(item_title_container);
-
-                let item_icon = document.createElement('img');
-                item_icon.setAttribute('style', 'margin-right: 0.5em');
-                item_icon.src = hordes_img_url + item.item.img;
-                item_title_container.appendChild(item_icon);
-
-                let item_title = document.createElement('span');
-                item_title.innerText = item.item.label[lang];
-                item_title_container.appendChild(item_title);
-
-                let item_priority_container = document.createElement('div');
-                item_priority_container.classList.add('priority');
-                item_element.appendChild(item_priority_container);
-
-                let item_priority_select = document.createElement('select');
-                item_priority_select.addEventListener('change', () => {
-                    item.priority = +item_priority_select.value;
-                });
-                item_priority_container.appendChild(item_priority_select);
-
-                wishlist_priorities.forEach((priority) => {
-                    let item_priority_option = document.createElement('option');
-                    item_priority_option.value = priority.value;
-                    item_priority_option.innerText = priority.label[lang];
-                    item_priority_select.appendChild(item_priority_option);
-                    if (item.priority.toString().slice(0, 1) === priority.value.toString().slice(0,1)) {
-                        item_priority_option.selected = true;
-                    }
-                });
-
-                let item_bank_count = document.createElement('div');
-                item_bank_count.innerText = item.bankCount;
-                item_bank_count.classList.add('bank_count');
-                item_element.appendChild(item_bank_count);
-
-                let item_bank_needed = document.createElement('div');
-                item_bank_needed.classList.add('bank_needed');
-                item_element.appendChild(item_bank_needed);
-
-                let item_bank_needed_input = document.createElement('input');
-                item_bank_needed_input.type = 'number';
-                item_bank_needed_input.value = item.count;
-                item_bank_needed_input.addEventListener('change', (event) => {
-                    item_bank_needed_input.value = +event.target.value;
-                    item.count = +event.target.value;
-                    item_diff_input.value = item.count - item.bankCount;
-                });
-                item_bank_needed.appendChild(item_bank_needed_input);
-
-                let item_diff = document.createElement('div');
-                item_diff.classList.add('diff');
-                item_element.appendChild(item_diff);
-
-                let item_diff_input = document.createElement('input');
-                item_diff_input.type = 'number';
-                item_diff_input.value = item.count - item.bankCount;
-                item_diff_input.addEventListener('change', (event) => {
-                    item_diff_input.value = +event.target.value;
-                    item.count = +item.bankCount + +item_diff_input.value;
-                    item_bank_needed_input.value = item.count;
-                });
-                item_diff.appendChild(item_diff_input);
-
-                let item_remove = document.createElement('div');
-                item_remove.classList.add('delete');
-                item_element.appendChild(item_remove);
-
-                let item_remove_img = document.createElement('img');
-                item_remove_img.alt = '(X)';
-                item_remove_img.src = repo_img_url + 'icons/b_close.png';
-                item_remove_img.addEventListener('click', () => {
-                    item.count = undefined;
-                    item_bank_needed_input.value = item.bankCount;
-                    item_diff_input.value = 0;
-                    item_element.remove();
-                })
-                item_remove.appendChild(item_remove_img);
-
+                wishlist_list.appendChild(createWishlistItemElement(item));
             });
         }
     }, 500);
+}
+
+function createWishlistItemElement(item) {
+    let getLi = (target) => {
+        while (target.nodeName.toLowerCase() !== 'li' && target.nodeName.toLowerCase() !== 'body') {
+            target = target.parentNode;
+        }
+        if (target.nodeName.toLowerCase() == 'body') {
+            return false;
+        } else {
+            return target;
+        }
+    };
+
+    let item_element = document.createElement('li');
+    item_element.draggable = true;
+    item_element.setAttribute('itemId', item.item.xmlId);
+    item_element.addEventListener('dragstart', (event) => {
+        let target = getLi(event.target);
+        dragged.element = target;
+        dragged.item = item;
+    });
+    item_element.addEventListener('dragover', function(event) {
+        event.preventDefault();
+    });
+    item_element.addEventListener('dragenter', (event) => {
+        let target = getLi(event.target);
+        if (target !== dragged.element) {
+            target.style['border-bottom'] = '12px solid rgba(0, 0, 0, 0.25)';
+        }
+    });
+    item_element.addEventListener('dragleave', (event) => {
+        let target = getLi(event.target);
+        target.style['border-bottom'] = '';
+    }, false);
+    item_element.addEventListener('drop', (event) => {
+        event.preventDefault();
+        let target = getLi(event.target);
+        if (target !== dragged.element) {
+            target.style['border-bottom'] = '';
+            dragged.element.remove();
+            target.parentNode.insertBefore(dragged.element, target.nextSibling);
+            dragged.element = undefined;
+            dragged.item = undefined;
+        }
+    });
+
+    let item_title_container = document.createElement('div');
+    item_title_container.classList.add('label');
+    item_element.appendChild(item_title_container);
+
+    let item_icon = document.createElement('img');
+    item_icon.setAttribute('style', 'margin-right: 0.5em');
+    item_icon.src = hordes_img_url + item.item.img;
+    item_title_container.appendChild(item_icon);
+
+    let item_title = document.createElement('span');
+    item_title.innerText = item.item.label[lang];
+    item_title_container.appendChild(item_title);
+
+    let item_priority_container = document.createElement('div');
+    item_priority_container.classList.add('priority');
+    item_element.appendChild(item_priority_container);
+
+    let item_priority_select = document.createElement('select');
+    item_priority_select.addEventListener('change', () => {
+        item.priority = +item_priority_select.value;
+    });
+    item_priority_container.appendChild(item_priority_select);
+
+    wishlist_priorities.forEach((priority) => {
+        let item_priority_option = document.createElement('option');
+        item_priority_option.value = priority.value;
+        item_priority_option.innerText = priority.label[lang];
+        item_priority_select.appendChild(item_priority_option);
+        if (item.priority.toString().slice(0, 1) === priority.value.toString().slice(0,1)) {
+            item_priority_option.selected = true;
+        }
+    });
+
+    let item_bank_count = document.createElement('div');
+    item_bank_count.innerText = item.bankCount;
+    item_bank_count.classList.add('bank_count');
+    item_element.appendChild(item_bank_count);
+
+    let item_bank_needed = document.createElement('div');
+    item_bank_needed.classList.add('bank_needed');
+    item_element.appendChild(item_bank_needed);
+
+    let item_bank_needed_input = document.createElement('input');
+    item_bank_needed_input.type = 'number';
+    item_bank_needed_input.value = item.count;
+    item_bank_needed_input.addEventListener('change', (event) => {
+        item_bank_needed_input.value = +event.target.value;
+        item.count = +event.target.value;
+        item_diff_input.value = item.count - item.bankCount;
+    });
+    item_bank_needed.appendChild(item_bank_needed_input);
+
+    let item_diff = document.createElement('div');
+    item_diff.classList.add('diff');
+    item_element.appendChild(item_diff);
+
+    let item_diff_input = document.createElement('input');
+    item_diff_input.type = 'number';
+    item_diff_input.value = item.count - item.bankCount;
+    item_diff_input.addEventListener('change', (event) => {
+        item_diff_input.value = +event.target.value;
+        item.count = +item.bankCount + +item_diff_input.value;
+        item_bank_needed_input.value = item.count;
+    });
+    item_diff.appendChild(item_diff_input);
+
+    let item_remove = document.createElement('div');
+    item_remove.classList.add('delete');
+    item_element.appendChild(item_remove);
+
+    let item_remove_img = document.createElement('img');
+    item_remove_img.alt = '(X)';
+    item_remove_img.src = repo_img_url + 'icons/b_close.png';
+    item_remove_img.addEventListener('click', () => {
+        item.count = undefined;
+        item_bank_needed_input.value = item.bankCount;
+        item_diff_input.value = 0;
+        item_element.remove();
+    })
+    item_remove.appendChild(item_remove_img);
+
+    return item_element;
 }
 
 /**
@@ -2575,17 +2670,18 @@ function displayMap() {
     map_window.classList.add('visible');
 
     let content = document.getElementById(mh_optimizer_map_window_id + '-content');
-    let map_to_display = GM_getValue(mho_map_key);
-    console.log('map_to_display', map_to_display);
+    content.innerHTML = '';
 
-    console.log('id', map_to_display.style);
+    let map_to_display = GM_getValue(mho_map_key);
     let style = document.getElementById(map_to_display.source + '-map');
     if (!style) {
         document.head.innerHTML += map_to_display.style;
     }
-    content.innerHTML = map_to_display.block;
+    let img = document.createElement('img');
+    img.setAttribute('style', 'width: 100%; height: 100%');
+    img.src = map_to_display.block;
+    content.appendChild(img);
 }
-
 
 /** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
 function preventFromLeaving() {
@@ -2746,10 +2842,13 @@ function displayTranslateTool() {
             {value: 'es', img: '🇪🇸'},
             {value: 'fr', img: '🇫🇷'},
         ]
-        let mho_display_translate_input_div = document.createElement('div');
+        let mho_display_translate_input_div = createSelectWithSearch();
         mho_display_translate_input_div.id = mho_display_translate_input_id;
         mho_display_translate_input_div.setAttribute('style', 'position: absolute; top: 45px; right: 8px; margin: 0; width: 250px;');
-        let label = document.createElement('label');
+        let label = mho_display_translate_input_div.firstElementChild;
+        let input = label.firstElementChild;
+        input.setAttribute('style', 'width: calc(100% - 35px); display: inline-block;');
+
         let select = document.createElement('select');
         select.classList.add('small');
         select.setAttribute('style', 'height: 25px; width: 35px; font-size: 12px');
@@ -2764,34 +2863,15 @@ function displayTranslateTool() {
             select.appendChild(option);
         })
 
-        let input = document.createElement('input');
-        input.classList.add('inline');
-        input.setAttribute('style', 'width: calc(100% - 35px);');
-        input.type = 'text';
+        label.insertBefore(select, input);
 
-        let close = document.createElement('div');
-        close.innerHTML = '&#128473';
-        close.setAttribute('style', 'position: absolute; top: 0; right: 0; color: #5c2b20;');
-        close.addEventListener('click', () => {
-            div.classList.add('hidden');
-            input.value = '';
-        });
-
-        label.appendChild(select);
-        label.appendChild(input);
-        label.appendChild(close);
-
-        let div = document.createElement('div');
-        div.classList.add('hidden');
-        div.setAttribute('style', 'float: right; z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
+        let options = mho_display_translate_input_div.lastElementChild;
+        options.setAttribute('style', 'float: right; z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
         input.addEventListener('keyup', (event) => {
             if (event.key === 'Enter') {
-                div.classList.remove('hidden');
-                getTranslation(input.value, select.value, div);
+                getTranslation(input.value, select.value, options);
             }
         });
-        mho_display_translate_input_div.appendChild(label);
-        mho_display_translate_input_div.appendChild(div);
         gma.appendChild(mho_display_translate_input_div);
     } else if (display_translate_input) {
         display_translate_input.remove();
@@ -2801,58 +2881,22 @@ function displayTranslateTool() {
 // BOUTONS SUR LES OUTILS EXTERNES //
 /////////////////////////////////////
 function createCopyButton(source, map_id, button_block_id) {
+    let copy_button_parent = document.getElementById(button_block_id);
     let copy_button = document.createElement('button');
-    copy_button.innerText = texts.copy_map[lang];
+    copy_button.setAttribute('style', 'max-width: initial');
+    copy_button.innerHTML = `<img src="${mh_optimizer_icon}" width="30" height="30"><span style="margin: auto">${texts.copy_map[lang]}</span>`;
     copy_button.id = mho_copy_map_id;
     copy_button.addEventListener('click', () => {
-        let div = document.createElement('div');
-        div.innerHTML = document.getElementById(map_id);
-
-        let img = document.createElement('img');
-        img.src = htmlToCanvas(document.getElementById(map_id).outerHTML).toDataURL();
-        html2canvas(document.getElementById(map_id).outerHTML).then((canvas) => {
-            console.log( 'test', canvas);
+        copy_button.disabled = true;
+        html2canvas(document.getElementById(map_id)).then((canvas) => {
             GM_setValue(mho_map_key, {
                 source: source,
-                block: canvas.toDataURL().outerHTML,
-            //style: styles
+                block: canvas.toDataURL()
             })
-
-            console.log(GM_getValue(mho_map_key));
+            copy_button.disabled = false;
         });
-        // GM_setValue(mho_map_key, {
-        //     source: source,
-        //     block: img.outerHTML,
-        //     //style: styles
-        // });
-        // console.log(GM_getValue(mho_map_key));
     });
-    let copy_button_parent = document.getElementById(button_block_id);
     copy_button_parent.appendChild(copy_button);
-}
-
-function htmlToCanvas(html) {
-    html = '<svg><foreignObject>' + html + '</foreignObject></svg>';
-    let canvas = document.getElementById('mho-canvas');
-    if (!canvas) {
-        canvas = document.createElement('canvas');
-        canvas.id = 'mho-canvas';
-    }
-    let ctx = canvas.getContext('2d');
-
-    let DOMURL = window.URL || window.webkitURL || window;
-
-    let img = new Image();
-    let svg = new Blob([html], {type: 'image/svg+xml;charset=utf-8'});
-    let url = DOMURL.createObjectURL(svg);
-
-    img.onload = () => {
-        ctx.drawImage(img, 0, 0);
-        DOMURL.revokeObjectURL(url);
-    };
-
-    img.src = url;
-    return canvas;
 }
 
 ///////////
@@ -2987,8 +3031,7 @@ function createStyles() {
     + 'bottom: 0;'
     + 'color: #fff;'
     + 'left: 0;'
-    + 'overflow-x: hidden;'
-    + 'overflow-y: auto;'
+    + 'overflow: auto;'
     + 'padding: 2px;'
     + 'position: absolute;'
     + 'right: 0;'
@@ -3694,12 +3737,32 @@ function getRecipes() {
 
     if (document.URL.startsWith('https://bbh.fred26.fr/') || document.URL.startsWith('https://gest-hordes2.eragaming.fr/') || document.URL.startsWith('https://fatamorgana.md26.eu/')) {
         let current_key = '';
+        let map_block_id = '';
+        let ruin_block_id = '';
+        let block_copy_map_button = '';
+        let block_copy_ruin_button = '';
+        let source = '';
+
         if (document.URL.startsWith('https://bbh.fred26.fr/')) {
-            current_key = gm_bbh_updated_key
+            current_key = gm_bbh_updated_key;
+            map_block_id = 'carte';
+            ruin_block_id = 'plan';
+            block_copy_map_button = 'ul_infos_1';
+            block_copy_ruin_button = 'cl1';
+            source = 'bbh';
         } else if (document.URL.startsWith('https://gest-hordes2.eragaming.fr/')) {
             current_key = gm_gh_updated_key;
+            map_block_id = 'tabcarteid';
+            ruin_block_id = 'carteRuine';
+            block_copy_map_button = 'menu-ongletcarte';
+            block_copy_ruin_button = 'menuRuine';
+            source = 'gh';
         } else {
             current_key = gm_fata_updated_key;
+            map_block_id = 'map';
+            block_copy_map_button = 'update-myzone';
+            source = 'fata'
+
         }
 
         // Si on est sur le site de BBH ou GH ou Fata et que BBH ou GH ou Fata a été mis à jour depuis MyHordes, alors on recharge BBH ou GH ou Fata au moment de revenir sur l'onglet
@@ -3709,6 +3772,24 @@ function getRecipes() {
                 location.reload();
             }
         });
+
+        setInterval(() => {
+            let copy_button = document.getElementById(mho_copy_map_id);
+            // console.log(copy_button);
+            if (mho_parameters.display_map) {
+                let map_block = document.getElementById(map_block_id);
+                let ruin_block = document.getElementById(ruin_block_id);
+                if (!copy_button && (map_block || ruin_block)) {
+                    if (map_block) {
+                        createCopyButton(source, map_block_id, block_copy_map_button);
+                    } else if (ruin_block) {
+                        createCopyButton(source, ruin_block_id, block_copy_ruin_button);
+                    }
+                }
+            } else if (copy_button) {
+                copy_button.remove();
+            }
+        }, 1000)
     } else {
 
         /** Affiche le changelog de la version au premier chargement après la mise à jour */
