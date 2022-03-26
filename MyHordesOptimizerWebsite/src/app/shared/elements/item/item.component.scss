@@ -3,9 +3,9 @@
 .mho-item {
     height: 40px;
     list-style: none;
-    max-width: calc(25% - (2*0.15em));
+    max-width: calc(25% - (2 * 0.15em));
     min-width: 250px;
-    width: calc(25% - (2*0.15em));
+    width: calc(25% - (2 * 0.15em));
     margin: 0.15em;
 
     > div {
@@ -34,6 +34,9 @@
                     vertical-align: sub;
                     font-size: 0.75em;
                 }
+            }
+            .item_label {
+                vertical-align: middle;
             }
         }
     }

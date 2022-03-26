@@ -6,9 +6,7 @@ let components: any[] = [FooterComponent];
 
 @NgModule({
     imports: [SharedModule],
-    declarations: [
-        ...components
-    ],
+    declarations: [...components],
     exports: [...components]
 })
 

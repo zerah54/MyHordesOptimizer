@@ -1,0 +1,16 @@
+.mho-thanks {
+    .mat-dialog-title {
+        > div {
+            display: flex;
+            justify-content: space-between;
+            h2 {
+                display: inline-block;
+            }
+            .close-button {
+                position: relative;
+                top: -1em;
+                right: -1em;
+            }
+        }
+    }
+}
