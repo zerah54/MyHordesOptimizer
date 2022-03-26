@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.31
+// @version      1.0.0-alpha.32
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -33,8 +33,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Ajout d'un champ de sélection d'objets avec recherche dans la liste de courses\n`
-+ `[Nouveauté] Ajout d'une fonctionnélité permettant de copier une carte d'outil externe (carte complète ou carte de ruine), puis de l'afficher dans MyHordes\n`;
++ `[Correctif] Récupération de la carte depuis GH suite à la nouvelle version (mais la carte est toujours incomplète :'( )\n\n`
++ `[Attention] Suite à la mise à jour en V2 de Gest'Hordes, la mise à jour via le script et le site de MHO n'est plus fonctionnelle. Nous travaillons activement à une résolution du problème.\n`;
 
 const lang = document.documentElement.lang || navigator.language || navigator.userLanguage;
 
@@ -2678,7 +2678,7 @@ function displayMap() {
         document.head.innerHTML += map_to_display.style;
     }
     let img = document.createElement('img');
-    img.setAttribute('style', 'width: 100%; height: 100%');
+    img.setAttribute('style', 'width: auto; height: 100%');
     img.src = map_to_display.block;
     content.appendChild(img);
 }
@@ -2884,7 +2884,7 @@ function createCopyButton(source, map_id, button_block_id) {
     let copy_button_parent = document.getElementById(button_block_id);
     let copy_button = document.createElement('button');
     copy_button.setAttribute('style', 'max-width: initial');
-    copy_button.innerHTML = `<img src="${mh_optimizer_icon}" width="30" height="30"><span style="margin: auto">${texts.copy_map[lang]}</span>`;
+    copy_button.innerHTML = `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">${texts.copy_map[lang]}</span>`;
     copy_button.id = mho_copy_map_id;
     copy_button.addEventListener('click', () => {
         copy_button.disabled = true;
@@ -3752,9 +3752,9 @@ function getRecipes() {
             source = 'bbh';
         } else if (document.URL.startsWith('https://gest-hordes2.eragaming.fr/')) {
             current_key = gm_gh_updated_key;
-            map_block_id = 'tabcarteid';
+            map_block_id = 'zoneCarte';
             ruin_block_id = 'carteRuine';
-            block_copy_map_button = 'menu-ongletcarte';
+            block_copy_map_button = 'zoneInfoVilleAutre';
             block_copy_ruin_button = 'menuRuine';
             source = 'gh';
         } else {
