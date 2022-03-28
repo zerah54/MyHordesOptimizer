@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.31
+// @version      1.0.0-alpha.34
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -33,10 +33,10 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Ajout d'un champ de sélection d'objets avec recherche dans la liste de courses\n`
-+ `[Nouveauté] Ajout d'une fonctionnélité permettant de copier une carte d'outil externe (carte complète ou carte de ruine), puis de l'afficher dans MyHordes\n`;
++ `[Correctif] Tris pas toujours fonctionnels\n\n`
++ `[Correctif] Affichage du libellé du bouton sur Fata Morgana / Chrome\n`;
 
-const lang = document.documentElement.lang || navigator.language || navigator.userLanguage;
+const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
 const gm_bbh_updated_key = 'bbh_updated';
 const gm_gh_updated_key = 'gh_updated';
@@ -46,7 +46,7 @@ const gm_parameters_key = 'mh_optimizer_parameters';
 const mh_user_key = 'mh_user';
 const mho_map_key = 'mho_map';
 
-let mho_parameters = GM_getValue(gm_parameters_key);
+let mho_parameters = GM_getValue(gm_parameters_key) || {};
 let external_app_id = GM_getValue(gm_mh_external_app_id_key);
 let mh_user = GM_getValue(mh_user_key);
 
@@ -1108,7 +1108,15 @@ function createTabs(window_type) {
 
     let tabs_ul = document.createElement('ul')
 
-    let current_tabs_list = tabs_list[window_type].sort((a, b) => a.ordering > b.ordering);
+    let current_tabs_list = tabs_list[window_type].sort((a, b) => {
+        if (a.ordering > b.ordering) {
+            return 1;
+        } else if (a.ordering === b.ordering) {
+            return 0;
+        } else {
+            return -1;
+        }
+    });
     current_tabs_list.forEach((tab, index) => {
         let tab_link = document.createElement('div');
 
@@ -2678,7 +2686,7 @@ function displayMap() {
         document.head.innerHTML += map_to_display.style;
     }
     let img = document.createElement('img');
-    img.setAttribute('style', 'width: 100%; height: 100%');
+    img.setAttribute('style', 'width: auto; height: 100%');
     img.src = map_to_display.block;
     content.appendChild(img);
 }
@@ -2884,7 +2892,7 @@ function createCopyButton(source, map_id, button_block_id) {
     let copy_button_parent = document.getElementById(button_block_id);
     let copy_button = document.createElement('button');
     copy_button.setAttribute('style', 'max-width: initial');
-    copy_button.innerHTML = `<img src="${mh_optimizer_icon}" width="30" height="30"><span style="margin: auto">${texts.copy_map[lang]}</span>`;
+    copy_button.innerHTML = `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">${texts.copy_map[lang]}</span>`;
     copy_button.id = mho_copy_map_id;
     copy_button.addEventListener('click', () => {
         copy_button.disabled = true;
@@ -3367,7 +3375,15 @@ function getItems() {
                     item.category = getCategory(item.category)
                     return item;
                 })
-                    .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);
+                    .sort((item_a, item_b) => {
+                    if (item_a.category.ordering > item_b.category.ordering) {
+                      return 1;
+                    } else if (item_a.category.ordering === item_b.category.ordering) {
+                      return 0;
+                    } else {
+                      return -1;
+                    }
+                });
                 console.log('items', items);
                 let wiki_btn = document.getElementById(wiki_btn_id);
                 if (wiki_btn) {
@@ -3468,7 +3484,15 @@ function getBank() {
                     bank_info = bank_info.item;
                     return bank_info;
                 })
-                    .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);
+                    .sort((item_a, item_b) => {
+                    if (item_a.category.ordering > item_b.category.ordering) {
+                      return 1;
+                    } else if (item_a.category.ordering === item_b.category.ordering) {
+                      return 0;
+                    } else {
+                      return -1;
+                    }
+                });
             } else {
                 addError(response);
             }
@@ -3577,10 +3601,11 @@ function updateExternalTools() {
                 if (response.response.fataMorganaStatus.toLowerCase() === 'ok') GM_setValue(gm_fata_updated_key, true);
 
                 let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
-                let nb_tools_success = Object.keys(response.response).map((key) => response.response[key]).filter((tool_response) => tool_response.toLowerCase() === 'ok').length;
-                btn.innerHTML = nb_tools_to_update === nb_tools_success
-                    ? '<img src ="' + repo_img_url + 'icons/done.png">' + texts.update_external_tools_success_btn_label[lang]
-                : '<img src ="' + repo_img_url + 'emotes/warning.gif">' + texts.update_external_tools_errors_btn_label[lang];
+                let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
+                let tools_success = response_items.filter((tool_response) => tool_response.value.toLowerCase() === 'ok');
+                let tools_fail = response_items.filter((tool_response) => tool_response.value.toLowerCase() !== 'ok' && tool_response.value.toLowerCase() !== 'not activated');
+                btn.innerHTML = nb_tools_to_update === tools_success.length ? '<img src ="' + repo_img_url + 'icons/done.png">' + texts.update_external_tools_success_btn_label[lang]
+                : `<img src ="${repo_img_url}emotes/warning.gif">${texts.update_external_tools_errors_btn_label[lang]}<br>${tools_success.map((item) => item.key.replace('Status', ' : OK')).join('<br>')}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
             } else {
                 addError(response);
                 btn.innerHTML = '<img src ="' + repo_img_url + 'professions/death.gif">' + texts.update_external_tools_fail_btn_label[lang];
@@ -3599,7 +3624,15 @@ function getHeroSkills() {
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
-                hero_skills = response.response.sort((a, b) => a.daysNeeded > b.daysNeeded);
+                hero_skills = response.response.sort((a, b) => {
+                if (a.daysNeeded > b.daysNeeded) {
+                      return 1;
+                    } else if (a.daysNeeded === b.daysNeeded) {
+                      return 0;
+                    } else {
+                      return -1;
+                    }
+                });
             } else {
                 addError(response);
             }
@@ -3719,7 +3752,15 @@ function getRecipes() {
                     recipe.type = action_types.find((type) => type.id === recipe.type);
                     return recipe;
                 })
-                    .sort((a, b) => a.type.ordering > b.type.ordering);
+                    .sort((a, b) => {
+                    if (a.type.ordering > b.type.ordering) {
+                      return 1;
+                    } else if (a.type.ordering === b.type.ordering) {
+                      return 0;
+                    } else {
+                      return -1;
+                    }
+                });
             } else {
                 addError(response);
             }
@@ -3752,9 +3793,9 @@ function getRecipes() {
             source = 'bbh';
         } else if (document.URL.startsWith('https://gest-hordes2.eragaming.fr/')) {
             current_key = gm_gh_updated_key;
-            map_block_id = 'tabcarteid';
+            map_block_id = 'zoneCarte';
             ruin_block_id = 'carteRuine';
-            block_copy_map_button = 'menu-ongletcarte';
+            block_copy_map_button = 'zoneInfoVilleAutre';
             block_copy_ruin_button = 'menuRuine';
             source = 'gh';
         } else {
