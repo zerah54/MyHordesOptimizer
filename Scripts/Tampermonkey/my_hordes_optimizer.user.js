@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.33
+// @version      1.0.0-alpha.34
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -33,10 +33,10 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Prise en chage de Violentmonkey\n\n`
-+ `[Amélioration] Si un des outils externes ne se met pas bien à jour, on affiche le détail des succès et échecs\n`;
++ `[Correctif] Tris pas toujours fonctionnels\n\n`
++ `[Correctif] Affichage du libellé du bouton sur Fata Morgana / Chrome\n`;
 
-const lang = document.documentElement.lang || navigator.language || navigator.userLanguage;
+const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
 const gm_bbh_updated_key = 'bbh_updated';
 const gm_gh_updated_key = 'gh_updated';
@@ -1108,7 +1108,15 @@ function createTabs(window_type) {
 
     let tabs_ul = document.createElement('ul')
 
-    let current_tabs_list = tabs_list[window_type].sort((a, b) => a.ordering > b.ordering);
+    let current_tabs_list = tabs_list[window_type].sort((a, b) => {
+        if (a.ordering > b.ordering) {
+            return 1;
+        } else if (a.ordering === b.ordering) {
+            return 0;
+        } else {
+            return -1;
+        }
+    });
     current_tabs_list.forEach((tab, index) => {
         let tab_link = document.createElement('div');
 
@@ -3367,7 +3375,15 @@ function getItems() {
                     item.category = getCategory(item.category)
                     return item;
                 })
-                    .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);
+                    .sort((item_a, item_b) => {
+                    if (item_a.category.ordering > item_b.category.ordering) {
+                      return 1;
+                    } else if (item_a.category.ordering === item_b.category.ordering) {
+                      return 0;
+                    } else {
+                      return -1;
+                    }
+                });
                 console.log('items', items);
                 let wiki_btn = document.getElementById(wiki_btn_id);
                 if (wiki_btn) {
@@ -3468,7 +3484,15 @@ function getBank() {
                     bank_info = bank_info.item;
                     return bank_info;
                 })
-                    .sort((item_a, item_b) => item_a.category.ordering > item_b.category.ordering);
+                    .sort((item_a, item_b) => {
+                    if (item_a.category.ordering > item_b.category.ordering) {
+                      return 1;
+                    } else if (item_a.category.ordering === item_b.category.ordering) {
+                      return 0;
+                    } else {
+                      return -1;
+                    }
+                });
             } else {
                 addError(response);
             }
@@ -3600,7 +3624,15 @@ function getHeroSkills() {
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
-                hero_skills = response.response.sort((a, b) => a.daysNeeded > b.daysNeeded);
+                hero_skills = response.response.sort((a, b) => {
+                if (a.daysNeeded > b.daysNeeded) {
+                      return 1;
+                    } else if (a.daysNeeded === b.daysNeeded) {
+                      return 0;
+                    } else {
+                      return -1;
+                    }
+                });
             } else {
                 addError(response);
             }
@@ -3720,7 +3752,15 @@ function getRecipes() {
                     recipe.type = action_types.find((type) => type.id === recipe.type);
                     return recipe;
                 })
-                    .sort((a, b) => a.type.ordering > b.type.ordering);
+                    .sort((a, b) => {
+                    if (a.type.ordering > b.type.ordering) {
+                      return 1;
+                    } else if (a.type.ordering === b.type.ordering) {
+                      return 0;
+                    } else {
+                      return -1;
+                    }
+                });
             } else {
                 addError(response);
             }
