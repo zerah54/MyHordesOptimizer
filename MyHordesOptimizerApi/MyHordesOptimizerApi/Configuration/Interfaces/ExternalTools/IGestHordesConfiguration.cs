@@ -3,5 +3,7 @@
     public interface IGestHordesConfiguration
     {
         public string Url { get; }
+        public string LoginPath { get; }
+        public string MajPath { get; }
     }
 }

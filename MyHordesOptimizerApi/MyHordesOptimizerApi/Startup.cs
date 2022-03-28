@@ -53,7 +53,7 @@ namespace MyHordesOptimizerApi
             {
                 return new HttpClientHandler()
                 {
-                    UseCookies = false,
+                    UseCookies = true,
                 };
             });
             // services.AddSingleton(BuildAutoMapper());
