@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.32
+// @version      1.0.0-alpha.33
 // @description  Optimizer for MyHordes
 // @author       Zerah
 //
@@ -33,8 +33,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Récupération de la carte depuis GH suite à la nouvelle version (mais la carte est toujours incomplète :'( )\n\n`
-+ `[Attention] Suite à la mise à jour en V2 de Gest'Hordes, la mise à jour via le script et le site de MHO n'est plus fonctionnelle. Nous travaillons activement à une résolution du problème.\n`;
++ `[Nouveauté] Prise en chage de Violentmonkey\n\n`
++ `[Amélioration] Si un des outils externes ne se met pas bien à jour, on affiche le détail des succès et échecs\n`;
 
 const lang = document.documentElement.lang || navigator.language || navigator.userLanguage;
 
@@ -46,7 +46,7 @@ const gm_parameters_key = 'mh_optimizer_parameters';
 const mh_user_key = 'mh_user';
 const mho_map_key = 'mho_map';
 
-let mho_parameters = GM_getValue(gm_parameters_key);
+let mho_parameters = GM_getValue(gm_parameters_key) || {};
 let external_app_id = GM_getValue(gm_mh_external_app_id_key);
 let mh_user = GM_getValue(mh_user_key);
 
@@ -3577,10 +3577,11 @@ function updateExternalTools() {
                 if (response.response.fataMorganaStatus.toLowerCase() === 'ok') GM_setValue(gm_fata_updated_key, true);
 
                 let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
-                let nb_tools_success = Object.keys(response.response).map((key) => response.response[key]).filter((tool_response) => tool_response.toLowerCase() === 'ok').length;
-                btn.innerHTML = nb_tools_to_update === nb_tools_success
-                    ? '<img src ="' + repo_img_url + 'icons/done.png">' + texts.update_external_tools_success_btn_label[lang]
-                : '<img src ="' + repo_img_url + 'emotes/warning.gif">' + texts.update_external_tools_errors_btn_label[lang];
+                let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
+                let tools_success = response_items.filter((tool_response) => tool_response.value.toLowerCase() === 'ok');
+                let tools_fail = response_items.filter((tool_response) => tool_response.value.toLowerCase() !== 'ok' && tool_response.value.toLowerCase() !== 'not activated');
+                btn.innerHTML = nb_tools_to_update === tools_success.length ? '<img src ="' + repo_img_url + 'icons/done.png">' + texts.update_external_tools_success_btn_label[lang]
+                : `<img src ="${repo_img_url}emotes/warning.gif">${texts.update_external_tools_errors_btn_label[lang]}<br>${tools_success.map((item) => item.key.replace('Status', ' : OK')).join('<br>')}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
             } else {
                 addError(response);
                 btn.innerHTML = '<img src ="' + repo_img_url + 'professions/death.gif">' + texts.update_external_tools_fail_btn_label[lang];
