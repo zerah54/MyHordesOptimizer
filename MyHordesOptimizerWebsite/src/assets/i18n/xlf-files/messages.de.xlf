@@ -3,12 +3,7 @@
     <file source-language="fr" datatype="plaintext" original="ng2.template" target-language="de">
         <body>
             <trans-unit id="6704649609641667809" datatype="html">
-                <source>
-                    Développé par 
-                    <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;mailto:lenoune38@gmail.com&quot;>"/>
-                    Zerah
-                    <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>
-                </source>
+                <source>Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;mailto:lenoune38@gmail.com&quot;>"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></source>
                 <target state="new">
                     Développé par 
                     <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;mailto:lenoune38@gmail.com&quot;>"/>
@@ -33,17 +28,7 @@
                 </context-group>
             </trans-unit>
             <trans-unit id="6242075980192662431" datatype="html">
-                <source>
-                    Ce site n'est pas affilié à 
-                    <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>
-                    Motion Twin
-                    <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>
-                     ou à 
-                    <x id="START_LINK_1" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>
-                    MyHordes
-                    <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>
-                    .
-                </source>
+                <source>Ce site n'est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> ou à <x id="START_LINK_1" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</source>
                 <target state="new">
                     Ce site n'est pas affilié à 
                     <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>
@@ -62,17 +47,7 @@
                 </context-group>
             </trans-unit>
             <trans-unit id="7214429069938095037" datatype="html">
-                <source>
-                    Certains éléments graphiques appartiennent à 
-                    <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>
-                    Motion Twin
-                    <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>
-                     ou à 
-                    <x id="START_LINK_1" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>
-                    MyHordes
-                    <x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>
-                    .
-                </source>
+                <source>Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> ou à <x id="START_LINK_1" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>.</source>
                 <target state="new">
                     Certains éléments graphiques appartiennent à 
                     <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>
@@ -166,12 +141,7 @@
                 </context-group>
             </trans-unit>
             <trans-unit id="686217846145665540" datatype="html">
-                <source>
-                    Dans l'interface, vous pouvez cocher les différents outils externes que vous souhaitez pouvoir mettre à jour en un clic. Une fois sorti de la ville, vous pourrez cliquer sur un nouveau bouton qui mettra à jour tous les outils externes que vous avez sélectionnés dans vos options.
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    Si vous avez l'un des outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.
-                </source>
+                <source>Dans l'interface, vous pouvez cocher les différents outils externes que vous souhaitez pouvoir mettre à jour en un clic. Une fois sorti de la ville, vous pourrez cliquer sur un nouveau bouton qui mettra à jour tous les outils externes que vous avez sélectionnés dans vos options. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Si vous avez l'un des outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.</source>
                 <target state="new">
                     Dans l'interface, vous pouvez cocher les différents outils externes que vous souhaitez pouvoir mettre à jour en un clic. Une fois sorti de la ville, vous pourrez cliquer sur un nouveau bouton qui mettra à jour tous les outils externes que vous avez sélectionnés dans vos options.
                     <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
@@ -224,15 +194,7 @@
                 </context-group>
             </trans-unit>
             <trans-unit id="2998214405615728224" datatype="html">
-                <source>
-                    En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l'atelier. Cette liste contient des informations de priorité, de quantité en banque, de quantité totale requise, et de quantité manquante.
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    La liste de courses dans l'atelier ne présentera que les éléments pouvant obtenus à l'atelier si la quantité manquante est positive. Celle dans le désert affichera tous les éléments sans distinction si la quantité manquante est positive.
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    Dans le désert, les objets dans le sac ou au sol également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l'élément, et ce sans tenir compte de la quantité manquante.
-                </source>
+                <source>En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l'atelier. Cette liste contient des informations de priorité, de quantité en banque, de quantité totale requise, et de quantité manquante. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> La liste de courses dans l'atelier ne présentera que les éléments pouvant obtenus à l'atelier si la quantité manquante est positive. Celle dans le désert affichera tous les éléments sans distinction si la quantité manquante est positive. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Dans le désert, les objets dans le sac ou au sol également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l'élément, et ce sans tenir compte de la quantité manquante.</source>
                 <target state="new">
                     En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l'atelier. Cette liste contient des informations de priorité, de quantité en banque, de quantité totale requise, et de quantité manquante.
                     <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
@@ -344,12 +306,7 @@
                 </context-group>
             </trans-unit>
             <trans-unit id="2491470695189160268" datatype="html">
-                <source>
-                    Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur sujet).
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d'un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
-                </source>
+                <source>Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur sujet). <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d'un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.</source>
                 <target state="new">
                     Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur sujet).
                     <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
@@ -419,12 +376,7 @@
                 </context-group>
             </trans-unit>
             <trans-unit id="7867746115136000863" datatype="html">
-                <source>
-                    Affiche la liste des objets de la banque et leur quantité.
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    Si vous êtes incarnés, les objets qui ne sont pas dans la liste de courses sont suivis d'un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
-                </source>
+                <source>Affiche la liste des objets de la banque et leur quantité. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Si vous êtes incarnés, les objets qui ne sont pas dans la liste de courses sont suivis d'un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.</source>
                 <target state="new">
                     Affiche la liste des objets de la banque et leur quantité.
                     <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
@@ -467,12 +419,7 @@
                 </context-group>
             </trans-unit>
             <trans-unit id="2913252655917132441" datatype="html">
-                <source>
-                    Affiche une liste de courses contenant les objets ajoutés via les pages de liste d'objets et de banque.
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    Vous pouvez modifier la priorité de chaque objet, ainsi que la quantité requise.
-                </source>
+                <source>Affiche une liste de courses contenant les objets ajoutés via les pages de liste d'objets et de banque. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Vous pouvez modifier la priorité de chaque objet, ainsi que la quantité requise.</source>
                 <target state="new">
                     Affiche une liste de courses contenant les objets ajoutés via les pages de liste d'objets et de banque.
                     <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
@@ -493,11 +440,7 @@
                 </context-group>
             </trans-unit>
             <trans-unit id="3041060767908691760" datatype="html">
-                <source>
-                    Affiche une liste des citoyens de la ville, ainsi qu'une liste des pouvoirs héros disponibles pour lesquels il existe une action héroïque associée.
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    (à venir) Permet de changer son nombre de jours héros et de recalculer automatiquement le dernier pouvoir gagné, ainsi que de modifier ses actions disponibles.
-                </source>
+                <source>Affiche une liste des citoyens de la ville, ainsi qu'une liste des pouvoirs héros disponibles pour lesquels il existe une action héroïque associée. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> (à venir) Permet de changer son nombre de jours héros et de recalculer automatiquement le dernier pouvoir gagné, ainsi que de modifier ses actions disponibles.</source>
                 <target state="new">
                     Affiche une liste des citoyens de la ville, ainsi qu'une liste des pouvoirs héros disponibles pour lesquels il existe une action héroïque associée.
                     <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
@@ -533,19 +476,7 @@
                 </context-group>
             </trans-unit>
             <trans-unit id="5306542567161241657" datatype="html">
-                <source>
-                    Ce fichier contient un script Tampermonkey. Pour le faire fonctionner, il faut que Tampermonkey soit installé sur votre navigateur.
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    Une fois le script installé, vous verrez apparaittre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenête s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    <x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>
-                    Attention :
-                    <x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/>
-                    <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
-                    Vous allez d'abord devoir renseigner votre ID d'apps externes. Lors de la validation de l'ID d'apps, une confirmation sera demandée. Il faut l'autoriser.
-                </source>
+                <source>Ce fichier contient un script Tampermonkey. Pour le faire fonctionner, il faut que Tampermonkey soit installé sur votre navigateur. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Une fois le script installé, vous verrez apparaittre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenête s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Attention :<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Vous allez d'abord devoir renseigner votre ID d'apps externes. Lors de la validation de l'ID d'apps, une confirmation sera demandée. Il faut l'autoriser.</source>
                 <target state="new">
                     Ce fichier contient un script Tampermonkey. Pour le faire fonctionner, il faut que Tampermonkey soit installé sur votre navigateur.
                     <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/>
@@ -579,15 +510,14 @@
                     <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
                     <context context-type="linenumber">19,21</context>
                 </context-group>
-            </trans-unit>
-            <trans-unit id="8780767475049849011" datatype="html">
-                <source>Merci enfin à Aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.</source>
-                <target state="new">Merci enfin à Aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-                    <context context-type="linenumber">26,29</context>
-                </context-group>
-            </trans-unit>
+            </trans-unit><trans-unit id="9175648759449725798" datatype="html">
+        <source>Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.</source><target state="new">Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
+          <context context-type="linenumber">26,29</context>
+        </context-group>
+      </trans-unit>
+            
             <trans-unit id="673430564078029527" datatype="html">
                 <source>Filtrer</source>
                 <target state="new">Filtrer</target>

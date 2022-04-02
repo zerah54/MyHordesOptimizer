@@ -580,14 +580,15 @@
                     <context context-type="linenumber">19,21</context>
                 </context-group>
             </trans-unit>
-            <trans-unit id="8780767475049849011" datatype="html">
-                <source>Merci enfin à Aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.</source>
-                <target state="new">Merci enfin à Aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.</target>
+            <trans-unit id="9175648759449725798" datatype="html">
+                <source>Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.</source>
+                <target state="new">Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.</target>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
                     <context context-type="linenumber">26,29</context>
                 </context-group>
             </trans-unit>
+
             <trans-unit id="673430564078029527" datatype="html">
                 <source>Filtrer</source>
                 <target state="new">Filtrer</target>

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.34
-// @description  Optimizer for MyHordes
+// @version      1.0.0-alpha.35
+// @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
 // @icon         https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/logo/logo_mho_16x16.png
@@ -33,8 +33,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Tris pas toujours fonctionnels\n\n`
-+ `[Correctif] Affichage du libellé du bouton sur Fata Morgana / Chrome\n`;
++ `[Correctif] Quand on refusait une autorisation, on ne pouvait pas accéder au site\n\n`
++ `[Amélioration] Ajout du lien vers la documentation dans la description du script, afin que celui-ci soit accessible avant toute installation\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -767,6 +767,9 @@ function addError(error) {
     let notification = document.createElement('div');
     notification.classList.add('error', 'show');
     notification.innerText = `${GM_info.script.name} : ${api_texts.error[lang].replace('$error$', error.status)}`;
+    if (error.status === 0) {
+        notification.innerText += '\n' + error.error;
+    }
     notifications.appendChild(notification);
     notification.addEventListener('click', () => {
         notification.remove();
@@ -3393,6 +3396,10 @@ function getItems() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3418,6 +3425,10 @@ function getMe() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3439,6 +3450,10 @@ function getTown() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3462,6 +3477,10 @@ function getCitizens() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3497,6 +3516,10 @@ function getBank() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            console.log('error', error.error);
+            addError(error.error);
         }
     });
 }
@@ -3519,6 +3542,10 @@ function getWishlist() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3542,6 +3569,10 @@ function addItemToWishlist(item, cart_button) {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3573,6 +3604,10 @@ function updateWishlist() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3611,6 +3646,10 @@ function updateExternalTools() {
                 btn.innerHTML = '<img src ="' + repo_img_url + 'professions/death.gif">' + texts.update_external_tools_fail_btn_label[lang];
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3637,6 +3676,10 @@ function getHeroSkills() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3734,6 +3777,10 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                     addError(response);
                 }
                 endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
             }
         });
     }
@@ -3765,6 +3812,10 @@ function getRecipes() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
