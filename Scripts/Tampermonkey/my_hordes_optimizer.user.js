@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.35
+// @version      1.0.0-alpha.36
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,8 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Quand on refusait une autorisation, on ne pouvait pas accéder au site\n\n`
-+ `[Amélioration] Ajout du lien vers la documentation dans la description du script, afin que celui-ci soit accessible avant toute installation\n`;
++ `[Correctif] L'activation du script provoquait la disparition d'un élément d'arrière-plan du site\n\n`
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1391,7 +1390,7 @@ function displayWishlist() {
             tab_content.appendChild(wishlist_list);
 
             let list_header = document.createElement('div');
-            list_header.classList.add('header');
+            list_header.classList.add('mho-header');
             wishlist_list.appendChild(list_header);
 
             wishlist_headers.forEach((header) => {
@@ -1561,7 +1560,7 @@ function displayItems(filtered_items, tab_id) {
             category_text.innerText = item.category.label[lang];
 
             let category_container = document.createElement('div');
-            category_container.classList.add('category', 'header');
+            category_container.classList.add('mho-category', 'mho-header');
             category_container.appendChild(category_img);
             category_container.appendChild(category_text);
 
@@ -1582,10 +1581,14 @@ function displayItems(filtered_items, tab_id) {
 
             let add_to_wishlist_button = document.createElement('button');
             add_to_wishlist_button.classList.add('inline');
-            add_to_wishlist_button.innerHTML = '<img src="' + repo_img_url + 'item/item_cart.gif""></img>';
             add_to_wishlist_button.addEventListener('click', () => {
                 addItemToWishlist(item, item_add_to_wishlist);
             })
+          
+            let img = document.createElement('img');
+            img.src = `${repo_img_url}item/item_cart.gif`;
+            img.alt = '&#x1F6D2;';
+            add_to_wishlist_button.appendChild(img);
             item_add_to_wishlist.appendChild(add_to_wishlist_button);
         }
 
@@ -1670,7 +1673,7 @@ function displayCitizens() {
             header_cells.push(...skills_with_uses);
 
             let header_row = document.createElement('tr');
-            header_row.classList.add('header');
+            header_row.classList.add('mho-header');
 
             header_cells.forEach((header_cell) => {
                 let cell = document.createElement('th');
@@ -1751,7 +1754,7 @@ function displaySkills() {
         ];
 
         let header_row = document.createElement('tr');
-        header_row.classList.add('header');
+        header_row.classList.add('mho-header');
         header_cells.forEach((header_cell) => {
             let cell = document.createElement('th');
             cell.innerText = header_cell.label[lang];
@@ -1815,8 +1818,8 @@ function displayRecipes() {
                 category_text.innerText = recipe.type.label[lang];
 
                 let category_container = document.createElement('div');
-                category_container.classList.add('category');
-                category_container.classList.add('header');
+                category_container.classList.add('mho-category');
+                category_container.classList.add('mho-header');
                 category_container.appendChild(category_text);
 
                 recipes_list.appendChild(category_container);
@@ -2078,7 +2081,7 @@ function displayWishlistInApp() {
             content.appendChild(list);
 
             let list_header = document.createElement('div');
-            list_header.classList.add('row-flex', 'header', 'bottom');
+            list_header.classList.add('row-flex', 'mho-header', 'bottom');
             list.appendChild(list_header);
 
             wishlist_headers
@@ -2099,27 +2102,27 @@ function displayWishlistInApp() {
 
                 let title = document.createElement('div');
                 title.classList.add('padded', 'cell', 'rw-5');
-                title.innerHTML = `<img src="${hordes_img_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px"></img><span class="small">${item.item.label[lang]}</span>`;
+                title.innerHTML = `<img src="${hordes_img_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px" /><span class="small">${item.item.label[lang]}</span>`;
                 list_item.appendChild(title);
 
                 let item_priority = document.createElement('span');
                 item_priority.classList.add('padded', 'cell', 'rw-3');
-                item_priority.innerHTML = `<span class="small">${wishlist_priorities.find((priority) => item.priority.toString().slice(0, 1) === priority.value.toString().slice(0, 1)).label[lang]}</span}`;
+                item_priority.innerHTML = `<span class="small">${wishlist_priorities.find((priority) => item.priority.toString().slice(0, 1) === priority.value.toString().slice(0, 1)).label[lang]}</span>`;
                 list_item.appendChild(item_priority);
 
                 let bank_count = document.createElement('span');
                 bank_count.classList.add('padded', 'cell', 'rw-2');
-                bank_count.innerHTML = `<span class="small">${item.bankCount}</span}`;
+                bank_count.innerHTML = `<span class="small">${item.bankCount}</span>`;
                 list_item.appendChild(bank_count);
 
                 let bank_need = document.createElement('span');
                 bank_need.classList.add('padded', 'cell', 'rw-2');
-                bank_need.innerHTML = `<span class="small">${item.count}</span}`;
+                bank_need.innerHTML = `<span class="small">${item.count}</span>`;
                 list_item.appendChild(bank_need);
 
                 let needed = document.createElement('span');
                 needed.classList.add('padded', 'cell', 'rw-2');
-                needed.innerHTML = `<span class="small">${item.count - item.bankCount}</span}`;
+                needed.innerHTML = `<span class="small">${item.count - item.bankCount}</span>`;
                 list_item.appendChild(needed);
             });
 
@@ -2673,7 +2676,7 @@ function createDisplayMapButton() {
             display_map_btn.remove();
             clearInterval(interval);
         }
-    }, 2000);
+    }, 3000);
 }
 
 function displayMap() {
@@ -2751,7 +2754,7 @@ function preventDangerousActions() {
     let interval = setInterval(() => {
         if (mho_parameters.prevent_dangerous_actions && items) {
 
-            let actions = Array.from(document.getElementsByClassName('action'));
+            let actions = Array.from(document.getElementsByClassName('actions'));
 
             if (actions && actions.length > 0) {
 
@@ -2759,7 +2762,7 @@ function preventDangerousActions() {
                 let dead = items.filter((item) => item.actions && item.actions.indexOf('cyanide') > -1);
                 let status_drugged = Array.from(document.getElementsByClassName('status link')[0].getElementsByClassName('status')).some((status) => status.firstElementChild.src.indexOf('status_drugged') > -1);
                 let filtered_actions = Array.from(actions).filter((action) => {
-                    let action_img = action.firstElementChild.src;
+                    let action_img = action.firstElementChild ? action.firstElementChild.src : undefined;
                     return (action_img === drugs.some((item) => item.icon === action_img) && status_drugged) || action_img === dead.some((item) => item.icon === action_img);
                 });
                 filtered_actions.forEach((action) => {
@@ -3150,7 +3153,7 @@ function createStyles() {
     + 'display: none;'
     + '}';
 
-    const item_category = '#tab-content > ul div.category {'
+    const item_category = '#tab-content > ul div.mho-category {'
     + 'width: 100%;'
     + 'border-bottom: 1px solid;'
     + 'margin: 1em 0 0.5em;'
@@ -3175,7 +3178,7 @@ function createStyles() {
     + 'border-bottom: 1px solid #ddab76;'
     + '}';
 
-    const mho_table_header_style = '.header {'
+    const mho_table_header_style = '.mho-header {'
     + 'font-size: 10pt;'
     + 'background: linear-gradient(0deg,#643b25 0,rgba(100,59,37,0) 50%,rgba(100,59,37,0)) !important;'
     + 'border-bottom: 2px solid #f0d79e;'
@@ -3184,7 +3187,7 @@ function createStyles() {
     + 'font-weight: 700;'
     + '}';
 
-    const mho_table_row_style = '.mho-table tr:not(.header) {'
+    const mho_table_row_style = '.mho-table tr:not(.mho-header) {'
     + 'background-color: #5c2b20;'
     + 'border-bottom: 1px solid #7e4d2a;'
     + '}';
@@ -3228,7 +3231,7 @@ function createStyles() {
     + '-moz-appearance: textfield;'
     + '}';
 
-    const wishlist_header = '#wishlist .header, #wishlist > li {'
+    const wishlist_header = '#wishlist .mho-header, #wishlist > li {'
     + 'padding: 0 8px;'
     + 'margin: 0.125em 0;'
     + 'width: 100%;'
@@ -3238,7 +3241,7 @@ function createStyles() {
     + 'background-color: #5c2b20;'
     + '}';
 
-    const wishlist_header_cell = '#wishlist .header > div {'
+    const wishlist_header_cell = '#wishlist .mho-header > div {'
     + 'display: inline-block;'
     + 'vertical-align: middle;'
     + '}'
@@ -3518,8 +3521,8 @@ function getBank() {
             endLoading();
         },
         onerror: function(error){
-            console.log('error', error.error);
-            addError(error.error);
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3865,23 +3868,26 @@ function getRecipes() {
             }
         });
 
-        setInterval(() => {
+        let interval = setInterval(() => {
             let copy_button = document.getElementById(mho_copy_map_id);
             // console.log(copy_button);
-            if (mho_parameters.display_map) {
+            if (mho_parameters.display_map && !copy_button) {
                 let map_block = document.getElementById(map_block_id);
                 let ruin_block = document.getElementById(ruin_block_id);
-                if (!copy_button && (map_block || ruin_block)) {
+                if (map_block || ruin_block) {
                     if (map_block) {
                         createCopyButton(source, map_block_id, block_copy_map_button);
                     } else if (ruin_block) {
                         createCopyButton(source, ruin_block_id, block_copy_ruin_button);
                     }
                 }
-            } else if (copy_button) {
+            } else if (!mho_parameters.display_map && copy_button) {
                 copy_button.remove();
+                clearInterval(interval);
+            } else {
+                clearInterval(interval);
             }
-        }, 1000)
+        }, 1000);
     } else {
 
         /** Affiche le changelog de la version au premier chargement après la mise à jour */
