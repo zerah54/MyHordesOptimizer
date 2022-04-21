@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.36
+// @version      1.0.0-alpha.37
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -28,12 +28,11 @@
 // @grant        GM_xmlhttpRequest
 // @grant        GM_notification
 //
-// @require      http://html2canvas.hertzen.com/dist/html2canvas.min.js
-//
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] L'activation du script provoquait la disparition d'un élément d'arrière-plan du site\n\n`
++ `[Correctif] Retrait de l'option pour copier les cartes des outils externes suite à un bug Tampermonkey\n\n`
++ `[Correctif] L'ajout d'une élément de liste de courses à cette liste depuis la page de liste de courses devrait désormais fonctionner correctement`
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -75,6 +74,7 @@ const wiki_btn_id = 'wiki-btn-id';
 const zone_dead_zombies_id = 'zone-dead-zombies';
 const nb_dead_zombies_id = 'nb-dead-zombies';
 const mho_copy_map_id = 'mho-copy-map';
+const mho_opti_map_id = 'mho-opti-map';
 const mho_display_map_id = 'mho-display-map';
 const mho_search_building_field_id = 'mho-search-building-field';
 const mho_display_translate_input_id = 'mho-display-translate-input';
@@ -511,22 +511,22 @@ let params_categories = [
             de: `Fata Morgana aktualisieren`,
             es: `TODO`
         }, parent_id: null},
-        {
-            id: `display_map`,
-            label: {
-                en: `Allow to show a map from external tools`,
-                fr: `Permettre d'afficher une carte issue des outils externes`,
-                de: `Anzeigen einer Karte von externen Tools ermöglichen`,
-                es: `TODO`
-            },
-            help: {
-                en: `In any external tool, it will be possible to copy the town or ruin map and to paste it into MyHordes`,
-                fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`,
-                de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
-                es: `TODO`
-            },
-            parent_id: null
-        }
+        // {
+        //     id: `display_map`,
+        //     label: {
+        //         en: `Allow to show a map from external tools`,
+        //         fr: `Permettre d'afficher une carte issue des outils externes`,
+        //         de: `Anzeigen einer Karte von externen Tools ermöglichen`,
+        //         es: `TODO`
+        //     },
+        //     help: {
+        //         en: `In any external tool, it will be possible to copy the town or ruin map and to paste it into MyHordes`,
+        //         fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`,
+        //         de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
+        //         es: `TODO`
+        //     },
+        //     parent_id: null
+        // }
     ]},
     {id: `display`, label: {
         en: `Interface improvements`,
@@ -783,7 +783,7 @@ function addError(error) {
 function initOptions() {
     preventDangerousActions();
     preventFromLeaving();
-    createDisplayMapButton();
+    // createDisplayMapButton();
 }
 
 /**
@@ -1372,6 +1372,7 @@ function displayWishlist() {
                         count: 0,
                         bankCount: item.bankCount,
                     }
+                    wishlist.wishlist.push(wishlist_item);
                     wishlist_list.insertBefore(createWishlistItemElement(wishlist_item), wishlist_list.firstElementChild.nextSibling);
                     close.click();
                 });
@@ -1584,7 +1585,6 @@ function displayItems(filtered_items, tab_id) {
             add_to_wishlist_button.addEventListener('click', () => {
                 addItemToWishlist(item, item_add_to_wishlist);
             })
-          
             let img = document.createElement('img');
             img.src = `${repo_img_url}item/item_cart.gif`;
             img.alt = '&#x1F6D2;';
@@ -2913,6 +2913,218 @@ function createCopyButton(source, map_id, button_block_id) {
     copy_button_parent.appendChild(copy_button);
 }
 
+function createOptimizePathButton(source, map_id, button_block_id) {
+    console.log('source', source);
+    let opti_button_parent = document.getElementById(button_block_id);
+    let opti_button = document.createElement('button');
+    opti_button.setAttribute('style', 'max-width: initial');
+    opti_button.innerHTML = `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">[i18n] Chemin optimisé</span>`;
+    opti_button.id = mho_opti_map_id;
+    opti_button.addEventListener('click', () => {
+        opti_button.disabled = true;
+        let map;
+        if (source === 'gh') {
+            map = optimizeGh(document.getElementById(map_id));
+        } else if (source === 'bbh') {
+            map = optimizeBbh(document.getElementById(map_id));
+        }
+        getOptimalPath(map, document.getElementById(map_id), opti_button, source);
+      });
+      opti_button_parent.appendChild(opti_button);
+}
+
+function optimizeBbh(html) {
+    let map = html;
+    let rows = Array.from(map.querySelectorAll('tr')).filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
+        return col.children.length > 0; // Ligne d'index
+    }));
+    let final_rows = [];
+    let doors_positions = [];
+    let entrance = {};
+
+    rows.forEach((row, row_index) => {
+        let cols = Array.from(row.querySelectorAll('td'));
+        let final_cols = cols
+            .filter((col) => col.children.length > 0) // Colonne d'index
+            .map((col, col_index) => {
+                let cm = col.querySelector('div[id^="cm"]');
+                console.log('cm', cm);
+                if (cm && cm.classList.length === 0) {
+                    return 0;
+                } else {
+                    // Porte
+                    let cp = col.querySelector('div[id^="cp"][class^="p"]');
+                    if (cp) {
+                      doors_positions.push({colIndex: col_index, rowIndex: row_index});
+                    }
+                    // Entrée
+                    if (!cm) {
+                        entrance = {colIndex: col_index, rowIndex: row_index};
+                    }
+                    return col;
+                }
+            });
+        final_rows.push(final_cols);
+    });
+    return {
+        map: final_rows,
+        doors: doors_positions,
+        entrance: entrance
+    }
+}
+
+function optimizeGh(html) {
+    let map = html;
+    let rows = Array.from(map.querySelectorAll('tr')).filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
+        return !col.classList.contains('bordCarteRuine') // Ligne d'index
+    }));
+    let final_rows = [];
+    let doors_positions = [];
+    let entrance = {};
+
+    rows.forEach((row, row_index) => {
+        let cols = Array.from(row.querySelectorAll('td'));
+        let final_cols = cols
+            .filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
+            .map((col, col_index) => {
+                let use = col.querySelector('use');
+                let img = use.getAttribute('xlink:href');
+                if (img.endsWith('ruineCarte_19')) {
+                    // Pas de passage
+                    return 0;
+                } else {
+                    // Porte
+                    let door = col.querySelector('.ruineCarte_porte');
+                    if (door) {
+                        doors_positions.push({colIndex: col_index, rowIndex: row_index});
+                    }
+                    // Entrée
+                    let entrance_found = img.endsWith('ruineCarte_15');
+                    if (entrance_found) {
+                        entrance = {colIndex: col_index, rowIndex: row_index};
+                    }
+                    return 1;
+                }
+            });
+          final_rows.push(final_cols);
+    });
+  return {
+      map: final_rows,
+      doors: doors_positions,
+      entrance: entrance
+  }
+}
+
+function displayOptimalPathOnBbh(html, response) {
+    console.log('display opti bbh');
+    console.log('html', html);
+    console.log('response', response);
+}
+
+function displayOptimalPathOnGh(html, response) {
+    console.log('display opti gh');
+    let rows = Array.from(html.querySelectorAll('tr'))
+        .filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
+            return !col.classList.contains('bordCarteRuine') // Ligne d'index
+        }))
+        .map((row) => {
+            return Array.from(row.querySelectorAll('td')).filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
+        });
+
+    rows.forEach((row, row_index) => {
+        let response_pos_in_row = response.filter((response_pos) => response_pos.row === row_index);
+        if (response_pos_in_row && response_pos_in_row.length > 0) {
+            console.log('response_pos_in_row', response_pos_in_row);
+            row.forEach((col, col_index) => {
+                let response_at_pos = response_pos_in_row.filter((response_pos) => response_pos.column === col_index);
+                if (response_at_pos && response_at_pos.length > 0) {
+                    let mho_path_div = document.createElement('div');
+                    mho_path_div.classList.add('mho_opti_path');
+                    mho_path_div.setAttribute('style', 'position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; justify-content: space-around;');
+                    col.appendChild(mho_path_div);
+                }
+            });
+        }
+    });
+
+    response.forEach((path, index) => {
+        let path_cell = rows[path.row][path.column];
+
+        let path_div = document.createElement('span');
+        path_div.setAttribute('posPath', index);
+
+        let next_path = response[index + 1];
+        if (next_path) {
+
+            let next_path_cell = rows[next_path.row][next_path.column];
+
+            let next_path_div = document.createElement('span');
+            next_path_div.setAttribute('posPath', index);
+
+            path_div.setAttribute('position', 'start');
+            next_path_div.setAttribute('position', 'end');
+
+            if (next_path.column === path.column) { // Déplacement vertical
+                path_div.setAttribute('orientation', 'vertical');
+                next_path_div.setAttribute('orientation', 'vertical');
+                if (next_path.row > path.row) { // on se déplace vers le bas
+                    path_div.setAttribute('alignment', 'bottom');
+                    next_path_div.setAttribute('alignment', 'top');
+                } else { // on se déplace vers le haut
+                    path_div.setAttribute('alignment', 'top');
+                    next_path_div.setAttribute('alignment', 'bottom');
+                }
+
+                path_div.style.height = 'calc(50% - 4px)';
+                path_div.style.width = '4px';
+                path_div.style.display = 'inline-block';
+                path_div.style.backgroundColor = 'red';
+                next_path_div.style.height = 'calc(50% - 4px)';
+                next_path_div.style.width = '4px';
+                next_path_div.style.display = 'inline-block';
+                next_path_div.style.backgroundColor = 'red';
+            } else { // Déplacement horizontal
+                path_div.setAttribute('orientation', 'horizontal');
+                next_path_div.setAttribute('orientation', 'horizontal');
+
+                if (next_path.column > path.column) { // on se déplace vers la gauche
+                    path_div.setAttribute('alignment', 'right');
+                    next_path_div.setAttribute('alignment', 'left');
+                } else { // on se déplace vers la droite
+                    path_div.setAttribute('alignment', 'left');
+                    next_path_div.setAttribute('alignment', 'right');
+                }
+
+                path_div.style.width = 'calc(50% - 4px)';
+                path_div.style.height = '4px';
+                path_div.style.display = 'inline-block';
+                path_div.style.backgroundColor = 'red';
+                next_path_div.style.width = 'calc(50% - 4px)';
+                next_path_div.style.height = '4px';
+                next_path_div.style.display = 'inline-block';
+                next_path_div.style.backgroundColor = 'red';
+            }
+
+            path_div.style.marginLeft = path_div.getAttribute('alignment') === 'right' ? '50%' : 'initial';
+            path_div.style.marginRight = path_div.getAttribute('alignment') === 'left' ? '50%' : 'initial';
+            path_div.style.marginTop = path_div.getAttribute('alignment') === 'bottom' ? '50%' : 'initial';
+            path_div.style.marginBottom = path_div.getAttribute('alignment') === 'top' ? '50%' : 'initial';
+
+            next_path_div.style.marginLeft = next_path_div.getAttribute('alignment') === 'right' ? '50%' : 'initial';
+            next_path_div.style.marginRight = next_path_div.getAttribute('alignment') === 'left' ? '50%' : 'initial';
+            next_path_div.style.marginTop = next_path_div.getAttribute('alignment') === 'bottom' ? '50%' : 'initial';
+            next_path_div.style.marginBottom = next_path_div.getAttribute('alignment') === 'top' ? '50%' : 'initial';
+
+            path_cell.querySelector('.mho_opti_path').appendChild(path_div);
+            next_path_cell.querySelector('.mho_opti_path').appendChild(next_path_div);
+        }
+        console.log('cell', path_cell);
+    });
+
+    console.log('rows', rows);
+    console.log('response', response);
+}
+
 ///////////
 // STYLE //
 ///////////
@@ -3823,12 +4035,43 @@ function getRecipes() {
     });
 }
 
+/** Récupère le chemin optimal à partir d'une carte */
+function getOptimalPath(map, html, button, source) {
+    map.doors = map.doors.slice(2);
+    console.log('map before send', map);
+    GM_xmlhttpRequest({
+        method: 'POST',
+        data: JSON.stringify(map),
+        url: api_url + 'ruine/pathopti',
+        responseType: 'json',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        onload: function(response){
+            if (response.status === 200) {
+              if (source === 'gh') {
+                  displayOptimalPathOnGh(html, response.response)
+              } else if (source === 'bbh') {
+                  displayOptimalPathOnBbh(html, response.response)
+              }
+            } else {
+                console.error('error', response.reponse)
+            }
+
+            button.disabled = false;
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
+        }
+    });
+}
+
 
 ///////////////////////////
 //     MAIN FUNCTION     //
 ///////////////////////////
 (function() {
-    'use strict';
 
     if (document.URL.startsWith('https://bbh.fred26.fr/') || document.URL.startsWith('https://gest-hordes2.eragaming.fr/') || document.URL.startsWith('https://fatamorgana.md26.eu/')) {
         let current_key = '';
@@ -3876,9 +4119,12 @@ function getRecipes() {
                 let ruin_block = document.getElementById(ruin_block_id);
                 if (map_block || ruin_block) {
                     if (map_block) {
-                        createCopyButton(source, map_block_id, block_copy_map_button);
+                        // createCopyButton(source, map_block_id, block_copy_map_button);
                     } else if (ruin_block) {
-                        createCopyButton(source, ruin_block_id, block_copy_ruin_button);
+                        if (source !== 'fata') {
+                            // createOptimizePathButton(source, ruin_block_id, block_copy_ruin_button);
+                        }
+                        // createCopyButton(source, ruin_block_id, block_copy_ruin_button);
                     }
                 }
             } else if (!mho_parameters.display_map && copy_button) {
