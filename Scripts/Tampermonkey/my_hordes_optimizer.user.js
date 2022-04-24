@@ -1,6 +1,5 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.37
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -31,7 +30,6 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Retrait de l'option pour copier les cartes des outils externes suite à un bug Tampermonkey\n\n`
 + `[Correctif] L'ajout d'une élément de liste de courses à cette liste depuis la page de liste de courses devrait désormais fonctionner correctement`
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
@@ -1369,10 +1367,10 @@ function displayWishlist() {
                     let wishlist_item = {
                         item: item,
                         priority: 0,
-                        count: 0,
+                        count: 1,
                         bankCount: item.bankCount,
                     }
-                    wishlist.wishlist.push(wishlist_item);
+                    wishlist.wishList.push(wishlist_item);
                     wishlist_list.insertBefore(createWishlistItemElement(wishlist_item), wishlist_list.firstElementChild.nextSibling);
                     close.click();
                 });
@@ -1585,6 +1583,7 @@ function displayItems(filtered_items, tab_id) {
             add_to_wishlist_button.addEventListener('click', () => {
                 addItemToWishlist(item, item_add_to_wishlist);
             })
+
             let img = document.createElement('img');
             img.src = `${repo_img_url}item/item_cart.gif`;
             img.alt = '&#x1F6D2;';
