@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.38
+// @version      1.0.0-alpha.39
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -31,9 +31,10 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] L'ajout d'une élément de liste de courses à cette liste depuis la page de liste de courses devrait désormais fonctionner correctement`
++ `[Temporaire] Utilisation de l'anglais à la place de l'espagnol tant qu'on n'a pas les traductions espagnoles`
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
+const temp_lang = lang === 'es' ? 'en' : lang;
 
 const gm_bbh_updated_key = 'bbh_updated';
 const gm_gh_updated_key = 'gh_updated';
@@ -764,7 +765,7 @@ function addError(error) {
     let notifications = document.getElementById('notifications');
     let notification = document.createElement('div');
     notification.classList.add('error', 'show');
-    notification.innerText = `${GM_info.script.name} : ${api_texts.error[lang].replace('$error$', error.status)}`;
+    notification.innerText = `${GM_info.script.name} : ${api_texts.error[temp_lang].replace('$error$', error.status)}`;
     if (error.status === 0) {
         notification.innerText += '\n' + error.error;
     }
@@ -901,7 +902,7 @@ function createOptimizerButtonContent() {
 
         let tools_btn = document.createElement('a');
         tools_btn.classList.add('button');
-        tools_btn.innerHTML = texts.tools_btn_label[lang];
+        tools_btn.innerHTML = texts.tools_btn_label[temp_lang];
         tools_btn.addEventListener('click', () => {
             displayWindow('tools');
         });
@@ -919,7 +920,7 @@ function createOptimizerButtonContent() {
         //////////////////////////
 
         let informations_title = document.createElement('h1');
-        informations_title.innerText = texts.informations_section_label[lang];
+        informations_title.innerText = texts.informations_section_label[temp_lang];
 
         let informations_list = document.createElement('ul');
 
@@ -932,7 +933,7 @@ function createOptimizerButtonContent() {
         informations.forEach((information) => {
             let information_link = document.createElement('a');
             information_link.id = information.id;
-            information_link.innerHTML = (information.img ? `<img src="${repo_img_url + information.img}" style="margin: 0 4px 0 3px">` : ``)+ `<span class=small>${information.label[lang]}</span>`;
+            information_link.innerHTML = (information.img ? `<img src="${repo_img_url + information.img}" style="margin: 0 4px 0 3px">` : ``)+ `<span class=small>${information.label[temp_lang]}</span>`;
             information_link.href = information.src;
             information_link.target = '_blank';
 
@@ -952,7 +953,7 @@ function createOptimizerButtonContent() {
         content.appendChild(infomations_container);
 
     } else {
-        let help_button = createHelpButton(texts.external_app_id_help[lang]);
+        let help_button = createHelpButton(texts.external_app_id_help[temp_lang]);
         content.appendChild(help_button);
 
         let keytext = document.createElement('input');
@@ -960,7 +961,7 @@ function createOptimizerButtonContent() {
 
         let keysend = document.createElement('a');
         keysend.classList.add('button');
-        keysend.innerHTML = texts.save_external_app_id[lang];
+        keysend.innerHTML = texts.save_external_app_id[temp_lang];
         keysend.addEventListener('click', () => {
             GM_setValue(gm_mh_external_app_id_key, keytext.value);
             external_app_id = GM_getValue(gm_mh_external_app_id_key);
@@ -979,7 +980,7 @@ function createOptimizerButtonContent() {
 
 function createParams() {
     let params_title = document.createElement('h1');
-    params_title.innerText = texts.parameters_section_label[lang];
+    params_title.innerText = texts.parameters_section_label[temp_lang];
 
     let categories_list = document.createElement('ul');
 
@@ -1008,7 +1009,7 @@ function createParams() {
             let param_label = document.createElement('label');
             param_label.classList.add('small');
             param_label.htmlFor = param.id + '-input';
-            param_label.innerText = param.label[lang];
+            param_label.innerText = param.label[temp_lang];
 
             param_input.addEventListener('change', (event) => {
                 let new_params;
@@ -1043,7 +1044,7 @@ function createParams() {
             param_container.appendChild(param_label);
 
             if (param.help) {
-                let param_help = createHelpButton(param.help[lang]);
+                let param_help = createHelpButton(param.help[temp_lang]);
                 param_help.setAttribute('style', 'float: right; margin-top: 4px');
                 param_container.appendChild(param_help);
             }
@@ -1127,7 +1128,7 @@ function createTabs(window_type) {
             tab_link.appendChild(tab_icon);
         }
 
-        let tab_text = document.createTextNode(tab.label[lang]);
+        let tab_text = document.createTextNode(tab.label[temp_lang]);
         tab_link.appendChild(tab_text);
 
         let tab_li = document.createElement('li');
@@ -1327,7 +1328,7 @@ function displayWishlist() {
             let save_button = document.createElement('button');
             save_button.setAttribute('style', 'width: 250px;');
             save_button.classList.add('inline');
-            save_button.innerText = texts.save[lang];
+            save_button.innerText = texts.save[temp_lang];
             save_button.addEventListener('click', () => {
                 updateWishlist();
             });
@@ -1395,7 +1396,7 @@ function displayWishlist() {
 
             wishlist_headers.forEach((header) => {
                 let header_cell = document.createElement('div');
-                header_cell.innerText = header.label[lang];
+                header_cell.innerText = header.label[temp_lang];
                 header_cell.classList.add(header.id);
                 list_header.appendChild(header_cell);
             });
@@ -1480,7 +1481,7 @@ function createWishlistItemElement(item) {
     wishlist_priorities.forEach((priority) => {
         let item_priority_option = document.createElement('option');
         item_priority_option.value = priority.value;
-        item_priority_option.innerText = priority.label[lang];
+        item_priority_option.innerText = priority.label[temp_lang];
         item_priority_select.appendChild(item_priority_option);
         if (item.priority.toString().slice(0, 1) === priority.value.toString().slice(0,1)) {
             item_priority_option.selected = true;
@@ -1680,7 +1681,7 @@ function displayCitizens() {
                 if (cell.img) {
                     cell.innerHTML = '<img src="' + repo_img_url + header_cell.img + '.gif"></img>'
                 } else {
-                    cell.innerText = header_cell.label[lang];
+                    cell.innerText = header_cell.label[temp_lang];
                 }
                 header_row.appendChild(cell);
             });
@@ -1757,7 +1758,7 @@ function displaySkills() {
         header_row.classList.add('mho-header');
         header_cells.forEach((header_cell) => {
             let cell = document.createElement('th');
-            cell.innerText = header_cell.label[lang];
+            cell.innerText = header_cell.label[temp_lang];
             header_row.appendChild(cell);
         })
 
@@ -1908,7 +1909,7 @@ function getRecipeElement(recipe) {
 function createHelpButton(text_to_display) {
 
     let help_button = document.createElement('a');
-    help_button.innerHTML = texts.external_app_id_help_label[lang];
+    help_button.innerHTML = texts.external_app_id_help_label[temp_lang];
     help_button.classList.add('help-button');
 
     let help_tooltip = document.createElement('div')
@@ -1960,12 +1961,12 @@ function createUpdateExternalToolsButton() {
 
         let btn = document.createElement('button');
 
-        btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/arrowright.gif">' + texts.update_external_tools_needed_btn_label[lang];
+        btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/arrowright.gif">' + texts.update_external_tools_needed_btn_label[temp_lang];
         btn.id = mh_update_external_tools_id;
 
         btn.addEventListener('click', () => {
             /** Au clic sur le bouton, on appelle la fonction de mise à jour */
-            btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/middot.gif">' + texts.update_external_tools_pending_btn_label[lang];
+            btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/middot.gif">' + texts.update_external_tools_pending_btn_label[temp_lang];
             updateExternalTools();
         })
 
@@ -2005,7 +2006,7 @@ function displaySearchFieldOnBuildings() {
             search_field = document.createElement('input');
             search_field.type = 'text';
             search_field.id = mho_search_building_field_id;
-            search_field.placeholder = texts.search_building[lang];
+            search_field.placeholder = texts.search_building[temp_lang];
             search_field.classList.add('inline');
             search_field.setAttribute('style', 'min-width: 250px; margin-top: 1em;');
 
@@ -2068,7 +2069,7 @@ function displayWishlistInApp() {
 
             let update_btn = document.createElement('button');
             update_btn.classList.add('inline');
-            update_btn.innerText = texts.update[lang];
+            update_btn.innerText = texts.update[temp_lang];
             update_btn.addEventListener('click', () => {
                 is_refresh_wishlist = true;
                 wishlist = undefined;
@@ -2090,7 +2091,7 @@ function displayWishlistInApp() {
                 let header_cell = document.createElement('div');
                 header_cell.classList.add('padded', 'cell');
                 header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : (header_cell_item.id === 'priority' ? 'rw-3' : 'rw-2'));
-                header_cell.innerText = header_cell_item.label[lang];
+                header_cell.innerText = header_cell_item.label[temp_lang];
                 list_header.appendChild(header_cell);
             });
 
@@ -2183,7 +2184,7 @@ function displayWishlistInApp() {
         header_title.appendChild(hide_state);
 
         let header_label = document.createElement('span');
-        header_label.innerText = tabs_list.tools.find((tool) => tool.id === 'wishlist').label[lang];
+        header_label.innerText = tabs_list.tools.find((tool) => tool.id === 'wishlist').label[temp_lang];
         header_title.appendChild(header_label);
 
         let content = document.createElement('div');
@@ -2714,7 +2715,7 @@ function preventFromLeaving() {
                         mho_leaving_info = document.createElement('div');
                         mho_leaving_info.id = 'mho-leaving-info';
                         mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                        mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[lang] + texts.prevent_not_in_ae[lang];
+                        mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[temp_lang] + texts.prevent_not_in_ae[temp_lang];
                         button.parentNode.insertBefore(mho_leaving_info, button.nextSibling);
                     }
 
@@ -2729,7 +2730,7 @@ function preventFromLeaving() {
                     mho_leaving_info = document.createElement('div');
                     mho_leaving_info.id = 'mho-leaving-info';
                     mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                    mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[lang] + texts.escort_not_released[lang];
+                    mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[temp_lang] + texts.escort_not_released[temp_lang];
                     is_escorting.parentNode.insertBefore(mho_leaving_info, is_escorting.nextSibling);
                 }
             }
@@ -2795,7 +2796,7 @@ function notifyOnSearchEnd() {
                 setTimeout(() => {
                     if (!pageIsTown()) {
                         GM_notification({
-                            text: texts.search_ended[lang],
+                            text: texts.search_ended[temp_lang],
                             title: GM_info.script.name,
                             highlight: true,
                             timeout: 0
@@ -2824,7 +2825,7 @@ function displayNbDeadZombies() {
                 zone_dead_zombies = document.createElement('div');
                 zone_dead_zombies.id = zone_dead_zombies_id;
                 zone_dead_zombies.classList.add('cell', 'rw-12', 'center');
-                zone_dead_zombies.innerHTML = `${texts.nb_dead_zombies[lang]} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`
+                zone_dead_zombies.innerHTML = `${texts.nb_dead_zombies[temp_lang]} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`
 
                 let dist = zone_dist.firstElementChild;
                 dist.parentNode.insertBefore(zone_dead_zombies, dist);
@@ -2898,7 +2899,7 @@ function createCopyButton(source, map_id, button_block_id) {
     let copy_button_parent = document.getElementById(button_block_id);
     let copy_button = document.createElement('button');
     copy_button.setAttribute('style', 'max-width: initial');
-    copy_button.innerHTML = `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">${texts.copy_map[lang]}</span>`;
+    copy_button.innerHTML = `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">${texts.copy_map[temp_lang]}</span>`;
     copy_button.id = mho_copy_map_id;
     copy_button.addEventListener('click', () => {
         copy_button.disabled = true;
@@ -3779,7 +3780,7 @@ function addItemToWishlist(item, cart_button) {
             if (response.status === 200) {
                 item.wishListCount = 1;
                 cart_button.remove();
-                addSuccess(api_texts.add_to_wishlist_success[lang]);
+                addSuccess(api_texts.add_to_wishlist_success[temp_lang]);
             } else {
                 addError(response);
             }
@@ -3814,7 +3815,7 @@ function updateWishlist() {
                 wishlist = response.response;
                 wishlist.wishList = Object.keys(wishlist.wishList).map((key) => wishlist.wishList[key]);
 
-                addSuccess(api_texts.update_wishlist_success[lang]);
+                addSuccess(api_texts.update_wishlist_success[temp_lang]);
             } else {
                 addError(response);
             }
@@ -3854,11 +3855,11 @@ function updateExternalTools() {
                 let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
                 let tools_success = response_items.filter((tool_response) => tool_response.value.toLowerCase() === 'ok');
                 let tools_fail = response_items.filter((tool_response) => tool_response.value.toLowerCase() !== 'ok' && tool_response.value.toLowerCase() !== 'not activated');
-                btn.innerHTML = nb_tools_to_update === tools_success.length ? '<img src ="' + repo_img_url + 'icons/done.png">' + texts.update_external_tools_success_btn_label[lang]
-                : `<img src ="${repo_img_url}emotes/warning.gif">${texts.update_external_tools_errors_btn_label[lang]}<br>${tools_success.map((item) => item.key.replace('Status', ' : OK')).join('<br>')}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
+                btn.innerHTML = nb_tools_to_update === tools_success.length ? '<img src ="' + repo_img_url + 'icons/done.png">' + texts.update_external_tools_success_btn_label[temp_lang]
+                : `<img src ="${repo_img_url}emotes/warning.gif">${texts.update_external_tools_errors_btn_label[temp_lang]}<br>${tools_success.map((item) => item.key.replace('Status', ' : OK')).join('<br>')}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
             } else {
                 addError(response);
-                btn.innerHTML = '<img src ="' + repo_img_url + 'professions/death.gif">' + texts.update_external_tools_fail_btn_label[lang];
+                btn.innerHTML = '<img src ="' + repo_img_url + 'professions/death.gif">' + texts.update_external_tools_fail_btn_label[temp_lang];
             }
             endLoading();
         },
@@ -3923,7 +3924,7 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                         display_all_img.setAttribute('style', 'margin-right: 8px');
 
                         let display_all_text = document.createElement('text');
-                        display_all_text.innerText = texts.display_all_search_result[lang];
+                        display_all_text.innerText = texts.display_all_search_result[temp_lang];
 
                         display_all.appendChild(display_all_img);
                         display_all.appendChild(display_all_text);
@@ -3933,10 +3934,10 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                             show_exact_match = !show_exact_match;
                             if (show_exact_match) {
                                 display_all_img.src = `${repo_img_url}/icons/small_more.gif`;
-                                display_all_text.innerHTML = texts.display_all_search_result[lang];
+                                display_all_text.innerHTML = texts.display_all_search_result[temp_lang];
                             } else {
                                 display_all_img.src = `${repo_img_url}/icons/small_less.gif`;
-                                display_all_text.innerHTML = texts.display_exact_search_result[lang];
+                                display_all_text.innerHTML = texts.display_exact_search_result[temp_lang];
                             }
                             let not_exact = Array.from(block_to_display.getElementsByClassName('not-exact'));
                             not_exact.forEach((not_exact_item) => {
@@ -3949,7 +3950,7 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                         if (response.response.translations.length > 1) {
                             let context_div = document.createElement('div');
                             context_div.setAttribute('style', 'text-align: center; padding: 4px; font-variant: small-caps; font-size: 14px;');
-                            context_div.innerHTML = texts.translation_file_context[lang] + ` <img src="${repo_img_url}/emotes/arrowright.gif"> ` + translation.key.context;
+                            context_div.innerHTML = texts.translation_file_context[temp_lang] + ` <img src="${repo_img_url}/emotes/arrowright.gif"> ` + translation.key.context;
                             if (!translation.key.isExactMatch && show_exact_match) {
                                 context_div.classList.add('not-exact','hidden');
                             }
