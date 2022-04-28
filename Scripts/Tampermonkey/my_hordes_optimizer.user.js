@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.39
+// @version      1.0.0-alpha.40
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -31,7 +31,9 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Temporaire] Utilisation de l'anglais à la place de l'espagnol tant qu'on n'a pas les traductions espagnoles`
++ `[New] Réimplémentation de la fonctionnalité de consultation de carte, qui avait été supprimée.
+Désormais, les cartes sont reconstruites à partir des données récupérées en cliquant sur le bouton "copier".
+Il est donc normal que le design de votre carte ne soit pas identique à celui de votre outil préféré !`
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 const temp_lang = lang === 'es' ? 'en' : lang;
@@ -783,7 +785,7 @@ function addError(error) {
 function initOptions() {
     preventDangerousActions();
     preventFromLeaving();
-    // createDisplayMapButton();
+    createDisplayMapButton();
 }
 
 /**
@@ -1067,7 +1069,6 @@ function createParams() {
 function createWindow() {
     let window_content = document.createElement('div');
     window_content.id = mh_optimizer_window_id + '-content';
-
     let window_overlay_img = document.createElement('img');
     window_overlay_img.alt = '(X)';
     window_overlay_img.src = repo_img_url + 'icons/b_close.png';
@@ -1166,13 +1167,15 @@ function createMapWindow() {
 
     let window_content = document.createElement('div');
     window_content.id = mh_optimizer_map_window_id + '-content';
-    window_content.setAttribute('style', 'height: 100%; position: initial;');
+    window_content.setAttribute('style', 'height: calc(100% - 26px); position: initial; margin-top: 26px;');
+
     let window_overlay_img = document.createElement('img');
     window_overlay_img.alt = '(X)';
     window_overlay_img.src = repo_img_url + 'icons/b_close.png';
     let window_overlay_li = document.createElement('li');
     window_overlay_li.appendChild(window_overlay_img);
     let window_overlay_ul = document.createElement('ul');
+    window_overlay_ul.style.margin = '8px -6px 0 0';
     window_overlay_ul.appendChild(window_overlay_li);
 
     let window_overlay = document.createElement('div');
@@ -1951,7 +1954,7 @@ function createUpdateExternalToolsButton() {
     if (nb_tools_to_update > 0 && external_app_id && zone_marker) {
         if (update_external_tools_btn) return;
 
-        let el = zone_marker.parentElement;
+        let el = zone_marker.parentElement.parentElement.parentElement;
 
         let updater_bloc = document.createElement('div');
         el.appendChild(updater_bloc);
@@ -2663,7 +2666,7 @@ function createDisplayMapButton() {
             btn.addEventListener('click', (event) => {
                 event.stopPropagation();
                 event.preventDefault();
-                displayMap();
+                displayMapContent();
             })
 
             btn_container.appendChild(btn);
@@ -2680,22 +2683,270 @@ function createDisplayMapButton() {
     }, 3000);
 }
 
-function displayMap() {
+function displayMapContent() {
     let map_window = document.getElementById(mh_optimizer_map_window_id);
     map_window.classList.add('visible');
+    displayMap();
+}
 
+function displayMap() {
     let content = document.getElementById(mh_optimizer_map_window_id + '-content');
-    content.innerHTML = '';
-
-    let map_to_display = GM_getValue(mho_map_key);
-    let style = document.getElementById(map_to_display.source + '-map');
-    if (!style) {
-        document.head.innerHTML += map_to_display.style;
+    let table = content.querySelector('table');
+    if (table) {
+        table.outerHTML = '';
     }
-    let img = document.createElement('img');
-    img.setAttribute('style', 'width: auto; height: 100%');
-    img.src = map_to_display.block;
-    content.appendChild(img);
+
+    let transformMapping = (map) => {
+        table = document.createElement('table');
+        table.setAttribute('style', 'border-collapse: collapse;');
+        table.classList.add('mho-map');
+        let init_col_tr = document.createElement('tr');
+        table.appendChild(init_col_tr);
+
+        map.vertical_mapping.forEach((cell) => {
+            let td = document.createElement('td');
+            td.innerText = cell;
+            init_col_tr.appendChild(td);
+        });
+
+        map.map.forEach((row) => {
+            let tr = document.createElement('tr');
+            row.forEach((cell, cell_index) => {
+                if (cell_index === 0) {
+                    let init_row_td = document.createElement('td');
+                    init_row_td.innerText = cell.horizontal;
+                    tr.appendChild(init_row_td);
+                }
+                let td = document.createElement('td');
+                tr.appendChild(td);
+
+                let td_content = document.createElement('div');
+                td_content.style.position = 'relative';
+                td_content.style.height = '100%';
+                td_content.style.width = '100%';
+                td.appendChild(td_content);
+
+                if (cell.not_yet_visited) {
+                    td.style.backgroundColor = '#0f1717';
+                } else if (cell.not_visited_today) {
+                    td.style.backgroundColor = 'darkslategray';
+                } else {
+                    if (cell.zombies === '1') {
+                        td.style.backgroundColor = 'goldenrod';
+                    } else if (cell.zombies === '2') {
+                        td.style.backgroundColor = 'chocolate';
+                    } else if (+cell.zombies >= '3') {
+                        td.style.backgroundColor = 'firebrick';
+                    } else {
+                        td.style.backgroundColor = 'green';
+                    }
+                }
+
+
+                if (cell.town) {
+                    let town_here = document.createElement('div');
+                    town_here.innerText = '🏠';
+                    town_here.style.position = 'absolute';
+                    town_here.style.inset = 'calc(50% - 11px)';
+
+                    td_content.appendChild(town_here);
+                }
+                if (cell.bat) {
+                    let bat_here = document.createElement('div');
+                    bat_here.style.backgroundColor = 'grey';
+                    bat_here.style.position = 'absolute';
+                    bat_here.style.inset = '4px';
+
+                    if (cell.ruin) {
+                        bat_here.innerText = 'R';
+                        bat_here.style.color = 'black';
+                    } else if (cell.empty_bat) {
+                        bat_here.classList.add('empty-bat');
+                    }
+                    td_content.appendChild(bat_here);
+                }
+
+                if (cell.empty && !cell.town && !cell.not_yet_visited) {
+                    let empty_here = document.createElement('div');
+                    empty_here.classList.add('dotted-background');
+                    empty_here.style.position = 'absolute';
+                    empty_here.style.inset = '-1px';
+
+                    td_content.appendChild(empty_here);
+                }
+
+                if (cell.my_pos) {
+                    let player_here = document.createElement('div');
+                    player_here.style.backgroundColor = 'white';
+                    player_here.style.margin = 'auto';
+                    player_here.style.width = '6px';
+                    player_here.style.height = '6px';
+                    player_here.style.position = 'absolute';
+                    player_here.style.inset = 'calc(50% - 3px)';
+                    td_content.appendChild(player_here);
+                }
+                // if (cell.expedition_here) {
+                //     let expedition_here = document.createElement('div');
+                //     expedition_here.style.backgroundColor = 'black';
+                //     expedition_here.style.margin = 'auto';
+                //     expedition_here.textAlign = 'center';
+                //     expedition_here.style.width = '10px';
+                //     expedition_here.style.height = '10px';
+                //     td_content.appendChild(expedition_here);
+                // }
+
+                if (cell_index === row.length - 1) {
+                    let final_row_td = document.createElement('td');
+                    final_row_td.innerText = cell.horizontal;
+                    tr.appendChild(final_row_td);
+                }
+            });
+            table.appendChild(tr);
+        });
+
+        let final_col_tr = document.createElement('tr');
+        map.vertical_mapping.forEach((cell) => {
+            let td = document.createElement('td');
+            td.innerText = cell;
+            final_col_tr.appendChild(td);
+        });
+        table.appendChild(final_col_tr);
+        table.firstElementChild.firstElementChild.innerText = '🗘';
+        table.firstElementChild.firstElementChild.style.cursor = 'pointer';
+        table.firstElementChild.firstElementChild.addEventListener('click', () => displayMap());
+        content.appendChild(table);
+    }
+
+    let transformRuinMapping = (map) => {
+        table = document.createElement('table');
+        table.setAttribute('style', 'border-collapse: collapse;');
+        table.classList.add('mho-map');
+        let init_col_tr = document.createElement('tr');
+        table.appendChild(init_col_tr);
+
+        map.vertical_mapping.forEach((cell) => {
+            let td = document.createElement('td');
+            td.innerText = cell;
+            init_col_tr.appendChild(td);
+        });
+        map.map.forEach((row) => {
+            let tr = document.createElement('tr');
+            row.forEach((cell, cell_index) => {
+                if (cell_index === 0) {
+                    let init_row_td = document.createElement('td');
+                    init_row_td.innerText = cell.horizontal;
+                    tr.appendChild(init_row_td);
+                }
+                let td = document.createElement('td');
+                td.style.padding = 0;
+                tr.appendChild(td);
+                let td_content = document.createElement('div')
+                td.style.position = 'relative';
+                td.appendChild(td_content);
+
+                if (cell.borders !== '0000') {
+                    // let border = document.createElement('div');
+                    td_content.style.backgroundColor = 'black';
+                    td_content.style.position = 'absolute';
+                    td_content.style.top = '0';
+                    td_content.style.left = '0';
+                    td_content.style.bottom = '0';
+                    td_content.style.right = '0';
+
+                    let path = document.createElement('div');
+                    path.style.position = 'absolute';
+                    path.style.backgroundColor = 'grey';
+                    if (cell.borders === 'exit') {
+                        path.style.boxShadow = 'inset 0px 5px 6px lightyellow';
+                        path.style.left = '5px';
+                        path.style.top = '5px';
+                        path.style.right = '5px';
+                        path.style.bottom = '0';
+                    } else {
+                        path.style.left = cell.borders[0] === '0' ? '5px' : '0';
+                        path.style.top = cell.borders[1] === '0' ? '5px' : '0';
+                        path.style.right = cell.borders[2] === '0' ? '5px' : '0';
+                        path.style.bottom = cell.borders[3] === '0' ? '5px' : '0';
+                    }
+                    td_content.appendChild(path);
+
+                }
+
+                if (cell.zombies && cell.zombies !== '' && cell.zombies > 0) {
+                    let zombies = document.createElement('div');
+                    zombies.innerText = cell.zombies;
+                    zombies.style.position = 'absolute';
+                    zombies.style.bottom = '5px';
+                    zombies.style.right = '5px';
+                    zombies.style.fontSize = '10px';
+                    zombies.style.lineHeight = '10px';
+                    td_content.appendChild(zombies);
+                }
+
+                if (cell.door) {
+                    let img = document.createElement('img');
+                    img.src = `${repo_img_url}item/${cell.door}.gif`;
+                    img.style.position = 'absolute';
+                    img.style.left = 'calc(50% - 8px)';
+                    img.style.top = 'calc(50% - 8px)';
+                    img.style.zIndex = '100';
+                    td_content.appendChild(img);
+                }
+
+                if (cell_index === row.length - 1) {
+                    let final_row_td = document.createElement('td');
+                    final_row_td.innerText = cell.horizontal;
+                    tr.appendChild(final_row_td);
+                }
+
+                td.addEventListener('click', ($event) => {
+                    let my_pos = table.querySelector('.my-pos');
+                    if (my_pos) {
+                        my_pos.remove();
+                    }
+                    let new_pos = document.createElement('div');
+                    new_pos.classList.add('my-pos');
+                    new_pos.style.position = 'absolute';
+                    new_pos.style.backgroundColor = 'white';
+                    new_pos.style.zIndex = '300';
+                    new_pos.style.inset = 'calc(50% - 3px)';
+                    td_content.appendChild(new_pos);
+                });
+            });
+            table.appendChild(tr);
+        });
+
+        let final_col_tr = document.createElement('tr');
+        map.vertical_mapping.forEach((cell) => {
+            let td = document.createElement('td');
+            td.innerText = cell;
+            final_col_tr.appendChild(td);
+        });
+        table.appendChild(final_col_tr);
+        table.firstElementChild.firstElementChild.innerText = '🗘';
+        table.firstElementChild.firstElementChild.style.cursor = 'pointer';
+        table.firstElementChild.firstElementChild.addEventListener('click', () => displayMap());
+        content.appendChild(table);
+    }
+    if (GM_getValue(mho_map_key).source === 'gh') {
+        if (GM_getValue(mho_map_key).map === 'ruin') {
+            getGHRuin().then((map) => transformRuinMapping(map));
+        } else {
+            getGHMap().then((map) => transformMapping(map));
+        }
+    } else if (GM_getValue(mho_map_key).source === 'bbh') {
+        if (GM_getValue(mho_map_key).map === 'ruin') {
+            getBBHRuin().then((map) => transformRuinMapping(map));
+        } else {
+            getBBHMap().then((map) => transformMapping(map));
+        }
+    } else if (GM_getValue(mho_map_key).source === 'fm') {
+        if (GM_getValue(mho_map_key).map === 'ruin') {
+            getFMRuin().then((map) => transformRuinMapping(map));
+        } else {
+            getFMMap().then((map) => transformMapping(map));
+        }
+    }
 }
 
 /** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
@@ -2895,7 +3146,7 @@ function displayTranslateTool() {
 /////////////////////////////////////
 // BOUTONS SUR LES OUTILS EXTERNES //
 /////////////////////////////////////
-function createCopyButton(source, map_id, button_block_id) {
+function createCopyButton(source, map, map_id, button_block_id) {
     let copy_button_parent = document.getElementById(button_block_id);
     let copy_button = document.createElement('button');
     copy_button.setAttribute('style', 'max-width: initial');
@@ -2903,13 +3154,18 @@ function createCopyButton(source, map_id, button_block_id) {
     copy_button.id = mho_copy_map_id;
     copy_button.addEventListener('click', () => {
         copy_button.disabled = true;
-        html2canvas(document.getElementById(map_id)).then((canvas) => {
-            GM_setValue(mho_map_key, {
-                source: source,
-                block: canvas.toDataURL()
-            })
-            copy_button.disabled = false;
-        });
+        let map_to_convert = document.getElementById(map_id);
+        if (source === 'fm') {
+            map = document.querySelector('#ruinmap-wrapper') && document.querySelector('#ruinmap-wrapper').offsetParent === null ? 'map' : 'ruin';
+            map_to_convert = map === 'ruin' ? document.getElementById('ruinmap') : document.getElementById('map');
+        }
+        GM_setValue(mho_map_key, {
+            source: source,
+            map: map,
+            fm_block: source === 'fm' && map === 'map' ? map_to_convert.outerHTML : GM_getValue(mho_map_key).fm_block,
+            ruin: map === 'ruin' ? map_to_convert.outerHTML : GM_getValue(mho_map_key).ruin
+        })
+        copy_button.disabled = false;
     });
     copy_button_parent.appendChild(copy_button);
 }
@@ -3554,6 +3810,63 @@ function createStyles() {
     + 'transition: background-color .5s ease-in-out;'
     + '}'
 
+    const mho_map_td = `.mho-map tr td {`
+    + `border: 1px dotted;`
+    + `width: 30px;`
+    + `min-width: 30px;`
+    + `height: 30px;`
+    + `min-height: 30px;`
+    + `text-align: center;`
+    + `vertical-align: middle;`
+    + `}`;
+
+    const dotted_background = '.dotted-background {'
+    + `background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%),
+                         -moz-linear-gradient(-45deg, #444 25%, transparent 25%),
+                         -moz-linear-gradient(45deg, transparent 75%, #444 75%),
+                         -moz-linear-gradient(-45deg, transparent 75%, #444 75%);`
+    + `background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, #444), color-stop(.25, transparent)),
+                         -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, #444), color-stop(.25, transparent)),
+                         -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, #444)),
+                         -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, #444));`
+    + `background-image: -webkit-linear-gradient(45deg, #444 25%, transparent 25%),
+                         -webkit-linear-gradient(-45deg, #444 25%, transparent 25%),
+                         -webkit-linear-gradient(45deg, transparent 75%, #444 75%),
+                         -webkit-linear-gradient(-45deg, transparent 75%, #444 75%);`
+    + `background-image: -o-linear-gradient(45deg, #444 25%, transparent 25%),
+                         -o-linear-gradient(-45deg, #444 25%, transparent 25%),
+                         -o-linear-gradient(45deg, transparent 75%, #444 75%),
+                         -o-linear-gradient(-45deg, transparent 75%, #444 75%);`
+    + `background-image: linear-gradient(45deg, #444 25%, transparent 25%),
+                         linear-gradient(-45deg, #444 25%, transparent 25%),
+                         linear-gradient(45deg, transparent 75%, #444 75%),
+                         linear-gradient(-45deg, transparent 75%, #444 75%);`
+    + `-moz-background-size: 2px 2px;`
+    + `background-size: 2px 2px;`
+    + `-webkit-background-size: 2px 2px; /* override value for webkit */`
+    + `background-position: 0 0, 1px 0, 1px -1px, 0px 1px;`
+    + '}';
+
+    let empty_bat_before_after = '.empty-bat:before, .empty-bat:after {'
+    + 'position: absolute;'
+    + 'content: "";'
+    + 'background: black;'
+    + 'display: block;'
+    + 'width: 1px;'
+    + 'height: 25px;'
+    + '-webkit-transform: rotate(-45deg);'
+    + 'transform: rotate(-45deg);'
+    + 'left: 0;'
+    + 'right: 0;'
+    + 'top: 0;'
+    + 'bottom: 0;'
+    + 'margin: auto;'
+    + '}';
+    let empty_bat_after = '.empty-bat:after {'
+    + '-webkit-transform: rotate(45deg);'
+    + 'transform: rotate(45deg);'
+    + '}';
+
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
     + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
     + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
@@ -3564,7 +3877,7 @@ function createStyles() {
     + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
     + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
     + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
-    + display_map_btn + mh_optimizer_map_window_box_style;
+    + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + dotted_background + empty_bat_before_after + empty_bat_after;
 
     let style = document.createElement('style');
 
@@ -3575,6 +3888,641 @@ function createStyles() {
     }
 
     document.getElementsByTagName('head')[0].appendChild(style);
+}
+
+////////////////////////////
+// Appels outils externes //
+////////////////////////////
+
+/** Récupère la carte de GH */
+async function getGHMap() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+
+        let getArrow = (arrow) => {
+            let arrow_sprite = arrow.firstChild.href.baseVal.replace(/^(.*)#/, '');
+            switch (arrow_sprite) {
+                case 'fleche_0':
+                case 'fleche_0_b':
+                case 'fleche_0_n':
+                    return {direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'right'};
+                case 'fleche_1':
+                case 'fleche_1_b':
+                case 'fleche_1_n':
+                    return {direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'top'};
+                case 'fleche_2':
+                case 'fleche_2_b':
+                case 'fleche_2_n':
+                    return {direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'left'};
+                case 'fleche_3':
+                case 'fleche_3_b':
+                case 'fleche_3_n':
+                    return {direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
+                case 'fleche_4':
+                case 'fleche_4_b':
+                case 'fleche_4_n':
+                    return {direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'left'};
+                case 'fleche_5':
+                case 'fleche_5_b':
+                case 'fleche_5_n':
+                    return {direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
+                case 'fleche_6':
+                case 'fleche_6_b':
+                case 'fleche_6_n':
+                    return {direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'right'};
+                case 'fleche_7':
+                case 'fleche_7_b':
+                case 'fleche_7_n':
+                    return {direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'top'};
+                case 'fleche_8':
+                case 'fleche_8_b':
+                case 'fleche_8_n':
+                    return {direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'right'};
+                case 'fleche_9':
+                case 'fleche_9_b':
+                case 'fleche_9_n':
+                    return {direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'top'};
+                case 'fleche_10':
+                case 'fleche_10_b':
+                case 'fleche_10_n':
+                    return {direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'left'};
+                case 'fleche_11':
+                case 'fleche_11_b':
+                case 'fleche_11_n':
+                    return {direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
+                case 'fleche_12':
+                case 'fleche_12_b':
+                case 'fleche_12_n':
+                    return {direction: 'left', type: 'horizontal', source: '', length: 'plain', position: 'middle'};
+                case 'fleche_13':
+                case 'fleche_13_b':
+                case 'fleche_13_n':
+                    return {direction: 'bottom', type: 'vertical', source: '', length: 'plain', position: 'middle'};
+                case 'fleche_14':
+                case 'fleche_14_b':
+                case 'fleche_14_n':
+                    return {direction: 'right', type: 'horizontal', source: '', length: 'plain', position: 'middle'};
+                case 'fleche_15':
+                case 'fleche_15_b':
+                case 'fleche_15_n':
+                    return {direction: 'top', type: 'vertical', source: '', length: 'plain', position: 'middle'};
+                case 'fleche_16':
+                case 'fleche_16_b':
+                case 'fleche_16_n':
+                    return {direction: 'top', type: 'corner', source: 'right', length: '', position: ''};
+                case 'fleche_17':
+                case 'fleche_17_b':
+                case 'fleche_17_n':
+                    return {direction: 'bottom', type: 'corner', source: 'right', length: '', position: ''};
+                case 'fleche_18':
+                case 'fleche_18_b':
+                case 'fleche_18_n':
+                    return {direction: 'left', type: 'corner', source: 'top', length: '', position: ''};
+                case 'fleche_19':
+                case 'fleche_19_b':
+                case 'fleche_19_n':
+                    return {direction: 'right', type: 'corner', source: 'top', length: '', position: ''};
+                case 'fleche_20':
+                case 'fleche_20_b':
+                case 'fleche_20_n':
+                    return {direction: 'top', type: 'corner', source: 'left', length: '', position: ''};
+                case 'fleche_21':
+                case 'fleche_21_b':
+                case 'fleche_21_n':
+                    return {direction: 'bottom', type: 'corner', source: 'left', length: '', position: ''};
+                case 'fleche_22':
+                case 'fleche_22_b':
+                case 'fleche_22_n':
+                    return {direction: 'right', type: 'corner', source: 'bottom', length: '', position: ''};
+                case 'fleche_23':
+                case 'fleche_23_b':
+                case 'fleche_23_n':
+                    return {direction: 'left', type: 'corner', source: 'bottom', length: '', position: ''};
+                case 'fleche_24':
+                case 'fleche_24_b':
+                case 'fleche_24_n':
+                    return {direction: 'none', type: 'point', source: 'middle', length: 'none', position: 'middle'};
+            }
+        }
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: 'https://gest-hordes2.eragaming.fr/carte',
+            responseType: 'document',
+            onload: function(response){
+                if (response.status === 200) {
+                    let new_map = [];
+                    let map = Array.from(response.response.body.querySelector('#zoneCarte').children);
+                    let x_mapping = Array.from(map[0].children).map((x) => x.innerText);
+                    map
+                        .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('caseCarte')))
+                        .forEach((row) => {
+                        let cells = [];
+                        let y;
+                        Array.from(row.children).forEach((cell, index) => {
+                            if (cell.classList.contains('fondNoir')) {
+                                y = cell.innerText;
+                            } else {
+                                let cell_parts = Array.from(cell.children);
+
+                                let new_cell = {
+                                    horizontal: y,
+                                    vertical: x_mapping[index],
+                                    town: cell.querySelector('.caseVille'),
+                                    bat: cell.querySelector('.bat'),
+                                    my_pos: cell.querySelector('.posJoueur'),
+                                    expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& Array.from(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
+                                    expedition_arrows: [],/*Array.from(cell_parts.find((cell_part) => cell_part.classList.contains('expeditionVille')).children).map((arrow) => getArrow(arrow)), */
+                                    not_yet_visited: cell.querySelector('.zone-NonExplo'),
+                                    not_visited_today: !cell.querySelector('.danger') && !cell.querySelector('.caseVille'),
+                                    zombies: cell.querySelector('.danger') ? Array.from(cell.querySelector('.danger').classList).filter((class_name) => class_name.startsWith('zone-danger')).map((class_name) => class_name.replace('zone-danger', ''))[0] : undefined,
+                                    empty: cell.querySelector('.epuise'),
+                                    empty_bat: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-e',
+                                    ruin: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-r',
+                                };
+                                cells.push(new_cell);
+                            }
+                        });
+                        new_map.push(cells);
+                    });
+                    resolve({map: new_map, vertical_mapping: x_mapping});
+                } else {
+                    addError(response);
+                    reject(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
+                reject(error);
+            }
+        });
+    });
+}
+
+
+/** Récupère la carte de Gest'Hordes */
+async function getGHRuin() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+        if (GM_getValue(mho_map_key).ruin) {
+            let map_html = document.createElement('div');
+            map_html.innerHTML = GM_getValue(mho_map_key).ruin;
+
+            let new_map = [];
+            let rows = Array.from(map_html.querySelector('#carteRuine').querySelector('tbody').children);
+            let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
+            rows
+                .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('caseCarteRuine')))
+                .forEach((row, row_index, rows_array) => {
+                let new_cells = [];
+                let cells = Array.from(row.children);
+                let y;
+                cells.forEach((cell, cell_index, cell_array) => {
+                    if (cell.classList.contains('bordCarteRuine')) {
+                        y = cell.innerText;
+                    } else {
+
+                        let cell_parts = Array.from(cell.children);
+                        let new_cell = {
+                            horizontal: y,
+                            vertical: x_mapping[cell_index],
+                            borders: '0000',
+                            zombies: cell.firstElementChild.getAttribute('data-z')
+                        };
+
+                        let img_path = cell.querySelector('.ruineCarte').firstElementChild.href.baseVal.replace(/^(.*)#/, '');
+                        switch (img_path) {
+                            case 'ruineCarte_0':
+                                new_cell.borders = '0101';
+                                break;
+                            case 'ruineCarte_1':
+                                new_cell.borders = '1010';
+                                break;
+                            case 'ruineCarte_2':
+                                new_cell.borders = '1100';
+                                break;
+                            case 'ruineCarte_3':
+                                new_cell.borders = '0110';
+                                break;
+                            case 'ruineCarte_4':
+                                new_cell.borders = '1001';
+                                break;
+                            case 'ruineCarte_5':
+                                new_cell.borders = '0011';
+                                break;
+                            case 'ruineCarte_6':
+                                new_cell.borders = '1111';
+                                break;
+                            case 'ruineCarte_7':
+                                new_cell.borders = '0111';
+                                break;
+                            case 'ruineCarte_8':
+                                new_cell.borders = '1101';
+                                break;
+                            case 'ruineCarte_9':
+                                new_cell.borders = '1110';
+                                break;
+                            case 'ruineCarte_10':
+                                new_cell.borders = '1011';
+                                break;
+                            case 'ruineCarte_11':
+                                new_cell.borders = '1000';
+                                break;
+                            case 'ruineCarte_12':
+                                new_cell.borders = '0100';
+                                break;
+                            case 'ruineCarte_13':
+                                new_cell.borders = '0001';
+                                break;
+                            case 'ruineCarte_14':
+                                new_cell.borders = '0010';
+                                break;
+                            case 'ruineCarte_15':
+                                new_cell.borders = 'exit';
+                                break;
+                            case 'ruineCarte_17':
+                                new_cell.borders = '1010';
+                                break;
+                            default:
+                                new_cell.borders = '0000';
+                                break;
+                        };
+
+                        switch (cell.firstElementChild.getAttribute('data-porte')) {
+                            case 'pC':
+                                new_cell.door = 'item_lock';
+                                break;
+                            case 'p':
+                                new_cell.door = 'item_door';
+                                break;
+                            case 'pD':
+                                new_cell.door = 'item_classicKey';
+                                break;
+                            case 'pP':
+                                new_cell.door = 'item_bumpKey';
+                                break;
+                            case 'pM':
+                                new_cell.door = 'item_magneticKey';
+                                break;
+                            default:
+                                break;
+                        }
+                        new_cells.push(new_cell);
+                    }
+                });
+                new_map.push(new_cells);
+            });
+            resolve({map: new_map, vertical_mapping: x_mapping});
+        }
+        endLoading();
+    });
+}
+
+
+/** Récupère la carte de GH */
+async function getBBHMap() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: `https://bbh.fred26.fr/?cid=5-${mh_user.townId}&pg=map`,
+            responseType: 'document',
+            onload: function(response){
+                if (response.status === 200) {
+                    let new_map = [];
+                    let map = response.response.querySelector('#carte');
+                    if (map) {
+                        let x_mapping = Array.from(Array.from(map.children)[0].querySelectorAll('td')).map((x) => x.innerText);
+                        x_mapping.push('');
+                        x_mapping.splice(0, 0, '');
+                        if (map.querySelector('#cases')) {
+                            Array.from(map.querySelector('#cases').querySelectorAll('tr'))
+                                .forEach((row, row_index) => {
+                                let cells = [];
+                                let y;
+                                Array.from(row.children).forEach((cell, cell_index) => {
+                                    let cell_parts = Array.from(cell.querySelector('.divs').children);
+
+                                    let new_cell = {
+                                        horizontal: map.querySelector('.lgd_l').firstElementChild.children[row_index].firstElementChild.innerText,
+                                        vertical: x_mapping[cell_index],
+                                        town: cell.querySelector('.door'),
+                                        bat: cell.querySelector('.bat'),
+                                        my_pos: cell.querySelector('.me'),
+                                        expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& Array.from(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
+                                        expedition_arrows: [],
+                                        not_yet_visited: cell.querySelector('.nv'),
+                                        not_visited_today: cell.querySelector('.nvt'),
+                                        zombies: cell.querySelector('.zombies') ? Array.from(cell.querySelector('.zombies').classList).find((class_name) => class_name.startsWith('z_dng_')).replace('z_dng_', '') : undefined,
+                                        empty: cell.querySelector('.praf'),
+                                        empty_bat: cell.querySelector('.mark1'),
+                                        ruin: cell.querySelector('.tag_11')
+                                    };
+                                        cells.push(new_cell);
+                                });
+                                new_map.push(cells);
+                            });
+                            resolve({map: new_map, vertical_mapping: x_mapping});
+                        }
+                    }
+                    reject();
+                } else {
+                    addError(response);
+                    reject(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
+                reject(error);
+            }
+        });
+    });
+}
+
+
+/** Récupère la carte de BBH */
+async function getBBHRuin() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+        if (GM_getValue(mho_map_key).ruin) {
+            let map_html = document.createElement('div');
+            map_html.innerHTML = GM_getValue(mho_map_key).ruin;
+
+            let new_map = [];
+            let rows = Array.from(map_html.querySelector('#plan').firstElementChild.children);
+            let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
+            rows
+                .filter((row) => Array.from(row.children).some((cell) => cell.querySelector('.divs')))
+                .forEach((row, row_index, rows_array) => {
+                let new_cells = [];
+                let cells = Array.from(row.children);
+                let y;
+                cells.forEach((cell, cell_index, cell_array) => {
+                    if (!cell.querySelector('.divs')) {
+                        y = cell.innerText;
+                    } else {
+
+                        let cell_parts = Array.from(cell.firstElementChild.children);
+
+                        let div_zombies = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('z')))
+                        let zombies = div_zombies ? Array.from(div_zombies.classList).find(() => (class_name) => class_name.startsWith('z')) : undefined;
+
+                        let new_cell = {
+                            horizontal: y,
+                            vertical: x_mapping[cell_index],
+                            borders: '0000',
+                            zombies: zombies ? zombies[1] : ''
+                        };
+
+                        let div_path = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('m')))
+                        let img_path = div_path ? Array.from(div_path.classList).find(() => (class_name) => class_name.startsWith('m')) : undefined;
+                        switch (img_path) {
+                            case 'm1':
+                                new_cell.borders = 'exit';
+                                break;
+                            case 'm2':
+                                new_cell.borders = '0000';
+                                break;
+                            case 'm11':
+                                new_cell.borders = '0101';
+                                break;
+                            case 'm12':
+                                new_cell.borders = '1010';
+                                break;
+                            case 'm13':
+                                new_cell.borders = '1111';
+                                break;
+                            case 'm21':
+                                new_cell.borders = '0111';
+                                break;
+                            case 'm22':
+                                new_cell.borders = '1110';
+                                break;
+                            case 'm23':
+                                new_cell.borders = '1101';
+                                break;
+                            case 'm24':
+                                new_cell.borders = '1011';
+                                break;
+                            case 'm31':
+                                new_cell.borders = '0110';
+                                break;
+                            case 'm32':
+                                new_cell.borders = '1100';
+                                break;
+                            case 'm33':
+                                new_cell.borders = '0011';
+                                break;
+                            case 'm34':
+                                new_cell.borders = '1001';
+                                break;
+                            case 'm41':
+                                new_cell.borders = '0100';
+                                break;
+                            case 'm42':
+                                new_cell.borders = '1000';
+                                break;
+                            case 'm43':
+                                new_cell.borders = '0001';
+                                break;
+                            case 'm44':
+                                new_cell.borders = '0010';
+                                break
+                            default:
+                                new_cell.borders = '0000';
+                                break;
+                        };
+
+                        let div_door = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('p')))
+                        let img_door = div_door ? Array.from(div_door.classList).find(() => (class_name) => class_name.startsWith('p')) : undefined;
+                        if (img_door) {
+                            switch (img_door) {
+                                case 'p2':
+                                    new_cell.door = 'item_lock';
+                                    break;
+                                case 'p1':
+                                    new_cell.door = 'item_door';
+                                    break;
+                                case 'p5':
+                                    new_cell.door = 'item_classicKey';
+                                    break;
+                                case 'p4':
+                                    new_cell.door = 'item_bumpKey';
+                                    break;
+                                case 'p3':
+                                    new_cell.door = 'item_magneticKey';
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        new_cells.push(new_cell);
+                    }
+                });
+                new_map.push(new_cells);
+            });
+            resolve({map: new_map, vertical_mapping: x_mapping});
+        }
+        endLoading();
+    });
+}
+
+/** Récupère la carte de FataMorgana */
+async function getFMMap() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+
+        let map_html = document.createElement('div');
+        map_html.innerHTML = GM_getValue(mho_map_key).fm_block;
+
+        let new_map = [];
+        let map = Array.from(map_html.querySelector('#map').children);
+        let x_mapping = Array.from(map[0].children).map((x) => x.innerText);
+        map
+            .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
+            .forEach((row) => {
+            let cells = [];
+            let y;
+            Array.from(row.children).forEach((cell, index) => {
+                if (cell.classList.contains('mapruler')) {
+                    y = cell.innerText;
+                } else {
+                    let cell_parts = Array.from(cell.children);
+
+                    let new_cell = {
+                        horizontal: y,
+                        vertical: x_mapping[index],
+                        town: cell.classList.contains('city'),
+                        bat: cell_parts.some((cell_part) => cell_part.classList.contains('building')),
+                        my_pos: cell_parts.some((cell_part) => cell_part.classList.contains('posJoueur')),
+                        expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('route-counter')),
+                        expedition_arrows: [],
+                        not_yet_visited: cell.classList.contains('nyv'),
+                        not_visited_today: cell.classList.contains('nvt'),
+                        zombies: Array.from(cell.classList).filter((class_name) => class_name.startsWith('danger')).map((class_name) => class_name.replace('danger', ''))[0],
+                        empty: !cell.querySelector('.zone-status-full'),
+                        empty_bat: cell.querySelector('.depleted-building'),
+                        ruin: cell.querySelector('.explorable-building'),
+                    };
+                    cells.push(new_cell);
+                }
+            });
+            new_map.push(cells);
+        });
+        resolve({map: new_map, vertical_mapping: x_mapping});
+        endLoading();
+    });
+}
+
+/** Récupère la carte de FataMorgana */
+async function getFMRuin() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+        if (GM_getValue(mho_map_key).ruin) {
+            let map_html = document.createElement('div');
+            map_html.innerHTML = GM_getValue(mho_map_key).ruin;
+
+            let new_map = [];
+            let rows = Array.from(map_html.querySelector('#ruinmap').children);
+            let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
+            rows
+                .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
+                .forEach((row, row_index, rows_array) => {
+                let new_cells = [];
+                let cells = Array.from(row.children);
+                let y;
+                cells.forEach((cell, cell_index, cell_array) => {
+                    if (cell.classList.contains('mapruler')) {
+                        y = cell.innerText;
+                    } else {
+                        let new_cell = {
+                            horizontal: y,
+                            vertical: x_mapping[cell_index],
+                            borders: '0000',
+                            zombies: cell.getAttribute('z')
+                        };
+
+                        let img = Array.from(cell.classList).find((class_name) => class_name.startsWith('tile-'));
+                        switch (img) {
+                            case 'tile-1':
+                                new_cell.borders = '0100';
+                                break;
+                            case 'tile-2':
+                                new_cell.borders = '0010';
+                                break;
+                            case 'tile-3':
+                                new_cell.borders = '0001';
+                                break;
+                            case 'tile-4':
+                                new_cell.borders = '1000';
+                                break;
+                            case 'tile-5':
+                                if (cell.classList.contains('ruinEntry')) {
+                                    new_cell.borders = 'exit';
+                                } else {
+                                    new_cell.borders = '0101';
+                                }
+                                break;
+                            case 'tile-6':
+                                new_cell.borders = '1010';
+                                break;
+                            case 'tile-7':
+                                new_cell.borders = '1111';
+                                break;
+                            case 'tile-8':
+                                new_cell.borders = '0110';
+                                break;
+                            case 'tile-9':
+                                new_cell.borders = '0011';
+                                break;
+                            case 'tile-10':
+                                new_cell.borders = '1001';
+                                break;
+                            case 'tile-11':
+                                new_cell.borders = '1100';
+                                break;
+                            case 'tile-12':
+                                new_cell.borders = '1110';
+                                break;
+                            case 'tile-13':
+                                new_cell.borders = '0111';
+                                break;
+                            case 'tile-14':
+                                new_cell.borders = '1011';
+                                break;
+                            case 'tile-15':
+                                new_cell.borders = '1101';
+                                break;
+                            case 'tile-0':
+                            default:
+                                new_cell.borders = '0000';
+                                break;
+                        };
+
+                        if (cell.classList.contains('doorlock-1')) {
+                            new_cell.door = 'item_lock';
+                        } else if (cell.classList.contains('doorlock-2')) {
+                            new_cell.door = 'item_door';
+                        } else if (cell.classList.contains('doorlock-3')) {
+                            new_cell.door = 'item_classicKey';
+                        } else if (cell.classList.contains('doorlock-4')) {
+                            new_cell.door = 'item_bumpKey';
+                        } else if (cell.classList.contains('doorlock-5')) {
+                            new_cell.door = 'item_magneticKey';
+                        }
+                        new_cells.push(new_cell);
+                    }
+                });
+                new_map.push(new_cells);
+            });
+            resolve({map: new_map, vertical_mapping: x_mapping});
+        }
+        endLoading();
+    });
 }
 
 ////////////////
@@ -4099,9 +5047,10 @@ function getOptimalPath(map, html, button, source) {
         } else {
             current_key = gm_fata_updated_key;
             map_block_id = 'map';
-            block_copy_map_button = 'update-myzone';
-            source = 'fata'
-
+            ruin_block_id = 'ruinmap';
+            block_copy_map_button = 'modeBar';
+            block_copy_ruin_button = 'modeBar';
+            source = 'fm'
         }
 
         // Si on est sur le site de BBH ou GH ou Fata et que BBH ou GH ou Fata a été mis à jour depuis MyHordes, alors on recharge BBH ou GH ou Fata au moment de revenir sur l'onglet
@@ -4119,13 +5068,11 @@ function getOptimalPath(map, html, button, source) {
                 let map_block = document.getElementById(map_block_id);
                 let ruin_block = document.getElementById(ruin_block_id);
                 if (map_block || ruin_block) {
-                    if (map_block) {
-                        // createCopyButton(source, map_block_id, block_copy_map_button);
-                    } else if (ruin_block) {
-                        if (source !== 'fata') {
-                            // createOptimizePathButton(source, ruin_block_id, block_copy_ruin_button);
-                        }
-                        // createCopyButton(source, ruin_block_id, block_copy_ruin_button);
+                    if (ruin_block) {
+                        createCopyButton(source, 'ruin', ruin_block_id, block_copy_ruin_button);
+                        // createOptimizePathButton(source, ruin_block_id, block_copy_ruin_button);
+                    } else if (map_block) {
+                        createCopyButton(source, 'map', map_block_id, block_copy_map_button);
                     }
                 }
             } else if (!mho_parameters.display_map && copy_button) {
