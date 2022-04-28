@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.40
+// @version      1.0.0-alpha.41
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -2928,23 +2928,27 @@ function displayMap() {
         table.firstElementChild.firstElementChild.addEventListener('click', () => displayMap());
         content.appendChild(table);
     }
-    if (GM_getValue(mho_map_key).source === 'gh') {
-        if (GM_getValue(mho_map_key).map === 'ruin') {
-            getGHRuin().then((map) => transformRuinMapping(map));
-        } else {
-            getGHMap().then((map) => transformMapping(map));
-        }
-    } else if (GM_getValue(mho_map_key).source === 'bbh') {
-        if (GM_getValue(mho_map_key).map === 'ruin') {
-            getBBHRuin().then((map) => transformRuinMapping(map));
-        } else {
-            getBBHMap().then((map) => transformMapping(map));
-        }
-    } else if (GM_getValue(mho_map_key).source === 'fm') {
-        if (GM_getValue(mho_map_key).map === 'ruin') {
-            getFMRuin().then((map) => transformRuinMapping(map));
-        } else {
-            getFMMap().then((map) => transformMapping(map));
+
+    let mho_map = GM_getValue(mho_map_key);
+    if (mho_map) {
+        if (mho_map.source === 'gh') {
+            if (mho_map.map === 'ruin') {
+                getGHRuin().then((map) => transformRuinMapping(map));
+            } else {
+                getGHMap().then((map) => transformMapping(map));
+            }
+        } else if (mho_map.source === 'bbh') {
+            if (mho_map.map === 'ruin') {
+                getBBHRuin().then((map) => transformRuinMapping(map));
+            } else {
+                getBBHMap().then((map) => transformMapping(map));
+            }
+        } else if (mho_map.source === 'fm') {
+            if (mho_map.map === 'ruin') {
+                getFMRuin().then((map) => transformRuinMapping(map));
+            } else {
+                getFMMap().then((map) => transformMapping(map));
+            }
         }
     }
 }
@@ -3162,8 +3166,8 @@ function createCopyButton(source, map, map_id, button_block_id) {
         GM_setValue(mho_map_key, {
             source: source,
             map: map,
-            fm_block: source === 'fm' && map === 'map' ? map_to_convert.outerHTML : GM_getValue(mho_map_key).fm_block,
-            ruin: map === 'ruin' ? map_to_convert.outerHTML : GM_getValue(mho_map_key).ruin
+            fm_block: source === 'fm' && map === 'map' ? map_to_convert.outerHTML : (GM_getValue(mho_map_key) ? GM_getValue(mho_map_key).fm_block : undefined),
+            ruin: map === 'ruin' ? map_to_convert.outerHTML : (GM_getValue(mho_map_key) ? GM_getValue(mho_map_key).ruin : undefined)
         })
         copy_button.disabled = false;
     });
