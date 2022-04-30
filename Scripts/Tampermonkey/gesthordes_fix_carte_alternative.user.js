@@ -3,7 +3,12 @@
 // @version      1.0
 // @description  Ajoute les blocs manquants à la carte alternative de GH
 // @author       Zerah
+//
+// @downloadURL  https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/gesthordes_fix_carte_alternative.user.js
+// @updateURL    https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/gesthordes_fix_carte_alternative.user.js
+//
 // @match        https://gest-hordes2.eragaming.fr/carte
+//
 // @grant        none
 // ==/UserScript==
 
