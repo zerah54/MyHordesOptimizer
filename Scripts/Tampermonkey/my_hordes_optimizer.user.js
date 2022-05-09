@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.41
+// @version      1.0.0-alpha.42
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -31,9 +31,9 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[New] Réimplémentation de la fonctionnalité de consultation de carte, qui avait été supprimée.
-Désormais, les cartes sont reconstruites à partir des données récupérées en cliquant sur le bouton "copier".
-Il est donc normal que le design de votre carte ne soit pas identique à celui de votre outil préféré !`
++ `[Correctif] Oups, j'avais oublié de réactiver l'option pour la carte, elle était bien implémentée mais impossible de l'activer ^^'\n`
++ `[Correctif] Je tente d'améliorer la fonctionnalité de notification à la fin de la fouille depuis quelques temps, ça semble être plus stable\n\n`
++ `[Amélioration] Ajout des PA du café dans le tooltip amélioré`
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 const temp_lang = lang === 'es' ? 'en' : lang;
@@ -513,22 +513,22 @@ let params_categories = [
             de: `Fata Morgana aktualisieren`,
             es: `TODO`
         }, parent_id: null},
-        // {
-        //     id: `display_map`,
-        //     label: {
-        //         en: `Allow to show a map from external tools`,
-        //         fr: `Permettre d'afficher une carte issue des outils externes`,
-        //         de: `Anzeigen einer Karte von externen Tools ermöglichen`,
-        //         es: `TODO`
-        //     },
-        //     help: {
-        //         en: `In any external tool, it will be possible to copy the town or ruin map and to paste it into MyHordes`,
-        //         fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`,
-        //         de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
-        //         es: `TODO`
-        //     },
-        //     parent_id: null
-        // }
+        {
+            id: `display_map`,
+            label: {
+                en: `Allow to show a map from external tools`,
+                fr: `Permettre d'afficher une carte issue des outils externes`,
+                de: `Anzeigen einer Karte von externen Tools ermöglichen`,
+                es: `TODO`
+            },
+            help: {
+                en: `In any external tool, it will be possible to copy the town or ruin map and to paste it into MyHordes`,
+                fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`,
+                de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
+                es: `TODO`
+            },
+            parent_id: null
+        }
     ]},
     {id: `display`, label: {
         en: `Interface improvements`,
@@ -2253,11 +2253,15 @@ function displayAdvancedTooltips() {
                     } else if (!advanced_tooltip_container.innerHTML) {
                         advanced_tooltip_container.innerHtml = '';
 
+                        if ((!item_deco || hovered_item.deco === 0) && !hovered_item.properties && !hovered_item.actions && hovered_item.recipes.length === 0) return;
+
                         console.log('hovered_item', hovered_item);
                         if (item_deco && hovered_item.deco > 0) {
                             let text = item_deco.innerText.replace(/ \(.*\)*/, '');
                             item_deco.innerHTML = `<span>${text} <em>( +${hovered_item.deco} )</em></span>`;
                         }
+
+                        if (!hovered_item.properties && !hovered_item.actions && hovered_item.recipes.length === 0) return;
 
                         if (hovered_item.properties) {
                             let item_properties = document.createElement('div');
@@ -2267,6 +2271,9 @@ function displayAdvancedTooltips() {
                                 item_properties.appendChild(item_action);
                             });
                         }
+
+                        if (!hovered_item.actions && hovered_item.recipes.length === 0) return;
+
                         if (hovered_item.actions) {
                             let item_actions = document.createElement('div');
                             advanced_tooltip_container.appendChild(item_actions);
@@ -2275,6 +2282,8 @@ function displayAdvancedTooltips() {
                                 item_actions.appendChild(item_action);
                             });
                         }
+
+                        if (hovered_item.recipes.length === 0) return;
 
                         if (hovered_item.recipes.length > 0) {
                             tooltip_container.firstElementChild.classList.add('large-tooltip');
@@ -2307,6 +2316,10 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'eat_7ap':
             item_action.classList.add(`item-tag-food`);
             item_action.innerHTML = `+${property_or_action.slice(4,5)}<img src="${repo_img_url}emotes/ap.${lang}.gif">`;
+            break;
+        case 'coffee':
+            item_action.classList.add(`item-tag-coffee`);
+            item_action.innerHTML = `+4<img src="${repo_img_url}emotes/ap.${lang}.gif">`;
             break;
         case 'drug_6ap_1':
         case 'drug_8ap_1':
@@ -2552,7 +2565,6 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'drug_april_2':
         case 'eat_meat_1':
         case 'eat_meat_2':
-        case 'coffee':
         case 'open_foodbox_in':
         case 'open_foodbox_out':
         case 'open_foodbox_in_t1':
@@ -3043,12 +3055,15 @@ function preventDangerousActions() {
 function notifyOnSearchEnd() {
     let interval = setInterval(() => {
         if (mho_parameters.notify_on_search_end && pageIsDesert()) {
-            let count = document.querySelectorAll('span[x-countdown]')[0];
+            let count = document.querySelector('span[x-countdown]');
             if (count) {
                 clearInterval(interval);
-                let countdown = count.getAttribute('x-countdown');
-                let timeout_counter = (count.getAttribute('x-countdown') - 5) * 1000;
-                setTimeout(() => {
+                let countdown_array = count.innerText.split(':');
+                if (countdown_array.length < 3) {
+                    countdown_array.splice(0, 0, 0);
+                }
+                let countdown = (+countdown_array[0] * 60 * 60) + (+countdown_array[1] * 60) + (+countdown_array[2]);
+                if (countdown < 5) {
                     if (!pageIsTown()) {
                         GM_notification({
                             text: texts.search_ended[temp_lang],
@@ -3058,8 +3073,17 @@ function notifyOnSearchEnd() {
                         });
                     }
                     clearInterval(interval);
-                    notifyOnSearchEnd();
-                }, timeout_counter);
+                    setTimeout(() => {
+                        clearInterval(interval);
+                        notifyOnSearchEnd();
+                    }, 10000)
+                } else {
+                    let timeout_counter = countdown / 2 * 1000;
+                    setTimeout(() => {
+                        clearInterval(interval);
+                        notifyOnSearchEnd();
+                    }, timeout_counter);
+                }
             }
         } else if (pageIsTown()) {
             clearInterval(interval);
@@ -4990,7 +5014,7 @@ function getRecipes() {
 
 /** Récupère le chemin optimal à partir d'une carte */
 function getOptimalPath(map, html, button, source) {
-    map.doors = map.doors.slice(2);
+    // map.doors = map.doors.slice(2);
     console.log('map before send', map);
     GM_xmlhttpRequest({
         method: 'POST',
@@ -5010,12 +5034,15 @@ function getOptimalPath(map, html, button, source) {
             } else {
                 console.error('error', response.reponse)
             }
-
             button.disabled = false;
         },
         onerror: function(error){
-            endLoading();
-            addError(error);
+            console.error('error', error);
+            button.disabled = false;
+        },
+        ontimeout: function(timeout) {
+            console.error('timeout', timeout);
+            button.disabled = false;
         }
     });
 }
