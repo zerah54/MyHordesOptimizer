@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.43
+// @version      1.0.0-alpha.44
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -224,7 +224,7 @@ const texts = {
         en: `TODO`,
         fr: `Attention : L'estimation de l'attaque par cette méthode a été approuvée par certains membres de l'équipe de développement.
         Toutefois, ils ont été prévenus de notre méthode, et prévoient déjà de corriger le mode de calcul en fonction.
-        Par conséquent, il est probable que cette fonctionnalité ne sout plus fiable dès la prochaine mise à jour`,
+        Par conséquent, il est probable que cette fonctionnalité ne soit plus fiable dès la prochaine mise à jour`,
         de: `Achtung: Die Abschätzungsmethode wurde vom Entwicklungsteam zwar abgesegnet, wir wurden allerdings gewarnt dass eine Korretkur der Berechnung in Planung ist.
         Es ist wahrscheinlich, dass diese Funktion ab dem nächsten Update nicht mehr zuverlässig funktioniert.`,
         es: `TODO`
