@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.42
+// @version      1.0.0-alpha.43
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -13,6 +13,7 @@
 // @supportURL   lenoune38@gmail.com
 //
 // @connect      https://myhordesoptimizerapi.azurewebsites.net/
+// @connect      http://144.24.192.182/
 // @connect      *
 //
 // @match        https://myhordes.de/*
@@ -31,9 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Oups, j'avais oublié de réactiver l'option pour la carte, elle était bien implémentée mais impossible de l'activer ^^'\n`
-+ `[Correctif] Je tente d'améliorer la fonctionnalité de notification à la fin de la fouille depuis quelques temps, ça semble être plus stable\n\n`
-+ `[Amélioration] Ajout des PA du café dans le tooltip amélioré`
++ `[Expérimental] Fonctionnalité (temporaire) d'estimation de l'attaque\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 const temp_lang = lang === 'es' ? 'en' : lang;
@@ -56,6 +55,7 @@ let mh_user = GM_getValue(mh_user_key);
 ////////////////////
 
 const api_url = 'https://myhordesoptimizerapi.azurewebsites.net/';
+const api2_url = 'http://144.24.192.182';
 
 ///////////////////////////////////////////
 // Listes de constantes / Constants list //
@@ -219,6 +219,39 @@ const texts = {
         fr: `Afficher uniquement les résultats exacts`,
         de: `Nur exakte Ergebnisse anzeigen`,
         es: `TODO`
+    },
+    prevention_estimation: {
+        en: `TODO`,
+        fr: `Attention : L'estimation de l'attaque par cette méthode a été approuvée par certains membres de l'équipe de développement.
+        Toutefois, ils ont été prévenus de notre méthode, et prévoient déjà de corriger le mode de calcul en fonction.
+        Par conséquent, il est probable que cette fonctionnalité ne sout plus fiable dès la prochaine mise à jour`,
+        de: `Achtung: Die Abschätzungsmethode wurde vom Entwicklungsteam zwar abgesegnet, wir wurden allerdings gewarnt dass eine Korretkur der Berechnung in Planung ist.
+        Es ist wahrscheinlich, dass diese Funktion ab dem nächsten Update nicht mehr zuverlässig funktioniert.`,
+        es: `TODO`
+    },
+    estimate: {
+        en: `TODO`,
+        fr: `Estimer l'attaque`,
+        de: `Angriffsabschätzung`,
+        es: `TODO`
+    },
+    current_day: {
+        en: `Current day`,
+        fr: `Jour actuel`,
+        de: `Aktueller Tag`,
+        es: `TODO`
+    },
+    today_estimation: {
+        en: `TODO`,
+        fr: `Estimation pour l'attaque du soir`,
+        de: `Schätzung für den nächtlichen Angriff`,
+        es: `Pronóstico del ataque nocturno`
+    },
+    tomorrow_estimation: {
+        en: `TODO`,
+        fr: `Estimation pour l'attaque du lendemain`,
+        de: `Schätzung für den morgigen Angriff`,
+        es: `Estimación del ataque del día siguiente`
     }
 };
 
@@ -479,6 +512,17 @@ let tabs_list = {
                 es: `TODO`
             },
             icon: repo_img_url + `icons/small_human.gif`
+        },
+        {
+            ordering: 3,
+            id: `estimations`,
+            label: {
+                en: `Estimations`,
+                fr: `Estimations`,
+                de: `Schätzen`,
+                es: `Estimación`
+            },
+            icon: repo_img_url + `item/item_scope.gif`
         }
     ]
 };
@@ -1290,6 +1334,9 @@ function dispatchContent(window_type, tab) {
         case 'wishlist':
             displayWishlist();
             break;
+        case 'estimations':
+            displayEstimations();
+            break;
         default:
             break;
     }
@@ -1744,6 +1791,117 @@ function displayCitizens() {
         }
     }, 500);
 }
+
+/** Affiche le formulaire d'estimation de l'attaque */
+function displayEstimations() {
+    let tab_content = document.getElementById('tab-content');
+    let percents = [33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100];
+    let prevention = document.createElement('div');
+    prevention.innerText = texts.prevention_estimation[temp_lang];
+    tab_content.appendChild(prevention);
+
+    let current_day_label = document.createElement('label');
+    current_day_label.style.marginTop = '1em';
+    current_day_label.style.marginRight = '1em';
+    current_day_label.innerText = texts.current_day[temp_lang]
+    let current_day = document.createElement('input');
+    current_day.style.marginTop = '1em';
+    current_day.id = 'current-day';
+
+    tab_content.appendChild(current_day_label);
+    tab_content.appendChild(current_day);
+
+    let days = ['today_estimation', 'tomorrow_estimation']
+    let days_selector = document.createElement('div');
+    tab_content.appendChild(days_selector);
+    let radio = document.createElement('input');
+    days.forEach((day, index) => {
+        let div = document.createElement('div');
+        days_selector.appendChild(div);
+        let input = document.createElement('input');
+        div.appendChild(input);
+        input.checked = index === 0;
+        input.type = 'radio';
+        input.id = day;
+        input.name = 'today'
+        input.value = day;
+        let label = document.createElement('label');
+        div.appendChild(label);
+        label.htmlFor = day;
+        label.innerText = texts[day][temp_lang];
+    })
+
+
+    let ul = document.createElement('ul');
+    ul.style.display = 'block';
+    tab_content.appendChild(ul);
+    ul.innerHTML = `<li><span style="display: inline-block; width: 50px;"></span><span style="display: inline-block; width: 150px">Min</span><span style="display: inline-block; width: 150px">Max</span></li>`;
+    percents.forEach((percent) => {
+        let li = document.createElement('li');
+        li.classList.add('estimation');
+        ul.appendChild(li);
+        let percent_text = document.createElement('span');
+        percent_text.style.width = '50px';
+        percent_text.style.display = 'inline-block';
+        percent_text.innerText = percent + '%';
+        li.appendChild(percent_text);
+        let input_min = document.createElement('input');
+        input_min.style.width = '150px';
+        li.appendChild(input_min);
+        let input_max = document.createElement('input');
+        input_max.style.width = '150px';
+        li.appendChild(input_max);
+
+        input_min.addEventListener('paste', (event) => {
+            setTimeout(() => {
+                let paste_value = input_min.value;
+                if (paste_value.indexOf('-') > -1) {
+                    let values = paste_value.split('-');
+                    input_min.value = values[0];
+                    input_max.value = values[1];
+                }
+            });
+        })
+
+        input_max.addEventListener('paste', (event) => {
+            setTimeout(() => {
+                let paste_value = input_max.value;
+                if (paste_value.indexOf('-') > -1) {
+                    let values = paste_value.split('-');
+                    input_min.value = values[0];
+                    input_max.value = values[1];
+                }
+            });
+        })
+    })
+
+    let estimate_button = document.createElement('button');
+    ul.appendChild(estimate_button);
+    estimate_button.setAttribute('style', 'width: 350px; margin-left: 0.5em;');
+    estimate_button.classList.add('inline');
+    estimate_button.innerText = texts.estimate[temp_lang];
+    estimate_button.addEventListener('click', () => {
+        let values_nodes = Array.from(tab_content.querySelectorAll('.estimation'));
+        let values = {};
+
+        let today = Array.from(days_selector.querySelectorAll('input')).find((radio) => radio.checked).id === 'today_estimation';
+        let current_day_value = document.querySelector('#current-day').value;
+        values_nodes.forEach((value, index) => {
+            let value_details = Array.from(value.querySelectorAll('input')).map((input) => input.value);
+            values[percents[index]] = value_details[0] && value_details[1] ? value_details.join(' - ') : ' ';
+        })
+
+        getTodayEstimation(current_day_value, values, today).then((response) => {
+            let bloc = document.querySelector('#mho-estimation-response');
+            bloc.innerText = response;
+        });
+    });
+
+    let response = document.createElement('p');
+    response.id = 'mho-estimation-response';
+    tab_content.appendChild(response);
+}
+
 
 /** Affiche la liste des pouvoirs */
 function displaySkills() {
@@ -5012,6 +5170,31 @@ function getRecipes() {
     });
 }
 
+/** Récupère la liste complète des recettes */
+async function getTodayEstimation(day, estimations, today) {
+    return new Promise((resolve, reject) => {
+        startLoading();
+        GM_xmlhttpRequest({
+            method: 'POST',
+            url: api2_url + `:8080/${today ? 'attaque' : 'planif'}.php?day=${day}&id=${mh_user.townId}&type=normal&debug=false`,
+            data: JSON.stringify(estimations),
+            responseType: 'text',
+            onload: function(response){
+                if (response.status === 200) {
+                    resolve(response.response);
+                } else {
+                    addError(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
+            }
+        });
+    });
+}
+
 /** Récupère le chemin optimal à partir d'une carte */
 function getOptimalPath(map, html, button, source) {
     // map.doors = map.doors.slice(2);
@@ -5019,7 +5202,8 @@ function getOptimalPath(map, html, button, source) {
     GM_xmlhttpRequest({
         method: 'POST',
         data: JSON.stringify(map),
-        url: api_url + 'ruine/pathopti',
+        url: api2_url + '/ruine/pathopti',
+        // url: api_url + 'ruine/pathopti',
         responseType: 'json',
         headers: {
             'Content-Type': 'application/json'
