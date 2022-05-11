@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.44
+// @version      1.0.0-alpha.45
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Expérimental] Fonctionnalité (temporaire) d'estimation de l'attaque\n`;
++ `[Nouveauté] Nouvelle option, permettant d'afficher le seuil (70% + 1pa) auquel réparer les chantiers pour qu'ils ne soient pas détruits en Pandé \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 const temp_lang = lang === 'es' ? 'en' : lang;
@@ -252,7 +252,13 @@ const texts = {
         fr: `Estimation pour l'attaque du lendemain`,
         de: `Schätzung für den morgigen Angriff`,
         es: `Estimación del ataque del día siguiente`
-    }
+    },
+    missing_ap_explanation: {
+        en: `(including %VAR% for the building to stay overnight)`,
+        fr: `(dont %VAR% pour que le bâtiment passe la nuit)`,
+        de: `(einschließlich %VAR% für das Gebäude zum Übernachten)`,
+        es: `(incluyendo %VAR% para el edificio para pernoctar)`,
+}
 };
 
 const categories_mapping = {
@@ -642,6 +648,22 @@ let params_categories = [
             },
             parent_id: null
         },
+        {
+            id: `display_missing_ap_for_buildings_to_be_safe`,
+            label: {
+                en: `Show missing AP to repair construction sites`,
+                fr: `Afficher les PA manquants pour réparer les chantiers`,
+                de: `Fehlende AP anzeigen, um Konstruktionen zu reparieren`,
+                es: `Mostrar puntos de acceso faltantes para reparar construcciónes`
+            },
+            help: {
+                en: `TODO`,
+                fr: `En Pandémonium, les bâtiments prennent des dégâts lors de l'attaque. Ces dégâts équivalent à un maximum de 70% des points de vie du bâtiment (arrondi à l'entier supérieur). Cette option affiche sur les bâtiments les PA à investir pour que le bâtiment soit en sécurité.`,
+                de: `TODO`,
+                es: `TODO`
+            },
+            parent_id: null
+        }
     ]},
     {id: `notifications`, label: {
         en: `Notices and warnings`,
@@ -2200,7 +2222,61 @@ function displaySearchFieldOnBuildings() {
     }
 }
 
+/** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */
+function displayMinApOnBuildings() {
+    if (mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
+        let complete_buildings = document.querySelectorAll('.row.complete');
+        if (!complete_buildings || complete_buildings.length === 0) return;
 
+        let broken_buildings = Array.from(complete_buildings).filter((complete_building) => complete_building.querySelector('.ap-bar'));
+
+        if (!broken_buildings || broken_buildings.length === 0) return;
+
+        broken_buildings.forEach((broken_building) => {
+            let bar = broken_building.querySelector('.ap-bar');
+            let tooltip = bar.querySelector('.tooltip');
+            if (!tooltip || !tooltip.innerHTML) return;
+
+            let status = tooltip.innerText.match(/[0-9]+\/[0-9]+/)[0].split('/');
+            let nb_pts_per_ap = parseInt(tooltip.innerHTML.match(/<b>[0-9]+<\/b>/)[0].match(/[0-9]+/)[0], 10);
+            let current = parseInt(status[0], 10);
+            let total = parseInt(status[1], 10);
+
+            let minimum_safe = Math.ceil(total * 70 / 100) + 1
+            if (minimum_safe <= current) return;
+
+            let missing_pts = minimum_safe - current;
+            bar.style.display = 'flex';
+            let new_ap_bar = bar.querySelector('.mho-safe-ap');
+            if (!new_ap_bar) {
+                new_ap_bar = document.createElement('div');
+                new_ap_bar.classList.add('mho-safe-ap');
+            }
+            new_ap_bar.style.background = 'yellow';
+            new_ap_bar.style.width = missing_pts / total * 100 + '%';
+            bar.appendChild(new_ap_bar);
+
+            let nb_ap = broken_building.querySelector('.build-req');
+            let missing_ap_info = nb_ap.querySelector('.mho-missing-ap');
+            if (!missing_ap_info) {
+                missing_ap_info = document.createElement('span')
+                missing_ap_info.classList.add('mho-missing-ap');
+            }
+            missing_ap_info.style.fontWeight = 'initial';
+            missing_ap_info.style.fontSize = '0.8em';
+            missing_ap_info.innerText = texts.missing_ap_explanation[lang].replace('%VAR%', Math.ceil(missing_pts/nb_pts_per_ap));
+            nb_ap.appendChild(missing_ap_info);
+        });
+    } else if (pageIsConstructions()) {
+        let missing_ap_infos = document.querySelectorAll('.mho-missing-ap');
+        if (!missing_ap_infos) return;
+        Array.from(missing_ap_infos).forEach((missing_ap_info) => missing_ap_info.remove())
+
+        let mho_safe_aps = document.querySelectorAll('.mho-safe-ap');
+        if (!mho_safe_aps) return;
+        Array.from(mho_safe_aps).forEach((mho_safe_ap) => mho_safe_ap.remove());
+    }
+}
 
 /** Affiche la liste de courses dans le désert et l'atelier */
 function displayWishlistInApp() {
@@ -5325,6 +5401,7 @@ function getOptimalPath(map, html, button, source) {
             createUpdateExternalToolsButton();
             clickOnVotedToRedirect();
             displaySearchFieldOnBuildings();
+            displayMinApOnBuildings();
             displayWishlistInApp();
             displayPriorityOnItems();
             displayNbDeadZombies();
