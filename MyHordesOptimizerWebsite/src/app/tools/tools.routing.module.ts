@@ -1,3 +1,4 @@
+import { EstimationComponent } from './estimation/estimation.component';
 import { WishlistComponent } from './wishlist/wishlist.component';
 import { CitizensComponent } from './citizens/citizens.component';
 import { BankComponent } from './bank/bank.component';
@@ -11,6 +12,7 @@ let routes: Routes = [
             {path: 'bank', component: BankComponent},
             {path: 'citizens', component: CitizensComponent},
             {path: 'wishlist', component: WishlistComponent},
+            {path: 'estimation', component: EstimationComponent},
         ]
     }
 ]

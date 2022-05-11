@@ -1,8 +1,9 @@
+import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
-import { getExternalAppId, getUserId, setUserId } from 'src/app/shared/utilities/localstorage.util';
+import { getExternalAppId, getTownId, getUserId, setTownId, setUserId } from 'src/app/shared/utilities/localstorage.util';
 import { ItemDTO } from '../dto/item.dto';
 import { ToolsToUpdate } from '../types/_types';
 import { SnackbarService } from './../../shared/services/snackbar.service';
@@ -16,6 +17,7 @@ import { WishlistItem } from './../types/wishlist-item.class';
 import { GlobalServices } from './global.services';
 
 const API_URL: string = 'https://myhordesoptimizerapi.azurewebsites.net/';
+const API_URL_2: string = 'http://144.24.192.182';
 
 @Injectable()
 export class ApiServices extends GlobalServices {
@@ -47,7 +49,9 @@ export class ApiServices extends GlobalServices {
     public getMe(): void {
         super.get<{ id: number }>(API_URL + 'myhordesfetcher/me?userKey=' + getExternalAppId())
             .subscribe((response: HttpResponse<{ id: number } | null>) => {
+                console.log('test', response.body);
                 setUserId(response.body ? response.body.id : null);
+                setTownId(response.body ? response.body.id : null);
             })
     }
 
@@ -134,6 +138,23 @@ export class ApiServices extends GlobalServices {
                     next: () => {
                         sub.next();
                         this.snackbar.successSnackbar(`L'objet ${item.label[this.locale]} a bien été ajouté à la liste de courses`);
+                    }
+                })
+        })
+    }
+
+
+    /**
+     * Demande l'estimation à partid des données du tableau
+     * @param {Dictionary<string>} rows Les données pour l'estimation
+     */
+     public estimateAttack(rows: Dictionary<string>, today: boolean, day: number): Observable<string> {
+        return new Observable((sub: Subscriber<string>) => {
+            super.post<string>(API_URL_2 + `:8080/${today ? 'attack' : 'planif'}.php?day=${day}&id=${getTownId()}&type=normal&debug=false`, JSON.stringify(rows))
+                .subscribe({
+                    next: (response) => {
+                        sub.next(response);
+                        console.log('test', response);
                     }
                 })
         })

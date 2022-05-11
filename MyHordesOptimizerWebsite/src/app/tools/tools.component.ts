@@ -1,3 +1,4 @@
+import { EstimationComponent } from './estimation/estimation.component';
 import { PageWithSidenav } from './../shared/page-with-sidenav/page-with-sidenav.component';
 import { Component, OnInit } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
@@ -21,7 +22,8 @@ export class ToolsComponent extends PageWithSidenav implements OnInit {
     public tools_list: SidenavLinks[] = [
         { label: $localize`Banque`, id: 'bank', component: BankComponent, selected: true },
         { label: $localize`Liste de courses`, id: 'wishlist', component: WishlistComponent, selected: false },
-        { label: $localize`Citoyens`, id: 'citizens', component: CitizensComponent, selected: false }
+        { label: $localize`Citoyens`, id: 'citizens', component: CitizensComponent, selected: false },
+        { label: $localize`Estimation de l'attaque`, id: 'estimation', component: EstimationComponent, selected: false }
     ]
 
     constructor(public media: MediaObserver, private sidenav: SidenavService) {

@@ -1,0 +1,18 @@
+.mho-estimation {
+    .estimation-options {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .mat-table {
+        width: 100%;
+        tbody {
+            tr {
+                height: 30px;
+            }
+        }
+        .mat-form-field {
+            margin: 0 0.5em;
+        }
+    }
+}
