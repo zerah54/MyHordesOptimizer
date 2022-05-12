@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.45
+// @version      1.0.0-alpha.46
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Nouvelle option, permettant d'afficher le seuil (70% + 1pa) auquel réparer les chantiers pour qu'ils ne soient pas détruits en Pandé \n`;
++ `[Amélioration] Traductions pour la fonctionnalité d'estimation de l'attaque (plus que quelques jours pour l'utiliser avant qu'elle ne disparaisse) \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 const temp_lang = lang === 'es' ? 'en' : lang;
@@ -221,34 +221,38 @@ const texts = {
         es: `TODO`
     },
     prevention_estimation: {
-        en: `TODO`,
+        en: `The attack estimation through this method was approved by certain members of the developer team.
+        Nonetheless, they have been warned about our methods, and they will correct the calculation mode.
+        This means that after the next update this feature won't be reliable`,
         fr: `Attention : L'estimation de l'attaque par cette méthode a été approuvée par certains membres de l'équipe de développement.
         Toutefois, ils ont été prévenus de notre méthode, et prévoient déjà de corriger le mode de calcul en fonction.
         Par conséquent, il est probable que cette fonctionnalité ne soit plus fiable dès la prochaine mise à jour`,
         de: `Achtung: Die Abschätzungsmethode wurde vom Entwicklungsteam zwar abgesegnet, wir wurden allerdings gewarnt dass eine Korretkur der Berechnung in Planung ist.
         Es ist wahrscheinlich, dass diese Funktion ab dem nächsten Update nicht mehr zuverlässig funktioniert.`,
-        es: `TODO`
+        es: `¡Cuidado!: La estimación del ataque por este método fue aprobada por ciertos desarrolladores del juego.
+        Sin embargo, previnieron al equipo sobre nuestro método y preveen corregir el modo de cálculo.
+        En consecuencia, es probable que esta función no sea fiable a partir de la próxima actualización.`
     },
     estimate: {
-        en: `TODO`,
+        en: `Estimate the attack`,
         fr: `Estimer l'attaque`,
         de: `Angriffsabschätzung`,
-        es: `TODO`
+        es: `Estimar el ataque`
     },
     current_day: {
         en: `Current day`,
         fr: `Jour actuel`,
         de: `Aktueller Tag`,
-        es: `TODO`
+        es: `Día actual`
     },
     today_estimation: {
-        en: `TODO`,
+        en: `Estimation for tonight's attack`,
         fr: `Estimation pour l'attaque du soir`,
         de: `Schätzung für den nächtlichen Angriff`,
         es: `Pronóstico del ataque nocturno`
     },
     tomorrow_estimation: {
-        en: `TODO`,
+        en: `Estimation for tomorrow's 's attack`,
         fr: `Estimation pour l'attaque du lendemain`,
         de: `Schätzung für den morgigen Angriff`,
         es: `Estimación del ataque del día siguiente`
@@ -258,7 +262,7 @@ const texts = {
         fr: `(dont %VAR% pour que le bâtiment passe la nuit)`,
         de: `(einschließlich %VAR% für das Gebäude zum Übernachten)`,
         es: `(incluyendo %VAR% para el edificio para pernoctar)`,
-}
+    }
 };
 
 const categories_mapping = {
