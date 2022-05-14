@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.46
+// @version      1.0.0-alpha.47
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Amélioration] Traductions pour la fonctionnalité d'estimation de l'attaque (plus que quelques jours pour l'utiliser avant qu'elle ne disparaisse) \n`;
++ `[Amélioration] Ajout du stock en banque et du stock souhaité dans le tooltip avancé\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 const temp_lang = lang === 'es' ? 'en' : lang;
@@ -2490,6 +2490,19 @@ function displayAdvancedTooltips() {
                         tooltip_content.appendChild(advanced_tooltip_container);
                     } else if (!advanced_tooltip_container.innerHTML) {
                         advanced_tooltip_container.innerHtml = '';
+
+                        let stock_div = document.createElement('div');
+                        advanced_tooltip_container.appendChild(stock_div);
+                        let bank_div = document.createElement('div');
+                        stock_div.appendChild(bank_div);
+                        stock_div.style.borderBottom = '1px solid white';
+                        bank_div.innerText = wishlist_headers[2].label[temp_lang] + ' : ' + hovered_item.bankCount;
+
+                        if (hovered_item.wishListCount && hovered_item.wishListCount > 0) {
+                            let wishlist_wanted_div = document.createElement('div');
+                            stock_div.appendChild(wishlist_wanted_div);
+                            wishlist_wanted_div.innerText = wishlist_headers[3].label[temp_lang] + ' : ' + hovered_item.wishListCount;
+                        }
 
                         if ((!item_deco || hovered_item.deco === 0) && !hovered_item.properties && !hovered_item.actions && hovered_item.recipes.length === 0) return;
 
