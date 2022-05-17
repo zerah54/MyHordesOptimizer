@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.47
+// @version      1.0.0-alpha.48
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Amélioration] Ajout du stock en banque et du stock souhaité dans le tooltip avancé\n`;
++ `[Supression] Suppression de la fonctionnalité d'estimation. Le mode de calcul a comme prévu été changé, rendant la fonctionnalité inefficace \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 const temp_lang = lang === 'es' ? 'en' : lang;
@@ -523,17 +523,17 @@ let tabs_list = {
             },
             icon: repo_img_url + `icons/small_human.gif`
         },
-        {
-            ordering: 3,
-            id: `estimations`,
-            label: {
-                en: `Estimations`,
-                fr: `Estimations`,
-                de: `Schätzen`,
-                es: `Estimación`
-            },
-            icon: repo_img_url + `item/item_scope.gif`
-        }
+        // {
+        //     ordering: 3,
+        //     id: `estimations`,
+        //     label: {
+        //         en: `Estimations`,
+        //         fr: `Estimations`,
+        //         de: `Schätzen`,
+        //         es: `Estimación`
+        //     },
+        //     icon: repo_img_url + `item/item_scope.gif`
+        // }
     ]
 };
 
