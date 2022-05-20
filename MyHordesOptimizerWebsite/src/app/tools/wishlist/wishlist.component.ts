@@ -55,7 +55,7 @@ export class WishlistComponent {
     constructor(private api: ApiServices) {
 
     }
-
+    
     ngOnInit(): void {
         this.datasource = new MatTableDataSource();
         this.datasource.sort = this.sort;

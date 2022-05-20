@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.34
-// @description  Optimizer for MyHordes
+// @version      1.0.0-alpha.48
+// @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
 // @icon         https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/logo/logo_mho_16x16.png
@@ -13,6 +13,7 @@
 // @supportURL   lenoune38@gmail.com
 //
 // @connect      https://myhordesoptimizerapi.azurewebsites.net/
+// @connect      http://144.24.192.182/
 // @connect      *
 //
 // @match        https://myhordes.de/*
@@ -28,15 +29,13 @@
 // @grant        GM_xmlhttpRequest
 // @grant        GM_notification
 //
-// @require      http://html2canvas.hertzen.com/dist/html2canvas.min.js
-//
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Tris pas toujours fonctionnels\n\n`
-+ `[Correctif] Affichage du libellé du bouton sur Fata Morgana / Chrome\n`;
++ `[Supression] Suppression de la fonctionnalité d'estimation. Le mode de calcul a comme prévu été changé, rendant la fonctionnalité inefficace \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
+const temp_lang = lang === 'es' ? 'en' : lang;
 
 const gm_bbh_updated_key = 'bbh_updated';
 const gm_gh_updated_key = 'gh_updated';
@@ -56,6 +55,7 @@ let mh_user = GM_getValue(mh_user_key);
 ////////////////////
 
 const api_url = 'https://myhordesoptimizerapi.azurewebsites.net/';
+const api2_url = 'http://144.24.192.182';
 
 ///////////////////////////////////////////
 // Listes de constantes / Constants list //
@@ -76,6 +76,7 @@ const wiki_btn_id = 'wiki-btn-id';
 const zone_dead_zombies_id = 'zone-dead-zombies';
 const nb_dead_zombies_id = 'nb-dead-zombies';
 const mho_copy_map_id = 'mho-copy-map';
+const mho_opti_map_id = 'mho-opti-map';
 const mho_display_map_id = 'mho-display-map';
 const mho_search_building_field_id = 'mho-search-building-field';
 const mho_display_translate_input_id = 'mho-display-translate-input';
@@ -218,6 +219,49 @@ const texts = {
         fr: `Afficher uniquement les résultats exacts`,
         de: `Nur exakte Ergebnisse anzeigen`,
         es: `TODO`
+    },
+    prevention_estimation: {
+        en: `The attack estimation through this method was approved by certain members of the developer team.
+        Nonetheless, they have been warned about our methods, and they will correct the calculation mode.
+        This means that after the next update this feature won't be reliable`,
+        fr: `Attention : L'estimation de l'attaque par cette méthode a été approuvée par certains membres de l'équipe de développement.
+        Toutefois, ils ont été prévenus de notre méthode, et prévoient déjà de corriger le mode de calcul en fonction.
+        Par conséquent, il est probable que cette fonctionnalité ne soit plus fiable dès la prochaine mise à jour`,
+        de: `Achtung: Die Abschätzungsmethode wurde vom Entwicklungsteam zwar abgesegnet, wir wurden allerdings gewarnt dass eine Korretkur der Berechnung in Planung ist.
+        Es ist wahrscheinlich, dass diese Funktion ab dem nächsten Update nicht mehr zuverlässig funktioniert.`,
+        es: `¡Cuidado!: La estimación del ataque por este método fue aprobada por ciertos desarrolladores del juego.
+        Sin embargo, previnieron al equipo sobre nuestro método y preveen corregir el modo de cálculo.
+        En consecuencia, es probable que esta función no sea fiable a partir de la próxima actualización.`
+    },
+    estimate: {
+        en: `Estimate the attack`,
+        fr: `Estimer l'attaque`,
+        de: `Angriffsabschätzung`,
+        es: `Estimar el ataque`
+    },
+    current_day: {
+        en: `Current day`,
+        fr: `Jour actuel`,
+        de: `Aktueller Tag`,
+        es: `Día actual`
+    },
+    today_estimation: {
+        en: `Estimation for tonight's attack`,
+        fr: `Estimation pour l'attaque du soir`,
+        de: `Schätzung für den nächtlichen Angriff`,
+        es: `Pronóstico del ataque nocturno`
+    },
+    tomorrow_estimation: {
+        en: `Estimation for tomorrow's 's attack`,
+        fr: `Estimation pour l'attaque du lendemain`,
+        de: `Schätzung für den morgigen Angriff`,
+        es: `Estimación del ataque del día siguiente`
+    },
+    missing_ap_explanation: {
+        en: `(including %VAR% for the building to stay overnight)`,
+        fr: `(dont %VAR% pour que le bâtiment passe la nuit)`,
+        de: `(einschließlich %VAR% für das Gebäude zum Übernachten)`,
+        es: `(incluyendo %VAR% para el edificio para pernoctar)`,
     }
 };
 
@@ -478,7 +522,18 @@ let tabs_list = {
                 es: `TODO`
             },
             icon: repo_img_url + `icons/small_human.gif`
-        }
+        },
+        // {
+        //     ordering: 3,
+        //     id: `estimations`,
+        //     label: {
+        //         en: `Estimations`,
+        //         fr: `Estimations`,
+        //         de: `Schätzen`,
+        //         es: `Estimación`
+        //     },
+        //     icon: repo_img_url + `item/item_scope.gif`
+        // }
     ]
 };
 
@@ -597,6 +652,22 @@ let params_categories = [
             },
             parent_id: null
         },
+        {
+            id: `display_missing_ap_for_buildings_to_be_safe`,
+            label: {
+                en: `Show missing AP to repair construction sites`,
+                fr: `Afficher les PA manquants pour réparer les chantiers`,
+                de: `Fehlende AP anzeigen, um Konstruktionen zu reparieren`,
+                es: `Mostrar puntos de acceso faltantes para reparar construcciónes`
+            },
+            help: {
+                en: `TODO`,
+                fr: `En Pandémonium, les bâtiments prennent des dégâts lors de l'attaque. Ces dégâts équivalent à un maximum de 70% des points de vie du bâtiment (arrondi à l'entier supérieur). Cette option affiche sur les bâtiments les PA à investir pour que le bâtiment soit en sécurité.`,
+                de: `TODO`,
+                es: `TODO`
+            },
+            parent_id: null
+        }
     ]},
     {id: `notifications`, label: {
         en: `Notices and warnings`,
@@ -766,7 +837,10 @@ function addError(error) {
     let notifications = document.getElementById('notifications');
     let notification = document.createElement('div');
     notification.classList.add('error', 'show');
-    notification.innerText = `${GM_info.script.name} : ${api_texts.error[lang].replace('$error$', error.status)}`;
+    notification.innerText = `${GM_info.script.name} : ${api_texts.error[temp_lang].replace('$error$', error.status)}`;
+    if (error.status === 0) {
+        notification.innerText += '\n' + error.error;
+    }
     notifications.appendChild(notification);
     notification.addEventListener('click', () => {
         notification.remove();
@@ -900,7 +974,7 @@ function createOptimizerButtonContent() {
 
         let tools_btn = document.createElement('a');
         tools_btn.classList.add('button');
-        tools_btn.innerHTML = texts.tools_btn_label[lang];
+        tools_btn.innerHTML = texts.tools_btn_label[temp_lang];
         tools_btn.addEventListener('click', () => {
             displayWindow('tools');
         });
@@ -918,7 +992,7 @@ function createOptimizerButtonContent() {
         //////////////////////////
 
         let informations_title = document.createElement('h1');
-        informations_title.innerText = texts.informations_section_label[lang];
+        informations_title.innerText = texts.informations_section_label[temp_lang];
 
         let informations_list = document.createElement('ul');
 
@@ -931,7 +1005,7 @@ function createOptimizerButtonContent() {
         informations.forEach((information) => {
             let information_link = document.createElement('a');
             information_link.id = information.id;
-            information_link.innerHTML = (information.img ? `<img src="${repo_img_url + information.img}" style="margin: 0 4px 0 3px">` : ``)+ `<span class=small>${information.label[lang]}</span>`;
+            information_link.innerHTML = (information.img ? `<img src="${repo_img_url + information.img}" style="margin: 0 4px 0 3px">` : ``)+ `<span class=small>${information.label[temp_lang]}</span>`;
             information_link.href = information.src;
             information_link.target = '_blank';
 
@@ -951,7 +1025,7 @@ function createOptimizerButtonContent() {
         content.appendChild(infomations_container);
 
     } else {
-        let help_button = createHelpButton(texts.external_app_id_help[lang]);
+        let help_button = createHelpButton(texts.external_app_id_help[temp_lang]);
         content.appendChild(help_button);
 
         let keytext = document.createElement('input');
@@ -959,7 +1033,7 @@ function createOptimizerButtonContent() {
 
         let keysend = document.createElement('a');
         keysend.classList.add('button');
-        keysend.innerHTML = texts.save_external_app_id[lang];
+        keysend.innerHTML = texts.save_external_app_id[temp_lang];
         keysend.addEventListener('click', () => {
             GM_setValue(gm_mh_external_app_id_key, keytext.value);
             external_app_id = GM_getValue(gm_mh_external_app_id_key);
@@ -978,7 +1052,7 @@ function createOptimizerButtonContent() {
 
 function createParams() {
     let params_title = document.createElement('h1');
-    params_title.innerText = texts.parameters_section_label[lang];
+    params_title.innerText = texts.parameters_section_label[temp_lang];
 
     let categories_list = document.createElement('ul');
 
@@ -1007,7 +1081,7 @@ function createParams() {
             let param_label = document.createElement('label');
             param_label.classList.add('small');
             param_label.htmlFor = param.id + '-input';
-            param_label.innerText = param.label[lang];
+            param_label.innerText = param.label[temp_lang];
 
             param_input.addEventListener('change', (event) => {
                 let new_params;
@@ -1042,7 +1116,7 @@ function createParams() {
             param_container.appendChild(param_label);
 
             if (param.help) {
-                let param_help = createHelpButton(param.help[lang]);
+                let param_help = createHelpButton(param.help[temp_lang]);
                 param_help.setAttribute('style', 'float: right; margin-top: 4px');
                 param_container.appendChild(param_help);
             }
@@ -1065,7 +1139,6 @@ function createParams() {
 function createWindow() {
     let window_content = document.createElement('div');
     window_content.id = mh_optimizer_window_id + '-content';
-
     let window_overlay_img = document.createElement('img');
     window_overlay_img.alt = '(X)';
     window_overlay_img.src = repo_img_url + 'icons/b_close.png';
@@ -1126,7 +1199,7 @@ function createTabs(window_type) {
             tab_link.appendChild(tab_icon);
         }
 
-        let tab_text = document.createTextNode(tab.label[lang]);
+        let tab_text = document.createTextNode(tab.label[temp_lang]);
         tab_link.appendChild(tab_text);
 
         let tab_li = document.createElement('li');
@@ -1164,13 +1237,15 @@ function createMapWindow() {
 
     let window_content = document.createElement('div');
     window_content.id = mh_optimizer_map_window_id + '-content';
-    window_content.setAttribute('style', 'height: 100%; position: initial;');
+    window_content.setAttribute('style', 'height: calc(100% - 26px); position: initial; margin-top: 26px;');
+
     let window_overlay_img = document.createElement('img');
     window_overlay_img.alt = '(X)';
     window_overlay_img.src = repo_img_url + 'icons/b_close.png';
     let window_overlay_li = document.createElement('li');
     window_overlay_li.appendChild(window_overlay_img);
     let window_overlay_ul = document.createElement('ul');
+    window_overlay_ul.style.margin = '8px -6px 0 0';
     window_overlay_ul.appendChild(window_overlay_li);
 
     let window_overlay = document.createElement('div');
@@ -1285,6 +1360,9 @@ function dispatchContent(window_type, tab) {
         case 'wishlist':
             displayWishlist();
             break;
+        case 'estimations':
+            displayEstimations();
+            break;
         default:
             break;
     }
@@ -1326,7 +1404,7 @@ function displayWishlist() {
             let save_button = document.createElement('button');
             save_button.setAttribute('style', 'width: 250px;');
             save_button.classList.add('inline');
-            save_button.innerText = texts.save[lang];
+            save_button.innerText = texts.save[temp_lang];
             save_button.addEventListener('click', () => {
                 updateWishlist();
             });
@@ -1367,9 +1445,10 @@ function displayWishlist() {
                     let wishlist_item = {
                         item: item,
                         priority: 0,
-                        count: 0,
+                        count: 1,
                         bankCount: item.bankCount,
                     }
+                    wishlist.wishList.push(wishlist_item);
                     wishlist_list.insertBefore(createWishlistItemElement(wishlist_item), wishlist_list.firstElementChild.nextSibling);
                     close.click();
                 });
@@ -1388,12 +1467,12 @@ function displayWishlist() {
             tab_content.appendChild(wishlist_list);
 
             let list_header = document.createElement('div');
-            list_header.classList.add('header');
+            list_header.classList.add('mho-header');
             wishlist_list.appendChild(list_header);
 
             wishlist_headers.forEach((header) => {
                 let header_cell = document.createElement('div');
-                header_cell.innerText = header.label[lang];
+                header_cell.innerText = header.label[temp_lang];
                 header_cell.classList.add(header.id);
                 list_header.appendChild(header_cell);
             });
@@ -1478,7 +1557,7 @@ function createWishlistItemElement(item) {
     wishlist_priorities.forEach((priority) => {
         let item_priority_option = document.createElement('option');
         item_priority_option.value = priority.value;
-        item_priority_option.innerText = priority.label[lang];
+        item_priority_option.innerText = priority.label[temp_lang];
         item_priority_select.appendChild(item_priority_option);
         if (item.priority.toString().slice(0, 1) === priority.value.toString().slice(0,1)) {
             item_priority_option.selected = true;
@@ -1558,7 +1637,7 @@ function displayItems(filtered_items, tab_id) {
             category_text.innerText = item.category.label[lang];
 
             let category_container = document.createElement('div');
-            category_container.classList.add('category', 'header');
+            category_container.classList.add('mho-category', 'mho-header');
             category_container.appendChild(category_img);
             category_container.appendChild(category_text);
 
@@ -1579,10 +1658,14 @@ function displayItems(filtered_items, tab_id) {
 
             let add_to_wishlist_button = document.createElement('button');
             add_to_wishlist_button.classList.add('inline');
-            add_to_wishlist_button.innerHTML = '<img src="' + repo_img_url + 'item/item_cart.gif""></img>';
             add_to_wishlist_button.addEventListener('click', () => {
                 addItemToWishlist(item, item_add_to_wishlist);
             })
+
+            let img = document.createElement('img');
+            img.src = `${repo_img_url}item/item_cart.gif`;
+            img.alt = '&#x1F6D2;';
+            add_to_wishlist_button.appendChild(img);
             item_add_to_wishlist.appendChild(add_to_wishlist_button);
         }
 
@@ -1667,14 +1750,14 @@ function displayCitizens() {
             header_cells.push(...skills_with_uses);
 
             let header_row = document.createElement('tr');
-            header_row.classList.add('header');
+            header_row.classList.add('mho-header');
 
             header_cells.forEach((header_cell) => {
                 let cell = document.createElement('th');
                 if (cell.img) {
                     cell.innerHTML = '<img src="' + repo_img_url + header_cell.img + '.gif"></img>'
                 } else {
-                    cell.innerText = header_cell.label[lang];
+                    cell.innerText = header_cell.label[temp_lang];
                 }
                 header_row.appendChild(cell);
             });
@@ -1735,6 +1818,117 @@ function displayCitizens() {
     }, 500);
 }
 
+/** Affiche le formulaire d'estimation de l'attaque */
+function displayEstimations() {
+    let tab_content = document.getElementById('tab-content');
+    let percents = [33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100];
+    let prevention = document.createElement('div');
+    prevention.innerText = texts.prevention_estimation[temp_lang];
+    tab_content.appendChild(prevention);
+
+    let current_day_label = document.createElement('label');
+    current_day_label.style.marginTop = '1em';
+    current_day_label.style.marginRight = '1em';
+    current_day_label.innerText = texts.current_day[temp_lang]
+    let current_day = document.createElement('input');
+    current_day.style.marginTop = '1em';
+    current_day.id = 'current-day';
+
+    tab_content.appendChild(current_day_label);
+    tab_content.appendChild(current_day);
+
+    let days = ['today_estimation', 'tomorrow_estimation']
+    let days_selector = document.createElement('div');
+    tab_content.appendChild(days_selector);
+    let radio = document.createElement('input');
+    days.forEach((day, index) => {
+        let div = document.createElement('div');
+        days_selector.appendChild(div);
+        let input = document.createElement('input');
+        div.appendChild(input);
+        input.checked = index === 0;
+        input.type = 'radio';
+        input.id = day;
+        input.name = 'today'
+        input.value = day;
+        let label = document.createElement('label');
+        div.appendChild(label);
+        label.htmlFor = day;
+        label.innerText = texts[day][temp_lang];
+    })
+
+
+    let ul = document.createElement('ul');
+    ul.style.display = 'block';
+    tab_content.appendChild(ul);
+    ul.innerHTML = `<li><span style="display: inline-block; width: 50px;"></span><span style="display: inline-block; width: 150px">Min</span><span style="display: inline-block; width: 150px">Max</span></li>`;
+    percents.forEach((percent) => {
+        let li = document.createElement('li');
+        li.classList.add('estimation');
+        ul.appendChild(li);
+        let percent_text = document.createElement('span');
+        percent_text.style.width = '50px';
+        percent_text.style.display = 'inline-block';
+        percent_text.innerText = percent + '%';
+        li.appendChild(percent_text);
+        let input_min = document.createElement('input');
+        input_min.style.width = '150px';
+        li.appendChild(input_min);
+        let input_max = document.createElement('input');
+        input_max.style.width = '150px';
+        li.appendChild(input_max);
+
+        input_min.addEventListener('paste', (event) => {
+            setTimeout(() => {
+                let paste_value = input_min.value;
+                if (paste_value.indexOf('-') > -1) {
+                    let values = paste_value.split('-');
+                    input_min.value = values[0];
+                    input_max.value = values[1];
+                }
+            });
+        })
+
+        input_max.addEventListener('paste', (event) => {
+            setTimeout(() => {
+                let paste_value = input_max.value;
+                if (paste_value.indexOf('-') > -1) {
+                    let values = paste_value.split('-');
+                    input_min.value = values[0];
+                    input_max.value = values[1];
+                }
+            });
+        })
+    })
+
+    let estimate_button = document.createElement('button');
+    ul.appendChild(estimate_button);
+    estimate_button.setAttribute('style', 'width: 350px; margin-left: 0.5em;');
+    estimate_button.classList.add('inline');
+    estimate_button.innerText = texts.estimate[temp_lang];
+    estimate_button.addEventListener('click', () => {
+        let values_nodes = Array.from(tab_content.querySelectorAll('.estimation'));
+        let values = {};
+
+        let today = Array.from(days_selector.querySelectorAll('input')).find((radio) => radio.checked).id === 'today_estimation';
+        let current_day_value = document.querySelector('#current-day').value;
+        values_nodes.forEach((value, index) => {
+            let value_details = Array.from(value.querySelectorAll('input')).map((input) => input.value);
+            values[percents[index]] = value_details[0] && value_details[1] ? value_details.join(' - ') : ' ';
+        })
+
+        getTodayEstimation(current_day_value, values, today).then((response) => {
+            let bloc = document.querySelector('#mho-estimation-response');
+            bloc.innerText = response;
+        });
+    });
+
+    let response = document.createElement('p');
+    response.id = 'mho-estimation-response';
+    tab_content.appendChild(response);
+}
+
+
 /** Affiche la liste des pouvoirs */
 function displaySkills() {
     if (hero_skills) {
@@ -1748,10 +1942,10 @@ function displaySkills() {
         ];
 
         let header_row = document.createElement('tr');
-        header_row.classList.add('header');
+        header_row.classList.add('mho-header');
         header_cells.forEach((header_cell) => {
             let cell = document.createElement('th');
-            cell.innerText = header_cell.label[lang];
+            cell.innerText = header_cell.label[temp_lang];
             header_row.appendChild(cell);
         })
 
@@ -1812,8 +2006,8 @@ function displayRecipes() {
                 category_text.innerText = recipe.type.label[lang];
 
                 let category_container = document.createElement('div');
-                category_container.classList.add('category');
-                category_container.classList.add('header');
+                category_container.classList.add('mho-category');
+                category_container.classList.add('mho-header');
                 category_container.appendChild(category_text);
 
                 recipes_list.appendChild(category_container);
@@ -1902,7 +2096,7 @@ function getRecipeElement(recipe) {
 function createHelpButton(text_to_display) {
 
     let help_button = document.createElement('a');
-    help_button.innerHTML = texts.external_app_id_help_label[lang];
+    help_button.innerHTML = texts.external_app_id_help_label[temp_lang];
     help_button.classList.add('help-button');
 
     let help_tooltip = document.createElement('div')
@@ -1944,7 +2138,7 @@ function createUpdateExternalToolsButton() {
     if (nb_tools_to_update > 0 && external_app_id && zone_marker) {
         if (update_external_tools_btn) return;
 
-        let el = zone_marker.parentElement;
+        let el = zone_marker.parentElement.parentElement.parentElement;
 
         let updater_bloc = document.createElement('div');
         el.appendChild(updater_bloc);
@@ -1954,12 +2148,12 @@ function createUpdateExternalToolsButton() {
 
         let btn = document.createElement('button');
 
-        btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/arrowright.gif">' + texts.update_external_tools_needed_btn_label[lang];
+        btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/arrowright.gif">' + texts.update_external_tools_needed_btn_label[temp_lang];
         btn.id = mh_update_external_tools_id;
 
         btn.addEventListener('click', () => {
             /** Au clic sur le bouton, on appelle la fonction de mise à jour */
-            btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/middot.gif">' + texts.update_external_tools_pending_btn_label[lang];
+            btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/middot.gif">' + texts.update_external_tools_pending_btn_label[temp_lang];
             updateExternalTools();
         })
 
@@ -1999,7 +2193,7 @@ function displaySearchFieldOnBuildings() {
             search_field = document.createElement('input');
             search_field.type = 'text';
             search_field.id = mho_search_building_field_id;
-            search_field.placeholder = texts.search_building[lang];
+            search_field.placeholder = texts.search_building[temp_lang];
             search_field.classList.add('inline');
             search_field.setAttribute('style', 'min-width: 250px; margin-top: 1em;');
 
@@ -2032,7 +2226,61 @@ function displaySearchFieldOnBuildings() {
     }
 }
 
+/** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */
+function displayMinApOnBuildings() {
+    if (mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
+        let complete_buildings = document.querySelectorAll('.row.complete');
+        if (!complete_buildings || complete_buildings.length === 0) return;
 
+        let broken_buildings = Array.from(complete_buildings).filter((complete_building) => complete_building.querySelector('.ap-bar'));
+
+        if (!broken_buildings || broken_buildings.length === 0) return;
+
+        broken_buildings.forEach((broken_building) => {
+            let bar = broken_building.querySelector('.ap-bar');
+            let tooltip = bar.querySelector('.tooltip');
+            if (!tooltip || !tooltip.innerHTML) return;
+
+            let status = tooltip.innerText.match(/[0-9]+\/[0-9]+/)[0].split('/');
+            let nb_pts_per_ap = parseInt(tooltip.innerHTML.match(/<b>[0-9]+<\/b>/)[0].match(/[0-9]+/)[0], 10);
+            let current = parseInt(status[0], 10);
+            let total = parseInt(status[1], 10);
+
+            let minimum_safe = Math.ceil(total * 70 / 100) + 1
+            if (minimum_safe <= current) return;
+
+            let missing_pts = minimum_safe - current;
+            bar.style.display = 'flex';
+            let new_ap_bar = bar.querySelector('.mho-safe-ap');
+            if (!new_ap_bar) {
+                new_ap_bar = document.createElement('div');
+                new_ap_bar.classList.add('mho-safe-ap');
+            }
+            new_ap_bar.style.background = 'yellow';
+            new_ap_bar.style.width = missing_pts / total * 100 + '%';
+            bar.appendChild(new_ap_bar);
+
+            let nb_ap = broken_building.querySelector('.build-req');
+            let missing_ap_info = nb_ap.querySelector('.mho-missing-ap');
+            if (!missing_ap_info) {
+                missing_ap_info = document.createElement('span')
+                missing_ap_info.classList.add('mho-missing-ap');
+            }
+            missing_ap_info.style.fontWeight = 'initial';
+            missing_ap_info.style.fontSize = '0.8em';
+            missing_ap_info.innerText = texts.missing_ap_explanation[lang].replace('%VAR%', Math.ceil(missing_pts/nb_pts_per_ap));
+            nb_ap.appendChild(missing_ap_info);
+        });
+    } else if (pageIsConstructions()) {
+        let missing_ap_infos = document.querySelectorAll('.mho-missing-ap');
+        if (!missing_ap_infos) return;
+        Array.from(missing_ap_infos).forEach((missing_ap_info) => missing_ap_info.remove())
+
+        let mho_safe_aps = document.querySelectorAll('.mho-safe-ap');
+        if (!mho_safe_aps) return;
+        Array.from(mho_safe_aps).forEach((mho_safe_ap) => mho_safe_ap.remove());
+    }
+}
 
 /** Affiche la liste de courses dans le désert et l'atelier */
 function displayWishlistInApp() {
@@ -2062,7 +2310,7 @@ function displayWishlistInApp() {
 
             let update_btn = document.createElement('button');
             update_btn.classList.add('inline');
-            update_btn.innerText = texts.update[lang];
+            update_btn.innerText = texts.update[temp_lang];
             update_btn.addEventListener('click', () => {
                 is_refresh_wishlist = true;
                 wishlist = undefined;
@@ -2075,7 +2323,7 @@ function displayWishlistInApp() {
             content.appendChild(list);
 
             let list_header = document.createElement('div');
-            list_header.classList.add('row-flex', 'header', 'bottom');
+            list_header.classList.add('row-flex', 'mho-header', 'bottom');
             list.appendChild(list_header);
 
             wishlist_headers
@@ -2084,7 +2332,7 @@ function displayWishlistInApp() {
                 let header_cell = document.createElement('div');
                 header_cell.classList.add('padded', 'cell');
                 header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : (header_cell_item.id === 'priority' ? 'rw-3' : 'rw-2'));
-                header_cell.innerText = header_cell_item.label[lang];
+                header_cell.innerText = header_cell_item.label[temp_lang];
                 list_header.appendChild(header_cell);
             });
 
@@ -2096,27 +2344,27 @@ function displayWishlistInApp() {
 
                 let title = document.createElement('div');
                 title.classList.add('padded', 'cell', 'rw-5');
-                title.innerHTML = `<img src="${hordes_img_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px"></img><span class="small">${item.item.label[lang]}</span>`;
+                title.innerHTML = `<img src="${hordes_img_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px" /><span class="small">${item.item.label[lang]}</span>`;
                 list_item.appendChild(title);
 
                 let item_priority = document.createElement('span');
                 item_priority.classList.add('padded', 'cell', 'rw-3');
-                item_priority.innerHTML = `<span class="small">${wishlist_priorities.find((priority) => item.priority.toString().slice(0, 1) === priority.value.toString().slice(0, 1)).label[lang]}</span}`;
+                item_priority.innerHTML = `<span class="small">${wishlist_priorities.find((priority) => item.priority.toString().slice(0, 1) === priority.value.toString().slice(0, 1)).label[lang]}</span>`;
                 list_item.appendChild(item_priority);
 
                 let bank_count = document.createElement('span');
                 bank_count.classList.add('padded', 'cell', 'rw-2');
-                bank_count.innerHTML = `<span class="small">${item.bankCount}</span}`;
+                bank_count.innerHTML = `<span class="small">${item.bankCount}</span>`;
                 list_item.appendChild(bank_count);
 
                 let bank_need = document.createElement('span');
                 bank_need.classList.add('padded', 'cell', 'rw-2');
-                bank_need.innerHTML = `<span class="small">${item.count}</span}`;
+                bank_need.innerHTML = `<span class="small">${item.count}</span>`;
                 list_item.appendChild(bank_need);
 
                 let needed = document.createElement('span');
                 needed.classList.add('padded', 'cell', 'rw-2');
-                needed.innerHTML = `<span class="small">${item.count - item.bankCount}</span}`;
+                needed.innerHTML = `<span class="small">${item.count - item.bankCount}</span>`;
                 list_item.appendChild(needed);
             });
 
@@ -2177,7 +2425,7 @@ function displayWishlistInApp() {
         header_title.appendChild(hide_state);
 
         let header_label = document.createElement('span');
-        header_label.innerText = tabs_list.tools.find((tool) => tool.id === 'wishlist').label[lang];
+        header_label.innerText = tabs_list.tools.find((tool) => tool.id === 'wishlist').label[temp_lang];
         header_title.appendChild(header_label);
 
         let content = document.createElement('div');
@@ -2243,11 +2491,28 @@ function displayAdvancedTooltips() {
                     } else if (!advanced_tooltip_container.innerHTML) {
                         advanced_tooltip_container.innerHtml = '';
 
+                        let stock_div = document.createElement('div');
+                        advanced_tooltip_container.appendChild(stock_div);
+                        let bank_div = document.createElement('div');
+                        stock_div.appendChild(bank_div);
+                        stock_div.style.borderBottom = '1px solid white';
+                        bank_div.innerText = wishlist_headers[2].label[temp_lang] + ' : ' + hovered_item.bankCount;
+
+                        if (hovered_item.wishListCount && hovered_item.wishListCount > 0) {
+                            let wishlist_wanted_div = document.createElement('div');
+                            stock_div.appendChild(wishlist_wanted_div);
+                            wishlist_wanted_div.innerText = wishlist_headers[3].label[temp_lang] + ' : ' + hovered_item.wishListCount;
+                        }
+
+                        if ((!item_deco || hovered_item.deco === 0) && !hovered_item.properties && !hovered_item.actions && hovered_item.recipes.length === 0) return;
+
                         console.log('hovered_item', hovered_item);
                         if (item_deco && hovered_item.deco > 0) {
                             let text = item_deco.innerText.replace(/ \(.*\)*/, '');
                             item_deco.innerHTML = `<span>${text} <em>( +${hovered_item.deco} )</em></span>`;
                         }
+
+                        if (!hovered_item.properties && !hovered_item.actions && hovered_item.recipes.length === 0) return;
 
                         if (hovered_item.properties) {
                             let item_properties = document.createElement('div');
@@ -2257,6 +2522,9 @@ function displayAdvancedTooltips() {
                                 item_properties.appendChild(item_action);
                             });
                         }
+
+                        if (!hovered_item.actions && hovered_item.recipes.length === 0) return;
+
                         if (hovered_item.actions) {
                             let item_actions = document.createElement('div');
                             advanced_tooltip_container.appendChild(item_actions);
@@ -2265,6 +2533,8 @@ function displayAdvancedTooltips() {
                                 item_actions.appendChild(item_action);
                             });
                         }
+
+                        if (hovered_item.recipes.length === 0) return;
 
                         if (hovered_item.recipes.length > 0) {
                             tooltip_container.firstElementChild.classList.add('large-tooltip');
@@ -2297,6 +2567,10 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'eat_7ap':
             item_action.classList.add(`item-tag-food`);
             item_action.innerHTML = `+${property_or_action.slice(4,5)}<img src="${repo_img_url}emotes/ap.${lang}.gif">`;
+            break;
+        case 'coffee':
+            item_action.classList.add(`item-tag-coffee`);
+            item_action.innerHTML = `+4<img src="${repo_img_url}emotes/ap.${lang}.gif">`;
             break;
         case 'drug_6ap_1':
         case 'drug_8ap_1':
@@ -2542,7 +2816,6 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'drug_april_2':
         case 'eat_meat_1':
         case 'eat_meat_2':
-        case 'coffee':
         case 'open_foodbox_in':
         case 'open_foodbox_out':
         case 'open_foodbox_in_t1':
@@ -2656,7 +2929,7 @@ function createDisplayMapButton() {
             btn.addEventListener('click', (event) => {
                 event.stopPropagation();
                 event.preventDefault();
-                displayMap();
+                displayMapContent();
             })
 
             btn_container.appendChild(btn);
@@ -2670,25 +2943,277 @@ function createDisplayMapButton() {
             display_map_btn.remove();
             clearInterval(interval);
         }
-    }, 2000);
+    }, 3000);
+}
+
+function displayMapContent() {
+    let map_window = document.getElementById(mh_optimizer_map_window_id);
+    map_window.classList.add('visible');
+    displayMap();
 }
 
 function displayMap() {
-    let map_window = document.getElementById(mh_optimizer_map_window_id);
-    map_window.classList.add('visible');
-
     let content = document.getElementById(mh_optimizer_map_window_id + '-content');
-    content.innerHTML = '';
-
-    let map_to_display = GM_getValue(mho_map_key);
-    let style = document.getElementById(map_to_display.source + '-map');
-    if (!style) {
-        document.head.innerHTML += map_to_display.style;
+    let table = content.querySelector('table');
+    if (table) {
+        table.outerHTML = '';
     }
-    let img = document.createElement('img');
-    img.setAttribute('style', 'width: auto; height: 100%');
-    img.src = map_to_display.block;
-    content.appendChild(img);
+
+    let transformMapping = (map) => {
+        table = document.createElement('table');
+        table.setAttribute('style', 'border-collapse: collapse;');
+        table.classList.add('mho-map');
+        let init_col_tr = document.createElement('tr');
+        table.appendChild(init_col_tr);
+
+        map.vertical_mapping.forEach((cell) => {
+            let td = document.createElement('td');
+            td.innerText = cell;
+            init_col_tr.appendChild(td);
+        });
+
+        map.map.forEach((row) => {
+            let tr = document.createElement('tr');
+            row.forEach((cell, cell_index) => {
+                if (cell_index === 0) {
+                    let init_row_td = document.createElement('td');
+                    init_row_td.innerText = cell.horizontal;
+                    tr.appendChild(init_row_td);
+                }
+                let td = document.createElement('td');
+                tr.appendChild(td);
+
+                let td_content = document.createElement('div');
+                td_content.style.position = 'relative';
+                td_content.style.height = '100%';
+                td_content.style.width = '100%';
+                td.appendChild(td_content);
+
+                if (cell.not_yet_visited) {
+                    td.style.backgroundColor = '#0f1717';
+                } else if (cell.not_visited_today) {
+                    td.style.backgroundColor = 'darkslategray';
+                } else {
+                    if (cell.zombies === '1') {
+                        td.style.backgroundColor = 'goldenrod';
+                    } else if (cell.zombies === '2') {
+                        td.style.backgroundColor = 'chocolate';
+                    } else if (+cell.zombies >= '3') {
+                        td.style.backgroundColor = 'firebrick';
+                    } else {
+                        td.style.backgroundColor = 'green';
+                    }
+                }
+
+
+                if (cell.town) {
+                    let town_here = document.createElement('div');
+                    town_here.innerText = '🏠';
+                    town_here.style.position = 'absolute';
+                    town_here.style.inset = 'calc(50% - 11px)';
+
+                    td_content.appendChild(town_here);
+                }
+                if (cell.bat) {
+                    let bat_here = document.createElement('div');
+                    bat_here.style.backgroundColor = 'grey';
+                    bat_here.style.position = 'absolute';
+                    bat_here.style.inset = '4px';
+
+                    if (cell.ruin) {
+                        bat_here.innerText = 'R';
+                        bat_here.style.color = 'black';
+                    } else if (cell.empty_bat) {
+                        bat_here.classList.add('empty-bat');
+                    }
+                    td_content.appendChild(bat_here);
+                }
+
+                if (cell.empty && !cell.town && !cell.not_yet_visited) {
+                    let empty_here = document.createElement('div');
+                    empty_here.classList.add('dotted-background');
+                    empty_here.style.position = 'absolute';
+                    empty_here.style.inset = '-1px';
+
+                    td_content.appendChild(empty_here);
+                }
+
+                if (cell.my_pos) {
+                    let player_here = document.createElement('div');
+                    player_here.style.backgroundColor = 'white';
+                    player_here.style.margin = 'auto';
+                    player_here.style.width = '6px';
+                    player_here.style.height = '6px';
+                    player_here.style.position = 'absolute';
+                    player_here.style.inset = 'calc(50% - 3px)';
+                    td_content.appendChild(player_here);
+                }
+                // if (cell.expedition_here) {
+                //     let expedition_here = document.createElement('div');
+                //     expedition_here.style.backgroundColor = 'black';
+                //     expedition_here.style.margin = 'auto';
+                //     expedition_here.textAlign = 'center';
+                //     expedition_here.style.width = '10px';
+                //     expedition_here.style.height = '10px';
+                //     td_content.appendChild(expedition_here);
+                // }
+
+                if (cell_index === row.length - 1) {
+                    let final_row_td = document.createElement('td');
+                    final_row_td.innerText = cell.horizontal;
+                    tr.appendChild(final_row_td);
+                }
+            });
+            table.appendChild(tr);
+        });
+
+        let final_col_tr = document.createElement('tr');
+        map.vertical_mapping.forEach((cell) => {
+            let td = document.createElement('td');
+            td.innerText = cell;
+            final_col_tr.appendChild(td);
+        });
+        table.appendChild(final_col_tr);
+        table.firstElementChild.firstElementChild.innerText = '🗘';
+        table.firstElementChild.firstElementChild.style.cursor = 'pointer';
+        table.firstElementChild.firstElementChild.addEventListener('click', () => displayMap());
+        content.appendChild(table);
+    }
+
+    let transformRuinMapping = (map) => {
+        table = document.createElement('table');
+        table.setAttribute('style', 'border-collapse: collapse;');
+        table.classList.add('mho-map');
+        let init_col_tr = document.createElement('tr');
+        table.appendChild(init_col_tr);
+
+        map.vertical_mapping.forEach((cell) => {
+            let td = document.createElement('td');
+            td.innerText = cell;
+            init_col_tr.appendChild(td);
+        });
+        map.map.forEach((row) => {
+            let tr = document.createElement('tr');
+            row.forEach((cell, cell_index) => {
+                if (cell_index === 0) {
+                    let init_row_td = document.createElement('td');
+                    init_row_td.innerText = cell.horizontal;
+                    tr.appendChild(init_row_td);
+                }
+                let td = document.createElement('td');
+                td.style.padding = 0;
+                tr.appendChild(td);
+                let td_content = document.createElement('div')
+                td.style.position = 'relative';
+                td.appendChild(td_content);
+
+                if (cell.borders !== '0000') {
+                    // let border = document.createElement('div');
+                    td_content.style.backgroundColor = 'black';
+                    td_content.style.position = 'absolute';
+                    td_content.style.top = '0';
+                    td_content.style.left = '0';
+                    td_content.style.bottom = '0';
+                    td_content.style.right = '0';
+
+                    let path = document.createElement('div');
+                    path.style.position = 'absolute';
+                    path.style.backgroundColor = 'grey';
+                    if (cell.borders === 'exit') {
+                        path.style.boxShadow = 'inset 0px 5px 6px lightyellow';
+                        path.style.left = '5px';
+                        path.style.top = '5px';
+                        path.style.right = '5px';
+                        path.style.bottom = '0';
+                    } else {
+                        path.style.left = cell.borders[0] === '0' ? '5px' : '0';
+                        path.style.top = cell.borders[1] === '0' ? '5px' : '0';
+                        path.style.right = cell.borders[2] === '0' ? '5px' : '0';
+                        path.style.bottom = cell.borders[3] === '0' ? '5px' : '0';
+                    }
+                    td_content.appendChild(path);
+
+                }
+
+                if (cell.zombies && cell.zombies !== '' && cell.zombies > 0) {
+                    let zombies = document.createElement('div');
+                    zombies.innerText = cell.zombies;
+                    zombies.style.position = 'absolute';
+                    zombies.style.bottom = '5px';
+                    zombies.style.right = '5px';
+                    zombies.style.fontSize = '10px';
+                    zombies.style.lineHeight = '10px';
+                    td_content.appendChild(zombies);
+                }
+
+                if (cell.door) {
+                    let img = document.createElement('img');
+                    img.src = `${repo_img_url}item/${cell.door}.gif`;
+                    img.style.position = 'absolute';
+                    img.style.left = 'calc(50% - 8px)';
+                    img.style.top = 'calc(50% - 8px)';
+                    img.style.zIndex = '100';
+                    td_content.appendChild(img);
+                }
+
+                if (cell_index === row.length - 1) {
+                    let final_row_td = document.createElement('td');
+                    final_row_td.innerText = cell.horizontal;
+                    tr.appendChild(final_row_td);
+                }
+
+                td.addEventListener('click', ($event) => {
+                    let my_pos = table.querySelector('.my-pos');
+                    if (my_pos) {
+                        my_pos.remove();
+                    }
+                    let new_pos = document.createElement('div');
+                    new_pos.classList.add('my-pos');
+                    new_pos.style.position = 'absolute';
+                    new_pos.style.backgroundColor = 'white';
+                    new_pos.style.zIndex = '300';
+                    new_pos.style.inset = 'calc(50% - 3px)';
+                    td_content.appendChild(new_pos);
+                });
+            });
+            table.appendChild(tr);
+        });
+
+        let final_col_tr = document.createElement('tr');
+        map.vertical_mapping.forEach((cell) => {
+            let td = document.createElement('td');
+            td.innerText = cell;
+            final_col_tr.appendChild(td);
+        });
+        table.appendChild(final_col_tr);
+        table.firstElementChild.firstElementChild.innerText = '🗘';
+        table.firstElementChild.firstElementChild.style.cursor = 'pointer';
+        table.firstElementChild.firstElementChild.addEventListener('click', () => displayMap());
+        content.appendChild(table);
+    }
+
+    let mho_map = GM_getValue(mho_map_key);
+    if (mho_map) {
+        if (mho_map.source === 'gh') {
+            if (mho_map.map === 'ruin') {
+                getGHRuin().then((map) => transformRuinMapping(map));
+            } else {
+                getGHMap().then((map) => transformMapping(map));
+            }
+        } else if (mho_map.source === 'bbh') {
+            if (mho_map.map === 'ruin') {
+                getBBHRuin().then((map) => transformRuinMapping(map));
+            } else {
+                getBBHMap().then((map) => transformMapping(map));
+            }
+        } else if (mho_map.source === 'fm') {
+            if (mho_map.map === 'ruin') {
+                getFMRuin().then((map) => transformRuinMapping(map));
+            } else {
+                getFMMap().then((map) => transformMapping(map));
+            }
+        }
+    }
 }
 
 /** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
@@ -2708,7 +3233,7 @@ function preventFromLeaving() {
                         mho_leaving_info = document.createElement('div');
                         mho_leaving_info.id = 'mho-leaving-info';
                         mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                        mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[lang] + texts.prevent_not_in_ae[lang];
+                        mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[temp_lang] + texts.prevent_not_in_ae[temp_lang];
                         button.parentNode.insertBefore(mho_leaving_info, button.nextSibling);
                     }
 
@@ -2723,7 +3248,7 @@ function preventFromLeaving() {
                     mho_leaving_info = document.createElement('div');
                     mho_leaving_info.id = 'mho-leaving-info';
                     mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                    mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[lang] + texts.escort_not_released[lang];
+                    mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[temp_lang] + texts.escort_not_released[temp_lang];
                     is_escorting.parentNode.insertBefore(mho_leaving_info, is_escorting.nextSibling);
                 }
             }
@@ -2748,7 +3273,7 @@ function preventDangerousActions() {
     let interval = setInterval(() => {
         if (mho_parameters.prevent_dangerous_actions && items) {
 
-            let actions = Array.from(document.getElementsByClassName('action'));
+            let actions = Array.from(document.getElementsByClassName('actions'));
 
             if (actions && actions.length > 0) {
 
@@ -2756,7 +3281,7 @@ function preventDangerousActions() {
                 let dead = items.filter((item) => item.actions && item.actions.indexOf('cyanide') > -1);
                 let status_drugged = Array.from(document.getElementsByClassName('status link')[0].getElementsByClassName('status')).some((status) => status.firstElementChild.src.indexOf('status_drugged') > -1);
                 let filtered_actions = Array.from(actions).filter((action) => {
-                    let action_img = action.firstElementChild.src;
+                    let action_img = action.firstElementChild ? action.firstElementChild.src : undefined;
                     return (action_img === drugs.some((item) => item.icon === action_img) && status_drugged) || action_img === dead.some((item) => item.icon === action_img);
                 });
                 filtered_actions.forEach((action) => {
@@ -2781,23 +3306,35 @@ function preventDangerousActions() {
 function notifyOnSearchEnd() {
     let interval = setInterval(() => {
         if (mho_parameters.notify_on_search_end && pageIsDesert()) {
-            let count = document.querySelectorAll('span[x-countdown]')[0];
+            let count = document.querySelector('span[x-countdown]');
             if (count) {
                 clearInterval(interval);
-                let countdown = count.getAttribute('x-countdown');
-                let timeout_counter = (count.getAttribute('x-countdown') - 5) * 1000;
-                setTimeout(() => {
+                let countdown_array = count.innerText.split(':');
+                if (countdown_array.length < 3) {
+                    countdown_array.splice(0, 0, 0);
+                }
+                let countdown = (+countdown_array[0] * 60 * 60) + (+countdown_array[1] * 60) + (+countdown_array[2]);
+                if (countdown < 5) {
                     if (!pageIsTown()) {
                         GM_notification({
-                            text: texts.search_ended[lang],
+                            text: texts.search_ended[temp_lang],
                             title: GM_info.script.name,
                             highlight: true,
                             timeout: 0
                         });
                     }
                     clearInterval(interval);
-                    notifyOnSearchEnd();
-                }, timeout_counter);
+                    setTimeout(() => {
+                        clearInterval(interval);
+                        notifyOnSearchEnd();
+                    }, 10000)
+                } else {
+                    let timeout_counter = countdown / 2 * 1000;
+                    setTimeout(() => {
+                        clearInterval(interval);
+                        notifyOnSearchEnd();
+                    }, timeout_counter);
+                }
             }
         } else if (pageIsTown()) {
             clearInterval(interval);
@@ -2818,7 +3355,7 @@ function displayNbDeadZombies() {
                 zone_dead_zombies = document.createElement('div');
                 zone_dead_zombies.id = zone_dead_zombies_id;
                 zone_dead_zombies.classList.add('cell', 'rw-12', 'center');
-                zone_dead_zombies.innerHTML = `${texts.nb_dead_zombies[lang]} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`
+                zone_dead_zombies.innerHTML = `${texts.nb_dead_zombies[temp_lang]} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`
 
                 let dist = zone_dist.firstElementChild;
                 dist.parentNode.insertBefore(zone_dead_zombies, dist);
@@ -2888,23 +3425,240 @@ function displayTranslateTool() {
 /////////////////////////////////////
 // BOUTONS SUR LES OUTILS EXTERNES //
 /////////////////////////////////////
-function createCopyButton(source, map_id, button_block_id) {
+function createCopyButton(source, map, map_id, button_block_id) {
     let copy_button_parent = document.getElementById(button_block_id);
     let copy_button = document.createElement('button');
     copy_button.setAttribute('style', 'max-width: initial');
-    copy_button.innerHTML = `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">${texts.copy_map[lang]}</span>`;
+    copy_button.innerHTML = `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">${texts.copy_map[temp_lang]}</span>`;
     copy_button.id = mho_copy_map_id;
     copy_button.addEventListener('click', () => {
         copy_button.disabled = true;
-        html2canvas(document.getElementById(map_id)).then((canvas) => {
-            GM_setValue(mho_map_key, {
-                source: source,
-                block: canvas.toDataURL()
-            })
-            copy_button.disabled = false;
-        });
+        let map_to_convert = document.getElementById(map_id);
+        if (source === 'fm') {
+            map = document.querySelector('#ruinmap-wrapper') && document.querySelector('#ruinmap-wrapper').offsetParent === null ? 'map' : 'ruin';
+            map_to_convert = map === 'ruin' ? document.getElementById('ruinmap') : document.getElementById('map');
+        }
+        GM_setValue(mho_map_key, {
+            source: source,
+            map: map,
+            fm_block: source === 'fm' && map === 'map' ? map_to_convert.outerHTML : (GM_getValue(mho_map_key) ? GM_getValue(mho_map_key).fm_block : undefined),
+            ruin: map === 'ruin' ? map_to_convert.outerHTML : (GM_getValue(mho_map_key) ? GM_getValue(mho_map_key).ruin : undefined)
+        })
+        copy_button.disabled = false;
     });
     copy_button_parent.appendChild(copy_button);
+}
+
+function createOptimizePathButton(source, map_id, button_block_id) {
+    console.log('source', source);
+    let opti_button_parent = document.getElementById(button_block_id);
+    let opti_button = document.createElement('button');
+    opti_button.setAttribute('style', 'max-width: initial');
+    opti_button.innerHTML = `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">[i18n] Chemin optimisé</span>`;
+    opti_button.id = mho_opti_map_id;
+    opti_button.addEventListener('click', () => {
+        opti_button.disabled = true;
+        let map;
+        if (source === 'gh') {
+            map = optimizeGh(document.getElementById(map_id));
+        } else if (source === 'bbh') {
+            map = optimizeBbh(document.getElementById(map_id));
+        }
+        getOptimalPath(map, document.getElementById(map_id), opti_button, source);
+      });
+      opti_button_parent.appendChild(opti_button);
+}
+
+function optimizeBbh(html) {
+    let map = html;
+    let rows = Array.from(map.querySelectorAll('tr')).filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
+        return col.children.length > 0; // Ligne d'index
+    }));
+    let final_rows = [];
+    let doors_positions = [];
+    let entrance = {};
+
+    rows.forEach((row, row_index) => {
+        let cols = Array.from(row.querySelectorAll('td'));
+        let final_cols = cols
+            .filter((col) => col.children.length > 0) // Colonne d'index
+            .map((col, col_index) => {
+                let cm = col.querySelector('div[id^="cm"]');
+                console.log('cm', cm);
+                if (cm && cm.classList.length === 0) {
+                    return 0;
+                } else {
+                    // Porte
+                    let cp = col.querySelector('div[id^="cp"][class^="p"]');
+                    if (cp) {
+                      doors_positions.push({colIndex: col_index, rowIndex: row_index});
+                    }
+                    // Entrée
+                    if (!cm) {
+                        entrance = {colIndex: col_index, rowIndex: row_index};
+                    }
+                    return col;
+                }
+            });
+        final_rows.push(final_cols);
+    });
+    return {
+        map: final_rows,
+        doors: doors_positions,
+        entrance: entrance
+    }
+}
+
+function optimizeGh(html) {
+    let map = html;
+    let rows = Array.from(map.querySelectorAll('tr')).filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
+        return !col.classList.contains('bordCarteRuine') // Ligne d'index
+    }));
+    let final_rows = [];
+    let doors_positions = [];
+    let entrance = {};
+
+    rows.forEach((row, row_index) => {
+        let cols = Array.from(row.querySelectorAll('td'));
+        let final_cols = cols
+            .filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
+            .map((col, col_index) => {
+                let use = col.querySelector('use');
+                let img = use.getAttribute('xlink:href');
+                if (img.endsWith('ruineCarte_19')) {
+                    // Pas de passage
+                    return 0;
+                } else {
+                    // Porte
+                    let door = col.querySelector('.ruineCarte_porte');
+                    if (door) {
+                        doors_positions.push({colIndex: col_index, rowIndex: row_index});
+                    }
+                    // Entrée
+                    let entrance_found = img.endsWith('ruineCarte_15');
+                    if (entrance_found) {
+                        entrance = {colIndex: col_index, rowIndex: row_index};
+                    }
+                    return 1;
+                }
+            });
+          final_rows.push(final_cols);
+    });
+  return {
+      map: final_rows,
+      doors: doors_positions,
+      entrance: entrance
+  }
+}
+
+function displayOptimalPathOnBbh(html, response) {
+    console.log('display opti bbh');
+    console.log('html', html);
+    console.log('response', response);
+}
+
+function displayOptimalPathOnGh(html, response) {
+    console.log('display opti gh');
+    let rows = Array.from(html.querySelectorAll('tr'))
+        .filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
+            return !col.classList.contains('bordCarteRuine') // Ligne d'index
+        }))
+        .map((row) => {
+            return Array.from(row.querySelectorAll('td')).filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
+        });
+
+    rows.forEach((row, row_index) => {
+        let response_pos_in_row = response.filter((response_pos) => response_pos.row === row_index);
+        if (response_pos_in_row && response_pos_in_row.length > 0) {
+            console.log('response_pos_in_row', response_pos_in_row);
+            row.forEach((col, col_index) => {
+                let response_at_pos = response_pos_in_row.filter((response_pos) => response_pos.column === col_index);
+                if (response_at_pos && response_at_pos.length > 0) {
+                    let mho_path_div = document.createElement('div');
+                    mho_path_div.classList.add('mho_opti_path');
+                    mho_path_div.setAttribute('style', 'position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; justify-content: space-around;');
+                    col.appendChild(mho_path_div);
+                }
+            });
+        }
+    });
+
+    response.forEach((path, index) => {
+        let path_cell = rows[path.row][path.column];
+
+        let path_div = document.createElement('span');
+        path_div.setAttribute('posPath', index);
+
+        let next_path = response[index + 1];
+        if (next_path) {
+
+            let next_path_cell = rows[next_path.row][next_path.column];
+
+            let next_path_div = document.createElement('span');
+            next_path_div.setAttribute('posPath', index);
+
+            path_div.setAttribute('position', 'start');
+            next_path_div.setAttribute('position', 'end');
+
+            if (next_path.column === path.column) { // Déplacement vertical
+                path_div.setAttribute('orientation', 'vertical');
+                next_path_div.setAttribute('orientation', 'vertical');
+                if (next_path.row > path.row) { // on se déplace vers le bas
+                    path_div.setAttribute('alignment', 'bottom');
+                    next_path_div.setAttribute('alignment', 'top');
+                } else { // on se déplace vers le haut
+                    path_div.setAttribute('alignment', 'top');
+                    next_path_div.setAttribute('alignment', 'bottom');
+                }
+
+                path_div.style.height = 'calc(50% - 4px)';
+                path_div.style.width = '4px';
+                path_div.style.display = 'inline-block';
+                path_div.style.backgroundColor = 'red';
+                next_path_div.style.height = 'calc(50% - 4px)';
+                next_path_div.style.width = '4px';
+                next_path_div.style.display = 'inline-block';
+                next_path_div.style.backgroundColor = 'red';
+            } else { // Déplacement horizontal
+                path_div.setAttribute('orientation', 'horizontal');
+                next_path_div.setAttribute('orientation', 'horizontal');
+
+                if (next_path.column > path.column) { // on se déplace vers la gauche
+                    path_div.setAttribute('alignment', 'right');
+                    next_path_div.setAttribute('alignment', 'left');
+                } else { // on se déplace vers la droite
+                    path_div.setAttribute('alignment', 'left');
+                    next_path_div.setAttribute('alignment', 'right');
+                }
+
+                path_div.style.width = 'calc(50% - 4px)';
+                path_div.style.height = '4px';
+                path_div.style.display = 'inline-block';
+                path_div.style.backgroundColor = 'red';
+                next_path_div.style.width = 'calc(50% - 4px)';
+                next_path_div.style.height = '4px';
+                next_path_div.style.display = 'inline-block';
+                next_path_div.style.backgroundColor = 'red';
+            }
+
+            path_div.style.marginLeft = path_div.getAttribute('alignment') === 'right' ? '50%' : 'initial';
+            path_div.style.marginRight = path_div.getAttribute('alignment') === 'left' ? '50%' : 'initial';
+            path_div.style.marginTop = path_div.getAttribute('alignment') === 'bottom' ? '50%' : 'initial';
+            path_div.style.marginBottom = path_div.getAttribute('alignment') === 'top' ? '50%' : 'initial';
+
+            next_path_div.style.marginLeft = next_path_div.getAttribute('alignment') === 'right' ? '50%' : 'initial';
+            next_path_div.style.marginRight = next_path_div.getAttribute('alignment') === 'left' ? '50%' : 'initial';
+            next_path_div.style.marginTop = next_path_div.getAttribute('alignment') === 'bottom' ? '50%' : 'initial';
+            next_path_div.style.marginBottom = next_path_div.getAttribute('alignment') === 'top' ? '50%' : 'initial';
+
+            path_cell.querySelector('.mho_opti_path').appendChild(path_div);
+            next_path_cell.querySelector('.mho_opti_path').appendChild(next_path_div);
+        }
+        console.log('cell', path_cell);
+    });
+
+    console.log('rows', rows);
+    console.log('response', response);
 }
 
 ///////////
@@ -3147,7 +3901,7 @@ function createStyles() {
     + 'display: none;'
     + '}';
 
-    const item_category = '#tab-content > ul div.category {'
+    const item_category = '#tab-content > ul div.mho-category {'
     + 'width: 100%;'
     + 'border-bottom: 1px solid;'
     + 'margin: 1em 0 0.5em;'
@@ -3172,7 +3926,7 @@ function createStyles() {
     + 'border-bottom: 1px solid #ddab76;'
     + '}';
 
-    const mho_table_header_style = '.header {'
+    const mho_table_header_style = '.mho-header {'
     + 'font-size: 10pt;'
     + 'background: linear-gradient(0deg,#643b25 0,rgba(100,59,37,0) 50%,rgba(100,59,37,0)) !important;'
     + 'border-bottom: 2px solid #f0d79e;'
@@ -3181,7 +3935,7 @@ function createStyles() {
     + 'font-weight: 700;'
     + '}';
 
-    const mho_table_row_style = '.mho-table tr:not(.header) {'
+    const mho_table_row_style = '.mho-table tr:not(.mho-header) {'
     + 'background-color: #5c2b20;'
     + 'border-bottom: 1px solid #7e4d2a;'
     + '}';
@@ -3225,7 +3979,7 @@ function createStyles() {
     + '-moz-appearance: textfield;'
     + '}';
 
-    const wishlist_header = '#wishlist .header, #wishlist > li {'
+    const wishlist_header = '#wishlist .mho-header, #wishlist > li {'
     + 'padding: 0 8px;'
     + 'margin: 0.125em 0;'
     + 'width: 100%;'
@@ -3235,7 +3989,7 @@ function createStyles() {
     + 'background-color: #5c2b20;'
     + '}';
 
-    const wishlist_header_cell = '#wishlist .header > div {'
+    const wishlist_header_cell = '#wishlist .mho-header > div {'
     + 'display: inline-block;'
     + 'vertical-align: middle;'
     + '}'
@@ -3335,6 +4089,63 @@ function createStyles() {
     + 'transition: background-color .5s ease-in-out;'
     + '}'
 
+    const mho_map_td = `.mho-map tr td {`
+    + `border: 1px dotted;`
+    + `width: 30px;`
+    + `min-width: 30px;`
+    + `height: 30px;`
+    + `min-height: 30px;`
+    + `text-align: center;`
+    + `vertical-align: middle;`
+    + `}`;
+
+    const dotted_background = '.dotted-background {'
+    + `background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%),
+                         -moz-linear-gradient(-45deg, #444 25%, transparent 25%),
+                         -moz-linear-gradient(45deg, transparent 75%, #444 75%),
+                         -moz-linear-gradient(-45deg, transparent 75%, #444 75%);`
+    + `background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, #444), color-stop(.25, transparent)),
+                         -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, #444), color-stop(.25, transparent)),
+                         -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, #444)),
+                         -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, #444));`
+    + `background-image: -webkit-linear-gradient(45deg, #444 25%, transparent 25%),
+                         -webkit-linear-gradient(-45deg, #444 25%, transparent 25%),
+                         -webkit-linear-gradient(45deg, transparent 75%, #444 75%),
+                         -webkit-linear-gradient(-45deg, transparent 75%, #444 75%);`
+    + `background-image: -o-linear-gradient(45deg, #444 25%, transparent 25%),
+                         -o-linear-gradient(-45deg, #444 25%, transparent 25%),
+                         -o-linear-gradient(45deg, transparent 75%, #444 75%),
+                         -o-linear-gradient(-45deg, transparent 75%, #444 75%);`
+    + `background-image: linear-gradient(45deg, #444 25%, transparent 25%),
+                         linear-gradient(-45deg, #444 25%, transparent 25%),
+                         linear-gradient(45deg, transparent 75%, #444 75%),
+                         linear-gradient(-45deg, transparent 75%, #444 75%);`
+    + `-moz-background-size: 2px 2px;`
+    + `background-size: 2px 2px;`
+    + `-webkit-background-size: 2px 2px; /* override value for webkit */`
+    + `background-position: 0 0, 1px 0, 1px -1px, 0px 1px;`
+    + '}';
+
+    let empty_bat_before_after = '.empty-bat:before, .empty-bat:after {'
+    + 'position: absolute;'
+    + 'content: "";'
+    + 'background: black;'
+    + 'display: block;'
+    + 'width: 1px;'
+    + 'height: 25px;'
+    + '-webkit-transform: rotate(-45deg);'
+    + 'transform: rotate(-45deg);'
+    + 'left: 0;'
+    + 'right: 0;'
+    + 'top: 0;'
+    + 'bottom: 0;'
+    + 'margin: auto;'
+    + '}';
+    let empty_bat_after = '.empty-bat:after {'
+    + '-webkit-transform: rotate(45deg);'
+    + 'transform: rotate(45deg);'
+    + '}';
+
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
     + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
     + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
@@ -3345,7 +4156,7 @@ function createStyles() {
     + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
     + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
     + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
-    + display_map_btn + mh_optimizer_map_window_box_style;
+    + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + dotted_background + empty_bat_before_after + empty_bat_after;
 
     let style = document.createElement('style');
 
@@ -3356,6 +4167,641 @@ function createStyles() {
     }
 
     document.getElementsByTagName('head')[0].appendChild(style);
+}
+
+////////////////////////////
+// Appels outils externes //
+////////////////////////////
+
+/** Récupère la carte de GH */
+async function getGHMap() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+
+        let getArrow = (arrow) => {
+            let arrow_sprite = arrow.firstChild.href.baseVal.replace(/^(.*)#/, '');
+            switch (arrow_sprite) {
+                case 'fleche_0':
+                case 'fleche_0_b':
+                case 'fleche_0_n':
+                    return {direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'right'};
+                case 'fleche_1':
+                case 'fleche_1_b':
+                case 'fleche_1_n':
+                    return {direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'top'};
+                case 'fleche_2':
+                case 'fleche_2_b':
+                case 'fleche_2_n':
+                    return {direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'left'};
+                case 'fleche_3':
+                case 'fleche_3_b':
+                case 'fleche_3_n':
+                    return {direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
+                case 'fleche_4':
+                case 'fleche_4_b':
+                case 'fleche_4_n':
+                    return {direction: 'right', type: 'horizontal', source: '', length: 'semi', position: 'left'};
+                case 'fleche_5':
+                case 'fleche_5_b':
+                case 'fleche_5_n':
+                    return {direction: 'top', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
+                case 'fleche_6':
+                case 'fleche_6_b':
+                case 'fleche_6_n':
+                    return {direction: 'left', type: 'horizontal', source: '', length: 'semi', position: 'right'};
+                case 'fleche_7':
+                case 'fleche_7_b':
+                case 'fleche_7_n':
+                    return {direction: 'bottom', type: 'vertical', source: '', length: 'semi', position: 'top'};
+                case 'fleche_8':
+                case 'fleche_8_b':
+                case 'fleche_8_n':
+                    return {direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'right'};
+                case 'fleche_9':
+                case 'fleche_9_b':
+                case 'fleche_9_n':
+                    return {direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'top'};
+                case 'fleche_10':
+                case 'fleche_10_b':
+                case 'fleche_10_n':
+                    return {direction: 'both', type: 'horizontal', source: '', length: 'semi', position: 'left'};
+                case 'fleche_11':
+                case 'fleche_11_b':
+                case 'fleche_11_n':
+                    return {direction: 'both', type: 'vertical', source: '', length: 'semi', position: 'bottom'};
+                case 'fleche_12':
+                case 'fleche_12_b':
+                case 'fleche_12_n':
+                    return {direction: 'left', type: 'horizontal', source: '', length: 'plain', position: 'middle'};
+                case 'fleche_13':
+                case 'fleche_13_b':
+                case 'fleche_13_n':
+                    return {direction: 'bottom', type: 'vertical', source: '', length: 'plain', position: 'middle'};
+                case 'fleche_14':
+                case 'fleche_14_b':
+                case 'fleche_14_n':
+                    return {direction: 'right', type: 'horizontal', source: '', length: 'plain', position: 'middle'};
+                case 'fleche_15':
+                case 'fleche_15_b':
+                case 'fleche_15_n':
+                    return {direction: 'top', type: 'vertical', source: '', length: 'plain', position: 'middle'};
+                case 'fleche_16':
+                case 'fleche_16_b':
+                case 'fleche_16_n':
+                    return {direction: 'top', type: 'corner', source: 'right', length: '', position: ''};
+                case 'fleche_17':
+                case 'fleche_17_b':
+                case 'fleche_17_n':
+                    return {direction: 'bottom', type: 'corner', source: 'right', length: '', position: ''};
+                case 'fleche_18':
+                case 'fleche_18_b':
+                case 'fleche_18_n':
+                    return {direction: 'left', type: 'corner', source: 'top', length: '', position: ''};
+                case 'fleche_19':
+                case 'fleche_19_b':
+                case 'fleche_19_n':
+                    return {direction: 'right', type: 'corner', source: 'top', length: '', position: ''};
+                case 'fleche_20':
+                case 'fleche_20_b':
+                case 'fleche_20_n':
+                    return {direction: 'top', type: 'corner', source: 'left', length: '', position: ''};
+                case 'fleche_21':
+                case 'fleche_21_b':
+                case 'fleche_21_n':
+                    return {direction: 'bottom', type: 'corner', source: 'left', length: '', position: ''};
+                case 'fleche_22':
+                case 'fleche_22_b':
+                case 'fleche_22_n':
+                    return {direction: 'right', type: 'corner', source: 'bottom', length: '', position: ''};
+                case 'fleche_23':
+                case 'fleche_23_b':
+                case 'fleche_23_n':
+                    return {direction: 'left', type: 'corner', source: 'bottom', length: '', position: ''};
+                case 'fleche_24':
+                case 'fleche_24_b':
+                case 'fleche_24_n':
+                    return {direction: 'none', type: 'point', source: 'middle', length: 'none', position: 'middle'};
+            }
+        }
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: 'https://gest-hordes2.eragaming.fr/carte',
+            responseType: 'document',
+            onload: function(response){
+                if (response.status === 200) {
+                    let new_map = [];
+                    let map = Array.from(response.response.body.querySelector('#zoneCarte').children);
+                    let x_mapping = Array.from(map[0].children).map((x) => x.innerText);
+                    map
+                        .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('caseCarte')))
+                        .forEach((row) => {
+                        let cells = [];
+                        let y;
+                        Array.from(row.children).forEach((cell, index) => {
+                            if (cell.classList.contains('fondNoir')) {
+                                y = cell.innerText;
+                            } else {
+                                let cell_parts = Array.from(cell.children);
+
+                                let new_cell = {
+                                    horizontal: y,
+                                    vertical: x_mapping[index],
+                                    town: cell.querySelector('.caseVille'),
+                                    bat: cell.querySelector('.bat'),
+                                    my_pos: cell.querySelector('.posJoueur'),
+                                    expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& Array.from(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
+                                    expedition_arrows: [],/*Array.from(cell_parts.find((cell_part) => cell_part.classList.contains('expeditionVille')).children).map((arrow) => getArrow(arrow)), */
+                                    not_yet_visited: cell.querySelector('.zone-NonExplo'),
+                                    not_visited_today: !cell.querySelector('.danger') && !cell.querySelector('.caseVille'),
+                                    zombies: cell.querySelector('.danger') ? Array.from(cell.querySelector('.danger').classList).filter((class_name) => class_name.startsWith('zone-danger')).map((class_name) => class_name.replace('zone-danger', ''))[0] : undefined,
+                                    empty: cell.querySelector('.epuise'),
+                                    empty_bat: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-e',
+                                    ruin: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-r',
+                                };
+                                cells.push(new_cell);
+                            }
+                        });
+                        new_map.push(cells);
+                    });
+                    resolve({map: new_map, vertical_mapping: x_mapping});
+                } else {
+                    addError(response);
+                    reject(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
+                reject(error);
+            }
+        });
+    });
+}
+
+
+/** Récupère la carte de Gest'Hordes */
+async function getGHRuin() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+        if (GM_getValue(mho_map_key).ruin) {
+            let map_html = document.createElement('div');
+            map_html.innerHTML = GM_getValue(mho_map_key).ruin;
+
+            let new_map = [];
+            let rows = Array.from(map_html.querySelector('#carteRuine').querySelector('tbody').children);
+            let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
+            rows
+                .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('caseCarteRuine')))
+                .forEach((row, row_index, rows_array) => {
+                let new_cells = [];
+                let cells = Array.from(row.children);
+                let y;
+                cells.forEach((cell, cell_index, cell_array) => {
+                    if (cell.classList.contains('bordCarteRuine')) {
+                        y = cell.innerText;
+                    } else {
+
+                        let cell_parts = Array.from(cell.children);
+                        let new_cell = {
+                            horizontal: y,
+                            vertical: x_mapping[cell_index],
+                            borders: '0000',
+                            zombies: cell.firstElementChild.getAttribute('data-z')
+                        };
+
+                        let img_path = cell.querySelector('.ruineCarte').firstElementChild.href.baseVal.replace(/^(.*)#/, '');
+                        switch (img_path) {
+                            case 'ruineCarte_0':
+                                new_cell.borders = '0101';
+                                break;
+                            case 'ruineCarte_1':
+                                new_cell.borders = '1010';
+                                break;
+                            case 'ruineCarte_2':
+                                new_cell.borders = '1100';
+                                break;
+                            case 'ruineCarte_3':
+                                new_cell.borders = '0110';
+                                break;
+                            case 'ruineCarte_4':
+                                new_cell.borders = '1001';
+                                break;
+                            case 'ruineCarte_5':
+                                new_cell.borders = '0011';
+                                break;
+                            case 'ruineCarte_6':
+                                new_cell.borders = '1111';
+                                break;
+                            case 'ruineCarte_7':
+                                new_cell.borders = '0111';
+                                break;
+                            case 'ruineCarte_8':
+                                new_cell.borders = '1101';
+                                break;
+                            case 'ruineCarte_9':
+                                new_cell.borders = '1110';
+                                break;
+                            case 'ruineCarte_10':
+                                new_cell.borders = '1011';
+                                break;
+                            case 'ruineCarte_11':
+                                new_cell.borders = '1000';
+                                break;
+                            case 'ruineCarte_12':
+                                new_cell.borders = '0100';
+                                break;
+                            case 'ruineCarte_13':
+                                new_cell.borders = '0001';
+                                break;
+                            case 'ruineCarte_14':
+                                new_cell.borders = '0010';
+                                break;
+                            case 'ruineCarte_15':
+                                new_cell.borders = 'exit';
+                                break;
+                            case 'ruineCarte_17':
+                                new_cell.borders = '1010';
+                                break;
+                            default:
+                                new_cell.borders = '0000';
+                                break;
+                        };
+
+                        switch (cell.firstElementChild.getAttribute('data-porte')) {
+                            case 'pC':
+                                new_cell.door = 'item_lock';
+                                break;
+                            case 'p':
+                                new_cell.door = 'item_door';
+                                break;
+                            case 'pD':
+                                new_cell.door = 'item_classicKey';
+                                break;
+                            case 'pP':
+                                new_cell.door = 'item_bumpKey';
+                                break;
+                            case 'pM':
+                                new_cell.door = 'item_magneticKey';
+                                break;
+                            default:
+                                break;
+                        }
+                        new_cells.push(new_cell);
+                    }
+                });
+                new_map.push(new_cells);
+            });
+            resolve({map: new_map, vertical_mapping: x_mapping});
+        }
+        endLoading();
+    });
+}
+
+
+/** Récupère la carte de GH */
+async function getBBHMap() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: `https://bbh.fred26.fr/?cid=5-${mh_user.townId}&pg=map`,
+            responseType: 'document',
+            onload: function(response){
+                if (response.status === 200) {
+                    let new_map = [];
+                    let map = response.response.querySelector('#carte');
+                    if (map) {
+                        let x_mapping = Array.from(Array.from(map.children)[0].querySelectorAll('td')).map((x) => x.innerText);
+                        x_mapping.push('');
+                        x_mapping.splice(0, 0, '');
+                        if (map.querySelector('#cases')) {
+                            Array.from(map.querySelector('#cases').querySelectorAll('tr'))
+                                .forEach((row, row_index) => {
+                                let cells = [];
+                                let y;
+                                Array.from(row.children).forEach((cell, cell_index) => {
+                                    let cell_parts = Array.from(cell.querySelector('.divs').children);
+
+                                    let new_cell = {
+                                        horizontal: map.querySelector('.lgd_l').firstElementChild.children[row_index].firstElementChild.innerText,
+                                        vertical: x_mapping[cell_index],
+                                        town: cell.querySelector('.door'),
+                                        bat: cell.querySelector('.bat'),
+                                        my_pos: cell.querySelector('.me'),
+                                        expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& Array.from(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
+                                        expedition_arrows: [],
+                                        not_yet_visited: cell.querySelector('.nv'),
+                                        not_visited_today: cell.querySelector('.nvt'),
+                                        zombies: cell.querySelector('.zombies') ? Array.from(cell.querySelector('.zombies').classList).find((class_name) => class_name.startsWith('z_dng_')).replace('z_dng_', '') : undefined,
+                                        empty: cell.querySelector('.praf'),
+                                        empty_bat: cell.querySelector('.mark1'),
+                                        ruin: cell.querySelector('.tag_11')
+                                    };
+                                        cells.push(new_cell);
+                                });
+                                new_map.push(cells);
+                            });
+                            resolve({map: new_map, vertical_mapping: x_mapping});
+                        }
+                    }
+                    reject();
+                } else {
+                    addError(response);
+                    reject(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
+                reject(error);
+            }
+        });
+    });
+}
+
+
+/** Récupère la carte de BBH */
+async function getBBHRuin() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+        if (GM_getValue(mho_map_key).ruin) {
+            let map_html = document.createElement('div');
+            map_html.innerHTML = GM_getValue(mho_map_key).ruin;
+
+            let new_map = [];
+            let rows = Array.from(map_html.querySelector('#plan').firstElementChild.children);
+            let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
+            rows
+                .filter((row) => Array.from(row.children).some((cell) => cell.querySelector('.divs')))
+                .forEach((row, row_index, rows_array) => {
+                let new_cells = [];
+                let cells = Array.from(row.children);
+                let y;
+                cells.forEach((cell, cell_index, cell_array) => {
+                    if (!cell.querySelector('.divs')) {
+                        y = cell.innerText;
+                    } else {
+
+                        let cell_parts = Array.from(cell.firstElementChild.children);
+
+                        let div_zombies = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('z')))
+                        let zombies = div_zombies ? Array.from(div_zombies.classList).find(() => (class_name) => class_name.startsWith('z')) : undefined;
+
+                        let new_cell = {
+                            horizontal: y,
+                            vertical: x_mapping[cell_index],
+                            borders: '0000',
+                            zombies: zombies ? zombies[1] : ''
+                        };
+
+                        let div_path = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('m')))
+                        let img_path = div_path ? Array.from(div_path.classList).find(() => (class_name) => class_name.startsWith('m')) : undefined;
+                        switch (img_path) {
+                            case 'm1':
+                                new_cell.borders = 'exit';
+                                break;
+                            case 'm2':
+                                new_cell.borders = '0000';
+                                break;
+                            case 'm11':
+                                new_cell.borders = '0101';
+                                break;
+                            case 'm12':
+                                new_cell.borders = '1010';
+                                break;
+                            case 'm13':
+                                new_cell.borders = '1111';
+                                break;
+                            case 'm21':
+                                new_cell.borders = '0111';
+                                break;
+                            case 'm22':
+                                new_cell.borders = '1110';
+                                break;
+                            case 'm23':
+                                new_cell.borders = '1101';
+                                break;
+                            case 'm24':
+                                new_cell.borders = '1011';
+                                break;
+                            case 'm31':
+                                new_cell.borders = '0110';
+                                break;
+                            case 'm32':
+                                new_cell.borders = '1100';
+                                break;
+                            case 'm33':
+                                new_cell.borders = '0011';
+                                break;
+                            case 'm34':
+                                new_cell.borders = '1001';
+                                break;
+                            case 'm41':
+                                new_cell.borders = '0100';
+                                break;
+                            case 'm42':
+                                new_cell.borders = '1000';
+                                break;
+                            case 'm43':
+                                new_cell.borders = '0001';
+                                break;
+                            case 'm44':
+                                new_cell.borders = '0010';
+                                break
+                            default:
+                                new_cell.borders = '0000';
+                                break;
+                        };
+
+                        let div_door = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('p')))
+                        let img_door = div_door ? Array.from(div_door.classList).find(() => (class_name) => class_name.startsWith('p')) : undefined;
+                        if (img_door) {
+                            switch (img_door) {
+                                case 'p2':
+                                    new_cell.door = 'item_lock';
+                                    break;
+                                case 'p1':
+                                    new_cell.door = 'item_door';
+                                    break;
+                                case 'p5':
+                                    new_cell.door = 'item_classicKey';
+                                    break;
+                                case 'p4':
+                                    new_cell.door = 'item_bumpKey';
+                                    break;
+                                case 'p3':
+                                    new_cell.door = 'item_magneticKey';
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        new_cells.push(new_cell);
+                    }
+                });
+                new_map.push(new_cells);
+            });
+            resolve({map: new_map, vertical_mapping: x_mapping});
+        }
+        endLoading();
+    });
+}
+
+/** Récupère la carte de FataMorgana */
+async function getFMMap() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+
+        let map_html = document.createElement('div');
+        map_html.innerHTML = GM_getValue(mho_map_key).fm_block;
+
+        let new_map = [];
+        let map = Array.from(map_html.querySelector('#map').children);
+        let x_mapping = Array.from(map[0].children).map((x) => x.innerText);
+        map
+            .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
+            .forEach((row) => {
+            let cells = [];
+            let y;
+            Array.from(row.children).forEach((cell, index) => {
+                if (cell.classList.contains('mapruler')) {
+                    y = cell.innerText;
+                } else {
+                    let cell_parts = Array.from(cell.children);
+
+                    let new_cell = {
+                        horizontal: y,
+                        vertical: x_mapping[index],
+                        town: cell.classList.contains('city'),
+                        bat: cell_parts.some((cell_part) => cell_part.classList.contains('building')),
+                        my_pos: cell_parts.some((cell_part) => cell_part.classList.contains('posJoueur')),
+                        expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('route-counter')),
+                        expedition_arrows: [],
+                        not_yet_visited: cell.classList.contains('nyv'),
+                        not_visited_today: cell.classList.contains('nvt'),
+                        zombies: Array.from(cell.classList).filter((class_name) => class_name.startsWith('danger')).map((class_name) => class_name.replace('danger', ''))[0],
+                        empty: !cell.querySelector('.zone-status-full'),
+                        empty_bat: cell.querySelector('.depleted-building'),
+                        ruin: cell.querySelector('.explorable-building'),
+                    };
+                    cells.push(new_cell);
+                }
+            });
+            new_map.push(cells);
+        });
+        resolve({map: new_map, vertical_mapping: x_mapping});
+        endLoading();
+    });
+}
+
+/** Récupère la carte de FataMorgana */
+async function getFMRuin() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+        if (GM_getValue(mho_map_key).ruin) {
+            let map_html = document.createElement('div');
+            map_html.innerHTML = GM_getValue(mho_map_key).ruin;
+
+            let new_map = [];
+            let rows = Array.from(map_html.querySelector('#ruinmap').children);
+            let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
+            rows
+                .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
+                .forEach((row, row_index, rows_array) => {
+                let new_cells = [];
+                let cells = Array.from(row.children);
+                let y;
+                cells.forEach((cell, cell_index, cell_array) => {
+                    if (cell.classList.contains('mapruler')) {
+                        y = cell.innerText;
+                    } else {
+                        let new_cell = {
+                            horizontal: y,
+                            vertical: x_mapping[cell_index],
+                            borders: '0000',
+                            zombies: cell.getAttribute('z')
+                        };
+
+                        let img = Array.from(cell.classList).find((class_name) => class_name.startsWith('tile-'));
+                        switch (img) {
+                            case 'tile-1':
+                                new_cell.borders = '0100';
+                                break;
+                            case 'tile-2':
+                                new_cell.borders = '0010';
+                                break;
+                            case 'tile-3':
+                                new_cell.borders = '0001';
+                                break;
+                            case 'tile-4':
+                                new_cell.borders = '1000';
+                                break;
+                            case 'tile-5':
+                                if (cell.classList.contains('ruinEntry')) {
+                                    new_cell.borders = 'exit';
+                                } else {
+                                    new_cell.borders = '0101';
+                                }
+                                break;
+                            case 'tile-6':
+                                new_cell.borders = '1010';
+                                break;
+                            case 'tile-7':
+                                new_cell.borders = '1111';
+                                break;
+                            case 'tile-8':
+                                new_cell.borders = '0110';
+                                break;
+                            case 'tile-9':
+                                new_cell.borders = '0011';
+                                break;
+                            case 'tile-10':
+                                new_cell.borders = '1001';
+                                break;
+                            case 'tile-11':
+                                new_cell.borders = '1100';
+                                break;
+                            case 'tile-12':
+                                new_cell.borders = '1110';
+                                break;
+                            case 'tile-13':
+                                new_cell.borders = '0111';
+                                break;
+                            case 'tile-14':
+                                new_cell.borders = '1011';
+                                break;
+                            case 'tile-15':
+                                new_cell.borders = '1101';
+                                break;
+                            case 'tile-0':
+                            default:
+                                new_cell.borders = '0000';
+                                break;
+                        };
+
+                        if (cell.classList.contains('doorlock-1')) {
+                            new_cell.door = 'item_lock';
+                        } else if (cell.classList.contains('doorlock-2')) {
+                            new_cell.door = 'item_door';
+                        } else if (cell.classList.contains('doorlock-3')) {
+                            new_cell.door = 'item_classicKey';
+                        } else if (cell.classList.contains('doorlock-4')) {
+                            new_cell.door = 'item_bumpKey';
+                        } else if (cell.classList.contains('doorlock-5')) {
+                            new_cell.door = 'item_magneticKey';
+                        }
+                        new_cells.push(new_cell);
+                    }
+                });
+                new_map.push(new_cells);
+            });
+            resolve({map: new_map, vertical_mapping: x_mapping});
+        }
+        endLoading();
+    });
 }
 
 ////////////////
@@ -3393,6 +4839,10 @@ function getItems() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3418,6 +4868,10 @@ function getMe() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3439,6 +4893,10 @@ function getTown() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3462,6 +4920,10 @@ function getCitizens() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3497,6 +4959,10 @@ function getBank() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3519,6 +4985,10 @@ function getWishlist() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3537,11 +5007,15 @@ function addItemToWishlist(item, cart_button) {
             if (response.status === 200) {
                 item.wishListCount = 1;
                 cart_button.remove();
-                addSuccess(api_texts.add_to_wishlist_success[lang]);
+                addSuccess(api_texts.add_to_wishlist_success[temp_lang]);
             } else {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3568,11 +5042,15 @@ function updateWishlist() {
                 wishlist = response.response;
                 wishlist.wishList = Object.keys(wishlist.wishList).map((key) => wishlist.wishList[key]);
 
-                addSuccess(api_texts.update_wishlist_success[lang]);
+                addSuccess(api_texts.update_wishlist_success[temp_lang]);
             } else {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3604,13 +5082,17 @@ function updateExternalTools() {
                 let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
                 let tools_success = response_items.filter((tool_response) => tool_response.value.toLowerCase() === 'ok');
                 let tools_fail = response_items.filter((tool_response) => tool_response.value.toLowerCase() !== 'ok' && tool_response.value.toLowerCase() !== 'not activated');
-                btn.innerHTML = nb_tools_to_update === tools_success.length ? '<img src ="' + repo_img_url + 'icons/done.png">' + texts.update_external_tools_success_btn_label[lang]
-                : `<img src ="${repo_img_url}emotes/warning.gif">${texts.update_external_tools_errors_btn_label[lang]}<br>${tools_success.map((item) => item.key.replace('Status', ' : OK')).join('<br>')}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
+                btn.innerHTML = nb_tools_to_update === tools_success.length ? '<img src ="' + repo_img_url + 'icons/done.png">' + texts.update_external_tools_success_btn_label[temp_lang]
+                : `<img src ="${repo_img_url}emotes/warning.gif">${texts.update_external_tools_errors_btn_label[temp_lang]}<br>${tools_success.map((item) => item.key.replace('Status', ' : OK')).join('<br>')}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
             } else {
                 addError(response);
-                btn.innerHTML = '<img src ="' + repo_img_url + 'professions/death.gif">' + texts.update_external_tools_fail_btn_label[lang];
+                btn.innerHTML = '<img src ="' + repo_img_url + 'professions/death.gif">' + texts.update_external_tools_fail_btn_label[temp_lang];
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3637,6 +5119,10 @@ function getHeroSkills() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
         }
     });
 }
@@ -3665,7 +5151,7 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                         display_all_img.setAttribute('style', 'margin-right: 8px');
 
                         let display_all_text = document.createElement('text');
-                        display_all_text.innerText = texts.display_all_search_result[lang];
+                        display_all_text.innerText = texts.display_all_search_result[temp_lang];
 
                         display_all.appendChild(display_all_img);
                         display_all.appendChild(display_all_text);
@@ -3675,10 +5161,10 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                             show_exact_match = !show_exact_match;
                             if (show_exact_match) {
                                 display_all_img.src = `${repo_img_url}/icons/small_more.gif`;
-                                display_all_text.innerHTML = texts.display_all_search_result[lang];
+                                display_all_text.innerHTML = texts.display_all_search_result[temp_lang];
                             } else {
                                 display_all_img.src = `${repo_img_url}/icons/small_less.gif`;
-                                display_all_text.innerHTML = texts.display_exact_search_result[lang];
+                                display_all_text.innerHTML = texts.display_exact_search_result[temp_lang];
                             }
                             let not_exact = Array.from(block_to_display.getElementsByClassName('not-exact'));
                             not_exact.forEach((not_exact_item) => {
@@ -3691,7 +5177,7 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                         if (response.response.translations.length > 1) {
                             let context_div = document.createElement('div');
                             context_div.setAttribute('style', 'text-align: center; padding: 4px; font-variant: small-caps; font-size: 14px;');
-                            context_div.innerHTML = texts.translation_file_context[lang] + ` <img src="${repo_img_url}/emotes/arrowright.gif"> ` + translation.key.context;
+                            context_div.innerHTML = texts.translation_file_context[temp_lang] + ` <img src="${repo_img_url}/emotes/arrowright.gif"> ` + translation.key.context;
                             if (!translation.key.isExactMatch && show_exact_match) {
                                 context_div.classList.add('not-exact','hidden');
                             }
@@ -3734,6 +5220,10 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                     addError(response);
                 }
                 endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
             }
         });
     }
@@ -3765,6 +5255,71 @@ function getRecipes() {
                 addError(response);
             }
             endLoading();
+        },
+        onerror: function(error){
+            endLoading();
+            addError(error);
+        }
+    });
+}
+
+/** Récupère la liste complète des recettes */
+async function getTodayEstimation(day, estimations, today) {
+    return new Promise((resolve, reject) => {
+        startLoading();
+        GM_xmlhttpRequest({
+            method: 'POST',
+            url: api2_url + `:8080/${today ? 'attaque' : 'planif'}.php?day=${day}&id=${mh_user.townId}&type=normal&debug=false`,
+            data: JSON.stringify(estimations),
+            responseType: 'text',
+            onload: function(response){
+                if (response.status === 200) {
+                    resolve(response.response);
+                } else {
+                    addError(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
+            }
+        });
+    });
+}
+
+/** Récupère le chemin optimal à partir d'une carte */
+function getOptimalPath(map, html, button, source) {
+    // map.doors = map.doors.slice(2);
+    console.log('map before send', map);
+    GM_xmlhttpRequest({
+        method: 'POST',
+        data: JSON.stringify(map),
+        url: api2_url + '/ruine/pathopti',
+        // url: api_url + 'ruine/pathopti',
+        responseType: 'json',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        onload: function(response){
+            if (response.status === 200) {
+              if (source === 'gh') {
+                  displayOptimalPathOnGh(html, response.response)
+              } else if (source === 'bbh') {
+                  displayOptimalPathOnBbh(html, response.response)
+              }
+            } else {
+                console.error('error', response.reponse)
+            }
+            button.disabled = false;
+        },
+        onerror: function(error){
+            console.error('error', error);
+            button.disabled = false;
+        },
+        ontimeout: function(timeout) {
+            console.error('timeout', timeout);
+            button.disabled = false;
         }
     });
 }
@@ -3774,7 +5329,6 @@ function getRecipes() {
 //     MAIN FUNCTION     //
 ///////////////////////////
 (function() {
-    'use strict';
 
     if (document.URL.startsWith('https://bbh.fred26.fr/') || document.URL.startsWith('https://gest-hordes2.eragaming.fr/') || document.URL.startsWith('https://fatamorgana.md26.eu/')) {
         let current_key = '';
@@ -3801,9 +5355,10 @@ function getRecipes() {
         } else {
             current_key = gm_fata_updated_key;
             map_block_id = 'map';
-            block_copy_map_button = 'update-myzone';
-            source = 'fata'
-
+            ruin_block_id = 'ruinmap';
+            block_copy_map_button = 'modeBar';
+            block_copy_ruin_button = 'modeBar';
+            source = 'fm'
         }
 
         // Si on est sur le site de BBH ou GH ou Fata et que BBH ou GH ou Fata a été mis à jour depuis MyHordes, alors on recharge BBH ou GH ou Fata au moment de revenir sur l'onglet
@@ -3814,23 +5369,27 @@ function getRecipes() {
             }
         });
 
-        setInterval(() => {
+        let interval = setInterval(() => {
             let copy_button = document.getElementById(mho_copy_map_id);
             // console.log(copy_button);
-            if (mho_parameters.display_map) {
+            if (mho_parameters.display_map && !copy_button) {
                 let map_block = document.getElementById(map_block_id);
                 let ruin_block = document.getElementById(ruin_block_id);
-                if (!copy_button && (map_block || ruin_block)) {
-                    if (map_block) {
-                        createCopyButton(source, map_block_id, block_copy_map_button);
-                    } else if (ruin_block) {
-                        createCopyButton(source, ruin_block_id, block_copy_ruin_button);
+                if (map_block || ruin_block) {
+                    if (ruin_block) {
+                        createCopyButton(source, 'ruin', ruin_block_id, block_copy_ruin_button);
+                        // createOptimizePathButton(source, ruin_block_id, block_copy_ruin_button);
+                    } else if (map_block) {
+                        createCopyButton(source, 'map', map_block_id, block_copy_map_button);
                     }
                 }
-            } else if (copy_button) {
+            } else if (!mho_parameters.display_map && copy_button) {
                 copy_button.remove();
+                clearInterval(interval);
+            } else {
+                clearInterval(interval);
             }
-        }, 1000)
+        }, 1000);
     } else {
 
         /** Affiche le changelog de la version au premier chargement après la mise à jour */
@@ -3859,6 +5418,7 @@ function getRecipes() {
             createUpdateExternalToolsButton();
             clickOnVotedToRedirect();
             displaySearchFieldOnBuildings();
+            displayMinApOnBuildings();
             displayWishlistInApp();
             displayPriorityOnItems();
             displayNbDeadZombies();
