@@ -72,6 +72,7 @@ namespace MyHordesOptimizerApi
 
             // Repository
             services.AddSingleton<IWebApiRepository, SimpleWebApiRepository>();
+            services.AddSingleton<IMyHordesCodeRepository, MyHordesCodeRepository>();
 
             services.AddScoped<IMyHordesJsonApiRepository, MyHordesJsonApiRepository>();
             services.AddScoped<IMyHordesXmlApiRepository, MyHordesXmlApiRepository>();

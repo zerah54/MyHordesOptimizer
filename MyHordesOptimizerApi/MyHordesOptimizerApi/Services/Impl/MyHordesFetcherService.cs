@@ -16,6 +16,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IMyHordesJsonApiRepository MyHordesJsonApiRepository { get; set; }
         protected IMyHordesXmlApiRepository MyHordesXmlApiRepository { get; set; }
         protected IMyHordesOptimizerFirebaseRepository FirebaseRepository { get; set; }
+        protected IMyHordesCodeRepository MyHordesCodeRepository { get; set; }
         protected readonly IMapper Mapper;
         protected IUserInfoProvider UserInfoProvider { get; set; }
 
@@ -24,6 +25,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             IMyHordesJsonApiRepository myHordesJsonApiRepository,
             IMyHordesXmlApiRepository myHordesXmlApiRepository,
             IMyHordesOptimizerFirebaseRepository firebaseRepository,
+            IMyHordesCodeRepository myHordesCodeRepository,
             IMapper mapper,
             IUserInfoProvider userInfoProvider)
         {
@@ -31,6 +33,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             MyHordesJsonApiRepository = myHordesJsonApiRepository;
             MyHordesXmlApiRepository = myHordesXmlApiRepository;
             FirebaseRepository = firebaseRepository;
+            MyHordesCodeRepository = myHordesCodeRepository;
             Mapper = mapper;
             UserInfoProvider = userInfoProvider;
         }
@@ -150,6 +153,12 @@ namespace MyHordesOptimizerApi.Services.Impl
             var citizens = town.Citizens;
 
             return citizens;
+        }
+
+        public IEnumerable<MyHordesOptimizerRuin> GetRuins()
+        {
+            var ruins = FirebaseRepository.GetRuins();
+            return ruins.Values;
         }
     }
 }

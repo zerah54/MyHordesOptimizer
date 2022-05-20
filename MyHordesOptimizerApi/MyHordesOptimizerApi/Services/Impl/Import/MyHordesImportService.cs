@@ -22,6 +22,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         protected readonly IWebApiRepository WebApiRepository;
         protected IMyHordesJsonApiRepository MyHordesJsonApiRepository { get; set; }
         protected IMyHordesXmlApiRepository MyHordesXmlApiRepository { get; set; }
+        protected IMyHordesCodeRepository MyHordesCodeRepository { get; set; }
         protected readonly IMapper Mapper;
 
 
@@ -29,12 +30,14 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             IWebApiRepository webApiRepository,
             IMyHordesJsonApiRepository myHordesJsonApiRepository,
             IMyHordesXmlApiRepository myHordesXmlApiRepository,
+            IMyHordesCodeRepository myHordesCodeRepository,
             IMapper mapper)
         {
             FirebaseRepository = firebaseRepository;
             WebApiRepository = webApiRepository;
             MyHordesJsonApiRepository = myHordesJsonApiRepository;
             MyHordesXmlApiRepository = myHordesXmlApiRepository;
+            MyHordesCodeRepository = myHordesCodeRepository;
             Mapper = mapper;
         }
 
@@ -278,6 +281,49 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         #endregion
 
+        #region Ruins
+
+        public void ImportRuins()
+        {
+            var jsonApiResult = MyHordesJsonApiRepository.GetRuins();
+            var jsonRuins = Mapper.Map<List<MyHordesOptimizerRuin>>(jsonApiResult);
+
+            var codeResult = MyHordesCodeRepository.GetRuins();
+            var codeRuins = Mapper.Map<List<MyHordesOptimizerRuin>>(codeResult);
+
+            var items = FirebaseRepository.GetItems();
+
+            foreach (var ruin in jsonRuins)
+            {
+                var miror = codeRuins.FirstOrDefault(x => x.Img == ruin.Img);
+                var codeRuin = codeResult.Values.FirstOrDefault(x => x.Icon == ruin.Img);
+                if (miror != null)
+                {
+                    var totalWeight = 0;
+                    foreach(var drop in codeRuin.Drops)
+                    {
+                        totalWeight += drop.Value;
+                        var itemKey = drop.Key.Remove(drop.Key.Length - 4); // On retire le _#00
+                        var item = items.FirstOrDefault(x => x.JsonIdName == itemKey);
+                        miror.Drops.Add(new ItemResult()
+                        {
+                            Item = item,
+                            Weight = drop.Value
+                        });
+                    }
+                    miror.Drops.ForEach(x => x.Probability = (double)x.Weight / totalWeight);
+                    ruin.HydrateMyHordesCodeValues(miror);
+                }
+            }
+
+            // Enregistrer dans firebase
+            FirebaseRepository.PatchRuins(jsonRuins);
+        }
+
+        #endregion
+
+        #region privatesUtils
+
         private static string[] SplitOnStringNotInBraces(string strToParse, string searchedStr)
         {
             // var regex = new Regex("(?![^)(]*\\([^)(]*?\\)\\)),(?![^\\[]*\\])");
@@ -379,5 +425,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             }
             return dico;
         }
+
+        #endregion
     }
 }

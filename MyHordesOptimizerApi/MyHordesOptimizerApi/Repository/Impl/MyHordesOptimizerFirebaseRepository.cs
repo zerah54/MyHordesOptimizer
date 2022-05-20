@@ -33,6 +33,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         private const string _heroSkillCollection = "Wiki/heroSkills";
         private const string _itemCollection = "Wiki/items";
         private const string _recipeCollection = "Wiki/recipes";
+        private const string _ruinsCollection = "Wiki/ruins";
         private const string _parameterAuth = "auth";
 
         public MyHordesOptimizerFirebaseRepository(ILogger<AbstractWebApiRepositoryBase> logger,
@@ -181,6 +182,27 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var urlLastUpdate = $"{Configuration.Url}/{_townCollection}/{townId}/{nameof(Town.Citizens)}/{nameof(CitizensWrapper.LastUpdateInfo)}.json";
             urlLastUpdate = AddParameterToQuery(urlLastUpdate, "auth", Configuration.Secret);
             base.Patch(url: urlLastUpdate, body: wrapper.LastUpdateInfo);
+        }
+
+        #endregion
+
+        #region Ruins
+
+        public void PatchRuins(List<MyHordesOptimizerRuin> ruins)
+        {
+            foreach (var ruin in ruins)
+            {
+                var url = $"{Configuration.Url}/{_ruinsCollection}/{ruin.Img}.json";
+                url = AddAuthentication(url);
+                base.Patch(url: url, body: ruin);
+            }
+        }
+
+        public Dictionary<string, MyHordesOptimizerRuin> GetRuins()
+        {
+            var url = $"{Configuration.Url}/{_ruinsCollection}.json";
+            url = AddAuthentication(url);
+            return base.Get<Dictionary<string, MyHordesOptimizerRuin>>(url);
         }
 
         #endregion

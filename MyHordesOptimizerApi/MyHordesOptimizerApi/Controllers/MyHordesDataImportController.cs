@@ -77,5 +77,18 @@ namespace MyHordesOptimizerApi.Controllers
             MyHordesImportService.ImportItems(request);
             return Ok();
         }
+
+        [HttpPost]
+        [Route("Ruins")]
+        public ActionResult ImportRuins(string userKey)
+        {
+            if (string.IsNullOrWhiteSpace(userKey))
+            {
+                return BadRequest($"{nameof(userKey)} cannot be empty");
+            }
+            UserKeyProvider.UserKey = userKey;
+            MyHordesImportService.ImportRuins();
+            return Ok();
+        }
     }
 }

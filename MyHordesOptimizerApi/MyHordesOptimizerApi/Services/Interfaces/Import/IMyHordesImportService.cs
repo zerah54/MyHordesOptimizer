@@ -6,5 +6,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
     {
         void ImportHeroSkill(ImportHeroSkillRequestDto request);
         void ImportItems(ImportItemsRequestDto request);
+        void ImportRuins();
     }
 }

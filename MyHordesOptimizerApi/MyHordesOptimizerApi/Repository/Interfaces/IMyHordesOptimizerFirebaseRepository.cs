@@ -24,5 +24,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PatchCitizen(int townId, CitizensWrapper citizens);
 
         void PutWishList(int townId, WishListWrapper wishList);
+        void PatchRuins(List<MyHordesOptimizerRuin> jsonRuins);
+        Dictionary<string, MyHordesOptimizerRuin> GetRuins();
     }
 }

@@ -40,5 +40,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
             UserKeyProvider.UserName = response.Name;
             return response;
         }
+
+        public Dictionary<string, MyHordesApiRuinDto> GetRuins()
+        {
+            var url = GenerateUrl(EndpointRuins);
+            url = AddParameterToQuery(url, _parameterFields, "id,name,desc,explorable,img");
+            return base.Get<Dictionary<string, MyHordesApiRuinDto>>(url);
+        }
     }
 }

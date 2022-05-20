@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -54,13 +55,20 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Me")]
         public ActionResult<SimpleMe> GetMe(string userKey)
         {
-            if (string.IsNullOrWhiteSpace(userKey))
+            try
             {
-                return BadRequest($"{nameof(userKey)} cannot be empty");
+                if (string.IsNullOrWhiteSpace(userKey))
+                {
+                    return BadRequest($"{nameof(userKey)} cannot be empty");
+                }
+                UserKeyProvider.UserKey = userKey;
+                var me = _myHordesFetcherService.GetSimpleMe();
+                return me;
             }
-            UserKeyProvider.UserKey = userKey;
-            var me = _myHordesFetcherService.GetSimpleMe();
-            return me;
+            catch (Exception e)
+            {
+                return BadRequest(e.ToString());
+            }
         }
 
         [HttpGet]
@@ -105,5 +113,14 @@ namespace MyHordesOptimizerApi.Controllers
             var citizens = _myHordesFetcherService.GetCitizens();
             return citizens;
         }
+
+        [HttpGet]
+        [Route("Ruins")]
+        public ActionResult<IEnumerable<MyHordesOptimizerRuin>> GetRuins()
+        {
+            var ruins = _myHordesFetcherService.GetRuins().ToList();
+            return ruins;
+        }
+
     }
 }

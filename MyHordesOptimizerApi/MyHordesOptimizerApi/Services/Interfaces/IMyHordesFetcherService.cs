@@ -13,5 +13,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         IEnumerable<ItemRecipe> GetRecipes();
         BankWrapper GetBank();
         CitizensWrapper GetCitizens();
+        IEnumerable<MyHordesOptimizerRuin> GetRuins();
     }
 }
