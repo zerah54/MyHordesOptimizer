@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.49
+// @version      1.0.0-alpha.50
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,8 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Expérimental] Estimnation des chances de survie en camping. Ca se passe dans "Outils" > "Camping" \n`
-+ `[Nouveauté] Liste des bâtiments et probabilités sur les objets qu'on peut trouver dedans, tout ça dans "Wiki" > "Bâtiments" \n`;
++ `[Fix] Migration de serveur pour tenter de ne plus avoir de problèmes de quota (on croise les doigts pour que ça marche toujours après ça...). La migration ne concerne malheureusement pas encore le camping et la liste des bâtiments\n`
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 const temp_lang = lang === 'es' ? 'en' : lang;
@@ -5728,7 +5727,7 @@ function getItems() {
     startLoading();
     GM_xmlhttpRequest({
         method: 'GET',
-        url: api_url + 'myhordesfetcher/items?userKey=' + external_app_id,
+        url: api2_url + '/myhordesfetcher/items?userKey=' + external_app_id,
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
@@ -5804,7 +5803,7 @@ function getMe() {
     startLoading();
     GM_xmlhttpRequest({
         method: 'GET',
-        url: api_url + 'myhordesfetcher/me?userKey=' + external_app_id,
+        url: api2_url + '/myhordesfetcher/me?userKey=' + external_app_id,
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
@@ -5834,7 +5833,7 @@ async function getTown() {
         startLoading();
         GM_xmlhttpRequest({
             method: 'GET',
-            url: api_url + 'myhordesfetcher/town?userKey=' + external_app_id,
+            url: api2_url + 'myhordesfetcher/town?userKey=' + external_app_id,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -5863,7 +5862,7 @@ async function getCitizens() {
             startLoading();
             GM_xmlhttpRequest({
                 method: 'GET',
-                url: api_url + 'myhordesfetcher/citizens?userKey=' + external_app_id,
+                url: api2_url + 'myhordesfetcher/citizens?userKey=' + external_app_id,
                 responseType: 'json',
                 onload: function(response){
                     if (response.status === 200) {
@@ -5892,7 +5891,7 @@ async function getBank() {
         startLoading();
         GM_xmlhttpRequest({
             method: 'GET',
-            url: api_url + 'myhordesfetcher/bank?userKey=' + external_app_id,
+            url: api2_url + 'myhordesfetcher/bank?userKey=' + external_app_id,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -5935,7 +5934,7 @@ function getWishlist() {
     startLoading();
     GM_xmlhttpRequest({
         method: 'GET',
-        url: api_url + 'wishlist?userKey=' + external_app_id,
+        url: api2_url + '/wishlist?userKey=' + external_app_id,
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
@@ -5965,7 +5964,7 @@ async function addItemToWishlist(item) {
         startLoading();
         GM_xmlhttpRequest({
             method: 'POST',
-            url: api_url + 'wishlist/add/' + item.xmlId + '?userKey=' + external_app_id,
+            url: api2_url + 'wishlist/add/' + item.xmlId + '?userKey=' + external_app_id,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -5997,7 +5996,7 @@ function updateWishlist() {
     startLoading();
     GM_xmlhttpRequest({
         method: 'PUT',
-        url: api_url + 'wishlist?userKey=' + external_app_id,
+        url: api2_url + 'wishlist?userKey=' + external_app_id,
         data: JSON.stringify(item_list),
         responseType: 'json',
         headers: {
@@ -6033,7 +6032,7 @@ function updateExternalTools() {
     let btn = document.getElementById(mh_update_external_tools_id);
     GM_xmlhttpRequest({
         method: 'POST',
-        url: api_url + 'externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id,
+        url: api2_url + 'externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id,
         data: JSON.stringify(tools_to_update),
         headers: {
             'Content-Type': 'application/json'
@@ -6071,7 +6070,7 @@ async function getHeroSkills() {
             startLoading();
             GM_xmlhttpRequest({
                 method: 'GET',
-                url: api_url + 'myhordesfetcher/heroSkills',
+                url: api2_url + 'myhordesfetcher/heroSkills',
                 responseType: 'json',
                 onload: function(response){
                     if (response.status === 200) {
@@ -6113,7 +6112,7 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
         startLoading();
         GM_xmlhttpRequest({
             method: 'GET',
-            url: api_url + 'myhordestranslation?' + locale + '&' + sourceString,
+            url: api2_url + 'myhordestranslation?' + locale + '&' + sourceString,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6212,7 +6211,7 @@ async function getRecipes() {
             startLoading();
             GM_xmlhttpRequest({
                 method: 'GET',
-                url: api_url + 'myhordesfetcher/recipes',
+                url: api2_url + 'myhordesfetcher/recipes',
                 responseType: 'json',
                 onload: function(response){
                     if (response.status === 200) {
@@ -6285,7 +6284,6 @@ async function getOptimalPath(map, html, button) {
             method: 'POST',
             data: JSON.stringify(map),
             url: api2_url + '/ruine/pathopti',
-            // url: api_url + 'ruine/pathopti',
             responseType: 'json',
             headers: {
                 'Content-Type': 'application/json'
