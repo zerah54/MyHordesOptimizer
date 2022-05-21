@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.48
+// @version      1.0.0-alpha.49
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,7 +32,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Supression] Suppression de la fonctionnalité d'estimation. Le mode de calcul a comme prévu été changé, rendant la fonctionnalité inefficace \n`;
++ `[Expérimental] Estimnation des chances de survie en camping. Ca se passe dans "Outils" > "Camping" \n`
++ `[Nouveauté] Liste des bâtiments et probabilités sur les objets qu'on peut trouver dedans, tout ça dans "Wiki" > "Bâtiments" \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 const temp_lang = lang === 'es' ? 'en' : lang;
@@ -262,8 +263,211 @@ const texts = {
         fr: `(dont %VAR% pour que le bâtiment passe la nuit)`,
         de: `(einschließlich %VAR% für das Gebäude zum Übernachten)`,
         es: `(incluyendo %VAR% para el edificio para pernoctar)`,
+    },
+    job: {
+        en: `Profession`,
+        fr: `Métier`,
+        de: `Beruf`,
+        es: `Oficio`,
+    },
+    town_type: {
+        en: `Town type`,
+        fr: `Type de ville`,
+        de: `Stadttyp`,
+        es: `Tipo de pueblo`,
+    },
+    ruin: {
+        en: `Ruin`,
+        fr: `Bâtiment`,
+        de: `Ruine`,
+        es: `Ruina`,
+    },
+    pro_camper: {
+        en: `Pro Camper`,
+        fr: `Campeur professionnel`,
+        de: `Proficamper`,
+        es: `Campista Experto`,
+    },
+    distance: {
+        en: `Distance from town (in km)`,
+        fr: `Distance de la ville (en km)`,
+        de: `Entfernung von der Stadt (in km)`,
+        es: `TODO`,
+    },
+    nb_campings: {
+        en: `Number of campsites already made`,
+        fr: `Nombre de campings déjà effectués`,
+        de: `Anzahl der bereits gemachten Campingplätze`,
+        es: `TODO`,
+    },
+    hidden_campers: {
+        en: `Number of campers already hidden on the cell`,
+        fr: `Nombre de campeurs déjà cachés sur la case`,
+        de: `Anzahl der Camper, die bereits auf der Zelle versteckt sind`,
+        es: `TODO`,
+    },
+    vest: {
+        en: `Camouflage Vest`,
+        fr: `Tenue de camouflage`,
+        de: `Tarnanzug`,
+        es: `Camuflaje`,
+    },
+    tomb: {
+        en: `Tomb`,
+        fr: `Tombe`,
+        de: `Grab`,
+        es: `Tumba`,
+    },
+    night: {
+        en: `Night`,
+        fr: `Nuit`,
+        de: `Nacht`,
+        es: `Noche`,
+    },
+    devastated: {
+        en: `Devastated town`,
+        fr: `Ville dévastée`,
+        de: `Zerstörte Stadt`,
+        es: `Pueblo devastado`,
+    },
+    phare: {
+        en: `Lighthouse`,
+        fr: `Phare`,
+        de: `Leuchtturm`,
+        es: `Faro`,
+    },
+    zombies_on_cell: {
+        en: `Number of zombies on the cell`,
+        fr: `Nombre de zombies sur la case`,
+        de: `Anzahl der Zombies auf der Zelle`,
+        es: `TODO`,
+    },
+    objects_in_bag: {
+        en: `Number of skins and tents in the bag`,
+        fr: `Nombre de pelures de peau et de toiles de tentes dans le sac`,
+        de: `Anzahl der Felle und Zelte in der Tasche`,
+        es: `TODO`,
+    },
+    improve: {
+        en: `Number of simple improvements made on the cell (must subtract 3 after each attack)`,
+        fr: `Nombre d'améliorations simples faites sur la case (il faut en soustraire 3 après chaque attaque)`,
+        de: `Anzahl der einfachen Verbesserungen, die an der Zelle vorgenommen wurden (muss nach jedem Angriff 3 abziehen)`,
+        es: `TODO`,
+    },
+    object_improve: {
+        en: `Number of defense objects installed on the cell`,
+        fr: `Nombre d'objets de défense installés sur la case`,
+        de: `Anzahl der auf der Zelle installierten Verteidigungsobjekte`,
+        es: `TODO`,
+    },
+    camping_town: {
+        en: `The town`,
+        fr: `La ville`,
+        de: `Die Stadt`,
+        es: `El pueblo`,
+    },
+    camping_citizen: {
+        en: `The citizen`,
+        fr: `Le citoyen`,
+        de: `El habitante`,
+        es: `Der Bürger`,
+    },
+    camping_ruin: {
+        en: `The ruin`,
+        fr: `Le bâtiment`,
+        de: `Die Ruine`,
+        es: `La ruina`,
+    },
+    result: {
+        en: `Result`,
+        fr: `Résultat`,
+        de: `Ergebnis`,
+        es: `TODO`,
     }
 };
+
+const camping_results = [
+    {
+        probability: 0.1,
+        strict: false,
+        label: {
+        en: `You reckon your chances of surviving here are hee haw... Might as well take some cyanide now.`,
+        fr: `Vous estimez que vos chances de survie ici sont quasi nulles… Autant gober du cyanure tout de suite.`,
+        de: `Du schätzt, dass deine Überlebenschancen hier quasi Null sind... Besser gleich 'ne Zyanidkapsel schlucken.`,
+        es: `Crees que tus posibilidades de sobrevivir aquí son casi nulas... ¿Cianuro?`,
+        }
+    },
+    {
+        probability: 0.3,
+        strict: false,
+        label: {
+        en: `You reckon your chances of surviving here are really poor. Maybe you should play heads or tails?`,
+        fr: `Vous estimez que vos chances de survie ici sont très faibles. Peut-être que vous aimez jouer à pile ou face ?`,
+        de: `Du schätzt, dass deine Überlebenschancen hier sehr gering sind. Vielleicht hast du ja Bock 'ne Runde Kopf oder Zahl zu spielen?`,
+        es: `Crees que tus posibilidades de sobrevivir aquí son muy pocas. ¿Apostamos?`,
+        }
+    },
+    {
+        probability: 0.5,
+        strict: false,
+        label: {
+        en: `You reckon your chances of surviving here are poor. Difficult to say.`,
+        fr: `Vous estimez que vos chances de survie ici sont faibles. Difficile à dire.`,
+        de: `Du schätzt, dass deine Überlebenschancen hier gering sind. Hmmm... schwer zu sagen, wie das hier ausgeht.`,
+        es: `Crees que tus posibilidades de sobrevivir aquí son pocas. Quién sabe...`,
+        }
+    },
+    {
+        probability: 0.65,
+        strict: false,
+        label: {
+        en: `You reckon your chances of surviving here are limited, but tempting. However, accidents happen...`,
+        fr: `Vous estimez que vos chances de survie ici sont limitées, bien que ça puisse se tenter. Mais un accident est vite arrivé...`,
+        de: `Du schätzt, dass deine Überlebenschancen hier mittelmäßig sind. Ist allerdings einen Versuch wert.. obwohl, Unfälle passieren schnell...`,
+        es: `Crees que tus posibilidades de sobrevivir aquí son reducidas, aunque se puede intentar. Tú sabes, podrías sufrir un accidente...`,
+        }
+    },
+    {
+        probability: 0.8,
+        strict: false,
+        label: {
+        en: `You reckon your chances of surviving here are largely satisfactory, as long as nothing unforeseen happens.`,
+        fr: `Vous estimez que vos chances de survie ici sont à peu près satisfaisantes, pour peu qu'aucun imprévu ne vous tombe dessus.`,
+        de: `Du schätzt, dass deine Überlebenschancen hier zufriedenstellend sind - vorausgesetzt du erlebst keine böse Überraschung.`,
+        es: `Crees que tus posibilidades de sobrevivir aquí son aceptables, esperando que no suceda ningún imprevisto.`,
+        }
+    },
+    {
+        probability: 0.9,
+        strict: false,
+        label: {
+        en: `You reckon your chances of surviving here are decent: you just have to hope for the best!`,
+        fr: `Vous estimez que vos chances de survie ici sont correctes : il ne vous reste plus qu'à croiser les doigts !`,
+        de: `Du schätzt, dass deine Überlebenschancen hier korrekt sind. Jetzt heißt's nur noch Daumen drücken!`,
+        es: `Crees que tus posibilidades de sobrevivir aquí son buenas. ¡Cruza los dedos!`,
+        }
+    },
+    {
+        probability: 1,
+        strict: true,
+        label: {
+        en: `You reckon your chances of surviving here are good, you should be able to spend the night here.`,
+        fr: `Vous estimez que vos chances de survie ici sont élevées : vous devriez pouvoir passer la nuit ici.`,
+        de: `Du schätzt, dass deine Überlebenschancen hier gut sind. Du müsstest hier problemlos die Nacht verbringen können.`,
+        es: `Crees que tus posibilidades de sobrevivir aquí son altas. Podías pasar la noche aquí.`,
+        }
+    },
+    {
+        probability: 1,
+        strict: false,
+        label: {
+        en: `You reckon your chances of surviving here are optimal. Nobody would see you, even if they were looking straight at you.`,
+        fr: `Vous estimez que vos chances de survie ici sont optimales : personne ne vous verrait même en vous pointant du doigt.`,
+        de: `Du schätzt, dass deine Überlebenschancen hier optimal sind. Niemand wird dich sehen - selbst wenn man mit dem Finger auf dich zeigt.`,
+        es: `Crees que tus posibilidades de sobrevivir aquí son óptimas. Nadie te verá, ni señalándote con el dedo`,
+        }
+    },
+];
 
 const categories_mapping = {
     armor : {
@@ -355,6 +559,80 @@ const categories_mapping = {
         ordering : 2
     }
 }
+
+const jobs = [
+    {
+        id: 'citizen',
+        img: 'basic',
+        label: {
+            de : `Einwohner`,
+            en : `Citizen`,
+            es : `Resident`,
+            fr : `Habitant`
+        },
+        camping_factor: 0.9
+    },
+    {
+        id: 'scavenger',
+        img: 'dig',
+        label: {
+            de : `Buddler`,
+            en : `Scavenger`,
+            es : `Excavador`,
+            fr : `Fouineur`
+        }
+    },
+    {
+        id: 'scout',
+        img: 'vest',
+        label: {
+            de : `Aufklärer`,
+            en : `Scout`,
+            es : `Explorador`,
+            fr : `Éclaireur`
+        }
+    },
+    {
+        id: 'guardian',
+        img: 'shield',
+        label: {
+            de : `Wächter`,
+            en : `Guardian`,
+            es : `Guardián`,
+            fr : `Gardien`
+        }
+    },
+    {
+        id: 'survivalist',
+        img: 'book',
+        label: {
+            de : `Einsiedler`,
+            en : `Survivalist`,
+            es : `Ermitaño`,
+            fr : `Ermite`
+        }
+    },
+    {
+        id: 'tamer',
+        img: 'tamer',
+        label: {
+            de : `Dompteur`,
+            en : `Tamer`,
+            es : `Domador`,
+            fr : `Apprivoiseur`
+        }
+    },
+    {
+        id: 'technician',
+        img: 'tech',
+        label: {
+            de : `Techniker`,
+            en : `Technician`,
+            es : `Técnico`,
+            fr : `Technicien`
+        }
+    },
+];
 
 const api_texts = {
     error: {
@@ -487,6 +765,17 @@ let tabs_list = {
                 es: `TODO`
             },
             icon: repo_img_url + `/professions/hero.gif`
+        },
+        {
+            ordering: 3,
+            id: `ruins`,
+            label: {
+                en: `Ruins`,
+                fr: `Bâtiments`,
+                de: `Ruinen`,
+                es: `Ruinas`
+            },
+            icon: repo_img_url + `icons/home.gif`,
         }
     ],
     tools: [
@@ -499,7 +788,8 @@ let tabs_list = {
                 de: `Bank`,
                 es: `TODO`
             },
-            icon: repo_img_url + `icons/home.gif`
+            icon: repo_img_url + `icons/home.gif`,
+            needs_town: true,
         },
         {
             ordering: 1,
@@ -510,7 +800,8 @@ let tabs_list = {
                 de: `Wunschzettel`,
                 es: `TODO`
             },
-            icon: repo_img_url + `item/item_cart.gif`
+            icon: repo_img_url + `item/item_cart.gif`,
+            needs_town: true,
         },
         {
             ordering: 2,
@@ -521,7 +812,8 @@ let tabs_list = {
                 de: `Bürger`,
                 es: `TODO`
             },
-            icon: repo_img_url + `icons/small_human.gif`
+            icon: repo_img_url + `icons/small_human.gif`,
+            needs_town: true,
         },
         // {
         //     ordering: 3,
@@ -532,8 +824,21 @@ let tabs_list = {
         //         de: `Schätzen`,
         //         es: `Estimación`
         //     },
-        //     icon: repo_img_url + `item/item_scope.gif`
+        //     icon: repo_img_url + `item/item_scope.gif`,
+        //     needs_town: true,
         // }
+        {
+            ordering: 4,
+            id: `camping`,
+            label: {
+                en: `Camping`,
+                fr: `Camping`,
+                de: `Camping`,
+                es: `Camping`
+            },
+            icon: repo_img_url + `status/status_camper.gif`,
+            needs_town: false,
+        }
     ]
 };
 
@@ -735,10 +1040,10 @@ let informations = [
 let loading_count = 0;
 
 let items;
+let ruins;
 let recipes;
 let citizens;
 let hero_skills;
-let bank;
 let wishlist;
 
 let is_refresh_wishlist;
@@ -1179,9 +1484,11 @@ function createTabs(window_type) {
     let window_content = document.getElementById(mh_optimizer_window_id + '-content');
     window_content.innerHTML = '';
 
-    let tabs_ul = document.createElement('ul')
+    let tabs_ul = document.createElement('ul');
 
-    let current_tabs_list = tabs_list[window_type].sort((a, b) => {
+    let current_tabs_list = tabs_list[window_type]
+    .filter((tab) => mh_user.townId || !tab.needs_town)
+    .sort((a, b) => {
         if (a.ordering > b.ordering) {
             return 1;
         } else if (a.ordering === b.ordering) {
@@ -1351,6 +1658,9 @@ function dispatchContent(window_type, tab) {
         case 'skills':
             displaySkills();
             break;
+        case 'ruins':
+            displayRuins();
+            break;
         case 'citizens':
             displayCitizens();
             break;
@@ -1362,6 +1672,9 @@ function dispatchContent(window_type, tab) {
             break;
         case 'estimations':
             displayEstimations();
+            break;
+        case 'camping':
+            displayCamping();
             break;
         default:
             break;
@@ -1378,14 +1691,11 @@ function filterItems(source_items) {
  * @param {string} tab_id
  */
 function displayBank(tab_id) {
-    bank = undefined;
-    getBank();
-    let interval = setInterval(() => {
+    getBank().then((bank) => {
         if (bank) {
             displayItems(bank.bank, tab_id);
-            clearInterval(interval);
         }
-    }, 500);
+    });
 }
 
 /** Affiche les éléments présents dans la liste de courses */
@@ -1659,7 +1969,9 @@ function displayItems(filtered_items, tab_id) {
             let add_to_wishlist_button = document.createElement('button');
             add_to_wishlist_button.classList.add('inline');
             add_to_wishlist_button.addEventListener('click', () => {
-                addItemToWishlist(item, item_add_to_wishlist);
+                addItemToWishlist(item).then((wishlist) => {
+                    item_add_to_wishlist.remove();
+                });
             })
 
             let img = document.createElement('img');
@@ -1694,22 +2006,7 @@ function displayItems(filtered_items, tab_id) {
 
         item_properties_container.innerHTML = `<span class="small">${item.description[lang]}</span>`;
 
-        if (item.properties) {
-            let item_properties = document.createElement('div');
-            item_properties_container.appendChild(item_properties);
-            item.properties.forEach((property) => {
-                let item_action = displayPropertiesOrActions(property, item);
-                item_properties.appendChild(item_action);
-            });
-        }
-        if (item.actions) {
-            let item_actions = document.createElement('div');
-            item_properties_container.appendChild(item_actions);
-            item.actions.forEach((action) => {
-                let item_action = displayPropertiesOrActions(action, item);
-                item_actions.appendChild(item_action);
-            });
-        }
+        createAdvancedProperties(item_properties_container, item, undefined);
 
         let item_container = document.createElement('li');
         item_container.appendChild(item_title_and_add_container);
@@ -1727,9 +2024,8 @@ function displayItems(filtered_items, tab_id) {
 /** Affiche la liste des citoyens */
 function displayCitizens() {
     citizens = undefined;
-    getCitizens();
-    let tab_content = document.getElementById('tab-content');
-    let interval = setInterval(() => {
+    getCitizens().then(() => {
+        let tab_content = document.getElementById('tab-content');
         if (citizens && hero_skills) {
             console.log('heroskills', hero_skills);
 
@@ -1813,9 +2109,8 @@ function displayCitizens() {
                     citizen_row.appendChild(cell);
                 });
             }
-            clearInterval(interval);
         }
-    }, 500);
+    });
 }
 
 /** Affiche le formulaire d'estimation de l'attaque */
@@ -1928,10 +2223,577 @@ function displayEstimations() {
     tab_content.appendChild(response);
 }
 
+/** Affiche le calcul des probabilités en camping */
+function displayCamping() {
+    getRuins().then((ruins) => {
+        let all_ruins = [
+            {id: '', camping: 0, label: {en: `None`, fr: 'Aucun', de: `Kein`, es: `TODO`}},
+            {id: 'nondig', camping: 8, label: {en: `Buried building`, fr: 'Bâtiment non déterré', de: `Verschüttete Ruine`, es: `Sector inexplotable`}}
+        ];
+        all_ruins = all_ruins.concat(ruins);
+
+        let tab_content = document.getElementById('tab-content');
+
+        let camping_tab_content = document.createElement('div');
+        camping_tab_content.style.padding = '0 0.5em';
+        camping_tab_content.classList.add('camping-tab');
+        tab_content.appendChild(camping_tab_content);
+
+        /** @see CitizenHandler > getCampingValues > $distance_map */
+        let distance_map = {
+            1: -24,
+            2: -19,
+            3: -14,
+            4: -11,
+            5: -9,
+            6: -9,
+            7: -9,
+            8: -9,
+            9: -9,
+            10: -9,
+            11: -9,
+            12: -8,
+            13: -7.6,
+            14: -7,
+            15: -6,
+            16: -5 // 16 et +
+        };
+
+        /** @see CitizenHandler > getCampingValues > $campings_map */
+        let campings_map = {
+            normal: {
+                nonpro: {
+                    0: 0,
+                    1: -4,
+                    2: -9,
+                    3: -13,
+                    4: -16,
+                    5: -26,
+                    6: -36,
+                    7: -50, // Totally arbitrary
+                    8: -65, // Totally arbitrary
+                    9: -80 // Totally arbitrary // 9 et +
+                },
+                pro: {
+                    0: 0,
+                    1: -2,
+                    2: -4,
+                    3: -8,
+                    4: -10,
+                    5: -12,
+                    6: -16,
+                    7: -26,
+                    8: -36,
+                    9: -60 // Totally arbitrary // 9 et +
+                }
+            },
+            pande: {
+                nonpro: {
+                    0: 0,
+                    1: -4,
+                    2: -6,
+                    3: -8,
+                    4: -10,
+                    5: -20,
+                    6: -36,
+                    7: -50,
+                    8: -65,
+                    9: -80 // 9 et +
+                },
+                pro: {
+                    0: 0,
+                    1: -1,
+                    2: -2,
+                    3: -4,
+                    4: -6,
+                    5: -8,
+                    6: -10,
+                    7: -20,
+                    8: -36,
+                    9: -60 // 9 et +
+                }
+            },
+        };
+
+        /** @see CitizenHandler > getCampingValues > $campers_map */
+        let hidden_campers_map = {
+            0: 0,
+            1: 0,
+            2: -2,
+            3: -6,
+            4: -10,
+            5: -14,
+            6: -20,
+            7: -26
+        };
+
+        let calculateProbabilities = (conf) => {
+            let chances = 0;
+            /** Type de ville */
+            chances += conf.town === 'pande' ? -14 : 0;
+            /** Tombe creusée */
+            chances += conf.tomb ? 1.6 : 0;
+            /** Mode nuit */
+            chances += conf.night ? 2 : 0;
+            /** Ville devastée */
+            chances += conf.devastated ? -10 : 0;
+            /** Phare */
+            chances += conf.phare ? 5 : 0;
+            /** Zombies dans la zone */
+            let zombies_factor = conf.vest ? 0.6 : 1.4;
+            chances += -zombies_factor * conf.zombies;
+
+            /** Nombre de campings */
+            let nb_camping_town_type_mapping = conf.town === 'pande' ? campings_map.pande : campings_map.normal;
+            let nb_camping_mapping = conf.pro ? nb_camping_town_type_mapping.pro : nb_camping_town_type_mapping.nonpro;
+            chances += (conf.campings > 9 ? nb_camping_mapping[9] : nb_camping_mapping[conf.campings]);
+
+            /** Distance de la ville */
+            chances += (conf.distance > 16 ? distance_map[16] : distance_map[conf.distance]);
+
+            /** Nombre de personnes déjà cachées */
+            chances += (conf.hidden_campers > 7 ? hidden_campers_map[7] : hidden_campers_map[conf.hidden_campers]);
+
+            /** Nombre d'objets de protection dans l'inventaire */
+            chances += conf.objects;
+
+            /**
+              * Nombre d'améliorations simples sur la case
+              * @see ActionDataService.php : 'improve'
+              */
+            chances += conf.improve;
+
+            /**
+              * Nombre d'objets de défense installés sur la case
+              * @see ActionDataService.php : 'cm_campsite_improve'
+              */
+            chances += conf.object_improve * 1.8;
+
+            /**
+              * Bonus liés au bâtiment
+              * @see RuinDataService.php
+              */
+            chances += parseInt(all_ruins.find((ruin) => conf.ruin.toString() === ruin.id.toString()).camping, 10);
+
+            let probability = Math.min(Math.max((100.0 - (Math.abs(Math.min(0, chances)) * 5)) / 100.0, .1), (conf.job === 'survivalist' ? 1.0 : 0.9));
+            let camping_result_text = camping_results.find((camping_result) => camping_result.string ? probability < camping_result.probability : probability <= camping_result.probability);
+            let result = document.querySelector('#camping-result');
+            result.innerText = `${camping_result_text ? camping_result_text.label[temp_lang] : ''} (${probability * 100}%)`;
+        };
+
+        let conf = {
+            town: 'rne',
+            job: 'citizen',
+            distance: 1,
+            campings: 0,
+            pro: false,
+            hidden_campers: 0,
+            objects: 0,
+            vest: false,
+            tomb: false,
+            zombies: 0,
+            night: false,
+            devastated: false,
+            phare: false,
+            improve: 0,
+            object_improve: 0,
+            ruin: ''
+        }
+
+        let town_type = [
+            {id: 'rne', label: {de: 'Kleine Stadt', en: 'Small Town', es: 'Amateur', fr: 'Petite carte'}},
+            {id: 're', label: {de: 'Entfernte Regionen', en: 'Distant Region', es: 'Leyenda', fr: 'Région éloignée'}},
+            {id: 'pande', label: {de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium'}}
+        ]
+
+        let my_info = document.createElement('div');
+        camping_tab_content.appendChild(my_info);
+
+        let my_info_title = document.createElement('h3');
+        my_info_title.innerText = texts.camping_citizen[temp_lang];
+        my_info.appendChild(my_info_title);
+
+        let my_info_content = document.createElement('div');
+        my_info.appendChild(my_info_content);
+
+        let town_info = document.createElement('div');
+        camping_tab_content.appendChild(town_info);
+
+        let town_info_title = document.createElement('h3');
+        town_info_title.innerText = texts.camping_town[temp_lang];
+        town_info.appendChild(town_info_title);
+
+        let town_info_content = document.createElement('div');
+        town_info.appendChild(town_info_content);
+
+        let cell_info = document.createElement('div');
+        camping_tab_content.appendChild(cell_info);
+
+        let cell_info_title = document.createElement('h3');
+        cell_info_title.innerText = texts.camping_ruin[temp_lang];
+        cell_info.appendChild(cell_info_title);
+
+        let cell_info_content = document.createElement('div');
+        cell_info.appendChild(cell_info_content);
+
+        let result = document.createElement('div');
+        camping_tab_content.appendChild(result);
+
+        let result_title = document.createElement('h3');
+        result_title.innerText = texts.result[temp_lang];
+        result.appendChild(result_title);
+
+        let result_content = document.createElement('div');
+        result_content.id = 'camping-result';
+        result.appendChild(result_content);
+
+        /** Type de ville */
+        let town_div = document.createElement('div');
+        town_info_content.appendChild(town_div);
+
+        let select_town_label = document.createElement('label');
+        select_town_label.htmlFor = 'select-town';
+        select_town_label.classList.add('spaced-label');
+        select_town_label.innerText = texts.town_type[temp_lang];
+        let select_town = document.createElement('select');
+        select_town.id = 'select-town';
+        select_town.value = conf.town;
+        select_town.classList.add('small');
+        town_type.forEach((town) => {
+            let town_option = document.createElement('option');
+            town_option.value = town.id;
+            town_option.label = town.label[temp_lang];
+            select_town.appendChild(town_option);
+        });
+        select_town.addEventListener('change', ($event) => {
+            conf.town = $event.srcElement.value;
+            calculateProbabilities(conf);
+        })
+        town_div.appendChild(select_town_label);
+        town_div.appendChild(select_town);
+
+
+        /** Métier */
+        let job_div = document.createElement('div');
+        my_info_content.appendChild(job_div);
+
+        let select_job_label = document.createElement('label');
+        select_job_label.htmlFor = 'select-job';
+        select_job_label.innerText = texts.job[temp_lang];
+        select_job_label.classList.add('spaced-label');
+        let select_job = document.createElement('select');
+        select_job.id = 'select-job';
+        select_job.value = conf.job;
+        select_job.classList.add('small');
+        jobs.forEach((job) => {
+            let job_option = document.createElement('option');
+            job_option.value = job.id;
+            job_option.label = job.label[temp_lang];
+            select_job.appendChild(job_option);
+        });
+        select_job.addEventListener('change', ($event) => {
+            conf.job = $event.srcElement.value;
+            let vest_field = document.querySelector('#vest-field');
+            if (conf.job !== 'scout') {
+                conf.vest = false;
+                vest_field.style.display = 'none';
+            } else {
+                vest_field.style.display = 'initial';
+            }
+            calculateProbabilities(conf);
+        })
+
+        job_div.appendChild(select_job_label);
+        job_div.appendChild(select_job);
+
+        /** Capuche ? */
+        let vest_div = document.createElement('div');
+        vest_div.id = 'vest-field';
+        vest_div.style.display = 'none';
+        my_info_content.appendChild(vest_div);
+
+        let vest_label = document.createElement('label');
+        vest_label.htmlFor = 'vest';
+        vest_label.innerHTML = `<img src="${repo_img_url}emotes/proscout.gif"> ${texts.vest[temp_lang]}`;
+        let vest = document.createElement('input');
+        vest.type = 'checkbox';
+        vest.id = 'vest';
+        vest.checked = conf.vest;
+        vest.addEventListener('change', ($event) => {
+            conf.vest = $event.srcElement.checked;
+            calculateProbabilities(conf);
+        })
+        vest_div.appendChild(vest);
+        vest_div.appendChild(vest_label);
+
+        /** Campeur pro ? */
+        let pro_camper_div = document.createElement('div');
+        my_info_content.appendChild(pro_camper_div);
+
+        let pro_camper_label = document.createElement('label');
+        pro_camper_label.htmlFor = 'pro';
+        pro_camper_label.innerHTML = `<img src="${repo_img_url}status/status_camper.gif"> ${texts.pro_camper[temp_lang]}`;
+        let pro_camper = document.createElement('input');
+        pro_camper.type = 'checkbox';
+        pro_camper.id = 'pro';
+        pro_camper.checked = conf.pro;
+        pro_camper.addEventListener('change', ($event) => {
+            conf.pro = $event.srcElement.checked;
+            calculateProbabilities(conf);
+        })
+        pro_camper_div.appendChild(pro_camper);
+        pro_camper_div.appendChild(pro_camper_label);
+
+        /** Tombe ? */
+        let tomb_div = document.createElement('div');
+        my_info_content.appendChild(tomb_div);
+
+        let tomb_label = document.createElement('label');
+        tomb_label.htmlFor = 'tomb';
+        tomb_label.innerHTML = `<img src="${repo_img_url}building/small_cemetery.gif"> ${texts.tomb[temp_lang]}`;
+        let tomb = document.createElement('input');
+        tomb.type = 'checkbox';
+        tomb.id = 'tomb';
+        tomb.checked = conf.tomb;
+        tomb.addEventListener('change', ($event) => {
+            conf.tomb = $event.srcElement.checked;
+            calculateProbabilities(conf);
+        })
+        tomb_div.appendChild(tomb);
+        tomb_div.appendChild(tomb_label);
+
+        /** Nombre de nuits déjà campées */
+        let nb_campings_div = document.createElement('div');
+        my_info_content.appendChild(nb_campings_div);
+
+        let nb_campings_label = document.createElement('label');
+        nb_campings_label.htmlFor = 'nb-campings';
+        nb_campings_label.innerHTML = `<img src="${repo_img_url}emotes/sleep.gif"> ${texts.nb_campings[temp_lang]}`;
+        nb_campings_label.classList.add('spaced-label');
+        let nb_campings = document.createElement('input');
+        nb_campings.type = 'number';
+        nb_campings.id = 'nb-campings';
+        nb_campings.value = conf.campings;
+        nb_campings.classList.add('inline');
+        nb_campings.addEventListener('change', ($event) => {
+            conf.campings = +$event.srcElement.value;
+            calculateProbabilities(conf);
+        })
+        nb_campings_div.appendChild(nb_campings_label);
+        nb_campings_div.appendChild(nb_campings);
+
+        /** Nombre de toiles de tente ou pelure de peau */
+        let objects_in_bag_div = document.createElement('div');
+        my_info_content.appendChild(objects_in_bag_div);
+
+        let objects_in_bag_label = document.createElement('label');
+        objects_in_bag_label.htmlFor = 'nb-objects';
+        objects_in_bag_label.innerText = texts.objects_in_bag[temp_lang];
+        objects_in_bag_label.innerHTML = `<img src="${repo_img_url}emotes/bag.gif"> ${texts.objects_in_bag[temp_lang]}`;
+        objects_in_bag_label.classList.add('spaced-label');
+        let objects_in_bag = document.createElement('input');
+        objects_in_bag.type = 'number';
+        objects_in_bag.id = 'nb-objects';
+        objects_in_bag.value = conf.objects;
+        objects_in_bag.classList.add('inline');
+        objects_in_bag.addEventListener('change', ($event) => {
+            conf.objects = +$event.srcElement.value;
+            calculateProbabilities(conf);
+        })
+        objects_in_bag_div.appendChild(objects_in_bag_label);
+        objects_in_bag_div.appendChild(objects_in_bag);
+
+
+        /** Type de bâtiment */
+        let ruin_type_div = document.createElement('div');
+        cell_info_content.appendChild(ruin_type_div);
+
+        let select_ruin_label = document.createElement('label');
+        select_ruin_label.htmlFor = 'select-ruin';
+        select_ruin_label.innerText = texts.ruin[temp_lang];
+        select_ruin_label.classList.add('spaced-label');
+        let select_ruin = document.createElement('select');
+        select_ruin.id = 'select-ruin';
+        select_ruin.value = conf.ruin;
+        select_ruin.classList.add('small');
+        all_ruins.forEach((ruin) => {
+            let ruin_option = document.createElement('option');
+            ruin_option.value = ruin.id;
+            ruin_option.label = ruin.label[temp_lang];
+            select_ruin.appendChild(ruin_option);
+        });
+        select_ruin.addEventListener('change', ($event) => {
+            conf.ruin = $event.srcElement.value;
+            calculateProbabilities(conf);
+        })
+        ruin_type_div.appendChild(select_ruin_label);
+        ruin_type_div.appendChild(select_ruin);
+
+        /** Distance de la ville */
+        let distance_div = document.createElement('div');
+        cell_info_content.appendChild(distance_div);
+
+        let distance_label = document.createElement('label');
+        distance_label.htmlFor = 'distance';
+        distance_label.innerText = texts.distance[temp_lang].replace('%VAR%', '');
+        distance_label.innerHTML = `<img src="${repo_img_url}emotes/explo.gif"> ${texts.distance[temp_lang].replace('%VAR%', '')}`;
+        distance_label.classList.add('spaced-label');
+        let distance = document.createElement('input');
+        distance.type = 'number';
+        distance.id = 'distance';
+        distance.value = conf.distance;
+        distance.classList.add('inline');
+        distance.addEventListener('change', ($event) => {
+            conf.distance = +$event.srcElement.value;
+            calculateProbabilities(conf);
+        })
+        distance_div.appendChild(distance_label);
+        distance_div.appendChild(distance);
+
+        /** Nombre de zombies sur la case */
+        let zombies_div = document.createElement('div');
+        cell_info_content.appendChild(zombies_div);
+
+        let zombies_label = document.createElement('label');
+        zombies_label.htmlFor = 'nb-zombies';
+        zombies_label.innerHTML = `<img src="${repo_img_url}emotes/zombie.gif"> ${texts.zombies_on_cell[temp_lang]}`;
+        zombies_label.classList.add('spaced-label');
+        let zombies = document.createElement('input');
+        zombies.type = 'number';
+        zombies.id = 'nb-zombies';
+        zombies.value = conf.zombies;
+        zombies.classList.add('inline');
+        zombies.addEventListener('change', ($event) => {
+            conf.zombies = +$event.srcElement.value;
+            calculateProbabilities(conf);
+        })
+        zombies_div.appendChild(zombies_label);
+        zombies_div.appendChild(zombies);
+
+        /** Nombre d'améliorations simples sur la case */
+        let improve_div = document.createElement('div');
+        cell_info_content.appendChild(improve_div);
+
+        let improve_label = document.createElement('label');
+        improve_label.htmlFor = 'nb-improve';
+        improve_label.innerHTML = `<img src="${repo_img_url}icons/home_recycled.gif"> ${texts.improve[temp_lang]}`;
+        improve_label.classList.add('spaced-label');
+        let improve = document.createElement('input');
+        improve.type = 'number';
+        improve.id = 'nb-improve';
+        improve.value = conf.improve;
+        improve.classList.add('inline');
+        improve.addEventListener('change', ($event) => {
+            conf.improve = +$event.srcElement.value;
+            calculateProbabilities(conf);
+        })
+        improve_div.appendChild(improve_label);
+        improve_div.appendChild(improve);
+
+        /** Nombre d'objets de campement installés sur la case */
+        let object_improve_div = document.createElement('div');
+        cell_info_content.appendChild(object_improve_div);
+
+        let object_improve_label = document.createElement('label');
+        object_improve_label.htmlFor = 'nb-object-improve';
+        object_improve_label.innerHTML = `<img src="${repo_img_url}icons/home.gif"> ${texts.object_improve[temp_lang]}`;
+        object_improve_label.classList.add('spaced-label');
+        let object_improve = document.createElement('input');
+        object_improve.type = 'number';
+        object_improve.id = 'nb-object-improve';
+        object_improve.value = conf.object_improve;
+        object_improve.classList.add('inline');
+        object_improve.addEventListener('change', ($event) => {
+            conf.object_improve = +$event.srcElement.value;
+            calculateProbabilities(conf);
+        })
+        object_improve_div.appendChild(object_improve_label);
+        object_improve_div.appendChild(object_improve);
+
+        /** Nombre de personnes déjà cachées */
+        let hidden_campers_div = document.createElement('div');
+        cell_info_content.appendChild(hidden_campers_div);
+
+        let hidden_campers_label = document.createElement('label');
+        hidden_campers_label.htmlFor = 'hidden-campers';
+        hidden_campers_label.innerHTML = `<img src="${repo_img_url}emotes/human.gif"> ${texts.hidden_campers[temp_lang]}`;
+        hidden_campers_label.classList.add('spaced-label');
+        let hidden_campers = document.createElement('input');
+        hidden_campers.type = 'number';
+        hidden_campers.id = 'hidden-campers';
+        hidden_campers.value = conf.hidden_campers;
+        hidden_campers.classList.add('inline');
+        hidden_campers.addEventListener('change', ($event) => {
+            conf.hidden_campers = +$event.srcElement.value;
+            calculateProbabilities(conf);
+        })
+        hidden_campers_div.appendChild(hidden_campers_label);
+        hidden_campers_div.appendChild(hidden_campers);
+
+        /** Nuit ? */
+        let night_div = document.createElement('div');
+        town_info_content.appendChild(night_div);
+
+        let night_label = document.createElement('label');
+        night_label.htmlFor = 'night';
+        night_label.innerHTML = `<img src="${repo_img_url}pictos/r_doutsd.gif"> ${texts.night[temp_lang]}`;
+        let night = document.createElement('input');
+        night.type = 'checkbox';
+        night.id = 'night';
+        night.checked = conf.night;
+        night.addEventListener('change', ($event) => {
+            conf.night = $event.srcElement.checked;
+            calculateProbabilities(conf);
+        })
+        night_div.appendChild(night);
+        night_div.appendChild(night_label);
+
+        /** Ville dévastée ? */
+        let devastated_div = document.createElement('div');
+        town_info_content.appendChild(devastated_div);
+
+        let devastated_label = document.createElement('label');
+        devastated_label.htmlFor = 'devastated';
+        devastated_label.innerHTML = `<img src="${repo_img_url}item/item_out_def_broken.gif"> ${texts.devastated[temp_lang]}`;
+        let devastated = document.createElement('input');
+        devastated.type = 'checkbox';
+        devastated.id = 'devastated';
+        devastated.checked = conf.devastated;
+        devastated.addEventListener('change', ($event) => {
+            conf.devastated = $event.srcElement.checked;
+            calculateProbabilities(conf);
+        })
+        devastated_div.appendChild(devastated);
+        devastated_div.appendChild(devastated_label);
+
+        /** Phare construit ? */
+        let phare_div = document.createElement('div');
+        town_info_content.appendChild(phare_div);
+
+        let phare_label = document.createElement('label');
+        phare_label.htmlFor = 'phare';
+        phare_label.innerText = texts.phare[temp_lang];
+        phare_label.innerHTML = `<img src="${repo_img_url}building/small_lighthouse.gif"> ${texts.phare[temp_lang]}`;
+        let phare = document.createElement('input');
+        phare.type = 'checkbox';
+        phare.id = 'phare';
+        phare.checked = conf.phare;
+        phare.addEventListener('change', ($event) => {
+            conf.phare = $event.srcElement.checked;
+            calculateProbabilities(conf);
+        })
+        phare_div.appendChild(phare);
+        phare_div.appendChild(phare_label);
+
+
+        calculateProbabilities(conf);
+    });
+}
+
 
 /** Affiche la liste des pouvoirs */
 function displaySkills() {
-    if (hero_skills) {
+    getHeroSkills().then((hero_skills) => {
         let tab_content = document.getElementById('tab-content');
 
         let header_cells = [
@@ -1979,52 +2841,127 @@ function displaySkills() {
                 skill_row.appendChild(cell);
             })
         }
-    } else {
-        getHeroSkills();
-        let interval = setInterval(() => {
-            if (hero_skills) {
-                displaySkills()
-                clearInterval(interval);
-            }
-        }, 500);
-    }
+    });
+}
+
+/** Affiche la liste des bâtiments trouvables dans le désert */
+function displayRuins() {
+    getRuins().then((ruins) => {
+        if (ruins) {
+            let tab_content = document.getElementById('tab-content');
+
+            let header_cells = [
+                {id: 'img', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
+                {id: 'label', label: {en: `Name`, fr: 'Nom', de: `Name`, es: `TODO`}, type: 'th'},
+                {id: 'description', label: {en: `Description`, fr: 'Description', de: `Beschreibung`, es: `TODO`}, type: 'td'},
+                {id: 'minDist', label: {en: `Minimum distance`, fr: 'Distance minimum', de: `Mindestabstand`, es: `TODO`}, type: 'td'},
+                {id: 'maxDist', label: {en: `Maximum distance`, fr: 'Distance maximum', de: `Maximale Entfernung`, es: `TODO`}, type: 'td'},
+                {id: 'drops', label: {en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `TODO`}, type: 'td'},
+            ];
+
+            let header_row = document.createElement('tr');
+            header_row.classList.add('mho-header');
+            header_cells.forEach((header_cell) => {
+                let cell = document.createElement('th');
+                cell.innerText = header_cell.label[temp_lang];
+                header_row.appendChild(cell);
+            })
+
+            let table = document.createElement('table');
+            table.classList.add('mho-table');
+            table.appendChild(header_row);
+            tab_content.appendChild(table);
+            ruins.forEach((ruin) => {
+                let ruin_row = document.createElement('tr');
+                table.appendChild(ruin_row);
+
+                header_cells.forEach((header_cell) => {
+                    let cell = document.createElement(header_cell.type);
+                    let img = document.createElement('img');
+                    switch(header_cell.id) {
+                        case 'img':
+                            img.src = `${repo_img_url}ruin/${ruin[header_cell.id]}.gif`;
+                            cell.appendChild(img);
+                            break;
+                        case 'label':
+                        case 'description':
+                            cell.setAttribute('style', 'text-align: left');
+                            cell.innerHTML = ruin[header_cell.id][lang];
+                            break;
+                        case 'drops':
+                            cell.setAttribute('style', 'text-align: left');
+                            var item_divs = document.createElement('div');
+                            item_divs.style.display = 'flex';
+                            item_divs.style.flexWrap = 'wrap';
+                            item_divs.style.justifyContent = 'space-around';
+                            cell.appendChild(item_divs);
+                            ruin[header_cell.id].forEach((item) => {
+                                let item_div = document.createElement('div');
+                                item_div.style.margin = '0 0.5em';
+                                item_div.title = item.item.label[temp_lang];
+
+                                let item_img = document.createElement('img');
+                                item_img.src = hordes_img_url + item.item.img;
+                                item_img.style.display = 'block';
+                                item_img.style.margin = 'auto';
+                                // let item_label = document.createElement('span');
+                                // item_label.innerText = item.item.label[temp_lang];
+                                let item_proba = document.createElement('span');
+                                item_proba.innerText = Math.round(item.probability * 100) + '%';
+                                item_proba.style.display = 'block';
+                                item_proba.style.margin = 'auto';
+
+                                item_div.appendChild(item_img);
+                                // item_div.appendChild(item_label);
+                                item_div.appendChild(item_proba);
+
+                                item_divs.appendChild(item_div);
+                            });
+                            break;
+                        case 'minDist':
+                        case 'maxDist':
+                            cell.setAttribute('style', 'text-align: center');
+                            cell.innerHTML = ruin[header_cell.id] + 'km';
+                            break;
+                        default:
+                            break;
+                    }
+                    ruin_row.appendChild(cell);
+                })
+            });
+        }
+    });
 }
 
 /** Affiche la liste des recettes */
 function displayRecipes() {
-    if (recipes) {
-        let tab_content = document.getElementById('tab-content');
+    getRecipes().then((recipes) => {
+        if (recipes) {
+            let tab_content = document.getElementById('tab-content');
 
-        let recipes_list = document.createElement('ul');
-        recipes_list.id = 'recipes-list';
+            let recipes_list = document.createElement('ul');
+            recipes_list.id = 'recipes-list';
 
-        tab_content.appendChild(recipes_list);
+            tab_content.appendChild(recipes_list);
 
-        recipes.forEach((recipe, index) => {
-            if (index === 0 || recipes[index - 1].type.id !== recipe.type.id) {
-                let category_text = document.createElement('span');
-                category_text.innerText = recipe.type.label[lang];
+            recipes.forEach((recipe, index) => {
+                if (index === 0 || recipes[index - 1].type.id !== recipe.type.id) {
+                    let category_text = document.createElement('span');
+                    category_text.innerText = recipe.type.label[lang];
 
-                let category_container = document.createElement('div');
-                category_container.classList.add('mho-category');
-                category_container.classList.add('mho-header');
-                category_container.appendChild(category_text);
+                    let category_container = document.createElement('div');
+                    category_container.classList.add('mho-category');
+                    category_container.classList.add('mho-header');
+                    category_container.appendChild(category_text);
 
-                recipes_list.appendChild(category_container);
-            }
+                    recipes_list.appendChild(category_container);
+                }
 
-            recipes_list.appendChild(getRecipeElement(recipe));
-        });
+                recipes_list.appendChild(getRecipeElement(recipe));
+            });
 
-    } else {
-        getRecipes();
-        let interval = setInterval(() => {
-            if (recipes) {
-                displayRecipes()
-                clearInterval(interval);
-            }
-        }, 500);
-    }
+        }
+    });
 }
 
 /** Affiche une recette */
@@ -2478,7 +3415,6 @@ function displayAdvancedTooltips() {
 
             if (hovered_item) {
                 let tooltip_content = tooltip_container.firstElementChild;
-
                 let item_deco = tooltip_content.getElementsByClassName('item-tag-deco')[0];
                 let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
                 if (should_display_advanced_tooltip) {
@@ -2489,63 +3425,7 @@ function displayAdvancedTooltips() {
 
                         tooltip_content.appendChild(advanced_tooltip_container);
                     } else if (!advanced_tooltip_container.innerHTML) {
-                        advanced_tooltip_container.innerHtml = '';
-
-                        let stock_div = document.createElement('div');
-                        advanced_tooltip_container.appendChild(stock_div);
-                        let bank_div = document.createElement('div');
-                        stock_div.appendChild(bank_div);
-                        stock_div.style.borderBottom = '1px solid white';
-                        bank_div.innerText = wishlist_headers[2].label[temp_lang] + ' : ' + hovered_item.bankCount;
-
-                        if (hovered_item.wishListCount && hovered_item.wishListCount > 0) {
-                            let wishlist_wanted_div = document.createElement('div');
-                            stock_div.appendChild(wishlist_wanted_div);
-                            wishlist_wanted_div.innerText = wishlist_headers[3].label[temp_lang] + ' : ' + hovered_item.wishListCount;
-                        }
-
-                        if ((!item_deco || hovered_item.deco === 0) && !hovered_item.properties && !hovered_item.actions && hovered_item.recipes.length === 0) return;
-
-                        console.log('hovered_item', hovered_item);
-                        if (item_deco && hovered_item.deco > 0) {
-                            let text = item_deco.innerText.replace(/ \(.*\)*/, '');
-                            item_deco.innerHTML = `<span>${text} <em>( +${hovered_item.deco} )</em></span>`;
-                        }
-
-                        if (!hovered_item.properties && !hovered_item.actions && hovered_item.recipes.length === 0) return;
-
-                        if (hovered_item.properties) {
-                            let item_properties = document.createElement('div');
-                            advanced_tooltip_container.appendChild(item_properties);
-                            hovered_item.properties.forEach((property) => {
-                                let item_action = displayPropertiesOrActions(property, hovered_item);
-                                item_properties.appendChild(item_action);
-                            });
-                        }
-
-                        if (!hovered_item.actions && hovered_item.recipes.length === 0) return;
-
-                        if (hovered_item.actions) {
-                            let item_actions = document.createElement('div');
-                            advanced_tooltip_container.appendChild(item_actions);
-                            hovered_item.actions.forEach((action) => {
-                                let item_action = displayPropertiesOrActions(action, hovered_item);
-                                item_actions.appendChild(item_action);
-                            });
-                        }
-
-                        if (hovered_item.recipes.length === 0) return;
-
-                        if (hovered_item.recipes.length > 0) {
-                            tooltip_container.firstElementChild.classList.add('large-tooltip');
-                            let item_recipes = document.createElement('div');
-                            item_recipes.classList.add('recipe');
-                            advanced_tooltip_container.appendChild(item_recipes);
-
-                            hovered_item.recipes.forEach((recipe) => {
-                                item_recipes.appendChild(getRecipeElement(recipe));
-                            });
-                        }
+                        createAdvancedProperties(advanced_tooltip_container, hovered_item, tooltip_container);
                     }
                 } else if (advanced_tooltip_container) {
                     advanced_tooltip_container.remove();
@@ -2554,6 +3434,74 @@ function displayAdvancedTooltips() {
         } else if (advanced_tooltip_container) {
             advanced_tooltip_container.remove();
         }
+    }
+}
+
+function createAdvancedProperties(content, item, tooltip) {
+    let item_deco;
+    if (tooltip) {
+         item_deco = tooltip.getElementsByClassName('item-tag-deco')[0];
+    }
+    content.innerHtml = '';
+    if (tooltip) {
+        let stock_div = document.createElement('div');
+        content.appendChild(stock_div);
+        let bank_div = document.createElement('div');
+        stock_div.appendChild(bank_div);
+        stock_div.style.borderBottom = '1px solid white';
+        bank_div.innerText = wishlist_headers[2].label[temp_lang] + ' : ' + item.bankCount;
+
+        if (item.wishListCount && item.wishListCount > 0) {
+            let wishlist_wanted_div = document.createElement('div');
+            stock_div.appendChild(wishlist_wanted_div);
+            wishlist_wanted_div.innerText = wishlist_headers[3].label[temp_lang] + ' : ' + item.wishListCount;
+        }
+    }
+    if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0) return;
+
+    if (tooltip) {
+        console.log('hovered_item', item);
+    }
+    if (item_deco && item.deco > 0) {
+        let text = item_deco.innerText.replace(/ \(.*\)*/, '');
+        item_deco.innerHTML = `<span>${text} <em>( +${item.deco} )</em></span>`;
+    }
+
+    if (!item.properties && !item.actions && item.recipes.length === 0) return;
+
+    if (item.properties) {
+        let item_properties = document.createElement('div');
+        content.appendChild(item_properties);
+        item.properties.forEach((property) => {
+            let item_action = displayPropertiesOrActions(property, item);
+            item_properties.appendChild(item_action);
+        });
+    }
+
+    if (!item.actions && item.recipes.length === 0) return;
+
+    if (item.actions) {
+        let item_actions = document.createElement('div');
+        content.appendChild(item_actions);
+        item.actions.forEach((action) => {
+            let item_action = displayPropertiesOrActions(action, item);
+            item_actions.appendChild(item_action);
+        });
+    }
+
+    if (item.recipes.length === 0) return;
+
+    if (item.recipes.length > 0) {
+        if (tooltip) {
+            tooltip.firstElementChild.classList.add('large-tooltip');
+        }
+        let item_recipes = document.createElement('div');
+        item_recipes.classList.add('recipe');
+        content.appendChild(item_recipes);
+
+        item.recipes.forEach((recipe) => {
+            item_recipes.appendChild(getRecipeElement(recipe));
+        });
     }
 }
 
@@ -2641,7 +3589,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.innerHTML = `Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)`
             break;
         case 'improve':
-            item_action.innerHTML = `Objet de camping`
+            item_action.innerHTML = `Permet d'aménager un campement`
             break;
         case 'defence':
             // déjà affichés par le jeu
@@ -2969,6 +3917,7 @@ function displayMap() {
         map.vertical_mapping.forEach((cell) => {
             let td = document.createElement('td');
             td.innerText = cell;
+            td.classList.add('around-map');
             init_col_tr.appendChild(td);
         });
 
@@ -2978,6 +3927,7 @@ function displayMap() {
                 if (cell_index === 0) {
                     let init_row_td = document.createElement('td');
                     init_row_td.innerText = cell.horizontal;
+                    init_row_td.classList.add('around-map');
                     tr.appendChild(init_row_td);
                 }
                 let td = document.createElement('td');
@@ -3061,6 +4011,7 @@ function displayMap() {
                 if (cell_index === row.length - 1) {
                     let final_row_td = document.createElement('td');
                     final_row_td.innerText = cell.horizontal;
+                    final_row_td.classList.add('around-map');
                     tr.appendChild(final_row_td);
                 }
             });
@@ -3071,6 +4022,7 @@ function displayMap() {
         map.vertical_mapping.forEach((cell) => {
             let td = document.createElement('td');
             td.innerText = cell;
+            td.classList.add('around-map');
             final_col_tr.appendChild(td);
         });
         table.appendChild(final_col_tr);
@@ -3090,6 +4042,7 @@ function displayMap() {
         map.vertical_mapping.forEach((cell) => {
             let td = document.createElement('td');
             td.innerText = cell;
+            td.classList.add('around-map');
             init_col_tr.appendChild(td);
         });
         map.map.forEach((row) => {
@@ -3098,6 +4051,7 @@ function displayMap() {
                 if (cell_index === 0) {
                     let init_row_td = document.createElement('td');
                     init_row_td.innerText = cell.horizontal;
+                    init_row_td.classList.add('around-map');
                     tr.appendChild(init_row_td);
                 }
                 let td = document.createElement('td');
@@ -3125,6 +4079,7 @@ function displayMap() {
                         path.style.top = '5px';
                         path.style.right = '5px';
                         path.style.bottom = '0';
+                        td.classList.add('exit');
                     } else {
                         path.style.left = cell.borders[0] === '0' ? '5px' : '0';
                         path.style.top = cell.borders[1] === '0' ? '5px' : '0';
@@ -3132,7 +4087,8 @@ function displayMap() {
                         path.style.bottom = cell.borders[3] === '0' ? '5px' : '0';
                     }
                     td_content.appendChild(path);
-
+                } else {
+                    td.classList.add('empty');
                 }
 
                 if (cell.zombies && cell.zombies !== '' && cell.zombies > 0) {
@@ -3154,11 +4110,13 @@ function displayMap() {
                     img.style.top = 'calc(50% - 8px)';
                     img.style.zIndex = '100';
                     td_content.appendChild(img);
+                    td.classList.add('door');
                 }
 
                 if (cell_index === row.length - 1) {
                     let final_row_td = document.createElement('td');
                     final_row_td.innerText = cell.horizontal;
+                    final_row_td.classList.add('around-map');
                     tr.appendChild(final_row_td);
                 }
 
@@ -3183,6 +4141,7 @@ function displayMap() {
         map.vertical_mapping.forEach((cell) => {
             let td = document.createElement('td');
             td.innerText = cell;
+            td.classList.add('around-map');
             final_col_tr.appendChild(td);
         });
         table.appendChild(final_col_tr);
@@ -3213,8 +4172,168 @@ function displayMap() {
                 getFMMap().then((map) => transformMapping(map));
             }
         }
+        // if (mho_map.map === 'ruin') {
+        //     createOptimizePathButton();
+        // }
     }
 }
+
+
+function createOptimizePathButton() {
+    let opti_button_parent = document.getElementById('optimizer-map-window-content');
+    let opti_button = document.createElement('button');
+    opti_button.setAttribute('style', 'max-width: initial');
+    opti_button.innerHTML = `<span style="margin: auto; vertical-align: middle;">[i18n] Chemin optimisé</span>`;
+    opti_button.id = mho_opti_map_id;
+    opti_button.addEventListener('click', () => {
+        opti_button.disabled = true;
+        getOptimalPath(mapToOptimize()).then((optimal_path) => displayOptimalPath(optimal_path));
+      });
+      opti_button_parent.appendChild(opti_button);
+}
+
+function mapToOptimize() {
+    let map = document.querySelector('#optimizer-map-window-content');
+    let rows = Array.from(map.querySelectorAll('tr')).filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
+        return !col.classList.contains('around-map') // Ligne d'index
+    }));
+    let final_rows = [];
+    let doors_positions = [];
+    let entrance = {};
+
+    rows.forEach((row, row_index) => {
+        let cols = Array.from(row.querySelectorAll('td'));
+        let final_cols = cols
+            .filter((col) => !col.classList.contains('around-map')) // Colonne d'index
+            .map((col, col_index) => {
+                if (col.classList.contains('empty')) {
+                    // Pas de passage
+                    return 0;
+                } else {
+                    // Porte
+                    if (col.classList.contains('door')) {
+                        doors_positions.push({colIndex: col_index, rowIndex: row_index});
+                    }
+                    // Entrée
+                    if (col.classList.contains('exit')) {
+                        entrance = {colIndex: col_index, rowIndex: row_index};
+                    }
+                    return 1;
+                }
+            });
+          final_rows.push(final_cols);
+    });
+  return {
+      map: final_rows,
+      doors: doors_positions,
+      entrance: entrance
+  }
+}
+
+function displayOptimalPath(html, response) {
+    console.log('display opti');
+    let rows = Array.from(html.querySelectorAll('tr'))
+        .filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
+            return !col.classList.contains('bordCarteRuine') // Ligne d'index
+        }))
+        .map((row) => {
+            return Array.from(row.querySelectorAll('td')).filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
+        });
+
+    rows.forEach((row, row_index) => {
+        let response_pos_in_row = response.filter((response_pos) => response_pos.row === row_index);
+        if (response_pos_in_row && response_pos_in_row.length > 0) {
+            console.log('response_pos_in_row', response_pos_in_row);
+            row.forEach((col, col_index) => {
+                let response_at_pos = response_pos_in_row.filter((response_pos) => response_pos.column === col_index);
+                if (response_at_pos && response_at_pos.length > 0) {
+                    let mho_path_div = document.createElement('div');
+                    mho_path_div.classList.add('mho_opti_path');
+                    mho_path_div.setAttribute('style', 'position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; justify-content: space-around;');
+                    col.appendChild(mho_path_div);
+                }
+            });
+        }
+    });
+
+    response.forEach((path, index) => {
+        let path_cell = rows[path.row][path.column];
+
+        let path_div = document.createElement('span');
+        path_div.setAttribute('posPath', index);
+
+        let next_path = response[index + 1];
+        if (next_path) {
+
+            let next_path_cell = rows[next_path.row][next_path.column];
+
+            let next_path_div = document.createElement('span');
+            next_path_div.setAttribute('posPath', index);
+
+            path_div.setAttribute('position', 'start');
+            next_path_div.setAttribute('position', 'end');
+
+            if (next_path.column === path.column) { // Déplacement vertical
+                path_div.setAttribute('orientation', 'vertical');
+                next_path_div.setAttribute('orientation', 'vertical');
+                if (next_path.row > path.row) { // on se déplace vers le bas
+                    path_div.setAttribute('alignment', 'bottom');
+                    next_path_div.setAttribute('alignment', 'top');
+                } else { // on se déplace vers le haut
+                    path_div.setAttribute('alignment', 'top');
+                    next_path_div.setAttribute('alignment', 'bottom');
+                }
+
+                path_div.style.height = 'calc(50% - 4px)';
+                path_div.style.width = '4px';
+                path_div.style.display = 'inline-block';
+                path_div.style.backgroundColor = 'red';
+                next_path_div.style.height = 'calc(50% - 4px)';
+                next_path_div.style.width = '4px';
+                next_path_div.style.display = 'inline-block';
+                next_path_div.style.backgroundColor = 'red';
+            } else { // Déplacement horizontal
+                path_div.setAttribute('orientation', 'horizontal');
+                next_path_div.setAttribute('orientation', 'horizontal');
+
+                if (next_path.column > path.column) { // on se déplace vers la gauche
+                    path_div.setAttribute('alignment', 'right');
+                    next_path_div.setAttribute('alignment', 'left');
+                } else { // on se déplace vers la droite
+                    path_div.setAttribute('alignment', 'left');
+                    next_path_div.setAttribute('alignment', 'right');
+                }
+
+                path_div.style.width = 'calc(50% - 4px)';
+                path_div.style.height = '4px';
+                path_div.style.display = 'inline-block';
+                path_div.style.backgroundColor = 'red';
+                next_path_div.style.width = 'calc(50% - 4px)';
+                next_path_div.style.height = '4px';
+                next_path_div.style.display = 'inline-block';
+                next_path_div.style.backgroundColor = 'red';
+            }
+
+            path_div.style.marginLeft = path_div.getAttribute('alignment') === 'right' ? '50%' : 'initial';
+            path_div.style.marginRight = path_div.getAttribute('alignment') === 'left' ? '50%' : 'initial';
+            path_div.style.marginTop = path_div.getAttribute('alignment') === 'bottom' ? '50%' : 'initial';
+            path_div.style.marginBottom = path_div.getAttribute('alignment') === 'top' ? '50%' : 'initial';
+
+            next_path_div.style.marginLeft = next_path_div.getAttribute('alignment') === 'right' ? '50%' : 'initial';
+            next_path_div.style.marginRight = next_path_div.getAttribute('alignment') === 'left' ? '50%' : 'initial';
+            next_path_div.style.marginTop = next_path_div.getAttribute('alignment') === 'bottom' ? '50%' : 'initial';
+            next_path_div.style.marginBottom = next_path_div.getAttribute('alignment') === 'top' ? '50%' : 'initial';
+
+            path_cell.querySelector('.mho_opti_path').appendChild(path_div);
+            next_path_cell.querySelector('.mho_opti_path').appendChild(next_path_div);
+        }
+        console.log('cell', path_cell);
+    });
+
+    console.log('rows', rows);
+    console.log('response', response);
+}
+
 
 /** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
 function preventFromLeaving() {
@@ -3447,218 +4566,6 @@ function createCopyButton(source, map, map_id, button_block_id) {
         copy_button.disabled = false;
     });
     copy_button_parent.appendChild(copy_button);
-}
-
-function createOptimizePathButton(source, map_id, button_block_id) {
-    console.log('source', source);
-    let opti_button_parent = document.getElementById(button_block_id);
-    let opti_button = document.createElement('button');
-    opti_button.setAttribute('style', 'max-width: initial');
-    opti_button.innerHTML = `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">[i18n] Chemin optimisé</span>`;
-    opti_button.id = mho_opti_map_id;
-    opti_button.addEventListener('click', () => {
-        opti_button.disabled = true;
-        let map;
-        if (source === 'gh') {
-            map = optimizeGh(document.getElementById(map_id));
-        } else if (source === 'bbh') {
-            map = optimizeBbh(document.getElementById(map_id));
-        }
-        getOptimalPath(map, document.getElementById(map_id), opti_button, source);
-      });
-      opti_button_parent.appendChild(opti_button);
-}
-
-function optimizeBbh(html) {
-    let map = html;
-    let rows = Array.from(map.querySelectorAll('tr')).filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
-        return col.children.length > 0; // Ligne d'index
-    }));
-    let final_rows = [];
-    let doors_positions = [];
-    let entrance = {};
-
-    rows.forEach((row, row_index) => {
-        let cols = Array.from(row.querySelectorAll('td'));
-        let final_cols = cols
-            .filter((col) => col.children.length > 0) // Colonne d'index
-            .map((col, col_index) => {
-                let cm = col.querySelector('div[id^="cm"]');
-                console.log('cm', cm);
-                if (cm && cm.classList.length === 0) {
-                    return 0;
-                } else {
-                    // Porte
-                    let cp = col.querySelector('div[id^="cp"][class^="p"]');
-                    if (cp) {
-                      doors_positions.push({colIndex: col_index, rowIndex: row_index});
-                    }
-                    // Entrée
-                    if (!cm) {
-                        entrance = {colIndex: col_index, rowIndex: row_index};
-                    }
-                    return col;
-                }
-            });
-        final_rows.push(final_cols);
-    });
-    return {
-        map: final_rows,
-        doors: doors_positions,
-        entrance: entrance
-    }
-}
-
-function optimizeGh(html) {
-    let map = html;
-    let rows = Array.from(map.querySelectorAll('tr')).filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
-        return !col.classList.contains('bordCarteRuine') // Ligne d'index
-    }));
-    let final_rows = [];
-    let doors_positions = [];
-    let entrance = {};
-
-    rows.forEach((row, row_index) => {
-        let cols = Array.from(row.querySelectorAll('td'));
-        let final_cols = cols
-            .filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
-            .map((col, col_index) => {
-                let use = col.querySelector('use');
-                let img = use.getAttribute('xlink:href');
-                if (img.endsWith('ruineCarte_19')) {
-                    // Pas de passage
-                    return 0;
-                } else {
-                    // Porte
-                    let door = col.querySelector('.ruineCarte_porte');
-                    if (door) {
-                        doors_positions.push({colIndex: col_index, rowIndex: row_index});
-                    }
-                    // Entrée
-                    let entrance_found = img.endsWith('ruineCarte_15');
-                    if (entrance_found) {
-                        entrance = {colIndex: col_index, rowIndex: row_index};
-                    }
-                    return 1;
-                }
-            });
-          final_rows.push(final_cols);
-    });
-  return {
-      map: final_rows,
-      doors: doors_positions,
-      entrance: entrance
-  }
-}
-
-function displayOptimalPathOnBbh(html, response) {
-    console.log('display opti bbh');
-    console.log('html', html);
-    console.log('response', response);
-}
-
-function displayOptimalPathOnGh(html, response) {
-    console.log('display opti gh');
-    let rows = Array.from(html.querySelectorAll('tr'))
-        .filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
-            return !col.classList.contains('bordCarteRuine') // Ligne d'index
-        }))
-        .map((row) => {
-            return Array.from(row.querySelectorAll('td')).filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
-        });
-
-    rows.forEach((row, row_index) => {
-        let response_pos_in_row = response.filter((response_pos) => response_pos.row === row_index);
-        if (response_pos_in_row && response_pos_in_row.length > 0) {
-            console.log('response_pos_in_row', response_pos_in_row);
-            row.forEach((col, col_index) => {
-                let response_at_pos = response_pos_in_row.filter((response_pos) => response_pos.column === col_index);
-                if (response_at_pos && response_at_pos.length > 0) {
-                    let mho_path_div = document.createElement('div');
-                    mho_path_div.classList.add('mho_opti_path');
-                    mho_path_div.setAttribute('style', 'position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; justify-content: space-around;');
-                    col.appendChild(mho_path_div);
-                }
-            });
-        }
-    });
-
-    response.forEach((path, index) => {
-        let path_cell = rows[path.row][path.column];
-
-        let path_div = document.createElement('span');
-        path_div.setAttribute('posPath', index);
-
-        let next_path = response[index + 1];
-        if (next_path) {
-
-            let next_path_cell = rows[next_path.row][next_path.column];
-
-            let next_path_div = document.createElement('span');
-            next_path_div.setAttribute('posPath', index);
-
-            path_div.setAttribute('position', 'start');
-            next_path_div.setAttribute('position', 'end');
-
-            if (next_path.column === path.column) { // Déplacement vertical
-                path_div.setAttribute('orientation', 'vertical');
-                next_path_div.setAttribute('orientation', 'vertical');
-                if (next_path.row > path.row) { // on se déplace vers le bas
-                    path_div.setAttribute('alignment', 'bottom');
-                    next_path_div.setAttribute('alignment', 'top');
-                } else { // on se déplace vers le haut
-                    path_div.setAttribute('alignment', 'top');
-                    next_path_div.setAttribute('alignment', 'bottom');
-                }
-
-                path_div.style.height = 'calc(50% - 4px)';
-                path_div.style.width = '4px';
-                path_div.style.display = 'inline-block';
-                path_div.style.backgroundColor = 'red';
-                next_path_div.style.height = 'calc(50% - 4px)';
-                next_path_div.style.width = '4px';
-                next_path_div.style.display = 'inline-block';
-                next_path_div.style.backgroundColor = 'red';
-            } else { // Déplacement horizontal
-                path_div.setAttribute('orientation', 'horizontal');
-                next_path_div.setAttribute('orientation', 'horizontal');
-
-                if (next_path.column > path.column) { // on se déplace vers la gauche
-                    path_div.setAttribute('alignment', 'right');
-                    next_path_div.setAttribute('alignment', 'left');
-                } else { // on se déplace vers la droite
-                    path_div.setAttribute('alignment', 'left');
-                    next_path_div.setAttribute('alignment', 'right');
-                }
-
-                path_div.style.width = 'calc(50% - 4px)';
-                path_div.style.height = '4px';
-                path_div.style.display = 'inline-block';
-                path_div.style.backgroundColor = 'red';
-                next_path_div.style.width = 'calc(50% - 4px)';
-                next_path_div.style.height = '4px';
-                next_path_div.style.display = 'inline-block';
-                next_path_div.style.backgroundColor = 'red';
-            }
-
-            path_div.style.marginLeft = path_div.getAttribute('alignment') === 'right' ? '50%' : 'initial';
-            path_div.style.marginRight = path_div.getAttribute('alignment') === 'left' ? '50%' : 'initial';
-            path_div.style.marginTop = path_div.getAttribute('alignment') === 'bottom' ? '50%' : 'initial';
-            path_div.style.marginBottom = path_div.getAttribute('alignment') === 'top' ? '50%' : 'initial';
-
-            next_path_div.style.marginLeft = next_path_div.getAttribute('alignment') === 'right' ? '50%' : 'initial';
-            next_path_div.style.marginRight = next_path_div.getAttribute('alignment') === 'left' ? '50%' : 'initial';
-            next_path_div.style.marginTop = next_path_div.getAttribute('alignment') === 'bottom' ? '50%' : 'initial';
-            next_path_div.style.marginBottom = next_path_div.getAttribute('alignment') === 'top' ? '50%' : 'initial';
-
-            path_cell.querySelector('.mho_opti_path').appendChild(path_div);
-            next_path_cell.querySelector('.mho_opti_path').appendChild(next_path_div);
-        }
-        console.log('cell', path_cell);
-    });
-
-    console.log('rows', rows);
-    console.log('response', response);
 }
 
 ///////////
@@ -4024,9 +4931,13 @@ function createStyles() {
     + 'justify-content: space-between;'
     + '}';
 
-    const advanced_tooltip_recipe_li = '#mho-advanced-tooltip > div.recipe > li {'
+    const advanced_tooltip_recipe_li = '#mho-advanced-tooltip > div.recipe > li, #item-list > li.selected > .properties > .recipe > li {'
     + 'display: flex;'
     + 'padding: 0.25em 0;'
+    + '}';
+
+    const item_recipe_li = '#item-list > li.selected > .properties > .recipe > li:not(:last-child) {'
+    + 'border-bottom: 1px dotted white;'
     + '}';
 
     const advanced_tooltip_recipe_li_ul = '#mho-advanced-tooltip > div.recipe > li > ul {'
@@ -4146,6 +5057,11 @@ function createStyles() {
     + 'transform: rotate(45deg);'
     + '}';
 
+    let camping_spaced_label = '.spaced-label:after {'
+    + `content: '\\00a0:\\00a0'`
+    + '}';
+
+
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
     + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
     + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
@@ -4153,10 +5069,10 @@ function createStyles() {
     + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
     + parameters_informations_style + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
     + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style + label_text
-    + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
+    + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + item_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
     + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
     + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
-    + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + dotted_background + empty_bat_before_after + empty_bat_after;
+    + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label;
 
     let style = document.createElement('style');
 
@@ -4333,7 +5249,7 @@ async function getGHMap() {
             onerror: function(error){
                 endLoading();
                 addError(error);
-                reject(error);
+                addError(error);
             }
         });
     });
@@ -4847,6 +5763,42 @@ function getItems() {
     });
 }
 
+async function getRuins() {
+    return new Promise((resolve, reject) => {
+        if (!ruins) {
+            startLoading();
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: api_url + 'myhordesfetcher/ruins?userKey=' + external_app_id,
+                responseType: 'json',
+                onload: function(response){
+                    if (response.status === 200) {
+                        ruins = response.response.sort((a, b) => {
+                            if(a.label[temp_lang] < b.label[temp_lang]) { return -1; }
+                            if(a.label[temp_lang] > b.label[temp_lang]) { return 1; }
+                            return 0;
+                        });
+                        resolve(ruins);
+                    } else {
+                        addError(response);
+                        reject(response);
+                    }
+                    endLoading();
+                },
+                onerror: function(error){
+                    endLoading();
+                    addError(error);
+                    reject(error);
+                }
+            });
+            endLoading();
+        } else {
+            resolve(ruins);
+            endLoading();
+        }
+    })
+}
+
 /** Récupère les informations de la ville */
 function getMe() {
     startLoading();
@@ -4877,93 +5829,104 @@ function getMe() {
 }
 
 /** Récupère les informations de la ville */
-function getTown() {
-    startLoading();
-    if (!hero_skills) {
-        getHeroSkills();
-    }
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url: api_url + 'myhordesfetcher/town?userKey=' + external_app_id,
-        responseType: 'json',
-        onload: function(response){
-            if (response.status === 200) {
-                console.log('town', response.response);
-            } else {
-                addError(response);
+async function getTown() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: api_url + 'myhordesfetcher/town?userKey=' + external_app_id,
+            responseType: 'json',
+            onload: function(response){
+                if (response.status === 200) {
+                    console.log('town', response.response);
+                    resolve(response.response);
+                } else {
+                    addError(response);
+                    reject(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
+                reject(error);
             }
-            endLoading();
-        },
-        onerror: function(error){
-            endLoading();
-            addError(error);
-        }
+        });
     });
 }
 
 
 /** Récupère les informations de la ville */
-function getCitizens() {
-    startLoading();
-    if (!hero_skills) {
-        getHeroSkills();
-    }
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url: api_url + 'myhordesfetcher/citizens?userKey=' + external_app_id,
-        responseType: 'json',
-        onload: function(response){
-            if (response.status === 200) {
-                citizens = response.response;
-                citizens.citizens = Object.keys(citizens.citizens).map((key) => citizens.citizens[key])
-            } else {
-                addError(response);
-            }
-            endLoading();
-        },
-        onerror: function(error){
-            endLoading();
-            addError(error);
-        }
+async function getCitizens() {
+    return new Promise((resolve, reject) => {
+        getHeroSkills().then((hero_skills) => {
+            startLoading();
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: api_url + 'myhordesfetcher/citizens?userKey=' + external_app_id,
+                responseType: 'json',
+                onload: function(response){
+                    if (response.status === 200) {
+                        citizens = response.response;
+                        citizens.citizens = Object.keys(citizens.citizens).map((key) => citizens.citizens[key])
+                        resolve(citizens);
+                    } else {
+                        addError(response);
+                        reject(citizens);
+                    }
+                    endLoading();
+                },
+                onerror: function(error){
+                    endLoading();
+                    addError(error);
+                    reject(error);
+                }
+            });
+        });
     });
 }
 
 /** Récupère les informations de la banque */
-function getBank() {
-    startLoading();
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url: api_url + 'myhordesfetcher/bank?userKey=' + external_app_id,
-        responseType: 'json',
-        onload: function(response){
-            if (response.status === 200) {
-                bank = response.response;
-                bank.bank = Object.keys(bank.bank).map((key) => bank.bank[key])
-                    .map((bank_info) => {
-                    bank_info.item.category = getCategory(bank_info.item.category);
-                    bank_info.item.count = bank_info.count;
-                    bank_info.item.wishListCount = bank_info.wishListCount;
-                    bank_info = bank_info.item;
-                    return bank_info;
-                })
-                    .sort((item_a, item_b) => {
-                    if (item_a.category.ordering > item_b.category.ordering) {
-                      return 1;
-                    } else if (item_a.category.ordering === item_b.category.ordering) {
-                      return 0;
-                    } else {
-                      return -1;
-                    }
-                });
-            } else {
-                addError(response);
+async function getBank() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: api_url + 'myhordesfetcher/bank?userKey=' + external_app_id,
+            responseType: 'json',
+            onload: function(response){
+                if (response.status === 200) {
+                    let bank = response.response;
+                    bank.bank = Object.keys(bank.bank).map((key) => bank.bank[key])
+                        .map((bank_info) => {
+                        bank_info.item.category = getCategory(bank_info.item.category);
+                        bank_info.item.count = bank_info.count;
+                        bank_info.item.wishListCount = bank_info.wishListCount;
+                        bank_info = bank_info.item;
+                        return bank_info;
+                    })
+                        .sort((item_a, item_b) => {
+                        if (item_a.category.ordering > item_b.category.ordering) {
+                            return 1;
+                        } else if (item_a.category.ordering === item_b.category.ordering) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    });
+                    resolve(bank);
+                } else {
+                    addError(response);
+                    reject(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
+                reject(error);
             }
-            endLoading();
-        },
-        onerror: function(error){
-            endLoading();
-            addError(error);
-        }
+        });
     });
 }
 
@@ -4997,26 +5960,30 @@ function getWishlist() {
   * Ajoute un élément à la wishlist
   * @param item l'élément à ajouter à la wishlist
   */
-function addItemToWishlist(item, cart_button) {
-    startLoading();
-    GM_xmlhttpRequest({
-        method: 'POST',
-        url: api_url + 'wishlist/add/' + item.xmlId + '?userKey=' + external_app_id,
-        responseType: 'json',
-        onload: function(response){
-            if (response.status === 200) {
-                item.wishListCount = 1;
-                cart_button.remove();
-                addSuccess(api_texts.add_to_wishlist_success[temp_lang]);
-            } else {
-                addError(response);
+async function addItemToWishlist(item) {
+    return new Promise((resolve, reject) => {
+        startLoading();
+        GM_xmlhttpRequest({
+            method: 'POST',
+            url: api_url + 'wishlist/add/' + item.xmlId + '?userKey=' + external_app_id,
+            responseType: 'json',
+            onload: function(response){
+                if (response.status === 200) {
+                    item.wishListCount = 1;
+                    resolve(item);
+                    addSuccess(api_texts.add_to_wishlist_success[temp_lang]);
+                } else {
+                    addError(response);
+                    reject(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
+                reject(error);
             }
-            endLoading();
-        },
-        onerror: function(error){
-            endLoading();
-            addError(error);
-        }
+        });
     });
 }
 
@@ -5098,31 +6065,40 @@ function updateExternalTools() {
 }
 
 /** Récupère la liste complète des pouvoirs héros */
-function getHeroSkills() {
-    startLoading();
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url: api_url + 'myhordesfetcher/heroSkills',
-        responseType: 'json',
-        onload: function(response){
-            if (response.status === 200) {
-                hero_skills = response.response.sort((a, b) => {
-                if (a.daysNeeded > b.daysNeeded) {
-                      return 1;
-                    } else if (a.daysNeeded === b.daysNeeded) {
-                      return 0;
+async function getHeroSkills() {
+    return new Promise((resolve, reject) => {
+        if (!hero_skills) {
+            startLoading();
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: api_url + 'myhordesfetcher/heroSkills',
+                responseType: 'json',
+                onload: function(response){
+                    if (response.status === 200) {
+                        hero_skills = response.response.sort((a, b) => {
+                            if (a.daysNeeded > b.daysNeeded) {
+                                return 1;
+                            } else if (a.daysNeeded === b.daysNeeded) {
+                                return 0;
+                            } else {
+                                return -1;
+                            }
+                        });
+                        resolve(hero_skills);
                     } else {
-                      return -1;
+                        addError(response);
+                        reject(response);
                     }
-                });
-            } else {
-                addError(response);
-            }
-            endLoading();
-        },
-        onerror: function(error){
-            endLoading();
-            addError(error);
+                    endLoading();
+                },
+                onerror: function(error){
+                    endLoading();
+                    addError(error);
+                    reject(error);
+                }
+            });
+        } else {
+            resolve(hero_skills);
         }
     });
 }
@@ -5230,35 +6206,44 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
 }
 
 /** Récupère la liste complète des recettes */
-function getRecipes() {
-    startLoading();
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url: api_url + 'myhordesfetcher/recipes',
-        responseType: 'json',
-        onload: function(response){
-            if (response.status === 200) {
-                recipes = response.response.map((recipe) => {
-                    recipe.type = action_types.find((type) => type.id === recipe.type);
-                    return recipe;
-                })
-                    .sort((a, b) => {
-                    if (a.type.ordering > b.type.ordering) {
-                      return 1;
-                    } else if (a.type.ordering === b.type.ordering) {
-                      return 0;
+async function getRecipes() {
+    return new Promise((resolve, reject) => {
+        if (!recipes) {
+            startLoading();
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: api_url + 'myhordesfetcher/recipes',
+                responseType: 'json',
+                onload: function(response){
+                    if (response.status === 200) {
+                        recipes = response.response.map((recipe) => {
+                            recipe.type = action_types.find((type) => type.id === recipe.type);
+                            return recipe;
+                        })
+                            .sort((a, b) => {
+                            if (a.type.ordering > b.type.ordering) {
+                                return 1;
+                            } else if (a.type.ordering === b.type.ordering) {
+                                return 0;
+                            } else {
+                                return -1;
+                            }
+                        });
+                        resolve(recipes);
                     } else {
-                      return -1;
+                        addError(response);
+                        reject(recipes);
                     }
-                });
-            } else {
-                addError(response);
-            }
-            endLoading();
-        },
-        onerror: function(error){
-            endLoading();
-            addError(error);
+                    endLoading();
+                },
+                onerror: function(error){
+                    endLoading();
+                    addError(error);
+                    reject(error);
+                }
+            });
+        } else {
+            resolve(recipes);
         }
     });
 }
@@ -5277,50 +6262,50 @@ async function getTodayEstimation(day, estimations, today) {
                     resolve(response.response);
                 } else {
                     addError(response);
+                    reject(response);
                 }
                 endLoading();
             },
             onerror: function(error){
                 endLoading();
                 addError(error);
+                reject(error);
             }
         });
     });
 }
 
 /** Récupère le chemin optimal à partir d'une carte */
-function getOptimalPath(map, html, button, source) {
-    // map.doors = map.doors.slice(2);
-    console.log('map before send', map);
-    GM_xmlhttpRequest({
-        method: 'POST',
-        data: JSON.stringify(map),
-        url: api2_url + '/ruine/pathopti',
-        // url: api_url + 'ruine/pathopti',
-        responseType: 'json',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        onload: function(response){
-            if (response.status === 200) {
-              if (source === 'gh') {
-                  displayOptimalPathOnGh(html, response.response)
-              } else if (source === 'bbh') {
-                  displayOptimalPathOnBbh(html, response.response)
-              }
-            } else {
-                console.error('error', response.reponse)
+async function getOptimalPath(map, html, button) {
+    return new Promise((resolve, reject) => {
+        map.doors = map.doors.slice(2);
+        console.log('map before send', map);
+        startLoading();
+        GM_xmlhttpRequest({
+            method: 'POST',
+            data: JSON.stringify(map),
+            url: api2_url + '/ruine/pathopti',
+            // url: api_url + 'ruine/pathopti',
+            responseType: 'json',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            timeout: 3600000,
+            onload: function(response){
+                if (response.status === 200) {
+                    resolve(response.reponse);
+                } else {
+                    addError(response);
+                    reject(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                console.error('error', error);
+                endLoading();
+                reject(error);
             }
-            button.disabled = false;
-        },
-        onerror: function(error){
-            console.error('error', error);
-            button.disabled = false;
-        },
-        ontimeout: function(timeout) {
-            console.error('timeout', timeout);
-            button.disabled = false;
-        }
+        });
     });
 }
 
@@ -5378,7 +6363,6 @@ function getOptimalPath(map, html, button, source) {
                 if (map_block || ruin_block) {
                     if (ruin_block) {
                         createCopyButton(source, 'ruin', ruin_block_id, block_copy_ruin_button);
-                        // createOptimizePathButton(source, ruin_block_id, block_copy_ruin_button);
                     } else if (map_block) {
                         createCopyButton(source, 'map', map_block_id, block_copy_map_button);
                     }
