@@ -1,7 +1,8 @@
 import { Recipe } from './recipe.class';
+import { Common } from './_common.class';
 import { I18nLabels } from './_types';
 
-export interface Item {
+export interface Item extends Common {
     actions: string[];
     bank_count: number;
     category: string;

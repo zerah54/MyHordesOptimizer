@@ -1,0 +1,22 @@
+.mho-ruins {
+    table {
+        width: 100%;
+
+        .mat-cell {
+            padding: 0.5em;
+        }
+
+        td > .drops-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            > div {
+                margin: 0.5em;
+                > * {
+                    text-align: center;
+                    margin: auto;
+                }
+            }
+        }
+    }
+}

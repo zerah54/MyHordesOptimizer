@@ -1,9 +1,9 @@
-<mat-card class="mho-hero-skills">
+<mat-card class="mho-ruins">
     <mat-card-header>
-        <mat-card-title i18n>Pouvoirs</mat-card-title>
+        <mat-card-title i18n>Bâtiments</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-        <ng-container *ngIf="hero_skills">
+        <ng-container *ngIf="ruins">
             <div class="mat-elevation-z8">
                 <table mat-table [dataSource]="datasource" matSort>
 
@@ -23,8 +23,8 @@
 
                         <td mat-cell *matCellDef="let row">
                             <ng-container [ngSwitch]="column.id">
-                                <ng-container *ngSwitchCase="'icon'">
-                                    <img [src]="HORDES_IMG_REPO + 'heroskill/' + row[column.id] + '.gif'" />
+                                <ng-container *ngSwitchCase="'img'">
+                                    <img [src]="HORDES_IMG_REPO + 'ruin/' + row[column.id] + '.gif'" />
                                 </ng-container>
                                 <ng-container *ngSwitchCase="'label'">
                                     {{row[column.id][locale]}}
@@ -32,8 +32,16 @@
                                 <ng-container *ngSwitchCase="'description'">
                                     <span [innerHTML]="row[column.id][locale]"></span>
                                 </ng-container>
+                                <ng-container *ngSwitchCase="'drops'">
+                                        <div class="drops-list">
+                                            <div *ngFor="let drop of row[column.id]" [title]="drop.item.label[locale]">
+                                                <img [src]="HORDES_IMG_REPO + drop.item.img">
+                                                <div>{{(drop.probability * 100) | number:'1.0-0':locale}}%</div>
+                                            </div>
+                                        </div>
+                                </ng-container>
                                 <ng-container *ngSwitchDefault>
-                                        {{row[column.id]}}
+                                        {{row[column.id]}}km
                                 </ng-container>
                             </ng-container>
                         </td>

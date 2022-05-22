@@ -64,15 +64,10 @@
                                 options.
                                 <br />
                                 <br />
-                                Pour les cartes de BBH et de GH, vous pourrez
-                                voir votre emplacement sur la carte. La
-                                visibilité des expéditions n'est pas encore
-                                prise en compte.
-                                <br />
-                                <br />
-                                Pour la carte de la ruine, vous pouvez simuler
-                                votre emplacement en cliquant sur une des cases,
-                                ce qui fait se déplaces un point sur la carte.
+                                Si vous avez l'un des outils en question ouvert
+                                dans votre navigateur, alors la prochaine fois
+                                que vous naviguerez vers son onglet celui-ci
+                                sera automatiquement rafraîchi.
                             </ng-container>
                         </p>
                     </li>
@@ -95,11 +90,16 @@
                                 redimensionnée.
                                 <br />
                                 <br />
-                                Si vous avez l'un des outils en question ouvert
-                                dans votre navigateur, alors la prochaine fois
-                                que vous naviguerez vers son onglet celui-ci
-                                sera automatiquement rafraîchi.</ng-container
-                            >
+                                Pour les cartes de BBH et de GH, vous pourrez
+                                voir votre emplacement sur la carte. La
+                                visibilité des expéditions n'est pas encore
+                                prise en compte.
+                                <br />
+                                <br />
+                                Pour la carte de la ruine, vous pouvez simuler
+                                votre emplacement en cliquant sur une des cases,
+                                ce qui fait se déplaces un point sur la carte.
+                            </ng-container>
                         </p>
                     </li>
                     <li>
@@ -302,58 +302,82 @@
                                 avant obtention.</ng-container
                             >
                         </p>
+                        <h3 id="ruins" i18n>Bâtiments</h3>
+                        <p>
+                            <ng-container i18n
+                                >Affiche la liste de tous les bâtiments existant
+                                dans le jeu, leur distance de la ville, ainsi
+                                que la liste des objets qu'on peut obtenir en
+                                les fouillant et leurs probabilités d'obtention
+                                .</ng-container
+                            >
+                        </p>
                     </li>
                 </ul>
             </li>
             <li>
                 <h2 id="tools" i18n>Outils</h2>
                 <ul>
-                    <h3 id="citizens-list" i18n>Banque</h3>
-                    <p>
-                        <ng-container i18n
-                            >Affiche la liste des objets de la banque et leur
-                            quantité.
-                            <br />
-                            <br />
-                            Si vous êtes incarnés, les objets qui ne sont pas
-                            dans la liste de courses sont suivis d'un bouton
-                            présentant un caddie. Un clic sur ce bouton les
-                            ajoute à la liste de courses.</ng-container
-                        >
-                    </p>
+                    <li>
+                        <h3 id="citizens-list" i18n>Banque</h3>
+                        <p>
+                            <ng-container i18n
+                                >Affiche la liste des objets de la banque et
+                                leur quantité.
+                                <br />
+                                <br />
+                                Si vous êtes incarnés, les objets qui ne sont
+                                pas dans la liste de courses sont suivis d'un
+                                bouton présentant un caddie. Un clic sur ce
+                                bouton les ajoute à la liste de
+                                courses.</ng-container
+                            >
+                        </p>
+                    </li>
+                    <li>
+                        <h3 id="citizens-list" i18n>Liste de courses</h3>
+                        <p>
+                            <ng-container i18n
+                                >Affiche une liste de courses contenant les
+                                objets ajoutés via les pages de liste d'objets
+                                et de banque.
+                                <br />
+                                <br />
+                                Vous pouvez modifier la priorité de chaque
+                                objet, ainsi que la quantité
+                                requise.</ng-container
+                            >
+                        </p>
+                    </li>
+                    <li>
+                        <h3 id="citizens-list" i18n>
+                            (En cours) Liste des citoyens
+                        </h3>
+                        <p>
+                            <ng-container i18n
+                                >Affiche une liste des citoyens de la ville,
+                                ainsi qu'une liste des pouvoirs héros
+                                disponibles pour lesquels il existe une action
+                                héroïque associée.
+                                <br />
+                                (à venir) Permet de changer son nombre de jours
+                                héros et de recalculer automatiquement le
+                                dernier pouvoir gagné, ainsi que de modifier ses
+                                actions disponibles.</ng-container
+                            >
+                        </p>
+                    </li>
+                    <li>
+                        <h3 id="camping" i18n>Camping</h3>
+                        <p>
+                            <ng-container i18n
+                                >Affiche un outil de prédiction des chances de
+                                survie en camping.
+                            </ng-container>
+                        </p>
+                    </li>
                 </ul>
-                <ul>
-                    <h3 id="citizens-list" i18n>Liste de courses</h3>
-                    <p>
-                        <ng-container i18n
-                            >Affiche une liste de courses contenant les objets
-                            ajoutés via les pages de liste d'objets et de
-                            banque.
-                            <br />
-                            <br />
-                            Vous pouvez modifier la priorité de chaque objet,
-                            ainsi que la quantité requise.</ng-container
-                        >
-                    </p>
-                </ul>
-                <ul>
-                    <h3 id="citizens-list" i18n>
-                        (En cours) Liste des citoyens
-                    </h3>
-                    <p>
-                        <ng-container i18n
-                            >Affiche une liste des citoyens de la ville, ainsi
-                            qu'une liste des pouvoirs héros disponibles pour
-                            lesquels il existe une action héroïque associée.
-                            <br />
-                            (à venir) Permet de changer son nombre de jours
-                            héros et de recalculer automatiquement le dernier
-                            pouvoir gagné, ainsi que de modifier ses actions
-                            disponibles.</ng-container
-                        >
-                    </p>
-                </ul>
-                <ul>
+                <!-- <ul>
                     <h3 id="attack-estimation" i18n>Estimation de l'attaque</h3>
                     <p>
                         <ng-container i18n
@@ -370,7 +394,7 @@
                             l'attaque.</ng-container
                         >
                     </p>
-                </ul>
+                </ul> -->
             </li>
         </ul>
     </ng-template>

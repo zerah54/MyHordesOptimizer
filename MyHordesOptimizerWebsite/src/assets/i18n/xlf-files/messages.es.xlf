@@ -80,7 +80,7 @@
 
                 
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/navbar/navbar.component.ts</context><context context-type="linenumber">31</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">309</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/navbar/navbar.component.ts</context><context context-type="linenumber">31</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">319</context></context-group></trans-unit>
             <trans-unit id="9108179050199310445" datatype="html">
                 <source>Wiki</source>
                 <target state="new">Wiki</target>
@@ -113,23 +113,20 @@
           <context context-type="sourcefile">src/app/script/script.component.html</context>
           <context context-type="linenumber">53,55</context>
         </context-group>
-      </trans-unit><trans-unit id="7096502426053925512" datatype="html">
-        <source>Dans l'interface, vous pouvez cocher les différents outils externes que vous souhaitez pouvoir mettre à jour en un clic. Une fois sorti de la ville, vous pourrez cliquer sur un nouveau bouton qui mettra à jour tous les outils externes que vous avez sélectionnés dans vos options. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Pour les cartes de BBH et de GH, vous pourrez voir votre emplacement sur la carte. La visibilité des expéditions n'est pas encore prise en compte. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur une des cases, ce qui fait se déplaces un point sur la carte. </source><target state="new">Dans l'interface, vous pouvez cocher les différents outils externes que vous souhaitez pouvoir mettre à jour en un clic. Une fois sorti de la ville, vous pourrez cliquer sur un nouveau bouton qui mettra à jour tous les outils externes que vous avez sélectionnés dans vos options. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Pour les cartes de BBH et de GH, vous pourrez voir votre emplacement sur la carte. La visibilité des expéditions n'est pas encore prise en compte. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur une des cases, ce qui fait se déplaces un point sur la carte. </target>
+      </trans-unit><trans-unit id="7453662949015928238" datatype="html">
+        <source>Dans l'interface, vous pouvez cocher les différents outils externes que vous souhaitez pouvoir mettre à jour en un clic. Une fois sorti de la ville, vous pourrez cliquer sur un nouveau bouton qui mettra à jour tous les outils externes que vous avez sélectionnés dans vos options. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Si vous avez l'un des outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi. </source><target state="new">Dans l'interface, vous pouvez cocher les différents outils externes que vous souhaitez pouvoir mettre à jour en un clic. Une fois sorti de la ville, vous pourrez cliquer sur un nouveau bouton qui mettra à jour tous les outils externes que vous avez sélectionnés dans vos options. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Si vous avez l'un des outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">58,76</context>
+          <context context-type="linenumber">58,71</context>
         </context-group>
       </trans-unit><trans-unit id="4645072481410047246" datatype="html">
         <source> Affichage des cartes issues des outils externes </source><target state="new"> Affichage des cartes issues des outils externes </target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">75</context></context-group></trans-unit><trans-unit id="5864665739744787743" datatype="html">
+        <source>Depuis l'interface, vous pouvez cocher une option permettant d'afficher des cartes directement dans MyHordes. Une fois cette option cochée, vous trouverez dans les différents outils externes des boutons pour "copier" une carte, que ce soit une carte de la ville ou une carte de ruine. Une fois la carte copiée, il suffit de retourner dans MyHordes et de cliquer sur l'icône de carte pour pouvoir consulter la carte dans une fenêtre qui peut être déplacée et redimensionnée. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Pour les cartes de BBH et de GH, vous pourrez voir votre emplacement sur la carte. La visibilité des expéditions n'est pas encore prise en compte. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur une des cases, ce qui fait se déplaces un point sur la carte. </source><target state="new">Depuis l'interface, vous pouvez cocher une option permettant d'afficher des cartes directement dans MyHordes. Une fois cette option cochée, vous trouverez dans les différents outils externes des boutons pour "copier" une carte, que ce soit une carte de la ville ou une carte de ruine. Une fois la carte copiée, il suffit de retourner dans MyHordes et de cliquer sur l'icône de carte pour pouvoir consulter la carte dans une fenêtre qui peut être déplacée et redimensionnée. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Pour les cartes de BBH et de GH, vous pourrez voir votre emplacement sur la carte. La visibilité des expéditions n'est pas encore prise en compte. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur une des cases, ce qui fait se déplaces un point sur la carte. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">80,82</context>
-        </context-group>
-      </trans-unit><trans-unit id="6472381276491399302" datatype="html">
-        <source>Depuis l'interface, vous pouvez cocher une option permettant d'afficher des cartes directement dans MyHordes. Une fois cette option cochée, vous trouverez dans les différents outils externes des boutons pour "copier" une carte, que ce soit une carte de la ville ou une carte de ruine. Une fois la carte copiée, il suffit de retourner dans MyHordes et de cliquer sur l'icône de carte pour pouvoir consulter la carte dans une fenêtre qui peut être déplacée et redimensionnée. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Si vous avez l'un des outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.</source><target state="new">Depuis l'interface, vous pouvez cocher une option permettant d'afficher des cartes directement dans MyHordes. Une fois cette option cochée, vous trouverez dans les différents outils externes des boutons pour "copier" une carte, que ce soit une carte de la ville ou une carte de ruine. Une fois la carte copiée, il suffit de retourner dans MyHordes et de cliquer sur l'icône de carte pour pouvoir consulter la carte dans une fenêtre qui peut être déplacée et redimensionnée. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Si vous avez l'un des outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">85,101</context>
+          <context context-type="linenumber">80,102</context>
         </context-group>
       </trans-unit><trans-unit id="312340675049552530" datatype="html">
         <source> Affichage des tooltips détaillés </source><target state="new"> Affichage des tooltips détaillés </target>
@@ -286,12 +283,32 @@
                 
                 
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">297</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.html</context><context context-type="linenumber">3</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/wiki.component.ts</context><context context-type="linenumber">24</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">297</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.html</context><context context-type="linenumber">3</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/wiki.component.ts</context><context context-type="linenumber">25</context></context-group></trans-unit>
             <trans-unit id="1998145900290430095" datatype="html">
                 <source>Présente tout simplement la liste des pouvoirs héros, leur description et le nombre de jours avant obtention.</source>
                 <target state="new">Présente tout simplement la liste des pouvoirs héros, leur description et le nombre de jours avant obtention.</target>
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">300</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">300</context></context-group></trans-unit><trans-unit id="8819719048481824214" datatype="html">
+        <source>Bâtiments</source><target state="new">Bâtiments</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/script/script.component.html</context>
+          <context context-type="linenumber">305</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/wiki.component.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit><trans-unit id="1657704445686283444" datatype="html">
+        <source>Affiche la liste de tous les bâtiments existant dans le jeu, leur distance de la ville, ainsi que la liste des objets qu'on peut obtenir en les fouillant et leurs probabilités d'obtention .</source><target state="new">Affiche la liste de tous les bâtiments existant dans le jeu, leur distance de la ville, ainsi que la liste des objets qu'on peut obtenir en les fouillant et leurs probabilités d'obtention .</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/script/script.component.html</context>
+          <context context-type="linenumber">308,312</context>
+        </context-group>
+      </trans-unit>
             <trans-unit id="5382458688695417420" datatype="html">
                 <source>Banque</source>
                 <target state="new">Banque</target>
@@ -299,7 +316,7 @@
                 
                 
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">311</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/bank/bank.component.html</context><context context-type="linenumber">3</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/tools.component.ts</context><context context-type="linenumber">23</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">322</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/bank/bank.component.html</context><context context-type="linenumber">3</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/tools.component.ts</context><context context-type="linenumber">23</context></context-group></trans-unit>
             <trans-unit id="7867746115136000863" datatype="html">
                 <source>Affiche la liste des objets de la banque et leur quantité. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Si vous êtes incarnés, les objets qui ne sont pas dans la liste de courses sont suivis d'un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.</source>
                 <target state="new">
@@ -309,7 +326,7 @@
                     Si vous êtes incarnés, les objets qui ne sont pas dans la liste de courses sont suivis d'un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.
                 </target>
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">314</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">325</context></context-group></trans-unit>
             <trans-unit id="6373263061828099513" datatype="html">
                 <source>Citoyens</source>
                 <target state="new">Citoyens</target>
@@ -354,7 +371,7 @@
                 
                 
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">326</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/tools.component.ts</context><context context-type="linenumber">24</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.html</context><context context-type="linenumber">3</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">338</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/tools.component.ts</context><context context-type="linenumber">24</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.html</context><context context-type="linenumber">3</context></context-group></trans-unit>
             <trans-unit id="2913252655917132441" datatype="html">
                 <source>Affiche une liste de courses contenant les objets ajoutés via les pages de liste d'objets et de banque. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Vous pouvez modifier la priorité de chaque objet, ainsi que la quantité requise.</source>
                 <target state="new">
@@ -364,13 +381,10 @@
                     Vous pouvez modifier la priorité de chaque objet, ainsi que la quantité requise.
                 </target>
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">329</context></context-group></trans-unit><trans-unit id="1910935492369364964" datatype="html">
+            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">341</context></context-group></trans-unit><trans-unit id="1910935492369364964" datatype="html">
         <source> (En cours) Liste des citoyens </source><target state="new"> (En cours) Liste des citoyens </target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">340,342</context>
-        </context-group>
-      </trans-unit>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">353</context></context-group></trans-unit>
             
             <trans-unit id="3041060767908691760" datatype="html">
                 <source>Affiche une liste des citoyens de la ville, ainsi qu'une liste des pouvoirs héros disponibles pour lesquels il existe une action héroïque associée. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> (à venir) Permet de changer son nombre de jours héros et de recalculer automatiquement le dernier pouvoir gagné, ainsi que de modifier ses actions disponibles.</source>
@@ -380,48 +394,42 @@
                     (à venir) Permet de changer son nombre de jours héros et de recalculer automatiquement le dernier pouvoir gagné, ainsi que de modifier ses actions disponibles.
                 </target>
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">345</context></context-group></trans-unit><trans-unit id="626566591049088014" datatype="html">
+            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">358</context></context-group></trans-unit><trans-unit id="2287398703048181232" datatype="html">
+        <source>Camping</source><target state="new">Camping</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/script/script.component.html</context>
+          <context context-type="linenumber">371</context>
+        </context-group>
+      </trans-unit><trans-unit id="294304982780945228" datatype="html">
+        <source>Affiche un outil de prédiction des chances de survie en camping. </source><target state="new">Affiche un outil de prédiction des chances de survie en camping. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/script/script.component.html</context>
+          <context context-type="linenumber">374,376</context>
+        </context-group>
+      </trans-unit><trans-unit id="626566591049088014" datatype="html">
         <source>Estimation de l'attaque</source><target state="new">Estimation de l'attaque</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">357</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/estimation/estimation.component.html</context>
-          <context context-type="linenumber">3</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/tools.component.ts</context>
-          <context context-type="linenumber">26</context>
-        </context-group>
-      </trans-unit><trans-unit id="9062007292184086579" datatype="html">
-        <source>Cette fonctionnalité est temporaire. En effet, nous avons trouvé un moyen de calculer l'attaque très précisément à partir des estimations. L'équipe du jeu est au courant de cette possibilité, nous a donné son accord pour la partager, mais devrait la corriger lors de la prochaine mise à jour. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> En rentrant certaines estimations de la TDG ou du planificateur, et en indiquant le jour actuel, vous pouvez simplement obtenir le résultat exact de l'attaque.</source><target state="new">Cette fonctionnalité est temporaire. En effet, nous avons trouvé un moyen de calculer l'attaque très précisément à partir des estimations. L'équipe du jeu est au courant de cette possibilité, nous a donné son accord pour la partager, mais devrait la corriger lors de la prochaine mise à jour. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> En rentrant certaines estimations de la TDG ou du planificateur, et en indiquant le jour actuel, vous pouvez simplement obtenir le résultat exact de l'attaque.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">360,370</context>
-        </context-group>
-      </trans-unit>
+        
+        
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/estimation/estimation.component.html</context><context context-type="linenumber">3</context></context-group></trans-unit>
             <trans-unit id="7419787782755641631" datatype="html">
                 <source>Installation</source>
                 <target state="new">Installation</target>
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">378</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">402</context></context-group></trans-unit>
             <trans-unit id="5533636342207968001" datatype="html">
                 <source>Lien vers le script : </source>
                 <target state="new">Lien vers le script : </target>
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">380</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">404</context></context-group></trans-unit>
             <trans-unit id="385117475076003880" datatype="html">
                 <source>Installer le script</source>
                 <target state="new">Installer le script</target>
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">387</context></context-group></trans-unit><trans-unit id="3286917017621738565" datatype="html">
+            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">411</context></context-group></trans-unit><trans-unit id="3286917017621738565" datatype="html">
         <source>Ce fichier contient un script qui fonctionne avec des outils comme Tampermonkey ou Violentmonkey. Pour le faire fonctionner, il faut que Tampermonkey ou Violentmonkey soit installé sur votre navigateur. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Une fois le script installé, vous verrez apparaittre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenête s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Attention :<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Vous allez d'abord devoir renseigner votre ID d'apps externes. Lors de la validation de l'ID d'apps, une confirmation sera demandée. Il faut l'autoriser.</source><target state="new">Ce fichier contient un script qui fonctionne avec des outils comme Tampermonkey ou Violentmonkey. Pour le faire fonctionner, il faut que Tampermonkey ou Violentmonkey soit installé sur votre navigateur. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Une fois le script installé, vous verrez apparaittre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenête s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Attention :<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Vous allez d'abord devoir renseigner votre ID d'apps externes. Lors de la validation de l'ID d'apps, une confirmation sera demandée. Il faut l'autoriser.</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">392,408</context>
-        </context-group>
-      </trans-unit>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">416</context></context-group></trans-unit>
             
             <trans-unit id="5344623683730509987" datatype="html">
                 <source>Un grand merci à Renack, sans qui ni le script ni le site n'existeraient puisqu'il a fait tout le backend !</source>
@@ -451,11 +459,8 @@
             <trans-unit id="673430564078029527" datatype="html">
                 <source>Filtrer</source>
                 <target state="new">Filtrer</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.html</context>
-                    <context context-type="linenumber">14</context>
-                </context-group>
-            </trans-unit>
+                
+            <context-group purpose="location"><context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.html</context><context context-type="linenumber">14</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.html</context><context context-type="linenumber">14</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.html</context><context context-type="linenumber">14</context></context-group></trans-unit>
             <trans-unit id="4977912145007192180" datatype="html">
                 <source>Enregistrer</source>
                 <target state="new">Enregistrer</target>
@@ -469,11 +474,8 @@
             <trans-unit id="347985381929507270" datatype="html">
                 <source>Nom de l'objet</source>
                 <target state="new">Nom de l'objet</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.ts</context>
-                    <context context-type="linenumber">34</context>
-                </context-group>
-            </trans-unit>
+                
+            <context-group purpose="location"><context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.ts</context><context context-type="linenumber">34</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context><context context-type="linenumber">27</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context><context context-type="linenumber">28</context></context-group></trans-unit>
             <trans-unit id="4434386636143018239" datatype="html">
                 <source>Priorité</source>
                 <target state="new">Priorité</target>
@@ -545,31 +547,47 @@
                     <context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.ts</context>
                     <context context-type="linenumber">52</context>
                 </context-group>
-            </trans-unit>
+            </trans-unit><trans-unit id="7031255060364978694" datatype="html">
+        <source>Jours héros nécessaires</source><target state="new">Jours héros nécessaires</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+      </trans-unit><trans-unit id="4902817035128594900" datatype="html">
+        <source>Description</source><target state="new">Description</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+      </trans-unit>
             <trans-unit id="1087900872515566478" datatype="html">
                 <source>Objets</source>
                 <target state="new">Objets</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/items/items.component.html</context>
-                    <context context-type="linenumber">3</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/wiki.component.ts</context>
-                    <context context-type="linenumber">22</context>
-                </context-group>
-            </trans-unit>
+                
+                
+            <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/items/items.component.html</context><context context-type="linenumber">3</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context><context context-type="linenumber">32</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/wiki.component.ts</context><context context-type="linenumber">23</context></context-group></trans-unit>
             <trans-unit id="530325689928281558" datatype="html">
                 <source>Recettes</source>
                 <target state="new">Recettes</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
-                    <context context-type="linenumber">3</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/wiki.component.ts</context>
-                    <context context-type="linenumber">23</context>
-                </context-group>
-            </trans-unit>
+                
+                
+            <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context><context context-type="linenumber">3</context></context-group></trans-unit><trans-unit id="7533053521139949104" datatype="html">
+        <source>Distance minimum</source><target state="new">Distance minimum</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit><trans-unit id="3656199934377633082" datatype="html">
+        <source>Distance maximum</source><target state="new">Distance maximum</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit>
         </body>
     </file>
 </xliff>

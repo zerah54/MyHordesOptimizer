@@ -1,3 +1,4 @@
+import { Common } from "./_common.class";
 
-export interface Recipe {
+export interface Recipe extends Common {
 }

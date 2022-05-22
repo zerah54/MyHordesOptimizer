@@ -1,3 +1,4 @@
+import { RuinDTO, RuinDtoTransform } from './../dto/ruin.dto';
 import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -15,6 +16,9 @@ import { Item } from './../types/item.class';
 import { WishlistInfo } from './../types/wishlist-info.class';
 import { WishlistItem } from './../types/wishlist-item.class';
 import { GlobalServices } from './global.services';
+import { Ruin } from '../types/ruin.class';
+import { HeroSkill } from '../types/hero-skill.class';
+import { HeroSkillDTO, HeroSkillDtoTransform } from '../dto/hero-skill.dto';
 
 const API_URL: string = 'https://myhordesoptimizerapi.azurewebsites.net/';
 const API_URL_2: string = 'http://144.24.192.182';
@@ -157,6 +161,44 @@ export class ApiServices extends GlobalServices {
                         console.log('test', response);
                     }
                 })
+        })
+    }
+
+    /**
+     * Récupère la liste des bâtiments
+     *
+     * @returns {Observable<Ruin[]>}
+     */
+    public getRuins(): Observable<Ruin[]> {
+        return new Observable((sub: Subscriber<Ruin[]>) => {
+            super.get<RuinDTO[]>(API_URL + 'myhordesfetcher/ruins')
+            .subscribe({
+                next: (response: HttpResponse<RuinDTO[]>) => {
+                    let ruins: Ruin[] = RuinDtoTransform.transformDtoArray(response.body).sort((a, b) => {
+                        if (a.label[this.locale] < b.label[this.locale]) { return -1; }
+                        if (a.label[this.locale] > b.label[this.locale]) { return 1; }
+                        return 0;
+                    });
+                    sub.next(ruins);
+                }
+            })
+        })
+    }
+
+    /**
+     * Récupère la liste des pouvoirs héro
+     *
+     * @returns {Observable<HeroSkill[]>}
+     */
+    public getHeroSkill(): Observable<HeroSkill[]> {
+        return new Observable((sub: Subscriber<HeroSkill[]>) => {
+            super.get<HeroSkillDTO[]>(API_URL + 'myhordesfetcher/heroSkills')
+            .subscribe({
+                next: (response: HttpResponse<HeroSkillDTO[]>) => {
+                    console.log('test', response.body);
+                    sub.next(HeroSkillDtoTransform.transformDtoArray(response.body));
+                }
+            })
         })
     }
 }

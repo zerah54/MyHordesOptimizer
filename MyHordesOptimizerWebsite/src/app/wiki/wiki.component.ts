@@ -1,3 +1,4 @@
+import { RuinsComponent } from './ruins/ruins.component';
 import { PageWithSidenav } from './../shared/page-with-sidenav/page-with-sidenav.component';
 import { Component, OnInit } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
@@ -19,9 +20,10 @@ export class WikiComponent extends PageWithSidenav implements OnInit {
 
     /** La liste des pages du wiki */
     public wiki_list: SidenavLinks[] = [
-        { label: $localize`Objets`, id: 'items', component: ItemsComponent, selected: true },
-        { label: $localize`Recettes`, id: 'recipes', component: RecipesComponent, selected: false },
-        { label: $localize`Pouvoirs`, id: 'hero-skills', component: HeroSkillsComponent, selected: false }
+        { label: $localize`Objets`, id: 'items', component: ItemsComponent, selected: false },
+        // { label: $localize`Recettes`, id: 'recipes', component: RecipesComponent, selected: false },
+        { label: $localize`Pouvoirs`, id: 'hero-skills', component: HeroSkillsComponent, selected: true },
+        { label: $localize`Bâtiments`, id: 'ruins', component: RuinsComponent, selected: false }
     ]
 
     constructor(public media: MediaObserver, private sidenav: SidenavService) {
