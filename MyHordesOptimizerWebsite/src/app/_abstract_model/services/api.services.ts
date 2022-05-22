@@ -174,7 +174,7 @@ export class ApiServices extends GlobalServices {
             super.get<RuinDTO[]>(API_URL + 'myhordesfetcher/ruins')
             .subscribe({
                 next: (response: HttpResponse<RuinDTO[]>) => {
-                    let ruins: Ruin[] = RuinDtoTransform.transformDtoArray(response.body).sort((a, b) => {
+                    let ruins: Ruin[] = RuinDtoTransform.transformDtoArray(response.body).sort((a: Ruin, b: Ruin) => {
                         if (a.label[this.locale] < b.label[this.locale]) { return -1; }
                         if (a.label[this.locale] > b.label[this.locale]) { return 1; }
                         return 0;
@@ -195,8 +195,12 @@ export class ApiServices extends GlobalServices {
             super.get<HeroSkillDTO[]>(API_URL + 'myhordesfetcher/heroSkills')
             .subscribe({
                 next: (response: HttpResponse<HeroSkillDTO[]>) => {
-                    console.log('test', response.body);
-                    sub.next(HeroSkillDtoTransform.transformDtoArray(response.body));
+                    let skills: HeroSkill[] = HeroSkillDtoTransform.transformDtoArray(response.body).sort((a: HeroSkill, b: HeroSkill) => {
+                        if (a.days_needed < b.days_needed) { return -1; }
+                        if (a.days_needed > b.days_needed) { return 1; }
+                        return 0;
+                    });
+                    sub.next(skills);
                 }
             })
         })
