@@ -1,3 +1,3 @@
-export class Common {
-    
+export abstract class Common {
+
 }

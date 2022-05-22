@@ -27,14 +27,14 @@ export class AppComponent implements OnInit {
         this.checkUserId();
     }
 
-    private checkUserId() {
+    private checkUserId(): void {
         let user_id: number | null = getUserId();
         if (!user_id && getExternalAppId()) {
             this.api.getMe();
         }
     }
 
-    private loaderOnRouting() {
+    private loaderOnRouting(): void {
         this.router.events
         .pipe(filter((event: Event) => event instanceof NavigationStart || event instanceof NavigationEnd))
         .subscribe((event: Event) => {

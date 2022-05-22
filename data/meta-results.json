@@ -1,0 +1,124 @@
+[
+                {"do_nothing" : []},
+                {"do_nothing_attack" : {"message" : {"text" : "Mit aller Kraft schlägst du mehrmals auf einen Zombie ein, aber <strong>es scheint ihm nichts anzuhaben</strong>!"} }},
+                {"do_nothing_attack2" : {"message" : {"text" : "Sie greifen einen Zombie mit Ihrem {item} an, aber <strong>er reagiert nicht einmal</strong> und macht weiter!"} }},
+
+                {"contaminated_zone_infect"  : { "collection" : { "custom" : [22] } }},
+
+                {"consume_item"    : { "item" : { "consume" : true,  "morph" : null, "break" : null, "poison" : null } }},
+                {"break_item"      : { "item" : { "consume" : false, "morph" : null, "break" : true, "poison" : null }, "picto" : "picto_break", "message" : {"text" : "Deine Waffe ist durch den harten Aufschlag <strong>kaputt</strong> gegangen...", "ordering" : 99999} }},
+                {"cleanse_item"    : { "item" : { "consume" : false, "morph" : null, "break" : true, "poison" : false } }},
+                {"empty_jerrygun"  : { "item" : { "consume" : false, "morph" : "jerrygun_off_#00", "break" : null, "poison" : null } }},
+
+                {"consume_water"     : { "consume" : [ "water_#00" ] }},
+                {"consume_matches"   : { "consume" : [ "lights_#00" ] }},
+                {"consume_battery"   : { "consume" : [ "pile_#00"  ] }},
+                {"consume_micropur"  : { "consume" : [ "water_cleaner_#00"  ] }},
+                {"consume_drug"      : { "consume" : [ "drug_#00"  ] }},
+                {"consume_jerrycan"  : { "consume" : [ "jerrycan_#00"  ] }},
+
+                {"spawn_target"    : { "target" : { "consume" : false, "morph" : null, "break" : null, "poison" : null } }},
+                {"consume_target"  : { "target" : { "consume" : true, "morph" : null, "break" : null, "poison" : null } }},
+                {"repair_target"   : { "target" : { "consume" : false, "morph" : null, "break" : false, "poison" : null } }},
+                {"poison_target"   : { "target" : { "consume" : false, "morph" : null, "break" : null, "poison" : "ItemPoisonType::Deadly"  } }},
+                {"poison_infect_target"   : { "target" : { "consume" : false, "morph" : null, "break" : null, "poison" : "ItemPoisonType::Infectious"  } }},
+
+                {"drink_ap_1"  : { "status" : "add_has_drunk", "ap" : "to_max_plus_0" }},
+                {"drink_ap_2"  : { "status" : "remove_thirst" }},
+                {"drink_no_ap" : { "status" : "replace_dehydration" }},
+                {"reset_thirst_counter" : { "status" : "reset_thirst_counter" }},
+
+                {"eat_ap6"     : { "status" : "add_has_eaten", "ap" : "to_max_plus_0", "message" : {"escort" : false, "text" : "Es schmeckt wirklich komisch... aber es erfüllt seinen Zweck: Dein Hunger ist gestillt. Glaub aber nicht, dass du dadurch zusätzliche APs erhältst..."} }},
+                {"eat_ap6_silent" : { "status" : "add_has_eaten", "ap" : "to_max_plus_0" }},
+                {"eat_ap7"     : { "status" : "add_has_eaten", "ap" : "to_max_plus_1", "message" : {"escort" : false, "text" : "Einmal ist zwar keinmal, dennoch genießt du dein(e) <span class=\"tool\">{item}</span>. Das ist mal ne echte Abwechslung zu dem sonstigen Fraß... Du spürst deine Kräfte wieder zurückkehren.{hr}Du hast <strong>1 zusätzlichen AP erhalten!</strong>"} }},
+
+                {"drunk" : { "status" : "add_drunk", "picto" : ["r_alcool_#00"]}},
+
+                {"drug_any"              : { "status" : "add_is_drugged", "picto" : ["r_drug_#00"] }},
+                {"drug_addict"           : { "status" : "add_addicted", "picto" : ["r_drug_#00"], "message" : {"text" : "<t-stat-up-addict>Schlechte Neuigkeiten! Du bist jetzt abhängig! Von nun an musst du jeden Tag eine Droge nehmen... oder STERBEN!</t-stat-up-addict>", "ordering" : 1000} }},
+                {"drug_addict_no_msg"    : { "status" : "add_addicted", "picto" : ["r_drug_#00"] } },
+                {"terrorize"             : { "status" : "add_terror" } },
+                {"unterrorize"           : { "status" : "remove_terror" } },
+
+                {"infect"        : { "status" : "add_infection", "message" : {"text" : "Schlechte Nachrichten, das hättest du nicht in den Mund nehmen sollen... Du bist infiziert!"} }},
+                {"infect_no_msg" : { "status" : "add_infection" }},
+                {"disinfect"     : { "status" : "remove_infection" }},
+                {"immune"        : { "status" : "add_immune" }},
+                {"give_shaman_immune"  : { "status" : "shaman_immune"}},
+
+                {"minus_1ap"    : { "ap" : "minus_1" }},
+                {"minus_5ap"    : { "ap" : "minus_5" }},
+                {"minus_6ap"    : { "ap" : "minus_6" }},
+                {"minus_1pm"    : { "pm" : "minus_1" }},
+                {"minus_2pm"    : { "pm" : "minus_2" }},
+                {"minus_3pm"    : { "pm" : "minus_3" }},
+                {"minus_1cp"    : { "cp" : "minus_1" }},
+                {"plus_4ap"     : { "ap" : "plus_4" }},
+                {"plus_2ap"     : { "ap" : "plus_2" }},
+                {"plus_2ap_7"   : { "ap" : "plus_2_7" }},
+                {"just_ap6"     : { "ap" : "to_max_plus_0" }},
+                {"just_ap7"     : { "ap" : "to_max_plus_1" }},
+                {"just_ap8"     : { "ap" : "to_max_plus_2" }},
+                {"plus_ap8_30"  : { "ap" : "plus_8_30" }},
+
+                {"april" : { "status" : { "from" : null, "to" : "tg_april_ooze" } }},
+
+                {"produce_watercan3" : { "item" : { "consume" : false, "morph" : "water_can_3_#00" } }},
+                {"produce_watercan2" : { "item" : { "consume" : false, "morph" : "water_can_2_#00" } }},
+                {"produce_watercan1" : { "item" : { "consume" : false, "morph" : "water_can_1_#00" } }},
+                {"produce_watercan0" : { "item" : { "consume" : false, "morph" : "water_can_empty_#00", "break" : null, "poison" : false } }},
+
+                {"kill_1_zombie"   : { "zombies" : "kill_1z", "message" :  {"text_key" : "weapon_use"} }},
+                {"kill_1_zombie_s" : { "zombies" : "kill_1z" } },
+                {"kill_1_2_zombie" : { "zombies" : "kill_1z_2z", "message" : {"text_key" : "weapon_use"} }},
+                {"kill_2_zombie" : { "zombies" : "kill_2z", "message" : {"text_key" : "weapon_use"} }},
+                {"kill_3_zombie" : { "zombies" : "kill_3z", "message" : {"text_key" : "weapon_use"} }},
+                {"kill_all_zombie" : { "zombies" : "kill_all_z" }},
+
+                {"find_rp" : { "rp" : [true] }},
+
+                {"casino_dice"   : { "custom" : [1], "status" : { "from" : null, "to" : "tg_dice" } }},
+                {"casino_card"   : { "custom" : [2], "status" : { "from" : null, "to" : "tg_cards" } }},
+                {"casino_guitar" : { "custom" : [3] } },
+                {"casino_banned_note" : { "custom" : [15] } },
+
+                {"heal_wound"  : { "status" : "heal_wound" } },
+                {"add_bandage" : { "status" : "add_bandage" } },
+                {"inflict_wound" : { "status" : "inflict_wound" } },
+
+                {"zonemarker" : { "zone" : {"scout" : true} }},
+                {"nessquick"  : { "zone" : {"uncover" : true} }},
+
+                {"cyanide" : { "death" : [ "CauseOfDeath::Cyanide" ]} },
+                {"death_poison" : { "death" : [ "CauseOfDeath::Poison" ] } },
+
+                {"hero_tamer_1"  : { "custom" : [4] }},
+                {"hero_tamer_2"  : { "custom" : [5] }},
+                {"hero_tamer_1b" : { "custom" : [16] }},
+                {"hero_tamer_2b" : { "custom" : [17] }},
+                {"hero_tamer_3" : { "item" : { "consume" : false, "morph" : "tamed_pet_drug_#00" } }},
+
+                {"hero_surv_0" : { "status" : { "from" : null, "to" : "tg_sbook" } }},
+                {"hero_surv_1" : { "custom" : [6] }},
+                {"hero_surv_2" : { "custom" : [7] }},
+
+                {"hero_act"    : { "status" : { "from" : null, "to" : "tg_hero" } }},
+                {"hero_immune" : { "status" : { "from" : null, "to" : "hsurvive" } }},
+
+                {"hero_hunter" : { "item" : { "consume" : false, "morph" : "vest_on_#00" } }},
+
+                {"camp_hide" : { "status" : { "from" : null, "to" : "tg_hide" } }},
+                {"camp_tomb" : { "status" : { "from" : null, "to" : "tg_tomb" } }},
+                {"camp_unhide" : { "status" : { "from" : "tg_hide", "to" : null } }},
+                {"camp_untomb" : { "status" : { "from" : "tg_tomb", "to" : null } }},
+
+                {"home_lab_success" : { "spawn" : "lab_success_drugs", "picto" : ["r_drgmkr_#00"], "message" :  {"text_key" : "use_lab_success"} }},
+                {"home_lab_failure" : { "spawn" : "lab_fail_drugs", "message" :  {"text_key" : "use_lab_fail"} }},
+
+                {"home_kitchen_success" : { "spawn" : "kitchen_success_food", "picto" : ["r_cookr_#00"] }},
+                {"home_kitchen_failure" : { "spawn" : "kitchen_fail_food" }},
+
+                {"become_ghoul"    : { "status" : "become_ghoul"    }},
+                {"become_ghoul_5"  : { "status" : "become_ghoul_5"  }},
+                {"become_ghoul_25" : { "status" : "become_ghoul_25" }}
+]
