@@ -27,8 +27,8 @@ export class RuinsComponent implements OnInit {
         { id: 'img', header: `` },
         { id: 'label', header: $localize`Nom de l'objet` },
         { id: 'description', header: $localize`Description` },
-        { id: 'minDist', header: $localize`Distance minimum` },
-        { id: 'maxDist', header: $localize`Distance maximum` },
+        { id: 'min_dist', header: $localize`Distance minimum` },
+        { id: 'max_dist', header: $localize`Distance maximum` },
         { id: 'drops', header: $localize`Objets` }
     ];
     /** La liste des colonnes */

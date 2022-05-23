@@ -1,34 +1,5 @@
 import { I18nLabels } from '../types/_types';
-import { Item } from './../types/item.class';
-import { RecipeDTO, RecipeDtoTransform } from './recipe.dto';
-
-export class ItemDtoTransform {
-
-    public static transformDtoArray(array: ItemDTO[] | null): Item[] {
-        return array ? array.map((dto: ItemDTO) => this.dtoToClass(dto)) : [];
-    }
-
-    public static dtoToClass(dto: ItemDTO): Item {
-        return {
-            actions: dto.actions,
-            bank_count: dto.bankCount,
-            category: dto.category,
-            deco: dto.deco,
-            description: dto.description,
-            guard: dto.guard,
-            img: dto.img.replace(/\..*\./, '.'),
-            is_heaver: dto.isHeaver,
-            json_id_name: dto.jsonIdName,
-            label: dto.label,
-            properties: dto.properties,
-            recipes: RecipeDtoTransform.transformDtoArray(dto.recipes),
-            wishlist_count: dto.wishListCount,
-            xml_id: dto.xmlId,
-            xml_name: dto.xmlName
-        };
-    }
-
-}
+import { RecipeDTO } from './recipe.dto';
 
 export interface ItemDTO {
     actions: string[];

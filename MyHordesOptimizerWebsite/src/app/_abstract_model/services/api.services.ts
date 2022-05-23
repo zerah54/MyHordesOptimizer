@@ -1,4 +1,4 @@
-import { RuinDTO, RuinDtoTransform } from './../dto/ruin.dto';
+import { RuinDTO } from './../dto/ruin.dto';
 import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -8,9 +8,8 @@ import { getExternalAppId, getTownId, getUserId, setTownId, setUserId } from 'sr
 import { ItemDTO } from '../dto/item.dto';
 import { ToolsToUpdate } from '../types/_types';
 import { SnackbarService } from './../../shared/services/snackbar.service';
-import { BankInfoDTO, BankInfoDtoTransform } from './../dto/bank-info.dto';
-import { ItemDtoTransform } from './../dto/item.dto';
-import { WishlistInfoDTO, WishlistInfoDtoTransform } from './../dto/wishlist-info.dto';
+import { BankInfoDTO } from './../dto/bank-info.dto';
+import { WishlistInfoDTO } from './../dto/wishlist-info.dto';
 import { BankInfo } from './../types/bank-info.class';
 import { Item } from './../types/item.class';
 import { WishlistInfo } from './../types/wishlist-info.class';
@@ -18,7 +17,8 @@ import { WishlistItem } from './../types/wishlist-item.class';
 import { GlobalServices } from './global.services';
 import { Ruin } from '../types/ruin.class';
 import { HeroSkill } from '../types/hero-skill.class';
-import { HeroSkillDTO, HeroSkillDtoTransform } from '../dto/hero-skill.dto';
+import { HeroSkillDTO } from '../dto/hero-skill.dto';
+import { dtoToModelArray } from '../types/_common.class';
 
 const API_URL: string = 'https://myhordesoptimizerapi.azurewebsites.net/';
 const API_URL_2: string = 'http://144.24.192.182';
@@ -43,7 +43,7 @@ export class ApiServices extends GlobalServices {
             super.get<ItemDTO[]>(API_URL + 'myhordesfetcher/items?userKey=' + getExternalAppId())
                 .subscribe({
                     next: (response: HttpResponse<ItemDTO[]>) => {
-                        sub.next(ItemDtoTransform.transformDtoArray(response.body));
+                        sub.next(dtoToModelArray(Item, response.body));
                     }
                 });
         });
@@ -69,7 +69,7 @@ export class ApiServices extends GlobalServices {
             super.get<BankInfoDTO>(API_URL + 'myhordesfetcher/bank?userKey=' + getExternalAppId())
                 .subscribe({
                     next: (response: HttpResponse<BankInfoDTO>) => {
-                        sub.next(BankInfoDtoTransform.dtoToClass(response.body));
+                        sub.next(new BankInfo(response.body));
                     }
                 });
         });
@@ -101,7 +101,7 @@ export class ApiServices extends GlobalServices {
             super.get<WishlistInfoDTO>(API_URL + 'wishlist?userKey=' + getExternalAppId())
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
-                        sub.next(WishlistInfoDtoTransform.dtoToClass(response.body));
+                        sub.next(new WishlistInfo(response.body));
                     }
                 });
         });
@@ -124,7 +124,7 @@ export class ApiServices extends GlobalServices {
             super.put<WishlistInfoDTO>(API_URL + 'wishlist?userKey=' + getExternalAppId(), item_list)
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
-                        sub.next(WishlistInfoDtoTransform.dtoToClass(response.body));
+                        sub.next(new WishlistInfo(response.body));
                         this.snackbar.successSnackbar(`La liste de courses a bien été enregistrée`);
                     }
                 })
@@ -174,7 +174,7 @@ export class ApiServices extends GlobalServices {
             super.get<RuinDTO[]>(API_URL + 'myhordesfetcher/ruins')
             .subscribe({
                 next: (response: HttpResponse<RuinDTO[]>) => {
-                    let ruins: Ruin[] = RuinDtoTransform.transformDtoArray(response.body).sort((a: Ruin, b: Ruin) => {
+                    let ruins: Ruin[] = dtoToModelArray(Ruin, response.body).sort((a: Ruin, b: Ruin) => {
                         if (a.label[this.locale] < b.label[this.locale]) { return -1; }
                         if (a.label[this.locale] > b.label[this.locale]) { return 1; }
                         return 0;
@@ -195,7 +195,7 @@ export class ApiServices extends GlobalServices {
             super.get<HeroSkillDTO[]>(API_URL + 'myhordesfetcher/heroSkills')
             .subscribe({
                 next: (response: HttpResponse<HeroSkillDTO[]>) => {
-                    let skills: HeroSkill[] = HeroSkillDtoTransform.transformDtoArray(response.body).sort((a: HeroSkill, b: HeroSkill) => {
+                    let skills: HeroSkill[] = dtoToModelArray(HeroSkill, response.body).sort((a: HeroSkill, b: HeroSkill) => {
                         if (a.days_needed < b.days_needed) { return -1; }
                         if (a.days_needed > b.days_needed) { return 1; }
                         return 0;
