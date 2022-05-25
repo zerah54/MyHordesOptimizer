@@ -146,3 +146,12 @@ function addError(error) {
     }, 5000);
     console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
 }
+
+/**
+* TODO Supprimer une fois les données remontées proprement de la base
+* @param {string} category
+* @return la catégorie complète associé au string passé en paramètre
+*/
+function getCategory(category) {
+    return categories_mapping[category.toLowerCase()];
+}
