@@ -8,6 +8,7 @@ const gm_mh_external_app_id_key = 'mh_external_app_id';
 const gm_parameters_key = 'mh_optimizer_parameters';
 const mh_user_key = 'mh_user';
 const mho_map_key = 'mho_map';
+const mho_blacklist_key = 'mho_blacklist'
 
 const hordes_img_url = '/build/images/';
 const repo_img_url = 'https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/hordes_img/';

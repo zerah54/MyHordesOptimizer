@@ -952,6 +952,23 @@ let params_categories = [
             parent_id: null
         },
         {
+            id: `block_users`,
+            label: {
+                en: `TODO`,
+                fr: `Permettre de bloquer des utilisateurs`,
+                de: `TOOD`,
+                es: `TODO`
+            },
+            help: {
+                en: `TODO`,
+                fr: `Affiche un icône devant les noms d'utilisateurs sur le forum, permettant de bloquer / débloquer un utilisateur. 
+                Si un utilisateur est bloqué, masque ses messages tout en permettant de réafficher chaque message au besoin.`,
+                de: `TODO`,
+                es: `TODO`
+            },
+            parent_id: null
+        },
+        {
             id: `display_missing_ap_for_buildings_to_be_safe`,
             label: {
                 en: `Show missing AP to repair construction sites`,

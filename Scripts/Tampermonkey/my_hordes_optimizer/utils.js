@@ -40,6 +40,11 @@ function pageIsDesert() {
     return document.URL.indexOf('desert') > -1;
 }
 
+/** @return {boolean}    true si la page de l'utilisateur est une page de forum */
+function pageIsForum() {
+    return document.URL.indexOf('forum') > -1;
+}
+
 /** Affiche ou masque la page de chargement de MyHordes en fonction du nombre d'appels en cours */
 function displayLoading() {
     let loadzone = document.getElementById('loadzone');
