@@ -948,3 +948,32 @@ let informations = [
         es: `TODO`
     }, src: `mailto:lenoune38@gmail.com?Subject=[${GM_info.script.name}]`, action: () => {}, img: `icons/small_mail.gif`},
 ];
+
+const table_hero_skills_headers = [
+    {id: 'name', label: {en: `Name`, fr: `Nom`, de: ``, es: ``}, type: 'th'},
+    {id: 'nombreJourHero', label: {en: ``, fr: `Jours héros`, de: ``, es: ``}, type: 'td'},
+    {id: 'lastSkill', label: {en: ``, fr: `Dernier pouvoir gagné`, de: ``, es: ``}, type: 'td'},
+    {id: 'uppercut', label: {en: ``, fr: `Uppercut Sauvage`, de: ``, es: ``}, type: 'td', img: ''},
+    {id: 'rescue', label: {en: `Rescue`, fr: `Sauvetage`, de: ``, es: ``}, type: 'td', img: ''}
+];
+
+const table_skills_headers = [
+    {id: 'icon', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
+    {id: 'label', label: {en: ``, fr: `Capacité`, de: ``, es: ``}, type: 'th'},
+    {id: 'daysNeeded', label: {en: ``, fr: `Jours héros nécessaires`, de: ``, es: ``}, type: 'td'},
+    {id: 'description', label: {en: `Description`, fr: `Description`, de: ``, es: ``}, type: 'td'}
+];
+
+const table_ruins_headers = [
+    {id: 'img', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
+    {id: 'label', label: {en: `Name`, fr: 'Nom', de: `Name`, es: `TODO`}, type: 'th'},
+    {id: 'description', label: {en: `Description`, fr: 'Description', de: `Beschreibung`, es: `TODO`}, type: 'td'},
+    {id: 'minDist', label: {en: `Minimum distance`, fr: 'Distance minimum', de: `Mindestabstand`, es: `TODO`}, type: 'td'},
+    {id: 'maxDist', label: {en: `Maximum distance`, fr: 'Distance maximum', de: `Maximale Entfernung`, es: `TODO`}, type: 'td'},
+    {id: 'drops', label: {en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `TODO`}, type: 'td'},
+];
+
+const added_ruins = [
+    {id: '', camping: 0, label: {en: `None`, fr: 'Aucun', de: `Kein`, es: `TODO`}},
+    {id: 'nondig', camping: 8, label: {en: `Buried building`, fr: 'Bâtiment non déterré', de: `Verschüttete Ruine`, es: `Sector inexplotable`}}
+];
