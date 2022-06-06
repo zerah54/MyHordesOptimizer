@@ -2,7 +2,7 @@
 {
     public class Property
     {
-        public int IdPropertys { get; set; }
+        public int IdProperty { get; set; }
         public string Name { get; set; }
     }
 }

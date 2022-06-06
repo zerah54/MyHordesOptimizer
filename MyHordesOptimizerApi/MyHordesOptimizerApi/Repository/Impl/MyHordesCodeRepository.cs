@@ -1,4 +1,5 @@
-﻿using MyHordesOptimizerApi.Data.Ruins;
+﻿using MyHordesOptimizerApi.Data.Items;
+using MyHordesOptimizerApi.Data.Ruins;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using System.Collections.Generic;
@@ -14,6 +15,22 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var json = File.ReadAllText(path);
             var dico = json.FromJson<Dictionary<string, MyHordesRuinCodeModel>>();
             return dico;
+        }
+
+        public List<MyHordesCategoryCodeModel> GetCategories()
+        {
+            var path = "Data/Items/categories.json";
+            var json = File.ReadAllText(path);
+            var list = json.FromJson<List<MyHordesCategoryCodeModel>>();
+            return list;
+        }
+
+        public List<MyHordesItemCodeModel> GetItems()
+        {
+            var path = "Data/Items/items.json";
+            var json = File.ReadAllText(path);
+            var list = json.FromJson<List<MyHordesItemCodeModel>>();
+            return list;
         }
     }
 }
