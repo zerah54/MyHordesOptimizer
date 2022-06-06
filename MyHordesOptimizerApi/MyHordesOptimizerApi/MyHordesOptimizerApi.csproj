@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>2d6a7f12-93df-4654-8023-f347a9c9071c</UserSecretsId>
+    <ApplicationInsightsResourceId>/subscriptions/1a9dafbc-3492-481b-9aca-ea560d462a4b/resourceGroups/MyHordesOptimizer/providers/microsoft.insights/components/MyHordesOptimizer-ai</ApplicationInsightsResourceId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +11,7 @@
     <PackageReference Include="Automapper" Version="11.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="BouncyCastle" Version="1.8.9" />
+    <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.20.0" />
