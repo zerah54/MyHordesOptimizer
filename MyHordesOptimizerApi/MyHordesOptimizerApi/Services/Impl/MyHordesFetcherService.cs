@@ -53,7 +53,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             if (me.Map != null) // On ne récupère les info propres à la ville uniquement si on est incarné
             {
                 var town = FirebaseRepository.GetTown(me.Map.Id);
-
+                if(town == null)
+                {
+                    town = GetTown();
+                }
                 foreach (var item in items)
                 {
                     if (town.WishList != null && town.WishList.WishList != null)
