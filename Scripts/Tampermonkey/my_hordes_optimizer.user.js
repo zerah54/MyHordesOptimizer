@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.52
+// @version      1.0.0-alpha.53
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,9 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Ajout d'un bouton pour retirer son ID d'app externes de MHO sans avoir à passer par les paramètres de l'extension\n`
-+ `[Nouveauté] Ajout de la date de dernière mise à jour de la liste des courses dans la page de liste de courses \n\n`
-+ `[Fix] Images des objets\n`;
++ `[Fix] Le positionnement du champ de traduction ne bloque plus le bouton de sondage\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 const temp_lang = lang === 'es' ? 'en' : lang;
@@ -1251,7 +1249,7 @@ function removeExternalAppId() {
 function createSelectWithSearch() {
 
     let select_complete = document.createElement('div');
-
+    
     let select = document.createElement('label');
 
     let input = document.createElement('input');
@@ -4567,7 +4565,7 @@ function displayTranslateTool() {
         ]
         let mho_display_translate_input_div = createSelectWithSearch();
         mho_display_translate_input_div.id = mho_display_translate_input_id;
-        mho_display_translate_input_div.setAttribute('style', 'position: absolute; top: 45px; right: 8px; margin: 0; width: 250px;');
+        mho_display_translate_input_div.setAttribute('style', 'position: absolute; top: 45px; right: 8px; margin: 0; width: 250px; height: 25px;');
         let label = mho_display_translate_input_div.firstElementChild;
         let input = label.firstElementChild;
         input.setAttribute('style', 'width: calc(100% - 35px); display: inline-block;');
