@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.53
+// @version      1.0.0-alpha.54
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Fix] Le positionnement du champ de traduction ne bloque plus le bouton de sondage\n`;
++ `[Fix] En cas d'absence de wishlist enregistrée, l'écran de wishlist ne fonctionnait pas\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 const temp_lang = lang === 'es' ? 'en' : lang;
@@ -1783,7 +1783,9 @@ function displayWishlist() {
              let last_update = document.createElement('span');
             last_update.classList.add('small');
             last_update.setAttribute('style', 'margin-right: 0.5em;');
-            last_update.innerText = new Intl.DateTimeFormat('default', { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
+            if (wishlist.lastUpdateInfo) {
+                last_update.innerText = new Intl.DateTimeFormat('default', { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
+            }
 
             let save_button = document.createElement('button');
             save_button.setAttribute('style', 'width: 250px;');
@@ -3296,7 +3298,9 @@ function displayWishlistInApp() {
             let last_update = document.createElement('span');
             last_update.classList.add('small');
             last_update.setAttribute('style', 'margin-right: 0.5em;');
-            last_update.innerText = new Intl.DateTimeFormat('default', { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
+            if (wishlist.lastUpdateInfo) {
+                last_update.innerText = new Intl.DateTimeFormat('default', { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
+            }
             update_section.appendChild(last_update);
 
             let update_btn = document.createElement('button');
