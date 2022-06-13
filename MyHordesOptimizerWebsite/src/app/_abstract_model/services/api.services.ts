@@ -1,3 +1,6 @@
+import { CitizenInfo } from './../types/citizen-info.class';
+import { CitizenInfoDTO } from './../dto/citizen-info.dto';
+import { Citizen } from './../types/citizen.class';
 import { RuinDTO } from './../dto/ruin.dto';
 import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { HttpClient, HttpResponse } from '@angular/common/http';
@@ -19,6 +22,7 @@ import { Ruin } from '../types/ruin.class';
 import { HeroSkill } from '../types/hero-skill.class';
 import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { dtoToModelArray } from '../types/_common.class';
+import { CitizenDTO } from '../dto/citizen.dto';
 
 const API_URL: string = 'https://myhordesoptimizerapi.azurewebsites.net/';
 const API_URL_2: string = 'http://144.24.192.182';
@@ -149,7 +153,7 @@ export class ApiServices extends GlobalServices {
 
 
     /**
-     * Demande l'estimation à partid des données du tableau
+     * Demande l'estimation à partir des données du tableau
      * @param {Dictionary<string>} rows Les données pour l'estimation
      */
      public estimateAttack(rows: Dictionary<string>, today: boolean, day: number): Observable<string> {
@@ -158,7 +162,6 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response) => {
                         sub.next(response);
-                        console.log('test', response);
                     }
                 })
         })
@@ -205,5 +208,21 @@ export class ApiServices extends GlobalServices {
             })
         })
     }
+
+    /**
+     * Récupère la liste des citoyens
+     *
+     * @returns {Observable<CitizenInfo>}
+     */
+         public getCitizens(): Observable<CitizenInfo> {
+            return new Observable((sub: Subscriber<CitizenInfo>) => {
+                super.get<CitizenInfoDTO>(API_URL + '/myhordesfetcher/citizens?userKey=' + getExternalAppId())
+                .subscribe({
+                    next: (response: HttpResponse<CitizenInfoDTO>) => {
+                        sub.next(new CitizenInfo(response.body));
+                    }
+                })
+            })
+        }
 }
 

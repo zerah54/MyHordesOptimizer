@@ -1,3 +1,4 @@
+import { CampingComponent } from './camping/camping.component';
 import { NgModule } from '@angular/core';
 import { SharedModule } from '../shared/shared.module';
 import { BankComponent } from './bank/bank.component';
@@ -7,7 +8,7 @@ import { ToolsComponent } from './tools.component';
 import { WikiRoutingModule } from './tools.routing.module';
 import { WishlistComponent } from './wishlist/wishlist.component';
 
-let components: any[] = [ToolsComponent, BankComponent, CitizensComponent, WishlistComponent, EstimationComponent];
+let components: any[] = [ToolsComponent, BankComponent, CitizensComponent, WishlistComponent, EstimationComponent, CampingComponent];
 
 @NgModule({
     imports: [SharedModule, WikiRoutingModule],
