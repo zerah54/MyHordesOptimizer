@@ -1,7 +1,7 @@
 import { PageWithSidenav } from './page-with-sidenav/page-with-sidenav.component';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
@@ -13,7 +13,7 @@ import { SidenavService } from './services/sidenav.service';
 import { SnackbarService } from './services/snackbar.service';
 
 let custom_modules: any[] = [MaterialModule, ElementsModule];
-let angular_modules: any[] = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule]
+let angular_modules: any[] = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule]
 let custom_components: any[] = [PageWithSidenav];
 
 @NgModule({
