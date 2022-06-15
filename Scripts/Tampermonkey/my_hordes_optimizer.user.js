@@ -88,19 +88,19 @@ const texts = {
         en: `Save your external ID for apps`,
         fr: `Enregistrez votre ID d'app externe`,
         de: `Speichern Sie Ihre externe ID für Apps`,
-        es: `TODO`
+        es: `Guarde su identificador externo para aplicaciones`
     },
     external_app_id_help: {
         en: `You have to fill your external ID for apps. <br />You can find it by following “My soul” > “Settings” > “Advanced” > “External Applications” `,
         fr: `Vous devez renseigner votre ID externe pour les apps.<br />Celle-ci se trouve dans "Votre âme" > "Réglages" > "Avancés" > "Applications externes"`,
         de: `Sie müssen Ihre externe ID für Apps eingeben. <br /> Sie können es finden indem Sie folgen “Deine Seele” > “Einstellungen” > “Erweitert” > “Externe Anwendungen” `,
-        es: `TODO`
+        es: `Ingrese su identificador externo para aplicaciones. <br />Este se encuentra en “Tu alma” > “Configuración” > “Avanzada” > “Aplicaciones Externas”`
     },
     external_app_id_help_label: {
         en: `Help`,
         fr: `Aide`,
         de: `Hilfe`,
-        es: `Guía`
+        es: `Ayuda`
     },
     tools_btn_label: {
         en: `Tools`,
@@ -112,115 +112,115 @@ const texts = {
         en: `Parameters`,
         fr: `Paramètres`,
         de: `Einstellungen`,
-        es: `TODO`
+        es: `Parámetros`
     },
     informations_section_label: {
         en: `Informations`,
         fr: `Informations`,
         de: `Informationen`,
-        es: `TODO`
+        es: `Informaciones`
     },
     update_external_tools_needed_btn_label: {
         en: `Update external tools`,
         fr: `Mettre à jour les outils externes`,
         de: `Externe Tools Aktualisieren`,
-        es: `TODO`
+        es: `Actualizar aplicaciones externas`
     },
     update_external_tools_pending_btn_label: {
         en: `Updating...`,
         fr: `Mise à jour en cours...`,
         de: `Aktualisierung…`,
-        es: `TODO`
+        es: `Actualizando...`
     },
     update_external_tools_success_btn_label: {
         en: `Update completed!`,
         fr: `Mise à jour terminée !`,
         de: `Aktualisierung abgeschlossen!`,
-        es: `TODO`
+        es: `¡Actualización exitosa!`
     },
     update_external_tools_errors_btn_label: {
         en: `Update completed with errors.`,
         fr: `Mise à jour terminée avec des erreurs.`,
         de: `Aktualisierung mit Fehlern abgeschlossen.`,
-        es: `TODO`
+        es: `Actualización completada con errores.`
     },
     update_external_tools_fail_btn_label: {
         en: `Can not update.`,
         fr: `Impossible de mettre à jour.`,
         de: `Aktualisierung unmöglich`,
-        es: `TODO`
+        es: `No se puede actualizar.`
     },
     prevent_from_leaving_information: {
         en: `You asked to be notified before leaving if your escort options were not good: `,
         fr: `Vous avez demandé à être prévenu avant de quitter la page si vos options d'escorte ne sont pas les bonnes : `,
         de: `Sie haben dafür gewählt vor der Abreise benachrichtigt zu werden wenn Ihre Eskorte-Optionen nicht gut waren:`,
-        es: `TODO`
+        es: `Ha pedido ser notificado antes de cerrar la página si sus opciones de escolta son incorrectas: `
     },
     prevent_not_in_ae: {
         en: `you are not waiting for an escort.`,
         fr: `vous n'êtes pas en attente d'escorte.`,
         de: `Sie warten nicht auf eine Eskorte.`,
-        es: `TODO`
+        es: `su escolta no está activada.`
     },
     escort_not_released: {
         en: `you did not let go of your escort`,
         fr: `vous n'avez pas relâché votre escorte.`,
         de: `Sie haben Ihre Eskorte nicht losgelassen`,
-        es: `TODO`
+        es: `no ha soltado a sus acompañantes en escolta.`
     },
     save: {
         en: `Save`,
         fr: `Enregistrer`,
         de: `Speichern`,
-        es: `TODO`
+        es: `Guardar`
     },
     update: {
         en: `Update`,
         fr: `Mettre à jour`,
         de: `Aktualisieren`,
-        es: `TODO`
+        es: `Actualizar`
     },
     search_ended: {
         en: `Search completed`,
         fr: `La fouille est terminée`,
         de: `Grabungsaktion fertig`,
-        es: `TODO`
+        es: `La búsqueda ha finalizado`
     },
     nb_dead_zombies: {
         en: `Number of zombies that died here today`,
         fr: `Nombre de zombies morts sur cette case aujourd'hui`,
         de: `Anzahl der Zombies die heute hier gestorben sind`,
-        es: `TODO`
+        es: `Número de zombis que han muerto aquí el día de hoy`
     },
     copy_map: {
         en: `Copy map`,
         fr: `Copier la carte`,
         de: `Karte kopieren`,
-        es: `TODO`
+        es: `Copiar el mapa`
     },
     search_building: {
         en: `Search for a construction site`,
         fr: `Rechercher un chantier`,
         de: `Baustelle suchen`,
-        es: `TODO`
+        es: `Buscar una construcción`
     },
     translation_file_context: {
         en: `Context (translation file)`,
         fr: `Contexte (fichier de traduction)`,
         de: `Kontext (Übersetzungsdatei)`,
-        es: `TODO`,
+        es: `Contexto (archivo de traducción)`,
     },
     display_all_search_result: {
         en: `Display all results`,
         fr: `Afficher tous les résultats`,
         de: `Alle Ergebnisse anzeigen`,
-        es: `TODO`
+        es: `Mostrar todos los resultados`
     },
     display_exact_search_result: {
         en: `Only display exact results`,
         fr: `Afficher uniquement les résultats exacts`,
         de: `Nur exakte Ergebnisse anzeigen`,
-        es: `TODO`
+        es: `Mostrar sólo los resultados exactos`
     },
     prevention_estimation: {
         en: `The attack estimation through this method was approved by certain members of the developer team.
@@ -251,19 +251,19 @@ const texts = {
         en: `Estimation for tonight's attack`,
         fr: `Estimation pour l'attaque du soir`,
         de: `Schätzung für den nächtlichen Angriff`,
-        es: `Pronóstico del ataque nocturno`
+        es: `Estimación del ataque de hoy`
     },
     tomorrow_estimation: {
         en: `Estimation for tomorrow's 's attack`,
         fr: `Estimation pour l'attaque du lendemain`,
         de: `Schätzung für den morgigen Angriff`,
-        es: `Estimación del ataque del día siguiente`
+        es: `Estimación del ataque de mañana`
     },
     missing_ap_explanation: {
         en: `(including %VAR% for the building to stay overnight)`,
         fr: `(dont %VAR% pour que le bâtiment passe la nuit)`,
         de: `(einschließlich %VAR% für das Gebäude zum Übernachten)`,
-        es: `(incluyendo %VAR% para el edificio para pernoctar)`,
+        es: `(incluyendo %VAR% para que el edificio resista el ataque)`,
     },
     job: {
         en: `Profession`,
@@ -293,19 +293,19 @@ const texts = {
         en: `Distance from town (in km)`,
         fr: `Distance de la ville (en km)`,
         de: `Entfernung von der Stadt (in km)`,
-        es: `TODO`,
+        es: `Distancia con respecto al pueblo (en km)`,
     },
     nb_campings: {
         en: `Number of campsites already made`,
         fr: `Nombre de campings déjà effectués`,
         de: `Anzahl der bereits gemachten Campingplätze`,
-        es: `TODO`,
+        es: `Cantidad de acampes ya realizados`,
     },
     hidden_campers: {
         en: `Number of campers already hidden on the cell`,
         fr: `Nombre de campeurs déjà cachés sur la case`,
         de: `Anzahl der Camper, die bereits auf der Zelle versteckt sind`,
-        es: `TODO`,
+        es: `Cantidad de campistas ya escondidos en la zona`,
     },
     vest: {
         en: `Camouflage Vest`,
@@ -341,25 +341,25 @@ const texts = {
         en: `Number of zombies on the cell`,
         fr: `Nombre de zombies sur la case`,
         de: `Anzahl der Zombies auf der Zelle`,
-        es: `TODO`,
+        es: `Cantidad de zombis en la zona`,
     },
     objects_in_bag: {
         en: `Number of skins and tents in the bag`,
         fr: `Nombre de pelures de peau et de toiles de tentes dans le sac`,
         de: `Anzahl der Felle und Zelte in der Tasche`,
-        es: `TODO`,
+        es: `Cantidad de pellejos humanos y telas de carpa en el bolso`,
     },
     improve: {
         en: `Number of simple improvements made on the cell (must subtract 3 after each attack)`,
         fr: `Nombre d'améliorations simples faites sur la case (il faut en soustraire 3 après chaque attaque)`,
         de: `Anzahl der einfachen Verbesserungen, die an der Zelle vorgenommen wurden (muss nach jedem Angriff 3 abziehen)`,
-        es: `TODO`,
+        es: `Cantidad de mejoras simples hechas en la zona (hay que restar 3 luego de cada ataque)`,
     },
     object_improve: {
         en: `Number of defense objects installed on the cell`,
         fr: `Nombre d'objets de défense installés sur la case`,
         de: `Anzahl der auf der Zelle installierten Verteidigungsobjekte`,
-        es: `TODO`,
+        es: `Cantidad de objetos defensivos instalados en la zona`,
     },
     camping_town: {
         en: `The town`,
@@ -370,8 +370,8 @@ const texts = {
     camping_citizen: {
         en: `The citizen`,
         fr: `Le citoyen`,
-        de: `El habitante`,
-        es: `Der Bürger`,
+        de: `Der Bürger`,
+        es: `El habitante`,
     },
     camping_ruin: {
         en: `The ruin`,
@@ -383,7 +383,7 @@ const texts = {
         en: `Result`,
         fr: `Résultat`,
         de: `Ergebnis`,
-        es: `TODO`,
+        es: `Resultado`,
     }
 };
 
@@ -640,25 +640,25 @@ const api_texts = {
         en: `An error occured. (Error : $error$)`,
         fr: `Une erreur s'est produite. (Erreur : $error$)`,
         de: `Fehler aufgetreten. (Fehler : $error$)`,
-        es: `TODO`
+        es: `Ha ocurrido un error. (Error: $error$)`
     },
     update_wishlist_success: {
         en: `Shopping list updated.`,
         fr: `La liste de courses a bien été mise à jour.`,
         de: `Einkaufsliste aktualisiert.`,
-        es: `TODO`
+        es: `La lista de deseos ha sido actualizada.`
     },
     add_to_wishlist_success: {
         en: `Item has been added to the shopping list.`,
         fr: `L'objet a bien été ajouté à la liste de courses.`,
         de: `Gegenstand wurde der Einkaufsliste hinzugefügt.`,
-        es: `TODO`
+        es: `El objeto ha sido añadido a la lista de deseos.`
     },
 };
 
 const action_types = [
-    {id: `Manual`, label: {en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `TODO`}, ordering: 1},
-    {id: `Workshop`, label: {en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `TODO`}, ordering: 0},
+    {id: `Manual`, label: {en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante`}, ordering: 1},
+    {id: `Workshop`, label: {en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller`}, ordering: 0},
 ];
 
 const wishlist_priorities = [
@@ -666,31 +666,31 @@ const wishlist_priorities = [
         en: `Do not bring to town`,
         fr: `Ne pas ramener`,
         de: `Nicht mitbringen`,
-        es: `TODO`
+        es: `No traer al pueblo`
     }},
     {value: 0, label: {
         en: `Not defined`,
         fr: `Non définie`,
         de: `Nicht definiert`,
-        es: `TODO`
+        es: `Indefinida`
     }},
     {value: 1000, label: {
         en: `Low`,
         fr: `Basse`,
         de: `Niedrig`,
-        es: `TODO`
+        es: `Baja`
     }},
     {value: 2000, label: {
         en: `Medium`,
         fr: `Moyenne`,
         de: `Mittel`,
-        es: `TODO`
+        es: `Media`
     }},
     {value: 3000, label: {
         en: `High`,
         fr: `Haute`,
         de: `Hoch`,
-        es: `TODO`
+        es: `Alta`
     }},
 ];
 
@@ -699,31 +699,31 @@ const wishlist_headers = [
         en: `Item`,
         fr: `Objet`,
         de: `Gegenstand`,
-        es: `TODO`
+        es: `Objeto`
     }, id: `label`},
     {label: {
         en: `Priority`,
         fr: `Priorité`,
         de: `Priorität`,
-        es: `TODO`
+        es: `Prioridad`
     }, id: `priority`},
     {label: {
         en: `Stock in bank`,
         fr: `Stock en banque`,
         de: `Bestand in der Bank`,
-        es: `TODO`
+        es: `Cantidad en el almacén`
     }, id: `bank_count`},
     {label: {
         en: `Desired stock`,
         fr: `Stock souhaité`,
         de: `Gewünschter Bestand`,
-        es: `TODO`
+        es: `Cantidad deseada`
     }, id: `bank_needed`},
     {label: {
         en: `Missing quantity`,
         fr: `Quantité manquante`,
         de: `Fehlende Menge`,
-        es: `TODO`
+        es: `Cantidad necesaria`
     }, id: `diff`},
     {label: {en: ``, fr: ``, es: ``, de: ``}, id: 'delete'},
 ];
@@ -741,7 +741,7 @@ let tabs_list = {
                 en: `Items`,
                 fr: `Objets`,
                 de: `Gegenstände`,
-                es: `TODO`
+                es: `Objetos`
             },
             icon: repo_img_url + `emotes/bag.gif`
         },
@@ -752,7 +752,7 @@ let tabs_list = {
                 en: `Recipes`,
                 fr: `Recettes`,
                 de: `Rezepte`,
-                es: `TODO`
+                es: `Transformaciones`
             },
             icon: repo_img_url + `building/small_refine.gif`
         },
@@ -763,7 +763,7 @@ let tabs_list = {
                 en: `Hero Skills`,
                 fr: `Pouvoirs`,
                 de: `Heldentaten`,
-                es: `TODO`
+                es: `Poderes`
             },
             icon: repo_img_url + `/professions/hero.gif`
         },
@@ -787,7 +787,7 @@ let tabs_list = {
                 en: `Bank`,
                 fr: `Banque`,
                 de: `Bank`,
-                es: `TODO`
+                es: `Almacén`
             },
             icon: repo_img_url + `icons/home.gif`,
             needs_town: true,
@@ -799,7 +799,7 @@ let tabs_list = {
                 en: `Wishlist`,
                 fr: `Liste de courses`,
                 de: `Wunschzettel`,
-                es: `TODO`
+                es: `Lista de deseos`
             },
             icon: repo_img_url + `item/item_cart.gif`,
             needs_town: true,
@@ -811,7 +811,7 @@ let tabs_list = {
                 en: `Citizens`,
                 fr: `Citoyens`,
                 de: `Bürger`,
-                es: `TODO`
+                es: `Habitantes`
             },
             icon: repo_img_url + `icons/small_human.gif`,
             needs_town: true,
@@ -853,25 +853,25 @@ let params_categories = [
         en: `External tools`,
         fr: `Outils externes`,
         de: `Externen Tool`,
-        es: `TODO`
+        es: `Aplicaciones externas`
     }, params: [
         {id: `update_bbh`, label: {
             en: `Update BigBroth’Hordes`,
             fr: `Mettre à jour BigBroth'Hordes`,
             de: `BigBroth’Hordes Aktualisieren`,
-            es: `TODO`
+            es: `Actualizar BigBroth'Hordes`
         }, parent_id: null},
         {id: `update_gh`, label: {
             en: `Update Gest’Hordes`,
             fr: `Mettre à jour Gest'Hordes`,
             de: `Gest’Hordes aktualisieren`,
-            es: `TODO`
+            es: `Actualizar Gest'Hordes`
         }, parent_id: null},
         {id: `update_fata`, label: {
             en: `Update Fata Morgana`,
             fr: `Mettre à jour Fata Morgana`,
             de: `Fata Morgana aktualisieren`,
-            es: `TODO`
+            es: `Actualizar Fata Morgana`
         }, parent_id: null},
         {
             id: `display_map`,
@@ -879,13 +879,13 @@ let params_categories = [
                 en: `Allow to show a map from external tools`,
                 fr: `Permettre d'afficher une carte issue des outils externes`,
                 de: `Anzeigen einer Karte von externen Tools ermöglichen`,
-                es: `TODO`
+                es: `Permitir que se muestre un mapa proveniente de las aplicaciones externas`
             },
             help: {
                 en: `In any external tool, it will be possible to copy the town or ruin map and to paste it into MyHordes`,
                 fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`,
                 de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
-                es: `TODO`
+                es: `En toda aplicación externa, es posible copiar el mapa del pueblo o de la ruina y pegarlo en MyHordes`
             },
             parent_id: null
         }
@@ -894,37 +894,37 @@ let params_categories = [
         en: `Interface improvements`,
         fr: `Améliorations de l'interface`,
         de: `Benutzeroberfläche Verbesserungen`,
-        es: `TODO`
+        es: `Mejoras de la interfaz`
     }, params: [
         {id: `enhanced_tooltips`, label: {
             en: `Show detailed tooltips`,
             fr: `Afficher des tooltips détaillés`,
             de: `Detaillierte Tooltips anzeigen`,
-            es: `TODO`
+            es: `Mostrar tooltips detallados`
         }, parent_id: null},
         {id: `click_on_voted`, label: {
             en: `Quick navigation to recommended construction site`,
             fr: `Navigation rapide vers le chantier recommandé`,
             de: `Schnelle Navigation zur empfohlenen Baustelle`,
-            es: `TODO`
+            es: `Navegación rápida hacia la construcción recomendada`
         }, parent_id: null},
         {id: `display_search_field_on_buildings`, label: {
             en: `Show a search field for construction sites`,
             fr: `Afficher un champ de recherche pour les chantiers`,
             de: `Ein Suchfeld für Baustellen anzeigen`,
-            es: `TODO`
+            es: `Mostrar la barra buscadora para construcciones`
         }, parent_id: null},
         {id: `display_wishlist`, label: {
             en: `Display wishlist in interface`,
             fr: `Afficher la liste de courses dans l'interface`,
             de: `Wunschzettel in der Benutzeroberfläche anzeigen`,
-            es: `TODO`
+            es: `Mostrar la lista de deseos en la interfaz`
         }, parent_id: null},
         {id: `display_wishlist_closed`, label: {
             en: `Wishlish folded by default`,
             fr: `Liste de courses repliée par défaut`,
             de: `Wunschzettel standardmäßig gefaltet`,
-            es: `TODO`
+            es: `Lista de deseos minimizada por defecto`
         }, parent_id: `display_wishlist`},
         {
             id: `display_nb_dead_zombies`,
@@ -932,13 +932,13 @@ let params_categories = [
                 en: `Show the number of zombie that died today`,
                 fr: `Afficher le nombre de zombies morts aujourd'hui`,
                 de: `Anzahl der Zombies die heute hier gestorben sind anzeigen`,
-                es: `TODO`
+                es: `Mostrar la cantidad de zombis que murieron hoy`
             },
             help: {
                 en: `Allows to display the number of blood splatters on the map`,
                 fr: `Permet d'afficher le nombre de tâches de sang sur la carte`,
                 de: `Ermöglicht die Anzeige der Anzahl der Blutfleck auf der Karte`,
-                es: `TODO`
+                es: `Permite mostrar la cantidad de manchas de sangre en el mapa`
             },
             parent_id: null
         },
@@ -948,13 +948,13 @@ let params_categories = [
                 en: `Show MyHordes' item translation bar`,
                 fr: `Afficher la barre de traduction des éléments de MyHordes`,
                 de: `Übersetzungsleiste für MyHordes Elemente anzeigen`,
-                es: `TODO`
+                es: `Mostrar la barra de traducción de elementos de MyHordes`
             },
             help: {
                 en: `Shows a translation bar. You must choose the initial language, then type the searched element to get the other translations.`,
                 fr: `Affiche une barre de traduction. Vous devez choisir la langue initiale, puis saisir l'élément recherché pour en récupérer les différentes traductions.`,
                 de: `Zeigt eine Übersetzungsleiste an. Sie müssen die Ausgangssprache auswählen, und dann die Zielelemente eingeben um die Übersetzungen zu generieren.`,
-                es: `TODO`
+                es: `Muestra una barra de traducción. Primero se debe escoger el idioma inicial, y luego ingresar el elemento buscado en la barra para obtener las distintas traducciones.`
             },
             parent_id: null
         },
@@ -964,51 +964,51 @@ let params_categories = [
                 en: `Show missing AP to repair construction sites`,
                 fr: `Afficher les PA manquants pour réparer les chantiers`,
                 de: `Fehlende AP anzeigen, um Konstruktionen zu reparieren`,
-                es: `Mostrar puntos de acceso faltantes para reparar construcciónes`
+                es: `Mostrar los PA faltantes para reparar las construcciones`
             },
             help: {
-                en: `TODO`,
+                en: `In Pandemonium (Hardcore towns), the construction sites are damaged during the attack. The damages can amount to 70% max of the construction's life points (rounded up to the nearest whole number). This option displays over the constructions the number of AP needed to keep them safe.`,
                 fr: `En Pandémonium, les bâtiments prennent des dégâts lors de l'attaque. Ces dégâts équivalent à un maximum de 70% des points de vie du bâtiment (arrondi à l'entier supérieur). Cette option affiche sur les bâtiments les PA à investir pour que le bâtiment soit en sécurité.`,
                 de: `TODO`,
-                es: `TODO`
+                es: `En Pandemonio, las construcciones sufren daños durante el ataque. Estos daños equivalen a un máximo de 70% de los puntos de vida de la construcción (redondeados al entero superior). Esta opción muestra sobre las construcciones la cantidad de PA a invertir para evitar que puedan ser destruidas.`
             },
             parent_id: null
         },
         // {
         //     id: `block_users`,
         //     label: {
-        //         en: `TODO`,
+        //         en: `Allows to block users`,
         //         fr: `Permettre de bloquer des utilisateurs`,
         //         de: `TODO`,
-        //         es: `TODO`
+        //         es: `Permite bloquear usuarios`
         //     },
         //     help: {
-        //         en: `TODO`,
+        //         en: `Shows an icon next to the usernames in the forum, allowing to block / unblock a user. If a user is blocked, this option will hide their messages (while allowing to show again any message).`,
         //         fr: `Affiche un icône devant les noms d'utilisateurs sur le forum, permettant de bloquer / débloquer un utilisateur. 
         //         Si un utilisateur est bloqué, masque ses messages tout en permettant de réafficher chaque message au besoin.`,
         //         de: `TODO`,
-        //         es: `TODO`
+        //         es: `Muestra un ícono junto a los nombres de usuario en el foro que permite bloquear / desbloquear a un usuario. Si un usuario ha sido bloqueado, sus mensajes serán ocultados (pero es posible volver a mostrar cualquier mensaje si se desea).`
         //     },
         //     parent_id: null
         // }
     ]},
     {id: `notifications`, label: {
-        en: `Notices and warnings`,
+        en: `Notifications and warnings`,
         fr: `Notifications et avertissements`,
         de: `Hinweise und Warnungen`,
-        es: `TODO`
+        es: `Notificaciones y advertencias`
     }, params: [
         {id: `prevent_from_leaving`, label: {
             en: `Request confirmation before leaving without automatic escort`,
             fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`,
             de: `Bestätigung anfordern bevor Abreise ohne automatische Eskorte`,
-            es: `TODO`
+            es: `Pedir confirmación antes de cerrar la página sin haber puesto la escolta automática`
         }, parent_id: null},
         {id: `prevent_dangerous_actions`, label: {
             en: `[Experimental] Request confirmation before performing hazardous actions`,
             fr: `[Expérimental] Demander confirmation avant d'effectuer des actions dangereuses`,
             de: `[Experimentell] Bestätigung anfordern, bevor Ausführung gefährliche Aktionen`,
-            es: `TODO`
+            es: `[Experimental] Pedir confirmación antes de efectuar acciones peligrosas`
         }, parent_id: null},
         {
             id: `notify_on_search_end`,
@@ -1016,13 +1016,13 @@ let params_categories = [
                 en: `Notify me at the end of a search `,
                 fr: `Me notifier à la fin de la fouille`,
                 de: `Mich Benachrichtigen am Ende einer Grabungsaktion`,
-                es: `TODO`
+                es: `Notificarme al final de la búsquedas`
             },
             help: {
                 en: `Allows to receive a notification when a search ends if the page was not closed in the meantime`,
                 fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`,
                 de: `Ermöglicht den Erhalt einer Benachrichtigung wann eine Grabungsaktion endet wenn die Seite in der Zwischenzeit nicht geschlossen wurde`,
-                es: `TODO`
+                es: `Permite recibir una notificación al terminar una búsqueda si la página no ha sido cerrada entre tanto`
             },
             parent_id: null
         }
@@ -1034,55 +1034,55 @@ let informations = [
         en: `Website`,
         fr: `Site web`,
         de: `Webseite`,
-        es: `TODO`
+        es: `Sitio web`
     }, src: `https://myhordes-optimizer.web.app/`, action: () => {}, img: `emotes/explo.gif`},
     {id: `version`, label: {
         en: `Changelog ${GM_info.script.version}`,
         fr: `Notes de version ${GM_info.script.version}`,
         de: `Changelog ${GM_info.script.version}`,
-        es: `TODO`
+        es: `Notas de la versión ${GM_info.script.version}`
     }, src: undefined, action: () => {alert(changelog)}, img: `emotes/rptext.gif`},
     {id: `contact`, label: {
         en: `Bugs? Ideas?`,
         fr: `Des bugs ? Des idées ?`,
         de: `Fehler ? Ideen ?`,
-        es: `TODO`
+        es: `¿Bugs? ¿Ideas?`
     }, src: `mailto:lenoune38@gmail.com?Subject=[${GM_info.script.name}]`, action: () => {}, img: `icons/small_mail.gif`},    
     {id: `empty-app-id`, label: {
         en: `Remove your external ID for apps`,
         fr: `Retirer votre ID d'app externe`,
         de: `TODO`,
-        es: `TODO`
+        es: `Eliminar su ID externo para aplicaciones`
     }, src: undefined, action: () => removeExternalAppId(), img: `icons/small_remove.gif`},
 ];
 
 const table_hero_skills_headers = [
-    {id: 'name', label: {en: `Name`, fr: `Nom`, de: ``, es: ``}, type: 'th'},
-    {id: 'nombreJourHero', label: {en: ``, fr: `Jours héros`, de: ``, es: ``}, type: 'td'},
-    {id: 'lastSkill', label: {en: ``, fr: `Dernier pouvoir gagné`, de: ``, es: ``}, type: 'td'},
-    {id: 'uppercut', label: {en: ``, fr: `Uppercut Sauvage`, de: ``, es: ``}, type: 'td', img: ''},
-    {id: 'rescue', label: {en: `Rescue`, fr: `Sauvetage`, de: ``, es: ``}, type: 'td', img: ''}
+    {id: 'name', label: {en: `Name`, fr: `Nom`, de: ``, es: `Nombre`}, type: 'th'},
+    {id: 'nombreJourHero', label: {en: `Hero days`, fr: `Jours héros`, de: ``, es: `Días de héroe`}, type: 'td'},
+    {id: 'lastSkill', label: {en: `Last power earned`, fr: `Dernier pouvoir gagné`, de: ``, es: `Último poder obtenido`}, type: 'td'},
+    {id: 'uppercut', label: {en: `Vicious uppercut`, fr: `Uppercut Sauvage`, de: ``, es: `Puñetazo salvaje`}, type: 'td', img: ''},
+    {id: 'rescue', label: {en: `Rescue`, fr: `Sauvetage`, de: ``, es: `Rescate`}, type: 'td', img: ''}
 ];
 
 const table_skills_headers = [
     {id: 'icon', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
-    {id: 'label', label: {en: ``, fr: `Capacité`, de: ``, es: ``}, type: 'th'},
-    {id: 'daysNeeded', label: {en: ``, fr: `Jours héros nécessaires`, de: ``, es: ``}, type: 'td'},
-    {id: 'description', label: {en: `Description`, fr: `Description`, de: ``, es: ``}, type: 'td'}
+    {id: 'label', label: {en: `Skill`, fr: `Capacité`, de: ``, es: `Poder`}, type: 'th'},
+    {id: 'daysNeeded', label: {en: `Hero days needed`, fr: `Jours héros nécessaires`, de: ``, es: `Días de héroe necesarios`}, type: 'td'},
+    {id: 'description', label: {en: `Description`, fr: `Description`, de: ``, es: `Descripción`}, type: 'td'}
 ];
 
 const table_ruins_headers = [
     {id: 'img', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
-    {id: 'label', label: {en: `Name`, fr: 'Nom', de: `Name`, es: `TODO`}, type: 'th'},
-    {id: 'description', label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `TODO`}, type: 'td'},
-    {id: 'minDist', label: {en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `TODO`}, type: 'td'},
-    {id: 'maxDist', label: {en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `TODO`}, type: 'td'},
-    {id: 'drops', label: {en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `TODO`}, type: 'td'},
+    {id: 'label', label: {en: `Name`, fr: 'Nom', de: `Name`, es: `Nombre`}, type: 'th'},
+    {id: 'description', label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción`}, type: 'td'},
+    {id: 'minDist', label: {en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `Distancia mínima`}, type: 'td'},
+    {id: 'maxDist', label: {en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima`}, type: 'td'},
+    {id: 'drops', label: {en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `Objetos`}, type: 'td'},
 ];
 
 const added_ruins = [
-    {id: '', camping: 0, label: {en: `None`, fr: 'Aucun', de: `Kein`, es: `TODO`}},
-    {id: 'nondig', camping: 8, label: {en: `Buried building`, fr: 'Bâtiment non déterré', de: `Verschüttete Ruine`, es: `Sector inexplotable`}}
+    {id: '', camping: 0, label: {en: `None`, fr: 'Aucun', de: `Kein`, es: `Ninguna`}},
+    {id: 'nondig', camping: 8, label: {en: `Buried building`, fr: 'Bâtiment non déterré', de: `Verschüttete Ruine`, es: `Edificio no desenterrado`}}
 ];
 
 //////////////////////////////////////
