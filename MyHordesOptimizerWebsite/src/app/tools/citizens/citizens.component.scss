@@ -1,0 +1,19 @@
+.mho-citizens {
+    table {
+        width: 100%;
+        tr {
+            > td.center {
+                text-align: center;
+
+                > img {
+                    margin-right: 1em;
+                }
+            }
+        }
+
+        .table-filters {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+}

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.51
+// @version      1.0.0-alpha.54
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -13,7 +13,7 @@
 // @supportURL   lenoune38@gmail.com
 //
 // @connect      https://myhordesoptimizerapi.azurewebsites.net/
-// @connect      http://144.24.192.182/
+// @connect      http://144.24.192.182
 // @connect      *
 //
 // @match        https://myhordes.de/*
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Fix] Migration de serveur pour tenter de ne plus avoir de problèmes de quota (on croise les doigts pour que ça marche toujours après ça...). La migration ne concerne malheureusement pas encore le camping et la liste des bâtiments\n`
++ `[Fix] En cas d'absence de wishlist enregistrée, l'écran de wishlist ne fonctionnait pas\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 const temp_lang = lang === 'es' ? 'en' : lang;
@@ -44,6 +44,7 @@ const gm_mh_external_app_id_key = 'mh_external_app_id';
 const gm_parameters_key = 'mh_optimizer_parameters';
 const mh_user_key = 'mh_user';
 const mho_map_key = 'mho_map';
+const mho_blacklist_key = 'mho_blacklist'
 
 let mho_parameters = GM_getValue(gm_parameters_key) || {};
 let external_app_id = GM_getValue(gm_mh_external_app_id_key);
@@ -70,6 +71,7 @@ const mho_title = 'MH Optimizer';
 const mh_optimizer_window_id = 'optimizer-window';
 const mh_optimizer_map_window_id = 'optimizer-map-window';
 const btn_id = 'optimizer-btn';
+const content_btn_id = 'optimizer-content-btn';
 const mh_header_id = 'header-reload-area';
 const mh_update_external_tools_id = 'mh-update-external-tools';
 const wiki_btn_id = 'wiki-btn-id';
@@ -971,7 +973,24 @@ let params_categories = [
                 es: `TODO`
             },
             parent_id: null
-        }
+        },
+        // {
+        //     id: `block_users`,
+        //     label: {
+        //         en: `TODO`,
+        //         fr: `Permettre de bloquer des utilisateurs`,
+        //         de: `TODO`,
+        //         es: `TODO`
+        //     },
+        //     help: {
+        //         en: `TODO`,
+        //         fr: `Affiche un icône devant les noms d'utilisateurs sur le forum, permettant de bloquer / débloquer un utilisateur. 
+        //         Si un utilisateur est bloqué, masque ses messages tout en permettant de réafficher chaque message au besoin.`,
+        //         de: `TODO`,
+        //         es: `TODO`
+        //     },
+        //     parent_id: null
+        // }
     ]},
     {id: `notifications`, label: {
         en: `Notices and warnings`,
@@ -1028,9 +1047,43 @@ let informations = [
         fr: `Des bugs ? Des idées ?`,
         de: `Fehler ? Ideen ?`,
         es: `TODO`
-    }, src: `mailto:lenoune38@gmail.com?Subject=[${GM_info.script.name}]`, action: () => {}, img: `icons/small_mail.gif`},
+    }, src: `mailto:lenoune38@gmail.com?Subject=[${GM_info.script.name}]`, action: () => {}, img: `icons/small_mail.gif`},    
+    {id: `empty-app-id`, label: {
+        en: `Remove your external ID for apps`,
+        fr: `Retirer votre ID d'app externe`,
+        de: `TODO`,
+        es: `TODO`
+    }, src: undefined, action: () => removeExternalAppId(), img: `icons/small_remove.gif`},
 ];
 
+const table_hero_skills_headers = [
+    {id: 'name', label: {en: `Name`, fr: `Nom`, de: ``, es: ``}, type: 'th'},
+    {id: 'nombreJourHero', label: {en: ``, fr: `Jours héros`, de: ``, es: ``}, type: 'td'},
+    {id: 'lastSkill', label: {en: ``, fr: `Dernier pouvoir gagné`, de: ``, es: ``}, type: 'td'},
+    {id: 'uppercut', label: {en: ``, fr: `Uppercut Sauvage`, de: ``, es: ``}, type: 'td', img: ''},
+    {id: 'rescue', label: {en: `Rescue`, fr: `Sauvetage`, de: ``, es: ``}, type: 'td', img: ''}
+];
+
+const table_skills_headers = [
+    {id: 'icon', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
+    {id: 'label', label: {en: ``, fr: `Capacité`, de: ``, es: ``}, type: 'th'},
+    {id: 'daysNeeded', label: {en: ``, fr: `Jours héros nécessaires`, de: ``, es: ``}, type: 'td'},
+    {id: 'description', label: {en: `Description`, fr: `Description`, de: ``, es: ``}, type: 'td'}
+];
+
+const table_ruins_headers = [
+    {id: 'img', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
+    {id: 'label', label: {en: `Name`, fr: 'Nom', de: `Name`, es: `TODO`}, type: 'th'},
+    {id: 'description', label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `TODO`}, type: 'td'},
+    {id: 'minDist', label: {en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `TODO`}, type: 'td'},
+    {id: 'maxDist', label: {en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `TODO`}, type: 'td'},
+    {id: 'drops', label: {en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `TODO`}, type: 'td'},
+];
+
+const added_ruins = [
+    {id: '', camping: 0, label: {en: `None`, fr: 'Aucun', de: `Kein`, es: `TODO`}},
+    {id: 'nondig', camping: 8, label: {en: `Buried building`, fr: 'Bâtiment non déterré', de: `Verschüttete Ruine`, es: `Sector inexplotable`}}
+];
 
 //////////////////////////////////////
 // Les éléments récupérés via l'API //
@@ -1081,6 +1134,11 @@ function pageIsConstructions() {
 /** @return {boolean}    true si la page de l'utilisateur est la page du désert */
 function pageIsDesert() {
     return document.URL.indexOf('desert') > -1;
+}
+
+/** @return {boolean}    true si la page de l'utilisateur est la page du désert */
+function pageIsForum() {
+    return document.URL.indexOf('forum') > -1;
 }
 
 /** Affiche ou masque la page de chargement de MyHordes en fonction du nombre d'appels en cours */
@@ -1177,10 +1235,21 @@ function copyToClipboard(text) {
     input.remove();
 }
 
+/**
+ * Retire l'ID d'app externe de MHO
+ */
+function removeExternalAppId() {
+    GM_setValue(gm_mh_external_app_id_key, '')
+    
+    external_app_id = GM_getValue(gm_mh_external_app_id_key);
+
+    createOptimizerButtonContent();
+}
+
 function createSelectWithSearch() {
 
     let select_complete = document.createElement('div');
-
+    
     let select = document.createElement('label');
 
     let input = document.createElement('input');
@@ -1249,7 +1318,10 @@ function createOptimizerBtn() {
             event.stopPropagation();
         });
 
+        let content_zone = document.createElement('div');
+        content_zone.id = content_btn_id;
         header_zone.appendChild(optimizer_btn);
+        header_zone.appendChild(content_zone);
 
         createOptimizerButtonContent();
     }, 2000);
@@ -1258,7 +1330,7 @@ function createOptimizerBtn() {
 /** Crée le contenu du bouton de l'optimizer (bouton de wiki, bouton de configuration, etc) */
 function createOptimizerButtonContent() {
     let optimizer_btn = document.getElementById(btn_id);
-    let content = document.createElement('div');
+    let content = document.getElementById(content_btn_id);
     content.innerHTML = '';
 
     if (external_app_id && external_app_id !== '') {
@@ -1341,9 +1413,7 @@ function createOptimizerButtonContent() {
         keysend.addEventListener('click', () => {
             GM_setValue(gm_mh_external_app_id_key, keytext.value);
             external_app_id = GM_getValue(gm_mh_external_app_id_key);
-            if (!items) {
-                getItems();
-            }
+            getMe();
             content.innerHTML = '';
             createOptimizerButtonContent();
         });
@@ -1710,6 +1780,13 @@ function displayWishlist() {
             tab_content_header.setAttribute('style', 'margin: 0 0.5em; display: flex; justify-content: space-between; height: 25px;');
             tab_content.appendChild(tab_content_header);
 
+             let last_update = document.createElement('span');
+            last_update.classList.add('small');
+            last_update.setAttribute('style', 'margin-right: 0.5em;');
+            if (wishlist.lastUpdateInfo) {
+                last_update.innerText = new Intl.DateTimeFormat('default', { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
+            }
+
             let save_button = document.createElement('button');
             save_button.setAttribute('style', 'width: 250px;');
             save_button.classList.add('inline');
@@ -1742,7 +1819,7 @@ function displayWishlist() {
             items.forEach((item) => {
                 let content_div = document.createElement('div');
                 let img = document.createElement('img');
-                img.src = hordes_img_url + item.img;
+                img.src = repo_img_url + item.img;
                 img.setAttribute('style', 'margin-right: 8px');
 
                 let button_div = document.createElement('div');
@@ -1769,6 +1846,7 @@ function displayWishlist() {
 
             });
             tab_content_header.appendChild(add_item_with_search);
+            tab_content_header.appendChild(last_update);
             tab_content_header.appendChild(save_button);
 
             let wishlist_list = document.createElement('ul');
@@ -1846,7 +1924,7 @@ function createWishlistItemElement(item) {
 
     let item_icon = document.createElement('img');
     item_icon.setAttribute('style', 'margin-right: 0.5em');
-    item_icon.src = hordes_img_url + item.item.img;
+    item_icon.src = repo_img_url + item.item.img;
     item_title_container.appendChild(item_icon);
 
     let item_title = document.createElement('span');
@@ -1985,7 +2063,7 @@ function displayItems(filtered_items, tab_id) {
         item_title_container.appendChild(icon_container);
 
         let item_icon = document.createElement('img');
-        item_icon.src = hordes_img_url + item.img;
+        item_icon.src = repo_img_url + item.img;
         icon_container.appendChild(item_icon);
 
         if (tab_id === 'bank' && item.count > 1) {
@@ -2028,13 +2106,7 @@ function displayCitizens() {
         if (citizens && hero_skills) {
             console.log('heroskills', hero_skills);
 
-            let header_cells = [
-                {id: 'name', label: {en: 'Name', fr: 'Nom', de: '', es: ''}, type: 'th'},
-                {id: 'nombreJourHero', label: {en: '', fr: 'Jours héros', de: '', es: ''}, type: 'td'},
-                {id: 'lastSkill', label: {en: '', fr: 'Dernier pouvoir gagné', de: '', es: ''}, type: 'td'},
-                {id: 'uppercut', label: {en: '', fr: 'Uppercut Sauvage', de: '', es: ''}, type: 'td', img: ''},
-                {id: 'rescue', label: {en: 'Rescue', fr: 'Sauvetage', de: '', es: ''}, type: 'td', img: ''}
-            ];
+            let header_cells = [...table_hero_skills_headers];
 
             let skills_with_uses = hero_skills
             .filter((skill) => skill.nbUses > 0)
@@ -2225,10 +2297,7 @@ function displayEstimations() {
 /** Affiche le calcul des probabilités en camping */
 function displayCamping() {
     getRuins().then((ruins) => {
-        let all_ruins = [
-            {id: '', camping: 0, label: {en: `None`, fr: 'Aucun', de: `Kein`, es: `TODO`}},
-            {id: 'nondig', camping: 8, label: {en: `Buried building`, fr: 'Bâtiment non déterré', de: `Verschüttete Ruine`, es: `Sector inexplotable`}}
-        ];
+        let all_ruins = [...added_ruins];
         all_ruins = all_ruins.concat(ruins);
 
         let tab_content = document.getElementById('tab-content');
@@ -2795,12 +2864,7 @@ function displaySkills() {
     getHeroSkills().then((hero_skills) => {
         let tab_content = document.getElementById('tab-content');
 
-        let header_cells = [
-            {id: 'icon', label: {en: '', fr: '', de: '', es: ''}, type: 'th'},
-            {id: 'label', label: {en: '', fr: 'Capacité', de: '', es: ''}, type: 'th'},
-            {id: 'daysNeeded', label: {en: '', fr: 'Jours héros nécessaires', de: '', es: ''}, type: 'td'},
-            {id: 'description', label: {en: 'Description', fr: 'Description', de: '', es: ''}, type: 'td'}
-        ];
+        let header_cells = [...table_skills_headers];
 
         let header_row = document.createElement('tr');
         header_row.classList.add('mho-header');
@@ -2849,14 +2913,7 @@ function displayRuins() {
         if (ruins) {
             let tab_content = document.getElementById('tab-content');
 
-            let header_cells = [
-                {id: 'img', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
-                {id: 'label', label: {en: `Name`, fr: 'Nom', de: `Name`, es: `TODO`}, type: 'th'},
-                {id: 'description', label: {en: `Description`, fr: 'Description', de: `Beschreibung`, es: `TODO`}, type: 'td'},
-                {id: 'minDist', label: {en: `Minimum distance`, fr: 'Distance minimum', de: `Mindestabstand`, es: `TODO`}, type: 'td'},
-                {id: 'maxDist', label: {en: `Maximum distance`, fr: 'Distance maximum', de: `Maximale Entfernung`, es: `TODO`}, type: 'td'},
-                {id: 'drops', label: {en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `TODO`}, type: 'td'},
-            ];
+            let header_cells = [...table_ruins_headers];
 
             let header_row = document.createElement('tr');
             header_row.classList.add('mho-header');
@@ -3241,7 +3298,9 @@ function displayWishlistInApp() {
             let last_update = document.createElement('span');
             last_update.classList.add('small');
             last_update.setAttribute('style', 'margin-right: 0.5em;');
-            last_update.innerText = new Intl.DateTimeFormat('default', { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
+            if (wishlist.lastUpdateInfo) {
+                last_update.innerText = new Intl.DateTimeFormat('default', { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
+            }
             update_section.appendChild(last_update);
 
             let update_btn = document.createElement('button');
@@ -3280,7 +3339,7 @@ function displayWishlistInApp() {
 
                 let title = document.createElement('div');
                 title.classList.add('padded', 'cell', 'rw-5');
-                title.innerHTML = `<img src="${hordes_img_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px" /><span class="small">${item.item.label[lang]}</span>`;
+                title.innerHTML = `<img src="${repo_img_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px" /><span class="small">${item.item.label[lang]}</span>`;
                 list_item.appendChild(title);
 
                 let item_priority = document.createElement('span');
@@ -3398,6 +3457,7 @@ function displayPriorityOnItems() {
 /** Affiche les tooltips avancés */
 function displayAdvancedTooltips() {
     if (mho_parameters.enhanced_tooltips && items) {
+      
         let tooltip_container = document.getElementById('tooltip_container');
         let advanced_tooltip_container = document.getElementById('mho-advanced-tooltip');
         if (tooltip_container.innerHTML) {
@@ -3408,7 +3468,7 @@ function displayAdvancedTooltips() {
                     let hovered_item_img = item.firstElementChild.src;
                     let index = hovered_item_img.indexOf(hordes_img_url);
                     hovered_item_img = hovered_item_img.slice(index).replace(hordes_img_url, '');
-                    hovered_item = items.find((item) => item.img === hovered_item_img);
+                    hovered_item = items.find((item) => item.img === hovered_item_img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3'));
                 }
             }
 
@@ -3416,7 +3476,9 @@ function displayAdvancedTooltips() {
                 let tooltip_content = tooltip_container.firstElementChild;
                 let item_deco = tooltip_content.getElementsByClassName('item-tag-deco')[0];
                 let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
+              
                 if (should_display_advanced_tooltip) {
+                  
                     if (!advanced_tooltip_container) {
                         advanced_tooltip_container = document.createElement('div');
                         advanced_tooltip_container.id = 'mho-advanced-tooltip';
@@ -4507,7 +4569,7 @@ function displayTranslateTool() {
         ]
         let mho_display_translate_input_div = createSelectWithSearch();
         mho_display_translate_input_div.id = mho_display_translate_input_id;
-        mho_display_translate_input_div.setAttribute('style', 'position: absolute; top: 45px; right: 8px; margin: 0; width: 250px;');
+        mho_display_translate_input_div.setAttribute('style', 'position: absolute; top: 45px; right: 8px; margin: 0; width: 250px; height: 25px;');
         let label = mho_display_translate_input_div.firstElementChild;
         let input = label.firstElementChild;
         input.setAttribute('style', 'width: calc(100% - 35px); display: inline-block;');
@@ -4540,6 +4602,96 @@ function displayTranslateTool() {
         display_translate_input.remove();
     }
 }
+
+/** Permet de bloquer / débloquer des utilisateurs et de masquer les posts des utilisateurs bloqués */
+function blockUsersPosts() {
+    if (mho_parameters.block_users && pageIsForum()) {
+        let posts = document.querySelectorAll('.forum-post');
+          if (posts) {
+            Array.from(posts).forEach((post) => {
+                let blacklisted_user = post.querySelector("#blacklist")
+                let user = post.querySelector('.username');
+                let user_id = user.getAttribute('x-user-id');
+                if (user_id === mh_user.id.toString()) return;
+              
+                let blacklist = GM_getValue(mho_blacklist_key);
+                if (!blacklist) {
+                    blacklist = [];
+                }
+              
+                let is_user_in_blacklist = blacklist.some((blacklist_user_id) => blacklist_user_id === user_id) ;
+                let original_post_content = post.querySelector('.forum-post-content:not(.replace-original)');
+                let new_post_content = post.querySelector('.replace-original');
+              
+                if (!blacklisted_user) {
+                    blacklisted_user = document.createElement('span');
+                    blacklisted_user.id = 'blacklist';
+                    blacklisted_user.innerHTML = '&#10003;';
+                    blacklisted_user.style.marginRight = '0.5em';
+                    blacklisted_user.style.cursor = 'pointer';
+                    blacklisted_user.addEventListener('click', () => {
+                        let temp_blacklist = [...GM_getValue(mho_blacklist_key)];
+                        if (!blacklisted_user.getAttribute('blacklisted')) {
+                            temp_blacklist.push(user_id);
+                            blacklisted_user.setAttribute('blacklisted', true);
+                            let user_posts = Array.from(document.querySelectorAll(`.username[x-user-id="${user_id}"]`)).map((user_tag) => user_tag.parentElement.parentElement.querySelector('.original'));
+                            user_posts.forEach((user_post) => user_post.classList.remove('force-display'));
+                        } else {
+                            let index = temp_blacklist.findIndex((blacklisted_user_id) => blacklisted_user_id === user_id);
+                            if (index > -1) {
+                                temp_blacklist.splice(index, 1);
+                                blacklisted_user.removeAttribute('blacklisted');
+                            }
+                        }
+                        GM_setValue(mho_blacklist_key, [...temp_blacklist]);
+                        blacklist = [...GM_getValue(mho_blacklist_key)];
+                    });
+                    
+                    user.parentNode.insertBefore(blacklisted_user, user);
+                }
+ 
+                if (is_user_in_blacklist) {
+                    blacklisted_user.innerHTML = '&#10007;';
+                    blacklisted_user.setAttribute('blacklisted', true);
+                    original_post_content.classList.add('original');
+                    if (!original_post_content.classList.contains('force-display')) {
+                        original_post_content.style.display = 'none';
+                    }
+                  
+                  
+                    if (!new_post_content) {  
+                        new_post_content = document.createElement('div');
+                        new_post_content.classList.add('forum-post-content', 'replace-original');
+                        let link = document.createElement('a');
+                        link.innerText = 'Cliquez ici pour afficher ce message.';
+                        link.style.cursor = 'pointer';
+                        link.addEventListener('click', ($event, $event2) => {
+                            new_post_content.style.display = 'none';
+                            original_post_content.style.display = 'block';
+                            original_post_content.classList.add('force-display');
+                        });
+                        new_post_content.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 30px !important; vertical-align: middle; margin-right: 0.5em;"><i>L'utilisateur a été bloqué.</i><br />`;
+                        new_post_content.appendChild(link);
+                        original_post_content.parentNode.insertBefore(new_post_content, original_post_content);
+                    } else {
+                        if (!original_post_content.classList.contains('force-display')) {
+                            new_post_content.style.display = 'block';
+                        }
+                    }
+                } else {
+                    blacklisted_user.innerHTML = '&#10003;';
+                    blacklisted_user.removeAttribute('blacklisted');
+
+                    if (new_post_content) {
+                      new_post_content.style.display = 'none';
+                    }
+                    original_post_content.style.display = 'block';
+                }
+            });
+        }
+    }
+}
+
 /////////////////////////////////////
 // BOUTONS SUR LES OUTILS EXTERNES //
 /////////////////////////////////////
@@ -5733,7 +5885,8 @@ function getItems() {
             if (response.status === 200) {
                 items = response.response
                     .map((item) => {
-                    item.category = getCategory(item.category)
+                    item.category = getCategory(item.category);
+                    item.img = item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
                     return item;
                 })
                     .sort((item_a, item_b) => {
@@ -5800,31 +5953,39 @@ async function getRuins() {
 
 /** Récupère les informations de la ville */
 function getMe() {
-    startLoading();
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url: api2_url + '/myhordesfetcher/me?userKey=' + external_app_id,
-        responseType: 'json',
-        onload: function(response){
-            if (response.status === 200) {
-                mh_user = response.response;
-                GM_setValue(mh_user_key, mh_user);
+    if (external_app_id) {
+        startLoading();
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: api2_url + '/myhordesfetcher/me?userKey=' + external_app_id,
+            responseType: 'json',
+            onload: function(response){
+                if (response.status === 200) {
+                    mh_user = response.response;
+                    if (mh_user.id === 0 && mh_user.townId === 0) {
+                        mh_user = '';
+                        GM_setValue(gm_mh_external_app_id_key, undefined);
+                        external_app_id = undefined;
+                    }
+                    GM_setValue(mh_user_key, mh_user);
+                    console.log('MHO - I am...', mh_user);
 
-                getItems();
+                    getItems();
 
-                if (mh_user.townId) {
-                    getWishlist();
+                    if (mh_user.townId) {
+                        getWishlist();
+                    }
+                } else {
+                    addError(response);
                 }
-            } else {
-                addError(response);
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
             }
-            endLoading();
-        },
-        onerror: function(error){
-            endLoading();
-            addError(error);
-        }
-    });
+        });
+    }
 }
 
 /** Récupère les informations de la ville */
@@ -5901,6 +6062,7 @@ async function getBank() {
                         bank_info.item.category = getCategory(bank_info.item.category);
                         bank_info.item.count = bank_info.count;
                         bank_info.item.wishListCount = bank_info.wishListCount;
+                        bank_info.item.img = bank_info.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3')
                         bank_info = bank_info.item;
                         return bank_info;
                     })
@@ -5942,6 +6104,7 @@ function getWishlist() {
                 wishlist.wishList = Object.keys(wishlist.wishList)
                     .map((key) => wishlist.wishList[key])
                     .sort((item_a, item_b) => item_b.priority > item_a.priority);
+                wishlist.wishList.forEach((item) => item.item.img = item.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3'));
             } else {
                 wishlist;
                 addError(response);
@@ -6288,7 +6451,6 @@ async function getOptimalPath(map, html, button) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            timeout: 3600000,
             onload: function(response){
                 if (response.status === 200) {
                     resolve(response.reponse);
@@ -6299,7 +6461,7 @@ async function getOptimalPath(map, html, button) {
                 endLoading();
             },
             onerror: function(error){
-                console.error('error', error);
+                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
                 endLoading();
                 reject(error);
             }
@@ -6405,6 +6567,7 @@ async function getOptimalPath(map, html, button) {
             displayPriorityOnItems();
             displayNbDeadZombies();
             displayTranslateTool();
+            // blockUsersPosts();
         }, 500);
 
         setInterval(() => {

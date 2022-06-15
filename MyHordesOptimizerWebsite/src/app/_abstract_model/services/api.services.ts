@@ -1,3 +1,6 @@
+import { CitizenInfo } from './../types/citizen-info.class';
+import { CitizenInfoDTO } from './../dto/citizen-info.dto';
+import { Citizen } from './../types/citizen.class';
 import { RuinDTO } from './../dto/ruin.dto';
 import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { HttpClient, HttpResponse } from '@angular/common/http';
@@ -19,6 +22,9 @@ import { Ruin } from '../types/ruin.class';
 import { HeroSkill } from '../types/hero-skill.class';
 import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { dtoToModelArray } from '../types/_common.class';
+import { CitizenDTO } from '../dto/citizen.dto';
+import { Recipe } from '../types/recipe.class';
+import { RecipeDTO } from '../dto/recipe.dto';
 
 const API_URL: string = 'https://myhordesoptimizerapi.azurewebsites.net/';
 const API_URL_2: string = 'http://144.24.192.182';
@@ -149,16 +155,15 @@ export class ApiServices extends GlobalServices {
 
 
     /**
-     * Demande l'estimation à partid des données du tableau
+     * Demande l'estimation à partir des données du tableau
      * @param {Dictionary<string>} rows Les données pour l'estimation
      */
-     public estimateAttack(rows: Dictionary<string>, today: boolean, day: number): Observable<string> {
+    public estimateAttack(rows: Dictionary<string>, today: boolean, day: number): Observable<string> {
         return new Observable((sub: Subscriber<string>) => {
             super.post<string>(API_URL_2 + `:8080/${today ? 'attack' : 'planif'}.php?day=${day}&id=${getTownId()}&type=normal&debug=false`, JSON.stringify(rows))
                 .subscribe({
                     next: (response) => {
                         sub.next(response);
-                        console.log('test', response);
                     }
                 })
         })
@@ -172,16 +177,16 @@ export class ApiServices extends GlobalServices {
     public getRuins(): Observable<Ruin[]> {
         return new Observable((sub: Subscriber<Ruin[]>) => {
             super.get<RuinDTO[]>(API_URL + 'myhordesfetcher/ruins')
-            .subscribe({
-                next: (response: HttpResponse<RuinDTO[]>) => {
-                    let ruins: Ruin[] = dtoToModelArray(Ruin, response.body).sort((a: Ruin, b: Ruin) => {
-                        if (a.label[this.locale] < b.label[this.locale]) { return -1; }
-                        if (a.label[this.locale] > b.label[this.locale]) { return 1; }
-                        return 0;
-                    });
-                    sub.next(ruins);
-                }
-            })
+                .subscribe({
+                    next: (response: HttpResponse<RuinDTO[]>) => {
+                        let ruins: Ruin[] = dtoToModelArray(Ruin, response.body).sort((a: Ruin, b: Ruin) => {
+                            if (a.label[this.locale] < b.label[this.locale]) { return -1; }
+                            if (a.label[this.locale] > b.label[this.locale]) { return 1; }
+                            return 0;
+                        });
+                        sub.next(ruins);
+                    }
+                })
         })
     }
 
@@ -193,16 +198,49 @@ export class ApiServices extends GlobalServices {
     public getHeroSkill(): Observable<HeroSkill[]> {
         return new Observable((sub: Subscriber<HeroSkill[]>) => {
             super.get<HeroSkillDTO[]>(API_URL + 'myhordesfetcher/heroSkills')
-            .subscribe({
-                next: (response: HttpResponse<HeroSkillDTO[]>) => {
-                    let skills: HeroSkill[] = dtoToModelArray(HeroSkill, response.body).sort((a: HeroSkill, b: HeroSkill) => {
-                        if (a.days_needed < b.days_needed) { return -1; }
-                        if (a.days_needed > b.days_needed) { return 1; }
-                        return 0;
-                    });
-                    sub.next(skills);
-                }
-            })
+                .subscribe({
+                    next: (response: HttpResponse<HeroSkillDTO[]>) => {
+                        let skills: HeroSkill[] = dtoToModelArray(HeroSkill, response.body).sort((a: HeroSkill, b: HeroSkill) => {
+                            if (a.days_needed < b.days_needed) { return -1; }
+                            if (a.days_needed > b.days_needed) { return 1; }
+                            return 0;
+                        });
+                        sub.next(skills);
+                    }
+                })
+        })
+    }
+
+    /**
+     * Récupère la liste des citoyens
+     *
+     * @returns {Observable<CitizenInfo>}
+     */
+    public getCitizens(): Observable<CitizenInfo> {
+        return new Observable((sub: Subscriber<CitizenInfo>) => {
+            super.get<CitizenInfoDTO>(API_URL + '/myhordesfetcher/citizens?userKey=' + getExternalAppId())
+                .subscribe({
+                    next: (response: HttpResponse<CitizenInfoDTO>) => {
+                        sub.next(new CitizenInfo(response.body));
+                    }
+                })
+        })
+    }
+
+    /**
+     * Récupère la liste des citoyens
+     *
+     * @returns {Observable<Recipe[]>}
+     */
+    public getRecipes(): Observable<Recipe[]> {
+        return new Observable((sub: Subscriber<Recipe[]>) => {
+            super.get<RecipeDTO[]>(API_URL + '/myhordesfetcher/recipes')
+                .subscribe({
+                    next: (response: HttpResponse<RecipeDTO[]>) => {
+                        console.log('recipeDTO', response.body);
+                        sub.next(dtoToModelArray(Recipe, response.body));
+                    }
+                })
         })
     }
 }

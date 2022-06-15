@@ -2,7 +2,7 @@ import { I18nLabels } from './../types/_types';
 import { RuinItemDTO } from './ruin-item.dto';
 
 export interface RuinDTO {
-    id: number;
+    id: number | string;
     camping: number;
     chance: number;
     label: I18nLabels;

@@ -1,0 +1,103 @@
+<mat-card class="mho-camping">
+    <mat-card-header>
+        <mat-card-title i18n>Camping</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <form [formGroup]="configuration_form" *ngIf="configuration_form">
+            <ng-container *ngTemplateOutlet="citizenInfo"></ng-container>
+            <ng-container *ngTemplateOutlet="townInfo"></ng-container>
+            <ng-container *ngTemplateOutlet="cellInfo"></ng-container>
+            <ng-container *ngTemplateOutlet="campingResult"></ng-container>
+
+            <ng-template #citizenInfo>
+                <h3 i18n>Le citoyen</h3>
+                <div>
+                    <mat-form-field>
+                        <mat-label i18n>Métier</mat-label>
+                        <mat-select #jobSelect [formControlName]="'job'">
+                            <mat-option *ngFor="let job of jobs" [value]="job">{{job.label}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-checkbox [formControlName]="'vest'" *ngIf="jobSelect.value.id === 'scout'">
+                        <img [src]="HORDES_IMG_REPO +  'emotes/proscout.gif'"><ng-container i18n>Tenue de camouflage</ng-container>
+                    </mat-checkbox>
+                    <mat-checkbox [formControlName]="'pro'">
+                        <img [src]="HORDES_IMG_REPO + 'status/status_camper.gif'"><ng-container i18n>Campeur professionnel</ng-container>
+                    </mat-checkbox>
+                    <mat-checkbox [formControlName]="'tomb'">
+                        <img [src]="HORDES_IMG_REPO + 'building/small_cemetery.gif'"><ng-container i18n>Tombe</ng-container>
+                    </mat-checkbox>
+                    <mat-form-field>
+                        <mat-label><img [src]="HORDES_IMG_REPO + 'emotes/sleep.gif'"><ng-container i18n>Nombre de campings déjà effectués</ng-container></mat-label>
+                        <input matInput type="number" [formControlName]="'campings'">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label><img [src]="HORDES_IMG_REPO + 'emotes/bag.gif'"><ng-container i18n>Nombre de pelures de peau et de toiles de tentes dans le sac</ng-container></mat-label>
+                        <input matInput type="number" [formControlName]="'objects'">
+                    </mat-form-field>
+                </div>
+            </ng-template>
+
+            <ng-template #cellInfo>
+                <h3 i18n>La ville</h3>
+                <div>
+                    <mat-form-field>
+                        <mat-label i18n>Type de ville</mat-label>
+                        <mat-select [formControlName]="'town'">
+                            <mat-option *ngFor="let town_type of town_types" [value]="town_type">{{town_type.label}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-checkbox [formControlName]="'night'"><img [src]="HORDES_IMG_REPO +  'pictos/r_doutsd.gif'"><ng-container i18n>Nuit</ng-container></mat-checkbox>
+                    <mat-checkbox [formControlName]="'devastated'"><img [src]="HORDES_IMG_REPO + 'item/item_out_def_broken.gif'"><ng-container i18n>Ville dévastée</ng-container></mat-checkbox>
+                    <mat-checkbox [formControlName]="'phare'"><img [src]="HORDES_IMG_REPO + 'building/small_lighthouse.gif'"><ng-container i18n>Phare</ng-container></mat-checkbox>
+                </div>
+            </ng-template>
+
+            <ng-template #townInfo>
+                <h3 i18n>Le bâtiment</h3>
+                <div>
+                    <mat-form-field>
+                        <mat-label i18n>Bâtiment</mat-label>
+                        <mat-select [formControlName]="'ruin'">
+                            <mat-option *ngFor="let ruin of ruins" [value]="ruin">{{ruin.label[locale]}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label><img [src]="HORDES_IMG_REPO + 'emotes/explo.gif'"><ng-container i18n>Distance de la ville (en km)</ng-container></mat-label>
+                        <input matInput type="number" [formControlName]="'distance'">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label><img [src]="HORDES_IMG_REPO + 'emotes/zombie.gif'"><ng-container i18n>Nombre de zombies sur la case</ng-container></mat-label>
+                        <input matInput type="number" [formControlName]="'zombies'">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label><img [src]="HORDES_IMG_REPO + 'icons/home_recycled.gif'"><ng-container i18n>Nombre d'améliorations simples faites sur la case (il faut en soustraire 3 après chaque attaque)</ng-container></mat-label>
+                        <input matInput type="number" [formControlName]="'improve'">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label><img [src]="HORDES_IMG_REPO + 'icons/home.gif'"><ng-container i18n>Nombre d'objets de défense installés sur la case</ng-container></mat-label>
+                        <input matInput type="number" [formControlName]="'object_improve'">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label><img [src]="HORDES_IMG_REPO + 'emotes/human.gif'"><ng-container i18n>Nombre de campeurs déjà cachés sur la case</ng-container></mat-label>
+                        <input matInput type="number" [formControlName]="'hidden_campers'">
+                    </mat-form-field>
+
+                </div>
+            </ng-template>
+
+            <ng-template #campingResult>
+                <ng-container *ngIf="camping_result && camping_result.label && camping_result.label !== ''">
+                    <h3 i18n>Résultat</h3>
+                    <div>{{ camping_result.label }} ({{ camping_result.probability * 100 }}%)</div>
+                </ng-container>
+            </ng-template>
+
+        </form>
+    </mat-card-content>
+</mat-card>
