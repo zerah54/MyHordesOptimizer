@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.55
+// @version      1.0.0-alpha.56
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,9 +33,9 @@
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
 + `[Nouveauté] Traduction espagnole (Merci Nekomine !)\n`;
++ `[Amélioration] Amélioration pour les traductions\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
-const temp_lang = lang;
 
 const gm_bbh_updated_key = 'bbh_updated';
 const gm_gh_updated_key = 'gh_updated';
@@ -1057,18 +1057,18 @@ let informations = [
 ];
 
 const table_hero_skills_headers = [
-    {id: 'name', label: {en: `Name`, fr: `Nom`, de: ``, es: `Nombre`}, type: 'th'},
-    {id: 'nombreJourHero', label: {en: `Hero days`, fr: `Jours héros`, de: ``, es: `Días de héroe`}, type: 'td'},
-    {id: 'lastSkill', label: {en: `Last power earned`, fr: `Dernier pouvoir gagné`, de: ``, es: `Último poder obtenido`}, type: 'td'},
-    {id: 'uppercut', label: {en: `Vicious uppercut`, fr: `Uppercut Sauvage`, de: ``, es: `Puñetazo salvaje`}, type: 'td', img: ''},
-    {id: 'rescue', label: {en: `Rescue`, fr: `Sauvetage`, de: ``, es: `Rescate`}, type: 'td', img: ''}
+    {id: 'name', label: {en: `Name`, fr: `Nom`, de: `TODO`, es: `Nombre`}, type: 'th'},
+    {id: 'nombreJourHero', label: {en: `Hero days`, fr: `Jours héros`, de: `TODO`, es: `Días de héroe`}, type: 'td'},
+    {id: 'lastSkill', label: {en: `Last power earned`, fr: `Dernier pouvoir gagné`, de: `TODO`, es: `Último poder obtenido`}, type: 'td'},
+    {id: 'uppercut', label: {en: `Vicious uppercut`, fr: `Uppercut Sauvage`, de: `TODO`, es: `Puñetazo salvaje`}, type: 'td', img: ''},
+    {id: 'rescue', label: {en: `Rescue`, fr: `Sauvetage`, de: `TODO`, es: `Rescate`}, type: 'td', img: ''}
 ];
 
 const table_skills_headers = [
     {id: 'icon', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
-    {id: 'label', label: {en: `Skill`, fr: `Capacité`, de: ``, es: `Poder`}, type: 'th'},
-    {id: 'daysNeeded', label: {en: `Hero days needed`, fr: `Jours héros nécessaires`, de: ``, es: `Días de héroe necesarios`}, type: 'td'},
-    {id: 'description', label: {en: `Description`, fr: `Description`, de: ``, es: `Descripción`}, type: 'td'}
+    {id: 'label', label: {en: `Skill`, fr: `Capacité`, de: `TODO`, es: `Poder`}, type: 'th'},
+    {id: 'daysNeeded', label: {en: `Hero days needed`, fr: `Jours héros nécessaires`, de: `TODO`, es: `Días de héroe necesarios`}, type: 'td'},
+    {id: 'description', label: {en: `Description`, fr: `Description`, de: `TODO`, es: `Descripción`}, type: 'td'}
 ];
 
 const table_ruins_headers = [
@@ -1141,6 +1141,11 @@ function pageIsForum() {
     return document.URL.indexOf('forum') > -1;
 }
 
+
+function getI18N(item) {
+    return item[lang] !== 'TODO' ? item[lang] : (item['en'] === 'TODO' ? item['fr'] : item['en'])
+}
+
 /** Affiche ou masque la page de chargement de MyHordes en fonction du nombre d'appels en cours */
 function displayLoading() {
     let loadzone = document.getElementById('loadzone');
@@ -1199,7 +1204,7 @@ function addError(error) {
     let notifications = document.getElementById('notifications');
     let notification = document.createElement('div');
     notification.classList.add('error', 'show');
-    notification.innerText = `${GM_info.script.name} : ${api_texts.error[temp_lang].replace('$error$', error.status)}`;
+    notification.innerText = `${GM_info.script.name} : ${getI18N(api_texts.error).replace('$error$', error.status)}`;
     if (error.status === 0) {
         notification.innerText += '\n' + error.error;
     }
@@ -1350,7 +1355,7 @@ function createOptimizerButtonContent() {
 
         let tools_btn = document.createElement('a');
         tools_btn.classList.add('button');
-        tools_btn.innerHTML = texts.tools_btn_label[temp_lang];
+        tools_btn.innerHTML = getI18N(texts.tools_btn_label);
         tools_btn.addEventListener('click', () => {
             displayWindow('tools');
         });
@@ -1368,7 +1373,7 @@ function createOptimizerButtonContent() {
         //////////////////////////
 
         let informations_title = document.createElement('h1');
-        informations_title.innerText = texts.informations_section_label[temp_lang];
+        informations_title.innerText = getI18N(texts.informations_section_label);
 
         let informations_list = document.createElement('ul');
 
@@ -1381,7 +1386,7 @@ function createOptimizerButtonContent() {
         informations.forEach((information) => {
             let information_link = document.createElement('a');
             information_link.id = information.id;
-            information_link.innerHTML = (information.img ? `<img src="${repo_img_url + information.img}" style="margin: 0 4px 0 3px">` : ``)+ `<span class=small>${information.label[temp_lang]}</span>`;
+            information_link.innerHTML = (information.img ? `<img src="${repo_img_url + information.img}" style="margin: 0 4px 0 3px">` : ``)+ `<span class=small>${getI18N(information.label)}</span>`;
             information_link.href = information.src;
             information_link.target = '_blank';
 
@@ -1401,7 +1406,7 @@ function createOptimizerButtonContent() {
         content.appendChild(infomations_container);
 
     } else {
-        let help_button = createHelpButton(texts.external_app_id_help[temp_lang]);
+        let help_button = createHelpButton(getI18N(texts.external_app_id_help));
         content.appendChild(help_button);
 
         let keytext = document.createElement('input');
@@ -1409,7 +1414,7 @@ function createOptimizerButtonContent() {
 
         let keysend = document.createElement('a');
         keysend.classList.add('button');
-        keysend.innerHTML = texts.save_external_app_id[temp_lang];
+        keysend.innerHTML = getI18N(texts.save_external_app_id);
         keysend.addEventListener('click', () => {
             GM_setValue(gm_mh_external_app_id_key, keytext.value);
             external_app_id = GM_getValue(gm_mh_external_app_id_key);
@@ -1426,7 +1431,7 @@ function createOptimizerButtonContent() {
 
 function createParams() {
     let params_title = document.createElement('h1');
-    params_title.innerText = texts.parameters_section_label[temp_lang];
+    params_title.innerText = getI18N(texts.parameters_section_label);
 
     let categories_list = document.createElement('ul');
 
@@ -1439,7 +1444,7 @@ function createParams() {
     params_categories.forEach((category) => {
         let category_container = document.createElement('li');
         let category_title = document.createElement('h5');
-        category_title.innerText = category.label[lang];
+        category_title.innerText = getI18N(category.label);
         categories_list.appendChild(category_container);
         let category_content = document.createElement('ul');
         category_content.classList.add('parameters');
@@ -1455,7 +1460,7 @@ function createParams() {
             let param_label = document.createElement('label');
             param_label.classList.add('small');
             param_label.htmlFor = param.id + '-input';
-            param_label.innerText = param.label[temp_lang];
+            param_label.innerText = getI18N(param.label);
 
             param_input.addEventListener('change', (event) => {
                 let new_params;
@@ -1490,7 +1495,7 @@ function createParams() {
             param_container.appendChild(param_label);
 
             if (param.help) {
-                let param_help = createHelpButton(param.help[temp_lang]);
+                let param_help = createHelpButton(getI18N(param.help));
                 param_help.setAttribute('style', 'float: right; margin-top: 4px');
                 param_container.appendChild(param_help);
             }
@@ -1575,7 +1580,7 @@ function createTabs(window_type) {
             tab_link.appendChild(tab_icon);
         }
 
-        let tab_text = document.createTextNode(tab.label[temp_lang]);
+        let tab_text = document.createTextNode(getI18N(tab.label));
         tab_link.appendChild(tab_text);
 
         let tab_li = document.createElement('li');
@@ -1790,7 +1795,7 @@ function displayWishlist() {
             let save_button = document.createElement('button');
             save_button.setAttribute('style', 'width: 250px;');
             save_button.classList.add('inline');
-            save_button.innerText = texts.save[temp_lang];
+            save_button.innerText = getI18N(texts.save);
             save_button.addEventListener('click', () => {
                 updateWishlist();
             });
@@ -1840,7 +1845,7 @@ function displayWishlist() {
                 });
                 content_div.setAttribute('style', 'text-align: left; display: flex; justify-content: space-between; padding: 6px;');
 
-                content_div.innerHTML = `<div>${img.outerHTML}${item.label[lang]}</div>`;
+                content_div.innerHTML = `<div>${img.outerHTML}${getI18N(item.label)}</div>`;
                 content_div.appendChild(button_div);
                 options.appendChild(content_div);
 
@@ -1859,7 +1864,7 @@ function displayWishlist() {
 
             wishlist_headers.forEach((header) => {
                 let header_cell = document.createElement('div');
-                header_cell.innerText = header.label[temp_lang];
+                header_cell.innerText = getI18N(header.label);
                 header_cell.classList.add(header.id);
                 list_header.appendChild(header_cell);
             });
@@ -1928,7 +1933,7 @@ function createWishlistItemElement(item) {
     item_title_container.appendChild(item_icon);
 
     let item_title = document.createElement('span');
-    item_title.innerText = item.item.label[lang];
+    item_title.innerText = getI18N(item.item.label);
     item_title_container.appendChild(item_title);
 
     let item_priority_container = document.createElement('div');
@@ -1944,7 +1949,7 @@ function createWishlistItemElement(item) {
     wishlist_priorities.forEach((priority) => {
         let item_priority_option = document.createElement('option');
         item_priority_option.value = priority.value;
-        item_priority_option.innerText = priority.label[temp_lang];
+        item_priority_option.innerText = getI18N(priority.label);
         item_priority_select.appendChild(item_priority_option);
         if (item.priority.toString().slice(0, 1) === priority.value.toString().slice(0,1)) {
             item_priority_option.selected = true;
@@ -2021,7 +2026,7 @@ function displayItems(filtered_items, tab_id) {
             category_img.src = item.category.img;
 
             let category_text = document.createElement('span');
-            category_text.innerText = item.category.label[lang];
+            category_text.innerText = getI18N(item.category.label);
 
             let category_container = document.createElement('div');
             category_container.classList.add('mho-category', 'mho-header');
@@ -2075,13 +2080,13 @@ function displayItems(filtered_items, tab_id) {
 
         let item_title = document.createElement('span');
         item_title.classList.add('label_text');
-        item_title.innerText = item.label[lang];
+        item_title.innerText = getI18N(item.label);
         item_title_container.appendChild(item_title);
 
         let item_properties_container = document.createElement('div');
         item_properties_container.classList.add('properties');
 
-        item_properties_container.innerHTML = `<span class="small">${item.description[lang]}</span>`;
+        item_properties_container.innerHTML = `<span class="small">${getI18N(item.description)}</span>`;
 
         createAdvancedProperties(item_properties_container, item, undefined);
 
@@ -2124,7 +2129,7 @@ function displayCitizens() {
                 if (cell.img) {
                     cell.innerHTML = '<img src="' + repo_img_url + header_cell.img + '.gif"></img>'
                 } else {
-                    cell.innerText = header_cell.label[temp_lang];
+                    cell.innerText = getI18N(header_cell.label);
                 }
                 header_row.appendChild(cell);
             });
@@ -2157,7 +2162,7 @@ function displayCitizens() {
                                 cell.appendChild(input);
                                 break;
                             case 'lastSkill':
-                                cell.innerText = hero_skills.find((skill) => skill.daysNeeded >= citizen.nombreJourHero).label[lang];
+                                cell.innerText = getI18N(hero_skills.find((skill) => skill.daysNeeded >= citizen.nombreJourHero).label);
                                 break;
                             default:
                                 console.log(header_cell);
@@ -2170,7 +2175,7 @@ function displayCitizens() {
                                 cell.innerText = citizen[header_cell.id];
                                 break;
                             case 'lastSkill':
-                                cell.innerText = hero_skills.find((skill) => skill.daysNeeded >= citizen.nombreJourHero).label[lang];
+                                cell.innerText = getI18N(hero_skills.find((skill) => skill.daysNeeded >= citizen.nombreJourHero).label);
                                 break;
                             default:
                                 cell.innerText = '';
@@ -2189,13 +2194,13 @@ function displayEstimations() {
     let tab_content = document.getElementById('tab-content');
     let percents = [33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100];
     let prevention = document.createElement('div');
-    prevention.innerText = texts.prevention_estimation[temp_lang];
+    prevention.innerText = getI18N(texts.prevention_estimation);
     tab_content.appendChild(prevention);
 
     let current_day_label = document.createElement('label');
     current_day_label.style.marginTop = '1em';
     current_day_label.style.marginRight = '1em';
-    current_day_label.innerText = texts.current_day[temp_lang]
+    current_day_label.innerText = getI18N(texts.current_day);
     let current_day = document.createElement('input');
     current_day.style.marginTop = '1em';
     current_day.id = 'current-day';
@@ -2220,7 +2225,7 @@ function displayEstimations() {
         let label = document.createElement('label');
         div.appendChild(label);
         label.htmlFor = day;
-        label.innerText = texts[day][temp_lang];
+        label.innerText = getI18N(texts[day]);
     })
 
 
@@ -2271,7 +2276,7 @@ function displayEstimations() {
     ul.appendChild(estimate_button);
     estimate_button.setAttribute('style', 'width: 350px; margin-left: 0.5em;');
     estimate_button.classList.add('inline');
-    estimate_button.innerText = texts.estimate[temp_lang];
+    estimate_button.innerText = getI18N(texts.estimate);
     estimate_button.addEventListener('click', () => {
         let values_nodes = Array.from(tab_content.querySelectorAll('.estimation'));
         let values = {};
@@ -2446,7 +2451,7 @@ function displayCamping() {
             let probability = Math.min(Math.max((100.0 - (Math.abs(Math.min(0, chances)) * 5)) / 100.0, .1), (conf.job === 'survivalist' ? 1.0 : 0.9));
             let camping_result_text = camping_results.find((camping_result) => camping_result.string ? probability < camping_result.probability : probability <= camping_result.probability);
             let result = document.querySelector('#camping-result');
-            result.innerText = `${camping_result_text ? camping_result_text.label[temp_lang] : ''} (${probability * 100}%)`;
+            result.innerText = `${camping_result_text ? getI18N(camping_result_text.label) : ''} (${probability * 100}%)`;
         };
 
         let conf = {
@@ -2478,7 +2483,7 @@ function displayCamping() {
         camping_tab_content.appendChild(my_info);
 
         let my_info_title = document.createElement('h3');
-        my_info_title.innerText = texts.camping_citizen[temp_lang];
+        my_info_title.innerText = getI18N(texts.camping_citizen);
         my_info.appendChild(my_info_title);
 
         let my_info_content = document.createElement('div');
@@ -2488,7 +2493,7 @@ function displayCamping() {
         camping_tab_content.appendChild(town_info);
 
         let town_info_title = document.createElement('h3');
-        town_info_title.innerText = texts.camping_town[temp_lang];
+        town_info_title.innerText = getI18N(texts.camping_town);
         town_info.appendChild(town_info_title);
 
         let town_info_content = document.createElement('div');
@@ -2498,7 +2503,7 @@ function displayCamping() {
         camping_tab_content.appendChild(cell_info);
 
         let cell_info_title = document.createElement('h3');
-        cell_info_title.innerText = texts.camping_ruin[temp_lang];
+        cell_info_title.innerText = getI18N(texts.camping_ruin);
         cell_info.appendChild(cell_info_title);
 
         let cell_info_content = document.createElement('div');
@@ -2508,7 +2513,7 @@ function displayCamping() {
         camping_tab_content.appendChild(result);
 
         let result_title = document.createElement('h3');
-        result_title.innerText = texts.result[temp_lang];
+        result_title.innerText = getI18N(texts.result);
         result.appendChild(result_title);
 
         let result_content = document.createElement('div');
@@ -2522,7 +2527,7 @@ function displayCamping() {
         let select_town_label = document.createElement('label');
         select_town_label.htmlFor = 'select-town';
         select_town_label.classList.add('spaced-label');
-        select_town_label.innerText = texts.town_type[temp_lang];
+        select_town_label.innerText = getI18N(texts.town_type);
         let select_town = document.createElement('select');
         select_town.id = 'select-town';
         select_town.value = conf.town;
@@ -2530,7 +2535,7 @@ function displayCamping() {
         town_type.forEach((town) => {
             let town_option = document.createElement('option');
             town_option.value = town.id;
-            town_option.label = town.label[temp_lang];
+            town_option.label = getI18N(town.label);
             select_town.appendChild(town_option);
         });
         select_town.addEventListener('change', ($event) => {
@@ -2547,7 +2552,7 @@ function displayCamping() {
 
         let select_job_label = document.createElement('label');
         select_job_label.htmlFor = 'select-job';
-        select_job_label.innerText = texts.job[temp_lang];
+        select_job_label.innerText = getI18N(texts.job);
         select_job_label.classList.add('spaced-label');
         let select_job = document.createElement('select');
         select_job.id = 'select-job';
@@ -2556,7 +2561,7 @@ function displayCamping() {
         jobs.forEach((job) => {
             let job_option = document.createElement('option');
             job_option.value = job.id;
-            job_option.label = job.label[temp_lang];
+            job_option.label = getI18N(job.label);
             select_job.appendChild(job_option);
         });
         select_job.addEventListener('change', ($event) => {
@@ -2582,7 +2587,7 @@ function displayCamping() {
 
         let vest_label = document.createElement('label');
         vest_label.htmlFor = 'vest';
-        vest_label.innerHTML = `<img src="${repo_img_url}emotes/proscout.gif"> ${texts.vest[temp_lang]}`;
+        vest_label.innerHTML = `<img src="${repo_img_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
         let vest = document.createElement('input');
         vest.type = 'checkbox';
         vest.id = 'vest';
@@ -2600,7 +2605,7 @@ function displayCamping() {
 
         let pro_camper_label = document.createElement('label');
         pro_camper_label.htmlFor = 'pro';
-        pro_camper_label.innerHTML = `<img src="${repo_img_url}status/status_camper.gif"> ${texts.pro_camper[temp_lang]}`;
+        pro_camper_label.innerHTML = `<img src="${repo_img_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
         let pro_camper = document.createElement('input');
         pro_camper.type = 'checkbox';
         pro_camper.id = 'pro';
@@ -2618,7 +2623,7 @@ function displayCamping() {
 
         let tomb_label = document.createElement('label');
         tomb_label.htmlFor = 'tomb';
-        tomb_label.innerHTML = `<img src="${repo_img_url}building/small_cemetery.gif"> ${texts.tomb[temp_lang]}`;
+        tomb_label.innerHTML = `<img src="${repo_img_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
         let tomb = document.createElement('input');
         tomb.type = 'checkbox';
         tomb.id = 'tomb';
@@ -2636,7 +2641,7 @@ function displayCamping() {
 
         let nb_campings_label = document.createElement('label');
         nb_campings_label.htmlFor = 'nb-campings';
-        nb_campings_label.innerHTML = `<img src="${repo_img_url}emotes/sleep.gif"> ${texts.nb_campings[temp_lang]}`;
+        nb_campings_label.innerHTML = `<img src="${repo_img_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
         nb_campings_label.classList.add('spaced-label');
         let nb_campings = document.createElement('input');
         nb_campings.type = 'number';
@@ -2656,8 +2661,8 @@ function displayCamping() {
 
         let objects_in_bag_label = document.createElement('label');
         objects_in_bag_label.htmlFor = 'nb-objects';
-        objects_in_bag_label.innerText = texts.objects_in_bag[temp_lang];
-        objects_in_bag_label.innerHTML = `<img src="${repo_img_url}emotes/bag.gif"> ${texts.objects_in_bag[temp_lang]}`;
+        objects_in_bag_label.innerText = getI18N(texts.objects_in_bag);
+        objects_in_bag_label.innerHTML = `<img src="${repo_img_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
         objects_in_bag_label.classList.add('spaced-label');
         let objects_in_bag = document.createElement('input');
         objects_in_bag.type = 'number';
@@ -2678,7 +2683,7 @@ function displayCamping() {
 
         let select_ruin_label = document.createElement('label');
         select_ruin_label.htmlFor = 'select-ruin';
-        select_ruin_label.innerText = texts.ruin[temp_lang];
+        select_ruin_label.innerText = getI18N(texts.ruin);
         select_ruin_label.classList.add('spaced-label');
         let select_ruin = document.createElement('select');
         select_ruin.id = 'select-ruin';
@@ -2687,7 +2692,7 @@ function displayCamping() {
         all_ruins.forEach((ruin) => {
             let ruin_option = document.createElement('option');
             ruin_option.value = ruin.id;
-            ruin_option.label = ruin.label[temp_lang];
+            ruin_option.label = getI18N(ruin.label);
             select_ruin.appendChild(ruin_option);
         });
         select_ruin.addEventListener('change', ($event) => {
@@ -2703,8 +2708,8 @@ function displayCamping() {
 
         let distance_label = document.createElement('label');
         distance_label.htmlFor = 'distance';
-        distance_label.innerText = texts.distance[temp_lang].replace('%VAR%', '');
-        distance_label.innerHTML = `<img src="${repo_img_url}emotes/explo.gif"> ${texts.distance[temp_lang].replace('%VAR%', '')}`;
+        distance_label.innerText = getI18N(texts.distance).replace('%VAR%', '');
+        distance_label.innerHTML = `<img src="${repo_img_url}emotes/explo.gif"> ${getI18N(texts.distance).replace('%VAR%', '')}`;
         distance_label.classList.add('spaced-label');
         let distance = document.createElement('input');
         distance.type = 'number';
@@ -2724,7 +2729,7 @@ function displayCamping() {
 
         let zombies_label = document.createElement('label');
         zombies_label.htmlFor = 'nb-zombies';
-        zombies_label.innerHTML = `<img src="${repo_img_url}emotes/zombie.gif"> ${texts.zombies_on_cell[temp_lang]}`;
+        zombies_label.innerHTML = `<img src="${repo_img_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
         zombies_label.classList.add('spaced-label');
         let zombies = document.createElement('input');
         zombies.type = 'number';
@@ -2744,7 +2749,7 @@ function displayCamping() {
 
         let improve_label = document.createElement('label');
         improve_label.htmlFor = 'nb-improve';
-        improve_label.innerHTML = `<img src="${repo_img_url}icons/home_recycled.gif"> ${texts.improve[temp_lang]}`;
+        improve_label.innerHTML = `<img src="${repo_img_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
         improve_label.classList.add('spaced-label');
         let improve = document.createElement('input');
         improve.type = 'number';
@@ -2764,7 +2769,7 @@ function displayCamping() {
 
         let object_improve_label = document.createElement('label');
         object_improve_label.htmlFor = 'nb-object-improve';
-        object_improve_label.innerHTML = `<img src="${repo_img_url}icons/home.gif"> ${texts.object_improve[temp_lang]}`;
+        object_improve_label.innerHTML = `<img src="${repo_img_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
         object_improve_label.classList.add('spaced-label');
         let object_improve = document.createElement('input');
         object_improve.type = 'number';
@@ -2784,7 +2789,7 @@ function displayCamping() {
 
         let hidden_campers_label = document.createElement('label');
         hidden_campers_label.htmlFor = 'hidden-campers';
-        hidden_campers_label.innerHTML = `<img src="${repo_img_url}emotes/human.gif"> ${texts.hidden_campers[temp_lang]}`;
+        hidden_campers_label.innerHTML = `<img src="${repo_img_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
         hidden_campers_label.classList.add('spaced-label');
         let hidden_campers = document.createElement('input');
         hidden_campers.type = 'number';
@@ -2804,7 +2809,7 @@ function displayCamping() {
 
         let night_label = document.createElement('label');
         night_label.htmlFor = 'night';
-        night_label.innerHTML = `<img src="${repo_img_url}pictos/r_doutsd.gif"> ${texts.night[temp_lang]}`;
+        night_label.innerHTML = `<img src="${repo_img_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
         let night = document.createElement('input');
         night.type = 'checkbox';
         night.id = 'night';
@@ -2822,7 +2827,7 @@ function displayCamping() {
 
         let devastated_label = document.createElement('label');
         devastated_label.htmlFor = 'devastated';
-        devastated_label.innerHTML = `<img src="${repo_img_url}item/item_out_def_broken.gif"> ${texts.devastated[temp_lang]}`;
+        devastated_label.innerHTML = `<img src="${repo_img_url}item/item_out_def_broken.gif"> ${getI18N(texts.devastated)}`;
         let devastated = document.createElement('input');
         devastated.type = 'checkbox';
         devastated.id = 'devastated';
@@ -2840,8 +2845,8 @@ function displayCamping() {
 
         let phare_label = document.createElement('label');
         phare_label.htmlFor = 'phare';
-        phare_label.innerText = texts.phare[temp_lang];
-        phare_label.innerHTML = `<img src="${repo_img_url}building/small_lighthouse.gif"> ${texts.phare[temp_lang]}`;
+        phare_label.innerText = getI18N(texts.phare);
+        phare_label.innerHTML = `<img src="${repo_img_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
         let phare = document.createElement('input');
         phare.type = 'checkbox';
         phare.id = 'phare';
@@ -2870,7 +2875,7 @@ function displaySkills() {
         header_row.classList.add('mho-header');
         header_cells.forEach((header_cell) => {
             let cell = document.createElement('th');
-            cell.innerText = header_cell.label[temp_lang];
+            cell.innerText = getI18N(header_cell.label);
             header_row.appendChild(cell);
         })
 
@@ -2894,7 +2899,7 @@ function displaySkills() {
                     case 'label':
                     case 'description':
                         cell.setAttribute('style', 'text-align: left');
-                        cell.innerText = skill[header_cell.id][lang];
+                        cell.innerText = getI18N(skill[header_cell.id]);
                         break;
                     default:
                         cell.setAttribute('style', 'text-align: center');
@@ -2919,7 +2924,7 @@ function displayRuins() {
             header_row.classList.add('mho-header');
             header_cells.forEach((header_cell) => {
                 let cell = document.createElement('th');
-                cell.innerText = header_cell.label[temp_lang];
+                cell.innerText = getI18N(header_cell.label);
                 header_row.appendChild(cell);
             })
 
@@ -2942,7 +2947,7 @@ function displayRuins() {
                         case 'label':
                         case 'description':
                             cell.setAttribute('style', 'text-align: left');
-                            cell.innerHTML = ruin[header_cell.id][lang];
+                            cell.innerHTML = getI18N(ruin[header_cell.id]);
                             break;
                         case 'drops':
                             cell.setAttribute('style', 'text-align: left');
@@ -2954,14 +2959,14 @@ function displayRuins() {
                             ruin[header_cell.id].forEach((item) => {
                                 let item_div = document.createElement('div');
                                 item_div.style.margin = '0 0.5em';
-                                item_div.title = item.item.label[temp_lang];
+                                item_div.title = getI18N(item.item.label);
 
                                 let item_img = document.createElement('img');
                                 item_img.src = hordes_img_url + item.item.img;
                                 item_img.style.display = 'block';
                                 item_img.style.margin = 'auto';
                                 // let item_label = document.createElement('span');
-                                // item_label.innerText = item.item.label[temp_lang];
+                                // item_label.innerText = getI18N(item.item.label);
                                 let item_proba = document.createElement('span');
                                 item_proba.innerText = Math.round(item.probability * 100) + '%';
                                 item_proba.style.display = 'block';
@@ -3003,7 +3008,7 @@ function displayRecipes() {
             recipes.forEach((recipe, index) => {
                 if (index === 0 || recipes[index - 1].type.id !== recipe.type.id) {
                     let category_text = document.createElement('span');
-                    category_text.innerText = recipe.type.label[lang];
+                    category_text.innerText = getI18N(recipe.type.label);
 
                     let category_container = document.createElement('div');
                     category_container.classList.add('mho-category');
@@ -3036,7 +3041,7 @@ function getRecipeElement(recipe) {
 
         let component_label = document.createElement('span');
         component_label.classList.add('label_text');
-        component_label.innerText = compo.label[lang];
+        component_label.innerText = getI18N(compo.label);
         compo_container.appendChild(component_label);
 
         compos_container.appendChild(compo_container);
@@ -3065,7 +3070,7 @@ function getRecipeElement(recipe) {
 
         let result_label = document.createElement('span');
         result_label.classList.add('label_text');
-        result_label.innerText = result.item.label[lang];
+        result_label.innerText = getI18N(result.item.label);
         result_container.appendChild(result_label);
 
         if (result.probability !== 1) {
@@ -3089,7 +3094,7 @@ function getRecipeElement(recipe) {
 function createHelpButton(text_to_display) {
 
     let help_button = document.createElement('a');
-    help_button.innerHTML = texts.external_app_id_help_label[temp_lang];
+    help_button.innerHTML = getI18N(texts.external_app_id_help_label);
     help_button.classList.add('help-button');
 
     let help_tooltip = document.createElement('div')
@@ -3141,12 +3146,12 @@ function createUpdateExternalToolsButton() {
 
         let btn = document.createElement('button');
 
-        btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/arrowright.gif">' + texts.update_external_tools_needed_btn_label[temp_lang];
+        btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/arrowright.gif">' + getI18N(texts.update_external_tools_needed_btn_label);
         btn.id = mh_update_external_tools_id;
 
         btn.addEventListener('click', () => {
             /** Au clic sur le bouton, on appelle la fonction de mise à jour */
-            btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/middot.gif">' + texts.update_external_tools_pending_btn_label[temp_lang];
+            btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/middot.gif">' + getI18N(texts.update_external_tools_pending_btn_label);
             updateExternalTools();
         })
 
@@ -3186,7 +3191,7 @@ function displaySearchFieldOnBuildings() {
             search_field = document.createElement('input');
             search_field.type = 'text';
             search_field.id = mho_search_building_field_id;
-            search_field.placeholder = texts.search_building[temp_lang];
+            search_field.placeholder = getI18N(texts.search_building);
             search_field.classList.add('inline');
             search_field.setAttribute('style', 'min-width: 250px; margin-top: 1em;');
 
@@ -3261,7 +3266,7 @@ function displayMinApOnBuildings() {
             }
             missing_ap_info.style.fontWeight = 'initial';
             missing_ap_info.style.fontSize = '0.8em';
-            missing_ap_info.innerText = texts.missing_ap_explanation[lang].replace('%VAR%', Math.ceil(missing_pts/nb_pts_per_ap));
+            missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts/nb_pts_per_ap));
             nb_ap.appendChild(missing_ap_info);
         });
     } else if (pageIsConstructions()) {
@@ -3305,7 +3310,7 @@ function displayWishlistInApp() {
 
             let update_btn = document.createElement('button');
             update_btn.classList.add('inline');
-            update_btn.innerText = texts.update[temp_lang];
+            update_btn.innerText = getI18N(texts.update);
             update_btn.addEventListener('click', () => {
                 is_refresh_wishlist = true;
                 wishlist = undefined;
@@ -3327,7 +3332,7 @@ function displayWishlistInApp() {
                 let header_cell = document.createElement('div');
                 header_cell.classList.add('padded', 'cell');
                 header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : (header_cell_item.id === 'priority' ? 'rw-3' : 'rw-2'));
-                header_cell.innerText = header_cell_item.label[temp_lang];
+                header_cell.innerText = getI18N(header_cell_item.label);
                 list_header.appendChild(header_cell);
             });
 
@@ -3339,12 +3344,12 @@ function displayWishlistInApp() {
 
                 let title = document.createElement('div');
                 title.classList.add('padded', 'cell', 'rw-5');
-                title.innerHTML = `<img src="${repo_img_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px" /><span class="small">${item.item.label[lang]}</span>`;
+                title.innerHTML = `<img src="${repo_img_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
                 list_item.appendChild(title);
 
                 let item_priority = document.createElement('span');
                 item_priority.classList.add('padded', 'cell', 'rw-3');
-                item_priority.innerHTML = `<span class="small">${wishlist_priorities.find((priority) => item.priority.toString().slice(0, 1) === priority.value.toString().slice(0, 1)).label[lang]}</span>`;
+                item_priority.innerHTML = `<span class="small">${wishlist_priorities.find((priority) => item.priority.toString().slice(0, 1) === getI18N(priority.value.toString().slice(0, 1)).label)}</span>`;
                 list_item.appendChild(item_priority);
 
                 let bank_count = document.createElement('span');
@@ -3420,7 +3425,7 @@ function displayWishlistInApp() {
         header_title.appendChild(hide_state);
 
         let header_label = document.createElement('span');
-        header_label.innerText = tabs_list.tools.find((tool) => tool.id === 'wishlist').label[temp_lang];
+        header_label.innerText = getI18N(tabs_list.tools.find((tool) => tool.id === 'wishlist').label);
         header_title.appendChild(header_label);
 
         let content = document.createElement('div');
@@ -3510,12 +3515,12 @@ function createAdvancedProperties(content, item, tooltip) {
         let bank_div = document.createElement('div');
         stock_div.appendChild(bank_div);
         stock_div.style.borderBottom = '1px solid white';
-        bank_div.innerText = wishlist_headers[2].label[temp_lang] + ' : ' + item.bankCount;
+        bank_div.innerText = getI18N(wishlist_headers[2].label) + ' : ' + item.bankCount;
 
         if (item.wishListCount && item.wishListCount > 0) {
             let wishlist_wanted_div = document.createElement('div');
             stock_div.appendChild(wishlist_wanted_div);
-            wishlist_wanted_div.innerText = wishlist_headers[3].label[temp_lang] + ' : ' + item.wishListCount;
+            wishlist_wanted_div.innerText = getI18N(wishlist_headers[3].label) + ' : ' + item.wishListCount;
         }
     }
     if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0) return;
@@ -4413,7 +4418,7 @@ function preventFromLeaving() {
                         mho_leaving_info = document.createElement('div');
                         mho_leaving_info.id = 'mho-leaving-info';
                         mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                        mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[temp_lang] + texts.prevent_not_in_ae[temp_lang];
+                        mho_leaving_info.innerHTML = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.prevent_not_in_ae);
                         button.parentNode.insertBefore(mho_leaving_info, button.nextSibling);
                     }
 
@@ -4428,7 +4433,7 @@ function preventFromLeaving() {
                     mho_leaving_info = document.createElement('div');
                     mho_leaving_info.id = 'mho-leaving-info';
                     mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                    mho_leaving_info.innerHTML = texts.prevent_from_leaving_information[temp_lang] + texts.escort_not_released[temp_lang];
+                    mho_leaving_info.innerHTML = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.escort_not_released);
                     is_escorting.parentNode.insertBefore(mho_leaving_info, is_escorting.nextSibling);
                 }
             }
@@ -4497,7 +4502,7 @@ function notifyOnSearchEnd() {
                 if (countdown < 5) {
                     if (!pageIsTown()) {
                         GM_notification({
-                            text: texts.search_ended[temp_lang],
+                            text: getI18N(texts.search_ended),
                             title: GM_info.script.name,
                             highlight: true,
                             timeout: 0
@@ -4535,7 +4540,7 @@ function displayNbDeadZombies() {
                 zone_dead_zombies = document.createElement('div');
                 zone_dead_zombies.id = zone_dead_zombies_id;
                 zone_dead_zombies.classList.add('cell', 'rw-12', 'center');
-                zone_dead_zombies.innerHTML = `${texts.nb_dead_zombies[temp_lang]} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`
+                zone_dead_zombies.innerHTML = `${getI18N(texts.nb_dead_zombies)} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`
 
                 let dist = zone_dist.firstElementChild;
                 dist.parentNode.insertBefore(zone_dead_zombies, dist);
@@ -4699,7 +4704,7 @@ function createCopyButton(source, map, map_id, button_block_id) {
     let copy_button_parent = document.getElementById(button_block_id);
     let copy_button = document.createElement('button');
     copy_button.setAttribute('style', 'max-width: initial');
-    copy_button.innerHTML = `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">${texts.copy_map[temp_lang]}</span>`;
+    copy_button.innerHTML = `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">${getI18N(texts.copy_map)}</span>`;
     copy_button.id = mho_copy_map_id;
     copy_button.addEventListener('click', () => {
         copy_button.disabled = true;
@@ -5926,8 +5931,8 @@ async function getRuins() {
                 onload: function(response){
                     if (response.status === 200) {
                         ruins = response.response.sort((a, b) => {
-                            if(a.label[temp_lang] < b.label[temp_lang]) { return -1; }
-                            if(a.label[temp_lang] > b.label[temp_lang]) { return 1; }
+                            if(getI18N(a.label) < getI18N(b.label)) { return -1; }
+                            if(getI18N(a.label) > getI18N(b.label)) { return 1; }
                             return 0;
                         });
                         resolve(ruins);
@@ -6133,7 +6138,7 @@ async function addItemToWishlist(item) {
                 if (response.status === 200) {
                     item.wishListCount = 1;
                     resolve(item);
-                    addSuccess(api_texts.add_to_wishlist_success[temp_lang]);
+                    addSuccess(getI18N(api_texts.add_to_wishlist_success));
                 } else {
                     addError(response);
                     reject(response);
@@ -6171,7 +6176,7 @@ function updateWishlist() {
                 wishlist = response.response;
                 wishlist.wishList = Object.keys(wishlist.wishList).map((key) => wishlist.wishList[key]);
 
-                addSuccess(api_texts.update_wishlist_success[temp_lang]);
+                addSuccess(getI18N(api_texts.update_wishlist_success));
             } else {
                 addError(response);
             }
@@ -6211,11 +6216,11 @@ function updateExternalTools() {
                 let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
                 let tools_success = response_items.filter((tool_response) => tool_response.value.toLowerCase() === 'ok');
                 let tools_fail = response_items.filter((tool_response) => tool_response.value.toLowerCase() !== 'ok' && tool_response.value.toLowerCase() !== 'not activated');
-                btn.innerHTML = nb_tools_to_update === tools_success.length ? '<img src ="' + repo_img_url + 'icons/done.png">' + texts.update_external_tools_success_btn_label[temp_lang]
-                : `<img src ="${repo_img_url}emotes/warning.gif">${texts.update_external_tools_errors_btn_label[temp_lang]}<br>${tools_success.map((item) => item.key.replace('Status', ' : OK')).join('<br>')}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
+                btn.innerHTML = nb_tools_to_update === tools_success.length ? `<img src="${repo_img_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
+                : `<img src ="${repo_img_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_success.map((item) => item.key.replace('Status', ' : OK')).join('<br>')}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
             } else {
                 addError(response);
-                btn.innerHTML = '<img src ="' + repo_img_url + 'professions/death.gif">' + texts.update_external_tools_fail_btn_label[temp_lang];
+                btn.innerHTML = `<img src="${repo_img_url}professions/death.gif">` + getI18N(texts.update_external_tools_fail_btn_label);
             }
             endLoading();
         },
@@ -6289,7 +6294,7 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                         display_all_img.setAttribute('style', 'margin-right: 8px');
 
                         let display_all_text = document.createElement('text');
-                        display_all_text.innerText = texts.display_all_search_result[temp_lang];
+                        display_all_text.innerText = getI18N(texts.display_all_search_result);
 
                         display_all.appendChild(display_all_img);
                         display_all.appendChild(display_all_text);
@@ -6299,10 +6304,10 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                             show_exact_match = !show_exact_match;
                             if (show_exact_match) {
                                 display_all_img.src = `${repo_img_url}/icons/small_more.gif`;
-                                display_all_text.innerHTML = texts.display_all_search_result[temp_lang];
+                                display_all_text.innerHTML = getI18N(texts.display_all_search_result);
                             } else {
                                 display_all_img.src = `${repo_img_url}/icons/small_less.gif`;
-                                display_all_text.innerHTML = texts.display_exact_search_result[temp_lang];
+                                display_all_text.innerHTML = getI18N(texts.display_exact_search_result);
                             }
                             let not_exact = Array.from(block_to_display.getElementsByClassName('not-exact'));
                             not_exact.forEach((not_exact_item) => {
@@ -6315,7 +6320,7 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                         if (response.response.translations.length > 1) {
                             let context_div = document.createElement('div');
                             context_div.setAttribute('style', 'text-align: center; padding: 4px; font-variant: small-caps; font-size: 14px;');
-                            context_div.innerHTML = texts.translation_file_context[temp_lang] + ` <img src="${repo_img_url}/emotes/arrowright.gif"> ` + translation.key.context;
+                            context_div.innerHTML = getI18N(texts.translation_file_context) + ` <img src="${repo_img_url}/emotes/arrowright.gif"> ` + translation.key.context;
                             if (!translation.key.isExactMatch && show_exact_match) {
                                 context_div.classList.add('not-exact','hidden');
                             }
