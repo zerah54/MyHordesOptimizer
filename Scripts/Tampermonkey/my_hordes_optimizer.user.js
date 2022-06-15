@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.54
+// @version      1.0.0-alpha.55
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,10 +32,10 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Fix] En cas d'absence de wishlist enregistrée, l'écran de wishlist ne fonctionnait pas\n`;
++ `[Nouveauté] Traduction espagnole (Merci Nekomine !)\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
-const temp_lang = lang === 'es' ? 'en' : lang;
+const temp_lang = lang;
 
 const gm_bbh_updated_key = 'bbh_updated';
 const gm_gh_updated_key = 'gh_updated';
