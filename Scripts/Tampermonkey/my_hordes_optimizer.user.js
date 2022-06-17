@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.56
+// @version      1.0.0-alpha.57
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,8 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Traduction espagnole (Merci Nekomine !)\n`;
-+ `[Amélioration] Amélioration pour les traductions\n`;
++ `[Correction] Affichage de la liste de courses dans la page \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -3349,7 +3348,7 @@ function displayWishlistInApp() {
 
                 let item_priority = document.createElement('span');
                 item_priority.classList.add('padded', 'cell', 'rw-3');
-                item_priority.innerHTML = `<span class="small">${wishlist_priorities.find((priority) => item.priority.toString().slice(0, 1) === getI18N(priority.value.toString().slice(0, 1)).label)}</span>`;
+                item_priority.innerHTML = `<span class="small">${getI18N(wishlist_priorities.find((priority) => item.priority.toString().slice(0, 1) === priority.value.toString().slice(0, 1)).label)}</span>`;
                 list_item.appendChild(item_priority);
 
                 let bank_count = document.createElement('span');

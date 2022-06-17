@@ -1,3 +1,4 @@
+import { SelectComponent } from './select/select.component';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -7,7 +8,7 @@ import { RouterModule } from '@angular/router';
 import { MaterialModule } from './../material-modules.module';
 import { ItemComponent } from './item/item.component';
 
-let components: any[] = [ItemComponent];
+let components: any[] = [ItemComponent, SelectComponent];
 let custom_modules: any[] = [MaterialModule]
 let angular_modules: any[] = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule]
 
