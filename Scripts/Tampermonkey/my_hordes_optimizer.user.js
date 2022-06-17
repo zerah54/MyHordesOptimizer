@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.57
+// @version      1.0.0-alpha.58
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,7 +32,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correction] Affichage de la liste de courses dans la page \n`;
++ `[Correction] Affichage de la liste de courses dans la page \n`
++ `[Correction] Affichage de certaines icônes dans les recettes \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -3035,7 +3036,7 @@ function getRecipeElement(recipe) {
 
         let component_img = document.createElement('img');
         component_img.setAttribute('style', 'margin-right: 0.5em');
-        component_img.src = hordes_img_url + compo.img;
+        component_img.src = repo_img_url + compo.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
         compo_container.appendChild(component_img);
 
         let component_label = document.createElement('span');
@@ -3064,7 +3065,7 @@ function getRecipeElement(recipe) {
 
         let result_img = document.createElement('img');
         result_img.setAttribute('style', 'margin-right: 0.5em');
-        result_img.src = hordes_img_url + result.item.img;
+        result_img.src = repo_img_url + result.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
         result_container.appendChild(result_img);
 
         let result_label = document.createElement('span');
