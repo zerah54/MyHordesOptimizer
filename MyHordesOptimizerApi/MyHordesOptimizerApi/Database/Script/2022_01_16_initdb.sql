@@ -9,8 +9,7 @@
 );
 
 CREATE TABLE Property(
-	idProperty INT PRIMARY KEY NOT NULL IDENTITY,
-	name NVARCHAR(255)
+	name NVARCHAR(255) PRIMARY KEY NOT NULL
 );
 
 CREATE TABLE HeroSkills(
@@ -60,8 +59,7 @@ CREATE TABLE Recipe(
 );
 
 CREATE TABLE Action(
-	idAction INT PRIMARY KEY NOT NULL IDENTITY,
-	name NVARCHAR(255)
+	name NVARCHAR(255) PRIMARY KEY NOT NULL
 );
 
 CREATE TABLE WishList(
@@ -159,18 +157,18 @@ CREATE TABLE WishListItem(
 
 CREATE TABLE ItemAction(
 	idItem INT,
-	idAction INT,
-	PRIMARY KEY (idItem, idAction),
+	actionName  NVARCHAR(255),
+	PRIMARY KEY (idItem, actionName),
 	FOREIGN KEY(idItem) REFERENCES Item(idItem),
-	FOREIGN KEY(idAction) REFERENCES Action(idAction)
+	FOREIGN KEY(actionName) REFERENCES Action(name)
 );
 
 CREATE TABLE ItemProperty(
 	idItem INT,
-	idProperty INT,
-	PRIMARY KEY (idItem, idProperty),
+	propertyName NVARCHAR(255),
+	PRIMARY KEY (idItem, propertyName),
 	FOREIGN KEY(idItem) REFERENCES Item(idItem),
-	FOREIGN KEY(idProperty) REFERENCES Property(idProperty)
+	FOREIGN KEY(propertyName) REFERENCES Property(name)
 );
 
 CREATE TABLE RecipeItemResult(

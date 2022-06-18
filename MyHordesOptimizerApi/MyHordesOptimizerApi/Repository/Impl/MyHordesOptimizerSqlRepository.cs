@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using DapperExtensions;
+using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
@@ -14,10 +15,13 @@ namespace MyHordesOptimizerApi.Repository.Impl
     public class MyHordesOptimizerSqlRepository : IMyHordesOptimizerRepository
     {
         protected IMyHordesOptimizerSqlConfiguration Configuration { get; private set; }
-        public MyHordesOptimizerSqlRepository(IMyHordesOptimizerSqlConfiguration configuration)
+        protected ILogger<MyHordesOptimizerSqlRepository> Logger { get; private set; }
+        public MyHordesOptimizerSqlRepository(IMyHordesOptimizerSqlConfiguration configuration, ILogger<MyHordesOptimizerSqlRepository> logger)
         {
             Configuration = configuration;
+            Logger = logger;
         }
+
 
         #region Town
 
@@ -54,8 +58,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var toInsert = new List<ItemModel>();
-            var toUpdate = new List<ItemModel>();
             var existings = connection.Query<ItemModel>("SELECT * FROM Item");
             foreach (var item in items)
             {
@@ -191,5 +193,135 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #endregion
 
+        #region Properties
+
+        public void PatchProperties(List<string> properties)
+        {
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            foreach (var propertie in properties)
+            {
+                var exist = connection.ExecuteScalar<string>("SELECT name FROM Property WHERE name = @Name", new { Name = propertie });
+                if (exist != null)
+                {
+                    var sql = $@"UPDATE Property
+                                SET name = @Name
+                                WHERE name = @Name";
+                    connection.Execute(sql, new { Name = propertie });
+                }
+                else
+                {
+                    connection.Execute($@"INSERT INTO Property
+                                           (name)
+                                     VALUES
+                                           (@Name)", new { Name = propertie });
+                }
+            }
+            connection.Close();
+        }
+
+        public void DeleteAllPropertiesItem()
+        {
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Execute("DELETE FROM ItemProperty");
+            connection.Close();
+        }
+
+        public void PatchPropertiesItem(string itemUid, List<string> properties)
+        {
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            try
+            {
+                var existingItem = connection.QuerySingle<ItemModel>($@"SELECT * FROM Item WHERE uid = @itemUid", new { itemUid });
+                foreach (var propertie in properties)
+                {
+                    var exist = connection.ExecuteScalar<int>("SELECT  count(*) FROM ItemProperty WHERE idItem = @idItem AND propertyName = @propertyName", new { idItem = existingItem.IdItem, propertyName = propertie });
+                    if (exist == 0)
+                    {
+                        connection.Execute($@"INSERT INTO ItemProperty
+                                           (idItem
+                                           ,propertyName)
+                                     VALUES
+                                           (@idItem
+                                            ,@propertyName)", new { idItem = existingItem.IdItem, propertyName = propertie });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError($@"{e}{Environment.NewLine}{itemUid}", e);
+            }
+            connection.Close();
+        }
+
+        #endregion
+
+        #region Actions
+
+
+        public void PatchActions(List<string> allActions)
+        {
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            foreach (var action in allActions)
+            {
+                var exist = connection.ExecuteScalar<string>("SELECT name FROM Action WHERE name = @Name", new { Name = action });
+                if (exist != null)
+                {
+                    var sql = $@"UPDATE Action
+                                SET name = @Name
+                                WHERE name = @Name";
+                    connection.Execute(sql, new { Name = action });
+                }
+                else
+                {
+                    connection.Execute($@"INSERT INTO Action
+                                           (name)
+                                     VALUES
+                                           (@Name)", new { Name = action });
+                }
+            }
+            connection.Close();
+        }
+
+        public void DeleteAllActionsItem()
+        {
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Execute("DELETE FROM ItemAction");
+            connection.Close();
+        }
+
+        public void PatchActionsItem(string itemUid, List<string> actions)
+        {
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            try
+            {
+                var existingItem = connection.QuerySingle<ItemModel>($@"SELECT * FROM Item WHERE uid = @itemUid", new { itemUid });
+                foreach (var action in actions)
+                {
+                    var exist = connection.ExecuteScalar<int>("SELECT  count(*) FROM ItemAction WHERE idItem = @idItem AND actionName = @actionName", new { idItem = existingItem.IdItem, actionName = action });
+                    if (exist == 0)
+                    {
+                        connection.Execute($@"INSERT INTO ItemAction
+                                           (idItem
+                                           ,actionName)
+                                     VALUES
+                                           (@idItem
+                                            ,@actionName)", new { idItem = existingItem.IdItem, actionName = action });
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError($@"{e}{Environment.NewLine}{itemUid}", e);
+            }
+            connection.Close();
+        }
+
+        #endregion
     }
 }

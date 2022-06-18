@@ -29,5 +29,11 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         Dictionary<string, MyHordesOptimizerRuin> GetRuins();
         void PatchCategories(List<CategoryModel> categories);
         IEnumerable<CategoryModel> GetCategories();
+        void PatchProperties(List<string> allProperties);
+        void DeleteAllPropertiesItem();
+        void PatchPropertiesItem(string itemUid, List<string> properties);
+        void PatchActions(List<string> allActions);
+        void DeleteAllActionsItem();
+        void PatchActionsItem(string itemUid, List<string> actions);
     }
 }

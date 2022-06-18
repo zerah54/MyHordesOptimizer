@@ -24,5 +24,21 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var list = json.FromJson<List<MyHordesCategoryCodeModel>>();
             return list;
         }
+
+        public Dictionary<string,List<string>> GetItemsProperties()
+        {
+            var path = "Data/Items/item-properties.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, List<string>>>();
+            return dico;
+        }
+
+        public Dictionary<string, List<string>> GetItemsActions()
+        {
+            var path = "Data/Items/item-actions.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, List<string>>>();
+            return dico;
+        }
     }
 }

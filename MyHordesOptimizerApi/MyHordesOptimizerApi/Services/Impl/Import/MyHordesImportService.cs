@@ -114,39 +114,37 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         public void ImportItems()
         {
+            // Récupération des items
             var myHordesItems = MyHordesApiRepository.GetItems();
             var mhoItems = Mapper.Map<List<ItemModel>>(myHordesItems);
             MyHordesOptimizerRepository.PatchItems(mhoItems);
-        }
 
-        private static void ParseItemInfo(string strToParse, List<Item> items, string propertieName)
-        {
-            strToParse = RemoveComments(strToParse);
-            var strSplit = Regex.Split(strToParse, "\\n");
-            foreach (var line in strSplit)
+            // Récupération des properties
+            var codeItemsProperty = MyHordesCodeRepository.GetItemsProperties();
+            var allProperties = codeItemsProperty.Values.ToList().SelectMany(list => list).Distinct().ToList();
+            MyHordesOptimizerRepository.PatchProperties(allProperties);
+
+            MyHordesOptimizerRepository.DeleteAllPropertiesItem();
+            foreach (var kvp in codeItemsProperty)
             {
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    var splited = Regex.Split(line, "=>");
-                    var key = splited[0].Replace("'", "").Trim(); // On récupère un truc du genre saw_tool_#00
-                    key = key.Remove(key.Length - 4); // On retire le _#00
-                    var properties = splited[1].Replace("[", "").Replace("]", "").Trim(); // On récupère un truc du genre 'impoundable', 'can_opener', 'box_opener'
-                    var list = new List<string>();
-                    foreach (var propertie in properties.Split(','))
-                    {
-                        var propertieValue = propertie.Replace("'", "").Trim();
-                        if (!string.IsNullOrWhiteSpace(propertieValue))
-                        {
-                            list.Add(propertieValue);
-                        }
-                    }
-                    Item item = items.FirstOrDefault(item => item.Uid == key);
-                    if (item != null)
-                    {
-                        typeof(Item).GetProperty(propertieName).SetValue(item, list);
-                    }
-                }
+                var itemUid = kvp.Key;
+                var properties = kvp.Value;
+                MyHordesOptimizerRepository.PatchPropertiesItem(itemUid, properties);
             }
+
+            // Récupération des actions
+            var codeItemsActions = MyHordesCodeRepository.GetItemsActions();
+            var allActions = codeItemsActions.Values.ToList().SelectMany(list => list).Distinct().ToList();
+            MyHordesOptimizerRepository.PatchActions(allActions);
+
+            MyHordesOptimizerRepository.DeleteAllActionsItem();
+            foreach (var kvp in codeItemsActions)
+            {
+                var itemUid = kvp.Key;
+                var actions = kvp.Value;
+                MyHordesOptimizerRepository.PatchActionsItem(itemUid, actions);
+            }
+
         }
 
         #endregion
@@ -223,26 +221,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         #region privatesUtils
 
-        private static string[] SplitOnStringNotInBraces(string strToParse, string searchedStr)
-        {
-            // var regex = new Regex("(?![^)(]*\\([^)(]*?\\)\\)),(?![^\\[]*\\])");
-            var regex = new PcreRegex($"(\\[(?:[^[\\]]++|(?1))*\\])(*SKIP)(*F)|{searchedStr}");
-
-            var workingAllProperties = regex.Replace(strToParse, "\n");
-            return workingAllProperties.Split("\n");
-        }
-
-        private static string[] SplitOnStringNotInBracesAndString(string strToParse, string searchedStr, string englobingStr)
-        {
-            searchedStr = GeneratePaternForSearchedStringNotInEnglobingStr(englobingStr, searchedStr);
-            var pattern = $"(\\[(?:[^[\\]]++|(?1))*\\])(*SKIP)(*F)|{searchedStr}";
-
-            var regex = new PcreRegex(pattern);
-
-            var workingAllProperties = regex.Replace(strToParse, "\n");
-            return workingAllProperties.Split("\n");
-        }
-
         private static string[] SplitOnCommaNotInString(string strToParse, string englobingStr)
         {
             var searchedStr = ",";
@@ -275,33 +253,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                                               },
                                               RegexOptions.Singleline);
             return noComments;
-        }
-
-        private static void GetTranslationFromTarget<TParam>(List<TParam> items, TranslationXmlFileDto translationFile, string targetLocale, string sourceLocale, string propertieName) where TParam : class
-        {
-            foreach (var item in items)
-            {
-                var property = typeof(TParam).GetProperty(propertieName);
-                var dictionary = property.GetValue(item) as IDictionary<string, string>;
-                var descriptionUnit = translationFile.File.Unit.First(unit => unit.Segment.Target == dictionary[targetLocale]);
-                dictionary[sourceLocale] = descriptionUnit.Segment.Source;
-                property.SetValue(item, dictionary);
-            }
-        }
-
-        private static void GetTranslationFromSource<TParam>(List<TParam> items, TranslationXmlFileDto translationFile, string targetLocale, string sourceLocale, string propertieName) where TParam : class
-        {
-            foreach (var item in items)
-            {
-                var property = typeof(TParam).GetProperty(propertieName);
-                var dictionary = property.GetValue(item) as IDictionary<string, string>;
-                if (!string.IsNullOrWhiteSpace(dictionary[sourceLocale]))
-                {
-                    var descriptionUnit = translationFile.File.Unit.First(unit => unit.Segment.Source == dictionary[sourceLocale]);
-                    dictionary[targetLocale] = descriptionUnit.Segment.Target;
-                    property.SetValue(item, dictionary);
-                }
-            }
         }
 
         /// <summary>

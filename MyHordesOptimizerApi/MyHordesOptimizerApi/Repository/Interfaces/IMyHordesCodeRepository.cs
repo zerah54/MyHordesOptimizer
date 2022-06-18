@@ -8,5 +8,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
     {
         Dictionary<string, MyHordesRuinCodeModel> GetRuins();
         List<MyHordesCategoryCodeModel> GetCategories();
+        Dictionary<string, List<string>> GetItemsProperties();
+        Dictionary<string, List<string>> GetItemsActions();
     }
 }
