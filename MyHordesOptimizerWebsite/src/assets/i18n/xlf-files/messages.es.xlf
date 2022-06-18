@@ -438,15 +438,14 @@
                     <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
                     <context context-type="linenumber">13,14</context>
                 </context-group>
-            </trans-unit>
-            <trans-unit id="8363808535317774451" datatype="html">
-                <source>Merci également aux traducteurs qui ont rendu l'internationalisation possible : Katt pour l'allemand et Shokolaw pour l'anglais.</source>
-                <target state="new">Merci également aux traducteurs qui ont rendu l'internationalisation possible : Katt pour l'allemand et Shokolaw pour l'anglais.</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-                    <context context-type="linenumber">19,21</context>
-                </context-group>
-            </trans-unit><trans-unit id="8694319651485984768" datatype="html">
+            </trans-unit><trans-unit id="775283245772645406" datatype="html">
+        <source>Merci également aux traducteurs qui ont rendu l'internationalisation possible : Katt pour l'allemand, Nekomine pour l'espagnol et Shokolaw pour l'anglais.</source><target state="new">Merci également aux traducteurs qui ont rendu l'internationalisation possible : Katt pour l'allemand, Nekomine pour l'espagnol et Shokolaw pour l'anglais.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
+          <context context-type="linenumber">19,21</context>
+        </context-group>
+      </trans-unit>
+            <trans-unit id="8694319651485984768" datatype="html">
         <source>Merci Argo qui assure à la perfection - assistée de Katt - le rôle de responsable des relations avec l'équipe de développement du jeu, et sans qui l'idée de faire du script un site ne serait pas née.</source><target state="new">Merci Argo qui assure à la perfection - assistée de Katt - le rôle de responsable des relations avec l'équipe de développement du jeu, et sans qui l'idée de faire du script un site ne serait pas née.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
@@ -465,119 +464,62 @@
         </context-group>
       </trans-unit><trans-unit id="5833055296319952035" datatype="html">
         <source>Métier</source><target state="new">Métier</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">16</context>
-        </context-group>
-      </trans-unit><trans-unit id="452066521029087062" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">16</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">22</context></context-group></trans-unit><trans-unit id="452066521029087062" datatype="html">
         <source>Tenue de camouflage</source><target state="new">Tenue de camouflage</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">22</context>
-        </context-group>
-      </trans-unit><trans-unit id="7954001980226848388" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">26</context></context-group></trans-unit><trans-unit id="7954001980226848388" datatype="html">
         <source>Campeur professionnel</source><target state="new">Campeur professionnel</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">25</context>
-        </context-group>
-      </trans-unit><trans-unit id="8079361333376398985" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">29</context></context-group></trans-unit><trans-unit id="8079361333376398985" datatype="html">
         <source>Tombe</source><target state="new">Tombe</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">28</context>
-        </context-group>
-      </trans-unit><trans-unit id="3231213779188554984" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">32</context></context-group></trans-unit><trans-unit id="3231213779188554984" datatype="html">
         <source>Nombre de campings déjà effectués</source><target state="new">Nombre de campings déjà effectués</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">31</context>
-        </context-group>
-      </trans-unit><trans-unit id="3915433859665099927" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">35</context></context-group></trans-unit><trans-unit id="3915433859665099927" datatype="html">
         <source>Nombre de pelures de peau et de toiles de tentes dans le sac</source><target state="new">Nombre de pelures de peau et de toiles de tentes dans le sac</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">35</context>
-        </context-group>
-      </trans-unit><trans-unit id="560884417072143682" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">39</context></context-group></trans-unit><trans-unit id="560884417072143682" datatype="html">
         <source>La ville</source><target state="new">La ville</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
-      </trans-unit><trans-unit id="2205198219410592279" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">46</context></context-group></trans-unit><trans-unit id="2205198219410592279" datatype="html">
         <source>Type de ville</source><target state="new">Type de ville</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">45</context>
-        </context-group>
-      </trans-unit><trans-unit id="5596519199501316309" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">49</context></context-group></trans-unit><trans-unit id="5596519199501316309" datatype="html">
         <source>Nuit</source><target state="new">Nuit</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">50</context>
-        </context-group>
-      </trans-unit><trans-unit id="5745500004130467995" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">54</context></context-group></trans-unit><trans-unit id="5745500004130467995" datatype="html">
         <source>Ville dévastée</source><target state="new">Ville dévastée</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">51</context>
-        </context-group>
-      </trans-unit><trans-unit id="3246864206079397926" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">55</context></context-group></trans-unit><trans-unit id="3246864206079397926" datatype="html">
         <source>Phare</source><target state="new">Phare</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">52</context>
-        </context-group>
-      </trans-unit><trans-unit id="4122043223946991758" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">56</context></context-group></trans-unit><trans-unit id="4122043223946991758" datatype="html">
         <source>Le bâtiment</source><target state="new">Le bâtiment</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">57</context>
-        </context-group>
-      </trans-unit><trans-unit id="4574043683605876869" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">61</context></context-group></trans-unit><trans-unit id="4574043683605876869" datatype="html">
         <source>Bâtiment</source><target state="new">Bâtiment</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">60</context>
-        </context-group>
-      </trans-unit><trans-unit id="7523060874803429510" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">64</context></context-group></trans-unit><trans-unit id="7523060874803429510" datatype="html">
         <source>Distance de la ville (en km)</source><target state="new">Distance de la ville (en km)</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">67</context>
-        </context-group>
-      </trans-unit><trans-unit id="2420553302076927639" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">71</context></context-group></trans-unit><trans-unit id="2420553302076927639" datatype="html">
         <source>Nombre de zombies sur la case</source><target state="new">Nombre de zombies sur la case</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">72</context>
-        </context-group>
-      </trans-unit><trans-unit id="4097701325926047102" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">76</context></context-group></trans-unit><trans-unit id="4097701325926047102" datatype="html">
         <source>Nombre d'améliorations simples faites sur la case (il faut en soustraire 3 après chaque attaque)</source><target state="new">Nombre d'améliorations simples faites sur la case (il faut en soustraire 3 après chaque attaque)</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">77</context>
-        </context-group>
-      </trans-unit><trans-unit id="1569331568164081073" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">81</context></context-group></trans-unit><trans-unit id="1569331568164081073" datatype="html">
         <source>Nombre d'objets de défense installés sur la case</source><target state="new">Nombre d'objets de défense installés sur la case</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">82</context>
-        </context-group>
-      </trans-unit><trans-unit id="7014743875484323339" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">86</context></context-group></trans-unit><trans-unit id="7014743875484323339" datatype="html">
         <source>Nombre de campeurs déjà cachés sur la case</source><target state="new">Nombre de campeurs déjà cachés sur la case</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">87</context>
-        </context-group>
-      </trans-unit><trans-unit id="2902261471051690112" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">91</context></context-group></trans-unit><trans-unit id="2902261471051690112" datatype="html">
         <source>Résultat</source><target state="new">Résultat</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">96</context>
-        </context-group>
-      </trans-unit><trans-unit id="6003110979058162782" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">100</context></context-group></trans-unit><trans-unit id="6003110979058162782" datatype="html">
         <source>Petite carte</source><target state="new">Petite carte</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>

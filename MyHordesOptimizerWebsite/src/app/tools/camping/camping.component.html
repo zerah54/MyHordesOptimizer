@@ -18,6 +18,10 @@
                             <mat-option *ngFor="let job of jobs" [value]="job">{{job.label}}</mat-option>
                         </mat-select>
                     </mat-form-field>
+                    <mat-form-field>
+                        <mat-label i18n>Métier</mat-label>
+                        <mho-select #jobSelect [formControlName]="'job'" [form_control]="configuration_form.controls['job']" [options]="jobs" [bindLabel]="'label'"></mho-select>
+                    </mat-form-field>
                     <mat-checkbox [formControlName]="'vest'" *ngIf="jobSelect.value.id === 'scout'">
                         <img [src]="HORDES_IMG_REPO +  'emotes/proscout.gif'"><ng-container i18n>Tenue de camouflage</ng-container>
                     </mat-checkbox>
