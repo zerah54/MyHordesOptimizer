@@ -16,14 +16,14 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         protected IUserInfoProvider UserInfoProvider { get; set; }
         protected IMyHordesJsonApiRepository MyHordesJsonApiRepository { get; set; }
-        protected IMyHordesOptimizerFirebaseRepository FirebaseRepository { get; set; }
+        protected IMyHordesOptimizerRepository FirebaseRepository { get; set; }
 
         private int _townId; // On est dans de l'injection de dépendance Scoped, on peut se permettre de stocker des infos
 
         public WishListService(ILogger<MyHordesFetcherService> logger,
             IUserInfoProvider userInfoProvider,
             IMyHordesJsonApiRepository myHordesJsonApiRepository,
-            IMyHordesOptimizerFirebaseRepository firebaseRepository)
+            IMyHordesOptimizerRepository firebaseRepository)
         {
             Logger = logger;
             UserInfoProvider = userInfoProvider;

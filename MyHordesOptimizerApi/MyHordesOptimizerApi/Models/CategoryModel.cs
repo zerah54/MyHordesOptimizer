@@ -1,8 +1,9 @@
 ﻿namespace MyHordesOptimizerApi.Models
 {
-    public class Category
+    public class CategoryModel
     {
         public int IdCategory { get; set; }
+        public string Name { get; set; }
         public string LabelFr { get; set; }
         public string LabelEn { get; set; }
         public string LabelEs { get; set; }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
@@ -215,7 +216,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
 
         protected virtual void CustomizeHttpClient(HttpClient client)
         {
-           // Do nothing here
+            // Do nothing here
         }
 
         protected string AddParameterToQuery(string url, string parameterKey, object parameterValue)

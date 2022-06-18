@@ -15,7 +15,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected ILogger<MyHordesFetcherService> Logger { get; set; }
         protected IMyHordesJsonApiRepository MyHordesJsonApiRepository { get; set; }
         protected IMyHordesXmlApiRepository MyHordesXmlApiRepository { get; set; }
-        protected IMyHordesOptimizerFirebaseRepository FirebaseRepository { get; set; }
+        protected IMyHordesOptimizerRepository FirebaseRepository { get; set; }
         protected IMyHordesCodeRepository MyHordesCodeRepository { get; set; }
         protected readonly IMapper Mapper;
         protected IUserInfoProvider UserInfoProvider { get; set; }
@@ -24,7 +24,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         public MyHordesFetcherService(ILogger<MyHordesFetcherService> logger,
             IMyHordesJsonApiRepository myHordesJsonApiRepository,
             IMyHordesXmlApiRepository myHordesXmlApiRepository,
-            IMyHordesOptimizerFirebaseRepository firebaseRepository,
+            IMyHordesOptimizerRepository firebaseRepository,
             IMyHordesCodeRepository myHordesCodeRepository,
             IMapper mapper,
             IUserInfoProvider userInfoProvider)

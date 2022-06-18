@@ -68,7 +68,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Import.i18n
 	}
 
 	[XmlRoot(ElementName = "xliff", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]
-	public class TranslationFileDto
+	public class TranslationXmlFileDto
 	{
 
 		[XmlElement(ElementName = "file", Namespace = "urn:oasis:names:tc:xliff:document:2.0")]

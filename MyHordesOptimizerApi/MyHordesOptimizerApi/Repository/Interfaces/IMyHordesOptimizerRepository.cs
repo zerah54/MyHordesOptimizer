@@ -1,10 +1,11 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Models;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
 {
-    public interface IMyHordesOptimizerFirebaseRepository
+    public interface IMyHordesOptimizerRepository
     {
         void PatchTown(Town town);
         Town GetTown(int townId);
@@ -26,5 +27,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PutWishList(int townId, WishListWrapper wishList);
         void PatchRuins(List<MyHordesOptimizerRuin> jsonRuins);
         Dictionary<string, MyHordesOptimizerRuin> GetRuins();
+        void PatchCategories(List<CategoryModel> categories);
     }
 }

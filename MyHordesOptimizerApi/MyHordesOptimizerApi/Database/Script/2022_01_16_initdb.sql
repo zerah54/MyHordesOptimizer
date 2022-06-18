@@ -1,5 +1,6 @@
 ﻿CREATE TABLE Category(
 	idCategory INT PRIMARY KEY NOT NULL IDENTITY,
+	name NVARCHAR(255) NOT NULL,
 	label_fr NVARCHAR(255),
 	label_en NVARCHAR(255),
 	label_es NVARCHAR(255),

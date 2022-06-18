@@ -1,6 +1,6 @@
 ﻿namespace MyHordesOptimizerApi.Models
 {
-    public class Item
+    public class ItemModel
     {
         public int IdItem { get; set; }
         public int IdCategory { get; set; }

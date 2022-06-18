@@ -13,18 +13,18 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
     public class TranslationService : ITranslationService
     {
         protected readonly IWebApiRepository WebApiRepository;
-        protected Dictionary<string, List<TranslationFileDto>> XlfFilesByLocale { get; private set; }
+        protected Dictionary<string, List<TranslationXmlFileDto>> XlfFilesByLocale { get; private set; }
 
         public TranslationService(IWebApiRepository webApiRepository)
         {
             WebApiRepository = webApiRepository;
-            XlfFilesByLocale = new Dictionary<string, List<TranslationFileDto>>();
+            XlfFilesByLocale = new Dictionary<string, List<TranslationXmlFileDto>>();
             var gitlabFiles = WebApiRepository.Get<List<GitlabTreeResult>>("https://gitlab.com/api/v4/projects/17840758/repository/tree?path=translations&per_page=100");
             foreach (var file in gitlabFiles)
             {
                 if (file.Name.EndsWith(".xlf"))
                 {
-                    var translationFile = WebApiRepository.Get<TranslationFileDto>(url: $"https://gitlab.com/api/v4/projects/17840758/repository/files/{HttpUtility.UrlEncode(file.Path)}/raw", mediaTypeOut: MediaTypeNames.Application.Xml);
+                    var translationFile = WebApiRepository.Get<TranslationXmlFileDto>(url: $"https://gitlab.com/api/v4/projects/17840758/repository/files/{HttpUtility.UrlEncode(file.Path)}/raw", mediaTypeOut: MediaTypeNames.Application.Xml);
                     var fileNameWithoutXlf = file.Name.Substring(0, file.Name.Length - 4); // Remove .xlf
                     var fileLocale = fileNameWithoutXlf.Substring(fileNameWithoutXlf.LastIndexOf(".") + 1, 2);
                     if (XlfFilesByLocale.TryGetValue(fileLocale, out var files))
@@ -33,7 +33,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
                     }
                     else
                     {
-                        XlfFilesByLocale.Add(fileLocale, new List<TranslationFileDto>() { translationFile });
+                        XlfFilesByLocale.Add(fileLocale, new List<TranslationXmlFileDto>() { translationFile });
                     }
                 }
             }

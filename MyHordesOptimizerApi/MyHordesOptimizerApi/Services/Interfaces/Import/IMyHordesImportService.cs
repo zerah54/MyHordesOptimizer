@@ -1,4 +1,5 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordes.Import;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Services.Interfaces.Import
 {
@@ -7,5 +8,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
         void ImportHeroSkill(ImportHeroSkillRequestDto request);
         void ImportItems(ImportItemsRequestDto request);
         void ImportRuins();
+        Task ImportCategoriesAsync();
     }
 }

@@ -23,7 +23,7 @@ using System.Text;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
-    public class MyHordesOptimizerFirebaseRepository : AbstractWebApiRepositoryBase, IMyHordesOptimizerFirebaseRepository
+ /*   public class MyHordesOptimizerFirebaseRepository : AbstractWebApiRepositoryBase, IMyHordesOptimizerFirebaseRepository
     {
         protected IMyHordesOptimizerFirebaseConfiguration Configuration { get; set; }
 
@@ -280,5 +280,5 @@ namespace MyHordesOptimizerApi.Repository.Impl
         }
 
         #endregion
-    }
+    }*/
 }

@@ -9,11 +9,11 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
 {
     public class TownBankResolver : IValueResolver<MyHordesMap, Town, BankWrapper>
     {
-        protected IMyHordesOptimizerFirebaseRepository FirebaseRepository { get; set; }
+        protected IMyHordesOptimizerRepository FirebaseRepository { get; set; }
         protected IUserInfoProvider UserInfoProvider { get; set; }
 
 
-        public TownBankResolver(IMyHordesOptimizerFirebaseRepository firebaseRepository,
+        public TownBankResolver(IMyHordesOptimizerRepository firebaseRepository,
             IUserInfoProvider userInfoProvider)
         {
             FirebaseRepository = firebaseRepository;

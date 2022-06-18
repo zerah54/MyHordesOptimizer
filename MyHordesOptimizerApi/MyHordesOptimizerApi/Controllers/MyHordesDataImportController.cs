@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordes.Import;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Controllers
 {
@@ -88,6 +89,14 @@ namespace MyHordesOptimizerApi.Controllers
             }
             UserKeyProvider.UserKey = userKey;
             MyHordesImportService.ImportRuins();
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("Categories")]
+        public async Task<ActionResult> ImportCategories()
+        {
+            await MyHordesImportService.ImportCategoriesAsync();
             return Ok();
         }
     }
