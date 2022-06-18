@@ -1,6 +1,6 @@
 ﻿namespace MyHordesOptimizerApi.Models
 {
-    public class Action
+    public class ActionModel
     {
         public int IdAction { get; set; }
         public string Name { get; set; }

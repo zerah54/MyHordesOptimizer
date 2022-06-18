@@ -15,14 +15,14 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected ILogger<MyHordesFetcherService> Logger { get; set; }
 
         protected IUserInfoProvider UserInfoProvider { get; set; }
-        protected IMyHordesJsonApiRepository MyHordesJsonApiRepository { get; set; }
+        protected IMyHordesApiRepository MyHordesJsonApiRepository { get; set; }
         protected IMyHordesOptimizerRepository FirebaseRepository { get; set; }
 
         private int _townId; // On est dans de l'injection de dépendance Scoped, on peut se permettre de stocker des infos
 
         public WishListService(ILogger<MyHordesFetcherService> logger,
             IUserInfoProvider userInfoProvider,
-            IMyHordesJsonApiRepository myHordesJsonApiRepository,
+            IMyHordesApiRepository myHordesJsonApiRepository,
             IMyHordesOptimizerRepository firebaseRepository)
         {
             Logger = logger;
@@ -47,7 +47,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             foreach (var kvp in wishList.WishList)
             {
                 var wishlistItem = kvp.Value;
-                if (town.Bank.Bank.TryGetValue(wishlistItem.Item.XmlId.ToString(), out var bankItem))
+                if (town.Bank.Bank.TryGetValue(wishlistItem.Item.Id.ToString(), out var bankItem))
                 {
                     wishlistItem.BankCount = bankItem.Count;
                 }
@@ -56,7 +56,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     wishlistItem.BankCount = 0;
                 }
                 wishlistItem.IsWorkshop = recipes.Values.Any(x => x.Type == ItemRecipeType.Workshop.GetDescription()
-                                                             && (x.Components.Any(component => component.XmlId == wishlistItem.Item.XmlId) || x.Result.Any(result => result.Item.XmlId == wishlistItem.Item.XmlId)));
+                                                             && (x.Components.Any(component => component.Id == wishlistItem.Item.Id) || x.Result.Any(result => result.Item.Id == wishlistItem.Item.Id)));
             }
             return wishList;
         }
@@ -74,7 +74,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var itemId = request.Id;
                 var wishLiteItem = new WishListItem()
                 {
-                    Item = items.First(x => x.XmlId == itemId),
+                    Item = items.First(x => x.Id == itemId),
                     Count = request.Count,
                     Priority = request.Priority
                 };
@@ -89,11 +89,11 @@ namespace MyHordesOptimizerApi.Services.Impl
             var item = FirebaseRepository.GetItemsById(itemId);
             var wishList = GetWishList();
             wishList.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            if (wishList.WishList.TryGetValue(item.XmlId.ToString(), out var @out)) // Si l'item est déjà dans la wishlist, on ne fait rien
+            if (wishList.WishList.TryGetValue(item.Id.ToString(), out var @out)) // Si l'item est déjà dans la wishlist, on ne fait rien
             {
                 return;
             }
-            wishList.WishList[item.XmlId.ToString()] = new WishListItem()
+            wishList.WishList[item.Id.ToString()] = new WishListItem()
             {
                 Item = item,
                 Priority = 0,

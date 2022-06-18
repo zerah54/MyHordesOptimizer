@@ -1,6 +1,6 @@
 ﻿namespace MyHordesOptimizerApi.Models
 {
-    public class Town
+    public class TownModel
     {
         public int IdTown { get; set; }
     }

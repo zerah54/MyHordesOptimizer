@@ -1,6 +1,6 @@
 ﻿namespace MyHordesOptimizerApi.Models
 {
-    public class WishList
+    public class WishListModel
     {
         public int IdWishList { get; set; }
     }

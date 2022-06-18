@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
 {
-    public interface IMyHordesJsonApiRepository
+    public interface IMyHordesApiRepository
     {
-        Dictionary<string, MyHordesJsonItem> GetItems();
+        Dictionary<string, MyHordesItem> GetItems();
         MyHordesMeResponseDto GetMe();
         Dictionary<string, MyHordesApiRuinDto> GetRuins();
     }

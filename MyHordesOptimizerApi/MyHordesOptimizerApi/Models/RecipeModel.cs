@@ -2,11 +2,11 @@
 
 namespace MyHordesOptimizerApi.Models
 {
-    public class Recipe
+    public class RecipeModel
     {
         public int IdRecipe { get; set; }
-        public List<Item> Results { get; set; }
-        public List<Item> Components { get; set; }
+        public List<ItemModel> Results { get; set; }
+        public List<ItemModel> Components { get; set; }
         public bool IsShamanOnly { get; set; }
         public string ActionFr { get; set; }
         public string ActionEn { get; set; }

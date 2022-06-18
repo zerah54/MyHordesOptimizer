@@ -2,7 +2,7 @@
 
 namespace MyHordesOptimizerApi.Models
 {
-    public class LastUpdateInfo
+    public class LastUpdateInfoModel
     {
         public int IdLastUpdateInfo { get; set; }
         public DateTime DateUpdate { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace MyHordesOptimizerApi.Models
 {
-    public class HeroSkills
+    public class HeroSkillsModel
     {
         public int IdHeroSkill { get; set; }
         public string Name { get; set; }

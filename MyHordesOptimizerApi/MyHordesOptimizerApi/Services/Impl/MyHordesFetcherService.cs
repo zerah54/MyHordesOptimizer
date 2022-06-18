@@ -13,8 +13,7 @@ namespace MyHordesOptimizerApi.Services.Impl
     public class MyHordesFetcherService : IMyHordesFetcherService
     {
         protected ILogger<MyHordesFetcherService> Logger { get; set; }
-        protected IMyHordesJsonApiRepository MyHordesJsonApiRepository { get; set; }
-        protected IMyHordesXmlApiRepository MyHordesXmlApiRepository { get; set; }
+        protected IMyHordesApiRepository MyHordesJsonApiRepository { get; set; }
         protected IMyHordesOptimizerRepository FirebaseRepository { get; set; }
         protected IMyHordesCodeRepository MyHordesCodeRepository { get; set; }
         protected readonly IMapper Mapper;
@@ -22,8 +21,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
 
         public MyHordesFetcherService(ILogger<MyHordesFetcherService> logger,
-            IMyHordesJsonApiRepository myHordesJsonApiRepository,
-            IMyHordesXmlApiRepository myHordesXmlApiRepository,
+            IMyHordesApiRepository myHordesJsonApiRepository,
             IMyHordesOptimizerRepository firebaseRepository,
             IMyHordesCodeRepository myHordesCodeRepository,
             IMapper mapper,
@@ -31,7 +29,6 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             Logger = logger;
             MyHordesJsonApiRepository = myHordesJsonApiRepository;
-            MyHordesXmlApiRepository = myHordesXmlApiRepository;
             FirebaseRepository = firebaseRepository;
             MyHordesCodeRepository = myHordesCodeRepository;
             Mapper = mapper;
@@ -44,8 +41,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             var recipes = FirebaseRepository.GetRecipes();
             foreach (var item in items)
             {
-                var recipesToAdd = recipes.Values.Where(recipe => recipe.Components.Any(component => component.XmlId == item.XmlId)).ToList();
-                recipesToAdd.AddRange(recipes.Values.Where(recipes => recipes.Result.Any(result => result.Item.XmlId == item.XmlId)));
+                var recipesToAdd = recipes.Values.Where(recipe => recipe.Components.Any(component => component.Id == item.Id)).ToList();
+                recipesToAdd.AddRange(recipes.Values.Where(recipes => recipes.Result.Any(result => result.Item.Id == item.Id)));
                 item.Recipes = recipesToAdd;
             }
 
@@ -61,7 +58,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     if (town.WishList != null && town.WishList.WishList != null)
                     {
-                        if (town.WishList.WishList.TryGetValue(item.XmlId.ToString(), out var wishListItem))
+                        if (town.WishList.WishList.TryGetValue(item.Id.ToString(), out var wishListItem))
                         {
                             item.WishListCount = wishListItem.Count;
                         }
@@ -71,7 +68,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                         }
                     }
 
-                    if (town.Bank.Bank.TryGetValue(item.XmlId.ToString(), out var bankItem))
+                    if (town.Bank.Bank.TryGetValue(item.Id.ToString(), out var bankItem))
                     {
                         item.BankCount = bankItem.Count;
                     }
@@ -132,7 +129,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 foreach (var kvp in bankWrapper.Bank)
                 {
                     var bankItem = kvp.Value;
-                    if (town.WishList.WishList.TryGetValue(bankItem.Item.XmlId.ToString(), out var wishListItem))
+                    if (town.WishList.WishList.TryGetValue(bankItem.Item.Id.ToString(), out var wishListItem))
                     {
                         bankItem.WishListCount = wishListItem.Count;
                     }

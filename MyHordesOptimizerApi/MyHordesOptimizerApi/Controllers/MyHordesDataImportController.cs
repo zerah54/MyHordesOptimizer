@@ -48,34 +48,15 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Items")]
-        public ActionResult ImportItems(string userKey, ImportItemsRequestDto request)
+        public async Task<ActionResult> ImportItems(string userKey)
         {
-            if (string.IsNullOrEmpty(request.ItemsProperties))
+            if (string.IsNullOrEmpty(userKey))
             {
-                return BadRequest($"{nameof(request.ItemsProperties)} is required");
+                return BadRequest($"{nameof(userKey)} is required");
             }
-            if (string.IsNullOrEmpty(request.ItemActions))
-            {
-                return BadRequest($"{nameof(request.ItemActions)} is required");
-            }
-            if (string.IsNullOrEmpty(request.Recipes))
-            {
-                return BadRequest($"{nameof(request.Recipes)} is required");
-            }
-            if (string.IsNullOrEmpty(request.Fr))
-            {
-                return BadRequest($"{nameof(request.Fr)} is required");
-            }
-            if (string.IsNullOrEmpty(request.En))
-            {
-                return BadRequest($"{nameof(request.En)} is required");
-            }
-            if (string.IsNullOrEmpty(request.Es))
-            {
-                return BadRequest($"{nameof(request.Es)} is required");
-            }
+
             UserKeyProvider.UserKey = userKey;
-            MyHordesImportService.ImportItems(request);
+            MyHordesImportService.ImportItems();
             return Ok();
         }
 

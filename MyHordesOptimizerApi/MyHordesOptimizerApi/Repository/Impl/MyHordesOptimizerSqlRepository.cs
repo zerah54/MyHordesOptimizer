@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using DapperExtensions;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
@@ -6,6 +7,7 @@ using MyHordesOptimizerApi.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
@@ -48,77 +50,24 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #region Items
 
-        public void PatchItems(List<Item> items)
+        public void PatchItems(List<ItemModel> items)
         {
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
+            var toInsert = new List<ItemModel>();
+            var toUpdate = new List<ItemModel>();
+            var existings = connection.Query<ItemModel>("SELECT * FROM Item");
             foreach (var item in items)
             {
-                var category = connection.QueryFirst<CategoryModel>(@$"SELECT idCategory AS IdCategory
-                                                                    ,name AS Name
-                                                                    ,label_fr AS LabelFr
-                                                                    ,label_en AS LabelEn
-                                                                    ,label_es AS LabelEs
-                                                                    ,label_de AS LabelDe
-                                                                    ,ordering AS Ordering
-                                                                    WHERE name = {item.Category}");
-                var hehe = connection.ExecuteScalar<int?>($"SELECT idItem FROM Item where idItem = {item.XmlId}");
-                if (hehe.HasValue)
+                if (existings.Any(i => i.IdItem == item.IdItem))
                 {
-                    connection.Execute($@"UPDATE Item
-                                           SET idCategory = {category.IdCategory}
-                                              ,uid = {item.JsonIdName}
-                                              ,deco = {item.Deco}
-                                              ,label_fr = {item.Label["fr"]}
-                                              ,label_en = {item.Label["en"]}
-                                              ,label_es = {item.Label["es"]}
-                                              ,label_de = {item.Label["de"]}
-                                              ,description_fr = {item.Description["fr"]}
-                                              ,description_en = {item.Description["en"]}
-                                              ,description_es = {item.Description["es"]}
-                                              ,description_de = {item.Description["de"]}
-                                              ,guard = {item.Guard}
-                                              ,img = {item.Img}
-                                              ,isHeaver = {item.IsHeaver}
-                                         WHERE idItem = {item.XmlId}");
+                    connection.Update(item);
                 }
                 else
                 {
-                    connection.Execute($@"INSERT INTO Item
-                                           (idItem
-                                           ,idCategory
-                                           ,uid
-                                           ,deco
-                                           ,label_fr
-                                           ,label_en
-                                           ,label_es
-                                           ,label_de
-                                           ,description_fr
-                                           ,description_en
-                                           ,description_es
-                                           ,description_de
-                                           ,guard
-                                           ,img
-                                           ,isHeaver)
-                                     VALUES
-                                           ({item.XmlId}
-                                           ,{category.IdCategory}
-                                           ,{item.JsonIdName}
-                                           ,{item.Deco}
-                                           ,{item.Label["fr"]}
-                                           ,{item.Label["en"]}
-                                           ,{item.Label["es"]}
-                                           ,{item.Label["de"]}
-                                           ,{item.Description["fr"]}
-                                           ,{item.Description["en"]}
-                                           ,{item.Description["es"]}
-                                           ,{item.Description["de"]}
-                                           ,{item.Guard}
-                                           ,{item.Img}
-                                           ,{item.IsHeaver}");
+                    connection.Insert(item);
                 }
             }
-
             connection.Close();
         }
 
@@ -195,9 +144,9 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
-            foreach(var category in categories)
+            foreach (var category in categories)
             {
-                var exist = connection.ExecuteScalar<int?>($"SELECT idCategory FROM Category where name = @name", new { category.Name});
+                var exist = connection.ExecuteScalar<int?>($"SELECT idCategory FROM Category where name = @name", new { category.Name });
                 if (exist.HasValue)
                 {
                     var sql = $@"UPDATE Category
@@ -208,7 +157,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                     ,label_de = @LabelDe
                                     ,ordering = @Ordering
                                 WHERE idCategory = @IdCategory";
-                    connection.Execute(sql, new { category.Name, category.LabelFr, category.LabelEn, category.LabelEs, category.LabelDe, category.Ordering, category.IdCategory});
+                    connection.Execute(sql, new { category.Name, category.LabelFr, category.LabelEn, category.LabelEs, category.LabelDe, category.Ordering, category.IdCategory });
                 }
                 else
                 {
@@ -229,6 +178,15 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 }
             }
             connection.Close();
+        }
+
+        public IEnumerable<CategoryModel> GetCategories()
+        {
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var categories = connection.GetList<CategoryModel>();
+            connection.Close();
+            return categories;
         }
 
         #endregion

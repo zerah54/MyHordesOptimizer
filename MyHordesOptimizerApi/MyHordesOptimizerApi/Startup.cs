@@ -1,6 +1,7 @@
 using AutoMapper;
 using Common.Core.Repository.Impl;
 using Common.Core.Repository.Interfaces;
+using Dapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +11,9 @@ using MyHordesOptimizerApi.Configuration.Impl;
 using MyHordesOptimizerApi.Configuration.Impl.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
+using MyHordesOptimizerApi.DapperMapping;
 using MyHordesOptimizerApi.MappingProfiles;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Impl;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Impl;
@@ -25,6 +28,9 @@ using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
+using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 
@@ -76,8 +82,7 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<IWebApiRepository, SimpleWebApiRepository>();
             services.AddSingleton<IMyHordesCodeRepository, MyHordesCodeRepository>();
 
-            services.AddScoped<IMyHordesJsonApiRepository, MyHordesJsonApiRepository>();
-            services.AddScoped<IMyHordesXmlApiRepository, MyHordesXmlApiRepository>();
+            services.AddScoped<IMyHordesApiRepository, MyHordesApiRepository>();
 
             services.AddScoped<IBigBrothHordesRepository, BigBrothHordesRepository>();
             services.AddScoped<IFataMorganaRepository, FataMorganaRepository>();
@@ -93,6 +98,7 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<ITranslationService, TranslationService>();
             services.AddSingleton<IMyHordesRuineService, MyHordesRuineService>();
 
+            DapperExtensions.DapperExtensions.DefaultMapper = typeof(MyClassMapper<>);
 
             services.AddApplicationInsightsTelemetry();
         }

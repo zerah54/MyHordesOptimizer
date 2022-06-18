@@ -26,13 +26,13 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
             var items = FirebaseRepository.GetItems();
             foreach (var bankItem in source.City.Bank)
             {
-                var item = items.First(x => x.XmlId == bankItem.Id);
+                var item = items.First(x => x.Id == bankItem.Id);
                 var destinationBankItem = new BankItem()
                 {
                     Item = item,
                     Count = bankItem.Count
                 };
-                wrapper.Bank[item.XmlId.ToString()] = destinationBankItem;
+                wrapper.Bank[item.Id.ToString()] = destinationBankItem;
             }
             wrapper.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             return wrapper;

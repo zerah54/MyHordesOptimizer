@@ -1,7 +1,7 @@
 ﻿namespace MyHordesOptimizerApi.Models
 {
-    public class Citizen
-    {
+    public class CitizenModel
+	{
 		public int IdCitizen { get; set; }
 		public string CitizenName { get; set; }
 		public string HomeMessage { get; set; }

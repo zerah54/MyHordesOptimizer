@@ -13,7 +13,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PatchHeroSkill(IEnumerable<HeroSkill> heroSkills);
         Dictionary<string, HeroSkill> GetHeroSkills();
 
-        void PatchItems(List<Item> items);
+        void PatchItems(List<ItemModel> items);
         List<Item> GetItems();
         Item GetItemsById(int itemId);
 
@@ -28,5 +28,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PatchRuins(List<MyHordesOptimizerRuin> jsonRuins);
         Dictionary<string, MyHordesOptimizerRuin> GetRuins();
         void PatchCategories(List<CategoryModel> categories);
+        IEnumerable<CategoryModel> GetCategories();
     }
 }

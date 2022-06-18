@@ -1,6 +1,6 @@
 ﻿namespace MyHordesOptimizerApi.Models
 {
-    public class Bank
+    public class BankModel
     {
         public int IdBank { get; set; }
     }

@@ -24,13 +24,5 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var list = json.FromJson<List<MyHordesCategoryCodeModel>>();
             return list;
         }
-
-        public List<MyHordesItemCodeModel> GetItems()
-        {
-            var path = "Data/Items/items.json";
-            var json = File.ReadAllText(path);
-            var list = json.FromJson<List<MyHordesItemCodeModel>>();
-            return list;
-        }
     }
 }

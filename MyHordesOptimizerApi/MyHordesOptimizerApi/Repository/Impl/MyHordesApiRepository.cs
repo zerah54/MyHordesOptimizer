@@ -12,23 +12,24 @@ using System.Net.Http;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
-    public class MyHordesJsonApiRepository : AbstractMyHordeRepositoryBase, IMyHordesJsonApiRepository
+    public class MyHordesApiRepository : AbstractMyHordeRepositoryBase, IMyHordesApiRepository
     {
-        public override string HttpClientName => nameof(MyHordesJsonApiRepository);
+        public override string HttpClientName => nameof(MyHordesApiRepository);
 
         protected override string BaseEndpoint => "json";
 
-        public MyHordesJsonApiRepository(ILogger<MyHordesJsonApiRepository> logger,
+        public MyHordesApiRepository(ILogger<MyHordesApiRepository> logger,
             IHttpClientFactory httpClientFactory,
             IMyHordesApiConfiguration myHordesApiConfiguration,
             IUserInfoProvider userKeyProvider) : base(logger, httpClientFactory, myHordesApiConfiguration, userKeyProvider)
         {
         }
 
-        public Dictionary<string, MyHordesJsonItem> GetItems()
+        public Dictionary<string, MyHordesItem> GetItems()
         {
             var url = GenerateUrl(EndpointItems);
-            return base.Get<Dictionary<string, MyHordesJsonItem>>(url);
+            url = AddParameterToQuery(url, _parameterFields, "id,name,count,broken,img,cat,heavy,deco,guard,desc");
+            return base.Get<Dictionary<string, MyHordesItem>>(url);
         }
 
         public MyHordesMeResponseDto GetMe()
