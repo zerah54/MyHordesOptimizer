@@ -1,11 +1,11 @@
-import { EstimationComponent } from './estimation/estimation.component';
-import { PageWithSidenav } from './../shared/page-with-sidenav/page-with-sidenav.component';
 import { Component, OnInit } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { skip } from 'rxjs';
 import { SidenavLinks } from '../_abstract_model/types/_types';
+import { PageWithSidenav } from './../shared/page-with-sidenav/page-with-sidenav.component';
 import { SidenavService } from './../shared/services/sidenav.service';
 import { BankComponent } from './bank/bank.component';
+import { CampingComponent } from './camping/camping.component';
 import { CitizensComponent } from './citizens/citizens.component';
 import { WishlistComponent } from './wishlist/wishlist.component';
 
@@ -23,6 +23,7 @@ export class ToolsComponent extends PageWithSidenav implements OnInit {
         { label: $localize`Banque`, id: 'bank', component: BankComponent, selected: true },
         { label: $localize`Liste de courses`, id: 'wishlist', component: WishlistComponent, selected: false },
         { label: $localize`Citoyens`, id: 'citizens', component: CitizensComponent, selected: false },
+        { label: $localize`Camping`, id: 'camping', component: CampingComponent, selected: false },
         // { label: $localize`Estimation de l'attaque`, id: 'estimation', component: EstimationComponent, selected: false }
     ]
 

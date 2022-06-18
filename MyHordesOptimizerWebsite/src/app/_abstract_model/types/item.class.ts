@@ -53,7 +53,7 @@ export class Item extends CommonModel<ItemDTO> {
             this.deco = dto.deco;
             this.description = dto.description;
             this.guard = dto.guard;
-            this.img = dto.img.replace(/\..*\./, '.');
+            this.img = dto.img ? dto.img.replace(/\..*\./, '.') : '';
             this.is_heaver = dto.isHeaver;
             this.json_id_name = dto.jsonIdName;
             this.label = dto.label;

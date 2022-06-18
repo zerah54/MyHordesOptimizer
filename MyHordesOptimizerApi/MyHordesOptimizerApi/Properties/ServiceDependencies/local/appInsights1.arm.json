@@ -1,0 +1,67 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourceGroupName": {
+      "type": "string",
+      "defaultValue": "MyHordesOptimizer",
+      "metadata": {
+        "_parameterType": "resourceGroup",
+        "description": "Nom du groupe de ressources de la ressource. Il est recommandé de placer les ressources sous le même groupe de ressources pour un meilleur suivi."
+      }
+    },
+    "resourceGroupLocation": {
+      "type": "string",
+      "defaultValue": "francecentral",
+      "metadata": {
+        "_parameterType": "location",
+        "description": "Emplacement du groupe de ressources. Les groupes de ressources peuvent avoir un emplacement différent de celui des ressources."
+      }
+    },
+    "resourceLocation": {
+      "type": "string",
+      "defaultValue": "[parameters('resourceGroupLocation')]",
+      "metadata": {
+        "_parameterType": "location",
+        "description": "Emplacement de la ressource. Par défaut, utilisez l'emplacement du groupe de ressources, sauf s'il ne prend pas en charge le fournisseur de ressources."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "name": "[parameters('resourceGroupName')]",
+      "location": "[parameters('resourceGroupLocation')]",
+      "apiVersion": "2019-10-01"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('MyHordesOptimizer-ai', subscription().subscriptionId)))]",
+      "resourceGroup": "[parameters('resourceGroupName')]",
+      "apiVersion": "2019-10-01",
+      "dependsOn": [
+        "[parameters('resourceGroupName')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": [
+            {
+              "name": "MyHordesOptimizer-ai",
+              "type": "microsoft.insights/components",
+              "location": "[parameters('resourceLocation')]",
+              "kind": "web",
+              "properties": {},
+              "apiVersion": "2015-05-01"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "_dependencyType": "appInsights.azure"
+  }
+}

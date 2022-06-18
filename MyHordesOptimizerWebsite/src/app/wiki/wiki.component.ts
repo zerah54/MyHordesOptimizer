@@ -7,6 +7,7 @@ import { SidenavLinks } from '../_abstract_model/types/_types';
 import { SidenavService } from './../shared/services/sidenav.service';
 import { HeroSkillsComponent } from './hero-skills/hero-skills.component';
 import { ItemsComponent } from './items/items.component';
+import { RecipesComponent } from './recipes/recipes.component';
 
 @Component({
     selector: 'mho-wiki',
@@ -20,7 +21,7 @@ export class WikiComponent extends PageWithSidenav implements OnInit {
     /** La liste des pages du wiki */
     public wiki_list: SidenavLinks[] = [
         { label: $localize`Objets`, id: 'items', component: ItemsComponent, selected: true },
-        // { label: $localize`Recettes`, id: 'recipes', component: RecipesComponent, selected: false },
+        { label: $localize`Recettes`, id: 'recipes', component: RecipesComponent, selected: false },
         { label: $localize`Pouvoirs`, id: 'hero-skills', component: HeroSkillsComponent, selected: false },
         { label: $localize`Bâtiments`, id: 'ruins', component: RuinsComponent, selected: false }
     ]

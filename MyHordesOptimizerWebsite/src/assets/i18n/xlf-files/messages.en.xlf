@@ -396,11 +396,8 @@
                 
             <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">358</context></context-group></trans-unit><trans-unit id="2287398703048181232" datatype="html">
         <source>Camping</source><target state="new">Camping</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">371</context>
-        </context-group>
-      </trans-unit><trans-unit id="294304982780945228" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">371</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">3</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/tools.component.ts</context><context context-type="linenumber">26</context></context-group></trans-unit><trans-unit id="294304982780945228" datatype="html">
         <source>Affiche un outil de prédiction des chances de survie en camping. </source><target state="new">Affiche un outil de prédiction des chances de survie en camping. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
@@ -426,10 +423,13 @@
                 <source>Installer le script</source>
                 <target state="new">Installer le script</target>
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">411</context></context-group></trans-unit><trans-unit id="3286917017621738565" datatype="html">
-        <source>Ce fichier contient un script qui fonctionne avec des outils comme Tampermonkey ou Violentmonkey. Pour le faire fonctionner, il faut que Tampermonkey ou Violentmonkey soit installé sur votre navigateur. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Une fois le script installé, vous verrez apparaittre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenête s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Attention :<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Vous allez d'abord devoir renseigner votre ID d'apps externes. Lors de la validation de l'ID d'apps, une confirmation sera demandée. Il faut l'autoriser.</source><target state="new">Ce fichier contient un script qui fonctionne avec des outils comme Tampermonkey ou Violentmonkey. Pour le faire fonctionner, il faut que Tampermonkey ou Violentmonkey soit installé sur votre navigateur. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Une fois le script installé, vous verrez apparaittre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenête s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Attention :<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Vous allez d'abord devoir renseigner votre ID d'apps externes. Lors de la validation de l'ID d'apps, une confirmation sera demandée. Il faut l'autoriser.</target>
-        
-      <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">416</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/script/script.component.html</context><context context-type="linenumber">411</context></context-group></trans-unit><trans-unit id="1183541937079182130" datatype="html">
+        <source>Ce fichier contient un script qui fonctionne avec des outils comme Tampermonkey ou Violentmonkey. Pour le faire fonctionner, il faut que Tampermonkey ou Violentmonkey soit installé sur votre navigateur. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="START_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;ul>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/> Sur ordinateur, il suffit d'installer l'application de script de votre choix. <x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/> Sur Android, il faut : <x id="START_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;ul>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/>Installer Kiwi Browser ;<x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/> Rechercher le script de votre choix dans votre barre de recherche ; <x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/>Installer l'extension pour Chrome ;<x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/> Cliquer sur le lien d'installation du script. <x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="CLOSE_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;/ul>"/><x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/> Sur iOS, il faut : <x id="START_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;ul>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/>Installer Gear Browser ;<x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/> Cliquer sur le lien d'installation du script. <x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="CLOSE_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;/ul>"/><x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="CLOSE_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;/ul>"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Une fois le script installé, vous verrez apparaittre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenête s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Attention :<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Vous allez d'abord devoir renseigner votre ID d'apps externes. Lors de la validation de l'ID d'apps, une confirmation sera demandée. Il faut l'autoriser.</source><target state="new">Ce fichier contient un script qui fonctionne avec des outils comme Tampermonkey ou Violentmonkey. Pour le faire fonctionner, il faut que Tampermonkey ou Violentmonkey soit installé sur votre navigateur. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="START_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;ul>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/> Sur ordinateur, il suffit d'installer l'application de script de votre choix. <x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/> Sur Android, il faut : <x id="START_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;ul>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/>Installer Kiwi Browser ;<x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/> Rechercher le script de votre choix dans votre barre de recherche ; <x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/>Installer l'extension pour Chrome ;<x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/> Cliquer sur le lien d'installation du script. <x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="CLOSE_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;/ul>"/><x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/> Sur iOS, il faut : <x id="START_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;ul>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/>Installer Gear Browser ;<x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li>"/> Cliquer sur le lien d'installation du script. <x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="CLOSE_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;/ul>"/><x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li>"/><x id="CLOSE_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;/ul>"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Une fois le script installé, vous verrez apparaittre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenête s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong>"/>Attention :<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong>"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br />"/> Vous allez d'abord devoir renseigner votre ID d'apps externes. Lors de la validation de l'ID d'apps, une confirmation sera demandée. Il faut l'autoriser.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/script/script.component.html</context>
+          <context context-type="linenumber">416,461</context>
+        </context-group>
+      </trans-unit>
             
             <trans-unit id="5344623683730509987" datatype="html">
                 <source>Un grand merci à Renack, sans qui ni le script ni le site n'existeraient puisqu'il a fait tout le backend !</source>
@@ -438,29 +438,202 @@
                     <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
                     <context context-type="linenumber">13,14</context>
                 </context-group>
-            </trans-unit>
-            <trans-unit id="8363808535317774451" datatype="html">
-                <source>Merci également aux traducteurs qui ont rendu l'internationalisation possible : Katt pour l'allemand et Shokolaw pour l'anglais.</source>
-                <target state="new">Merci également aux traducteurs qui ont rendu l'internationalisation possible : Katt pour l'allemand et Shokolaw pour l'anglais.</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-                    <context context-type="linenumber">19,21</context>
-                </context-group>
-            </trans-unit>
+            </trans-unit><trans-unit id="775283245772645406" datatype="html">
+        <source>Merci également aux traducteurs qui ont rendu l'internationalisation possible : Katt pour l'allemand, Nekomine pour l'espagnol et Shokolaw pour l'anglais.</source><target state="new">Merci également aux traducteurs qui ont rendu l'internationalisation possible : Katt pour l'allemand, Nekomine pour l'espagnol et Shokolaw pour l'anglais.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
+          <context context-type="linenumber">19,21</context>
+        </context-group>
+      </trans-unit>
+            <trans-unit id="8694319651485984768" datatype="html">
+        <source>Merci Argo qui assure à la perfection - assistée de Katt - le rôle de responsable des relations avec l'équipe de développement du jeu, et sans qui l'idée de faire du script un site ne serait pas née.</source><target state="new">Merci Argo qui assure à la perfection - assistée de Katt - le rôle de responsable des relations avec l'équipe de développement du jeu, et sans qui l'idée de faire du script un site ne serait pas née.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
+          <context context-type="linenumber">26,29</context>
+        </context-group>
+      </trans-unit>
             <trans-unit id="9175648759449725798" datatype="html">
                 <source>Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.</source>
                 <target state="new">Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-                    <context context-type="linenumber">26,29</context>
-                </context-group>
-            </trans-unit>
+                
+            <context-group purpose="location"><context context-type="sourcefile">src/app/thanks/thanks.component.html</context><context context-type="linenumber">34</context></context-group></trans-unit><trans-unit id="4328907410933636413" datatype="html">
+        <source>Le citoyen</source><target state="new">Le citoyen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit><trans-unit id="5833055296319952035" datatype="html">
+        <source>Métier</source><target state="new">Métier</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">16</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">22</context></context-group></trans-unit><trans-unit id="452066521029087062" datatype="html">
+        <source>Tenue de camouflage</source><target state="new">Tenue de camouflage</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">26</context></context-group></trans-unit><trans-unit id="7954001980226848388" datatype="html">
+        <source>Campeur professionnel</source><target state="new">Campeur professionnel</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">29</context></context-group></trans-unit><trans-unit id="8079361333376398985" datatype="html">
+        <source>Tombe</source><target state="new">Tombe</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">32</context></context-group></trans-unit><trans-unit id="3231213779188554984" datatype="html">
+        <source>Nombre de campings déjà effectués</source><target state="new">Nombre de campings déjà effectués</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">35</context></context-group></trans-unit><trans-unit id="3915433859665099927" datatype="html">
+        <source>Nombre de pelures de peau et de toiles de tentes dans le sac</source><target state="new">Nombre de pelures de peau et de toiles de tentes dans le sac</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">39</context></context-group></trans-unit><trans-unit id="560884417072143682" datatype="html">
+        <source>La ville</source><target state="new">La ville</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">46</context></context-group></trans-unit><trans-unit id="2205198219410592279" datatype="html">
+        <source>Type de ville</source><target state="new">Type de ville</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">49</context></context-group></trans-unit><trans-unit id="5596519199501316309" datatype="html">
+        <source>Nuit</source><target state="new">Nuit</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">54</context></context-group></trans-unit><trans-unit id="5745500004130467995" datatype="html">
+        <source>Ville dévastée</source><target state="new">Ville dévastée</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">55</context></context-group></trans-unit><trans-unit id="3246864206079397926" datatype="html">
+        <source>Phare</source><target state="new">Phare</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">56</context></context-group></trans-unit><trans-unit id="4122043223946991758" datatype="html">
+        <source>Le bâtiment</source><target state="new">Le bâtiment</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">61</context></context-group></trans-unit><trans-unit id="4574043683605876869" datatype="html">
+        <source>Bâtiment</source><target state="new">Bâtiment</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">64</context></context-group></trans-unit><trans-unit id="7523060874803429510" datatype="html">
+        <source>Distance de la ville (en km)</source><target state="new">Distance de la ville (en km)</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">71</context></context-group></trans-unit><trans-unit id="2420553302076927639" datatype="html">
+        <source>Nombre de zombies sur la case</source><target state="new">Nombre de zombies sur la case</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">76</context></context-group></trans-unit><trans-unit id="4097701325926047102" datatype="html">
+        <source>Nombre d'améliorations simples faites sur la case (il faut en soustraire 3 après chaque attaque)</source><target state="new">Nombre d'améliorations simples faites sur la case (il faut en soustraire 3 après chaque attaque)</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">81</context></context-group></trans-unit><trans-unit id="1569331568164081073" datatype="html">
+        <source>Nombre d'objets de défense installés sur la case</source><target state="new">Nombre d'objets de défense installés sur la case</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">86</context></context-group></trans-unit><trans-unit id="7014743875484323339" datatype="html">
+        <source>Nombre de campeurs déjà cachés sur la case</source><target state="new">Nombre de campeurs déjà cachés sur la case</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">91</context></context-group></trans-unit><trans-unit id="2902261471051690112" datatype="html">
+        <source>Résultat</source><target state="new">Résultat</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">100</context></context-group></trans-unit><trans-unit id="6003110979058162782" datatype="html">
+        <source>Petite carte</source><target state="new">Petite carte</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit><trans-unit id="3774627028364286981" datatype="html">
+        <source>Région éloignée</source><target state="new">Région éloignée</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+      </trans-unit><trans-unit id="3131499204058979166" datatype="html">
+        <source>Pandémonium</source><target state="new">Pandémonium</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+      </trans-unit><trans-unit id="4432237988758794872" datatype="html">
+        <source>Vous estimez que vos chances de survie ici sont quasi nulles… Autant gober du cyanure tout de suite.</source><target state="new">Vous estimez que vos chances de survie ici sont quasi nulles… Autant gober du cyanure tout de suite.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+      </trans-unit><trans-unit id="6213763127342156699" datatype="html">
+        <source>Vous estimez que vos chances de survie ici sont très faibles. Peut-être que vous aimez jouer à pile ou face ?</source><target state="new">Vous estimez que vos chances de survie ici sont très faibles. Peut-être que vous aimez jouer à pile ou face ?</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit><trans-unit id="7504642152507572973" datatype="html">
+        <source>Vous estimez que vos chances de survie ici sont faibles. Difficile à dire.</source><target state="new">Vous estimez que vos chances de survie ici sont faibles. Difficile à dire.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit><trans-unit id="231606051471459055" datatype="html">
+        <source>Vous estimez que vos chances de survie ici sont limitées, bien que ça puisse se tenter. Mais un accident est vite arrivé...</source><target state="new">Vous estimez que vos chances de survie ici sont limitées, bien que ça puisse se tenter. Mais un accident est vite arrivé...</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit><trans-unit id="5761136900658164502" datatype="html">
+        <source>Vous estimez que vos chances de survie ici sont à peu près satisfaisantes, pour peu qu'aucun imprévu ne vous tombe dessus.</source><target state="new">Vous estimez que vos chances de survie ici sont à peu près satisfaisantes, pour peu qu'aucun imprévu ne vous tombe dessus.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+      </trans-unit><trans-unit id="79698220406071142" datatype="html">
+        <source>Vous estimez que vos chances de survie ici sont correctes : il ne vous reste plus qu'à croiser les doigts !</source><target state="new">Vous estimez que vos chances de survie ici sont correctes : il ne vous reste plus qu'à croiser les doigts !</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit><trans-unit id="1576211583593529594" datatype="html">
+        <source>Vous estimez que vos chances de survie ici sont élevées : vous devriez pouvoir passer la nuit ici.</source><target state="new">Vous estimez que vos chances de survie ici sont élevées : vous devriez pouvoir passer la nuit ici.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+      </trans-unit><trans-unit id="4766424387273938786" datatype="html">
+        <source>Vous estimez que vos chances de survie ici sont optimales : personne ne vous verrait même en vous pointant du doigt.</source><target state="new">Vous estimez que vos chances de survie ici sont optimales : personne ne vous verrait même en vous pointant du doigt.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">73</context>
+        </context-group>
+      </trans-unit><trans-unit id="8263357425236059440" datatype="html">
+        <source>Habitant</source><target state="new">Habitant</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+      </trans-unit><trans-unit id="8999093564615496242" datatype="html">
+        <source>Fouineur</source><target state="new">Fouineur</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">86</context>
+        </context-group>
+      </trans-unit><trans-unit id="5692239162610982878" datatype="html">
+        <source>Éclaireur</source><target state="new">Éclaireur</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">91</context>
+        </context-group>
+      </trans-unit><trans-unit id="6969224440581200019" datatype="html">
+        <source>Gardien</source><target state="new">Gardien</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">96</context>
+        </context-group>
+      </trans-unit><trans-unit id="6227779130323052819" datatype="html">
+        <source>Ermite</source><target state="new">Ermite</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">101</context>
+        </context-group>
+      </trans-unit><trans-unit id="6520359063458937943" datatype="html">
+        <source>Apprivoiseur</source><target state="new">Apprivoiseur</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">106</context>
+        </context-group>
+      </trans-unit><trans-unit id="144888502729862279" datatype="html">
+        <source>Technicien</source><target state="new">Technicien</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+      </trans-unit>
 
             <trans-unit id="673430564078029527" datatype="html">
                 <source>Filtrer</source>
                 <target state="new">Filtrer</target>
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.html</context><context context-type="linenumber">14</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.html</context><context context-type="linenumber">14</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.html</context><context context-type="linenumber">14</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context><context context-type="linenumber">14</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.html</context><context context-type="linenumber">14</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.html</context><context context-type="linenumber">14</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.html</context><context context-type="linenumber">14</context></context-group></trans-unit>
             <trans-unit id="4977912145007192180" datatype="html">
                 <source>Enregistrer</source>
                 <target state="new">Enregistrer</target>
@@ -470,7 +643,25 @@
                 <source>La liste est vide</source>
                 <target state="new">La liste est vide</target>
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.html</context><context context-type="linenumber">99</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context><context context-type="linenumber">59</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.html</context><context context-type="linenumber">99</context></context-group></trans-unit><trans-unit id="6525109356951792180" datatype="html">
+        <source>Avatar</source><target state="new">Avatar</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit><trans-unit id="6975093736711169035" datatype="html">
+        <source>Nom du citoyen</source><target state="new">Nom du citoyen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+      </trans-unit><trans-unit id="8066608938393600549" datatype="html">
+        <source>Message</source><target state="new">Message</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
             <trans-unit id="347985381929507270" datatype="html">
                 <source>Nom de l'objet</source>
                 <target state="new">Nom de l'objet</target>
@@ -575,7 +766,7 @@
                 <target state="new">Recettes</target>
                 
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context><context context-type="linenumber">3</context></context-group></trans-unit><trans-unit id="7533053521139949104" datatype="html">
+            <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context><context context-type="linenumber">3</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/wiki.component.ts</context><context context-type="linenumber">24</context></context-group></trans-unit><trans-unit id="7533053521139949104" datatype="html">
         <source>Distance minimum</source><target state="new">Distance minimum</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>

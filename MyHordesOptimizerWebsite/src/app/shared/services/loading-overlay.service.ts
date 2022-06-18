@@ -17,10 +17,12 @@ export class LoadingOverlayService {
     /** Change l'état de chargement */
     public setLoading(is_loading: boolean): void {
         if (is_loading) {
-            this.loading_counter ++;
+            this.loading_counter++;
         } else {
-            this.loading_counter --;
+            this.loading_counter--;
         }
-        this.is_loading.next(this.loading_counter > 0);
+        setTimeout(() => {
+            this.is_loading.next(this.loading_counter > 0);
+        })
     }
 }
