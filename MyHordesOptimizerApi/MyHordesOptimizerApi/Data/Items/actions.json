@@ -1,5 +1,4 @@
-[
-  {
+{
     "water_tl0": {
       "label": "Trinken",
       "priority": 1,
@@ -20,9 +19,7 @@
         "consume_item"
       ],
       "escort_message_key": "escort_water_drink"
-    }
-  },
-  {
+    },
     "water_tl1a": {
       "label": "Trinken",
       "priority": 1,
@@ -42,9 +39,7 @@
         "consume_item"
       ],
       "escort_message_key": "escort_water_drink"
-    }
-  },
-  {
+    },
     "water_tl1b": {
       "label": "Trinken",
       "priority": 1,
@@ -63,9 +58,7 @@
         "consume_item"
       ],
       "escort_message_key": "escort_water_drink"
-    }
-  },
-  {
+    },
     "water_tl2": {
       "label": "Trinken",
       "priority": 1,
@@ -84,9 +77,7 @@
       ],
       "escort_message_key": "escort_water_drink_dehydration",
       "message_key": "water_drink_dehydration"
-    }
-  },
-  {
+    },
     "water_g": {
       "label": "Trinken",
       "priority": 1,
@@ -103,9 +94,7 @@
         "consume_item"
       ],
       "message_key": "water_drink_ghoul"
-    }
-  },
-  {
+    },
     "potion_tl0a": {
       "label": "Trinken",
       "cover": true,
@@ -129,9 +118,7 @@
       ],
       "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut...",
       "escort_message": "Der Bürger hat den mystischen Trank in einem Zug ausgetrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
-    }
-  },
-  {
+    },
     "potion_tl0b": {
       "label": "Trinken",
       "cover": true,
@@ -154,9 +141,7 @@
       ],
       "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut...",
       "escort_message": "Der Bürger hat den mystischen Trank in einem Zug ausgetrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
-    }
-  },
-  {
+    },
     "potion_tl1a": {
       "label": "Trinken",
       "cover": true,
@@ -180,9 +165,7 @@
       ],
       "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut...",
       "escort_message": "Der Bürger hat den mystischen Trank in einem Zug ausgetrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
-    }
-  },
-  {
+    },
     "potion_tl1b": {
       "label": "Trinken",
       "cover": true,
@@ -205,9 +188,7 @@
       ],
       "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut...",
       "escort_message": "Der Bürger hat den mystischen Trank in einem Zug ausgetrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
-    }
-  },
-  {
+    },
     "potion_tl2": {
       "label": "Trinken",
       "cover": true,
@@ -229,9 +210,7 @@
       ],
       "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut...",
       "escort_message": "Der Bürger hat den mystischen Trank in einem Zug ausgetrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
-    }
-  },
-  {
+    },
     "potion_g": {
       "label": "Trinken",
       "cover": true,
@@ -250,9 +229,7 @@
         }
       ],
       "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
-    }
-  },
-  {
+    },
     "potion_tl0a_immune": {
       "label": "Trinken",
       "cover": true,
@@ -276,9 +253,7 @@
       ],
       "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!",
       "escort_message": "Der Bürger hat den mystischen Trank in einem Zug ausgetrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
-    }
-  },
-  {
+    },
     "potion_tl0b_immune": {
       "label": "Trinken",
       "cover": true,
@@ -301,9 +276,7 @@
       ],
       "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!",
       "escort_message": "Der Bürger hat den mystischen Trank in einem Zug ausgetrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
-    }
-  },
-  {
+    },
     "potion_tl1a_immune": {
       "label": "Trinken",
       "cover": true,
@@ -327,9 +300,7 @@
       ],
       "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!",
       "escort_message": "Der Bürger hat den mystischen Trank in einem Zug ausgetrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
-    }
-  },
-  {
+    },
     "potion_tl1b_immune": {
       "label": "Trinken",
       "cover": true,
@@ -352,9 +323,7 @@
       ],
       "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!",
       "escort_message": "Der Bürger hat den mystischen Trank in einem Zug ausgetrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
-    }
-  },
-  {
+    },
     "potion_tl2_immune": {
       "label": "Trinken",
       "cover": true,
@@ -376,9 +345,7 @@
       ],
       "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!",
       "escort_message": "Der Bürger hat den mystischen Trank in einem Zug ausgetrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
-    }
-  },
-  {
+    },
     "potion_g_immune": {
       "label": "Trinken",
       "cover": true,
@@ -397,9 +364,7 @@
         }
       ],
       "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!"
-    }
-  },
-  {
+    },
     "watercan3_tl0": {
       "label": "Trinken",
       "priority": 4,
@@ -420,9 +385,7 @@
         "produce_watercan2"
       ],
       "escort_message_key": "escort_water_drink"
-    }
-  },
-  {
+    },
     "watercan3_tl1a": {
       "label": "Trinken",
       "priority": 4,
@@ -442,9 +405,7 @@
         "produce_watercan2"
       ],
       "escort_message_key": "escort_water_drink"
-    }
-  },
-  {
+    },
     "watercan3_tl1b": {
       "label": "Trinken",
       "priority": 4,
@@ -463,9 +424,7 @@
         "produce_watercan2"
       ],
       "escort_message_key": "escort_water_drink"
-    }
-  },
-  {
+    },
     "watercan3_tl2": {
       "label": "Trinken",
       "priority": 4,
@@ -484,9 +443,7 @@
       ],
       "escort_message_key": "escort_water_drink_dehydration",
       "message_key": "water_drink_dehydration"
-    }
-  },
-  {
+    },
     "watercan3_g": {
       "label": "Trinken",
       "priority": 4,
@@ -503,9 +460,7 @@
         "produce_watercan2"
       ],
       "message_key": "water_drink_ghoul"
-    }
-  },
-  {
+    },
     "watercan2_tl0": {
       "label": "Trinken",
       "priority": 3,
@@ -526,9 +481,7 @@
         "produce_watercan1"
       ],
       "escort_message_key": "escort_water_drink"
-    }
-  },
-  {
+    },
     "watercan2_tl1a": {
       "label": "Trinken",
       "priority": 3,
@@ -548,9 +501,7 @@
         "produce_watercan1"
       ],
       "escort_message_key": "escort_water_drink"
-    }
-  },
-  {
+    },
     "watercan2_tl1b": {
       "label": "Trinken",
       "priority": 3,
@@ -569,9 +520,7 @@
         "produce_watercan1"
       ],
       "escort_message_key": "escort_water_drink"
-    }
-  },
-  {
+    },
     "watercan2_tl2": {
       "label": "Trinken",
       "priority": 3,
@@ -590,9 +539,7 @@
       ],
       "escort_message_key": "escort_water_drink_dehydration",
       "message_key": "water_drink_dehydration"
-    }
-  },
-  {
+    },
     "watercan2_g": {
       "label": "Trinken",
       "priority": 3,
@@ -609,9 +556,7 @@
         "produce_watercan1"
       ],
       "message_key": "water_drink_ghoul"
-    }
-  },
-  {
+    },
     "watercan1_tl0": {
       "label": "Trinken",
       "priority": 2,
@@ -632,9 +577,7 @@
         "produce_watercan0"
       ],
       "escort_message_key": "escort_water_drink"
-    }
-  },
-  {
+    },
     "watercan1_tl1a": {
       "label": "Trinken",
       "priority": 2,
@@ -654,9 +597,7 @@
         "produce_watercan0"
       ],
       "escort_message_key": "escort_water_drink"
-    }
-  },
-  {
+    },
     "watercan1_tl1b": {
       "label": "Trinken",
       "priority": 2,
@@ -675,9 +616,7 @@
         "produce_watercan0"
       ],
       "escort_message_key": "escort_water_drink"
-    }
-  },
-  {
+    },
     "watercan1_tl2": {
       "label": "Trinken",
       "priority": 2,
@@ -696,9 +635,7 @@
       ],
       "escort_message_key": "escort_water_drink_dehydration",
       "message_key": "water_drink_dehydration"
-    }
-  },
-  {
+    },
     "watercan1_g": {
       "label": "Trinken",
       "priority": 2,
@@ -715,9 +652,7 @@
         "produce_watercan0"
       ],
       "message_key": "water_drink_ghoul"
-    }
-  },
-  {
+    },
     "water_no_effect": {
       "label": "Trinken",
       "cover": true,
@@ -729,9 +664,7 @@
         "consume_item"
       ],
       "message": "Du hast {item} getrunken, aber scheinbar geschieht nichts..."
-    }
-  },
-  {
+    },
     "alcohol": {
       "label": "Trinken",
       "cover": true,
@@ -748,9 +681,7 @@
         "consume_item"
       ],
       "message": "Dir ist schwindelig und du würdest dich am liebsten übergeben... Egal was, Hauptsache <strong>du bekommst wieder einen klaren Kopf</strong>."
-    }
-  },
-  {
+    },
     "alcohol_dx": {
       "label": "Trinken",
       "cover": true,
@@ -764,9 +695,7 @@
         "consume_item"
       ],
       "message": "Dir ist schwindelig und du würdest dich am liebsten übergeben... Egal was, Hauptsache <strong>du bekommst wieder einen klaren Kopf</strong>."
-    }
-  },
-  {
+    },
     "coffee": {
       "label": "Trinken",
       "cover": true,
@@ -779,9 +708,7 @@
         "consume_item"
       ],
       "message": "Dieses Gefühl des Wohlbefindens, das dieser kleine Kaffee hervorruft, bringt dich sofort wieder auf die Beine. Aah!"
-    }
-  },
-  {
+    },
     "special_dice": {
       "label": "Werfen",
       "at00": true,
@@ -793,9 +720,7 @@
         "casino_dice"
       ],
       "message": "{casino}"
-    }
-  },
-  {
+    },
     "special_card": {
       "label": "Karte ziehen",
       "at00": true,
@@ -807,9 +732,7 @@
         "casino_card"
       ],
       "message": "{casino}"
-    }
-  },
-  {
+    },
     "special_guitar": {
       "label": "Spielen",
       "meta": [
@@ -820,9 +743,7 @@
         "casino_guitar"
       ],
       "message": "{casino}"
-    }
-  },
-  {
+    },
     "can": {
       "label": "Öffnen",
       "at00": true,
@@ -840,9 +761,7 @@
         }
       ],
       "message_key": "container_open_tool"
-    }
-  },
-  {
+    },
     "can_t1": {
       "label": "Öffnen",
       "at00": true,
@@ -860,9 +779,7 @@
         }
       ],
       "message_key": "container_open_tool"
-    }
-  },
-  {
+    },
     "can_t2": {
       "label": "Öffnen (1 BP)",
       "at00": true,
@@ -881,9 +798,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "eat_6ap": {
       "label": "Essen",
       "cover": true,
@@ -899,9 +814,7 @@
         "consume_item"
       ],
       "escort_message_key": "escort_food_eat"
-    }
-  },
-  {
+    },
     "eat_7ap": {
       "label": "Essen",
       "priority": 1,
@@ -918,9 +831,7 @@
         "consume_item"
       ],
       "escort_message_key": "escort_food_eat"
-    }
-  },
-  {
+    },
     "drug_xana1": {
       "label": "Einsetzen",
       "cover": true,
@@ -938,9 +849,7 @@
         "consume_item"
       ],
       "message_key": "drug_xanax"
-    }
-  },
-  {
+    },
     "drug_xana2": {
       "label": "Einsetzen",
       "cover": true,
@@ -958,9 +867,7 @@
         "consume_item"
       ],
       "message_key": "drug_xanax"
-    }
-  },
-  {
+    },
     "drug_xana3": {
       "label": "Einsetzen",
       "cover": true,
@@ -977,9 +884,7 @@
         "consume_item"
       ],
       "message_key": "drug_no_use"
-    }
-  },
-  {
+    },
     "drug_xana4": {
       "label": "Einsetzen",
       "cover": true,
@@ -996,9 +901,7 @@
         "consume_item"
       ],
       "message_key": "drug_no_use"
-    }
-  },
-  {
+    },
     "drug_par_1": {
       "label": "Einnehmen",
       "cover": true,
@@ -1020,9 +923,7 @@
         "consume_item"
       ],
       "message_key": "drug_no_use_2"
-    }
-  },
-  {
+    },
     "drug_par_2": {
       "label": "Einnehmen",
       "cover": true,
@@ -1044,9 +945,7 @@
         "consume_item"
       ],
       "message_key": "drug_no_use_2"
-    }
-  },
-  {
+    },
     "drug_par_3": {
       "label": "Einnehmen",
       "cover": true,
@@ -1069,9 +968,7 @@
         "consume_item"
       ],
       "message_key": "drug_para"
-    }
-  },
-  {
+    },
     "drug_par_4": {
       "label": "Einnehmen",
       "cover": true,
@@ -1094,9 +991,7 @@
         "consume_item"
       ],
       "message_key": "drug_para"
-    }
-  },
-  {
+    },
     "drug_6ap_1": {
       "label": "Einnehmen",
       "cover": true,
@@ -1112,9 +1007,7 @@
         "consume_item"
       ],
       "message_key": "drug_normal_ap"
-    }
-  },
-  {
+    },
     "drug_6ap_2": {
       "label": "Einnehmen",
       "cover": true,
@@ -1130,9 +1023,7 @@
         "consume_item"
       ],
       "message_key": "drug_normal_ap"
-    }
-  },
-  {
+    },
     "drug_7ap_1": {
       "label": "Einnehmen",
       "cover": true,
@@ -1147,9 +1038,7 @@
         "just_ap7",
         "consume_item"
       ]
-    }
-  },
-  {
+    },
     "drug_7ap_2": {
       "label": "Einnehmen",
       "cover": true,
@@ -1164,9 +1053,7 @@
         "just_ap7",
         "consume_item"
       ]
-    }
-  },
-  {
+    },
     "drug_8ap_1": {
       "label": "Einnehmen",
       "cover": true,
@@ -1182,9 +1069,7 @@
         "consume_item"
       ],
       "message_key": "drug_twin_ap"
-    }
-  },
-  {
+    },
     "drug_8ap_2": {
       "label": "Einnehmen",
       "cover": true,
@@ -1200,9 +1085,7 @@
         "consume_item"
       ],
       "message_key": "drug_twin_ap"
-    }
-  },
-  {
+    },
     "drug_april_1": {
       "label": "Einnehmen",
       "cover": true,
@@ -1220,9 +1103,7 @@
         "consume_item"
       ],
       "message_key": "drug_no_use_3"
-    }
-  },
-  {
+    },
     "drug_april_2": {
       "label": "Einnehmen",
       "cover": true,
@@ -1240,9 +1121,7 @@
         "consume_item"
       ],
       "message_key": "drug_no_use_3"
-    }
-  },
-  {
+    },
     "drug_hyd_1": {
       "label": "Einnehmen",
       "cover": true,
@@ -1259,9 +1138,7 @@
         "consume_item"
       ],
       "message_key": "drug_no_use"
-    }
-  },
-  {
+    },
     "drug_hyd_2": {
       "label": "Einnehmen",
       "cover": true,
@@ -1278,9 +1155,7 @@
         "consume_item"
       ],
       "message_key": "drug_no_use"
-    }
-  },
-  {
+    },
     "drug_hyd_3": {
       "label": "Einnehmen",
       "cover": true,
@@ -1297,9 +1172,7 @@
         "consume_item"
       ],
       "message_key": "drug_hyd"
-    }
-  },
-  {
+    },
     "drug_hyd_4": {
       "label": "Einnehmen",
       "cover": true,
@@ -1316,9 +1189,7 @@
         "consume_item"
       ],
       "message_key": "drug_hyd"
-    }
-  },
-  {
+    },
     "drug_hyd_5": {
       "label": "Einnehmen",
       "cover": true,
@@ -1335,9 +1206,7 @@
         "consume_item"
       ],
       "message_key": "drug_hyd"
-    }
-  },
-  {
+    },
     "drug_hyd_6": {
       "label": "Einnehmen",
       "cover": true,
@@ -1354,9 +1223,7 @@
         "consume_item"
       ],
       "message_key": "drug_hyd"
-    }
-  },
-  {
+    },
     "drug_beta": {
       "label": "Einnehmen",
       "cover": true,
@@ -1377,9 +1244,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "cyanide": {
       "label": "Einnehmen",
       "cover": true,
@@ -1393,9 +1258,7 @@
         "cyanide",
         "consume_item"
       ]
-    }
-  },
-  {
+    },
     "bandage": {
       "label": "Verbinden",
       "at00": true,
@@ -1409,9 +1272,7 @@
         "add_bandage"
       ],
       "message": "So, zur Desinfektion nur noch draufspucken und hopp: Sieht wie neu aus!"
-    }
-  },
-  {
+    },
     "emt": {
       "label": "Einsetzen",
       "at00": true,
@@ -1434,9 +1295,7 @@
         }
       ],
       "message": "Es geht doch nichts über einen schönen Stromstoß in die Wirbelsäule, um so richtig wach zu werden! Aber irgendwie riecht es jetzt hier nach verbranntem Fleisch..."
-    }
-  },
-  {
+    },
     "drug_rand_1": {
       "label": "Einnehmen",
       "cover": true,
@@ -1506,9 +1365,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "drug_rand_2": {
       "label": "Einnehmen",
       "cover": true,
@@ -1577,9 +1434,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "drug_lsd_1": {
       "label": "Einnehmen",
       "cover": true,
@@ -1649,9 +1504,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "drug_lsd_2": {
       "label": "Einnehmen",
       "cover": true,
@@ -1720,9 +1573,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "drug_beta_bad_1": {
       "label": "Einnehmen",
       "cover": true,
@@ -1792,9 +1643,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "drug_beta_bad_2": {
       "label": "Einnehmen",
       "cover": true,
@@ -1863,9 +1712,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "drug_rand_xmas": {
       "label": "Essen",
       "cover": true,
@@ -1940,9 +1787,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "open_doggybag": {
       "label": "Öffnen",
       "at00": true,
@@ -1965,9 +1810,7 @@
         }
       ],
       "message": "Du hast dein <span class=\"tool\">{item}</span> ausgepackt und <span class=\"tool\">{items_spawn}</span> erhalten!"
-    }
-  },
-  {
+    },
     "open_lunchbag": {
       "label": "Öffnen",
       "at00": true,
@@ -1986,9 +1829,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_c_chest": {
       "label": "Öffnen",
       "at00": true,
@@ -2007,9 +1848,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_h_chest": {
       "label": "Öffnen",
       "at00": true,
@@ -2029,9 +1868,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_postbox": {
       "label": "Öffnen",
       "at00": true,
@@ -2050,9 +1887,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_postbox_xl": {
       "label": "Öffnen",
       "at00": true,
@@ -2071,9 +1906,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_letterbox": {
       "label": "Öffnen",
       "at00": true,
@@ -2094,9 +1927,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_justbox": {
       "label": "Öffnen",
       "at00": true,
@@ -2115,9 +1946,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_gamebox": {
       "label": "Öffnen",
       "at00": true,
@@ -2134,9 +1963,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_abox": {
       "label": "Öffnen",
       "at00": true,
@@ -2152,9 +1979,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_cbox": {
       "label": "Öffnen",
       "at00": true,
@@ -2185,9 +2010,7 @@
         }
       ],
       "message_key": "container_open_cbox"
-    }
-  },
-  {
+    },
     "open_matbox3": {
       "label": "Öffnen",
       "at00": true,
@@ -2205,9 +2028,7 @@
         }
       ],
       "message_key": "container_open_not_empty"
-    }
-  },
-  {
+    },
     "open_matbox2": {
       "label": "Öffnen",
       "at00": true,
@@ -2225,9 +2046,7 @@
         }
       ],
       "message_key": "container_open_not_empty"
-    }
-  },
-  {
+    },
     "open_matbox1": {
       "label": "Öffnen",
       "at00": true,
@@ -2241,9 +2060,7 @@
         }
       ],
       "message_key": "container_open_empty"
-    }
-  },
-  {
+    },
     "open_xmasbox3": {
       "label": "Öffnen",
       "at00": true,
@@ -2260,9 +2077,7 @@
         }
       ],
       "message_key": "container_open_not_empty"
-    }
-  },
-  {
+    },
     "open_xmasbox2": {
       "label": "Öffnen",
       "at00": true,
@@ -2279,9 +2094,7 @@
         }
       ],
       "message_key": "container_open_not_empty"
-    }
-  },
-  {
+    },
     "open_xmasbox1": {
       "label": "Öffnen",
       "at00": true,
@@ -2295,9 +2108,7 @@
         }
       ],
       "message_key": "container_open_empty"
-    }
-  },
-  {
+    },
     "open_metalbox": {
       "label": "Öffnen",
       "at00": true,
@@ -2313,9 +2124,7 @@
         }
       ],
       "message_key": "container_open_tool"
-    }
-  },
-  {
+    },
     "open_metalbox2": {
       "label": "Öffnen",
       "at00": true,
@@ -2331,9 +2140,7 @@
         }
       ],
       "message_key": "container_open_tool"
-    }
-  },
-  {
+    },
     "open_catbox": {
       "label": "Öffnen",
       "at00": true,
@@ -2349,9 +2156,7 @@
         }
       ],
       "message_key": "container_open_tool"
-    }
-  },
-  {
+    },
     "open_toolbox": {
       "label": "Öffnen",
       "at00": true,
@@ -2367,9 +2172,7 @@
         }
       ],
       "message_key": "container_open_weapon"
-    }
-  },
-  {
+    },
     "open_foodbox_out": {
       "label": "Öffnen",
       "at00": true,
@@ -2386,9 +2189,7 @@
         }
       ],
       "message_key": "container_open_weapon"
-    }
-  },
-  {
+    },
     "open_foodbox_in": {
       "label": "Öffnen",
       "at00": true,
@@ -2405,9 +2206,7 @@
         }
       ],
       "message_key": "container_open_weapon"
-    }
-  },
-  {
+    },
     "open_metalbox_t1": {
       "label": "Öffnen",
       "at00": true,
@@ -2423,9 +2222,7 @@
         }
       ],
       "message_key": "container_open_tool"
-    }
-  },
-  {
+    },
     "open_metalbox2_t1": {
       "label": "Öffnen",
       "at00": true,
@@ -2441,9 +2238,7 @@
         }
       ],
       "message_key": "container_open_tool"
-    }
-  },
-  {
+    },
     "open_catbox_t1": {
       "label": "Öffnen",
       "at00": true,
@@ -2459,9 +2254,7 @@
         }
       ],
       "message_key": "container_open_tool"
-    }
-  },
-  {
+    },
     "open_toolbox_t1": {
       "label": "Öffnen",
       "at00": true,
@@ -2477,9 +2270,7 @@
         }
       ],
       "message_key": "container_open_weapon"
-    }
-  },
-  {
+    },
     "open_foodbox_out_t1": {
       "label": "Öffnen",
       "at00": true,
@@ -2496,9 +2287,7 @@
         }
       ],
       "message_key": "container_open_weapon"
-    }
-  },
-  {
+    },
     "open_foodbox_in_t1": {
       "label": "Öffnen",
       "at00": true,
@@ -2515,9 +2304,7 @@
         }
       ],
       "message_key": "container_open_weapon"
-    }
-  },
-  {
+    },
     "open_metalbox_t2": {
       "label": "Öffnen (1 BP)",
       "at00": true,
@@ -2534,9 +2321,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_metalbox2_t2": {
       "label": "Öffnen (1 BP)",
       "at00": true,
@@ -2553,9 +2338,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_catbox_t2": {
       "label": "Öffnen (1 BP)",
       "at00": true,
@@ -2572,9 +2355,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_toolbox_t2": {
       "label": "Öffnen (1 BP)",
       "at00": true,
@@ -2591,9 +2372,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_foodbox_out_t2": {
       "label": "Öffnen (1 BP)",
       "at00": true,
@@ -2611,9 +2390,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_foodbox_in_t2": {
       "label": "Öffnen (1 BP)",
       "at00": true,
@@ -2631,9 +2408,7 @@
         }
       ],
       "message_key": "container_open"
-    }
-  },
-  {
+    },
     "open_safe": {
       "label": "Öffnen",
       "at00": true,
@@ -2665,9 +2440,7 @@
         }
       ],
       "message_key": "container_optional"
-    }
-  },
-  {
+    },
     "open_asafe": {
       "label": "Öffnen",
       "at00": true,
@@ -2699,9 +2472,7 @@
         }
       ],
       "message_key": "container_optional"
-    }
-  },
-  {
+    },
     "load_pilegun": {
       "label": "Laden",
       "at00": true,
@@ -2718,9 +2489,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "load_pilegun2": {
       "label": "Laden",
       "at00": true,
@@ -2737,9 +2506,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "load_pilegun3": {
       "label": "Laden",
       "at00": true,
@@ -2756,9 +2523,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "load_mixergun": {
       "label": "Laden",
       "at00": true,
@@ -2775,9 +2540,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "load_chainsaw": {
       "label": "Laden",
       "at00": true,
@@ -2794,9 +2557,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "load_taser": {
       "label": "Laden",
       "at00": true,
@@ -2813,9 +2574,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "load_lpointer": {
       "label": "Laden",
       "at00": true,
@@ -2832,9 +2591,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "load_lamp": {
       "label": "Laden",
       "at00": true,
@@ -2851,9 +2608,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "load_dildo": {
       "label": "Laden",
       "at00": true,
@@ -2870,9 +2625,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "load_rmk2": {
       "label": "Laden",
       "at00": true,
@@ -2889,9 +2642,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "load_maglite": {
       "label": "Laden",
       "at00": true,
@@ -2908,9 +2659,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "load_radio": {
       "label": "Laden",
       "at00": true,
@@ -2927,9 +2676,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "load_emt": {
       "label": "Laden",
       "at00": true,
@@ -2946,9 +2693,7 @@
         }
       ],
       "message_key": "item_load"
-    }
-  },
-  {
+    },
     "light_cig": {
       "label": "Rauchen",
       "meta": [
@@ -2991,9 +2736,7 @@
         "unterrorize"
       ],
       "message": "Du zündest eine Zigarette an. Der Rauch lässt dich kräftig Husten, vermutlich weil du daran nicht gewöhnt bist... Nach ein paar Minuten <strong>gelingt es dir dich zu beruhigen</strong>. Dieser Kurze Moment des Friedens ermöglicht lässt dich deinen Kummer vergessen und bringt dich zurück in die Wirklichkeit.<hr />Du drückst den Stummel auf dem Boden aus und bist bereit für einen weiteren Tag des Überlebens.!<t-consumed><hr />Dir fällt auf dass <strong>die Packung leer ist</strong>!</t-consumed><t-item-consumed>Das war dein <strong>letztes Streichholz</strong>... Es wird schwer sein, jetzt noch eine Zigarette anzuzünden.</t-item-consumed>"
-    }
-  },
-  {
+    },
     "fill_jsplash": {
       "label": "Befüllen",
       "at00": true,
@@ -3010,9 +2753,7 @@
         }
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_asplash1": {
       "label": "Befüllen",
       "meta": [
@@ -3030,9 +2771,7 @@
         }
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_asplash2": {
       "label": "Befüllen",
       "at00": true,
@@ -3050,9 +2789,7 @@
         }
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_splash1": {
       "label": "Befüllen",
       "meta": [
@@ -3070,9 +2807,7 @@
         }
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_splash2": {
       "label": "Befüllen",
       "at00": true,
@@ -3090,9 +2825,7 @@
         }
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_ksplash1": {
       "label": "Befüllen",
       "meta": [
@@ -3110,9 +2843,7 @@
         }
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_ksplash2": {
       "label": "Befüllen",
       "at00": true,
@@ -3130,9 +2861,7 @@
         }
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_grenade1": {
       "label": "Befüllen",
       "meta": [
@@ -3150,9 +2879,7 @@
         }
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_grenade2": {
       "label": "Befüllen",
       "at00": true,
@@ -3170,9 +2897,7 @@
         }
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_exgrenade1": {
       "label": "Befüllen",
       "meta": [
@@ -3190,9 +2915,7 @@
         }
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_exgrenade2": {
       "label": "Befüllen",
       "at00": true,
@@ -3210,9 +2933,7 @@
         }
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_watercan0": {
       "label": "Befüllen",
       "at00": true,
@@ -3225,9 +2946,7 @@
         "produce_watercan1"
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_watercan1": {
       "label": "Befüllen",
       "at00": true,
@@ -3240,9 +2959,7 @@
         "produce_watercan2"
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fill_watercan2": {
       "label": "Befüllen",
       "at00": true,
@@ -3255,9 +2972,7 @@
         "produce_watercan3"
       ],
       "message_key": "item_fill"
-    }
-  },
-  {
+    },
     "fire_pilegun": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3278,9 +2993,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "fire_pilegun2": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3326,9 +3039,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_pilegun3": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3374,9 +3085,7 @@
         },
         "kill_2_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_mixergun": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3411,9 +3120,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_chainsaw": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3448,9 +3155,7 @@
         },
         "kill_3_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_taser": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3486,9 +3191,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "fire_lpointer4": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3504,9 +3207,7 @@
         },
         "kill_2_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_lpointer3": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3522,9 +3223,7 @@
         },
         "kill_2_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_lpointer2": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3540,9 +3239,7 @@
         },
         "kill_2_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_lpointer1": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3558,9 +3255,7 @@
         },
         "kill_2_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_asplash5": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3576,9 +3271,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_asplash4": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3594,9 +3287,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_asplash3": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3612,9 +3303,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_asplash2": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3630,9 +3319,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_asplash1": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3648,9 +3335,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_splash3": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3666,9 +3351,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_splash2": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3684,9 +3367,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_splash1": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3702,9 +3383,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "fire_ksplash": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3720,9 +3399,7 @@
         },
         "kill_3_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_animal": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3739,9 +3416,7 @@
         }
       ],
       "message_key": "throw_animal"
-    }
-  },
-  {
+    },
     "throw_animal_cat": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3773,9 +3448,7 @@
         "kill_1_zombie_s"
       ],
       "message_key": "throw_animal"
-    }
-  },
-  {
+    },
     "throw_animal_dog": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3807,9 +3480,7 @@
         "kill_1_zombie_s"
       ],
       "message_key": "throw_animal"
-    }
-  },
-  {
+    },
     "throw_animal_angryc": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3841,9 +3512,7 @@
         }
       ],
       "message": "<t-stat-up-tg_meta_wound>Diese Katze ist unglaublich! Sie scheint keine Angst zu haben, nicht einmal vor dir. Das Tier springt dir an die Kehle und vergräbt seine Krallen tief in deinem Fleisch.</t-stat-up-tg_meta_wound><t-kills>Diese Katze ist unglaublich! Sie scheint keine Angst zu haben, nicht einmal vor dem abartigen Gestank der Zombies. Mit mehr Zerstörungskraft als der Duracell-Hase und das Killer-Kaninchen von Caerbannog hat sie die Zone komplett bereinigt.</t-kills>"
-    }
-  },
-  {
+    },
     "throw_b_machine_1": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3858,9 +3527,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_b_bone": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3875,9 +3542,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_b_can_opener": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3892,9 +3557,7 @@
           "group": "g_kill_1z_33"
         }
       ]
-    }
-  },
-  {
+    },
     "throw_b_chair_basic": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3911,9 +3574,7 @@
           "group": "g_kill_1z_85"
         }
       ]
-    }
-  },
-  {
+    },
     "throw_b_torch": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3930,9 +3591,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_b_chain": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3949,9 +3608,7 @@
           "group": "g_kill_1z_50"
         }
       ]
-    }
-  },
-  {
+    },
     "throw_b_staff": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -3992,9 +3649,7 @@
           "group": "g_kill_1z_33"
         }
       ]
-    }
-  },
-  {
+    },
     "throw_b_knife": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4009,9 +3664,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_b_machine_2": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4026,9 +3679,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_b_small_knife": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4045,9 +3696,7 @@
           "group": "g_kill_1z_33"
         }
       ]
-    }
-  },
-  {
+    },
     "throw_b_cutcut": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4062,9 +3711,7 @@
         },
         "kill_2_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_b_machine_3": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4079,9 +3726,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_b_pc": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4096,9 +3741,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_b_lawn": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4113,9 +3756,7 @@
         },
         "kill_2_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_b_screw": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4132,9 +3773,7 @@
           "group": "g_kill_1z_20"
         }
       ]
-    }
-  },
-  {
+    },
     "throw_b_swiss_knife": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4151,9 +3790,7 @@
           "group": "g_kill_1z_33"
         }
       ]
-    }
-  },
-  {
+    },
     "throw_b_cutter": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4170,9 +3807,7 @@
           "group": "g_kill_1z_60"
         }
       ]
-    }
-  },
-  {
+    },
     "throw_b_concrete_wall": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4187,9 +3822,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_b_torch_off": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4206,9 +3839,7 @@
           "group": "g_kill_1z_10"
         }
       ]
-    }
-  },
-  {
+    },
     "throw_b_wrench": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4225,9 +3856,7 @@
           "group": "g_kill_1z_50"
         }
       ]
-    }
-  },
-  {
+    },
     "throw_hurling_stick": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4244,9 +3873,7 @@
           "group": "g_kill_1z_60"
         }
       ]
-    }
-  },
-  {
+    },
     "throw_phone": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4262,9 +3889,7 @@
         },
         "kill_1_2_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_projector": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4280,9 +3905,7 @@
         },
         "kill_1_zombie"
       ]
-    }
-  },
-  {
+    },
     "throw_grenade": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4299,9 +3922,7 @@
         }
       ],
       "message_key": "weapon_use"
-    }
-  },
-  {
+    },
     "throw_exgrenade": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4318,9 +3939,7 @@
         }
       ],
       "message_key": "weapon_use"
-    }
-  },
-  {
+    },
     "throw_boomfruit": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4337,9 +3956,7 @@
         }
       ],
       "message_key": "weapon_use"
-    }
-  },
-  {
+    },
     "throw_jerrygun": {
       "label": "Waffe einsetzen",
       "meta": [
@@ -4355,9 +3972,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "bp_generic_1": {
       "label": "Lesen",
       "meta": [
@@ -4372,9 +3987,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "bp_generic_2": {
       "label": "Lesen",
       "meta": [
@@ -4389,9 +4002,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "bp_generic_3": {
       "label": "Lesen",
       "meta": [
@@ -4406,9 +4017,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "bp_generic_4": {
       "label": "Lesen",
       "meta": [
@@ -4423,9 +4032,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "bp_hotel_2": {
       "label": "Lesen",
       "meta": [
@@ -4447,9 +4054,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "bp_hotel_3": {
       "label": "Lesen",
       "meta": [
@@ -4472,9 +4077,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "bp_hotel_4": {
       "label": "Lesen",
       "meta": [
@@ -4493,9 +4096,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "bp_bunker_2": {
       "label": "Lesen",
       "meta": [
@@ -4516,9 +4117,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "bp_bunker_3": {
       "label": "Lesen",
       "meta": [
@@ -4541,9 +4140,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "bp_bunker_4": {
       "label": "Lesen",
       "meta": [
@@ -4562,9 +4159,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "bp_hospital_2": {
       "label": "Lesen",
       "meta": [
@@ -4582,9 +4177,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "bp_hospital_3": {
       "label": "Lesen",
       "meta": [
@@ -4607,9 +4200,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "bp_hospital_4": {
       "label": "Lesen",
       "meta": [
@@ -4628,9 +4219,7 @@
         }
       ],
       "message_key": "read_blueprint"
-    }
-  },
-  {
+    },
     "read_rp": {
       "label": "Lesen",
       "cover": false,
@@ -4641,9 +4230,7 @@
         "find_rp"
       ],
       "message": "Der Text ist überschrieben mit {rp_text}. Du beginnst, ihn zu lesen<t-rp_ok>! Der Text wurde deinem Archiv hinzugefügt.</t-rp_ok><t-rp_fail>... Leider stellst du fest, dass du diesen Text bereits kennst.</t-rp_fail>"
-    }
-  },
-  {
+    },
     "read_rp_cover": {
       "label": "Lesen",
       "cover": true,
@@ -4654,9 +4241,7 @@
         "find_rp"
       ],
       "message": "Der Text ist überschrieben mit {rp_text}. Du beginnst, ihn zu lesen<t-rp_ok>! Der Text wurde deinem Archiv hinzugefügt.</t-rp_ok><t-rp_fail>... Leider stellst du fest, dass du diesen Text bereits kennst.</t-rp_fail>"
-    }
-  },
-  {
+    },
     "read_banned_note": {
       "label": "Lesen",
       "cover": true,
@@ -4667,9 +4252,7 @@
         "casino_banned_note"
       ],
       "message": "Der Text ist überschrieben mit {item}. Du beginnst, ihn zu lesen.<t-bannote_ok>Diese gekritzelte Notiz gehörte früher einem verbanntem Bürger... Das einzige, was du lesen kannst, ist \"{zone}\"... Seltsam. Du zerstörst die Seite, nur um sicherzugehen, dass niemand die Nachricht liest...</t-bannote_ok><t-bannote_fail>Leider ist der Inhalt dieses Manuskripts völlig unleserlich.</t-bannote_fail>"
-    }
-  },
-  {
+    },
     "vibrator": {
       "label": "Verwenden",
       "meta": [
@@ -4691,9 +4274,7 @@
         }
       ],
       "message": "Du machst es dir daheim gemütlich und entspannst dich... doch dann erlebst du ein böse Überraschung: Dieses Ding ist unglaublich schmerzhaft! Du versuchst es weiter bis du Stück für Stück Gefallen daran findest. Die nach wenige Minuten einsetzende Wirkung ist berauschend! Du schwitzt und zitterst und ein wohlig-warmes Gefühl breitet sich in dir aus...Die Batterie ist komplett leer."
-    }
-  },
-  {
+    },
     "watercup_1": {
       "label": "Reinigen (Wasser)",
       "meta": [
@@ -4719,9 +4300,7 @@
         }
       ],
       "message_key": "item_clean_watercup"
-    }
-  },
-  {
+    },
     "watercup_2": {
       "label": "Reinigen (Wasser)",
       "meta": [
@@ -4744,9 +4323,7 @@
         }
       ],
       "message_key": "item_clean_watercup"
-    }
-  },
-  {
+    },
     "watercup_3": {
       "label": "In den Brunnen schütten",
       "meta": [
@@ -4764,9 +4341,7 @@
         }
       ],
       "message_key": "water_to_well"
-    }
-  },
-  {
+    },
     "jerrycan_1": {
       "label": "Reinigen (Wasser)",
       "meta": [
@@ -4816,9 +4391,7 @@
         }
       ],
       "message_key": "item_clean"
-    }
-  },
-  {
+    },
     "jerrycan_2": {
       "label": "In den Brunnen schütten",
       "meta": [
@@ -4837,9 +4410,7 @@
         }
       ],
       "message_key": "water_to_well"
-    }
-  },
-  {
+    },
     "jerrycan_3": {
       "label": "In den Brunnen schütten",
       "meta": [
@@ -4857,9 +4428,7 @@
         }
       ],
       "message_key": "water_to_well"
-    }
-  },
-  {
+    },
     "watercup_1b": {
       "label": "Reinigen (Wasser)",
       "meta": [
@@ -4883,9 +4452,7 @@
         }
       ],
       "message_key": "item_clean_watercup"
-    }
-  },
-  {
+    },
     "jerrycan_1b": {
       "label": "Reinigen (Wasser)",
       "meta": [
@@ -4928,9 +4495,7 @@
         }
       ],
       "message_key": "item_clean"
-    }
-  },
-  {
+    },
     "home_def_plus": {
       "label": "Aufstellen",
       "meta": [
@@ -4954,9 +4519,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "home_store_plus": {
       "label": "Aufstellen",
       "meta": [
@@ -4980,9 +4543,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "home_store_plus2": {
       "label": "Aufstellen",
       "meta": [
@@ -5006,9 +4567,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "repair_1": {
       "label": "Reparieren mit",
       "at00": true,
@@ -5031,9 +4590,7 @@
         }
       ],
       "message": "Du hast das {item} verbraucht, um damit {target} zu reparieren. Dabei hast du {minus_ap} AP eingesetzt."
-    }
-  },
-  {
+    },
     "repair_2": {
       "label": "Reparieren mit",
       "at00": true,
@@ -5059,9 +4616,7 @@
         "repair_target"
       ],
       "message": "Du hast das {item} verbraucht, um damit {target} zu reparieren. Dabei hast du {minus_ap} AP eingesetzt."
-    }
-  },
-  {
+    },
     "poison_1": {
       "label": "Vergiften mit",
       "at00": true,
@@ -5076,9 +4631,7 @@
         "poison_target"
       ],
       "message": "Du hast {target} mit {item} kombiniert und {target} erzeugt.{hr}Achtung: Du hast {target} vergiftet. Es ist <strong>nahezu unmöglich, es vom Original zu unterscheiden</strong>, sei also vorsichtig... Es liegt ganz an dir, was du damit jetzt tun möchtest."
-    }
-  },
-  {
+    },
     "poison_2": {
       "label": "Vergiften mit",
       "at00": true,
@@ -5093,9 +4646,7 @@
         "poison_infect_target"
       ],
       "message": "Du hast {target} mit {item} kombiniert und {target} erzeugt.{hr}Achtung: Du hast {target} vergiftet. Es ist <strong>nahezu unmöglich, es vom Original zu unterscheiden</strong>, sei also vorsichtig... Es liegt ganz an dir, was du damit jetzt tun möchtest."
-    }
-  },
-  {
+    },
     "zonemarker_1": {
       "label": "Einsetzen",
       "cover": true,
@@ -5106,9 +4657,7 @@
         "zonemarker"
       ],
       "message": "Mithilfe des {item} hast du die Umgebung gescannt."
-    }
-  },
-  {
+    },
     "zonemarker_2": {
       "label": "Einsetzen",
       "cover": true,
@@ -5137,9 +4686,7 @@
         "zonemarker"
       ],
       "message": "Mithilfe des {item} hast du die Umgebung gescannt."
-    }
-  },
-  {
+    },
     "nessquick": {
       "label": "Einsetzen",
       "meta": [
@@ -5151,9 +4698,7 @@
         "nessquick"
       ],
       "message": "Du hast das Gebiet mit deinem {item} teilweise geräumt ({bury_count} Punkte geräumt)."
-    }
-  },
-  {
+    },
     "bomb_1": {
       "label": "Werfen",
       "cover": true,
@@ -5170,9 +4715,7 @@
         }
       ],
       "message_key": "escape_item"
-    }
-  },
-  {
+    },
     "bomb_2": {
       "label": "Werfen",
       "cover": true,
@@ -5189,9 +4732,7 @@
         }
       ],
       "message_key": "escape_item"
-    }
-  },
-  {
+    },
     "smokebomb": {
       "label": "Werfen",
       "meta": [
@@ -5206,9 +4747,7 @@
         }
       ],
       "message": "Du wirfst eine Rauchbombe in diese Zone und ein Großes Durcheinander bricht aus!{hr}Deine <strong>nächste Bewegungsaktion</strong> wird night in das Register eingetragen, wenn sie <strong>innerhalb von 1 Minute</strong> erfolgt."
-    }
-  },
-  {
+    },
     "eat_fleshroom_1": {
       "label": "Essen",
       "cover": true,
@@ -5236,9 +4775,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "eat_fleshroom_2": {
       "label": "Essen",
       "cover": true,
@@ -5254,9 +4791,7 @@
         "eat_ap6",
         "consume_item"
       ]
-    }
-  },
-  {
+    },
     "eat_meat_1": {
       "label": "Essen",
       "cover": true,
@@ -5288,9 +4823,7 @@
         }
       ],
       "message_key": "eat_human_meat"
-    }
-  },
-  {
+    },
     "eat_meat_2": {
       "label": "Essen",
       "cover": true,
@@ -5312,9 +4845,7 @@
         }
       ],
       "message_key": "eat_human_meat_ghoul"
-    }
-  },
-  {
+    },
     "eat_bone_1": {
       "label": "Essen",
       "cover": true,
@@ -5353,9 +4884,7 @@
         }
       ],
       "message_key": "eat_human_meat"
-    }
-  },
-  {
+    },
     "eat_bone_2": {
       "label": "Essen",
       "cover": true,
@@ -5380,9 +4909,7 @@
         }
       ],
       "message_key": "eat_human_meat_ghoul"
-    }
-  },
-  {
+    },
     "eat_cadaver_1": {
       "label": "Essen",
       "cover": true,
@@ -5418,9 +4945,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "eat_cadaver_2": {
       "label": "Essen",
       "cover": true,
@@ -5445,9 +4970,7 @@
         }
       ],
       "message_key": "eat_human_meat_ghoul"
-    }
-  },
-  {
+    },
     "ghoul_serum": {
       "label": "Einnehmen",
       "cover": true,
@@ -5463,9 +4986,7 @@
         }
       ],
       "message": "Unglaublich! Die ganze Gier, die dich innerlich aufgefressen hat, verschwindet langsam. Ist es wirklich möglich, dass du wieder ein Mensch geworden bist?"
-    }
-  },
-  {
+    },
     "cuddle_teddy_1": {
       "label": "Knuddeln",
       "meta": [
@@ -5499,9 +5020,7 @@
         }
       ],
       "message": "Du drückst den {item} eng an deine Brust... <t-stat-down-terror>Tränen laufen über deine Wange, als du an die Hölle denkst, in der du lebst. Nach ein paar Minuten fühlst du dich besser!</t-stat-down-terror><nt-stat-down-terror>Aber nichts geschieht!</nt-stat-down-terror>"
-    }
-  },
-  {
+    },
     "cuddle_teddy_2": {
       "label": "Knuddeln",
       "meta": [
@@ -5511,9 +5030,7 @@
         "terrorize"
       ],
       "message": "Du drückst den {item} eng an deine Brust... <t-stat-up-terror>Panik steigt in dir auf!</t-stat-up-terror><nt-stat-up-terror>Aber nichts geschieht!</nt-stat-up-terror>"
-    }
-  },
-  {
+    },
     "clean_clothes": {
       "label": "Reinigen (Kleidung)",
       "meta": [
@@ -5533,9 +5050,7 @@
         }
       ],
       "message": "Du nimmst dir ein paar Minuten, um deine {item} zu reinigen. Du schrubbst sorgfältig die Blutflecken ab und flickst ein paar kleine Löcher."
-    }
-  },
-  {
+    },
     "flash_photo_3": {
       "label": "Benutzen",
       "meta": [
@@ -5570,9 +5085,7 @@
         }
       ],
       "message_key": "escape_item_camera"
-    }
-  },
-  {
+    },
     "flash_photo_2": {
       "label": "Benutzen",
       "meta": [
@@ -5607,9 +5120,7 @@
         }
       ],
       "message_key": "escape_item_camera"
-    }
-  },
-  {
+    },
     "flash_photo_1": {
       "label": "Benutzen",
       "meta": [
@@ -5644,9 +5155,7 @@
         }
       ],
       "message_key": "escape_item_camera"
-    }
-  },
-  {
+    },
     "alarm_clock": {
       "label": "Benutzen",
       "at00": true,
@@ -5660,9 +5169,7 @@
         }
       ],
       "message": "Du hast {item_from} in {item_to} verwandelt."
-    }
-  },
-  {
+    },
     "pumpkin": {
       "label": "Einsetzen",
       "meta": [],
@@ -5674,9 +5181,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "flare": {
       "label": "Benutzen",
       "meta": [],
@@ -5688,9 +5193,7 @@
         }
       ],
       "message": "<t-flare_ok>Du hast die Zone {zone} entdeckt.</t-flare_ok><t-flare_fail>Es gibt keine weitere Zone zu entdecken.</t-flare_fail>"
-    }
-  },
-  {
+    },
     "hero_tamer_1": {
       "label": "Zur Bank schicken",
       "at00": true,
@@ -5702,9 +5205,7 @@
         "hero_tamer_1"
       ],
       "message": "<t-fail><t-door-closed>Das Stadttor ist geschlossen...</t-door-closed><t-no-items>{tamer_dog} kann nichts mitnehmen, da du <strong>nichts im Rucksack hast</strong>.</t-no-items><t-too-heavy>{tamer_dog} kann deinen Rucksackinhalt nicht mitnehmen, da du einen <strong>sperrigen Gegenstand</strong> mit dir rumschleppt. Das ist dann wohl etwas zu viel des Guten für den Kleinen!</t-too-heavy></t-fail><nt-fail>Du befiehlst {tamer_dog} deinen Rucksackinhalt in die Stadt zu bringen.{hr}<strong>Deine Mitbürger werden sich über all diese Gegenstände in der Bank mächtig freuen.</strong></nt-fail>"
-    }
-  },
-  {
+    },
     "hero_tamer_2": {
       "label": "Zur Bank schicken",
       "at00": true,
@@ -5716,9 +5217,7 @@
         "hero_tamer_2"
       ],
       "message": "<t-fail><t-door-closed>Das Stadttor ist geschlossen...</t-door-closed><t-no-items>{tamer_dog} kann nichts mitnehmen, da du <strong>nichts im Rucksack hast</strong>.</t-no-items></t-fail><nt-fail>Du befiehlst {tamer_dog} deinen Rucksackinhalt in die Stadt zu bringen.{hr}<strong>Deine Mitbürger werden sich über all diese Gegenstände in der Bank mächtig freuen.</strong></nt-fail>"
-    }
-  },
-  {
+    },
     "hero_tamer_1b": {
       "label": "Zur Truhe schicken",
       "at00": true,
@@ -5730,9 +5229,7 @@
         "hero_tamer_1b"
       ],
       "message": "<t-fail><t-no-room>Deine Truhe kann nicht <strong>{items_count} Gegenstände</strong> aufnehmen: er hat <strong>{size} Platz(e)</strong> übrig.</t-no-room><t-door-closed>Das Stadttor ist geschlossen...</t-door-closed><t-no-items>{tamer_dog} kann nichts mitnehmen, da du <strong>nichts im Rucksack hast</strong>.</t-no-items><t-too-heavy>{tamer_dog} kann deinen Rucksackinhalt nicht mitnehmen, da du einen <strong>sperrigen Gegenstand</strong> mit dir rumschleppt. Das ist dann wohl etwas zu viel des Guten für den Kleinen!</t-too-heavy></t-fail><nt-fail>Du befiehlst {tamer_dog} deinen Rucksackinhalt in die Stadt zu bringen.{hr}Genau wie du es gewünscht hast, <strong>hat er alles zur Truhe in deinem Haus gebracht</strong>.{hr}Braver Junge!</nt-fail>"
-    }
-  },
-  {
+    },
     "hero_tamer_2b": {
       "label": "Zur Truhe schicken",
       "at00": true,
@@ -5744,9 +5241,7 @@
         "hero_tamer_2b"
       ],
       "message": "<t-fail><t-no-room>Deine Truhe kann nicht <strong>{items_count} Gegenstände</strong> aufnehmen: er hat <strong>{size} Platz(e)</strong> übrig.</t-no-room><t-door-closed>Das Stadttor ist geschlossen...</t-door-closed><t-no-items>{tamer_dog} kann nichts mitnehmen, da du <strong>nichts im Rucksack hast</strong>.</t-no-items></t-fail><nt-fail>Du befiehlst {tamer_dog} deinen Rucksackinhalt in die Stadt zu bringen.{hr}Genau wie du es gewünscht hast, <strong>hat er alles zur Truhe in deinem Haus gebracht</strong>.{hr}Braver Junge!</nt-fail>"
-    }
-  },
-  {
+    },
     "hero_tamer_3": {
       "label": "Dopen",
       "at00": true,
@@ -5760,9 +5255,7 @@
         "hero_tamer_3"
       ],
       "message": "Du gibst deinem {tamer_dog} {items_consume}, die er gierig hinunterschlingt.{hr}Es vergeht keine Minute bis die Drogen Wirkung zeigen: Dein Fifi hat nun leuchtende Augen, ein glänzendes Fell und einen wedelnden Schwanz."
-    }
-  },
-  {
+    },
     "hero_surv_1": {
       "label": "Wasser suchen",
       "renderer": "survivalist_popup",
@@ -5777,9 +5270,7 @@
         "hero_surv_1"
       ],
       "message": "{casino}"
-    }
-  },
-  {
+    },
     "hero_surv_2": {
       "label": "Essen suchen",
       "renderer": "survivalist_popup",
@@ -5796,9 +5287,7 @@
         "hero_surv_2"
       ],
       "message": "{casino}"
-    }
-  },
-  {
+    },
     "hero_hunter_1": {
       "label": "Tarnen",
       "at00": true,
@@ -5820,9 +5309,7 @@
         "hero_hunter"
       ],
       "message": "Du bist ab sofort getarnt."
-    }
-  },
-  {
+    },
     "hero_hunter_2": {
       "label": "Tarnen",
       "at00": true,
@@ -5833,9 +5320,7 @@
         "hero_hunter"
       ],
       "message": "Du bist nun getarnt."
-    }
-  },
-  {
+    },
     "hero_generic_return": {
       "label": "Die Rückkehr des Helden",
       "tooltip": "Wenn du 11 km oder weniger von der Stadt entfernt bist, kehrst du sofort in die Stadt zurück!",
@@ -5854,9 +5339,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "hero_generic_find": {
       "label": "Fund",
       "tooltip": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
@@ -5878,9 +5361,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "hero_generic_find_lucky": {
       "label": "Schönes Fundstück",
       "tooltip": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
@@ -5902,9 +5383,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "hero_generic_punch": {
       "label": "Wildstyle Uppercut",
       "tooltip": "Damit kannst du mit einem Schlag 2 Zombies umbringen!",
@@ -5924,9 +5403,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "hero_generic_ap": {
       "label": "Zweite Lunge",
       "tooltip": "Stellt deine AP wieder her und beseitigt deine Müdigkeit.",
@@ -5945,9 +5422,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "hero_generic_immune": {
       "label": "Den Tod besiegen",
       "tooltip": "Beim nächsten Angriff wird der Durst-, Infektions- und Abhängigkeitszustand außer Kraft gesetzt.",
@@ -5965,9 +5440,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "hero_generic_rescue": {
       "label": "Rettung",
       "tooltip": "Du bringst einen anderen Spieler nach Hause (dieser darf max. 2 Felder von der Stadt entfernt sein).",
@@ -5989,9 +5462,7 @@
         }
       ],
       "message": "Du hast {citizen} auf heldenhafte Weise in die Stadt gebracht!"
-    }
-  },
-  {
+    },
     "throw_sandball": {
       "label": "Werfen",
       "meta": [
@@ -6006,9 +5477,7 @@
         }
       ],
       "message": "<nt-fail>Du hast einen Sandball in {citizen}s Gesicht geworfen.</nt-fail><t-fail>Hier ist niemand, auf den du den Sandball werfen könntest...</t-fail>"
-    }
-  },
-  {
+    },
     "special_armag": {
       "label": "Durchgang in Kraft",
       "tooltip_key": "heroic_arma_tooltip",
@@ -6052,9 +5521,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "special_armag_d": {
       "label": "Durchgang in Kraft",
       "tooltip_key": "heroic_arma_tooltip",
@@ -6099,9 +5566,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "special_armag_n": {
       "label": "Durchgang in Kraft",
       "tooltip_key": "heroic_arma_tooltip",
@@ -6146,9 +5611,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "special_vote_shaman": {
       "label": "Den Shamane wählen",
       "target": {
@@ -6165,9 +5628,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "special_vote_guide": {
       "label": "Den Reiseleiter in der Außenwelt wählen",
       "target": {
@@ -6184,9 +5645,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "improve": {
       "label": "Aufbauen",
       "meta": [
@@ -6206,9 +5665,7 @@
         }
       ],
       "message": "Du befestigst den {item} und bedeckst ihn zur Tarnung mit herumliegendem Müll und vertrockneten Zweigen. Na bitte, das sollte hoffentlich deine Überlebenschancen heute Nacht verbessern. Du hast dafür 1 Aktionspunkt verbraucht."
-    }
-  },
-  {
+    },
     "cm_campsite_hide": {
       "label": "Sich verstecken und die Nacht hier schlafen!",
       "meta": [
@@ -6225,9 +5682,7 @@
         }
       ],
       "message": "Du hast Dich notdürftig versteckt."
-    }
-  },
-  {
+    },
     "cm_campsite_improve": {
       "label": "Schlafplatz verbessern (schwacher permanenter Bonus, 1AP)",
       "meta": [
@@ -6247,9 +5702,7 @@
         }
       ],
       "message": "Du hast das hiesige Versteck verbessert."
-    }
-  },
-  {
+    },
     "cm_campsite_tomb": {
       "label": "\"Grab\" schaufeln (mittelmäßiger vorübergehender Bonus, 1AP)",
       "meta": [
@@ -6269,9 +5722,7 @@
         }
       ],
       "message": "Du hast Dir Dein eigenes Grab geschaufelt. Oh welche Ironie!"
-    }
-  },
-  {
+    },
     "cm_campsite_unhide": {
       "label": "Versteck verlassen",
       "meta": [
@@ -6287,9 +5738,7 @@
         }
       ],
       "message": "Du hast Dein Versteck verlassen."
-    }
-  },
-  {
+    },
     "cm_campsite_untomb": {
       "label": "Grab verlassen",
       "meta": [
@@ -6305,9 +5754,7 @@
         }
       ],
       "message": "Du hast Dein Grab verlassen. Die schöne Arbeit umsonst!"
-    }
-  },
-  {
+    },
     "home_clean": {
       "label": "Haus aufräumen und putzen",
       "meta": [
@@ -6324,9 +5771,7 @@
         }
       ],
       "message": "Du räumst deinen ganzen Plunder auf und machst ein wenig Ordnung, damit es hier etwas aufgeräumter aussieht. Auch wenn\"s ne Bruchbude ist, es ist DEIN Zuhause..."
-    }
-  },
-  {
+    },
     "home_shower": {
       "label": "Duschen",
       "meta": [
@@ -6344,9 +5789,7 @@
         }
       ],
       "message": "Du springst unter die hausgemachte Dusche ohne weiter darüber nachzudenken. Das eiskalte Wasser erschreckt dich, aber dennoch bleibst du für einige Augenblicke unter dem schwachen Wasserstrahl stehen. In Ermangelung von Seife reibst du dich mit einem glatten Stein ab und versuchst, den Schlamm und die Blutflecken abzuwaschen. Dabei versuchst du, dir einzureden, dass es sich gut anfühlt."
-    }
-  },
-  {
+    },
     "home_heal_1": {
       "label": "Heilen",
       "meta": [
@@ -6368,9 +5811,7 @@
         }
       ],
       "message_key": "home_heal_wound"
-    }
-  },
-  {
+    },
     "home_heal_2": {
       "label": "Heilen",
       "meta": [
@@ -6392,9 +5833,7 @@
         }
       ],
       "message_key": "home_heal_infect"
-    }
-  },
-  {
+    },
     "home_heal_3": {
       "label": "Heilen",
       "meta": [
@@ -6416,9 +5855,7 @@
         }
       ],
       "message_key": "home_heal_infect"
-    }
-  },
-  {
+    },
     "home_defbuff": {
       "label": "Verteidigung organisieren",
       "meta": [
@@ -6441,9 +5878,7 @@
         }
       ],
       "message": "Du hast dir etwas Zeit genommen und zur Verteidigung der Stadt beigetragen."
-    }
-  },
-  {
+    },
     "home_crows": {
       "label": "Nach Ruinen Ausschau halten",
       "meta": [
@@ -6464,9 +5899,7 @@
         }
       ],
       "message": "<t-zone>Du hast eine neue Ruine auf {zone} entdeckt!</t-zone><nt-zone>Es scheint, als gäbe es nichts mehr zu entdecken ...</nt-zone>"
-    }
-  },
-  {
+    },
     "home_fillwater": {
       "label": "Wasserwaffen füllen",
       "meta": [
@@ -6481,9 +5914,7 @@
         }
       ],
       "message": "<t-fail>Du hast <strong>keine Wasserwaffen zum Befüllen</strong> in deinem Rucksack oder deiner Truhe.</t-fail><nt-fail>Du hast {items_spawn} dank des Wasserhahns kostenlos auffüllen können.</nt-fail>"
-    }
-  },
-  {
+    },
     "home_cinema": {
       "label": "Ins Kino gehen",
       "meta": [
@@ -6494,9 +5925,7 @@
         "unterrorize"
       ],
       "message": "Ja, klar... Du hast ihn schon hunderte Male gesehen, das Thema ändert sich auch nicht allzu sehr, aber trotzdem: Es geht nichts über einen guten Zombie-Film zur Entspannung.<t-stat-down-terror><hr />Diese seltsam fernen Schreie des Schreckens haben dir den Kopf gerade gerückt: <strong>Du hast deine Angst abgeschüttelt</strong>.</t-stat-down-terror>"
-    }
-  },
-  {
+    },
     "home_lab_1a": {
       "label": "Droge herstellen",
       "meta": [
@@ -6523,9 +5952,7 @@
         }
       ],
       "message_key": "use_lab"
-    }
-  },
-  {
+    },
     "home_lab_2a": {
       "label": "Droge herstellen",
       "meta": [
@@ -6552,9 +5979,7 @@
         }
       ],
       "message_key": "use_lab"
-    }
-  },
-  {
+    },
     "home_lab_3a": {
       "label": "Droge herstellen",
       "meta": [
@@ -6581,9 +6006,7 @@
         }
       ],
       "message_key": "use_lab"
-    }
-  },
-  {
+    },
     "home_lab_4a": {
       "label": "Droge herstellen",
       "meta": [
@@ -6601,9 +6024,7 @@
         "home_lab_success"
       ],
       "message_key": "use_lab"
-    }
-  },
-  {
+    },
     "home_lab_1b": {
       "label": "Droge herstellen",
       "meta": [
@@ -6630,9 +6051,7 @@
         }
       ],
       "message_key": "use_lab"
-    }
-  },
-  {
+    },
     "home_lab_2b": {
       "label": "Droge herstellen",
       "meta": [
@@ -6659,9 +6078,7 @@
         }
       ],
       "message_key": "use_lab"
-    }
-  },
-  {
+    },
     "home_lab_3b": {
       "label": "Droge herstellen",
       "meta": [
@@ -6688,9 +6105,7 @@
         }
       ],
       "message_key": "use_lab"
-    }
-  },
-  {
+    },
     "home_lab_4b": {
       "label": "Droge herstellen",
       "meta": [
@@ -6708,9 +6123,7 @@
         "home_lab_success"
       ],
       "message_key": "use_lab"
-    }
-  },
-  {
+    },
     "home_kitchen_1a": {
       "label": "Kochen",
       "target": {
@@ -6741,9 +6154,7 @@
         }
       ],
       "message_key": "use_kitchen"
-    }
-  },
-  {
+    },
     "home_kitchen_2a": {
       "label": "Kochen",
       "target": {
@@ -6774,9 +6185,7 @@
         }
       ],
       "message_key": "use_kitchen"
-    }
-  },
-  {
+    },
     "home_kitchen_3a": {
       "label": "Kochen",
       "target": {
@@ -6798,9 +6207,7 @@
         "home_kitchen_success"
       ],
       "message_key": "use_kitchen"
-    }
-  },
-  {
+    },
     "home_kitchen_4a": {
       "label": "Kochen",
       "target": {
@@ -6822,9 +6229,7 @@
         "home_kitchen_success"
       ],
       "message_key": "use_kitchen"
-    }
-  },
-  {
+    },
     "home_kitchen_1b": {
       "label": "Kochen",
       "target": {
@@ -6855,9 +6260,7 @@
         }
       ],
       "message_key": "use_kitchen"
-    }
-  },
-  {
+    },
     "home_kitchen_2b": {
       "label": "Kochen",
       "target": {
@@ -6888,9 +6291,7 @@
         }
       ],
       "message_key": "use_kitchen"
-    }
-  },
-  {
+    },
     "home_kitchen_3b": {
       "label": "Kochen",
       "target": {
@@ -6912,9 +6313,7 @@
         "home_kitchen_success"
       ],
       "message_key": "use_kitchen"
-    }
-  },
-  {
+    },
     "home_kitchen_4b": {
       "label": "Kochen",
       "target": {
@@ -6936,9 +6335,7 @@
         "home_kitchen_success"
       ],
       "message_key": "use_kitchen"
-    }
-  },
-  {
+    },
     "slaughter_4xs": {
       "label": "Ausweiden",
       "meta": [
@@ -6957,9 +6354,7 @@
         }
       ],
       "message_key": "use_butcher"
-    }
-  },
-  {
+    },
     "slaughter_2xs": {
       "label": "Ausweiden",
       "meta": [
@@ -6978,9 +6373,7 @@
         }
       ],
       "message_key": "use_butcher"
-    }
-  },
-  {
+    },
     "slaughter_4x": {
       "label": "Ausweiden",
       "meta": [
@@ -6999,9 +6392,7 @@
         }
       ],
       "message_key": "use_butcher"
-    }
-  },
-  {
+    },
     "slaughter_2x": {
       "label": "Ausweiden",
       "meta": [
@@ -7020,9 +6411,7 @@
         }
       ],
       "message_key": "use_butcher"
-    }
-  },
-  {
+    },
     "slaughter_bmb": {
       "label": "Ausweiden",
       "meta": [
@@ -7041,9 +6430,7 @@
         }
       ],
       "message_key": "use_butcher"
-    }
-  },
-  {
+    },
     "purify_soul": {
       "label": "Läutern",
       "meta": [
@@ -7069,9 +6456,7 @@
         }
       ],
       "message": "\"Du hast die Seele gereinigt und sie friedlich gemacht.\""
-    }
-  },
-  {
+    },
     "brew_shamanic_potion": {
       "label": "Herstellung eines Mystischern Trank",
       "tooltip": "Du kannst einen schamanischen Trank zubereiten, der den Rezipienten vor bösen Geistern schützt.",
@@ -7089,9 +6474,7 @@
         }
       ],
       "message": "Das ist ein Musterbeispiel eines schamanischen Tranks! Nun liegt es an die, der Stadt dessen Wirksamkeit zu vermitteln und sie von deinen schamanischen Fähigkeiten zu überzeugen."
-    }
-  },
-  {
+    },
     "home_rest_1": {
       "label": "Nickerchen machen",
       "meta": [
@@ -7119,9 +6502,7 @@
         }
       ],
       "message_key": "use_bed"
-    }
-  },
-  {
+    },
     "home_rest_2": {
       "label": "Nickerchen machen",
       "meta": [
@@ -7149,9 +6530,7 @@
         }
       ],
       "message_key": "use_bed"
-    }
-  },
-  {
+    },
     "home_rest_3": {
       "label": "Nickerchen machen",
       "meta": [
@@ -7179,27 +6558,21 @@
         }
       ],
       "message_key": "use_bed"
-    }
-  },
-  {
+    },
     "nw_break": {
       "label": "",
       "meta": [],
       "result": [
         "break_item"
       ]
-    }
-  },
-  {
+    },
     "nw_destroy": {
       "label": "",
       "meta": [],
       "result": [
         "consume_item"
       ]
-    }
-  },
-  {
+    },
     "nw_empty_big_pgun": {
       "label": "",
       "meta": [],
@@ -7211,9 +6584,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_pilegun_up": {
       "label": "",
       "meta": [],
@@ -7225,9 +6596,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_pilegun": {
       "label": "",
       "meta": [],
@@ -7239,9 +6608,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_taser": {
       "label": "",
       "meta": [],
@@ -7253,9 +6620,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_mixergun": {
       "label": "",
       "meta": [],
@@ -7267,9 +6632,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_chainsaw": {
       "label": "",
       "meta": [],
@@ -7281,9 +6644,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_phone": {
       "label": "",
       "meta": [],
@@ -7293,9 +6654,7 @@
           "spawn": "phone_nw"
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_watergun": {
       "label": "",
       "meta": [],
@@ -7307,9 +6666,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_watergun_opt": {
       "label": "",
       "meta": [],
@@ -7321,9 +6678,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_torch": {
       "label": "",
       "meta": [],
@@ -7335,9 +6690,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_staff": {
       "label": "",
       "meta": [],
@@ -7349,9 +6702,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_dildo": {
       "label": "",
       "meta": [],
@@ -7363,9 +6714,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_watercan": {
       "label": "",
       "meta": [],
@@ -7377,9 +6726,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_empty_kalach": {
       "label": "",
       "meta": [],
@@ -7391,9 +6738,7 @@
           }
         }
       ]
-    }
-  },
-  {
+    },
     "nw_meat": {
       "label": "",
       "meta": [],
@@ -7410,9 +6755,7 @@
           ]
         }
       ]
-    }
-  },
-  {
+    },
     "nw_meat_tasty": {
       "label": "",
       "meta": [],
@@ -7430,5 +6773,4 @@
         }
       ]
     }
-  }
-]
+}
