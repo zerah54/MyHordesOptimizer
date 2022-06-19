@@ -11,6 +11,12 @@ namespace MyHordesOptimizerApi.Configuration.Impl
 
         public string ItemEsUrl => _configuration.GetValue<string>("Items:Es");
 
+        public string GameFrUrl => _configuration.GetValue<string>("Game:Fr");
+
+        public string GameEnUrl => _configuration.GetValue<string>("Game:En");
+
+        public string GameEsUrl => _configuration.GetValue<string>("Game:Es");
+
         private IConfigurationSection _configuration;
 
         public MyHordesTranslationsConfiguration(IConfiguration configuration)

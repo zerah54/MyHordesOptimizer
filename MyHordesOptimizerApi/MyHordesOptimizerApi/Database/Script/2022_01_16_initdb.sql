@@ -13,8 +13,7 @@ CREATE TABLE Property(
 );
 
 CREATE TABLE HeroSkills(
-	idHeroSkill INT PRIMARY KEY NOT NULL IDENTITY,
-	name NVARCHAR(255),
+	name NVARCHAR(255) PRIMARY KEY NOT NULL,
 	daysNeeded  INT,
 	description_fr TEXT,
 	description_en TEXT,

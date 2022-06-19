@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Attributes;
 using MyHordesOptimizerApi.Controllers.Abstract;
-using MyHordesOptimizerApi.Dtos.MyHordes.Import;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using System.Threading.Tasks;
@@ -24,31 +23,15 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("HeroSkill")]
-        public ActionResult ImportHeroSkill(ImportHeroSkillRequestDto request)
+        public async Task<ActionResult> ImportHeroSkill()
         {
-            if (string.IsNullOrEmpty(request.HeroSkill))
-            {
-                return BadRequest($"{nameof(request.HeroSkill)} is required");
-            }
-            if (string.IsNullOrEmpty(request.Fr))
-            {
-                return BadRequest($"{nameof(request.Fr)} is required");
-            }
-            if (string.IsNullOrEmpty(request.En))
-            {
-                return BadRequest($"{nameof(request.En)} is required");
-            }
-            if (string.IsNullOrEmpty(request.Es))
-            {
-                return BadRequest($"{nameof(request.Es)} is required");
-            }
-            MyHordesImportService.ImportHeroSkill(request);
+            await MyHordesImportService.ImportHeroSkill();
             return Ok();
         }
 
         [HttpPost]
         [Route("Items")]
-        public async Task<ActionResult> ImportItems(string userKey)
+        public ActionResult ImportItems(string userKey)
         {
             if (string.IsNullOrEmpty(userKey))
             {

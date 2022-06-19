@@ -1,4 +1,5 @@
-﻿using MyHordesOptimizerApi.Data.Items;
+﻿using MyHordesOptimizerApi.Data.Heroes;
+using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Ruins;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -39,6 +40,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var json = File.ReadAllText(path);
             var dico = json.FromJson<Dictionary<string, List<string>>>();
             return dico;
+        }
+
+        public List<MyHordesHerosCapacitiesCodeModel> GetHeroCapacities()
+        {
+            var path = "Data/Heroes/capacities.json";
+            var json = File.ReadAllText(path);
+            var list = json.FromJson<List<MyHordesHerosCapacitiesCodeModel>>();
+            return list;
         }
     }
 }

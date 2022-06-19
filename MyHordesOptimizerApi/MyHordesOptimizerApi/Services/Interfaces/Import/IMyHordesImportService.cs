@@ -1,11 +1,10 @@
-﻿using MyHordesOptimizerApi.Dtos.MyHordes.Import;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Services.Interfaces.Import
 {
     public interface IMyHordesImportService
     {
-        void ImportHeroSkill(ImportHeroSkillRequestDto request);
+        Task ImportHeroSkill();
         void ImportRuins();
         Task ImportCategoriesAsync();
         void ImportItems();

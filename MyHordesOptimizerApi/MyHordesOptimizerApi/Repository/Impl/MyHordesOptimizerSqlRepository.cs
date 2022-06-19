@@ -39,9 +39,23 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #region HeroSkill
 
-        public void PatchHeroSkill(IEnumerable<HeroSkill> heroSkills)
+        public void PatchHeroSkill(List<HeroSkillsModel> heroSkills)
         {
-            throw new NotImplementedException();
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var existings = connection.Query<HeroSkillsModel>("SELECT * FROM HeroSkills");
+            foreach (var skill in heroSkills)
+            {
+                if (existings.Any(s => s.Name == skill.Name))
+                {
+                    connection.Update(skill);
+                }
+                else
+                {
+                    connection.Insert(skill);
+                }
+            }
+            connection.Close();
         }
 
         public Dictionary<string, HeroSkill> GetHeroSkills()

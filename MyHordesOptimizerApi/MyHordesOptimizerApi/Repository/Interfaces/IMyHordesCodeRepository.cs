@@ -1,4 +1,5 @@
-﻿using MyHordesOptimizerApi.Data.Items;
+﻿using MyHordesOptimizerApi.Data.Heroes;
+using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Ruins;
 using System.Collections.Generic;
 
@@ -10,5 +11,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         List<MyHordesCategoryCodeModel> GetCategories();
         Dictionary<string, List<string>> GetItemsProperties();
         Dictionary<string, List<string>> GetItemsActions();
+        List<MyHordesHerosCapacitiesCodeModel> GetHeroCapacities();
     }
 }
