@@ -26,7 +26,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
 
         void PutWishList(int townId, WishListWrapper wishList);
         void PatchRuins(List<MyHordesOptimizerRuin> jsonRuins);
-        Dictionary<string, MyHordesOptimizerRuin> GetRuins();
+        List<MyHordesOptimizerRuin> GetRuins();
         void PatchCategories(List<CategoryModel> categories);
         IEnumerable<CategoryModel> GetCategories();
         void PatchProperties(List<string> allProperties);

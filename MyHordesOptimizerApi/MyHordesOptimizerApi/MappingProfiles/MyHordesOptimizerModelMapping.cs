@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.MappingProfiles.Converters;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Views.Items;
+using MyHordesOptimizerApi.Models.Views.Ruins;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -64,6 +65,18 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.MaxDist, opt => opt.MapFrom(src => src.MaxDist))
                 .ForMember(dest => dest.MinDist, opt => opt.MapFrom(src => src.MinDist))
                 .ForMember(dest => dest.Explorable, opt => opt.MapFrom(src => src.Explorable));
+
+            CreateMap<RuinCompletModel, MyHordesOptimizerRuin>()
+                .ForMember(dest => dest.Chance, opt => opt.MapFrom(src => src.RuinChance))
+                .ForMember(dest => dest.Camping, opt => opt.MapFrom(src => src.RuinCamping))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.RuinDescriptionFr }, { "en", src.RuinDescriptionEn }, { "es", src.RuinDescriptionEs }, { "de", src.RuinDescriptionDe } }))
+                .ForMember(dest => dest.Label, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.RuinLabelFr }, { "en", src.RuinLabelEn }, { "es", src.RuinLabelEs }, { "de", src.RuinLabelDe } }))
+                .ForMember(dest => dest.MaxDist, opt => opt.MapFrom(src => src.RuinMaxDist))
+                .ForMember(dest => dest.MinDist, opt => opt.MapFrom(src => src.RuinMinDist))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IdRuin))
+                .ForMember(dest => dest.Explorable, opt => opt.MapFrom(src => src.RuinExplorable))
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.RuinImg))
+                .ForMember(dest => dest.Drops, opt => opt.Ignore());
         }
 
         private string RemoveRandomNumber(string img)

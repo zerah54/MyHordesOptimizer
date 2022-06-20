@@ -14,7 +14,7 @@ namespace MyHordesOptimizerApi.Services.Impl
     {
         protected ILogger<MyHordesFetcherService> Logger { get; set; }
         protected IMyHordesApiRepository MyHordesJsonApiRepository { get; set; }
-        protected IMyHordesOptimizerRepository FirebaseRepository { get; set; }
+        protected IMyHordesOptimizerRepository MyHordesOptimizerRepository { get; set; }
         protected IMyHordesCodeRepository MyHordesCodeRepository { get; set; }
         protected readonly IMapper Mapper;
         protected IUserInfoProvider UserInfoProvider { get; set; }
@@ -29,7 +29,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             Logger = logger;
             MyHordesJsonApiRepository = myHordesJsonApiRepository;
-            FirebaseRepository = firebaseRepository;
+            MyHordesOptimizerRepository = firebaseRepository;
             MyHordesCodeRepository = myHordesCodeRepository;
             Mapper = mapper;
             UserInfoProvider = userInfoProvider;
@@ -37,8 +37,8 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public IEnumerable<Item> GetItems()
         {
-            var items = FirebaseRepository.GetItems();
-            var recipes = FirebaseRepository.GetRecipes();
+            var items = MyHordesOptimizerRepository.GetItems();
+            var recipes = MyHordesOptimizerRepository.GetRecipes();
             foreach (var item in items)
             {
                 var recipesToAdd = recipes.Values.Where(recipe => recipe.Components.Any(component => component.Id == item.Id)).ToList();
@@ -49,7 +49,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var me = MyHordesJsonApiRepository.GetMe();
             if (me.Map != null) // On ne récupère les info propres à la ville uniquement si on est incarné
             {
-                var town = FirebaseRepository.GetTown(me.Map.Id);
+                var town = MyHordesOptimizerRepository.GetTown(me.Map.Id);
                 if(town == null)
                 {
                     town = GetTown();
@@ -88,8 +88,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             var town = Mapper.Map<Town>(myHordeMeResponse.Map);
 
             // Enregistrer en base
-            FirebaseRepository.PatchTown(town);
-            town = FirebaseRepository.GetTown(town.Id);
+            MyHordesOptimizerRepository.PatchTown(town);
+            town = MyHordesOptimizerRepository.GetTown(town.Id);
 
             return town;
         }
@@ -104,13 +104,13 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public IEnumerable<HeroSkill> GetHeroSkills()
         {
-            var heroSkills = FirebaseRepository.GetHeroSkills();
+            var heroSkills = MyHordesOptimizerRepository.GetHeroSkills();
             return heroSkills.Values;
         }
 
         public IEnumerable<ItemRecipe> GetRecipes()
         {
-            var recipes = FirebaseRepository.GetRecipes();
+            var recipes = MyHordesOptimizerRepository.GetRecipes();
             return recipes.Values;
         }
 
@@ -120,8 +120,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             var town = Mapper.Map<Town>(myHordeMeResponse.Map);
 
             // Enregistrer en base
-            FirebaseRepository.PutBank(town.Id, town.Bank);
-            town = FirebaseRepository.GetTown(town.Id);
+            MyHordesOptimizerRepository.PutBank(town.Id, town.Bank);
+            town = MyHordesOptimizerRepository.GetTown(town.Id);
             var bankWrapper = town.Bank;
 
             if (town.WishList != null && town.WishList.WishList != null)
@@ -148,8 +148,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             var town = Mapper.Map<Town>(myHordeMeResponse.Map);
 
             // Enregistrer en base
-            FirebaseRepository.PatchCitizen(town.Id, town.Citizens);
-            town = FirebaseRepository.GetTown(town.Id);
+            MyHordesOptimizerRepository.PatchCitizen(town.Id, town.Citizens);
+            town = MyHordesOptimizerRepository.GetTown(town.Id);
             var citizens = town.Citizens;
 
             return citizens;
@@ -157,8 +157,8 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public IEnumerable<MyHordesOptimizerRuin> GetRuins()
         {
-            var ruins = FirebaseRepository.GetRuins();
-            return ruins.Values;
+            var ruins = MyHordesOptimizerRepository.GetRuins();
+            return ruins;
         }
     }
 }

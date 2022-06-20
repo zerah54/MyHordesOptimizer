@@ -5,8 +5,8 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
-using MyHordesOptimizerApi.Models.Views;
 using MyHordesOptimizerApi.Models.Views.Items;
+using MyHordesOptimizerApi.Models.Views.Ruins;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -102,7 +102,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
 
             var items = Mapper.Map<List<Item>>(itemsComplets.Distinct(new ItemIdComparer()));
-            foreach(var item in items)
+            foreach (var item in items)
             {
                 IEnumerable<ItemCompletModel> matchingItemComplet = itemsComplets.Where(i => i.IdItem == item.Id);
                 item.Actions = matchingItemComplet.Select(i => i.ActionName).Distinct();
@@ -180,11 +180,11 @@ namespace MyHordesOptimizerApi.Repository.Impl
             }
 
             connection.Execute("DELETE FROM RuinItemDrop");
-            foreach(var ruin in ruins)
+            foreach (var ruin in ruins)
             {
-                foreach(var drop in ruin.Drops)
+                foreach (var drop in ruin.Drops)
                 {
-                    var exist = connection.ExecuteScalar<string>("SELECT idRuin, idItem FROM RuinItemDrop WHERE idRuin = @IdRuin AND idItem = @IdItem", new { IdRuin = ruin.Id, IdItem = drop.Item.Id});
+                    var exist = connection.ExecuteScalar<string>("SELECT idRuin, idItem FROM RuinItemDrop WHERE idRuin = @IdRuin AND idItem = @IdItem", new { IdRuin = ruin.Id, IdItem = drop.Item.Id });
                     if (exist != null)
                     {
                         var sql = $@"UPDATE RuinItemDrop
@@ -205,14 +205,35 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                            ,@Weight
                                            ,@Probability)", new { IdRuin = ruin.Id, IdItem = drop.Item.Id, Weight = drop.Weight, Probability = drop.Probability });
                     }
-                }         
+                }
             }
             connection.Close();
         }
 
-        public Dictionary<string, MyHordesOptimizerRuin> GetRuins()
+        public List<MyHordesOptimizerRuin> GetRuins()
         {
-            throw new NotImplementedException();
+            var items = GetItems();
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var ruinsComplet = connection.GetList<RuinCompletModel>();
+            connection.Close();
+
+            var ruins = Mapper.Map<List<MyHordesOptimizerRuin>>(ruinsComplet.Distinct(new RuinIdComparer()));
+            foreach (var ruin in ruins)
+            {
+                IEnumerable<RuinCompletModel> matchingComplet = ruinsComplet.Where(i => i.IdRuin == ruin.Id);
+                var dropComplet = matchingComplet.Select(r => new { r.IdItem, r.DropWeight, r.DropProbability });
+                foreach(var drop in dropComplet)
+                {
+                    ruin.Drops.Add(new ItemResult()
+                    {
+                        Item = items.First(i => i.Id == drop.IdItem),
+                        Probability = drop.DropProbability,
+                        Weight = drop.DropWeight
+                    });
+                }
+            }
+            return ruins;
         }
 
         #endregion
