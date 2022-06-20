@@ -1,86 +1,64 @@
-[
-  {
-    "ws001": {
+{"ws001": {
       "type": "WORKSHOP",
       "in": "repair_kit_part_#00",
       "out": "repair_kit_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws002": {
+  ,"ws002": {
       "type": "WORKSHOP",
       "in": "can_#00",
       "out": "can_open_#00",
       "action": "Öffnen"
     }
-  },
-  {
-    "ws003": {
+  ,"ws003": {
       "type": "WORKSHOP",
       "in": "plate_raw_#00",
       "out": "plate_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws004": {
+  ,"ws004": {
       "type": "WORKSHOP",
       "in": "wood_log_#00",
       "out": "wood2_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws005": {
+  ,"ws005": {
       "type": "WORKSHOP",
       "in": "wood_bad_#00",
       "out": "wood2_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws006": {
+  ,"ws006": {
       "type": "WORKSHOP",
       "in": "wood2_#00",
       "out": "wood_beam_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws007": {
+  ,"ws007": {
       "type": "WORKSHOP",
       "in": "wood_beam_#00",
       "out": "wood2_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws008": {
+  ,"ws008": {
       "type": "WORKSHOP",
       "in": "metal_bad_#00",
       "out": "metal_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws009": {
+  ,"ws009": {
       "type": "WORKSHOP",
       "in": "metal_#00",
       "out": "metal_beam_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws010": {
+  ,"ws010": {
       "type": "WORKSHOP",
       "in": "metal_beam_#00",
       "out": "metal_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws011": {
+  ,"ws011": {
       "type": "WORKSHOP",
       "in": "electro_box_#00",
       "out": [
@@ -111,9 +89,7 @@
       ],
       "action": "Zerlegen"
     }
-  },
-  {
-    "ws012": {
+  ,"ws012": {
       "type": "WORKSHOP",
       "in": "mecanism_#00",
       "out": [
@@ -136,9 +112,7 @@
       ],
       "action": "Zerlegen"
     }
-  },
-  {
-    "ws013": {
+  ,"ws013": {
       "type": "WORKSHOP",
       "in": "chest_#00",
       "out": [
@@ -173,9 +147,7 @@
       ],
       "action": "Öffnen"
     }
-  },
-  {
-    "ws014": {
+  ,"ws014": {
       "type": "WORKSHOP",
       "in": "chest_xl_#00",
       "out": [
@@ -214,9 +186,7 @@
       ],
       "action": "Öffnen"
     }
-  },
-  {
-    "ws015": {
+  ,"ws015": {
       "type": "WORKSHOP",
       "in": "chest_tools_#00",
       "out": [
@@ -247,9 +217,7 @@
       ],
       "action": "Öffnen"
     }
-  },
-  {
-    "ws016": {
+  ,"ws016": {
       "type": "WORKSHOP",
       "in": "chest_food_#00",
       "out": [
@@ -276,9 +244,7 @@
       ],
       "action": "Öffnen"
     }
-  },
-  {
-    "ws017": {
+  ,"ws017": {
       "type": "WORKSHOP",
       "in": "deco_box_#00",
       "out": [
@@ -305,9 +271,7 @@
       ],
       "action": "Wandeln"
     }
-  },
-  {
-    "ws018": {
+  ,"ws018": {
       "type": "WORKSHOP",
       "in": "catbox_#00",
       "out": [
@@ -326,50 +290,38 @@
       ],
       "action": "Öffnen"
     }
-  },
-  {
-    "ws019": {
+  ,"ws019": {
       "type": "WORKSHOP",
       "in": "prints_#00",
       "out": "magneticKey_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws020": {
+  ,"ws020": {
       "type": "WORKSHOP",
       "in": "prints_#01",
       "out": "bumpKey_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws021": {
+  ,"ws021": {
       "type": "WORKSHOP",
       "in": "prints_#02",
       "out": "classicKey_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws023": {
+  ,"ws023": {
       "type": "WORKSHOP",
       "in": "food_xmas_#00",
       "out": "wood_xmas_#00",
       "action": "Wandeln"
     }
-  },
-  {
-    "ws022": {
+  ,"ws022": {
       "type": "WORKSHOP_SHAMAN",
       "in": "soul_blue_#00",
       "out": "soul_yellow_#00",
       "action": "Wandeln",
       "picto": "r_mystic2_#00"
     }
-  },
-  {
-    "com001": {
+  ,"com001": {
       "type": "MANUAL_ANYWHERE",
       "out": "coffee_machine_#00",
       "provoking": "coffee_machine_part_#00",
@@ -383,9 +335,7 @@
         "tube_#00"
       ]
     }
-  },
-  {
-    "com002": {
+  ,"com002": {
       "type": "MANUAL_ANYWHERE",
       "out": "music_#00",
       "provoking": "music_part_#00",
@@ -395,9 +345,7 @@
         "electro_#00"
       ]
     }
-  },
-  {
-    "com003": {
+  ,"com003": {
       "type": "MANUAL_ANYWHERE",
       "out": "guitar_#00",
       "provoking": "staff2_#00",
@@ -407,9 +355,7 @@
         "staff2_#00"
       ]
     }
-  },
-  {
-    "com004": {
+  ,"com004": {
       "type": "MANUAL_ANYWHERE",
       "out": "car_door_#00",
       "provoking": "car_door_part_#00",
@@ -420,9 +366,7 @@
         "metal_#00"
       ]
     }
-  },
-  {
-    "com005": {
+  ,"com005": {
       "type": "MANUAL_ANYWHERE",
       "out": "torch_#00",
       "provoking": "lights_#00",
@@ -431,9 +375,7 @@
         "wood_bad_#00"
       ]
     }
-  },
-  {
-    "com006": {
+  ,"com006": {
       "type": "MANUAL_ANYWHERE",
       "out": "wood_plate_#00",
       "provoking": "wood_plate_part_#00",
@@ -442,9 +384,7 @@
         "wood2_#00"
       ]
     }
-  },
-  {
-    "com007": {
+  ,"com007": {
       "type": "MANUAL_ANYWHERE",
       "out": "concrete_wall_#00",
       "provoking": "concrete_#00",
@@ -453,9 +393,7 @@
         "water_#00"
       ]
     }
-  },
-  {
-    "com008": {
+  ,"com008": {
       "type": "MANUAL_ANYWHERE",
       "out": "chama_tasty_#00",
       "provoking": "chama_#00",
@@ -467,9 +405,7 @@
         "torch_#00"
       ]
     }
-  },
-  {
-    "com009": {
+  ,"com009": {
       "type": "MANUAL_ANYWHERE",
       "out": "food_noodles_hot_#00",
       "provoking": "spices_#00",
@@ -479,9 +415,7 @@
         "water_#00"
       ]
     }
-  },
-  {
-    "com010": {
+  ,"com010": {
       "type": "MANUAL_ANYWHERE",
       "out": "coffee_#00",
       "provoking": "coffee_machine_#00",
@@ -491,9 +425,7 @@
         "wood_bad_#00"
       ]
     }
-  },
-  {
-    "com011": {
+  ,"com011": {
       "type": "MANUAL_ANYWHERE",
       "out": "watergun_opt_empty_#00",
       "provoking": "watergun_opt_part_#00",
@@ -506,9 +438,7 @@
       ],
       "picto": "r_watgun_#00"
     }
-  },
-  {
-    "com012": {
+  ,"com012": {
       "type": "MANUAL_ANYWHERE",
       "out": "pilegun_up_empty_#00",
       "provoking": "pilegun_upkit_#00",
@@ -520,9 +450,7 @@
         "rustine_#00"
       ]
     }
-  },
-  {
-    "com013": {
+  ,"com013": {
       "type": "MANUAL_ANYWHERE",
       "out": "mixergun_empty_#00",
       "provoking": "mixergun_part_#00",
@@ -533,9 +461,7 @@
         "rustine_#00"
       ]
     }
-  },
-  {
-    "com014": {
+  ,"com014": {
       "type": "MANUAL_ANYWHERE",
       "out": "jerrygun_#00",
       "provoking": "jerrygun_part_#00",
@@ -545,9 +471,7 @@
         "rustine_#00"
       ]
     }
-  },
-  {
-    "com015": {
+  ,"com015": {
       "type": "MANUAL_ANYWHERE",
       "out": "chainsaw_empty_#00",
       "provoking": "chainsaw_part_#00",
@@ -560,9 +484,7 @@
       ],
       "picto": "r_tronco_#00"
     }
-  },
-  {
-    "com016": {
+  ,"com016": {
       "type": "MANUAL_ANYWHERE",
       "out": "bgrenade_empty_#00",
       "provoking": "deto_#00",
@@ -573,9 +495,7 @@
         "rustine_#00"
       ]
     }
-  },
-  {
-    "com017": {
+  ,"com017": {
       "type": "MANUAL_ANYWHERE",
       "out": "lawn_#00",
       "provoking": "lawn_part_#00",
@@ -586,9 +506,7 @@
         "rustine_#00"
       ]
     }
-  },
-  {
-    "com018": {
+  ,"com018": {
       "type": "MANUAL_ANYWHERE",
       "out": "flash_#00",
       "provoking": "powder_#00",
@@ -598,9 +516,7 @@
         "rustine_#00"
       ]
     }
-  },
-  {
-    "com019": {
+  ,"com019": {
       "type": "MANUAL_ANYWHERE",
       "out": "big_pgun_empty_#00",
       "provoking": "big_pgun_part_#00",
@@ -611,9 +527,7 @@
       ],
       "picto": "r_batgun_#00"
     }
-  },
-  {
-    "com020": {
+  ,"com020": {
       "type": "MANUAL_ANYWHERE",
       "out": "cart_#00",
       "provoking": "cart_part_#00",
@@ -624,9 +538,7 @@
         "tube_#00"
       ]
     }
-  },
-  {
-    "com021": {
+  ,"com021": {
       "type": "MANUAL_ANYWHERE",
       "out": "poison_#00",
       "provoking": "poison_part_#00",
@@ -636,9 +548,7 @@
         "pharma_#00"
       ]
     }
-  },
-  {
-    "com022": {
+  ,"com022": {
       "type": "MANUAL_ANYWHERE",
       "out": "flesh_#00",
       "provoking": "flesh_part_#00",
@@ -649,9 +559,7 @@
       "picto": "r_solban_#00",
       "stealthy": true
     }
-  },
-  {
-    "com023": {
+  ,"com023": {
       "type": "MANUAL_ANYWHERE",
       "out": "saw_tool_#00",
       "provoking": "saw_tool_part_#00",
@@ -661,9 +569,7 @@
         "meca_parts_#00"
       ]
     }
-  },
-  {
-    "com024": {
+  ,"com024": {
       "type": "MANUAL_ANYWHERE",
       "out": "engine_#00",
       "provoking": "engine_part_#00",
@@ -676,9 +582,7 @@
         "bone_#00"
       ]
     }
-  },
-  {
-    "com025": {
+  ,"com025": {
       "type": "MANUAL_ANYWHERE",
       "out": "repair_kit_#00",
       "provoking": "repair_kit_part_raw_#00",
@@ -689,9 +593,7 @@
         "wood2_#00"
       ]
     }
-  },
-  {
-    "com026": {
+  ,"com026": {
       "type": "MANUAL_ANYWHERE",
       "out": "fruit_part_#00",
       "provoking": "fruit_sub_part_#00",
@@ -702,9 +604,7 @@
       "picto": "r_solban_#00",
       "stealthy": true
     }
-  },
-  {
-    "com027": {
+  ,"com027": {
       "type": "MANUAL_ANYWHERE",
       "out": [
         [
@@ -738,9 +638,7 @@
         "pharma_#00"
       ]
     }
-  },
-  {
-    "com028": {
+  ,"com028": {
       "type": "MANUAL_ANYWHERE",
       "out": [
         [
@@ -776,9 +674,7 @@
       "picto": "r_solban_#00",
       "stealthy": true
     }
-  },
-  {
-    "com029": {
+  ,"com029": {
       "type": "MANUAL_ANYWHERE",
       "out": "trapma_#00",
       "provoking": "claymo_#00",
@@ -787,9 +683,7 @@
         "door_carpet_#00"
       ]
     }
-  },
-  {
-    "com030": {
+  ,"com030": {
       "type": "MANUAL_ANYWHERE",
       "out": "claymo_#00",
       "provoking": "wire_#00",
@@ -800,9 +694,7 @@
         "rustine_#00"
       ]
     }
-  },
-  {
-    "com031": {
+  ,"com031": {
       "type": "MANUAL_ANYWHERE",
       "out": "scope_#00",
       "provoking": "lens_#00",
@@ -811,9 +703,7 @@
         "lens_#00"
       ]
     }
-  },
-  {
-    "com032": {
+  ,"com032": {
       "type": "MANUAL_ANYWHERE",
       "out": "fungus_#00",
       "provoking": "ryebag_#00",
@@ -822,9 +712,7 @@
         "lens_#00"
       ]
     }
-  },
-  {
-    "com033": {
+  ,"com033": {
       "type": "MANUAL_ANYWHERE",
       "out": "lsd_#00",
       "provoking": "fungus_#00",
@@ -833,9 +721,7 @@
         "poison_part_#00"
       ]
     }
-  },
-  {
-    "com034": {
+  ,"com034": {
       "type": "MANUAL_ANYWHERE",
       "out": "chkspk_#00",
       "provoking": "chudol_#00",
@@ -844,9 +730,7 @@
         "lsd_#00"
       ]
     }
-  },
-  {
-    "com035": {
+  ,"com035": {
       "type": "MANUAL_ANYWHERE",
       "out": "fruit_#00",
       "provoking": "fruit_part_#00",
@@ -857,9 +741,7 @@
       "picto": "r_solban_#00",
       "stealthy": true
     }
-  },
-  {
-    "com036": {
+  ,"com036": {
       "type": "MANUAL_ANYWHERE",
       "out": "dfhifi_#00",
       "provoking": "cdelvi_#00",
@@ -868,9 +750,7 @@
         "music_#00"
       ]
     }
-  },
-  {
-    "com037": {
+  ,"com037": {
       "type": "MANUAL_ANYWHERE",
       "out": "hifiev_#00",
       "provoking": "cdphil_#00",
@@ -879,9 +759,7 @@
         "music_#00"
       ]
     }
-  },
-  {
-    "com038": {
+  ,"com038": {
       "type": "MANUAL_ANYWHERE",
       "out": "hifiev_#00",
       "provoking": "cdbrit_#00",
@@ -890,9 +768,7 @@
         "music_#00"
       ]
     }
-  },
-  {
-    "com039": {
+  ,"com039": {
       "type": "MANUAL_ANYWHERE",
       "out": "dfhifi_#01",
       "provoking": "bquies_#00",
@@ -901,9 +777,7 @@
         "bquies_#00"
       ]
     }
-  },
-  {
-    "com040": {
+  ,"com040": {
       "type": "MANUAL_ANYWHERE",
       "out": "lpoint4_#00",
       "provoking": "diode_#00",
@@ -915,9 +789,7 @@
         "diode_#00"
       ]
     }
-  },
-  {
-    "com041": {
+  ,"com041": {
       "type": "MANUAL_ANYWHERE",
       "out": "hmbrew_#00",
       "provoking": "oilcan_#00",
@@ -927,9 +799,7 @@
         "oilcan_#00"
       ]
     }
-  },
-  {
-    "com042": {
+  ,"com042": {
       "type": "MANUAL_ANYWHERE",
       "out": "wood_xmas_#00",
       "provoking": "food_xmas_#00",
@@ -938,9 +808,7 @@
         "can_open_#00"
       ]
     }
-  },
-  {
-    "com043": {
+  ,"com043": {
       "type": "MANUAL_ANYWHERE",
       "out": "gun_#00",
       "provoking": "gun_#00",
@@ -949,9 +817,7 @@
         "bullets_#00"
       ]
     }
-  },
-  {
-    "com044": {
+  ,"com044": {
       "type": "MANUAL_ANYWHERE",
       "out": "machine_gun_#00",
       "provoking": "machine_gun_#00",
@@ -960,9 +826,7 @@
         "bullets_#00"
       ]
     }
-  },
-  {
-    "com045": {
+  ,"com045": {
       "type": "MANUAL_ANYWHERE",
       "out": "christmas_suit_full_#00",
       "provoking": "christmas_suit_1_#00",
@@ -972,9 +836,7 @@
         "christmas_suit_3_#00"
       ]
     }
-  },
-  {
-    "com046": {
+  ,"com046": {
       "type": "MANUAL_ANYWHERE",
       "out": "christmas_suit_full_#00",
       "provoking": "christmas_suit_2_#00",
@@ -984,9 +846,7 @@
         "christmas_suit_3_#00"
       ]
     }
-  },
-  {
-    "com047": {
+  ,"com047": {
       "type": "MANUAL_ANYWHERE",
       "out": "christmas_suit_full_#00",
       "provoking": "christmas_suit_3_#00",
@@ -996,9 +856,7 @@
         "christmas_suit_3_#00"
       ]
     }
-  },
-  {
-    "com048": {
+  ,"com048": {
       "type": "MANUAL_ANYWHERE",
       "out": "pumpkin_on_#00",
       "provoking": "pumpkin_off_#00",
@@ -1008,9 +866,7 @@
         "pharma_#00"
       ]
     }
-  },
-  {
-    "com049": {
+  ,"com049": {
       "type": "MANUAL_ANYWHERE",
       "out": "angryc_#00",
       "provoking": "pet_snake2_#00",
@@ -1019,9 +875,7 @@
         "cutter_#00"
       ]
     }
-  },
-  {
-    "com050": {
+  ,"com050": {
       "type": "MANUAL_ANYWHERE",
       "out": "pumpkin_off_#00",
       "provoking": "pumpkin_raw_#00",
@@ -1033,9 +887,7 @@
         "small_knife_#00"
       ]
     }
-  },
-  {
-    "com051": {
+  ,"com051": {
       "type": "MANUAL_ANYWHERE",
       "out": "item_infect_poison_#00",
       "provoking": "infect_poison_part_#00",
@@ -1047,5 +899,4 @@
         "drug_water_#00"
       ]
     }
-  }
-]
+}
