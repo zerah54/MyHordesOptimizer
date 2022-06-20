@@ -26,7 +26,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return list;
         }
 
-        public Dictionary<string,List<string>> GetItemsProperties()
+        public Dictionary<string, List<string>> GetItemsProperties()
         {
             var path = "Data/Items/item-properties.json";
             var json = File.ReadAllText(path);
@@ -48,6 +48,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var json = File.ReadAllText(path);
             var list = json.FromJson<List<MyHordesHerosCapacitiesCodeModel>>();
             return list;
+        }
+
+        public Dictionary<string, MyHordesRecipeCodeModel> GetRecipes()
+        {
+            var path = "Data/Items/recipes.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, MyHordesRecipeCodeModel>>();
+            return dico;
         }
     }
 }

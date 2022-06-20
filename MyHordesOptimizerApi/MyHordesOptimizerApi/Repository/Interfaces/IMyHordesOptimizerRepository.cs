@@ -17,21 +17,29 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         List<Item> GetItems();
         Item GetItemsById(int itemId);
 
-        void PatchRecipes(List<ItemRecipe> recipes);
+        void PatchRecipes(List<RecipeModel> recipes);
         Dictionary<string, ItemRecipe> GetRecipes();
+        void DeleteAllRecipeComponents();
+        void DeleteAllRecipeResults();
+        void PatchRecipeComponents(string recipeName, List<string> componentUids);
+        void PatchRecipeResults(List<RecipeItemResultModel> results);
 
         void PutBank(int townId, BankWrapper bank);
 
         void PatchCitizen(int townId, CitizensWrapper citizens);
 
         void PutWishList(int townId, WishListWrapper wishList);
+
         void PatchRuins(List<MyHordesOptimizerRuin> jsonRuins);
         List<MyHordesOptimizerRuin> GetRuins();
+
         void PatchCategories(List<CategoryModel> categories);
         IEnumerable<CategoryModel> GetCategories();
+
         void PatchProperties(List<string> allProperties);
         void DeleteAllPropertiesItem();
         void PatchPropertiesItem(string itemUid, List<string> properties);
+
         void PatchActions(List<string> allActions);
         void DeleteAllActionsItem();
         void PatchActionsItem(string itemUid, List<string> actions);

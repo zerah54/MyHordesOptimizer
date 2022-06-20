@@ -1,15 +1,16 @@
 ﻿using AutoMapper;
 using Common.Core.Repository.Interfaces;
+using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
-using MyHordesOptimizerApi.Dtos.MyHordes.Import.i18n;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
 
@@ -21,17 +22,19 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         protected readonly IWebApiRepository WebApiRepository;
         protected readonly IMyHordesTranslationsConfiguration TranslationsConfiguration;
 
-        protected IMyHordesApiRepository MyHordesApiRepository { get; set; }
-        protected IMyHordesCodeRepository MyHordesCodeRepository { get; set; }
+        protected IMyHordesApiRepository MyHordesApiRepository;
+        protected IMyHordesCodeRepository MyHordesCodeRepository;
         protected readonly IMapper Mapper;
 
+        protected readonly ILogger<MyHordesImportService> Logger;
 
         public MyHordesImportService(IMyHordesOptimizerRepository firebaseRepository,
             IWebApiRepository webApiRepository,
             IMyHordesTranslationsConfiguration translationsConfiguration,
             IMyHordesApiRepository myHordesJsonApiRepository,
             IMyHordesCodeRepository myHordesCodeRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<MyHordesImportService> logger)
         {
             MyHordesOptimizerRepository = firebaseRepository;
             WebApiRepository = webApiRepository;
@@ -39,6 +42,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             MyHordesApiRepository = myHordesJsonApiRepository;
             MyHordesCodeRepository = myHordesCodeRepository;
             Mapper = mapper;
+            Logger = logger;
         }
 
         #region HeroSkill
@@ -76,7 +80,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         #region Items
 
-        public void ImportItems()
+        public async Task ImportItems()
         {
             // Récupération des items
             var myHordesItems = MyHordesApiRepository.GetItems();
@@ -109,6 +113,77 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 MyHordesOptimizerRepository.PatchActionsItem(itemUid, actions);
             }
 
+            //Récupération des recipes
+            var codeItemRecipes = MyHordesCodeRepository.GetRecipes();
+            var mhoRecipes = Mapper.Map<List<RecipeModel>>(codeItemRecipes);
+
+            // Traductions
+            var ymlDeserializer = new DeserializerBuilder()
+                .Build();
+            var ymlFr = await WebApiRepository.Get(url: TranslationsConfiguration.ItemFrUrl).Content.ReadAsStringAsync();
+            var ymlEn = await WebApiRepository.Get(url: TranslationsConfiguration.ItemEnUrl).Content.ReadAsStringAsync();
+            var ymlEs = await WebApiRepository.Get(url: TranslationsConfiguration.ItemEsUrl).Content.ReadAsStringAsync();
+
+            var frenchTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlFr);
+            var englishTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlEn);
+            var spanishTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlEs);
+            foreach (var recipe in mhoRecipes)
+            {
+                if (recipe.ActionDe != null)
+                {
+                    recipe.ActionFr = frenchTrads[recipe.ActionDe];
+                    recipe.ActionEn = englishTrads[recipe.ActionDe];
+                    recipe.ActionEs = spanishTrads[recipe.ActionDe];
+                }
+            }
+            MyHordesOptimizerRepository.PatchRecipes(mhoRecipes);
+            MyHordesOptimizerRepository.DeleteAllRecipeComponents();
+            MyHordesOptimizerRepository.DeleteAllRecipeResults();
+            foreach (var kvp in codeItemRecipes)
+            {
+                var recipeName = kvp.Key;
+                var componentUids = kvp.Value.In;
+                MyHordesOptimizerRepository.PatchRecipeComponents(recipeName, componentUids);
+                try
+                {
+                    var resultsObjects = kvp.Value.Out;
+                    var results = new List<RecipeItemResultModel>();
+                    var totalWeight = 0;
+                    foreach (var @object in resultsObjects)
+                    {
+                        if (@object is string)
+                        {
+                            var uid = @object as string;
+                            results.Add(new RecipeItemResultModel()
+                            {
+                                IdItem = mhoItems.Where(i => i.Uid == uid).Select(i => i.IdItem).First(),
+                                Probability = 1,
+                                Weight = 0,
+                                RecipeName = recipeName
+                            });
+                        }
+                        else if (@object is JArray)
+                        {
+                            var jArray = @object as JArray;
+                            var uid = jArray.First().Value<string>();
+                            var weight = jArray.Last().Value<int>();
+                            totalWeight += weight;
+                            results.Add(new RecipeItemResultModel()
+                            {
+                                IdItem = mhoItems.Where(i => i.Uid == uid).Select(i => i.IdItem).First(),
+                                Weight = weight,
+                                RecipeName = recipeName
+                            });
+                        }
+                    }
+                    results.ForEach(x => { if (x.Probability != 1) x.Probability = (float)x.Weight / totalWeight; });
+                    MyHordesOptimizerRepository.PatchRecipeResults(results);
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError(e, $"Erreur lors de l'enregistrement des réulstats de la recette {recipeName}");
+                }
+            }
         }
 
         #endregion

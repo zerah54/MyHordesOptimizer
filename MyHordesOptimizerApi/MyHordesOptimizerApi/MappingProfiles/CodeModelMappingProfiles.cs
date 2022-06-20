@@ -2,6 +2,7 @@
 using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Models;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
@@ -32,6 +33,16 @@ namespace MyHordesOptimizerApi.MappingProfiles
               .ForMember(dest => dest.DescriptionFr, opt => opt.Ignore())
               .ForMember(dest => dest.DescriptionEn, opt => opt.Ignore())
               .ForMember(dest => dest.DescriptionEs, opt => opt.Ignore());
+
+            CreateMap<KeyValuePair<string, MyHordesRecipeCodeModel>, RecipeModel>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Key))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Value.Type))
+                .ForMember(dest => dest.ActionDe, opt => opt.MapFrom(src => src.Value.Action))
+                .ForMember(dest => dest.Stealthy, opt => opt.MapFrom(src => src.Value.Stealthy))
+                .ForMember(dest => dest.PictoUid, opt => opt.MapFrom(src => src.Value.Picto))
+                .ForMember(dest => dest.ActionFr, opt => opt.Ignore())
+                .ForMember(dest => dest.ActionEs, opt => opt.Ignore())
+                .ForMember(dest => dest.ActionEn, opt => opt.Ignore());
         }
     }
 }

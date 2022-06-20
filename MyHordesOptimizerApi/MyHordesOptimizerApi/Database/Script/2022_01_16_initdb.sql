@@ -47,14 +47,14 @@ CREATE TABLE Item(
 );
 
 CREATE TABLE Recipe(
-	idRecipe INT PRIMARY KEY NOT NULL IDENTITY,
-	isShamanOnly BIT,
+	name NVARCHAR(255) PRIMARY KEY NOT NULL,
 	action_fr NVARCHAR(255),
 	action_en NVARCHAR(255),
 	action_de NVARCHAR(255),
 	action_es NVARCHAR(255),
-	name NVARCHAR(255),
-	type NVARCHAR(255)
+	type NVARCHAR(255),
+	pictoUid NVARCHAR(255),
+	stealthy BIT
 );
 
 CREATE TABLE Action(
@@ -189,21 +189,21 @@ CREATE TABLE ItemProperty(
 );
 
 CREATE TABLE RecipeItemResult(
-	idRecipe INT,
+	recipeName NVARCHAR(255),
 	idItem INT,
 	weight INT,
 	probability FLOAT,
-	PRIMARY KEY (idRecipe, idItem),
-	FOREIGN KEY(idRecipe) REFERENCES Recipe(idRecipe),
+	PRIMARY KEY (recipeName, idItem, probability),
+	FOREIGN KEY(recipeName) REFERENCES Recipe(name),
 	FOREIGN KEY(idItem) REFERENCES Item(idItem)
 );
 
 CREATE TABLE RecipeItemComponent(
-	idRecipe INT,
+	recipeName NVARCHAR(255),
 	idItem INT,
 	count INT,
-	PRIMARY KEY (idRecipe, idItem),
-	FOREIGN KEY(idRecipe) REFERENCES Recipe(idRecipe),
+	PRIMARY KEY (recipeName, idItem),
+	FOREIGN KEY(recipeName) REFERENCES Recipe(name),
 	FOREIGN KEY(idItem) REFERENCES Item(idItem)
 );
 

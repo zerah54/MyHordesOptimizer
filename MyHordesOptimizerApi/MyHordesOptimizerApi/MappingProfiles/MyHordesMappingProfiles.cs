@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using MyHordesOptimizerApi.Data.Ruins;
 using MyHordesOptimizerApi.Dtos.MyHordes;
-using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
-using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.MappingProfiles.Resolvers;
 using System.Collections.Generic;

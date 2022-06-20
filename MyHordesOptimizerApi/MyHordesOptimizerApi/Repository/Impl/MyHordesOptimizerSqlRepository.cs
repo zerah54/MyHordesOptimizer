@@ -125,9 +125,88 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #region Recipes
 
-        public void PatchRecipes(List<ItemRecipe> recipes)
+        public void PatchRecipes(List<RecipeModel> recipes)
         {
-            throw new NotImplementedException();
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var existings = connection.Query<RecipeModel>("SELECT * FROM Recipe");
+            foreach (var recipe in recipes)
+            {
+                if (existings.Any(r => r.Name == recipe.Name))
+                {
+                    connection.Update(recipe);
+                }
+                else
+                {
+                    connection.Insert(recipe);
+                }
+            }
+            connection.Close();
+        }
+
+        public void DeleteAllRecipeComponents()
+        {
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Execute("DELETE FROM RecipeItemComponent");
+            connection.Close();
+        }
+
+        public void DeleteAllRecipeResults()
+        {
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Execute("DELETE FROM RecipeItemResult");
+            connection.Close();
+        }
+
+        public void PatchRecipeComponents(string recipeName, List<string> componentUids)
+        {
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var grouping = componentUids.GroupBy(x => x).Select(x => new { Count = x.Count(), Uid = x.Key });
+            foreach (var group in grouping)
+            {
+                var existingItem = connection.QuerySingle<ItemModel>($@"SELECT * FROM Item WHERE uid = @ItemUid", new { ItemUid = group.Uid });
+                var exist = connection.ExecuteScalar<int>("SELECT  count(*) FROM RecipeItemComponent WHERE idItem = @IdItem AND recipeName = @RecipeName", new { IdItem = existingItem.IdItem, RecipeName = recipeName });
+                if (exist == 0)
+                {
+                    connection.Execute($@"INSERT INTO RecipeItemComponent
+                                           (idItem
+                                           ,recipeName
+                                           ,count)
+                                     VALUES
+                                           (@IdItem
+                                            ,@RecipeName
+                                            ,@Count)", new { IdItem = existingItem.IdItem, RecipeName = recipeName, Count = group.Count });
+                }
+            }
+            connection.Close();
+        }
+
+        public void PatchRecipeResults(List<RecipeItemResultModel> results)
+        {
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            foreach (var result in results)
+            {
+                var existingItem = connection.QuerySingle<ItemModel>($@"SELECT * FROM Item WHERE idItem = @IdItem", new { IdItem = result.IdItem });
+                var exist = connection.ExecuteScalar<int>("SELECT  count(*) FROM RecipeItemResult WHERE idItem = @IdItem AND recipeName = @RecipeName", new { IdItem = existingItem.IdItem, RecipeName = result.RecipeName });
+                if (exist == 0)
+                {
+                    connection.Execute($@"INSERT INTO RecipeItemResult
+                                           (idItem
+                                           ,recipeName
+                                           ,weight
+                                           ,probability)
+                                     VALUES
+                                           (@IdItem
+                                            ,@RecipeName
+                                            ,@Weight
+                                            ,@Probability)", new { IdItem = existingItem.IdItem, RecipeName = result.RecipeName, Weight = result.Weight, Probability = result.Probability });
+                }
+            }
+            connection.Close();
         }
 
         public Dictionary<string, ItemRecipe> GetRecipes()
@@ -228,7 +307,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             {
                 IEnumerable<RuinCompletModel> matchingComplet = ruinsComplet.Where(i => i.IdRuin == ruin.Id);
                 var dropComplet = matchingComplet.Select(r => new { r.IdItem, r.DropWeight, r.DropProbability });
-                foreach(var drop in dropComplet)
+                foreach (var drop in dropComplet)
                 {
                     ruin.Drops.Add(new ItemResult()
                     {
