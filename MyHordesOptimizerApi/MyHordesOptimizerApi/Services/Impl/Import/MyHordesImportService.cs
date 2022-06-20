@@ -72,18 +72,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             MyHordesOptimizerRepository.PatchHeroSkill(capacities);
         }
 
-        private void AddHeroSkillTraduction(string url, List<HeroSkill> heroSkillsWithoutTrad, string locale)
-        {
-            var translationFile = WebApiRepository.Get<TranslationXmlFileDto>(url: url, mediaTypeOut: MediaTypeNames.Application.Xml);
-            foreach (var heroSkill in heroSkillsWithoutTrad)
-            {
-                var descriptionUnit = translationFile.File.Unit.First(unit => unit.Segment.Source == heroSkill.Description[HeroSkill.DefaultLocale]);
-                heroSkill.Description[locale] = descriptionUnit.Segment.Target;
-                var labelUnit = translationFile.File.Unit.First(unit => unit.Segment.Source == heroSkill.Label[HeroSkill.DefaultLocale]);
-                heroSkill.Label[locale] = labelUnit.Segment.Target;
-            }
-        }
-
         #endregion
 
         #region Items
@@ -147,8 +135,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     foreach (var drop in codeRuin.Drops)
                     {
                         totalWeight += drop.Value;
-                        var itemKey = drop.Key.Remove(drop.Key.Length - 4); // On retire le _#00
-                        var item = items.FirstOrDefault(x => x.Uid == itemKey);
+                        var item = items.FirstOrDefault(x => x.Uid == drop.Key);
                         miror.Drops.Add(new ItemResult()
                         {
                             Item = item,

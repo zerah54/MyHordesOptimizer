@@ -1,9 +1,12 @@
-﻿using Dapper;
+﻿using AutoMapper;
+using Dapper;
 using DapperExtensions;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.Views;
+using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -16,10 +19,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
     {
         protected IMyHordesOptimizerSqlConfiguration Configuration { get; private set; }
         protected ILogger<MyHordesOptimizerSqlRepository> Logger { get; private set; }
-        public MyHordesOptimizerSqlRepository(IMyHordesOptimizerSqlConfiguration configuration, ILogger<MyHordesOptimizerSqlRepository> logger)
+        protected IMapper Mapper { get; private set; }
+        public MyHordesOptimizerSqlRepository(IMyHordesOptimizerSqlConfiguration configuration,
+            ILogger<MyHordesOptimizerSqlRepository> logger,
+            IMapper mapper)
         {
             Configuration = configuration;
             Logger = logger;
+            Mapper = mapper;
         }
 
 
@@ -89,7 +96,19 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public List<Item> GetItems()
         {
-            throw new NotImplementedException();
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var itemsComplets = connection.GetList<ItemCompletModel>();
+            connection.Close();
+
+            var items = Mapper.Map<List<Item>>(itemsComplets.Distinct(new ItemIdComparer()));
+            foreach(var item in items)
+            {
+                IEnumerable<ItemCompletModel> matchingItemComplet = itemsComplets.Where(i => i.IdItem == item.Id);
+                item.Actions = matchingItemComplet.Select(i => i.ActionName).Distinct();
+                item.Properties = matchingItemComplet.Select(i => i.PropertyName).Distinct();
+            }
+            return items;
         }
 
         public Item GetItemsById(int itemId)
@@ -144,7 +163,51 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchRuins(List<MyHordesOptimizerRuin> ruins)
         {
-            throw new NotImplementedException();
+            var model = Mapper.Map<List<RuinModel>>(ruins);
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var existings = connection.Query<RuinModel>("SELECT * FROM Ruin");
+            foreach (var ruin in model)
+            {
+                if (existings.Any(r => r.IdRuin == ruin.IdRuin))
+                {
+                    connection.Update(ruin);
+                }
+                else
+                {
+                    connection.Insert(ruin);
+                }
+            }
+
+            connection.Execute("DELETE FROM RuinItemDrop");
+            foreach(var ruin in ruins)
+            {
+                foreach(var drop in ruin.Drops)
+                {
+                    var exist = connection.ExecuteScalar<string>("SELECT idRuin, idItem FROM RuinItemDrop WHERE idRuin = @IdRuin AND idItem = @IdItem", new { IdRuin = ruin.Id, IdItem = drop.Item.Id});
+                    if (exist != null)
+                    {
+                        var sql = $@"UPDATE RuinItemDrop
+                                SET weight = @Weight
+                                WHERE probability = @Probability";
+                        connection.Execute(sql, new { Weight = drop.Weight, Probability = drop.Probability });
+                    }
+                    else
+                    {
+                        connection.Execute($@"INSERT INTO RuinItemDrop
+                                           (idRuin
+                                           ,idItem
+                                           ,weight
+                                           ,probability)
+                                     VALUES
+                                           (@IdRuin
+                                           ,@IdItem
+                                           ,@Weight
+                                           ,@Probability)", new { IdRuin = ruin.Id, IdItem = drop.Item.Id, Weight = drop.Weight, Probability = drop.Probability });
+                    }
+                }         
+            }
+            connection.Close();
         }
 
         public Dictionary<string, MyHordesOptimizerRuin> GetRuins()

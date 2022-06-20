@@ -83,6 +83,24 @@ CREATE TABLE Users(
 	userKey NVARCHAR(255)
 );
 
+CREATE TABLE Ruin(
+	idRuin INT PRIMARY KEY NOT NULL,
+	label_fr NVARCHAR(255),
+	label_en NVARCHAR(255),
+	label_es NVARCHAR(255),
+	label_de NVARCHAR(255),
+	description_fr NVARCHAR(1000),
+	description_en NVARCHAR(1000),
+	description_es NVARCHAR(1000),
+	description_de NVARCHAR(1000),
+	explorable BIT,
+	img NVARCHAR(255),
+	camping INT,
+	minDist INT,
+	maxDist INT,
+	chance INT
+);
+
 CREATE TABLE LastUpdateInfo(
 	idLastUpdateInfo INT PRIMARY KEY NOT NULL IDENTITY,
 	dateUpdate DATETIME2 NOT NULL,
@@ -188,3 +206,46 @@ CREATE TABLE RecipeItemComponent(
 	FOREIGN KEY(idRecipe) REFERENCES Recipe(idRecipe),
 	FOREIGN KEY(idItem) REFERENCES Item(idItem)
 );
+
+CREATE TABLE RuinItemDrop(
+	idRuin INT,
+	idItem INT,
+	weight INT,
+	probability FLOAT,
+	PRIMARY KEY (idRuin, idItem),
+	FOREIGN KEY(idRuin) REFERENCES Ruin(idRuin),
+	FOREIGN KEY(idItem) REFERENCES Item(idItem)
+);
+GO
+
+CREATE VIEW ItemComplet 
+AS SELECT item.idItem AS idItem
+      ,item.idCategory AS idCategory
+      ,item.uid AS itemUid
+      ,item.deco AS itemDeco
+      ,item.label_fr AS itemLabel_fr
+      ,item.label_en AS itemLabel_en
+      ,item.label_es AS itemLabel_es
+      ,item.label_de AS itemLabel_de
+      ,item.description_fr AS itemDescription_fr
+      ,item.description_en AS itemDescription_en
+      ,item.description_es AS itemDescription_es
+      ,item.description_de AS itemDescription_de
+      ,item.guard AS itemGuard
+      ,item.img AS itemImg
+      ,item.isHeaver as itemIsHeaver
+	  ,cat.name AS catName
+	  ,cat.ordering AS catOrdering
+	  ,cat.label_fr AS catLabel_fr
+	  ,cat.label_en AS catLabel_en
+	  ,cat.label_es AS catLabel_es
+	  ,cat.label_de AS catLabel_de
+	  ,a.name AS actionName
+	  ,p.name AS propertyName
+  FROM Item item
+  LEFT JOIN ItemAction ie ON ie.idItem = item.idItem
+  LEFT JOIN Category cat ON cat.idCategory = item.idCategory
+  LEFT JOIN Action a ON a.name = ie.actionName
+  LEFT JOIN ItemProperty ip ON ip.idItem = item.idItem
+  LEFT JOIN Property p ON ip.propertyName = p.name;
+  GO

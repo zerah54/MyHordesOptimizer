@@ -10,7 +10,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
         public string Img { get; set; }
         public IDictionary<string, string> Label { get; set; }
         public int Id { get; set; }
-        public string Category { get; set; }
+        public Category Category { get; set; }
         public int Deco { get; set; }
         public bool IsHeaver { get; set; }
         public int Guard { get; set; }
