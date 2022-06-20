@@ -65,9 +65,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
         }
 
-        public Dictionary<string, HeroSkill> GetHeroSkills()
+        public List<HeroSkill> GetHeroSkills()
         {
-            throw new NotImplementedException();
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var models = connection.GetList<HeroSkillsModel>();
+            connection.Close();
+            var heroSkills = Mapper.Map<List<HeroSkill>>(models);
+            return heroSkills;
         }
 
 

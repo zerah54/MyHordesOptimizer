@@ -11,9 +11,9 @@ using System.Text.RegularExpressions;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
-    public class MyHordesOptimizerModelMapping : Profile
+    public class MHOModelMappingProfiles : Profile
     {
-        public MyHordesOptimizerModelMapping()
+        public MHOModelMappingProfiles()
         {
             // Items
             CreateMap<KeyValuePair<string, MyHordesItem>, ItemModel>()
@@ -77,6 +77,15 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Explorable, opt => opt.MapFrom(src => src.RuinExplorable))
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.RuinImg))
                 .ForMember(dest => dest.Drops, opt => opt.Ignore());
+
+            //HeroSkills
+            CreateMap<HeroSkillsModel, HeroSkill>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.DaysNeeded, opt => opt.MapFrom(src => src.DaysNeeded))
+                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.Icon))
+                .ForMember(dest => dest.NbUses, opt => opt.MapFrom(src => src.NbUses))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.DescriptionFr }, { "en", src.DescriptionEn }, { "es", src.DescriptionEs }, { "de", src.DescriptionDe } }))
+                .ForMember(dest => dest.Label, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.LabelFr }, { "en", src.LabelEn }, { "es", src.LabelEs }, { "de", src.LabelDe } }));
         }
 
         private string RemoveRandomNumber(string img)

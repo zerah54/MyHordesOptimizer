@@ -105,7 +105,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         public IEnumerable<HeroSkill> GetHeroSkills()
         {
             var heroSkills = MyHordesOptimizerRepository.GetHeroSkills();
-            return heroSkills.Values;
+            return heroSkills;
         }
 
         public IEnumerable<ItemRecipe> GetRecipes()
