@@ -8,7 +8,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     {
         public string Name { get; set; }
         public string Type { get; set; }
-        public bool IsShamanOnly { get; set; }
         public List<ItemResult> Result { get; set; }
         public List<Item> Components { get; set; }
         public IDictionary<string, string> Actions { get; set; }
@@ -19,17 +18,5 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
             Components = new List<Item>();
             Result = new List<ItemResult>();
         }
-    }
-
-    public enum ItemRecipeType
-    {
-        [Description("Workshop")]
-        Workshop,
-        [Description("Manual")]
-        Manual,
-        [Description("Kitchen")]
-        Kitchen,
-        [Description("Labo")]
-        Labo
     }
 }

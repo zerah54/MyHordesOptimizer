@@ -41,8 +41,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             var recipes = MyHordesOptimizerRepository.GetRecipes();
             foreach (var item in items)
             {
-                var recipesToAdd = recipes.Values.Where(recipe => recipe.Components.Any(component => component.Id == item.Id)).ToList();
-                recipesToAdd.AddRange(recipes.Values.Where(recipes => recipes.Result.Any(result => result.Item.Id == item.Id)));
+                var recipesToAdd = recipes.Where(recipe => recipe.Components.Any(component => component.Id == item.Id)).ToList();
+                recipesToAdd.AddRange(recipes.Where(recipes => recipes.Result.Any(result => result.Item.Id == item.Id)));
                 item.Recipes = recipesToAdd;
             }
 
@@ -111,7 +111,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         public IEnumerable<ItemRecipe> GetRecipes()
         {
             var recipes = MyHordesOptimizerRepository.GetRecipes();
-            return recipes.Values;
+            return recipes;
         }
 
         public BankWrapper GetBank()

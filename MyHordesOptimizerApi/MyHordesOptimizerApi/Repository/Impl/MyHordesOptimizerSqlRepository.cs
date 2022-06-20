@@ -6,6 +6,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Views.Items;
+using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using System;
@@ -209,9 +210,29 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
         }
 
-        public Dictionary<string, ItemRecipe> GetRecipes()
+        public List<ItemRecipe> GetRecipes()
         {
-            throw new NotImplementedException();
+            var items = GetItems();
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var recipeCompletModels = connection.GetList<RecipeCompletModel>();
+            connection.Close();
+
+            var recipes = Mapper.Map<List<ItemRecipe>>(recipeCompletModels.Distinct(new RecipeNameComparer()));
+            foreach (var recipe in recipes)
+            {
+                IEnumerable<RecipeCompletModel> matchingComplet = recipeCompletModels.Where(r => r.RecipeName == recipe.Name);
+                recipe.Components = items.Where(i => matchingComplet.Any(x => x.ComponentItemId == i.Id)).ToList();
+                var resultsAsItems = items.Where(i => matchingComplet.Any(x => x.ResultItemId == i.Id));
+                var itemResults  = matchingComplet.Where(x => resultsAsItems.Any(i => i.Id == x.ResultItemId)).Select(x => new ItemResult()
+                {
+                    Item = items.First(i => i.Id == x.ResultItemId),
+                    Probability = x.ResultProbability,
+                    Weight = x.ResultWeight
+                }).ToList();
+                recipe.Result = itemResults;
+            }
+            return recipes;
         }
 
         #endregion

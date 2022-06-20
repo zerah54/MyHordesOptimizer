@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.MappingProfiles.Converters;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Views.Items;
+using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -86,6 +87,14 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.NbUses, opt => opt.MapFrom(src => src.NbUses))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.DescriptionFr }, { "en", src.DescriptionEn }, { "es", src.DescriptionEs }, { "de", src.DescriptionDe } }))
                 .ForMember(dest => dest.Label, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.LabelFr }, { "en", src.LabelEn }, { "es", src.LabelEs }, { "de", src.LabelDe } }));
+
+            //Recipes
+            CreateMap<RecipeCompletModel, ItemRecipe>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.RecipeName))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type))
+                .ForMember(dest => dest.Actions, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.ActionFr }, { "en", src.ActionEn }, { "es", src.ActionEs }, { "de", src.ActionDe } }))
+                .ForMember(dest => dest.Components, opt => opt.Ignore())
+                .ForMember(dest => dest.Result, opt => opt.Ignore());
         }
 
         private string RemoveRandomNumber(string img)

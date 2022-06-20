@@ -83,8 +83,8 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Recipes")]
         public ActionResult<IEnumerable<ItemRecipe>> GetRecipes()
         {
-            var heroSkills = _myHordesFetcherService.GetRecipes().ToList();
-            return heroSkills;
+            var recipes = _myHordesFetcherService.GetRecipes().ToList();
+            return recipes;
         }
 
         [HttpGet]

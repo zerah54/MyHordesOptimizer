@@ -18,7 +18,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         Item GetItemsById(int itemId);
 
         void PatchRecipes(List<RecipeModel> recipes);
-        Dictionary<string, ItemRecipe> GetRecipes();
+        List<ItemRecipe> GetRecipes();
         void DeleteAllRecipeComponents();
         void DeleteAllRecipeResults();
         void PatchRecipeComponents(string recipeName, List<string> componentUids);

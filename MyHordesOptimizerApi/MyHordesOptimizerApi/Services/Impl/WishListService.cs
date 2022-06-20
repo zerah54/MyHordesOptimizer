@@ -55,7 +55,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     wishlistItem.BankCount = 0;
                 }
-                wishlistItem.IsWorkshop = recipes.Values.Any(x => x.Type == ItemRecipeType.Workshop.GetDescription()
+                wishlistItem.IsWorkshop = recipes.Any(x => x.Type.StartsWith("WORKSHOP")
                                                              && (x.Components.Any(component => component.Id == wishlistItem.Item.Id) || x.Result.Any(result => result.Item.Id == wishlistItem.Item.Id)));
             }
             return wishList;
