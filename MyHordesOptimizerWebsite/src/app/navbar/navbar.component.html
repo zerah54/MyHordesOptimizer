@@ -15,13 +15,13 @@
     <!-- <span *ngIf="!external_app_id_field_value"> -->
     <span class="spacer"></span>
     <mat-form-field *ngIf="!saved_external_app_id" class="external-app-id-input">
-        <mat-label for="external-app-id">Identifiant d'app externe</mat-label>
+        <mat-label for="external-app-id" i18n>Identifiant d'app externe</mat-label>
         <input id="external-app-id" matInput type="text" [(ngModel)]="external_app_id_field_value">
         <button matSuffix mat-icon-button (click)="saveExternalAppId();" [disabled]="!external_app_id_field_value">
             <mat-icon>check</mat-icon>
         </button>
     </mat-form-field>
-    <a mat-button *ngIf="saved_external_app_id" (click)="updateExternalTools()">Mettre à jour les outils externes</a>
+    <a mat-button *ngIf="saved_external_app_id" (click)="updateExternalTools()" i18n>Mettre à jour les outils externes</a>
     <button mat-icon-button *ngIf="!media.isActive('gt-sm')" [matMenuTriggerFor]="linksMenu">
         <mat-icon>more_vert</mat-icon>
     </button>

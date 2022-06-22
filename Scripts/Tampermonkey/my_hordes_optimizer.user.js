@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.58
+// @version      1.0.0-alpha.59
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,8 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correction] Affichage de la liste de courses dans la page \n`
-+ `[Correction] Affichage de certaines icônes dans les recettes \n`;
++ `[Correction] L'affichage de "l'aura" de priorité ne fonctionnait plus \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -3451,7 +3450,7 @@ function displayPriorityOnItems() {
             .filter((wishlist_item) => wishlist_item.priority !== 0)
             .forEach((wishlist_item) => {
             present_items
-                .filter((present_item) => present_item.src.indexOf(wishlist_item.item.img) > 0)
+                .filter((present_item) => present_item.src.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3').indexOf(wishlist_item.item.img) > 0)
                 .forEach((present_item) => {
                 present_item.parentElement.parentElement.classList.add('priority_' + wishlist_item.priority);
             });
