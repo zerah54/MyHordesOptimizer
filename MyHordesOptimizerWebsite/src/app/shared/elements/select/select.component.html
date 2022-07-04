@@ -1,8 +1,6 @@
-<mat-select [multiple]="multiple">
-    <mat-option>
-        <input matInput (change)="filter($event)">
-    </mat-option>
-    <mat-option *ngFor="let option of options" [value]="option">
+<mat-select [multiple]="multiple" (valueChange)="writeValue($event);">
+    <input class="mat-option" matInput (input)="filter($event)">
+    <mat-option *ngFor="let option of displayed_options" [value]="option">
         {{bindLabel ? $any(option)[bindLabel] : option}}
     </mat-option>
 </mat-select>
