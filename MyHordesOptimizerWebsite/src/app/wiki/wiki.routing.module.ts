@@ -6,7 +6,7 @@ import { RecipesComponent } from './recipes/recipes.component';
 import { RuinsComponent } from './ruins/ruins.component';
 
 let routes: Routes = [
-    { path: 'wiki', redirectTo: '/wiki/items' },
+    { path: 'wiki', redirectTo: 'wiki/items' },
     {
         path: 'wiki', children: [
             { path: 'hero-skills', component: HeroSkillsComponent },

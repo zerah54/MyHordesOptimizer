@@ -7,7 +7,7 @@ import { EstimationComponent } from './estimation/estimation.component';
 import { WishlistComponent } from './wishlist/wishlist.component';
 
 let routes: Routes = [
-    {path: 'tools', redirectTo: '/tools/bank'},
+    {path: 'tools', redirectTo: 'tools/bank'},
     {
         path: 'tools', children: [
             {path: 'bank', component: BankComponent},
