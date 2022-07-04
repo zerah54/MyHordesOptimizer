@@ -1,6 +1,6 @@
 <mat-select [multiple]="multiple" (valueChange)="writeValue($event);">
     <input class="mat-option" matInput (input)="filter($event)">
     <mat-option *ngFor="let option of displayed_options" [value]="option">
-        {{bindLabel ? $any(option)[bindLabel] : option}}
+        {{option | label:bindLabel}}
     </mat-option>
 </mat-select>

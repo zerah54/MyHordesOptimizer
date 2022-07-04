@@ -5,6 +5,7 @@ import { MatFormFieldControl } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSelect } from '@angular/material/select';
 import { Subject } from 'rxjs';
+import { LabelPipe } from './label.pipe';
 
 @Component({
     selector: 'mho-select',
@@ -82,6 +83,9 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     private _placeholder!: string;
     private _required = false;
     private _disabled = false;
+
+    private label_pipe: LabelPipe<T> = new LabelPipe();
+
     private static nextId: number = 0; focused = false;
 
     //propagate changes into the custom form control
@@ -144,7 +148,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     public filter(event: Event) {
         const value: string = (<HTMLInputElement>event.target)?.value?.toLowerCase();
         this.displayed_options = [...this.complete_options.filter((option: T | string) => {
-            return !this.bindLabel ? (<string>option).toLowerCase().indexOf(value) > -1 : (<any>option)[this.bindLabel].toLowerCase().indexOf(value) > -1
+            const label: string = this.label_pipe.transform(option, this.bindLabel);
+            return label.toLowerCase().indexOf(value) > -1;
         })]
     }
 
