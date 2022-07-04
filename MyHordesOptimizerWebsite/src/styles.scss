@@ -19,6 +19,13 @@ body {
         background-color: rgba(0, 0, 0, 0.2);
         cursor: pointer;
     }
+
+    .mat-list-item {
+        text-decoration: none;
+        &.link-selected {
+            color: $accent;
+        }
+    }
 }
 
 .mat-drawer-content {

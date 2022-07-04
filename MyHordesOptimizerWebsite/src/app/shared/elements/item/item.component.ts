@@ -14,7 +14,7 @@ export class ItemComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     /** L'élément à afficher si c'est un objet de banque */
-    @Input() bank_item!: BankItem;
+    @Input() bankItem!: BankItem;
     /** L'élément à afficher si c'est un objet standard */
     @Input() item!: Item;
     /** Doit-on afficher le détail au clic ? */
@@ -35,8 +35,8 @@ export class ItemComponent {
      */
     public addItemToWishlist(item: Item): void {
         this.api.addItemToWishlist(item).subscribe(() => {
-            if (this.bank_item) {
-                this.bank_item.wishlist_count = 1;
+            if (this.bankItem) {
+                this.bankItem.wishlist_count = 1;
             } else {
                 this.item.wishlist_count = 1;
             }

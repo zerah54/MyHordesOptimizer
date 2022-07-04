@@ -1,16 +1,18 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ItemComponent } from './../shared/elements/item/item.component';
 import { HeroSkillsComponent } from './hero-skills/hero-skills.component';
+import { ItemsComponent } from './items/items.component';
 import { RecipesComponent } from './recipes/recipes.component';
-import { WikiComponent } from './wiki.component';
+import { RuinsComponent } from './ruins/ruins.component';
 
 let routes: Routes = [
+    { path: 'wiki', redirectTo: '/wiki/items' },
     {
-        path: 'wiki', component: WikiComponent, children: [
+        path: 'wiki', children: [
             { path: 'hero-skills', component: HeroSkillsComponent },
-            { path: 'items', component: ItemComponent },
+            { path: 'items', component: ItemsComponent },
             { path: 'recipes', component: RecipesComponent },
+            { path: 'ruins', component: RuinsComponent },
         ]
     }
 ]

@@ -1,13 +1,9 @@
-import { RuinsComponent } from './ruins/ruins.component';
-import { PageWithSidenav } from './../shared/page-with-sidenav/page-with-sidenav.component';
 import { Component, OnInit } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { skip } from 'rxjs';
 import { SidenavLinks } from '../_abstract_model/types/_types';
+import { PageWithSidenav } from './../shared/page-with-sidenav/page-with-sidenav.component';
 import { SidenavService } from './../shared/services/sidenav.service';
-import { HeroSkillsComponent } from './hero-skills/hero-skills.component';
-import { ItemsComponent } from './items/items.component';
-import { RecipesComponent } from './recipes/recipes.component';
 
 @Component({
     selector: 'mho-wiki',
@@ -20,10 +16,10 @@ export class WikiComponent extends PageWithSidenav implements OnInit {
 
     /** La liste des pages du wiki */
     public wiki_list: SidenavLinks[] = [
-        { label: $localize`Objets`, id: 'items', component: ItemsComponent, selected: true },
-        { label: $localize`Recettes`, id: 'recipes', component: RecipesComponent, selected: false },
-        { label: $localize`Pouvoirs`, id: 'hero-skills', component: HeroSkillsComponent, selected: false },
-        { label: $localize`Bâtiments`, id: 'ruins', component: RuinsComponent, selected: false }
+        { label: $localize`Objets`, id: 'items'},
+        { label: $localize`Recettes`, id: 'recipes'},
+        { label: $localize`Pouvoirs`, id: 'hero-skills'},
+        { label: $localize`Bâtiments`, id: 'ruins'}
     ]
 
     constructor(public media: MediaObserver, private sidenav: SidenavService) {
@@ -36,14 +32,5 @@ export class WikiComponent extends PageWithSidenav implements OnInit {
             .subscribe(() => {
                 this.opened_sidenav = !this.opened_sidenav;
             })
-    }
-
-    /**
-     * Change l'outil affiché
-     *
-     * @param {SidenavLinks} selected_wiki
-     */
-    public changeSelected(selected_wiki: SidenavLinks): void {
-        this.wiki_list.forEach((wiki: SidenavLinks) => wiki.selected = selected_wiki.id === wiki.id);
     }
 }
