@@ -33,6 +33,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     @Input() multiple: boolean = false;
     @Input() bindLabel!: string;
+    @Input() emptyOption: boolean = false;
     //current form control input. helpful in validating and accessing form control
     @Input() form_control: AbstractControl = new FormControl();
 

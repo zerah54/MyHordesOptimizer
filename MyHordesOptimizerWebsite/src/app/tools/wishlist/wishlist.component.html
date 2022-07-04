@@ -16,10 +16,10 @@
                                         <input matInput (keyup)="applyFilter($event)" #filterInput>
                                     </mat-form-field>
                                     <mat-form-field appearance="standard">
-                                        <mat-label>Ajouter un objet</mat-label>
+                                        <mat-label i18n>Ajouter un objet</mat-label>
                                         <mat-select #addItemSelect (valueChange)="addItemToWishlist($event)">
                                             <mat-form-field class="mat-option">
-                                                <input matInput [placeholder]="'Rechercher un objet'" #addItemFilterInput>
+                                                <input matInput [placeholder]="'Rechercher un objet'" i18n-placeholder #addItemFilterInput>
                                             </mat-form-field>
                                             <mat-option>--</mat-option>
                                             <mat-option *ngFor="let item of items" [value]="item"
@@ -94,7 +94,7 @@
                         <tr class="mat-row" *matNoDataRow>
                             <td class="mat-cell" colspan="6">
                                 <ng-container *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
-                                    <ng-container *i18n> objet ne correspond au filtre "{{filterInput.nativeElement.value}}"</ng-container>
+                                    <ng-container i18n>Aucun objet ne correspond au filtre "{{filterInput.nativeElement.value}}"</ng-container>
                                 </ng-container>
                                 <ng-template #emptyTable>
                                     <ng-container i18n>La liste est vide</ng-container>
