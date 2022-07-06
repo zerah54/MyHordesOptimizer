@@ -1,10 +1,6 @@
-<div
-    #mhoScript
-    class="mho-script"
-    [ngStyle]="{
-        height: mhoScript.parentElement?.parentElement?.clientHeight + 'px'
-    }"
->
+<div #mhoScript
+     class="mho-script"
+     [style.height.px]="mhoScript.parentElement?.parentElement?.clientHeight">
     <mat-drawer-container [style.height]="'100%'">
         <mat-drawer
             class="sidenav"

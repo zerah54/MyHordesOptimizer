@@ -1,29 +1,37 @@
 <mat-toolbar class="mho-footer" color="primary">
     <mat-toolbar-row>
         <div>
-            {{title}}&nbsp;-&nbsp;<ng-container i18n>Développé par&nbsp;<a color="accent" href="mailto:lenoune38@gmail.com">Zerah</a></ng-container>
-        </div>
-        <div style="margin-left: 50px;">
+            <ng-container i18n>Développé par&nbsp;<a color="accent" href="https://myhordes.eu/jx/soul/6042">Zerah</a> et <a color="accent" href="https://myhordes.eu/jx/soul/6173">Renack</a></ng-container>
+            <ng-container *ngTemplateOutlet="spacer"></ng-container>
+            <a color="accent" href="https://discord.gg/yVeaJ6uf" i18n>Discord</a>
+            <ng-container *ngTemplateOutlet="spacer"></ng-container>
             <a color="accent" (click)="openThanks()" i18n>Remerciements</a>
-        </div>
-        <div *ngIf="site_language" style="margin-left: 50px;">
-            <button mat-button [matMenuTriggerFor]="languageMenu">
-                <mat-icon>language</mat-icon>
-                {{site_language.label}}
-                <mat-icon>arrow_drop_down</mat-icon>
-            </button>
-            <mat-menu #languageMenu="matMenu">
-                <ng-container *ngFor="let language of language_list">
-                    <div mat-menu-item [disabled]="language.code === site_language.code"
-                        [class.warn-color]="language.code === site_language.code" (click)="changeLanguage(language)">
-                        {{language.label}}</div>
-                </ng-container>
-            </mat-menu>
+            <ng-container *ngTemplateOutlet="spacer"></ng-container>
+            <ng-container *ngIf="site_language">
+                <button mat-button [matMenuTriggerFor]="languageMenu">
+                    <mat-icon>language</mat-icon>
+                    {{site_language.label}}
+                    <mat-icon>arrow_drop_down</mat-icon>
+                </button>
+                <mat-menu #languageMenu="matMenu">
+                    <ng-container *ngFor="let language of language_list">
+                        <div mat-menu-item [disabled]="language.code === site_language.code"
+                            [class.warn-color]="language.code === site_language.code" (click)="changeLanguage(language)">
+                            {{language.label}}</div>
+                    </ng-container>
+                </mat-menu>
+            </ng-container>
         </div>
     </mat-toolbar-row>
     <mat-toolbar-row>
-        <ng-container i18n>Ce site n'est pas affilié à&nbsp;<a color="accent" href="https://motion-twin.com/fr/" target="_blank">Motion Twin</a>&nbsp;ou à&nbsp;<a color="accent" href="https://myhord.es" target="_blank">MyHordes</a>.</ng-container>
-        &nbsp;-&nbsp;
-        <ng-container i18n>Certains éléments graphiques appartiennent à&nbsp;<a color="accent" href="https://motion-twin.com/fr/" target="_blank">Motion Twin</a>&nbsp;ou à&nbsp;<a color="accent" href="https://myhord.es" target="_blank">MyHordes</a>.</ng-container>
+        <div>
+            <ng-container i18n>Ce site n'est pas affilié à&nbsp;<a color="accent" href="https://motion-twin.com/fr/" target="_blank">Motion Twin</a>&nbsp;ou à&nbsp;<a color="accent" href="https://myhord.es" target="_blank">MyHordes</a></ng-container>
+            <ng-container *ngTemplateOutlet="spacer"></ng-container>
+            <ng-container i18n>Certains éléments graphiques appartiennent à&nbsp;<a color="accent" href="https://motion-twin.com/fr/" target="_blank">Motion Twin</a>&nbsp;ou à&nbsp;<a color="accent" href="https://myhord.es" target="_blank">MyHordes</a></ng-container>
+        </div>
     </mat-toolbar-row>
 </mat-toolbar>
+
+<ng-template #spacer>
+    <span style="margin-left: 1em; margin-right: 1em;">-</span>
+</ng-template>
