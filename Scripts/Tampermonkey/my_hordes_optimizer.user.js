@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.58
+// @version      1.0.0-alpha.61
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,8 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correction] Affichage de la liste de courses dans la page \n`
-+ `[Correction] Affichage de certaines icônes dans les recettes \n`;
++ `[Correctif] Correction du lien discord qui n'a marché qu'une seule fois avant de décider de manière unilatérale de devenir inutilisable \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -63,7 +62,8 @@ const api2_url = 'http://144.24.192.182';
 ///////////////////////////////////////////
 
 const hordes_img_url = '/build/images/';
-const repo_img_url = 'https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/hordes_img/';
+const repo_img_url = 'https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/';
+const repo_img_hordes_url = repo_img_url + 'hordes_img/';
 
 const mh_optimizer_icon = 'https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/logo/logo_mho_64x64_outlined.png';
 
@@ -581,7 +581,8 @@ const jobs = [
             en : `Scavenger`,
             es : `Excavador`,
             fr : `Fouineur`
-        }
+        },
+        camping_factor: 0.9
     },
     {
         id: 'scout',
@@ -591,7 +592,8 @@ const jobs = [
             en : `Scout`,
             es : `Explorador`,
             fr : `Éclaireur`
-        }
+        },
+        camping_factor: 0.9
     },
     {
         id: 'guardian',
@@ -601,7 +603,8 @@ const jobs = [
             en : `Guardian`,
             es : `Guardián`,
             fr : `Gardien`
-        }
+        },
+        camping_factor: 0.9
     },
     {
         id: 'survivalist',
@@ -611,7 +614,8 @@ const jobs = [
             en : `Survivalist`,
             es : `Ermitaño`,
             fr : `Ermite`
-        }
+        },
+        camping_factor: 1
     },
     {
         id: 'tamer',
@@ -621,7 +625,8 @@ const jobs = [
             en : `Tamer`,
             es : `Domador`,
             fr : `Apprivoiseur`
-        }
+        },
+        camping_factor: 0.9
     },
     {
         id: 'technician',
@@ -631,7 +636,8 @@ const jobs = [
             en : `Technician`,
             es : `Técnico`,
             fr : `Technicien`
-        }
+        },
+        camping_factor: 0.9
     },
 ];
 
@@ -743,7 +749,7 @@ let tabs_list = {
                 de: `Gegenstände`,
                 es: `Objetos`
             },
-            icon: repo_img_url + `emotes/bag.gif`
+            icon: repo_img_hordes_url + `emotes/bag.gif`
         },
         {
             ordering: 1,
@@ -754,7 +760,7 @@ let tabs_list = {
                 de: `Rezepte`,
                 es: `Transformaciones`
             },
-            icon: repo_img_url + `building/small_refine.gif`
+            icon: repo_img_hordes_url + `building/small_refine.gif`
         },
         {
             ordering: 2,
@@ -765,7 +771,7 @@ let tabs_list = {
                 de: `Heldentaten`,
                 es: `Poderes`
             },
-            icon: repo_img_url + `/professions/hero.gif`
+            icon: repo_img_hordes_url + `/professions/hero.gif`
         },
         {
             ordering: 3,
@@ -776,7 +782,7 @@ let tabs_list = {
                 de: `Ruinen`,
                 es: `Ruinas`
             },
-            icon: repo_img_url + `icons/home.gif`,
+            icon: repo_img_hordes_url + `icons/home.gif`,
         }
     ],
     tools: [
@@ -789,7 +795,7 @@ let tabs_list = {
                 de: `Bank`,
                 es: `Almacén`
             },
-            icon: repo_img_url + `icons/home.gif`,
+            icon: repo_img_hordes_url + `icons/home.gif`,
             needs_town: true,
         },
         {
@@ -801,7 +807,7 @@ let tabs_list = {
                 de: `Wunschzettel`,
                 es: `Lista de deseos`
             },
-            icon: repo_img_url + `item/item_cart.gif`,
+            icon: repo_img_hordes_url + `item/item_cart.gif`,
             needs_town: true,
         },
         {
@@ -813,7 +819,7 @@ let tabs_list = {
                 de: `Bürger`,
                 es: `Habitantes`
             },
-            icon: repo_img_url + `icons/small_human.gif`,
+            icon: repo_img_hordes_url + `icons/small_human.gif`,
             needs_town: true,
         },
         // {
@@ -825,7 +831,7 @@ let tabs_list = {
         //         de: `Schätzen`,
         //         es: `Estimación`
         //     },
-        //     icon: repo_img_url + `item/item_scope.gif`,
+        //     icon: repo_img_hordes_url + `item/item_scope.gif`,
         //     needs_town: true,
         // }
         {
@@ -837,7 +843,7 @@ let tabs_list = {
                 de: `Camping`,
                 es: `Camping`
             },
-            icon: repo_img_url + `status/status_camper.gif`,
+            icon: repo_img_hordes_url + `status/status_camper.gif`,
             needs_town: false,
         }
     ]
@@ -1030,30 +1036,48 @@ let params_categories = [
 ];
 
 let informations = [
-    {id: `website`, label: {
-        en: `Website`,
-        fr: `Site web`,
-        de: `Webseite`,
-        es: `Sitio web`
-    }, src: `https://myhordes-optimizer.web.app/`, action: () => {}, img: `emotes/explo.gif`},
-    {id: `version`, label: {
-        en: `Changelog ${GM_info.script.version}`,
-        fr: `Notes de version ${GM_info.script.version}`,
-        de: `Changelog ${GM_info.script.version}`,
-        es: `Notas de la versión ${GM_info.script.version}`
-    }, src: undefined, action: () => {alert(changelog)}, img: `emotes/rptext.gif`},
-    {id: `contact`, label: {
-        en: `Bugs? Ideas?`,
-        fr: `Des bugs ? Des idées ?`,
-        de: `Fehler ? Ideen ?`,
-        es: `¿Bugs? ¿Ideas?`
-    }, src: `mailto:lenoune38@gmail.com?Subject=[${GM_info.script.name}]`, action: () => {}, img: `icons/small_mail.gif`},    
-    {id: `empty-app-id`, label: {
-        en: `Remove your external ID for apps`,
-        fr: `Retirer votre ID d'app externe`,
-        de: `TODO`,
-        es: `Eliminar su ID externo para aplicaciones`
-    }, src: undefined, action: () => removeExternalAppId(), img: `icons/small_remove.gif`},
+    {
+        id: `website`, 
+        label: {
+            en: `Website`,
+            fr: `Site web`,
+            de: `Webseite`,
+            es: `Sitio web`
+        }, 
+        src: `https://myhordes-optimizer.web.app/`, action: () => {}, img: `emotes/explo.gif`
+    },
+    {
+        id: `version`, 
+        label: {
+            en: `Changelog ${GM_info.script.version}`,
+            fr: `Notes de version ${GM_info.script.version}`,
+            de: `Changelog ${GM_info.script.version}`,
+            es: `Notas de la versión ${GM_info.script.version}`
+        }, 
+        src: undefined, action: () => {alert(changelog)}, img: `emotes/rptext.gif`
+    },
+    {
+        id: `discord-url-id`, 
+        label: {
+            en: `Bugs? Ideas?`,
+            fr: `Des bugs ? Des idées ?`,
+            de: `Fehler ? Ideen ?`,
+            es: `¿Bugs? ¿Ideas?`
+        }, 
+        src: `https://discord.gg/ZQH7ZPWcCm`, 
+        action: undefined, 
+        img: `${repo_img_url}discord.ico`
+    },
+    {
+        id: `empty-app-id`, 
+        label: {
+            en: `Remove your external ID for apps`,
+            fr: `Retirer votre ID d'app externe`,
+            de: `TODO`,
+            es: `Eliminar su ID externo para aplicaciones`
+        }, 
+        src: undefined, action: () => removeExternalAppId(), img: `icons/small_remove.gif`
+    }
 ];
 
 const table_hero_skills_headers = [
@@ -1386,7 +1410,7 @@ function createOptimizerButtonContent() {
         informations.forEach((information) => {
             let information_link = document.createElement('a');
             information_link.id = information.id;
-            information_link.innerHTML = (information.img ? `<img src="${repo_img_url + information.img}" style="margin: 0 4px 0 3px">` : ``)+ `<span class=small>${getI18N(information.label)}</span>`;
+            information_link.innerHTML = (information.img ? `<img src="${information.img.startsWith('http') ? information.img : repo_img_hordes_url + information.img}" style="margin: 0 4px 0 3px; width: 16px">` : ``)+ `<span class=small>${getI18N(information.label)}</span>`;
             information_link.href = information.src;
             information_link.target = '_blank';
 
@@ -1520,7 +1544,7 @@ function createWindow() {
     window_content.id = mh_optimizer_window_id + '-content';
     let window_overlay_img = document.createElement('img');
     window_overlay_img.alt = '(X)';
-    window_overlay_img.src = repo_img_url + 'icons/b_close.png';
+    window_overlay_img.src = repo_img_hordes_url + 'icons/b_close.png';
     let window_overlay_li = document.createElement('li');
     window_overlay_li.appendChild(window_overlay_img);
     let window_overlay_ul = document.createElement('ul');
@@ -1622,7 +1646,7 @@ function createMapWindow() {
 
     let window_overlay_img = document.createElement('img');
     window_overlay_img.alt = '(X)';
-    window_overlay_img.src = repo_img_url + 'icons/b_close.png';
+    window_overlay_img.src = repo_img_hordes_url + 'icons/b_close.png';
     let window_overlay_li = document.createElement('li');
     window_overlay_li.appendChild(window_overlay_img);
     let window_overlay_ul = document.createElement('ul');
@@ -1824,7 +1848,7 @@ function displayWishlist() {
             items.forEach((item) => {
                 let content_div = document.createElement('div');
                 let img = document.createElement('img');
-                img.src = repo_img_url + item.img;
+                img.src = repo_img_hordes_url + item.img;
                 img.setAttribute('style', 'margin-right: 8px');
 
                 let button_div = document.createElement('div');
@@ -1929,7 +1953,7 @@ function createWishlistItemElement(item) {
 
     let item_icon = document.createElement('img');
     item_icon.setAttribute('style', 'margin-right: 0.5em');
-    item_icon.src = repo_img_url + item.item.img;
+    item_icon.src = repo_img_hordes_url + item.item.img;
     item_title_container.appendChild(item_icon);
 
     let item_title = document.createElement('span');
@@ -1995,7 +2019,7 @@ function createWishlistItemElement(item) {
 
     let item_remove_img = document.createElement('img');
     item_remove_img.alt = '(X)';
-    item_remove_img.src = repo_img_url + 'icons/b_close.png';
+    item_remove_img.src = repo_img_hordes_url + 'icons/b_close.png';
     item_remove_img.addEventListener('click', () => {
         item.count = undefined;
         item_bank_needed_input.value = item.bankCount;
@@ -2057,7 +2081,7 @@ function displayItems(filtered_items, tab_id) {
             })
 
             let img = document.createElement('img');
-            img.src = `${repo_img_url}item/item_cart.gif`;
+            img.src = `${repo_img_hordes_url}item/item_cart.gif`;
             img.alt = '&#x1F6D2;';
             add_to_wishlist_button.appendChild(img);
             item_add_to_wishlist.appendChild(add_to_wishlist_button);
@@ -2068,7 +2092,7 @@ function displayItems(filtered_items, tab_id) {
         item_title_container.appendChild(icon_container);
 
         let item_icon = document.createElement('img');
-        item_icon.src = repo_img_url + item.img;
+        item_icon.src = repo_img_hordes_url + item.img;
         icon_container.appendChild(item_icon);
 
         if (tab_id === 'bank' && item.count > 1) {
@@ -2127,7 +2151,7 @@ function displayCitizens() {
             header_cells.forEach((header_cell) => {
                 let cell = document.createElement('th');
                 if (cell.img) {
-                    cell.innerHTML = '<img src="' + repo_img_url + header_cell.img + '.gif"></img>'
+                    cell.innerHTML = '<img src="' + repo_img_hordes_url + header_cell.img + '.gif"></img>'
                 } else {
                     cell.innerText = getI18N(header_cell.label);
                 }
@@ -2587,7 +2611,7 @@ function displayCamping() {
 
         let vest_label = document.createElement('label');
         vest_label.htmlFor = 'vest';
-        vest_label.innerHTML = `<img src="${repo_img_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
+        vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
         let vest = document.createElement('input');
         vest.type = 'checkbox';
         vest.id = 'vest';
@@ -2605,7 +2629,7 @@ function displayCamping() {
 
         let pro_camper_label = document.createElement('label');
         pro_camper_label.htmlFor = 'pro';
-        pro_camper_label.innerHTML = `<img src="${repo_img_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
+        pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
         let pro_camper = document.createElement('input');
         pro_camper.type = 'checkbox';
         pro_camper.id = 'pro';
@@ -2623,7 +2647,7 @@ function displayCamping() {
 
         let tomb_label = document.createElement('label');
         tomb_label.htmlFor = 'tomb';
-        tomb_label.innerHTML = `<img src="${repo_img_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
+        tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
         let tomb = document.createElement('input');
         tomb.type = 'checkbox';
         tomb.id = 'tomb';
@@ -2641,7 +2665,7 @@ function displayCamping() {
 
         let nb_campings_label = document.createElement('label');
         nb_campings_label.htmlFor = 'nb-campings';
-        nb_campings_label.innerHTML = `<img src="${repo_img_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
+        nb_campings_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
         nb_campings_label.classList.add('spaced-label');
         let nb_campings = document.createElement('input');
         nb_campings.type = 'number';
@@ -2662,7 +2686,7 @@ function displayCamping() {
         let objects_in_bag_label = document.createElement('label');
         objects_in_bag_label.htmlFor = 'nb-objects';
         objects_in_bag_label.innerText = getI18N(texts.objects_in_bag);
-        objects_in_bag_label.innerHTML = `<img src="${repo_img_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
+        objects_in_bag_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
         objects_in_bag_label.classList.add('spaced-label');
         let objects_in_bag = document.createElement('input');
         objects_in_bag.type = 'number';
@@ -2709,7 +2733,7 @@ function displayCamping() {
         let distance_label = document.createElement('label');
         distance_label.htmlFor = 'distance';
         distance_label.innerText = getI18N(texts.distance).replace('%VAR%', '');
-        distance_label.innerHTML = `<img src="${repo_img_url}emotes/explo.gif"> ${getI18N(texts.distance).replace('%VAR%', '')}`;
+        distance_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/explo.gif"> ${getI18N(texts.distance).replace('%VAR%', '')}`;
         distance_label.classList.add('spaced-label');
         let distance = document.createElement('input');
         distance.type = 'number';
@@ -2729,7 +2753,7 @@ function displayCamping() {
 
         let zombies_label = document.createElement('label');
         zombies_label.htmlFor = 'nb-zombies';
-        zombies_label.innerHTML = `<img src="${repo_img_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
+        zombies_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
         zombies_label.classList.add('spaced-label');
         let zombies = document.createElement('input');
         zombies.type = 'number';
@@ -2749,7 +2773,7 @@ function displayCamping() {
 
         let improve_label = document.createElement('label');
         improve_label.htmlFor = 'nb-improve';
-        improve_label.innerHTML = `<img src="${repo_img_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
+        improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
         improve_label.classList.add('spaced-label');
         let improve = document.createElement('input');
         improve.type = 'number';
@@ -2769,7 +2793,7 @@ function displayCamping() {
 
         let object_improve_label = document.createElement('label');
         object_improve_label.htmlFor = 'nb-object-improve';
-        object_improve_label.innerHTML = `<img src="${repo_img_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
+        object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
         object_improve_label.classList.add('spaced-label');
         let object_improve = document.createElement('input');
         object_improve.type = 'number';
@@ -2789,7 +2813,7 @@ function displayCamping() {
 
         let hidden_campers_label = document.createElement('label');
         hidden_campers_label.htmlFor = 'hidden-campers';
-        hidden_campers_label.innerHTML = `<img src="${repo_img_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
+        hidden_campers_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
         hidden_campers_label.classList.add('spaced-label');
         let hidden_campers = document.createElement('input');
         hidden_campers.type = 'number';
@@ -2809,7 +2833,7 @@ function displayCamping() {
 
         let night_label = document.createElement('label');
         night_label.htmlFor = 'night';
-        night_label.innerHTML = `<img src="${repo_img_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
+        night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
         let night = document.createElement('input');
         night.type = 'checkbox';
         night.id = 'night';
@@ -2827,7 +2851,7 @@ function displayCamping() {
 
         let devastated_label = document.createElement('label');
         devastated_label.htmlFor = 'devastated';
-        devastated_label.innerHTML = `<img src="${repo_img_url}item/item_out_def_broken.gif"> ${getI18N(texts.devastated)}`;
+        devastated_label.innerHTML = `<img src="${repo_img_hordes_url}item/item_out_def_broken.gif"> ${getI18N(texts.devastated)}`;
         let devastated = document.createElement('input');
         devastated.type = 'checkbox';
         devastated.id = 'devastated';
@@ -2846,7 +2870,7 @@ function displayCamping() {
         let phare_label = document.createElement('label');
         phare_label.htmlFor = 'phare';
         phare_label.innerText = getI18N(texts.phare);
-        phare_label.innerHTML = `<img src="${repo_img_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
+        phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
         let phare = document.createElement('input');
         phare.type = 'checkbox';
         phare.id = 'phare';
@@ -2893,7 +2917,7 @@ function displaySkills() {
                 let img = document.createElement('img');
                 switch(header_cell.id) {
                     case 'icon':
-                        img.src = repo_img_url + 'heroskill/' + skill[header_cell.id] + '.gif';
+                        img.src = repo_img_hordes_url + 'heroskill/' + skill[header_cell.id] + '.gif';
                         cell.appendChild(img);
                         break;
                     case 'label':
@@ -2941,7 +2965,7 @@ function displayRuins() {
                     let img = document.createElement('img');
                     switch(header_cell.id) {
                         case 'img':
-                            img.src = `${repo_img_url}ruin/${ruin[header_cell.id]}.gif`;
+                            img.src = `${repo_img_hordes_url}ruin/${ruin[header_cell.id]}.gif`;
                             cell.appendChild(img);
                             break;
                         case 'label':
@@ -3036,7 +3060,7 @@ function getRecipeElement(recipe) {
 
         let component_img = document.createElement('img');
         component_img.setAttribute('style', 'margin-right: 0.5em');
-        component_img.src = repo_img_url + compo.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
+        component_img.src = repo_img_hordes_url + compo.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
         compo_container.appendChild(component_img);
 
         let component_label = document.createElement('span');
@@ -3054,7 +3078,7 @@ function getRecipeElement(recipe) {
 
     let transform_img = document.createElement('img');
     transform_img.alt = '=>';
-    transform_img.src = repo_img_url + 'icons/small_move.gif';
+    transform_img.src = repo_img_hordes_url + 'icons/small_move.gif';
     transform_img.setAttribute('style', 'margin-left: 0.5em; margin-right: 0.5em');
     transform_img_container.appendChild(transform_img);
 
@@ -3065,7 +3089,7 @@ function getRecipeElement(recipe) {
 
         let result_img = document.createElement('img');
         result_img.setAttribute('style', 'margin-right: 0.5em');
-        result_img.src = repo_img_url + result.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
+        result_img.src = repo_img_hordes_url + result.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
         result_container.appendChild(result_img);
 
         let result_label = document.createElement('span');
@@ -3141,17 +3165,26 @@ function createUpdateExternalToolsButton() {
         let updater_bloc = document.createElement('div');
         el.appendChild(updater_bloc);
         let updater_title = document.createElement('h5');
-        updater_title.innerHTML = GM_info.script.name;
+        let updater_title_mho_img = document.createElement('img');
+        updater_title_mho_img.src = mh_optimizer_icon;
+        updater_title_mho_img.style.height = '24px';
+        updater_title_mho_img.style.marginRight = '0.5em';
+        updater_title.appendChild(updater_title_mho_img);
+        
+        let updater_title_text = document.createElement('text');
+        updater_title_text.innerHTML = GM_info.script.name;
+        updater_title.appendChild(updater_title_text);
+        
         updater_bloc.appendChild(updater_title);
 
         let btn = document.createElement('button');
 
-        btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/arrowright.gif">' + getI18N(texts.update_external_tools_needed_btn_label);
+        btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/arrowright.gif">' + getI18N(texts.update_external_tools_needed_btn_label);
         btn.id = mh_update_external_tools_id;
 
         btn.addEventListener('click', () => {
             /** Au clic sur le bouton, on appelle la fonction de mise à jour */
-            btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/middot.gif">' + getI18N(texts.update_external_tools_pending_btn_label);
+            btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/middot.gif">' + getI18N(texts.update_external_tools_pending_btn_label);
             updateExternalTools();
         })
 
@@ -3193,7 +3226,7 @@ function displaySearchFieldOnBuildings() {
             search_field.id = mho_search_building_field_id;
             search_field.placeholder = getI18N(texts.search_building);
             search_field.classList.add('inline');
-            search_field.setAttribute('style', 'min-width: 250px; margin-top: 1em;');
+            search_field.setAttribute('style', 'min-width: 250px; margin-top: 1em; padding-left: 24px;');
 
             let buidings_block = document.getElementsByClassName('clear')[0];
             let buildings = Array.from(buidings_block.getElementsByClassName('buildings'));
@@ -3217,6 +3250,13 @@ function displaySearchFieldOnBuildings() {
             });
 
             search_field_container.appendChild(search_field);
+            
+            let header_mho_img = document.createElement('img');
+            header_mho_img.src = mh_optimizer_icon;
+            header_mho_img.style.height = '24px';
+            header_mho_img.style.position = 'relative';
+            header_mho_img.style.left = '-250px';
+            search_field_container.appendChild(header_mho_img);
             tabs_block.insertBefore(search_field_container, tabs);
         }
     } else if (search_field) {
@@ -3344,7 +3384,7 @@ function displayWishlistInApp() {
 
                 let title = document.createElement('div');
                 title.classList.add('padded', 'cell', 'rw-5');
-                title.innerHTML = `<img src="${repo_img_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
+                title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
                 list_item.appendChild(title);
 
                 let item_priority = document.createElement('span');
@@ -3424,6 +3464,12 @@ function displayWishlistInApp() {
         hide_state.setAttribute('style', 'margin-right: 0.5em');
         header_title.appendChild(hide_state);
 
+        let header_mho_img = document.createElement('img');
+        header_mho_img.src = mh_optimizer_icon;
+        header_mho_img.style.height = '24px';
+        header_mho_img.style.marginRight = '0.5em';
+        header_title.appendChild(header_mho_img);
+        
         let header_label = document.createElement('span');
         header_label.innerText = getI18N(tabs_list.tools.find((tool) => tool.id === 'wishlist').label);
         header_title.appendChild(header_label);
@@ -3451,7 +3497,7 @@ function displayPriorityOnItems() {
             .filter((wishlist_item) => wishlist_item.priority !== 0)
             .forEach((wishlist_item) => {
             present_items
-                .filter((present_item) => present_item.src.indexOf(wishlist_item.item.img) > 0)
+                .filter((present_item) => present_item.src.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3').indexOf(wishlist_item.item.img) > 0)
                 .forEach((present_item) => {
                 present_item.parentElement.parentElement.classList.add('priority_' + wishlist_item.priority);
             });
@@ -3580,23 +3626,23 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'eat_6ap':
         case 'eat_7ap':
             item_action.classList.add(`item-tag-food`);
-            item_action.innerHTML = `+${property_or_action.slice(4,5)}<img src="${repo_img_url}emotes/ap.${lang}.gif">`;
+            item_action.innerHTML = `+${property_or_action.slice(4,5)}<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
             break;
         case 'coffee':
             item_action.classList.add(`item-tag-coffee`);
-            item_action.innerHTML = `+4<img src="${repo_img_url}emotes/ap.${lang}.gif">`;
+            item_action.innerHTML = `+4<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
             break;
         case 'drug_6ap_1':
         case 'drug_8ap_1':
             item_action.classList.add(`item-tag-drug`);
-            item_action.innerHTML = `+${property_or_action.slice(5,6)}<img src="${repo_img_url}emotes/ap.${lang}.gif">`;
+            item_action.innerHTML = `+${property_or_action.slice(5,6)}<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
             break;
         case 'alcohol':
             item_action.classList.add(`item-tag-alcohol`);
-            item_action.innerHTML = `+6<img src="${repo_img_url}emotes/ap.${lang}.gif">`;
+            item_action.innerHTML = `+6<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
             break;
         case 'cyanide':
-            item_action.innerHTML = `<img src="${repo_img_url}emotes/death.gif">`;
+            item_action.innerHTML = `<img src="${repo_img_hordes_url}emotes/death.gif">`;
             break;
         case 'hero_find':
             if (!(hovered_item.properties && hovered_item.properties.some((property) => property === 'hero_find_lucky')) && !(hovered_item.actions && hovered_item.actions.some((property) => property === 'hero_find_lucky'))) {
@@ -3939,7 +3985,17 @@ function createDisplayMapButton() {
             btn_container.setAttribute('style', `right: ${position}px`);
 
             let btn = document.createElement('div');
-            btn.innerHTML = '<img src ="' + repo_img_url + 'emotes/explo.gif">';
+            
+            let btn_mho_img = document.createElement('img');
+            btn_mho_img.src = mh_optimizer_icon;
+            btn_mho_img.style.height = '16px';
+            btn_mho_img.style.marginRight = '0.5em';
+            btn.appendChild(btn_mho_img);
+            
+            let btn_img = document.createElement('img');
+            btn_img.src = repo_img_hordes_url + 'emotes/explo.gif';
+            btn.appendChild(btn_img);
+            
             btn.addEventListener('click', (event) => {
                 event.stopPropagation();
                 event.preventDefault();
@@ -4170,7 +4226,7 @@ function displayMap() {
 
                 if (cell.door) {
                     let img = document.createElement('img');
-                    img.src = `${repo_img_url}item/${cell.door}.gif`;
+                    img.src = `${repo_img_hordes_url}item/${cell.door}.gif`;
                     img.style.position = 'absolute';
                     img.style.left = 'calc(50% - 8px)';
                     img.style.top = 'calc(50% - 8px)';
@@ -4186,7 +4242,7 @@ function displayMap() {
                     tr.appendChild(final_row_td);
                 }
 
-                td.addEventListener('click', ($event) => {
+                td.addEventListener('click', () => {
                     let my_pos = table.querySelector('.my-pos');
                     if (my_pos) {
                         my_pos.remove();
@@ -4531,19 +4587,38 @@ function notifyOnSearchEnd() {
 /** Affiche le nombre de zombies morts aujourd'hui */
 function displayNbDeadZombies() {
     if (mho_parameters.display_nb_dead_zombies && pageIsDesert()) {
-        let zone_dist = document.getElementsByClassName('zone-dist')[0];
+        let zone_dist = document.querySelectorAll(`.zone-dist:not(#${zone_dead_zombies_id})`)[0];
         if (zone_dist) {
             let zone_dead_zombies = document.getElementById(zone_dead_zombies_id);
-            let nb_dead_zombies = document.getElementsByClassName('splatter').length;
+            let nb_dead_zombies = document.querySelectorAll('.splatter').length;
 
             if (!zone_dead_zombies) {
                 zone_dead_zombies = document.createElement('div');
                 zone_dead_zombies.id = zone_dead_zombies_id;
-                zone_dead_zombies.classList.add('cell', 'rw-12', 'center');
-                zone_dead_zombies.innerHTML = `${getI18N(texts.nb_dead_zombies)} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`
+                zone_dead_zombies.classList.add('row', 'zone-dist');
+                zone_dead_zombies.addEventListener('click', (event) => {
+                    console.log('event', event);
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                });
 
-                let dist = zone_dist.firstElementChild;
-                dist.parentNode.insertBefore(zone_dead_zombies, dist);
+                let content_dead_zombie = document.createElement('div')
+                content_dead_zombie.classList.add('cell', 'rw-12', 'center');
+                zone_dead_zombies.appendChild(content_dead_zombie);
+                
+                let btn_mho_img = document.createElement('img');
+                btn_mho_img.src = mh_optimizer_icon;
+                btn_mho_img.style.height = '16px';
+                btn_mho_img.style.marginRight = '0.25em';
+                content_dead_zombie.appendChild(btn_mho_img);
+            
+                let nb_dead_zombies_text = document.createElement('text');
+                nb_dead_zombies_text.innerHTML = `${getI18N(texts.nb_dead_zombies)} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`;
+                
+                content_dead_zombie.appendChild(nb_dead_zombies_text);
+
+                zone_dist.parentNode.appendChild(zone_dead_zombies);
             } else {
                 let nb_dead_zombies_element = document.getElementById(nb_dead_zombies_id);
                 nb_dead_zombies.innerText = nb_dead_zombies;
@@ -4576,9 +4651,18 @@ function displayTranslateTool() {
         mho_display_translate_input_div.id = mho_display_translate_input_id;
         mho_display_translate_input_div.setAttribute('style', 'position: absolute; top: 45px; right: 8px; margin: 0; width: 250px; height: 25px;');
         let label = mho_display_translate_input_div.firstElementChild;
-        let input = label.firstElementChild;
-        input.setAttribute('style', 'width: calc(100% - 35px); display: inline-block;');
 
+        let input = label.firstElementChild;
+        input.setAttribute('style', 'width: calc(100% - 35px); display: inline-block; padding-right: 40px');
+
+        let btn_mho_img = document.createElement('img');
+        btn_mho_img.src = mh_optimizer_icon;
+        btn_mho_img.style.height = '24px';
+        btn_mho_img.style.float = 'right';
+        btn_mho_img.style.position = 'relative';
+        btn_mho_img.style.top = '-25px';
+        label.insertBefore(btn_mho_img, label.lastElementChild);
+        
         let select = document.createElement('select');
         select.classList.add('small');
         select.setAttribute('style', 'height: 25px; width: 35px; font-size: 12px');
@@ -4670,7 +4754,7 @@ function blockUsersPosts() {
                         let link = document.createElement('a');
                         link.innerText = 'Cliquez ici pour afficher ce message.';
                         link.style.cursor = 'pointer';
-                        link.addEventListener('click', ($event, $event2) => {
+                        link.addEventListener('click', ($event) => {
                             new_post_content.style.display = 'none';
                             original_post_content.style.display = 'block';
                             original_post_content.classList.add('force-display');
@@ -4789,7 +4873,7 @@ function createStyles() {
     + '}';
 
     const mh_optimizer_window_style = '#' + mh_optimizer_window_id + '{'
-    + 'background: url(' + repo_img_url + 'background/mask.png);'
+    + 'background: url(' + repo_img_hordes_url + 'background/mask.png);'
     + 'height: 100%;'
     + 'opacity: 1;'
     + 'position: fixed;'
@@ -4809,7 +4893,7 @@ function createStyles() {
     + '}';
 
     const mh_optimizer_window_box_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box {`
-    + 'background: url(' + repo_img_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
+    + 'background: url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
     + 'border-radius: 8px;'
     + 'box-shadow: 0 0 10px #000;'
     + 'left: calc(50% - 750px);'
@@ -4823,7 +4907,7 @@ function createStyles() {
     + '}';
 
     const mh_optimizer_map_window_box_style = `#${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box {`
-    + 'background: url(' + repo_img_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
+    + 'background: url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
     + 'border-radius: 8px;'
     + 'box-shadow: 0 0 10px #000;'
     + 'position: absolute;'
@@ -4861,7 +4945,7 @@ function createStyles() {
     + 'position: absolute;'
     + 'right: 0;'
     + 'top: 0;'
-    + 'background: url(' + repo_img_url + 'background/box/panel_00.gif) 0 0 no-repeat,url(' + repo_img_url + 'background/box/panel_02.gif) 100% 0 no-repeat,url(' + repo_img_url + 'background/box/panel_20.gif) 0 100% no-repeat,url(' + repo_img_url + 'background/box/panel_22.gif) 100% 100% no-repeat,url(' + repo_img_url + 'background/box/panel_01.gif) 0 0 repeat-x,url(' + repo_img_url + 'background/box/panel_10.gif) 0 0 repeat-y,url(' + repo_img_url + 'background/box/panel_12.gif) 100% 0 repeat-y,url(' + repo_img_url + 'background/box/panel_21.gif) 0 100% repeat-x,#7e4d2a;'
+    + 'background: url(' + repo_img_hordes_url + 'background/box/panel_00.gif) 0 0 no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_02.gif) 100% 0 no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_20.gif) 0 100% no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_22.gif) 100% 100% no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_01.gif) 0 0 repeat-x,url(' + repo_img_hordes_url + 'background/box/panel_10.gif) 0 0 repeat-y,url(' + repo_img_hordes_url + 'background/box/panel_12.gif) 100% 0 repeat-y,url(' + repo_img_hordes_url + 'background/box/panel_21.gif) 0 100% repeat-x,#7e4d2a;'
     + 'border-radius: 12px;'
     + 'left: 18px;'
     + 'padding: 8px;'
@@ -4881,7 +4965,7 @@ function createStyles() {
     + 'display: flex;'
     + 'flex-wrap: wrap;'
     + 'padding: 0;'
-    + `background: url(${repo_img_url}background/tabs-header-plain.gif) 0 100% round;`
+    + `background: url(${repo_img_hordes_url}background/tabs-header-plain.gif) 0 100% round;`
     + 'background-size: cover;'
     + 'height: 24px;'
     + 'margin-top: 2px;'
@@ -4901,7 +4985,7 @@ function createStyles() {
     + '}';
 
     const tabs_ul_li_div_style = '#tabs > ul > li > div {'
-    + 'background-image: url(' + repo_img_url + 'background/tab.gif);'
+    + 'background-image: url(' + repo_img_hordes_url + 'background/tab.gif);'
     + 'background-position: 0 0;'
     + 'background-repeat: no-repeat;'
     + 'border-left: 1px solid #694023;'
@@ -5120,23 +5204,23 @@ function createStyles() {
     + '}';
 
     const item_tag_food = 'div.item-tag-food::after {'
-    + `background: url(${repo_img_url}status/status_haseaten.gif) 50%/contain no-repeat;`
+    + `background: url(${repo_img_hordes_url}status/status_haseaten.gif) 50%/contain no-repeat;`
     + '}';
 
     const item_tag_load = 'div.item-tag-load::after {'
-    + `background: url(${repo_img_url}item/item_pile.gif) 50%/contain no-repeat;`
+    + `background: url(${repo_img_hordes_url}item/item_pile.gif) 50%/contain no-repeat;`
     + '}';
 
     const item_tag_hero = 'div.item-tag-hero::after {'
-    + `background: url(${repo_img_url}icons/star.gif) 50%/contain no-repeat;`
+    + `background: url(${repo_img_hordes_url}icons/star.gif) 50%/contain no-repeat;`
     + '}';
 
     const item_tag_alcohol = 'div.item-tag-alcohol::after {'
-    + `background: url(${repo_img_url}status/status_drunk.gif) 50%/contain no-repeat;`
+    + `background: url(${repo_img_hordes_url}status/status_drunk.gif) 50%/contain no-repeat;`
     + '}';
 
     const item_tag_drug = 'div.item-tag-drug::after {'
-    + `background: url(${repo_img_url}status/status_drugged.gif) 50%/contain no-repeat;`
+    + `background: url(${repo_img_hordes_url}status/status_drugged.gif) 50%/contain no-repeat;`
     + '}';
 
     const item_tag_smokebomb = 'div.item-tag-smokebomb {'
@@ -6216,11 +6300,11 @@ function updateExternalTools() {
                 let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
                 let tools_success = response_items.filter((tool_response) => tool_response.value.toLowerCase() === 'ok');
                 let tools_fail = response_items.filter((tool_response) => tool_response.value.toLowerCase() !== 'ok' && tool_response.value.toLowerCase() !== 'not activated');
-                btn.innerHTML = nb_tools_to_update === tools_success.length ? `<img src="${repo_img_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
-                : `<img src ="${repo_img_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_success.map((item) => item.key.replace('Status', ' : OK')).join('<br>')}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
+                btn.innerHTML = nb_tools_to_update === tools_success.length ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
+                : `<img src ="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_success.map((item) => item.key.replace('Status', ' : OK')).join('<br>')}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
             } else {
                 addError(response);
-                btn.innerHTML = `<img src="${repo_img_url}professions/death.gif">` + getI18N(texts.update_external_tools_fail_btn_label);
+                btn.innerHTML = `<img src="${repo_img_hordes_url}professions/death.gif">` + getI18N(texts.update_external_tools_fail_btn_label);
             }
             endLoading();
         },
@@ -6290,7 +6374,7 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                         let display_all = document.createElement('div');
                         display_all.setAttribute('style', 'padding: 4px; border-bottom: 1px solid; cursor: pointer');
                         let display_all_img = document.createElement('img');
-                        display_all_img.src = `${repo_img_url}/icons/small_more.gif`;
+                        display_all_img.src = `${repo_img_hordes_url}/icons/small_more.gif`;
                         display_all_img.setAttribute('style', 'margin-right: 8px');
 
                         let display_all_text = document.createElement('text');
@@ -6303,10 +6387,10 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                         display_all.addEventListener('click', () => {
                             show_exact_match = !show_exact_match;
                             if (show_exact_match) {
-                                display_all_img.src = `${repo_img_url}/icons/small_more.gif`;
+                                display_all_img.src = `${repo_img_hordes_url}/icons/small_more.gif`;
                                 display_all_text.innerHTML = getI18N(texts.display_all_search_result);
                             } else {
-                                display_all_img.src = `${repo_img_url}/icons/small_less.gif`;
+                                display_all_img.src = `${repo_img_hordes_url}/icons/small_less.gif`;
                                 display_all_text.innerHTML = getI18N(texts.display_exact_search_result);
                             }
                             let not_exact = Array.from(block_to_display.getElementsByClassName('not-exact'));
@@ -6320,7 +6404,7 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                         if (response.response.translations.length > 1) {
                             let context_div = document.createElement('div');
                             context_div.setAttribute('style', 'text-align: center; padding: 4px; font-variant: small-caps; font-size: 14px;');
-                            context_div.innerHTML = getI18N(texts.translation_file_context) + ` <img src="${repo_img_url}/emotes/arrowright.gif"> ` + translation.key.context;
+                            context_div.innerHTML = getI18N(texts.translation_file_context) + ` <img src="${repo_img_hordes_url}/emotes/arrowright.gif"> ` + translation.key.context;
                             if (!translation.key.isExactMatch && show_exact_match) {
                                 context_div.classList.add('not-exact','hidden');
                             }
@@ -6332,7 +6416,7 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
                             lang.forEach((result) => {
                                 let content_div = document.createElement('div');
                                 let img = document.createElement('img');
-                                img.src = `${repo_img_url}/lang/${lang_key}.png`
+                                img.src = `${repo_img_hordes_url}/lang/${lang_key}.png`
                                 img.setAttribute('style', 'margin-right: 8px');
 
                                 let button_div = document.createElement('div');

@@ -7,8 +7,6 @@ export interface ToolsToUpdate {
 export interface SidenavLinks {
     label: string;
     id: string;
-    component: any;
-    selected: boolean;
 }
 
 export type I18nLabels = Dictionary<string>;

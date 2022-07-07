@@ -84,31 +84,37 @@ export class CampingComponent implements OnInit {
             id: 'scavenger',
             img: 'dig',
             label: $localize`Fouineur`,
+            camping_factor: 0.9
         },
         {
             id: 'scout',
             img: 'vest',
             label: $localize`Éclaireur`,
+            camping_factor: 0.9
         },
         {
             id: 'guardian',
             img: 'shield',
             label: $localize`Gardien`,
+            camping_factor: 0.9
         },
         {
             id: 'survivalist',
             img: 'book',
             label: $localize`Ermite`,
+            camping_factor: 1
         },
         {
             id: 'tamer',
             img: 'tamer',
             label: $localize`Apprivoiseur`,
+            camping_factor: 0.9
         },
         {
             id: 'technician',
             img: 'tech',
             label: $localize`Technicien`,
+            camping_factor: 0.9
         },
     ];
 
@@ -225,7 +231,7 @@ export class CampingComponent implements OnInit {
 
         this.configuration_form = this.fb.group({
             town: [<TownType>this.town_types.find((town_type: TownType) => town_type.id === 'rne')],
-            job: ['citizen'],
+            job: [<Job>this.jobs.find((job: Job) => job.id === 'citizen')],
             distance: [1],
             campings: [0],
             pro: [false],
@@ -243,14 +249,12 @@ export class CampingComponent implements OnInit {
         });
 
         this.configuration_form.valueChanges.subscribe(() => this.calculateProbabilities())
-        console.log('this.form', this.configuration_form);
-
     }
 
     private calculateProbabilities(): void {
         let chances = 0;
         /** Type de ville */
-        chances += (<TownType>this.configuration_form.get('town')?.value).id === 'pande' ? -14 : 0;
+        chances += (<TownType>this.configuration_form.get('town')?.value)?.id === 'pande' ? -14 : 0;
         /** Tombe creusée */
         chances += this.configuration_form.get('tomb')?.value ? 1.6 : 0;
         /** Mode nuit */
@@ -264,7 +268,7 @@ export class CampingComponent implements OnInit {
         chances += -zombies_factor * this.configuration_form.get('zombies')?.value;
 
         /** Nombre de campings */
-        let nb_camping_town_type_mapping = (<TownType>this.configuration_form.get('town')?.value).id === 'pande' ? this.campings_map['pande'] : this.campings_map['normal'];
+        let nb_camping_town_type_mapping = (<TownType>this.configuration_form.get('town')?.value)?.id === 'pande' ? this.campings_map['pande'] : this.campings_map['normal'];
         let nb_camping_mapping = this.configuration_form.get('pro')?.value ? nb_camping_town_type_mapping['pro'] : nb_camping_town_type_mapping['nonpro'];
         chances += (this.configuration_form.get('campings')?.value > 9 ? nb_camping_mapping[9] : nb_camping_mapping[this.configuration_form.get('campings')?.value]);
 
@@ -293,10 +297,9 @@ export class CampingComponent implements OnInit {
           * Bonus liés au bâtiment
           * @see RuinDataService.php
           */
-        chances += (<Ruin>this.ruins.find((ruin: Ruin) => (<Ruin>this.configuration_form.get('ruin')?.value).id === ruin.id)).camping;
+        chances += (<Ruin>this.ruins.find((ruin: Ruin) => (<Ruin>this.configuration_form.get('ruin')?.value)?.id === ruin.id)).camping;
 
-        console.log('job', this.configuration_form.get('job')?.value);
-        this.camping_result.probability = Math.min(Math.max((100.0 - (Math.abs(Math.min(0, chances)) * 5)) / 100.0, .1), ((<Job>this.configuration_form.get('job')?.value).id === 'survivalist' ? 1.0 : 0.9));
+        this.camping_result.probability = Math.min(Math.max((100.0 - (Math.abs(Math.min(0, chances)) * 5)) / 100.0, .1), ((<Job>this.configuration_form.get('job')?.value)?.camping_factor));
         this.camping_result.label = this.camping_results.find((camping_result) => camping_result.strict ? <number>this.camping_result.probability < camping_result.probability : <number>this.camping_result.probability <= camping_result.probability)?.label;
     };
 }
@@ -316,5 +319,5 @@ interface Job {
     id: string,
     img: string,
     label: string,
-    camping_factor?: number
+    camping_factor: number
 }

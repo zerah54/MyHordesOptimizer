@@ -1,11 +1,13 @@
-<mat-card class="mho-bank">
-    <mat-card-header>
-        <mat-card-title i18n>Banque</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-        <ul *ngIf="bank">
-            <mho-item *ngFor="let bank_item of bank.bank_items" [bank_item]="bank_item" [displayDetails]="false">
-            </mho-item>
-        </ul>
-    </mat-card-content>
-</mat-card>
+<mho-tools>
+    <mat-card class="mho-bank">
+        <mat-card-header>
+            <mat-card-title i18n>Banque</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <ul *ngIf="bank">
+                <mho-item *ngFor="let bank_item of bank.bank_items" [bankItem]="bank_item" [displayDetails]="false">
+                </mho-item>
+            </ul>
+        </mat-card-content>
+    </mat-card>
+</mho-tools>
