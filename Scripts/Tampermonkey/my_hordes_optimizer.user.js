@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.60
+// @version      1.0.0-alpha.61
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,8 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Remplacement du lien mail par un lien discord \n`
-+ `[Nouveauté] Les ajouts d'interface en jeu sont distinctement identifiés comme venant de MHO \n`;
++ `[Correctif] Correction du lien discord qui n'a marché qu'une seule fois avant de décider de manière unilatérale de devenir inutilisable \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1065,7 +1064,7 @@ let informations = [
             de: `Fehler ? Ideen ?`,
             es: `¿Bugs? ¿Ideas?`
         }, 
-        src: `https://discord.gg/yVeaJ6uf`, 
+        src: `https://discord.gg/ZQH7ZPWcCm`, 
         action: undefined, 
         img: `${repo_img_url}discord.ico`
     },
