@@ -46,10 +46,8 @@ export class RuinsComponent implements OnInit {
     }
 
     /** Filtre la liste à afficher */
-    public applyFilter(event: Event): void {
-        const value: string = (event.target as HTMLInputElement).value;
+    public applyFilter(value: string): void {
         this.datasource.filter = value.trim().toLowerCase();
-
     }
 
     private customFilter(data: Ruin, filter: string): boolean {

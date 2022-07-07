@@ -11,10 +11,7 @@
                         <ng-container matColumnDef="filters">
                             <td mat-header-cell *matHeaderCellDef colspan="6">
                                 <div class="table-filters">
-                                    <mat-form-field appearance="standard">
-                                        <mat-label i18n>Filtrer</mat-label>
-                                        <input matInput (keyup)="applyFilter($event)" #filterInput>
-                                    </mat-form-field>
+                                    <mho-filter (filterChange)="applyFilter($event)"></mho-filter>
                                     <mat-form-field appearance="standard">
                                         <mat-label i18n>Ajouter un objet</mat-label>
                                         <mat-select #addItemSelect (valueChange)="addItemToWishlist($event)">

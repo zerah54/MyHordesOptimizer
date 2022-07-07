@@ -1,0 +1,19 @@
+.mho-recipes {
+    table {
+        width: 100%;
+
+        .mat-cell {
+            padding: 0.5em;
+        }
+
+        img {
+            vertical-align: middle;
+        }
+
+        div {
+            > img {
+                margin-right: 0.5em;
+            }
+        }
+    }
+}

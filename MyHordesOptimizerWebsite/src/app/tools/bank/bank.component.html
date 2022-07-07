@@ -4,10 +4,12 @@
             <mat-card-title i18n>Banque</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            <ul *ngIf="bank">
-                <mho-item *ngFor="let bank_item of bank.bank_items" [bankItem]="bank_item" [displayDetails]="false">
-                </mho-item>
-            </ul>
+            <ng-container *ngIf="displayed_bank_items">
+                <div class="filter"><mho-filter (filterChange)="applyFilter($event)"></mho-filter></div>
+                <ul>
+                    <mho-item *ngFor="let bank_item of displayed_bank_items" [bankItem]="bank_item"></mho-item>
+                </ul>
+            </ng-container>
         </mat-card-content>
     </mat-card>
 </mho-tools>

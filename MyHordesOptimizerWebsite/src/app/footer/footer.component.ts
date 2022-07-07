@@ -42,7 +42,6 @@ export class FooterComponent {
      * @param {Language} new_language
      */
     public changeLanguage(new_language: Language): void {
-        console.log('new_language', new_language);
         this.site_language = new_language;
         localStorage.setItem('mho-locale', new_language.code);
         setTimeout(() => {

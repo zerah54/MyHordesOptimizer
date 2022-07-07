@@ -1,5 +1,6 @@
 import { RecipeDTO } from './../dto/recipe.dto';
 import { Item } from './item.class';
+import { RecipeResultItem } from './recipe-result-item.class';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from "./_common.class";
 import { I18nLabels } from './_types';
 
@@ -8,7 +9,7 @@ export class Recipe extends CommonModel<RecipeDTO> {
     public components!: Item[]
     public is_shaman_only!: boolean;
     public name!: string;
-    public result!: Item[];
+    public result!: RecipeResultItem[];
     public type!: "Workshop" | "Manual";
 
     constructor(dto?: RecipeDTO) {
@@ -33,7 +34,7 @@ export class Recipe extends CommonModel<RecipeDTO> {
             this.components = dtoToModelArray(Item, dto.components);
             this.is_shaman_only = dto.isShamanOnly;
             this.name = dto.name;
-            this.result = dtoToModelArray(Item, dto.result);
+            this.result = dtoToModelArray(RecipeResultItem, dto.result);
             this.type = dto.type;
         }
     };
