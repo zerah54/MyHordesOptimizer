@@ -9,30 +9,31 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
 {
     public class TownBankResolver : IValueResolver<MyHordesMap, Town, BankWrapper>
     {
-        protected IMyHordesOptimizerRepository FirebaseRepository { get; set; }
+        protected IMyHordesOptimizerRepository MhoRepository { get; set; }
         protected IUserInfoProvider UserInfoProvider { get; set; }
 
 
         public TownBankResolver(IMyHordesOptimizerRepository firebaseRepository,
             IUserInfoProvider userInfoProvider)
         {
-            FirebaseRepository = firebaseRepository;
+            MhoRepository = firebaseRepository;
             UserInfoProvider = userInfoProvider;
         }
 
         public BankWrapper Resolve(MyHordesMap source, Town destination, BankWrapper destMember, ResolutionContext context)
         {
             var wrapper = new BankWrapper();
-            var items = FirebaseRepository.GetItems();
+            var items = MhoRepository.GetItems();
             foreach (var bankItem in source.City.Bank)
             {
                 var item = items.First(x => x.Id == bankItem.Id);
                 var destinationBankItem = new BankItem()
                 {
                     Item = item,
-                    Count = bankItem.Count
+                    Count = bankItem.Count,
+                    IsBroken = bankItem.Broken
                 };
-                wrapper.Bank[item.Id.ToString()] = destinationBankItem;
+                wrapper.Bank.Add(destinationBankItem);
             }
             wrapper.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             return wrapper;

@@ -35,7 +35,17 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchTown(Town town)
         {
-            throw new NotImplementedException();
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var exist = connection.ExecuteScalar<int?>("SELECT idTown FROM Town WHERE idTown = @TownId", new { TownId = town.Id });
+            if (!exist.HasValue)
+            {
+                var townModel = Mapper.Map<TownModel>(town);
+                connection.Insert(townModel);
+            }
+            connection.Close();
+            PatchCitizen(town.Id, town.Citizens);
+            PutBank(town.Id, town.Bank);
         }
 
         public Town GetTown(int townId)
@@ -224,7 +234,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 IEnumerable<RecipeCompletModel> matchingComplet = recipeCompletModels.Where(r => r.RecipeName == recipe.Name);
                 recipe.Components = items.Where(i => matchingComplet.Any(x => x.ComponentItemId == i.Id)).ToList();
                 var resultsAsItems = items.Where(i => matchingComplet.Any(x => x.ResultItemId == i.Id));
-                var itemResults  = matchingComplet.Where(x => resultsAsItems.Any(i => i.Id == x.ResultItemId)).Select(x => new ItemResult()
+                var itemResults = matchingComplet.Where(x => resultsAsItems.Any(i => i.Id == x.ResultItemId)).Select(x => new ItemResult()
                 {
                     Item = items.First(i => i.Id == x.ResultItemId),
                     Probability = x.ResultProbability,
@@ -241,7 +251,23 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PutBank(int townId, BankWrapper bank)
         {
-            throw new NotImplementedException();
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+
+            var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(bank.LastUpdateInfo);
+            var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
+                                                                   OUTPUT INSERTED.idLastUpdateInfo
+                                                                   VALUES (@DateUpdate, @IdUser)", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
+
+            var townBankItemModels = Mapper.Map<List<TownBankItemModel>>(bank.Bank);
+            townBankItemModels.ForEach(x => { x.IdTown = townId; x.IdLastUpdateInfo = idLastUpdateInfo; });
+            var trans = connection.BeginTransaction();
+            connection.Execute(@"INSERT INTO TownBankItem(idTown, idItem, count, isBroken, idLastUpdateInfo)
+                                 values(@IdTown, @IdItem, @Count, @IsBroken, @IdLastUpdateInfo)", townBankItemModels, transaction: trans);
+
+            trans.Commit();
+
+            connection.Close();
         }
 
         #endregion
@@ -259,7 +285,40 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchCitizen(int townId, CitizensWrapper wrapper)
         {
-            throw new NotImplementedException();
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var userIds = wrapper.Citizens.Select(x => x.Id).ToList();
+            var existingUsers = connection.Query<UsersModel>("SELECT * FROM Users WHERE idUser IN @UserIds", new { UserIds = userIds });
+            //  var insertBuilder = new StringBuilder("INSERT INTO User(idUser,name,userKey) VALUES ");
+            foreach (var citizen in wrapper.Citizens)
+            {
+                var userModel = Mapper.Map<UsersModel>(citizen);
+                var existingUser = existingUsers.FirstOrDefault(x => x.IdUser == citizen.Id);
+                if (existingUser != null && existingUser.Name != citizen.Name)
+                {
+                    // On devrait pas souvent faire des updates, alors on est pas obliger de bulk
+                    connection.Execute("UPDATE Users SET name = @Name WHERE idUser = @UserId", new { Name = userModel.Name, UserId = userModel.IdUser });
+                }
+                else if (existingUser == null)
+                {
+                    connection.Insert(userModel);
+                }
+            }
+
+            var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(wrapper.LastUpdateInfo);
+            var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
+                                                                   OUTPUT INSERTED.idLastUpdateInfo
+                                                                   VALUES (@DateUpdate, @IdUser)", new {DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser});
+
+            var townCitizenModels = Mapper.Map<List<TownCitizenModel>>(wrapper.Citizens);
+            townCitizenModels.ForEach(x => { x.IdTown = townId; x.IdLastUpdateInfo = idLastUpdateInfo; });
+            var trans = connection.BeginTransaction();
+            connection.Execute(@"INSERT INTO TownCitizen(idTown, idUser, homeMessage, jobName, jobUID, positionX, positionY, isGhost,idLastUpdateInfo)
+                                 values(@IdTown, @IdUser, @HomeMessage, @JobName, @JobUID, @PositionX, @PositionY, @IsGhost, @IdLastUpdateInfo)", townCitizenModels, transaction: trans);
+
+            trans.Commit();
+
+            connection.Close();
         }
 
         #endregion

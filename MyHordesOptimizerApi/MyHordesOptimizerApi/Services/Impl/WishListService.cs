@@ -47,7 +47,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             foreach (var kvp in wishList.WishList)
             {
                 var wishlistItem = kvp.Value;
-                if (town.Bank.Bank.TryGetValue(wishlistItem.Item.Id.ToString(), out var bankItem))
+                var bankItem = town.Bank.Bank.FirstOrDefault(x => x.Item.Id == wishlistItem.Item.Id);
+                if (bankItem != null)
                 {
                     wishlistItem.BankCount = bankItem.Count;
                 }

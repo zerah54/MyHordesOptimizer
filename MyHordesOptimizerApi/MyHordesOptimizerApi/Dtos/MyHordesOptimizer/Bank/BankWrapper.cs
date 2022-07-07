@@ -4,12 +4,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
     public class BankWrapper
     {
-        public Dictionary<string, BankItem> Bank { get; set; }
+        public List<BankItem> Bank { get; set; }
         public LastUpdateInfo LastUpdateInfo { get; set; }
 
         public BankWrapper()
         {
-            Bank = new Dictionary<string, BankItem>();
+            Bank = new List<BankItem>();
         }
     }
 }

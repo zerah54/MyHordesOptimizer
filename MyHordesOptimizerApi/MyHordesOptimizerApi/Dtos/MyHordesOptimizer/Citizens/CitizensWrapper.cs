@@ -6,16 +6,16 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     {
         public LastUpdateInfo LastUpdateInfo { get; set; }
 
-        public Dictionary<string, Citizen> Citizens { get; set; }
+        public List<Citizen> Citizens { get; set; }
 
-        public CitizensWrapper(IDictionary<string, Citizen> dictionary)
+        public CitizensWrapper(List<Citizen> dictionary)
         {
-            Citizens = new Dictionary<string, Citizen>(dictionary);
+            Citizens = new List<Citizen>(dictionary);
         }
 
         public CitizensWrapper()
         {
-            Citizens = new Dictionary<string, Citizen>();
+            Citizens = new List<Citizen>();
         }
     }
 }

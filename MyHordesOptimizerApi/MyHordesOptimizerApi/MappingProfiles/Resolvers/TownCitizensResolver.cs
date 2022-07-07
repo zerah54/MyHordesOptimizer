@@ -21,8 +21,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
 
         public CitizensWrapper Resolve(MyHordesMap source, Town destination, CitizensWrapper destMember, ResolutionContext context)
         {
-            var dictionary = source.Citizens.ToDictionary(citizen => $"{citizen.Id}_{citizen.Name}", citizen => citizen);
-            var wrapper = new CitizensWrapper(Mapper.Map<Dictionary<string,Citizen>>(dictionary));
+          //  var dictionary = source.Citizens.ToDictionary(citizen => $"{citizen.Id}_{citizen.Name}", citizen => citizen);
+            var wrapper = new CitizensWrapper(Mapper.Map<List<Citizen>>(source.Citizens));
             wrapper.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             return wrapper;
         }

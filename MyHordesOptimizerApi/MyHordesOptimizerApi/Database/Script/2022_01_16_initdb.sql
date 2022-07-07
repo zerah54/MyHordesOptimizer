@@ -65,21 +65,15 @@ CREATE TABLE WishList(
 	idWishList INT PRIMARY KEY NOT NULL IDENTITY
 );
 
-CREATE TABLE Bank(
-	idBank INT PRIMARY KEY NOT NULL IDENTITY,
-);
 
 CREATE TABLE Town (
 	idTown INT PRIMARY KEY NOT NULL
 );
 
-CREATE TABLE Citizens(
-	idCitizen INT PRIMARY KEY NOT NULL IDENTITY
-);
 
 CREATE TABLE Users(
-	name NVARCHAR(255) PRIMARY KEY NOT NULL,
-	userId INT,
+	idUser INT PRIMARY KEY NOT NULL,
+	name NVARCHAR(255) NOT NULL,
 	userKey NVARCHAR(255)
 );
 
@@ -104,51 +98,36 @@ CREATE TABLE Ruin(
 CREATE TABLE LastUpdateInfo(
 	idLastUpdateInfo INT PRIMARY KEY NOT NULL IDENTITY,
 	dateUpdate DATETIME2 NOT NULL,
-	userName NVARCHAR(255),
-	FOREIGN KEY(userName) REFERENCES Users(name)
+	idUser INT,
+	FOREIGN KEY(idUser) REFERENCES Users(idUser)
 );
 
-CREATE TABLE TownBank(
+CREATE TABLE TownBankItem(
 	idTown INT,
-	idBank INT,
+	idItem INT,
 	idLastUpdateInfo INT,
-	PRIMARY KEY (idTown, idBank, idLastUpdateInfo),
+	count INT,
+	isBroken BIT NOT NULL DEFAULT 0,
+	PRIMARY KEY (idTown, idItem, idLastUpdateInfo, isBroken),
 	FOREIGN KEY(idTown) REFERENCES Town(idTown),
-	FOREIGN KEY(idBank) REFERENCES Bank(idBank),
+	FOREIGN KEY(idItem) REFERENCES Item(idItem),
 	FOREIGN KEY(idLastUpdateInfo) REFERENCES LastUpdateInfo(idLastUpdateInfo)
 );
 
-CREATE TABLE BankItem(
-	idBank INT,
-	idItem INT,
-	count INT,
-	isBroken BIT NOT NULL DEFAULT 0,
-	FOREIGN KEY(idItem) REFERENCES Item(idItem),
-	FOREIGN KEY(idBank) REFERENCES Bank(idBank),
-	PRIMARY KEY (idBank, idItem, isBroken)
-);
 
-CREATE TABLE CitizensUsers(
-	idCitizen INT,
-	citizenName NVARCHAR(255),
+CREATE TABLE TownCitizen(
+	idTown INT,
+	idUser INT,
 	homeMessage TEXT,
 	jobName TEXT,
 	jobUID NVARCHAR(255),
 	positionX INT,
 	positionY INT,
 	isGhost BIT,
-	FOREIGN KEY(idCitizen) REFERENCES Citizens(idCitizen),
-	FOREIGN KEY(citizenName) REFERENCES Users(name),
-	PRIMARY KEY (idCitizen, citizenName)
-);
-
-CREATE TABLE TownCitizen(
-	idTown INT,
-	idCitizen INT,
 	idLastUpdateInfo INT,
-	PRIMARY KEY (idTown, idCitizen, idLastUpdateInfo),
+	PRIMARY KEY (idTown, idUser, idLastUpdateInfo),
 	FOREIGN KEY(idTown) REFERENCES Town(idTown),
-	FOREIGN KEY(idCitizen) REFERENCES Citizens(idCitizen),
+	FOREIGN KEY(idUser) REFERENCES Users(idUser),
 	FOREIGN KEY(idLastUpdateInfo) REFERENCES LastUpdateInfo(idLastUpdateInfo)
 );
 

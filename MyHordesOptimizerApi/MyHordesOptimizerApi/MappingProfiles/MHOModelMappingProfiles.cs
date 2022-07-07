@@ -95,6 +95,43 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Actions, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.ActionFr }, { "en", src.ActionEn }, { "es", src.ActionEs }, { "de", src.ActionDe } }))
                 .ForMember(dest => dest.Components, opt => opt.Ignore())
                 .ForMember(dest => dest.Result, opt => opt.Ignore());
+
+            //Town
+            CreateMap<Town, TownModel>()
+                .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => src.Id));
+
+            //User
+            CreateMap<Citizen, UsersModel>()
+                .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.UserKey, opt => opt.Ignore());
+
+            //TownCitizen
+            CreateMap<Citizen, TownCitizenModel>()
+                .ForMember(dest => dest.IdTown, opt => opt.Ignore())
+                .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
+                .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.HomeMessage, opt => opt.MapFrom(src => src.HomeMessage))
+                .ForMember(dest => dest.PositionY, opt => opt.MapFrom(src => src.Y))
+                .ForMember(dest => dest.PositionX, opt => opt.MapFrom(src => src.X))
+                .ForMember(dest => dest.JobUID, opt => opt.MapFrom(src => src.JobName))
+                .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.JobName))
+                .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.IsGhost));
+
+            //LastUpdate
+            CreateMap<LastUpdateInfo, LastUpdateInfoModel>()
+                .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.DateUpdate, opt => opt.MapFrom(src => src.UpdateTime))
+                .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore());
+
+
+            //TownBankItem
+            CreateMap<BankItem, TownBankItemModel>()
+                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Item.Id))
+                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
+                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
+                .ForMember(dest => dest.IdTown, opt => opt.Ignore())
+                .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore());
         }
 
         private string RemoveRandomNumber(string img)

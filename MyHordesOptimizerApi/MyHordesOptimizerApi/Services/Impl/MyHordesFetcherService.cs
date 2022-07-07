@@ -68,7 +68,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                         }
                     }
 
-                    if (town.Bank.Bank.TryGetValue(item.Id.ToString(), out var bankItem))
+                    var bankItem = town.Bank.Bank.FirstOrDefault(x => x.Item.Id == item.Id);
+                    if (bankItem != null)
                     {
                         item.BankCount = bankItem.Count;
                     }
@@ -126,9 +127,8 @@ namespace MyHordesOptimizerApi.Services.Impl
 
             if (town.WishList != null && town.WishList.WishList != null)
             {
-                foreach (var kvp in bankWrapper.Bank)
+                foreach (var bankItem in bankWrapper.Bank)
                 {
-                    var bankItem = kvp.Value;
                     if (town.WishList.WishList.TryGetValue(bankItem.Item.Id.ToString(), out var wishListItem))
                     {
                         bankItem.WishListCount = wishListItem.Count;

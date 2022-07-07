@@ -6,6 +6,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     {
         public string UserId { get; set; }
         public string UserName { get; set; }
+        public string UserKey { get; set; }
         public DateTime UpdateTime { get; set; }
     }
 }
