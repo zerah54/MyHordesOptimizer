@@ -1,13 +1,15 @@
 @import 'variables.scss';
 
 .mho-footer {
+    overflow-x: auto;
+    overflow-y: hidden;
+
     .mat-toolbar-row {
         height: 24px;
         font-size: 12px;
         font-weight: normal;
-        justify-content: center;
-        overflow-x: auto;
-        overflow-y: hidden;
+        overflow-x: hidden;
+        overflow-x: visible;
         &:first-child {
             margin-top: auto;
         }
@@ -23,6 +25,11 @@
             &:hover {
                 color: $accent;
             }
+        }
+
+        > * {
+            margin-left: auto;
+            margin-right: auto;
         }
     }
 }

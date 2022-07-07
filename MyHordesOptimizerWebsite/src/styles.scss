@@ -8,6 +8,7 @@ body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
     color: $primary;
+    overflow: hidden;
 }
 
 .mat-drawer.sidenav {
@@ -18,6 +19,13 @@ body {
     .mat-list-item:hover {
         background-color: rgba(0, 0, 0, 0.2);
         cursor: pointer;
+    }
+
+    .mat-list-item {
+        text-decoration: none;
+        &.link-selected {
+            color: $accent;
+        }
     }
 }
 
