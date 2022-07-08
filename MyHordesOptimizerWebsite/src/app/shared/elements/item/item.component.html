@@ -24,6 +24,13 @@
                 </div>
                 <hr>
             </ng-container>
+
+            <ng-container *ngIf="item ? (item.properties && item.properties.length > 0) : (bankItem.item.properties && bankItem.item.properties.length > 0)">
+                <div *ngFor="let property of (item ? item.properties : bankItem.item.properties)">
+                    {{property ? property.value.label : undefined}}
+                </div>
+                <hr>
+            </ng-container>
         </div>
     </div>
 </li>

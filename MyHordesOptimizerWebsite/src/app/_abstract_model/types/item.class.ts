@@ -1,3 +1,4 @@
+import { Property } from '../enum/property.enum';
 import { ItemDTO } from './../dto/item.dto';
 import { Recipe } from './recipe.class';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
@@ -14,7 +15,7 @@ export class Item extends CommonModel<ItemDTO> {
     public is_heaver!: boolean;
     public json_id_name!: string;
     public label!: I18nLabels;
-    public properties: string[] = [];
+    public properties: Property[] = [];
     public recipes: Recipe[] = [];
     public wishlist_count!: number;
     public xml_id!: number;
@@ -37,7 +38,7 @@ export class Item extends CommonModel<ItemDTO> {
             isHeaver: this.is_heaver,
             jsonIdName: this.json_id_name,
             label: this.label,
-            properties: this.properties,
+            properties: this.properties.map((property: Property) => property.key),
             recipes: modelToDtoArray(this.recipes),
             wishListCount: this.wishlist_count,
             xmlId: this.xml_id,
@@ -57,7 +58,7 @@ export class Item extends CommonModel<ItemDTO> {
             this.is_heaver = dto.isHeaver;
             this.json_id_name = dto.jsonIdName;
             this.label = dto.label;
-            this.properties = dto.properties;
+            this.properties = dto.properties ? <Property[]>dto.properties.map((property: string) => Property.getByKey(property)) : [];
             this.recipes = dtoToModelArray(Recipe, dto.recipes);
             this.wishlist_count = dto.wishListCount;
             this.xml_id = dto.xmlId;

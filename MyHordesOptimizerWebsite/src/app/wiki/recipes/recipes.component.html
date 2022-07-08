@@ -9,7 +9,7 @@
                     <table mat-table [dataSource]="datasource" matSort>
 
                         <ng-container matColumnDef="filters">
-                            <td mat-header-cell *matHeaderCellDef colspan="6">
+                            <td mat-header-cell *matHeaderCellDef colspan="4">
                                 <div class="table-filters">
                                     <mho-filter (filterChange)="applyFilter($event)"></mho-filter>
                                 </div>

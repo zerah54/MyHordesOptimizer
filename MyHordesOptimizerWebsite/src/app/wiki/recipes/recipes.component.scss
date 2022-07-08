@@ -10,9 +10,11 @@
             vertical-align: middle;
         }
 
-        div {
-            > img {
-                margin-right: 0.5em;
+        td {
+            div {
+                > img {
+                    margin-right: 0.5em;
+                }
             }
         }
     }

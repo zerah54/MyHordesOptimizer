@@ -20,9 +20,5 @@ export class RecipeComponent {
     /** La locale */
     public locale: string = moment.locale();
 
-    public roundProbability(result: RecipeResultItem): number {
-        return Math.round(result.probability * 10000) / 100;
-    }
-
 }
 
