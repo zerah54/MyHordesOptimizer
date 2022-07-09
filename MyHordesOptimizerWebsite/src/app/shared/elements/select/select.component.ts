@@ -1,5 +1,5 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { Component, ElementRef, HostBinding, Input, OnDestroy, Optional, Self, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostBinding, Input, OnDestroy, Optional, Output, Self, ViewChild, EventEmitter } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, FormControl, NgControl, ValidationErrors, Validator, Validators } from '@angular/forms';
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -54,6 +54,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     }
 
     @Input() get disabled(): boolean { return this._disabled; }
+
+    @Output() filterChange: EventEmitter<T | string | undefined> = new EventEmitter<T | string | undefined>();
 
     set required(req) {
         this._required = coerceBooleanProperty(req);
@@ -157,7 +159,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     //From ControlValueAccessor interface
     public writeValue(value: T | string | undefined) {
         this.innerValue = value;
-        this.onChange(value)
+        this.onChange(value);
+        this.filterChange.next(value);
     }
 
     //From ControlValueAccessor interface

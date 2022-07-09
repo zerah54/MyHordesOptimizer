@@ -1,3 +1,4 @@
+import { Action } from '../enum/action.enum';
 import { Property } from '../enum/property.enum';
 import { ItemDTO } from './../dto/item.dto';
 import { Recipe } from './recipe.class';
@@ -5,7 +6,7 @@ import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { I18nLabels } from './_types';
 
 export class Item extends CommonModel<ItemDTO> {
-    public actions: string[] = [];
+    public actions: Action[] = [];
     public bank_count!: number;
     public category!: string;
     public deco!: number;
@@ -28,7 +29,7 @@ export class Item extends CommonModel<ItemDTO> {
 
     public modelToDto(): ItemDTO {
         return {
-            actions: this.actions,
+            actions: this.actions.map((action: Action) => action.key),
             bankCount: this.bank_count,
             category: this.category,
             deco: this.deco,
@@ -48,7 +49,7 @@ export class Item extends CommonModel<ItemDTO> {
 
     protected dtoToModel(dto?: ItemDTO): void {
         if (dto) {
-            this.actions = dto.actions;
+            this.actions = dto.actions ? <Action[]>dto.actions.map((action: string) => Action.getByKey(action)) : [];
             this.bank_count = dto.bankCount;
             this.category = dto.category;
             this.deco = dto.deco;

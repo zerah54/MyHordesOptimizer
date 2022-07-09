@@ -42,7 +42,7 @@
                     <div>
                         <mat-form-field>
                             <mat-label i18n>Type de ville</mat-label>
-                            <mho-select #jobSelect [formControlName]="'town'" [options]="town_types" [bindLabel]="'label'"></mho-select>
+                            <mho-select [formControlName]="'town'" [options]="town_types" [bindLabel]="'label'"></mho-select>
                         </mat-form-field>
                         <mat-checkbox [formControlName]="'night'"><img [src]="HORDES_IMG_REPO +  'pictos/r_doutsd.gif'"><ng-container i18n>Nuit</ng-container></mat-checkbox>
                         <mat-checkbox [formControlName]="'devastated'"><img [src]="HORDES_IMG_REPO + 'item/item_out_def_broken.gif'"><ng-container i18n>Ville dévastée</ng-container></mat-checkbox>
@@ -55,7 +55,7 @@
                     <div>
                         <mat-form-field>
                             <mat-label i18n>Bâtiment</mat-label>
-                            <mho-select #jobSelect [formControlName]="'ruin'" [options]="ruins" [bindLabel]="'label.' + locale"></mho-select>
+                            <mho-select [formControlName]="'ruin'" [options]="ruins" [bindLabel]="'label.' + locale"></mho-select>
                         </mat-form-field>
 
                         <mat-form-field>

@@ -11,6 +11,12 @@ const IMPOUNDABLE_KEY: string = 'impoundable';
 const PREVENT_NIGHT_KEY: string = 'prevent_night';
 const IS_WATER_KEY: string = 'is_water';
 
+/** Veille */
+const NW_ARMORY_KEY: string = 'nw_armory';
+const NW_IKEA_KEY: string = 'nw_ikea';
+const NW_TREBUCHET_KEY: string = 'nw_trebuchet';
+const NW_SHOOTING_KEY: string = 'nw_shooting';
+
 /** Modifications possibles */
 const CAN_POISON_KEY: string = 'can_poison';
 const CAN_COOK_KEY: string = 'can_cook';
@@ -32,7 +38,13 @@ const HERO_FIND_LUCKY_DATA: PropertyData = { label: $localize`Trouvaille amélio
 const HERO_FIND_DATA: PropertyData = { label: $localize`Trouvaille`, category: '', img: '' };
 const IMPOUNDABLE_DATA: PropertyData = { label: $localize`Conservé en cas de banissement`, category: '', img: '' };
 const PREVENT_NIGHT_DATA: PropertyData = { label: $localize`Annule le malus de nuit sur la case une fois posé au sol`, category: '', img: '' };
-const IS_WATER_DATA: PropertyData = { label: $localize`Désaltère`, category: '', img: '' };
+const IS_WATER_DATA: PropertyData = { label: $localize`Désaltère`, category: '', img: 'status/status_hasdrunk.gif' };
+
+/** Veille */
+const NW_ARMORY_DATA: PropertyData = { label: $localize`Compte dans le calcul du bonus de veille donné par l'armurerie`, category: 'nightwatch', img: '' };
+const NW_IKEA_DATA: PropertyData = { label: $localize`Compte dans le calcul du bonus de veille donné par le magasin suédois`, category: 'nightwatch', img: '' };
+const NW_TREBUCHET_DATA: PropertyData = { label: $localize`Compte dans le calcul du bonus de veille donné par le lance-bête`, category: 'nightwatch', img: '' };
+const NW_SHOOTING_DATA: PropertyData = { label: $localize`Compte dans le calcul du bonus de veille donné par la tourelle lance-eau`, category: 'nightwatch', img: '' };
 
 /** Modifications possibles */
 const CAN_POISON_DATA: PropertyData = { label: $localize`Peut être empoisonné`, category: 'modification', img: '' };
@@ -57,6 +69,13 @@ export class Property extends CommonEnum {
     static IMPOUNDABLE: Property = new Property(IMPOUNDABLE_KEY, IMPOUNDABLE_DATA);
     static PREVENT_NIGHT: Property = new Property(PREVENT_NIGHT_KEY, PREVENT_NIGHT_DATA);
     static IS_WATER: Property = new Property(IS_WATER_KEY, IS_WATER_DATA);
+
+    /** Veille */
+    static NW_ARMORY: Property = new Property(NW_ARMORY_KEY, NW_ARMORY_DATA);
+    static NW_IKEA: Property = new Property(NW_IKEA_KEY, NW_IKEA_DATA);
+    static NW_TREBUCHET: Property = new Property(NW_TREBUCHET_KEY, NW_TREBUCHET_DATA);
+    static NW_SHOOTING: Property = new Property(NW_SHOOTING_KEY, NW_SHOOTING_DATA);
+
     /** Modifications possibles */
     static CAN_POISON: Property = new Property(CAN_POISON_KEY, CAN_POISON_DATA);
     static CAN_COOK: Property = new Property(CAN_COOK_KEY, CAN_COOK_DATA);

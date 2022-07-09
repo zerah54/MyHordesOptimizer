@@ -5,7 +5,12 @@
         </mat-card-header>
         <mat-card-content>
             <ng-container *ngIf="displayed_items">
-                <div class="filter"><mho-filter (filterChange)="applyFilter($event)"></mho-filter></div>
+                <div class="filter">
+                    <mho-filter (filterChange)="filter_value = $event; applyFilters()"></mho-filter>
+                    <mat-form-field style="margin-left: 1em;">
+                        <mho-select [multiple]="true" [options]="options" [bindLabel]="'value.label'" [(ngModel)]="select_value" (filterChange)="applyFilters()"></mho-select>
+                    </mat-form-field>
+                </div>
                 <ul>
                     <mho-item *ngFor="let item of displayed_items" [item]="item"></mho-item>
                 </ul>

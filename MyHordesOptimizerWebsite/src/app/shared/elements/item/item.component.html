@@ -27,7 +27,18 @@
 
             <ng-container *ngIf="item ? (item.properties && item.properties.length > 0) : (bankItem.item.properties && bankItem.item.properties.length > 0)">
                 <div *ngFor="let property of (item ? item.properties : bankItem.item.properties)">
-                    {{property ? property.value.label : undefined}}
+                    <ng-container *ngIf="property">
+                        <img *ngIf="property.value.img && property.value.img !== ''" [src]="HORDES_IMG_REPO + property.value.img">{{property.value.label}}
+                    </ng-container>
+                </div>
+                <hr>
+            </ng-container>
+
+            <ng-container *ngIf="item ? (item.actions && item.actions.length > 0) : (bankItem.item.actions && bankItem.item.actions.length > 0)">
+                <div *ngFor="let action of (item ? item.actions : bankItem.item.actions)">
+                    <ng-container *ngIf="action">
+                        <img *ngIf="action.value.img && action.value.img !== ''" [src]="HORDES_IMG_REPO + action.value.img">{{action.value.label}}
+                    </ng-container>
                 </div>
                 <hr>
             </ng-container>
