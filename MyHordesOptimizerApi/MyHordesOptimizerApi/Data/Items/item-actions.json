@@ -1,272 +1,773 @@
 {
-  "water_#00": [ "water_tl0", "water_tl1a", "water_tl1b", "water_tl2", "water_g" ],
-  "water_cup_#00": [ "water_tl0", "water_tl1a", "water_tl1b", "water_tl2", "water_g" ],
-  "potion_#00": [ "potion_tl0a", "potion_tl0b", "potion_tl1a", "potion_tl1b", "potion_tl2", "potion_g", "potion_tl0a_immune", "potion_tl0b_immune", "potion_tl1a_immune", "potion_tl1b_immune", "potion_tl2_immune", "potion_g_immune" ],
-
-  "water_can_3_#00": [ "watercan3_tl0", "watercan3_tl1a", "watercan3_tl1b", "watercan3_tl2", "watercan3_g" ],
-  "water_can_2_#00": [ "fill_watercan2", "watercan2_tl0", "watercan2_tl1a", "watercan2_tl1b", "watercan2_tl2", "watercan2_g" ],
-  "water_can_1_#00": [ "fill_watercan1", "watercan1_tl0", "watercan1_tl1a", "watercan1_tl1b", "watercan1_tl2", "watercan1_g" ],
-  "water_can_empty_#00": [ "fill_watercan0" ],
-
-  "can_#00": [ "can", "can_t1", "can_t2" ],
-
-  "can_open_#00": [ "eat_6ap" ],
-  "bretz_#00": [ "eat_6ap" ],
-  "undef_#00": [ "eat_6ap" ],
-  "dish_#00": [ "eat_6ap" ],
-  "vegetable_#00": [ "eat_6ap" ],
-  "food_bar1_#00": [ "eat_6ap" ],
-  "food_bar2_#00": [ "eat_6ap" ],
-  "food_bar3_#00": [ "eat_6ap" ],
-  "food_biscuit_#00": [ "eat_6ap" ],
-  "food_chick_#00": [ "eat_6ap" ],
-  "food_pims_#00": [ "eat_6ap" ],
-  "food_tarte_#00": [ "eat_6ap" ],
-  "food_sandw_#00": [ "eat_6ap" ],
-  "food_noodles_#00": [ "eat_6ap" ],
-  "wood_xmas_#00": [ "eat_6ap" ],
-  "fruit_#00": [ "eat_fleshroom_1", "eat_fleshroom_2" ],
-  "hmeat_#00": [ "eat_meat_1", "eat_meat_2" ],
-  "bone_meat_#00": [ "eat_bone_1", "eat_bone_2" ],
-  "cadaver_#00": [ "eat_cadaver_1", "eat_cadaver_2" ],
-  "vagoul_#00": [ "ghoul_serum" ],
-
-  "food_noodles_hot_#00": [ "eat_7ap" ],
-  "meat_#00": [ "eat_7ap" ],
-  "vegetable_tasty_#00": [ "eat_7ap" ],
-  "dish_tasty_#00": [ "eat_7ap" ],
-  "food_candies_#00": [ "eat_7ap" ],
-  "chama_tasty_#00": [ "eat_7ap" ],
-  "woodsteak_#00": [ "eat_7ap" ],
-  "egg_#00": [ "eat_7ap" ],
-  "apple_#00": [ "eat_7ap" ],
-
-  "disinfect_#00": [ "drug_par_1", "drug_par_2", "drug_par_3", "drug_par_4" ],
-  "drug_#00": [ "drug_6ap_1", "drug_6ap_2" ],
-  "drug_hero_#00": [ "drug_8ap_1", "drug_8ap_2" ],
-  "drug_random_#00": [ "drug_rand_1", "drug_rand_2" ],
-  "lsd_#00": [ "drug_lsd_1", "drug_lsd_2" ],
-  "beta_drug_bad_#00": [ "drug_beta_bad_1", "drug_beta_bad_2" ],
-  "beta_drug_#00": [ "drug_beta" ],
-  "xanax_#00": [ "drug_xana1", "drug_xana2", "drug_xana3", "drug_xana4" ],
-  "drug_water_#00": [ "drug_hyd_1", "drug_hyd_2", "drug_hyd_3", "drug_hyd_4", "drug_hyd_5", "drug_hyd_6" ],
-  "april_drug_#00": [ "drug_april_1", "drug_april_2" ],
-
-  "food_bag_#00": [ "open_doggybag" ],
-  "food_armag_#00": [ "open_lunchbag" ],
-  "chest_citizen_#00": [ "open_c_chest" ],
-  "chest_hero_#00": [ "open_h_chest" ],
-  "postal_box_#00": [ "open_postbox" ],
-  "postal_box_#01": [ "open_postbox" ],
-  "postal_box_xl_#00": [ "open_postbox_xl" ],
-  "book_gen_letter_#00": [ "open_letterbox" ],
-  "book_gen_box_#00": [ "open_justbox" ],
-
-  "game_box_#00": [ "open_gamebox" ],
-  "bplan_box_#00": [ "open_abox" ],
-  "bplan_drop_#00": [ "open_cbox" ],
-
-  "rsc_pack_3_#00": [ "open_matbox3" ],
-  "rsc_pack_2_#00": [ "open_matbox2" ],
-  "rsc_pack_1_#00": [ "open_matbox1" ],
-  "chest_christmas_3_#00": [ "open_xmasbox3" ],
-  "chest_christmas_2_#00": [ "open_xmasbox2" ],
-  "chest_christmas_1_#00": [ "open_xmasbox1" ],
-
-  "chest_#00": [ "open_metalbox", "open_metalbox_t1", "open_metalbox_t2" ],
-  "chest_xl_#00": [ "open_metalbox2", "open_metalbox2_t1", "open_metalbox2_t2" ],
-  "catbox_#00": [ "open_catbox", "open_catbox_t1", "open_catbox_t2" ],
-  "chest_tools_#00": [ "open_toolbox", "open_toolbox_t1", "open_toolbox_t2" ],
-  "chest_food_#00": [ "open_foodbox_in", "open_foodbox_out", "open_foodbox_in_t1", "open_foodbox_out_t1", "open_foodbox_in_t2", "open_foodbox_out_t2" ],
-
-  "safe_#00": [ "open_safe" ],
-  "bplan_box_e_#00": [ "open_asafe" ],
-
-  "pilegun_empty_#00": [ "load_pilegun" ],
-  "pilegun_up_empty_#00": [ "load_pilegun2" ],
-  "big_pgun_empty_#00": [ "load_pilegun3" ],
-  "mixergun_empty_#00": [ "load_mixergun" ],
-  "chainsaw_empty_#00": [ "load_chainsaw" ],
-  "taser_empty_#00": [ "load_taser" ],
-  "lpoint_#00": [ "load_lpointer" ],
-
-  "lamp_#00": [ "load_lamp" ],
-  "vibr_empty_#00": [ "load_dildo" ],
-  "radius_mk2_part_#00": [ "load_rmk2" ],
-  "maglite_off_#00": [ "load_maglite" ],
-  "maglite_1_#00": [ "load_maglite" ],
-  "radio_off_#00": [ "load_radio" ],
-  "sport_elec_empty_#00": [ "load_emt" ],
-
-  "watergun_opt_empty_#00": [ "fill_asplash1", "fill_asplash2" ],
-  "watergun_empty_#00": [ "fill_splash1", "fill_splash2" ],
-  "jerrygun_off_#00": [ "fill_jsplash" ],
-  "jerrygun_#00": [ "throw_jerrygun" ],
-  "kalach_#01": [ "fill_ksplash1", "fill_ksplash2" ],
-  "grenade_empty_#00": [ "fill_grenade1", "fill_grenade2" ],
-  "bgrenade_empty_#00": [ "fill_exgrenade1", "fill_exgrenade2" ],
-
-  "grenade_#00": [ "throw_grenade" ],
-  "bgrenade_#00": [ "throw_exgrenade" ],
-  "boomfruit_#00": [ "throw_boomfruit" ],
-
-  "pilegun_#00": [ "fire_pilegun" ],
-  "pilegun_up_#00": [ "fire_pilegun2" ],
-  "big_pgun_#00": [ "fire_pilegun3" ],
-  "mixergun_#00": [ "fire_mixergun" ],
-  "chainsaw_#00": [ "fire_chainsaw" ],
-  "taser_#00": [ "fire_taser" ],
-  "lpoint4_#00": [ "fire_lpointer4" ],
-  "lpoint3_#00": [ "fire_lpointer3" ],
-  "lpoint2_#00": [ "fire_lpointer2" ],
-  "lpoint1_#00": [ "fire_lpointer1" ],
-
-  "watergun_opt_5_#00": [ "fire_asplash5" ],
-  "watergun_opt_4_#00": [ "fire_asplash4" ],
-  "watergun_opt_3_#00": [ "fire_asplash3" ],
-  "watergun_opt_2_#00": [ "fire_asplash2" ],
-  "watergun_opt_1_#00": [ "fire_asplash1" ],
-  "watergun_3_#00": [ "fire_splash3" ],
-  "watergun_2_#00": [ "fire_splash2" ],
-  "watergun_1_#00": [ "fire_splash1" ],
-  "kalach_#00": [ "fire_ksplash" ],
-
-  "pet_chick_#00": [ "slaughter_2x", "throw_animal" ],
-  "pet_rat_#00": [ "slaughter_2x", "throw_animal" ],
-  "pet_pig_#00": [ "slaughter_4x", "throw_animal" ],
-  "pet_snake_#00": [ "slaughter_4xs", "throw_animal" ],
-  "pet_cat_#00": [ "slaughter_2xs", "throw_animal_cat" ],
-  "tekel_#00": [ "slaughter_2xs", "throw_animal_dog" ],
-  "pet_dog_#00": [ "slaughter_2xs", "throw_animal_dog" ],
-  "angryc_#00": [ "slaughter_bmb", "throw_animal_angryc" ],
-
-  "machine_1_#00": [ "throw_b_machine_1" ],
-  "bone_#00": [ "throw_b_bone" ],
-  "can_opener_#00": [ "throw_b_can_opener" ],
-  "chair_basic_#00": [ "throw_b_chair_basic" ],
-  "torch_#00": [ "throw_b_torch" ],
-  "chain_#00": [ "throw_b_chain" ],
-  "staff_#00": [ "throw_b_staff" ],
-  "knife_#00": [ "throw_b_knife" ],
-  "machine_2_#00": [ "throw_b_machine_2" ],
-  "small_knife_#00": [ "throw_b_small_knife" ],
-  "cutcut_#00": [ "throw_b_cutcut" ],
-  "machine_3_#00": [ "throw_b_machine_3" ],
-  "pc_#00": [ "throw_b_pc" ],
-  "lawn_#00": [ "throw_b_lawn" ],
-  "screw_#00": [ "throw_b_screw" ],
-  "swiss_knife_#00": [ "throw_b_swiss_knife" ],
-  "cutter_#00": [ "throw_b_cutter" ],
-  "concrete_wall_#00": [ "throw_b_concrete_wall" ],
-  "torch_off_#00": [ "throw_b_torch_off" ],
-  "wrench_#00": [ "throw_b_wrench" ],
-  "hurling_stick_#00": [ "throw_hurling_stick" ],
-  "iphone_#00": [ "throw_phone" ],
-  "cinema_#00": [ "throw_projector" ],
-
-  "bplan_c_#00": [ "bp_generic_1" ],
-  "bplan_u_#00": [ "bp_generic_2" ],
-  "bplan_r_#00": [ "bp_generic_3" ],
-  "bplan_e_#00": [ "bp_generic_4" ],
-  "hbplan_u_#00": [ "bp_hotel_2" ],
-  "hbplan_r_#00": [ "bp_hotel_3" ],
-  "hbplan_e_#00": [ "bp_hotel_4" ],
-  "bbplan_u_#00": [ "bp_bunker_2" ],
-  "bbplan_r_#00": [ "bp_bunker_3" ],
-  "bbplan_e_#00": [ "bp_bunker_4" ],
-  "mbplan_u_#00": [ "bp_hospital_2" ],
-  "mbplan_r_#00": [ "bp_hospital_3" ],
-  "mbplan_e_#00": [ "bp_hospital_4" ],
-
-  "rp_book_#00": [ "read_rp" ],
-  "rp_book_#01": [ "read_rp" ],
-  "rp_book2_#00": [ "read_rp" ],
-  "rp_scroll_#00": [ "read_rp" ],
-  "rp_scroll_#01": [ "read_rp" ],
-  "rp_sheets_#00": [ "read_rp" ],
-  "rp_letter_#00": [ "read_rp" ],
-  "rp_manual_#00": [ "read_rp" ],
-  "lilboo_#00": [ "read_rp_cover" ],
-  "rp_twin_#00": [ "read_rp" ],
-
-  "banned_note_#00": [ "read_banned_note" ],
-
-  "dice_#00": [ "special_dice" ],
-  "cards_#00": [ "special_card" ],
-  "guitar_#00": [ "special_guitar" ],
-
-  "rhum_#00": [ "alcohol" ],
-  "vodka_#00": [ "alcohol" ],
-  "vodka_de_#00": [ "alcohol" ],
-  "fest_#00": [ "alcohol" ],
-  "guiness_#00": [ "alcohol" ],
-  "hmbrew_#00": [ "alcohol_dx" ],
-
-  "coffee_#00": [ "coffee" ],
-  "vibr_#00": [ "vibrator" ],
-
-  "home_def_#00": [ "home_def_plus" ],
-  "home_box_#00": [ "home_store_plus" ],
-  "home_box_xl_#00": [ "home_store_plus2" ],
-
-  "bandage_#00": [ "bandage" ],
-  "sport_elec_#00": [ "emt" ],
-
-  "jerrycan_#00": [ "jerrycan_1", "jerrycan_1b", "jerrycan_2", "jerrycan_3" ],
-  "water_cup_part_#00": [ "watercup_1", "watercup_1b", "watercup_2", "watercup_3" ],
-
-  "cyanure_#00": [ "cyanide" ],
-
-  "repair_one_#00": [ "repair_1" ],
-  "repair_kit_#00": [ "repair_2" ],
-  "poison_#00": [ "poison_1" ],
-  "infect_poison_#00": [ "poison_2" ],
-
-  "tagger_#00": [ "zonemarker_1" ],
-  "radius_mk2_#00": [ "zonemarker_2" ],
-  "digger_#00": [ "nessquick" ],
-  "flesh_#00": [ "bomb_1" ],
-  "flash_#00": [ "bomb_2" ],
-
-  "smoke_bomb_#00": [ "smokebomb" ],
-
-  "teddy_#00": [ "cuddle_teddy_1" ],
-  "teddy_#01": [ "cuddle_teddy_2" ],
-
-  "cigs_#00": [ "light_cig" ],
-
-  "basic_suit_dirt_#00": [ "clean_clothes" ],
-
-  "tamed_pet_#00": [ "hero_tamer_1", "hero_tamer_1b", "hero_tamer_3" ],
-  "tamed_pet_drug_#00": [ "hero_tamer_2", "hero_tamer_2b" ],
-
-  "surv_book_#00": [ "hero_surv_1", "hero_surv_2" ],
-
-  "vest_off_#00": [ "hero_hunter_1", "hero_hunter_2" ],
-
-  "door_#00": [ "improve" ],
-  "plate_#00": [ "improve" ],
-  "trestle_#00": [ "improve" ],
-  "bed_#00": [ "improve" ],
-  "wood_plate_#00": [ "improve" ],
-  "out_def_#00": [ "improve" ],
-  "table_#00": [ "improve" ],
-
-  "soul_blue_#00": [ "purify_soul" ],
-  "soul_red_#00": [ "purify_soul" ],
-  "soul_blue_#01": [ "purify_soul" ],
-
-  "photo_3_#00": [ "flash_photo_3" ],
-  "photo_2_#00": [ "flash_photo_2" ],
-  "photo_1_#00": [ "flash_photo_1" ],
-
-  "omg_this_will_kill_you_#00": [ "water_no_effect" ],
-  "christmas_candy_#00": [ "drug_rand_xmas" ],
-  "sand_ball_#00": [ "throw_sandball" ],
-
-  "flare_#00": [ "flare" ],
-
-  "alarm_off_#00": [ "alarm_clock" ],
-
-  "pumpkin_on_#00": [ "pumpkin" ]
+    "water_#00": [
+        "water_tl0",
+        "water_tl1a",
+        "water_tl1b",
+        "water_tl2",
+        "water_g"
+    ],
+    "water_cup_#00": [
+        "water_tl0",
+        "water_tl1a",
+        "water_tl1b",
+        "water_tl2",
+        "water_g"
+    ],
+    "potion_#00": [
+        "potion_tl0a",
+        "potion_tl0b",
+        "potion_tl1a",
+        "potion_tl1b",
+        "potion_tl2",
+        "potion_g",
+        "potion_tl0a_immune",
+        "potion_tl0b_immune",
+        "potion_tl1a_immune",
+        "potion_tl1b_immune",
+        "potion_tl2_immune",
+        "potion_g_immune"
+    ],
+    "water_can_3_#00": [
+        "watercan3_tl0",
+        "watercan3_tl1a",
+        "watercan3_tl1b",
+        "watercan3_tl2",
+        "watercan3_g"
+    ],
+    "water_can_2_#00": [
+        "fill_watercan2",
+        "watercan2_tl0",
+        "watercan2_tl1a",
+        "watercan2_tl1b",
+        "watercan2_tl2",
+        "watercan2_g"
+    ],
+    "water_can_1_#00": [
+        "fill_watercan1",
+        "watercan1_tl0",
+        "watercan1_tl1a",
+        "watercan1_tl1b",
+        "watercan1_tl2",
+        "watercan1_g"
+    ],
+    "water_can_empty_#00": [
+        "fill_watercan0"
+    ],
+    "can_#00": [
+        "can",
+        "can_t1",
+        "can_t2"
+    ],
+    "can_open_#00": [
+        "eat_6ap"
+    ],
+    "bretz_#00": [
+        "eat_6ap"
+    ],
+    "undef_#00": [
+        "eat_6ap"
+    ],
+    "dish_#00": [
+        "eat_6ap"
+    ],
+    "vegetable_#00": [
+        "eat_6ap"
+    ],
+    "food_bar1_#00": [
+        "eat_6ap"
+    ],
+    "food_bar2_#00": [
+        "eat_6ap"
+    ],
+    "food_bar3_#00": [
+        "eat_6ap"
+    ],
+    "food_biscuit_#00": [
+        "eat_6ap"
+    ],
+    "food_chick_#00": [
+        "eat_6ap"
+    ],
+    "food_pims_#00": [
+        "eat_6ap"
+    ],
+    "food_tarte_#00": [
+        "eat_6ap"
+    ],
+    "food_sandw_#00": [
+        "eat_6ap"
+    ],
+    "food_noodles_#00": [
+        "eat_6ap"
+    ],
+    "wood_xmas_#00": [
+        "eat_6ap"
+    ],
+    "fruit_#00": [
+        "eat_fleshroom_1",
+        "eat_fleshroom_2"
+    ],
+    "hmeat_#00": [
+        "eat_meat_1",
+        "eat_meat_2"
+    ],
+    "bone_meat_#00": [
+        "eat_bone_1",
+        "eat_bone_2"
+    ],
+    "cadaver_#00": [
+        "eat_cadaver_1",
+        "eat_cadaver_2"
+    ],
+    "vagoul_#00": [
+        "ghoul_serum"
+    ],
+    "food_noodles_hot_#00": [
+        "eat_7ap"
+    ],
+    "meat_#00": [
+        "eat_7ap"
+    ],
+    "vegetable_tasty_#00": [
+        "eat_7ap"
+    ],
+    "dish_tasty_#00": [
+        "eat_7ap"
+    ],
+    "food_candies_#00": [
+        "eat_7ap"
+    ],
+    "chama_tasty_#00": [
+        "eat_7ap"
+    ],
+    "woodsteak_#00": [
+        "eat_7ap"
+    ],
+    "egg_#00": [
+        "eat_7ap"
+    ],
+    "apple_#00": [
+        "eat_7ap"
+    ],
+    "disinfect_#00": [
+        "drug_par_1",
+        "drug_par_2",
+        "drug_par_3",
+        "drug_par_4"
+    ],
+    "drug_#00": [
+        "drug_6ap_1",
+        "drug_6ap_2"
+    ],
+    "drug_hero_#00": [
+        "drug_8ap_1",
+        "drug_8ap_2"
+    ],
+    "drug_random_#00": [
+        "drug_rand_1",
+        "drug_rand_2"
+    ],
+    "lsd_#00": [
+        "drug_lsd_1",
+        "drug_lsd_2"
+    ],
+    "beta_drug_bad_#00": [
+        "drug_beta_bad_1",
+        "drug_beta_bad_2"
+    ],
+    "beta_drug_#00": [
+        "drug_beta"
+    ],
+    "xanax_#00": [
+        "drug_xana1",
+        "drug_xana2",
+        "drug_xana3",
+        "drug_xana4"
+    ],
+    "drug_water_#00": [
+        "drug_hyd_1",
+        "drug_hyd_2",
+        "drug_hyd_3",
+        "drug_hyd_4",
+        "drug_hyd_5",
+        "drug_hyd_6"
+    ],
+    "april_drug_#00": [
+        "drug_april_1",
+        "drug_april_2"
+    ],
+    "food_bag_#00": [
+        "open_doggybag"
+    ],
+    "food_armag_#00": [
+        "open_lunchbag"
+    ],
+    "chest_citizen_#00": [
+        "open_c_chest"
+    ],
+    "chest_hero_#00": [
+        "open_h_chest"
+    ],
+    "postal_box_#00": [
+        "open_postbox"
+    ],
+    "postal_box_#01": [
+        "open_postbox"
+    ],
+    "postal_box_xl_#00": [
+        "open_postbox_xl"
+    ],
+    "book_gen_letter_#00": [
+        "open_letterbox"
+    ],
+    "book_gen_box_#00": [
+        "open_justbox"
+    ],
+    "game_box_#00": [
+        "open_gamebox"
+    ],
+    "bplan_box_#00": [
+        "open_abox"
+    ],
+    "bplan_drop_#00": [
+        "open_cbox"
+    ],
+    "rsc_pack_3_#00": [
+        "open_matbox3"
+    ],
+    "rsc_pack_2_#00": [
+        "open_matbox2"
+    ],
+    "rsc_pack_1_#00": [
+        "open_matbox1"
+    ],
+    "chest_christmas_3_#00": [
+        "open_xmasbox3"
+    ],
+    "chest_christmas_2_#00": [
+        "open_xmasbox2"
+    ],
+    "chest_christmas_1_#00": [
+        "open_xmasbox1"
+    ],
+    "chest_#00": [
+        "open_metalbox",
+        "open_metalbox_t1",
+        "open_metalbox_t2"
+    ],
+    "chest_xl_#00": [
+        "open_metalbox2",
+        "open_metalbox2_t1",
+        "open_metalbox2_t2"
+    ],
+    "catbox_#00": [
+        "open_catbox",
+        "open_catbox_t1",
+        "open_catbox_t2"
+    ],
+    "chest_tools_#00": [
+        "open_toolbox",
+        "open_toolbox_t1",
+        "open_toolbox_t2"
+    ],
+    "chest_food_#00": [
+        "open_foodbox_in",
+        "open_foodbox_out",
+        "open_foodbox_in_t1",
+        "open_foodbox_out_t1",
+        "open_foodbox_in_t2",
+        "open_foodbox_out_t2"
+    ],
+    "safe_#00": [
+        "open_safe"
+    ],
+    "bplan_box_e_#00": [
+        "open_asafe"
+    ],
+    "pilegun_empty_#00": [
+        "load_pilegun"
+    ],
+    "pilegun_up_empty_#00": [
+        "load_pilegun2"
+    ],
+    "big_pgun_empty_#00": [
+        "load_pilegun3"
+    ],
+    "mixergun_empty_#00": [
+        "load_mixergun"
+    ],
+    "chainsaw_empty_#00": [
+        "load_chainsaw"
+    ],
+    "taser_empty_#00": [
+        "load_taser"
+    ],
+    "lpoint_#00": [
+        "load_lpointer"
+    ],
+    "lamp_#00": [
+        "load_lamp"
+    ],
+    "vibr_empty_#00": [
+        "load_dildo"
+    ],
+    "radius_mk2_part_#00": [
+        "load_rmk2"
+    ],
+    "maglite_off_#00": [
+        "load_maglite"
+    ],
+    "maglite_1_#00": [
+        "load_maglite"
+    ],
+    "radio_off_#00": [
+        "load_radio"
+    ],
+    "sport_elec_empty_#00": [
+        "load_emt"
+    ],
+    "watergun_opt_empty_#00": [
+        "fill_asplash1",
+        "fill_asplash2"
+    ],
+    "watergun_empty_#00": [
+        "fill_splash1",
+        "fill_splash2"
+    ],
+    "jerrygun_off_#00": [
+        "fill_jsplash"
+    ],
+    "jerrygun_#00": [
+        "throw_jerrygun"
+    ],
+    "kalach_#01": [
+        "fill_ksplash1",
+        "fill_ksplash2"
+    ],
+    "grenade_empty_#00": [
+        "fill_grenade1",
+        "fill_grenade2"
+    ],
+    "bgrenade_empty_#00": [
+        "fill_exgrenade1",
+        "fill_exgrenade2"
+    ],
+    "grenade_#00": [
+        "throw_grenade"
+    ],
+    "bgrenade_#00": [
+        "throw_exgrenade"
+    ],
+    "boomfruit_#00": [
+        "throw_boomfruit"
+    ],
+    "pilegun_#00": [
+        "fire_pilegun"
+    ],
+    "pilegun_up_#00": [
+        "fire_pilegun2"
+    ],
+    "big_pgun_#00": [
+        "fire_pilegun3"
+    ],
+    "mixergun_#00": [
+        "fire_mixergun"
+    ],
+    "chainsaw_#00": [
+        "fire_chainsaw"
+    ],
+    "taser_#00": [
+        "fire_taser"
+    ],
+    "lpoint4_#00": [
+        "fire_lpointer4"
+    ],
+    "lpoint3_#00": [
+        "fire_lpointer3"
+    ],
+    "lpoint2_#00": [
+        "fire_lpointer2"
+    ],
+    "lpoint1_#00": [
+        "fire_lpointer1"
+    ],
+    "watergun_opt_5_#00": [
+        "fire_asplash5"
+    ],
+    "watergun_opt_4_#00": [
+        "fire_asplash4"
+    ],
+    "watergun_opt_3_#00": [
+        "fire_asplash3"
+    ],
+    "watergun_opt_2_#00": [
+        "fire_asplash2"
+    ],
+    "watergun_opt_1_#00": [
+        "fire_asplash1"
+    ],
+    "watergun_3_#00": [
+        "fire_splash3"
+    ],
+    "watergun_2_#00": [
+        "fire_splash2"
+    ],
+    "watergun_1_#00": [
+        "fire_splash1"
+    ],
+    "kalach_#00": [
+        "fire_ksplash"
+    ],
+    "pet_chick_#00": [
+        "slaughter_2x",
+        "throw_animal"
+    ],
+    "pet_rat_#00": [
+        "slaughter_2x",
+        "throw_animal"
+    ],
+    "pet_pig_#00": [
+        "slaughter_4x",
+        "throw_animal"
+    ],
+    "pet_snake_#00": [
+        "slaughter_4xs",
+        "throw_animal"
+    ],
+    "pet_cat_#00": [
+        "slaughter_2xs",
+        "throw_animal_cat"
+    ],
+    "tekel_#00": [
+        "slaughter_2xs",
+        "throw_animal_dog"
+    ],
+    "pet_dog_#00": [
+        "slaughter_2xs",
+        "throw_animal_dog"
+    ],
+    "angryc_#00": [
+        "slaughter_bmb",
+        "throw_animal_angryc"
+    ],
+    "machine_1_#00": [
+        "throw_b_machine_1"
+    ],
+    "bone_#00": [
+        "throw_b_bone"
+    ],
+    "can_opener_#00": [
+        "throw_b_can_opener"
+    ],
+    "chair_basic_#00": [
+        "throw_b_chair_basic"
+    ],
+    "torch_#00": [
+        "throw_b_torch"
+    ],
+    "chain_#00": [
+        "throw_b_chain"
+    ],
+    "staff_#00": [
+        "throw_b_staff"
+    ],
+    "knife_#00": [
+        "throw_b_knife"
+    ],
+    "machine_2_#00": [
+        "throw_b_machine_2"
+    ],
+    "small_knife_#00": [
+        "throw_b_small_knife"
+    ],
+    "cutcut_#00": [
+        "throw_b_cutcut"
+    ],
+    "machine_3_#00": [
+        "throw_b_machine_3"
+    ],
+    "pc_#00": [
+        "throw_b_pc"
+    ],
+    "lawn_#00": [
+        "throw_b_lawn"
+    ],
+    "screw_#00": [
+        "throw_b_screw"
+    ],
+    "swiss_knife_#00": [
+        "throw_b_swiss_knife"
+    ],
+    "cutter_#00": [
+        "throw_b_cutter"
+    ],
+    "concrete_wall_#00": [
+        "throw_b_concrete_wall"
+    ],
+    "torch_off_#00": [
+        "throw_b_torch_off"
+    ],
+    "wrench_#00": [
+        "throw_b_wrench"
+    ],
+    "hurling_stick_#00": [
+        "throw_hurling_stick"
+    ],
+    "iphone_#00": [
+        "throw_phone"
+    ],
+    "cinema_#00": [
+        "throw_projector"
+    ],
+    "bplan_c_#00": [
+        "bp_generic_1"
+    ],
+    "bplan_u_#00": [
+        "bp_generic_2"
+    ],
+    "bplan_r_#00": [
+        "bp_generic_3"
+    ],
+    "bplan_e_#00": [
+        "bp_generic_4"
+    ],
+    "hbplan_u_#00": [
+        "bp_hotel_2"
+    ],
+    "hbplan_r_#00": [
+        "bp_hotel_3"
+    ],
+    "hbplan_e_#00": [
+        "bp_hotel_4"
+    ],
+    "bbplan_u_#00": [
+        "bp_bunker_2"
+    ],
+    "bbplan_r_#00": [
+        "bp_bunker_3"
+    ],
+    "bbplan_e_#00": [
+        "bp_bunker_4"
+    ],
+    "mbplan_u_#00": [
+        "bp_hospital_2"
+    ],
+    "mbplan_r_#00": [
+        "bp_hospital_3"
+    ],
+    "mbplan_e_#00": [
+        "bp_hospital_4"
+    ],
+    "rp_book_#00": [
+        "read_rp"
+    ],
+    "rp_book_#01": [
+        "read_rp"
+    ],
+    "rp_book2_#00": [
+        "read_rp"
+    ],
+    "rp_scroll_#00": [
+        "read_rp"
+    ],
+    "rp_scroll_#01": [
+        "read_rp"
+    ],
+    "rp_sheets_#00": [
+        "read_rp"
+    ],
+    "rp_letter_#00": [
+        "read_rp"
+    ],
+    "rp_manual_#00": [
+        "read_rp"
+    ],
+    "lilboo_#00": [
+        "read_rp_cover"
+    ],
+    "rp_twin_#00": [
+        "read_rp"
+    ],
+    "banned_note_#00": [
+        "read_banned_note"
+    ],
+    "dice_#00": [
+        "special_dice"
+    ],
+    "cards_#00": [
+        "special_card"
+    ],
+    "guitar_#00": [
+        "special_guitar"
+    ],
+    "rhum_#00": [
+        "alcohol"
+    ],
+    "vodka_#00": [
+        "alcohol"
+    ],
+    "vodka_de_#00": [
+        "alcohol"
+    ],
+    "fest_#00": [
+        "alcohol"
+    ],
+    "guiness_#00": [
+        "alcohol"
+    ],
+    "hmbrew_#00": [
+        "alcohol_dx"
+    ],
+    "coffee_#00": [
+        "coffee"
+    ],
+    "vibr_#00": [
+        "vibrator"
+    ],
+    "home_def_#00": [
+        "home_def_plus"
+    ],
+    "home_box_#00": [
+        "home_store_plus"
+    ],
+    "home_box_xl_#00": [
+        "home_store_plus2"
+    ],
+    "bandage_#00": [
+        "bandage"
+    ],
+    "sport_elec_#00": [
+        "emt"
+    ],
+    "jerrycan_#00": [
+        "jerrycan_1",
+        "jerrycan_1b",
+        "jerrycan_2",
+        "jerrycan_3"
+    ],
+    "water_cup_part_#00": [
+        "watercup_1",
+        "watercup_1b",
+        "watercup_2",
+        "watercup_3"
+    ],
+    "cyanure_#00": [
+        "cyanide"
+    ],
+    "repair_one_#00": [
+        "repair_1"
+    ],
+    "repair_kit_#00": [
+        "repair_2"
+    ],
+    "poison_#00": [
+        "poison_1"
+    ],
+    "infect_poison_#00": [
+        "poison_2"
+    ],
+    "tagger_#00": [
+        "zonemarker_1"
+    ],
+    "radius_mk2_#00": [
+        "zonemarker_2"
+    ],
+    "digger_#00": [
+        "nessquick"
+    ],
+    "flesh_#00": [
+        "bomb_1"
+    ],
+    "flash_#00": [
+        "bomb_2"
+    ],
+    "smoke_bomb_#00": [
+        "smokebomb"
+    ],
+    "teddy_#00": [
+        "cuddle_teddy_1"
+    ],
+    "teddy_#01": [
+        "cuddle_teddy_2"
+    ],
+    "cigs_#00": [
+        "light_cig"
+    ],
+    "basic_suit_dirt_#00": [
+        "clean_clothes"
+    ],
+    "tamed_pet_#00": [
+        "hero_tamer_1",
+        "hero_tamer_1b",
+        "hero_tamer_3"
+    ],
+    "tamed_pet_drug_#00": [
+        "hero_tamer_2",
+        "hero_tamer_2b"
+    ],
+    "surv_book_#00": [
+        "hero_surv_1",
+        "hero_surv_2"
+    ],
+    "vest_off_#00": [
+        "hero_hunter_1",
+        "hero_hunter_2"
+    ],
+    "door_#00": [
+        "improve"
+    ],
+    "plate_#00": [
+        "improve"
+    ],
+    "trestle_#00": [
+        "improve"
+    ],
+    "bed_#00": [
+        "improve"
+    ],
+    "wood_plate_#00": [
+        "improve"
+    ],
+    "out_def_#00": [
+        "improve"
+    ],
+    "table_#00": [
+        "improve"
+    ],
+    "soul_blue_#00": [
+        "purify_soul"
+    ],
+    "soul_red_#00": [
+        "purify_soul"
+    ],
+    "soul_blue_#01": [
+        "purify_soul"
+    ],
+    "photo_3_#00": [
+        "flash_photo_3"
+    ],
+    "photo_2_#00": [
+        "flash_photo_2"
+    ],
+    "photo_1_#00": [
+        "flash_photo_1"
+    ],
+    "omg_this_will_kill_you_#00": [
+        "water_no_effect"
+    ],
+    "christmas_candy_#00": [
+        "drug_rand_xmas"
+    ],
+    "sand_ball_#00": [
+        "throw_sandball"
+    ],
+    "flare_#00": [
+        "flare"
+    ],
+    "alarm_off_#00": [
+        "alarm_clock"
+    ],
+    "pumpkin_on_#00": [
+        "pumpkin"
+    ]
 }

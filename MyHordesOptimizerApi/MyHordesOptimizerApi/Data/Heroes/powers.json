@@ -1,9 +1,30 @@
 [
-    {"name" : "hero_generic_return", "unlockable" : false},
-    {"name" : "hero_generic_find", "unlockable" : false},
-    {"name" : "hero_generic_punch", "unlockable" : false},
-    {"name" : "hero_generic_ap", "unlockable" : true},
-    {"name" : "hero_generic_immune", "unlockable" : true},
-    {"name" : "hero_generic_find_lucky", "unlockable" : true},
-    {"name" : "hero_generic_rescue", "unlockable" : false}
+    {
+        "name": "hero_generic_return",
+        "unlockable": false
+    },
+    {
+        "name": "hero_generic_find",
+        "unlockable": false
+    },
+    {
+        "name": "hero_generic_punch",
+        "unlockable": false
+    },
+    {
+        "name": "hero_generic_ap",
+        "unlockable": true
+    },
+    {
+        "name": "hero_generic_immune",
+        "unlockable": true
+    },
+    {
+        "name": "hero_generic_find_lucky",
+        "unlockable": true
+    },
+    {
+        "name": "hero_generic_rescue",
+        "unlockable": false
+    }
 ]
