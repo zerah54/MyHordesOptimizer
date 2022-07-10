@@ -4,6 +4,7 @@ using DapperExtensions;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Recipes;
@@ -12,7 +13,9 @@ using MyHordesOptimizerApi.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
@@ -35,6 +38,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchTown(Town town)
         {
+            var sw = new Stopwatch();
+            sw.Start();
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
             var exist = connection.ExecuteScalar<int?>("SELECT idTown FROM Town WHERE idTown = @TownId", new { TownId = town.Id });
@@ -44,8 +49,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 connection.Insert(townModel);
             }
             connection.Close();
+            Logger.LogTrace($"Insertion de la ville : {sw.ElapsedMilliseconds}");
             PatchCitizen(town.Id, town.Citizens);
+            Logger.LogTrace($"PatchCitizen : {sw.ElapsedMilliseconds}");
             PutBank(town.Id, town.Bank);
+            Logger.LogTrace($"PutBank : {sw.ElapsedMilliseconds}");
+            sw.Stop();
         }
 
         public Town GetTown(int townId)
@@ -251,6 +260,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PutBank(int townId, BankWrapper bank)
         {
+            var sw = new Stopwatch();
+            sw.Start();
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
 
@@ -258,16 +269,16 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
                                                                    OUTPUT INSERTED.idLastUpdateInfo
                                                                    VALUES (@DateUpdate, @IdUser)", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
+            Logger.LogTrace($"[PutBank] Insert LastUpdate : {sw.ElapsedMilliseconds}");
 
             var townBankItemModels = Mapper.Map<List<TownBankItemModel>>(bank.Bank);
             townBankItemModels.ForEach(x => { x.IdTown = townId; x.IdLastUpdateInfo = idLastUpdateInfo; });
-            var trans = connection.BeginTransaction();
-            connection.Execute(@"INSERT INTO TownBankItem(idTown, idItem, count, isBroken, idLastUpdateInfo)
-                                 values(@IdTown, @IdItem, @Count, @IsBroken, @IdLastUpdateInfo)", townBankItemModels, transaction: trans);
-
-            trans.Commit();
-
+            Logger.LogTrace($"[PutBank] Automapper TownBankItemModel : {sw.ElapsedMilliseconds}");
+            var dico = new Dictionary<string, Func<TownBankItemModel, object>>() { { "idTown", x => x.IdTown }, { "idItem", x => x.IdItem }, { "count", x => x.Count }, { "isBroken", x => x.IsBroken }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo } };
+            connection.BulkInsert("TownBankItem", dico, townBankItemModels);
             connection.Close();
+            Logger.LogTrace($"[PutBank] Insert TownBankItem : {sw.ElapsedMilliseconds}");
+            sw.Stop();
         }
 
         #endregion
@@ -285,6 +296,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchCitizen(int townId, CitizensWrapper wrapper)
         {
+            var sw = new Stopwatch();
+            sw.Start();
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
             var userIds = wrapper.Citizens.Select(x => x.Id).ToList();
@@ -304,21 +317,20 @@ namespace MyHordesOptimizerApi.Repository.Impl
                     connection.Insert(userModel);
                 }
             }
-
+            Logger.LogTrace($"[PatchCitizen] Update des users : {sw.ElapsedMilliseconds}");
             var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(wrapper.LastUpdateInfo);
             var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
                                                                    OUTPUT INSERTED.idLastUpdateInfo
-                                                                   VALUES (@DateUpdate, @IdUser)", new {DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser});
-
+                                                                   VALUES (@DateUpdate, @IdUser)", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
+            Logger.LogTrace($"[PatchCitizen] Insert LastUpdate : {sw.ElapsedMilliseconds}");
             var townCitizenModels = Mapper.Map<List<TownCitizenModel>>(wrapper.Citizens);
             townCitizenModels.ForEach(x => { x.IdTown = townId; x.IdLastUpdateInfo = idLastUpdateInfo; });
-            var trans = connection.BeginTransaction();
-            connection.Execute(@"INSERT INTO TownCitizen(idTown, idUser, homeMessage, jobName, jobUID, positionX, positionY, isGhost,idLastUpdateInfo)
-                                 values(@IdTown, @IdUser, @HomeMessage, @JobName, @JobUID, @PositionX, @PositionY, @IsGhost, @IdLastUpdateInfo)", townCitizenModels, transaction: trans);
-
-            trans.Commit();
-
+            Logger.LogTrace($"[PatchCitizen] Automapper TownCitizenModel : {sw.ElapsedMilliseconds}");
+            var dico = new Dictionary<string, Func<TownCitizenModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser }, { "homeMessage", x => x.HomeMessage }, { "jobName", x => x.JobName }, { "jobUID", x => x.JobUID }, { "positionX", x => x.PositionX }, { "positionY", x => x.PositionY }, { "isGhost", x => x.IsGhost }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo } };
+            connection.BulkInsert("TownCitizen", dico, townCitizenModels);
             connection.Close();
+            Logger.LogTrace($"[PatchCitizen] Insert TownCitiern : {sw.ElapsedMilliseconds}");
+            sw.Stop();
         }
 
         #endregion
