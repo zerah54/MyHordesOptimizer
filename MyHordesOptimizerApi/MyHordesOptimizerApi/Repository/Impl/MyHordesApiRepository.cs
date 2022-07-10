@@ -37,7 +37,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var url = GenerateUrl(EndpointMe);
             url = AddParameterToQuery(url, _parameterFields, "id,name,map.fields(id, city.fields(bank, chantiers, buildings, name, water, x, y, door, chaos, hard, devast), citizens, wid, hei, consiparcy, cadavers)");
             var response = base.Get<MyHordesMeResponseDto>(url);
-            UserKeyProvider.UserId = response.Id.ToString();
+            UserKeyProvider.UserId = response.Id;
             UserKeyProvider.UserName = response.Name;
             return response;
         }

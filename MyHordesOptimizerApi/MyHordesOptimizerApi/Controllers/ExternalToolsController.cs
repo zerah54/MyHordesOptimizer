@@ -22,7 +22,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Update")]
-        public ActionResult<UpdateResponseDto> UpdateExternalsTools(string userKey, string userId, [FromBody] UpdateRequestDto updateRequestDto)
+        public ActionResult<UpdateResponseDto> UpdateExternalsTools(string userKey, int userId, [FromBody] UpdateRequestDto updateRequestDto)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
@@ -31,10 +31,6 @@ namespace MyHordesOptimizerApi.Controllers
             if (updateRequestDto == null)
             {
                 return BadRequest($"{nameof(updateRequestDto)} cannot be null");
-            }
-            if (string.IsNullOrWhiteSpace(userId))
-            {
-                return BadRequest($"{nameof(userId)} cannot be empty");
             }
             UserKeyProvider.UserKey = userKey;
             UserKeyProvider.UserId = userId;

@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.MappingProfiles.Converters;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
@@ -118,12 +119,28 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.JobName))
                 .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.IsGhost));
 
+            CreateMap<TownCitizenCompletModel, Citizen>()
+                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CitizenName))
+                 .ForMember(dest => dest.NombreJourHero, opt => opt.Ignore())
+                 .ForMember(dest => dest.Avatar, opt => opt.Ignore())
+                 .ForMember(dest => dest.HomeMessage, opt => opt.MapFrom(src => src.CitizenHomeMessage))
+                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CitizenId))
+                 .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.CitizenIsGhost))
+                 .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.CitizenJobName))
+                 .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.CitizenPositionX))
+                 .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.CitizenPositionY));
+
             //LastUpdate
             CreateMap<LastUpdateInfo, LastUpdateInfoModel>()
                 .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.DateUpdate, opt => opt.MapFrom(src => src.UpdateTime))
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore());
 
+            CreateMap<TownCitizenCompletModel, LastUpdateInfo>()
+               .ForMember(dest => dest.UserKey, opt => opt.Ignore())
+               .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
+               .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
+               .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
 
             //TownBankItem
             CreateMap<BankItem, TownBankItemModel>()

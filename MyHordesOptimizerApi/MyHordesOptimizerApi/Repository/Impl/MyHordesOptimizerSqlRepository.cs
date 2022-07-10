@@ -6,6 +6,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
@@ -15,7 +16,6 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
@@ -59,7 +59,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public Town GetTown(int townId)
         {
-            throw new NotImplementedException();
+            var town = new Town()
+            {
+                Id = townId
+            };
+            town.Citizens = GetCitizens(townId);
+            town.Bank = GetBank(townId);
+            town.WishList = GetWishList(townId);
+            return town;
         }
 
         #endregion
@@ -281,11 +288,21 @@ namespace MyHordesOptimizerApi.Repository.Impl
             sw.Stop();
         }
 
+        public BankWrapper GetBank(int townId)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region WishList
 
         public void PutWishList(int townId, WishListWrapper wishList)
+        {
+            throw new NotImplementedException();
+        }
+
+        public WishListWrapper GetWishList(int townId)
         {
             throw new NotImplementedException();
         }
@@ -331,6 +348,40 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
             Logger.LogTrace($"[PatchCitizen] Insert TownCitiern : {sw.ElapsedMilliseconds}");
             sw.Stop();
+        }
+
+        public CitizensWrapper GetCitizens(int townId)
+        {
+            var query = $@"SELECT idTown AS TownId
+                                  ,citizen.idUser AS CitizenId
+	                              ,citizen.name AS CitizenName
+                                  ,homeMessage AS CitizenHomeMessage
+                                  ,jobName AS CitizenJobName
+                                  ,jobUID AS CitizenJobUID
+                                  ,positionX AS CitizenPositionX
+                                  ,positionY AS CitizenPositionY
+                                  ,isGhost AS CitizenIsGhost
+                                  ,tc.idLastUpdateInfo AS LastUpdateInfoId
+	                              ,lui.idUser AS LastUpdateInfoUserId
+	                              ,lui.dateUpdate AS LastUpdateDateUpdate
+	                              ,userUpdater.name AS LastUpdateInfoUserName
+                              FROM TownCitizen tc
+                              INNER JOIN Users citizen ON citizen.idUser = tc.idUser
+                              INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = tc.idLastUpdateInfo 
+                              INNER JOIN Users userUpdater ON userUpdater.idUser = lui.idUser
+                              WHERE tc.idTown = @idTown";
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            var citizens = connection.Query<TownCitizenCompletModel>(query, new { idTown = townId });
+            var mostRecent = citizens.Max(x => x.LastUpdateDateUpdate);
+            citizens = citizens.Where(x => x.LastUpdateDateUpdate == mostRecent);
+            connection.Close();
+
+            var citizenWrapper = new CitizensWrapper()
+            {
+                LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.First()),
+                Citizens = Mapper.Map<List<Citizen>>(citizens)
+            };
+            return citizenWrapper;
         }
 
         #endregion

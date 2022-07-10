@@ -25,10 +25,13 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PatchRecipeResults(List<RecipeItemResultModel> results);
 
         void PutBank(int townId, BankWrapper bank);
+        BankWrapper GetBank(int townId);
 
         void PatchCitizen(int townId, CitizensWrapper citizens);
-
+        CitizensWrapper GetCitizens(int townId);
+        
         void PutWishList(int townId, WishListWrapper wishList);
+        WishListWrapper GetWishList(int townId);
 
         void PatchRuins(List<MyHordesOptimizerRuin> jsonRuins);
         List<MyHordesOptimizerRuin> GetRuins();
