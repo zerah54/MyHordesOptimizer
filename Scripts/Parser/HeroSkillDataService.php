@@ -28,7 +28,7 @@ $hero_skills = [
 ];
 
 $new_hero_skills = json_encode($hero_skills, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Heroes/capacities.json';
+$filename_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Heroes/capacities.json';
 file_put_contents($filename_target, $new_hero_skills)
 
 ?>

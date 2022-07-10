@@ -189,7 +189,7 @@ $find = [
 ];
 
 $new_find = json_encode($find, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/find.json';
+$filename_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/find.json';
 file_put_contents($filename_target, $new_find)
 
 ?>

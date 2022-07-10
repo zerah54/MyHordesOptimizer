@@ -12,7 +12,7 @@ $categories = [
 ];
 
 $new_categories = json_encode($categories, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/categories.json';
+$filename_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/categories.json';
 file_put_contents($filename_target, $new_categories)
 
 ?>

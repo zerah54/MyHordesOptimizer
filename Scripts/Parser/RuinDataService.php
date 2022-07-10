@@ -854,7 +854,7 @@ $ruins = [
 ];
 
 $new_ruins = json_encode($ruins, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Ruins/ruins.json';
+$filename_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Ruins/ruins.json';
 file_put_contents($filename_target, $new_ruins)
 
 ?>

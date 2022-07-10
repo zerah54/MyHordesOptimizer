@@ -28,7 +28,7 @@ $jobs = [
 ];
 
 $new_jobs = json_encode($jobs, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Heroes/jobs.json';
+$filename_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Heroes/jobs.json';
 file_put_contents($filename_target, $new_jobs)
 
 ?>

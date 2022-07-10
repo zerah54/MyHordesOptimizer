@@ -1406,27 +1406,27 @@ $actions = [
 ];
 
 $new_actions = json_encode($actions['actions'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_actions_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/actions.json';
+$filename_actions_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/actions.json';
 file_put_contents($filename_actions_target, $new_actions);
 
 $new_items_actions = json_encode($actions['items'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_items_actions_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/item-actions.json';
+$filename_items_actions_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/item-actions.json';
 file_put_contents($filename_items_actions_target, $new_items_actions);
 
 $new_items_nw = json_encode($actions['items_nw'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_items_nw_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/items-nightwatch.json';
+$filename_items_nw_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/items-nightwatch.json';
 file_put_contents($filename_items_nw_target, $new_items_nw);
 
 $new_meta_results = json_encode($actions['meta_results'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_meta_results_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/meta-results.json';
+$filename_meta_results_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/meta-results.json';
 file_put_contents($filename_meta_results_target, $new_meta_results);
 
 $new_heroics = json_encode($actions['heroics'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_powers_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Heroes/powers.json';
+$filename_powers_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Heroes/powers.json';
 file_put_contents($filename_powers_target, $new_heroics);
 
 $new_specials = json_encode($actions['specials'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_specials_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Heroes/specials.json';
+$filename_specials_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Heroes/specials.json';
 file_put_contents($filename_specials_target, $new_specials);
 
 ?>

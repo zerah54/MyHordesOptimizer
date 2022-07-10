@@ -206,7 +206,7 @@ $properties = [
 ];
 
 $new_properties = json_encode($properties, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/item-properties.json';
+$filename_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/item-properties.json';
 file_put_contents($filename_target, $new_properties);
 
 ?>

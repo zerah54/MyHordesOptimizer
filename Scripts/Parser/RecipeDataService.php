@@ -91,7 +91,7 @@ $recipes = [
 ];
 
 $new_recipes = json_encode($recipes, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-$filename_target = '../../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/recipes.json';
+$filename_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/recipes.json';
 file_put_contents($filename_target, $new_recipes)
 
 ?>
