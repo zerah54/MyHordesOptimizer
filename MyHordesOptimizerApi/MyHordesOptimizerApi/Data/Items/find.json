@@ -1,0 +1,674 @@
+{
+    "empty_dig": [
+        {
+            "item": "wood_bad_#00",
+            "count": "43250"
+        },
+        {
+            "item": "metal_bad_#00",
+            "count": "22000"
+        }
+    ],
+    "base_dig": [
+        {
+            "item": "wood2_#00",
+            "count": "17300"
+        },
+        {
+            "item": "metal_#00",
+            "count": "9875"
+        },
+        {
+            "item": "grenade_empty_#00",
+            "count": "6915"
+        },
+        {
+            "item": "food_bag_#00",
+            "count": "4845"
+        },
+        {
+            "item": "pile_#00",
+            "count": "4766"
+        },
+        {
+            "item": "pharma_#00",
+            "count": "3935"
+        },
+        {
+            "item": "rustine_#00",
+            "count": "2578"
+        },
+        {
+            "item": "can_#00",
+            "count": "2445"
+        },
+        {
+            "item": "concrete_#00",
+            "count": "1689"
+        },
+        {
+            "item": "wood_plate_part_#00",
+            "count": "1529"
+        },
+        {
+            "item": "jerrycan_#00",
+            "count": "1456"
+        },
+        {
+            "item": "chest_tools_#00",
+            "count": "1390"
+        },
+        {
+            "item": "deco_box_#00",
+            "count": "1309"
+        },
+        {
+            "item": "digger_#00",
+            "count": "1231"
+        },
+        {
+            "item": "tube_#00",
+            "count": "1184"
+        },
+        {
+            "item": "wood_beam_#00",
+            "count": "1176"
+        },
+        {
+            "item": "powder_#00",
+            "count": "1159"
+        },
+        {
+            "item": "staff_#00",
+            "count": "1138"
+        },
+        {
+            "item": "oilcan_#00",
+            "count": "1100"
+        },
+        {
+            "item": "mecanism_#00",
+            "count": "1063"
+        },
+        {
+            "item": "drug_#00",
+            "count": "965"
+        },
+        {
+            "item": "fest_#00",
+            "count": "964"
+        },
+        {
+            "item": "meca_parts_#00",
+            "count": "964"
+        },
+        {
+            "item": "plate_raw_#00",
+            "count": "963"
+        },
+        {
+            "item": "watergun_empty_#00",
+            "count": "953"
+        },
+        {
+            "item": "deto_#00",
+            "count": "935"
+        },
+        {
+            "item": "repair_one_#00",
+            "count": "907"
+        },
+        {
+            "item": "pet_snake_#00",
+            "count": "877"
+        },
+        {
+            "item": "pet_snake2_#00",
+            "count": "877"
+        },
+        {
+            "item": "electro_box_#00",
+            "count": "854"
+        },
+        {
+            "item": "door_#00",
+            "count": "841"
+        },
+        {
+            "item": "drug_random_#00",
+            "count": "818"
+        },
+        {
+            "item": "smoke_bomb_#00",
+            "count": "814"
+        },
+        {
+            "item": "bag_#00",
+            "count": "808"
+        },
+        {
+            "item": "water_cleaner_#00",
+            "count": "803"
+        },
+        {
+            "item": "bplan_drop_#00",
+            "count": "800"
+        },
+        {
+            "item": "tagger_#00",
+            "count": "794"
+        },
+        {
+            "item": "machine_3_#00",
+            "count": "794"
+        },
+        {
+            "item": "trestle_#00",
+            "count": "790"
+        },
+        {
+            "item": "pilegun_empty_#00",
+            "count": "784"
+        },
+        {
+            "item": "machine_1_#00",
+            "count": "777"
+        },
+        {
+            "item": "bretz_#00",
+            "count": "775"
+        },
+        {
+            "item": "explo_#00",
+            "count": "771"
+        },
+        {
+            "item": "food_noodles_#00",
+            "count": "763"
+        },
+        {
+            "item": "chest_#00",
+            "count": "734"
+        },
+        {
+            "item": "machine_2_#00",
+            "count": "729"
+        },
+        {
+            "item": "pet_rat_#00",
+            "count": "710"
+        },
+        {
+            "item": "wire_#00",
+            "count": "691"
+        },
+        {
+            "item": "drug_hero_#00",
+            "count": "634"
+        },
+        {
+            "item": "metal_beam_#00",
+            "count": "592"
+        },
+        {
+            "item": "ryebag_#00",
+            "count": "541"
+        },
+        {
+            "item": "spices_#00",
+            "count": "508"
+        },
+        {
+            "item": "small_knife_#00",
+            "count": "501"
+        },
+        {
+            "item": "bed_#00",
+            "count": "501"
+        },
+        {
+            "item": "rhum_#00",
+            "count": "499"
+        },
+        {
+            "item": "chain_#00",
+            "count": "493"
+        },
+        {
+            "item": "pet_chick_#00",
+            "count": "491"
+        },
+        {
+            "item": "cutter_#00",
+            "count": "476"
+        },
+        {
+            "item": "pet_pig_#00",
+            "count": "474"
+        },
+        {
+            "item": "meat_#00",
+            "count": "474"
+        },
+        {
+            "item": "can_opener_#00",
+            "count": "469"
+        },
+        {
+            "item": "lilboo_#00",
+            "count": "458"
+        },
+        {
+            "item": "electro_#00",
+            "count": "427"
+        },
+        {
+            "item": "chair_basic_#00",
+            "count": "423"
+        },
+        {
+            "item": "xanax_#00",
+            "count": "418"
+        },
+        {
+            "item": "diode_#00",
+            "count": "416"
+        },
+        {
+            "item": "tekel_#00",
+            "count": "400"
+        },
+        {
+            "item": "pet_cat_#00",
+            "count": "396"
+        },
+        {
+            "item": "lights_#00",
+            "count": "381"
+        },
+        {
+            "item": "sport_elec_empty_#00",
+            "count": "376"
+        },
+        {
+            "item": "lock_#00",
+            "count": "369"
+        },
+        {
+            "item": "lens_#00",
+            "count": "366"
+        },
+        {
+            "item": "chest_food_#00",
+            "count": "364"
+        },
+        {
+            "item": "chudol_#00",
+            "count": "347"
+        },
+        {
+            "item": "angryc_#00",
+            "count": "342"
+        },
+        {
+            "item": "home_box_#00",
+            "count": "302"
+        },
+        {
+            "item": "home_def_#00",
+            "count": "294"
+        },
+        {
+            "item": "fence_#00",
+            "count": "293"
+        },
+        {
+            "item": "repair_kit_part_raw_#00",
+            "count": "293"
+        },
+        {
+            "item": "rsc_pack_2_#00",
+            "count": "290"
+        },
+        {
+            "item": "lamp_#00",
+            "count": "288"
+        },
+        {
+            "item": "disinfect_#00",
+            "count": "288"
+        },
+        {
+            "item": "book_gen_letter_#00",
+            "count": "286"
+        },
+        {
+            "item": "bandage_#00",
+            "count": "284"
+        },
+        {
+            "item": "plate_#00",
+            "count": "283"
+        },
+        {
+            "item": "chest_citizen_#00",
+            "count": "282"
+        },
+        {
+            "item": "cart_part_#00",
+            "count": "274"
+        },
+        {
+            "item": "chair_#00",
+            "count": "273"
+        },
+        {
+            "item": "bquies_#00",
+            "count": "257"
+        },
+        {
+            "item": "screw_#00",
+            "count": "240"
+        },
+        {
+            "item": "badge_#00",
+            "count": "238"
+        },
+        {
+            "item": "pc_#00",
+            "count": "215"
+        },
+        {
+            "item": "music_part_#00",
+            "count": "210"
+        },
+        {
+            "item": "book_gen_box_#00",
+            "count": "209"
+        },
+        {
+            "item": "cyanure_#00",
+            "count": "206"
+        },
+        {
+            "item": "vodka_#00",
+            "count": "200"
+        },
+        {
+            "item": "hmeat_#00",
+            "count": "195"
+        },
+        {
+            "item": "knife_#00",
+            "count": "194"
+        },
+        {
+            "item": "engine_part_#00",
+            "count": "193"
+        },
+        {
+            "item": "game_box_#00",
+            "count": "192"
+        },
+        {
+            "item": "wood_log_#00",
+            "count": "190"
+        },
+        {
+            "item": "vibr_empty_#00",
+            "count": "189"
+        },
+        {
+            "item": "cigs_#00",
+            "count": "181"
+        },
+        {
+            "item": "out_def_#00",
+            "count": "180"
+        },
+        {
+            "item": "courroie_#00",
+            "count": "179"
+        },
+        {
+            "item": "catbox_#00",
+            "count": "170"
+        },
+        {
+            "item": "sheet_#00",
+            "count": "115"
+        },
+        {
+            "item": "iphone_#00",
+            "count": "112"
+        },
+        {
+            "item": "money_#00",
+            "count": "110"
+        },
+        {
+            "item": "home_box_xl_#00",
+            "count": "109"
+        },
+        {
+            "item": "coffee_machine_part_#00",
+            "count": "103"
+        },
+        {
+            "item": "cadaver_#00",
+            "count": "102"
+        },
+        {
+            "item": "smelly_meat_#00",
+            "count": "102"
+        },
+        {
+            "item": "maglite_off_#00",
+            "count": "100"
+        },
+        {
+            "item": "postal_box_#00",
+            "count": "98"
+        },
+        {
+            "item": "big_pgun_part_#00",
+            "count": "95"
+        },
+        {
+            "item": "car_door_part_#00",
+            "count": "95"
+        },
+        {
+            "item": "chama_#00",
+            "count": "94"
+        },
+        {
+            "item": "water_can_empty_#00",
+            "count": "93"
+        },
+        {
+            "item": "cdbrit_#00",
+            "count": "92"
+        },
+        {
+            "item": "pilegun_upkit_#00",
+            "count": "90"
+        },
+        {
+            "item": "saw_tool_part_#00",
+            "count": "90"
+        },
+        {
+            "item": "beta_drug_bad_#00",
+            "count": "90"
+        },
+        {
+            "item": "rp_book_#00",
+            "count": "90"
+        },
+        {
+            "item": "chest_xl_#00",
+            "count": "90"
+        },
+        {
+            "item": "poison_part_#00",
+            "count": "90"
+        },
+        {
+            "item": "gun_#00",
+            "count": "90"
+        },
+        {
+            "item": "rsc_pack_3_#00",
+            "count": "89"
+        },
+        {
+            "item": "safe_#00",
+            "count": "88"
+        },
+        {
+            "item": "rp_twin_#00",
+            "count": "87"
+        },
+        {
+            "item": "food_armag_#00",
+            "count": "87"
+        },
+        {
+            "item": "cdelvi_#00",
+            "count": "82"
+        },
+        {
+            "item": "cdphil_#00",
+            "count": "67"
+        },
+        {
+            "item": "cinema_#00",
+            "count": "53"
+        }
+    ],
+    "christmas_dig": [
+        {
+            "item": "renne_#00",
+            "count": "10"
+        },
+        {
+            "item": "sand_ball_#00",
+            "count": "2"
+        },
+        {
+            "item": "christmas_suit_3_#00",
+            "count": "8"
+        },
+        {
+            "item": "christmas_suit_1_#00",
+            "count": "8"
+        },
+        {
+            "item": "christmas_suit_2_#00",
+            "count": "8"
+        },
+        {
+            "item": "food_xmas_#00",
+            "count": "6"
+        }
+    ],
+    "christmas_dig_post": [
+        {
+            "item": "postal_box_#01",
+            "count": "3"
+        },
+        {
+            "item": "postal_box_xl_#00",
+            "count": "1"
+        }
+    ],
+    "easter_dig": [
+        {
+            "item": "paques_#00",
+            "count": "207"
+        }
+    ],
+    "stpatrick_dig": [
+        {
+            "item": "leprechaun_suit_#00",
+            "count": "7"
+        },
+        {
+            "item": "guiness_#00",
+            "count": "20"
+        },
+        {
+            "item": "hurling_stick_#00",
+            "count": "25"
+        }
+    ],
+    "stpatrick_dig_fair": [
+        {
+            "item": "hurling_stick_#00",
+            "count": "2"
+        }
+    ],
+    "halloween_dig": [
+        {
+            "item": "pumpkin_raw_#00",
+            "count": "5"
+        }
+    ],
+    "trash_good": [
+        {
+            "item": "fence_#00",
+            "count": "76"
+        },
+        {
+            "item": "chest_#00",
+            "count": "8"
+        },
+        {
+            "item": "wood2_#00",
+            "count": "22"
+        },
+        {
+            "item": "metal_#00",
+            "count": "5"
+        },
+        {
+            "item": "repair_one_#00",
+            "count": "7"
+        },
+        {
+            "item": "home_def_#00",
+            "count": "10"
+        },
+        {
+            "item": "home_box_#00",
+            "count": "7"
+        },
+        {
+            "item": "chain_#00",
+            "count": "5"
+        }
+    ],
+    "trash_bad": [
+        {
+            "item": "fruit_sub_part_#00",
+            "count": "337"
+        },
+        {
+            "item": "fruit_part_#00",
+            "count": "87"
+        },
+        {
+            "item": "pharma_part_#00",
+            "count": "278"
+        },
+        {
+            "item": "flesh_part_#00",
+            "count": "502"
+        },
+        {
+            "item": "water_cup_part_#00",
+            "count": "28"
+        }
+    ]
+}
