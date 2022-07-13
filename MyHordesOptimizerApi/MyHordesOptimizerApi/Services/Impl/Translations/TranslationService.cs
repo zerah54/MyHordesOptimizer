@@ -1,5 +1,5 @@
 ﻿using Common.Core.Repository.Interfaces;
-using MyHordesOptimizerApi.Configuration.Interfaces.MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.Gitlab;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Translations;
 using MyHordesOptimizerApi.Models.Translation;
@@ -67,7 +67,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
                 foreach (var translationFile in YmlFilesByLocale[locale])
                 {
                     var isExactMatch = false;
-                    
+
                     var translatedDeutchString = translationFile.Translations.Where(kvp => kvp.Value.ToLower().IndexOf(sourceString.ToLower()) >= 0).ToList().Select(kvp => kvp.Key);
                     var exactString = translationFile.Translations.Where(kvp => kvp.Value.ToLower() == sourceString.ToLower()).FirstOrDefault().Key;
                     if (exactString != null)

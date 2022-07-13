@@ -1,7 +1,6 @@
 using AutoMapper;
 using Common.Core.Repository.Impl;
 using Common.Core.Repository.Interfaces;
-using Dapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -12,9 +11,7 @@ using MyHordesOptimizerApi.Configuration.Impl.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.DapperMapping;
-using MyHordesOptimizerApi.Configuration.Interfaces.MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.MappingProfiles;
-using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Impl;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Impl;
@@ -29,9 +26,6 @@ using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
-using System;
-using System.ComponentModel;
-using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 
