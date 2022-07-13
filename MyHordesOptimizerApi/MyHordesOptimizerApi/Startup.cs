@@ -10,6 +10,7 @@ using MyHordesOptimizerApi.Configuration.Impl;
 using MyHordesOptimizerApi.Configuration.Impl.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
+using MyHordesOptimizerApi.Configuration.Interfaces.MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.MappingProfiles;
 using MyHordesOptimizerApi.Providers.Impl;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -67,6 +68,7 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<IGestHordesConfiguration, GestHordesConfiguration>();
             services.AddSingleton<IBigBrothHordesConfiguration, BigBrothHordesConfiguration>();
             services.AddSingleton<IFataMorganaConfiguration, FataMorganaConfiguration>();
+            services.AddSingleton<IMyHordesTranslationsConfiguration, MyHordesTranslationsConfiguration>();
 
             services.AddSingleton<IMyHordesOptimizerFirebaseConfiguration, MyHordesOptimizerFirebaseConfiguration>();
 
