@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.62
+// @version      1.0.0-alpha.63
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,7 +32,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Amélioration] Après avoir copié une carte, le texte du bouton informe explicitement l'utilisateur \n`;
++ `[Nouveauté] Dans la liste de courses, ajout de la possibilité de sélectionner un endroit où rapporter l'objet (banque ou zone de rapatriement) \n`
++ `[Correctif] Ajout d'une phrase explicative sur le champ d'ajout d'un objet à la liste de courses \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -396,6 +397,12 @@ const texts = {
         fr: `Résultat`,
         de: `Ergebnis`,
         es: `Resultado`,
+    },
+    searchObjectToAdd: {
+        en: `Find an object to add`,
+        fr: `Rechercher un objet à ajouter`,
+        de: `Suchen Sie ein hinzuzufügendes Objekt`,
+        es: `Encuentre un objeto para agregar`,
     }
 };
 
@@ -680,70 +687,140 @@ const action_types = [
 ];
 
 const wishlist_priorities = [
-    {value: -1000, label: {
-        en: `Do not bring to town`,
-        fr: `Ne pas ramener`,
-        de: `Nicht mitbringen`,
-        es: `No traer al pueblo`
-    }},
-    {value: 0, label: {
-        en: `Not defined`,
-        fr: `Non définie`,
-        de: `Nicht definiert`,
-        es: `Indefinida`
-    }},
-    {value: 1000, label: {
-        en: `Low`,
-        fr: `Basse`,
-        de: `Niedrig`,
-        es: `Baja`
-    }},
-    {value: 2000, label: {
-        en: `Medium`,
-        fr: `Moyenne`,
-        de: `Mittel`,
-        es: `Media`
-    }},
-    {value: 3000, label: {
-        en: `High`,
-        fr: `Haute`,
-        de: `Hoch`,
-        es: `Alta`
-    }},
+    {
+        value: -1000,
+        label: {
+            en: `Do not bring to town`,
+            fr: `Ne pas ramener`,
+            de: `Nicht mitbringen`,
+            es: `No traer al pueblo`
+        }
+    },
+    {
+        value: 0,
+        label: {
+            en: `Not defined`,
+            fr: `Non définie`,
+            de: `Nicht definiert`,
+            es: `Indefinida`
+        }
+    },
+    {
+        value: 1000,
+        label: {
+            en: `Low`,
+            fr: `Basse`,
+            de: `Niedrig`,
+            es: `Baja`
+        }
+    },
+    {
+        value: 2000,
+        label: {
+            en: `Medium`,
+            fr: `Moyenne`,
+            de: `Mittel`,
+            es: `Media`
+        }
+    },
+    {
+        value: 3000,
+        label: {
+            en: `High`,
+            fr: `Haute`,
+            de: `Hoch`,
+            es: `Alta`
+        }
+    },
+];
+
+const wishlist_depot = [
+    {
+        value: -1,
+        label: {
+            en: `Not defined`,
+            fr: `Non définie`,
+            de: `Nicht definiert`,
+            es: `Indefinida`
+        }
+    },
+    {
+        value: 0,
+        label: {
+            en: `Bank`,
+            fr: `Banque`,
+            de: `Bank`,
+            es: `Almacén`
+        }
+    },
+    {
+        value: 1,
+        label: {
+            en: `Teleport area`,
+            fr: `Zone de rapatriement`,
+            de: `TODO`,
+            es: `Zona de volver`
+        }
+    }
 ];
 
 const wishlist_headers = [
-    {label: {
-        en: `Item`,
-        fr: `Objet`,
-        de: `Gegenstand`,
-        es: `Objeto`
-    }, id: `label`},
-    {label: {
-        en: `Priority`,
-        fr: `Priorité`,
-        de: `Priorität`,
-        es: `Prioridad`
-    }, id: `priority`},
-    {label: {
-        en: `Stock in bank`,
-        fr: `Stock en banque`,
-        de: `Bestand in der Bank`,
-        es: `Cantidad en el almacén`
-    }, id: `bank_count`},
-    {label: {
-        en: `Desired stock`,
-        fr: `Stock souhaité`,
-        de: `Gewünschter Bestand`,
-        es: `Cantidad deseada`
-    }, id: `bank_needed`},
-    {label: {
-        en: `Missing quantity`,
-        fr: `Quantité manquante`,
-        de: `Fehlende Menge`,
-        es: `Cantidad necesaria`
-    }, id: `diff`},
-    {label: {en: ``, fr: ``, es: ``, de: ``}, id: 'delete'},
+    {
+        label: {
+            en: `Item`,
+            fr: `Objet`,
+            de: `Gegenstand`,
+            es: `Objeto`
+        },
+        id: `label`
+    },
+    {
+        label: {
+            en: `Priority`,
+            fr: `Priorité`,
+            de: `Priorität`,
+            es: `Prioridad`
+        }, id: `priority`},
+    {
+        label: {
+            en: `Depot`,
+            fr: `Dépôt`,
+            de: `TODO`,
+            es: `TODO`
+        },
+        id: `depot`
+    },
+    {
+        label: {
+            en: `Stock in bank`,
+            fr: `Stock en banque`,
+            de: `Bestand in der Bank`,
+            es: `Cantidad en el almacén`
+        },
+        id: `bank_count`
+    },
+    {
+        label: {
+            en: `Desired stock`,
+            fr: `Stock souhaité`,
+            de: `Gewünschter Bestand`,
+            es: `Cantidad deseada`
+        },
+        id: `bank_needed`
+    },
+    {
+        label: {
+            en: `Missing quantity`,
+            fr: `Quantité manquante`,
+            de: `Fehlende Menge`,
+            es: `Cantidad necesaria`
+        },
+        id: `diff`
+    },
+    {
+        label: {en: ``, fr: ``, es: ``, de: ``},
+        id: 'delete'
+    },
 ];
 
 //////////////////////////////////
@@ -1841,6 +1918,7 @@ function displayWishlist() {
             let label = add_item_with_search.firstElementChild;
             let input = label.firstElementChild;
             let close = label.lastElementChild;
+            input.placeholder = getI18N(texts.searchObjectToAdd);
             input.addEventListener('keyup', (event) => {
                 if (event.key === 'Enter') {
                     let wishlist_items = Array.from(wishlist_list.getElementsByTagName('li')).map((wishlist_item) => wishlist_item.getElementsByClassName('label')[0].textContent);
@@ -1872,6 +1950,7 @@ function displayWishlist() {
                     let wishlist_item = {
                         item: item,
                         priority: 0,
+                        depot: 1,
                         count: 1,
                         bankCount: item.bankCount,
                     }
@@ -1989,6 +2068,26 @@ function createWishlistItemElement(item) {
         item_priority_select.appendChild(item_priority_option);
         if (item.priority.toString().slice(0, 1) === priority.value.toString().slice(0,1)) {
             item_priority_option.selected = true;
+        }
+    });
+
+    let item_depot_container = document.createElement('div');
+    item_depot_container.classList.add('depot');
+    item_element.appendChild(item_depot_container);
+
+    let item_depot_select = document.createElement('select');
+    item_depot_select.addEventListener('change', () => {
+        item.priority = +item_depot_select.value;
+    });
+    item_depot_container.appendChild(item_depot_select);
+
+    wishlist_depot.forEach((depot) => {
+        let item_depot_option = document.createElement('option');
+        item_depot_option.value = depot.value;
+        item_depot_option.innerText = getI18N(depot.label);
+        item_depot_select.appendChild(item_depot_option);
+        if (item.depot === depot.value) {
+            item_depot_option.selected = true;
         }
     });
 
@@ -5163,7 +5262,7 @@ function createStyles() {
     + '}'
 
     const wishlist_label = '#wishlist .label {'
-    + 'width: calc(100% - 525px);'
+    + 'width: calc(100% - 650px);'
     + 'min-width: 200px;'
     + 'padding: 0 4px;'
     + '}';
@@ -5173,7 +5272,7 @@ function createStyles() {
     + 'font-variant: small-caps;'
     + '}';
 
-    const wishlist_cols = '#wishlist .priority, #wishlist .bank_count, #wishlist .bank_needed, #wishlist .diff {'
+    const wishlist_cols = '#wishlist .priority, #wishlist .depot, #wishlist .bank_count, #wishlist .bank_needed, #wishlist .diff {'
     + 'width: 125px;'
     + 'padding: 0 4px;'
     + '}';
@@ -6265,7 +6364,7 @@ function updateWishlist() {
     let item_list = wishlist.wishList
     .filter((item) => item.count)
     .map((item) => {
-        return {id: item.item.xmlId, priority: item.priority, count: item.count};
+        return {id: item.item.xmlId, priority: item.priority, depot: item.depot, count: item.count};
     });
     startLoading();
     GM_xmlhttpRequest({
