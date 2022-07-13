@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
-using MyHordesOptimizerApi.Configuration.Interfaces;
+using Microsoft.Extensions.Configuration;
+using MyHordesOptimizerApi.Configuration.Interfaces.MyHordesOptimizerApi.Configuration.Interfaces;
 
 namespace MyHordesOptimizerApi.Configuration.Impl
 {

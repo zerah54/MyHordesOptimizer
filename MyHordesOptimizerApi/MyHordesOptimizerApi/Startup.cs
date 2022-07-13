@@ -12,6 +12,7 @@ using MyHordesOptimizerApi.Configuration.Impl.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.DapperMapping;
+using MyHordesOptimizerApi.Configuration.Interfaces.MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.MappingProfiles;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Impl;

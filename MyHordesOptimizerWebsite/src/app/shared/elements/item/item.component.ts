@@ -1,9 +1,9 @@
-import { Item } from './../../../_abstract_model/types/item.class';
-import { ApiServices } from './../../../_abstract_model/services/api.services';
 import { Component, HostBinding, Input } from '@angular/core';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from './../../../_abstract_model/const';
+import { ApiServices } from './../../../_abstract_model/services/api.services';
 import { BankItem } from './../../../_abstract_model/types/bank-item.class';
+import { Item } from './../../../_abstract_model/types/item.class';
 
 @Component({
     selector: 'mho-item',
@@ -17,13 +17,13 @@ export class ItemComponent {
     @Input() bankItem!: BankItem;
     /** L'élément à afficher si c'est un objet standard */
     @Input() item!: Item;
-    /** Doit-on afficher le détail au clic ? */
-    @Input() displayDetails: boolean = false;
 
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public locale: string = moment.locale();
+
+    public display_mode: 'simple' | 'advanced' = 'simple';
 
     constructor(private api: ApiServices) {
     }
@@ -41,6 +41,10 @@ export class ItemComponent {
                 this.item.wishlist_count = 1;
             }
         })
+    }
+
+    public toggleAdvancedMode(): void {
+        this.display_mode = this.display_mode === 'simple' ? 'advanced' : 'simple';
     }
 }
 

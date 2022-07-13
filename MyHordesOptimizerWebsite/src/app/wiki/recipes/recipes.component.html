@@ -3,6 +3,65 @@
         <mat-card-header>
             <mat-card-title i18n>Recettes</mat-card-title>
         </mat-card-header>
+        <mat-card-content>
+            <ng-container *ngIf="recipes">
+                <div class="mat-elevation-z8">
+                    <table mat-table [dataSource]="datasource" matSort>
 
+                        <ng-container matColumnDef="filters">
+                            <td mat-header-cell *matHeaderCellDef colspan="4">
+                                <div class="table-filters">
+                                    <mho-filter (filterChange)="applyFilter($event)"></mho-filter>
+                                </div>
+                            </td>
+                        </ng-container>
+
+                        <ng-container *ngFor="let column of columns" [matColumnDef]="column.id" [sticky]="column.id === 'name'">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{column.header}}</th>
+                            <td mat-cell *matCellDef="let row">
+                                <ng-container [ngSwitch]="column.id">
+                                    <ng-container *ngSwitchCase="'type'">
+                                        <div>
+                                        <ng-container *ngIf="row[column.id] === 'Workshop'; else manual">
+                                            <img [src]="HORDES_IMG_REPO + 'log/workshop.gif'"><ng-container i18n>Atelier</ng-container>
+                                        </ng-container>
+                                        <ng-template #manual>
+                                            <img [src]="HORDES_IMG_REPO + 'log/citizen.gif'"><ng-container i18n>Action de citoyen</ng-container>
+                                        </ng-template>
+                                        </div>
+                                    </ng-container>
+
+                                    <ng-container *ngSwitchCase="'components'">
+                                        <ng-container *ngFor="let component of row[column.id]">
+                                            <div><img [src]="HORDES_IMG_REPO + component.img">{{component.label[locale]}}</div>
+                                        </ng-container>
+                                    </ng-container>
+
+                                    <ng-container *ngSwitchCase="'transformation'">
+                                        <img [src]="HORDES_IMG_REPO + 'icons/small_move.gif'">
+                                    </ng-container>
+
+                                    <ng-container *ngSwitchCase="'result'">
+                                        <ng-container *ngFor="let result of row[column.id]">
+                                            <div>
+                                                <img [src]="HORDES_IMG_REPO + result.item.img">
+                                                {{result.item.label[locale]}}
+                                                <small *ngIf="result.probability !== 1">({{result.probability | number:'1.0-2':locale}}%)</small>
+                                            </div>
+                                        </ng-container>
+                                    </ng-container>
+                                </ng-container>
+                            </td>
+                        </ng-container>
+
+                        <!-- Footer -->
+
+                        <tr mat-header-row *matHeaderRowDef="['filters']; sticky: true"></tr>
+                        <tr mat-header-row *matHeaderRowDef="columns_ids; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: columns_ids;"></tr>
+                    </table>
+                </div>
+            </ng-container>
+        </mat-card-content>
     </mat-card>
 </mho-wiki>

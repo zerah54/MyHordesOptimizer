@@ -1,0 +1,26 @@
+.mho-recipe {
+    display: flex;
+
+    margin-top: 1em;
+    margin-bottom: 1em;
+
+    small {
+        font-style: italic;
+    }
+    img {
+        vertical-align: middle;
+    }
+    > ul {
+        list-style: none;
+        padding: 0;
+        li {
+            img {
+                margin-right: 0.5em;
+            }
+        }
+    }
+
+    > div.transformation {
+        margin: 0 1em;
+    }
+}

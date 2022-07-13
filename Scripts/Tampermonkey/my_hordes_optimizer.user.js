@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.61
+// @version      1.0.0-alpha.62
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Correction du lien discord qui n'a marché qu'une seule fois avant de décider de manière unilatérale de devenir inutilisable \n`;
++ `[Amélioration] Après avoir copié une carte, le texte du bouton informe explicitement l'utilisateur \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -197,6 +197,18 @@ const texts = {
         fr: `Copier la carte`,
         de: `Karte kopieren`,
         es: `Copiar el mapa`
+    },
+    copy_map_end: {
+        en: `The map has been copied`,
+        fr: `La carte a été copiée`,
+        de: `Die Karte wurde kopiert`,
+        es: `El mapa ha sido copiado`
+    },
+    copy_map_end_more: {
+        en: `The previous map has been replaced`,
+        fr: `La carte précédente a été remplacée`,
+        de: `Die vorherige Karte wurde ersetzt`,
+        es: `El mapa anterior ha sido reemplazada`
     },
     search_building: {
         en: `Search for a construction site`,
@@ -4787,8 +4799,11 @@ function blockUsersPosts() {
 function createCopyButton(source, map, map_id, button_block_id) {
     let copy_button_parent = document.getElementById(button_block_id);
     let copy_button = document.createElement('button');
+    let copyText = (text, add) => {
+        return `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">${text}<br /><small>${add}</small></span>`;
+    }
     copy_button.setAttribute('style', 'max-width: initial');
-    copy_button.innerHTML = `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">${getI18N(texts.copy_map)}</span>`;
+    copy_button.innerHTML = copyText(getI18N(texts.copy_map), '');
     copy_button.id = mho_copy_map_id;
     copy_button.addEventListener('click', () => {
         copy_button.disabled = true;
@@ -4802,7 +4817,13 @@ function createCopyButton(source, map, map_id, button_block_id) {
             map: map,
             fm_block: source === 'fm' && map === 'map' ? map_to_convert.outerHTML : (GM_getValue(mho_map_key) ? GM_getValue(mho_map_key).fm_block : undefined),
             ruin: map === 'ruin' ? map_to_convert.outerHTML : (GM_getValue(mho_map_key) ? GM_getValue(mho_map_key).ruin : undefined)
-        })
+        });
+        
+        copy_button.innerHTML = copyText(getI18N(texts.copy_map_end), getI18N(texts.copy_map_end_more));
+        
+        setTimeout(() => {
+            copy_button.innerHTML = copyText(getI18N(texts.copy_map), '');
+        }, 5000)
         copy_button.disabled = false;
     });
     copy_button_parent.appendChild(copy_button);
@@ -5813,10 +5834,11 @@ async function getFMMap() {
 
         let map_html = document.createElement('div');
         map_html.innerHTML = GM_getValue(mho_map_key).fm_block;
-
+        
         let new_map = [];
         let map = Array.from(map_html.querySelector('#map').children);
         let x_mapping = Array.from(map[0].children).map((x) => x.innerText);
+        
         map
             .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
             .forEach((row) => {

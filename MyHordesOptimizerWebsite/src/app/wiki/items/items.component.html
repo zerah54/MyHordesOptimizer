@@ -4,10 +4,17 @@
             <mat-card-title i18n>Objets</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            <ul *ngIf="items">
-                <mho-item *ngFor="let item of items" [item]="item" [displayDetails]="true">
-                </mho-item>
-            </ul>
+            <ng-container *ngIf="displayed_items">
+                <div class="filter">
+                    <mho-filter (filterChange)="filter_value = $event; applyFilters()"></mho-filter>
+                    <mat-form-field style="margin-left: 1em;">
+                        <mho-select [multiple]="true" [options]="options" [bindLabel]="'value.label'" [(ngModel)]="select_value" (filterChange)="applyFilters()"></mho-select>
+                    </mat-form-field>
+                </div>
+                <ul>
+                    <mho-item *ngFor="let item of displayed_items" [item]="item"></mho-item>
+                </ul>
+            </ng-container>
         </mat-card-content>
     </mat-card>
 </mho-wiki>

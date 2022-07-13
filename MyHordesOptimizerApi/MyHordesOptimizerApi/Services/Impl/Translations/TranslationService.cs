@@ -1,107 +1,125 @@
 ﻿using Common.Core.Repository.Interfaces;
+using MyHordesOptimizerApi.Configuration.Interfaces.MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.Gitlab;
-using MyHordesOptimizerApi.Dtos.MyHordes.Import.i18n;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Translations;
+using MyHordesOptimizerApi.Models.Translation;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
 using System.Web;
+using YamlDotNet.Serialization;
 
 namespace MyHordesOptimizerApi.Services.Impl.Translations
 {
     public class TranslationService : ITranslationService
     {
         protected readonly IWebApiRepository WebApiRepository;
-        protected Dictionary<string, List<TranslationXmlFileDto>> XlfFilesByLocale { get; private set; }
+        protected readonly IMyHordesTranslationsConfiguration MyHordesTranslationsConfiguration;
+
+        protected Dictionary<string, List<YmlTranslationFileModel>> YmlFilesByLocale { get; private set; }
 
         public TranslationService(IWebApiRepository webApiRepository)
         {
             WebApiRepository = webApiRepository;
-            XlfFilesByLocale = new Dictionary<string, List<TranslationXmlFileDto>>();
+            var ymlDeserializer = new DeserializerBuilder().Build();
+            YmlFilesByLocale = new Dictionary<string, List<YmlTranslationFileModel>>();
             var gitlabFiles = WebApiRepository.Get<List<GitlabTreeResult>>("https://gitlab.com/api/v4/projects/17840758/repository/tree?path=translations&per_page=100");
             foreach (var file in gitlabFiles)
             {
-                if (file.Name.EndsWith(".xlf"))
+                if (file.Name.EndsWith(".yml"))
                 {
-                    var translationFile = WebApiRepository.Get<TranslationXmlFileDto>(url: $"https://gitlab.com/api/v4/projects/17840758/repository/files/{HttpUtility.UrlEncode(file.Path)}/raw", mediaTypeOut: MediaTypeNames.Application.Xml);
-                    var fileNameWithoutXlf = file.Name.Substring(0, file.Name.Length - 4); // Remove .xlf
-                    var fileLocale = fileNameWithoutXlf.Substring(fileNameWithoutXlf.LastIndexOf(".") + 1, 2);
-                    if (XlfFilesByLocale.TryGetValue(fileLocale, out var files))
+                    var ymlDatas = WebApiRepository.Get(url: $"https://gitlab.com/api/v4/projects/17840758/repository/files/{HttpUtility.UrlEncode(file.Path)}/raw").Content.ReadAsStringAsync().Result;
+                    var translationFile = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlDatas);
+                    var fileLocale = file.Name.Split(".")[1];
+                    if (YmlFilesByLocale.TryGetValue(fileLocale, out var files))
                     {
-                        files.Add(translationFile);
+                        files.Add(new YmlTranslationFileModel()
+                        {
+                            Name = file.Name,
+                            Translations = translationFile,
+                            DestinationLocale = fileLocale
+                        });
                     }
                     else
                     {
-                        XlfFilesByLocale.Add(fileLocale, new List<TranslationXmlFileDto>() { translationFile });
+                        YmlFilesByLocale.Add(fileLocale, new List<YmlTranslationFileModel>() { new YmlTranslationFileModel()
+                        {
+                            Name = file.Name,
+                            Translations = translationFile,
+                            DestinationLocale = fileLocale
+                        }});
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Permet de traduire du text dans sa langue vers l'ensemble des autres langue²
+        /// </summary>
+        /// <param name="locale">Langue utlisé pour sourceString</param>
+        /// <param name="sourceString"></param>
+        /// <returns></returns>
         public TranslationResultDto GetTranslation(string locale, string sourceString)
         {
             var result = new TranslationResultDto();
             if (locale != "de")
             {
-                foreach (var translationFile in XlfFilesByLocale[locale])
+                foreach (var translationFile in YmlFilesByLocale[locale])
                 {
                     var isExactMatch = false;
-
-                    var translatedDeutchStrings = translationFile.File.Unit.Where(unit => unit.Segment.Target.ToLower().IndexOf(sourceString.ToLower()) >= 0).Select(translationUnit => translationUnit.Segment.Source).ToList();
-                    var exactDeutchString = translationFile.File.Unit.Where(unit => unit.Segment.Target.ToLower() == sourceString.ToLower()).Select(translationUnit => translationUnit.Segment.Source).FirstOrDefault();
-                    if (exactDeutchString != null)
+                    
+                    var translatedDeutchString = translationFile.Translations.Where(kvp => kvp.Value.ToLower().IndexOf(sourceString.ToLower()) >= 0).ToList().Select(kvp => kvp.Key);
+                    var exactString = translationFile.Translations.Where(kvp => kvp.Value.ToLower() == sourceString.ToLower()).FirstOrDefault().Key;
+                    if (exactString != null)
                     {
-                        translatedDeutchStrings = new List<string>() { exactDeutchString };
+                        translatedDeutchString = new List<string>() { exactString };
                         isExactMatch = true;
                     }
-                    foreach (var deutchString in translatedDeutchStrings)
+
+                    foreach (var deutchString in translatedDeutchString)
                     {
-                        var xlfName = translationFile.File.Id.Substring(0, translationFile.File.Id.LastIndexOf(".")); // Remove .locale
-                        var file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.fr")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.fr");
-                        var translatedFrenchStrings = file.File.Unit.Where(unit => unit.Segment.Source.ToLower() == deutchString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                        var nameWithoutYml = translationFile.Name.Substring(0, translationFile.Name.LastIndexOf(".")); // Remove .yml
+                        var nameWithoutLocal = nameWithoutYml.Substring(0, nameWithoutYml.LastIndexOf(".")); // Puis .{locale}
+                        var file = YmlFilesByLocale["fr"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.fr.yml");
+                        var translatedFrenchStrings = new List<string>() { file.Translations[deutchString] };
 
-                        file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.es")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.es");
-                        var translatedSpanishStrings = file.File.Unit.Where(unit => unit.Segment.Source.ToLower() == deutchString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                        file = YmlFilesByLocale["es"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.es.yml");
+                        var translatedSpanishStrings = new List<string>() { file.Translations[deutchString] };
 
-                        file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.en")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.en");
-                        var translatedEnglishStrings = file.File.Unit.Where(unit => unit.Segment.Source.ToLower() == deutchString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                        file = YmlFilesByLocale["en"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.en.yml");
+                        var translatedEnglishStrings = new List<string>() { file.Translations[deutchString] };
 
-                        result.AddTranslation(de: deutchString, context: xlfName, isExactMatch: isExactMatch, fr: translatedFrenchStrings, es: translatedSpanishStrings, en: translatedEnglishStrings);
+                        result.AddTranslation(de: deutchString, context: nameWithoutLocal, isExactMatch: isExactMatch, fr: translatedFrenchStrings, es: translatedSpanishStrings, en: translatedEnglishStrings);
                     }
                 }
             }
             else
             {
-                foreach (var translationFile in XlfFilesByLocale[locale])
+                foreach (var translationFile in YmlFilesByLocale[locale])
                 {
                     var isExactMatch = false;
 
-                    var translatedDeutchStrings = translationFile.File.Unit.Where(unit => unit.Segment.Source.ToLower().IndexOf(sourceString.ToLower()) >= 0).Select(translationUnit => translationUnit.Segment.Target).ToList();
-                    var exactDeutchString = translationFile.File.Unit.Where(unit => unit.Segment.Source.ToLower() == sourceString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).FirstOrDefault();
-                    if (exactDeutchString != null)
+                    var translatedDeutchStrings = translationFile.Translations.Keys.Where(key => key.ToLower().IndexOf(sourceString.ToLower()) >= 0).ToList().Select(key => key);
+                    var exactString = translationFile.Translations.Where(kvp => kvp.Value.ToLower() == sourceString.ToLower()).FirstOrDefault().Key;
+                    if (exactString != null)
                     {
-                        translatedDeutchStrings = new List<string>() { exactDeutchString };
-                        isExactMatch = true;
-                    }
-                    if (exactDeutchString != null)
-                    {
-                        translatedDeutchStrings = new List<string>() { exactDeutchString };
+                        translatedDeutchStrings = new List<string>() { exactString };
                         isExactMatch = true;
                     }
                     foreach (var deutchString in translatedDeutchStrings)
                     {
-                        var xlfName = translationFile.File.Id.Substring(0, translationFile.File.Id.LastIndexOf(".")); // Remove .locale
-                        var file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.fr")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.fr");
-                        var translatedFrenchStrings = file.File.Unit.Where(unit => unit.Segment.Source.ToLower() == deutchString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                        var nameWithoutYml = translationFile.Name.Substring(0, translationFile.Name.LastIndexOf(".")); // Remove .yml
+                        var nameWithoutLocal = nameWithoutYml.Substring(0, nameWithoutYml.LastIndexOf(".")); // Puis .{locale}
+                        var file = YmlFilesByLocale["fr"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.fr.yml");
+                        var translatedFrenchStrings = new List<string>() { file.Translations[deutchString] };
 
-                        file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.es")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.es");
-                        var translatedSpanishStrings = file.File.Unit.Where(unit => unit.Segment.Source.ToLower() == deutchString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                        file = YmlFilesByLocale["es"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.es.yml");
+                        var translatedSpanishStrings = new List<string>() { file.Translations[deutchString] };
 
-                        file = XlfFilesByLocale.FirstOrDefault(x => x.Value.Any(y => y.File.Id == $"{xlfName}.en")).Value.FirstOrDefault(x => x.File.Id == $"{xlfName}.en");
-                        var translatedEnglishStrings = file.File.Unit.Where(unit => unit.Segment.Source.ToLower() == deutchString.ToLower()).Select(translationUnit => translationUnit.Segment.Target).ToList();
+                        file = YmlFilesByLocale["en"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.en.yml");
+                        var translatedEnglishStrings = new List<string>() { file.Translations[deutchString] };
 
-                        result.AddTranslation(de: deutchString, context: xlfName, isExactMatch: isExactMatch, fr: translatedFrenchStrings, es: translatedSpanishStrings, en: translatedEnglishStrings);
+                        result.AddTranslation(de: deutchString, context: nameWithoutLocal, isExactMatch: isExactMatch, fr: translatedFrenchStrings, es: translatedSpanishStrings, en: translatedEnglishStrings);
                     }
                 }
             }
