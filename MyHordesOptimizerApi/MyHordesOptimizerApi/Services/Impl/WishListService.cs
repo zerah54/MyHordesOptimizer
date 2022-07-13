@@ -77,7 +77,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     Item = items.First(x => x.Id == itemId),
                     Count = request.Count,
-                    Priority = request.Priority
+                    Priority = request.Priority,
+                    Depot = request.Depot
                 };
                 wishListWrapper.WishList[itemId.ToString()] = wishLiteItem;
             }
@@ -98,6 +99,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 Item = item,
                 Priority = 0,
+                Depot = 0,
                 Count = 1
             };
             FirebaseRepository.PutWishList(_townId, wishList);
