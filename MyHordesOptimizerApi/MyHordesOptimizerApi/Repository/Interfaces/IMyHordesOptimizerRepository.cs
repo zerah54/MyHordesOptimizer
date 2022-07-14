@@ -15,7 +15,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
 
         void PatchItems(List<ItemModel> items);
         List<Item> GetItems();
-        Item GetItemsById(int itemId);
 
         void PatchRecipes(List<RecipeModel> recipes);
         List<ItemRecipe> GetRecipes();

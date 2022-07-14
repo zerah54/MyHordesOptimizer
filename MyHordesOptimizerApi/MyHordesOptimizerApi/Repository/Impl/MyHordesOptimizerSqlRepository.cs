@@ -12,7 +12,6 @@ using MyHordesOptimizerApi.Models.Views.Items.Bank;
 using MyHordesOptimizerApi.Models.Views.Items.Wishlist;
 using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
-using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -148,11 +147,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 item.Properties = matchingItemComplet.Select(i => i.PropertyName).Distinct();
             }
             return items;
-        }
-
-        public Item GetItemsById(int itemId)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion
@@ -390,7 +384,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Open();
             connection.Execute(updateTownQuery, new { UserId = userId, DateUpdate = DateTime.UtcNow, TownId = townId });
             connection.Execute(cleanWishListQuery, new { TownId = townId });
-            connection.BulkInsert(tableName: "TownWishListItem", dico : dico, models: items);
+            connection.BulkInsert(tableName: "TownWishListItem", dico: dico, models: items);
             connection.Close();
         }
 
