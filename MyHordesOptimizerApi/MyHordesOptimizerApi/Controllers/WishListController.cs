@@ -23,30 +23,20 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpGet]
-        public ActionResult<WishListWrapper> GetWishList(string userKey)
+        public ActionResult<WishListWrapper> GetWishList(int townId)
         {
-            if (string.IsNullOrWhiteSpace(userKey))
-            {
-                return BadRequest($"{nameof(userKey)} cannot be empty");
-            }
-            UserKeyProvider.UserKey = userKey;
-            var wishList = _wishListService.GetWishList();
+            var wishList = _wishListService.GetWishList(townId);
             return wishList;
         }
 
         [HttpPut]
-        public ActionResult<WishListWrapper> PutWishList(string userKey, List<WishListPutResquestDto> request)
+        public ActionResult<WishListWrapper> PutWishList(int townId, int userId, List<WishListPutResquestDto> request)
         {
-            if (string.IsNullOrWhiteSpace(userKey))
-            {
-                return BadRequest($"{nameof(userKey)} cannot be empty");
-            }
             if (request == null)
             {
                 return BadRequest($"{nameof(request)} cannot be null");
             }
-            UserKeyProvider.UserKey = userKey;
-            var wishList = _wishListService.PutWishList(request);
+            var wishList = _wishListService.PutWishList(townId, userId, request);
             return Ok(wishList);
         }
 

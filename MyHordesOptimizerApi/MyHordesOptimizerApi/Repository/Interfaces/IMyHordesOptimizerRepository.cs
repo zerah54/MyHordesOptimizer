@@ -31,7 +31,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         CitizensWrapper GetCitizens(int townId);
 
         void AddItemToWishlist(int townId, int itemId, int userId);
-        void PutWishList(int townId, WishListWrapper wishList);
+        void PutWishList(int townId, int userId, List<TownWishlistItemModel> items);
         WishListWrapper GetWishList(int townId);
 
         void PatchRuins(List<MyHordesOptimizerRuin> jsonRuins);

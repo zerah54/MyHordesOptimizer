@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -16,37 +18,29 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IUserInfoProvider UserInfoProvider { get; set; }
         protected IMyHordesApiRepository MyHordesJsonApiRepository { get; set; }
         protected IMyHordesOptimizerRepository MyHordesOptimizerRepository { get; set; }
-
-        private int _townId; // On est dans de l'injection de dépendance Scoped, on peut se permettre de stocker des infos
+        protected IMapper Mapper { get; set; }
 
         public WishListService(ILogger<MyHordesFetcherService> logger,
             IUserInfoProvider userInfoProvider,
             IMyHordesApiRepository myHordesJsonApiRepository,
-            IMyHordesOptimizerRepository firebaseRepository)
+            IMyHordesOptimizerRepository firebaseRepository,
+            IMapper mapper)
         {
             Logger = logger;
             UserInfoProvider = userInfoProvider;
             MyHordesJsonApiRepository = myHordesJsonApiRepository;
             MyHordesOptimizerRepository = firebaseRepository;
+            Mapper = mapper;
         }
 
-        public WishListWrapper GetWishList()
+        public WishListWrapper GetWishList(int townId)
         {
-            var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
-            _townId = myHordeMeResponse.Map.Id;
-
-            var town = MyHordesOptimizerRepository.GetTown(myHordeMeResponse.Map.Id);
-            var wishList = town.WishList;
-            if (wishList == null)
-            {
-                return new WishListWrapper();
-            }
-
+            var wishList = MyHordesOptimizerRepository.GetWishList(townId);
             var recipes = MyHordesOptimizerRepository.GetRecipes();
-            foreach (var kvp in wishList.WishList)
+            var bank = MyHordesOptimizerRepository.GetBank(townId);
+            foreach (var wishlistItem in wishList.WishList)
             {
-                var wishlistItem = kvp.Value;
-                var bankItem = town.Bank.Bank.FirstOrDefault(x => x.Item.Id == wishlistItem.Item.Id);
+                var bankItem = bank.Bank.FirstOrDefault(x => x.Item.Id == wishlistItem.Item.Id);
                 if (bankItem != null)
                 {
                     wishlistItem.BankCount = bankItem.Count;
@@ -61,28 +55,12 @@ namespace MyHordesOptimizerApi.Services.Impl
             return wishList;
         }
 
-        public WishListWrapper PutWishList(List<WishListPutResquestDto> wishListPutRequest)
+        public WishListWrapper PutWishList(int townId, int userId, List<WishListPutResquestDto> wishListPutRequest)
         {
-            var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
-            var items = MyHordesOptimizerRepository.GetItems();
-            var wishListWrapper = new WishListWrapper()
-            {
-                LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo()
-            };
-            foreach (var request in wishListPutRequest)
-            {
-                var itemId = request.Id;
-                var wishLiteItem = new WishListItem()
-                {
-                    Item = items.First(x => x.Id == itemId),
-                    Count = request.Count,
-                    Priority = request.Priority,
-                    Depot = request.Depot
-                };
-                wishListWrapper.WishList[itemId.ToString()] = wishLiteItem;
-            }
-            MyHordesOptimizerRepository.PutWishList(myHordeMeResponse.Map.Id, wishListWrapper);
-            return wishListWrapper;
+            var items = Mapper.Map<List<TownWishlistItemModel>>(wishListPutRequest);
+            MyHordesOptimizerRepository.PutWishList(townId, userId, items);
+            var wishList = MyHordesOptimizerRepository.GetWishList(townId);
+            return wishList;
         }
 
         public void AddItemToWishList(int townId, int userId, int itemId)

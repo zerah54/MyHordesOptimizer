@@ -9,6 +9,7 @@ using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Items.Bank;
+using MyHordesOptimizerApi.Models.Views.Items.Wishlist;
 using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -337,10 +338,15 @@ namespace MyHordesOptimizerApi.Repository.Impl
                               WHERE tb.idTown = @idTown";
             using var connection = new SqlConnection(Configuration.ConnectionString);
             var townBankItem = connection.Query<BankItemCompletModel>(query, new { idTown = townId });
+            connection.Close();
+
+            if (!townBankItem.Any())
+            {
+                return new BankWrapper();
+            }
             var mostRecent = townBankItem.Max(x => x.LastUpdateDateUpdate);
             townBankItem = townBankItem.Where(x => x.LastUpdateDateUpdate == mostRecent);
             var group = townBankItem.GroupBy(x => new BankItemCompletKeyModel(x)).ToList();
-            connection.Close();
 
             var banksItems = Mapper.Map<List<BankItem>>(group);
             banksItems.ForEach(bankItemComplet =>
@@ -369,18 +375,86 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var query = @"EXECUTE AddItemToWishList @TownId, @UserId, @ItemId, @DateUpdate";
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
-            connection.Execute(query, new {TownId = townId, UserId = userId, ItemId = itemId, DateUpdate = DateTime.UtcNow});
+            connection.Execute(query, new { TownId = townId, UserId = userId, ItemId = itemId, DateUpdate = DateTime.UtcNow });
             connection.Close();
         }
 
-        public void PutWishList(int townId, WishListWrapper wishList)
+        public void PutWishList(int townId, int userId, List<TownWishlistItemModel> items)
         {
-            throw new NotImplementedException();
+            InsertTown(townId);
+            items.ForEach(x => x.IdTown = townId);
+            var updateTownQuery = @"UPDATE Town SET idUserWishListUpdater = @UserId, wishlistDateUpdate = @DateUpdate WHERE idTown = @TownId;";
+            var cleanWishListQuery = @"DELETE FROM TownWishListItem WHERE idTown = @TownId;";
+            var dico = new Dictionary<string, Func<TownWishlistItemModel, object>>() { { "idTown", x => x.IdTown }, { "idItem", x => x.IdItem }, { "count", x => x.Count }, { "priority", x => x.Priority }, { "depot", x => x.Depot } };
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Execute(updateTownQuery, new { UserId = userId, DateUpdate = DateTime.UtcNow, TownId = townId });
+            connection.Execute(cleanWishListQuery, new { TownId = townId });
+            connection.BulkInsert(tableName: "TownWishListItem", dico : dico, models: items);
+            connection.Close();
         }
 
         public WishListWrapper GetWishList(int townId)
         {
-            throw new NotImplementedException();
+            var query = @"SELECT twi.idTown AS TownId
+                                 ,item.idItem AS ItemId
+                                 ,item.uid AS ItemUid
+								 ,item.deco AS ItemDeco
+							     ,item.label_fr AS ItemLabelFr
+							     ,item.label_en AS ItemLabelEn
+							     ,item.label_es AS ItemLabelEs
+							     ,item.label_de AS ItemLabelDe
+							     ,item.description_fr AS ItemDescriptionFr
+							     ,item.description_en AS ItemDescriptionEn
+							     ,item.description_es AS ItemDescriptionEs
+							     ,item.description_de AS ItemDescriptionDe
+							     ,item.guard AS ItemGuard
+							     ,item.img AS ItemImg
+							     ,item.isHeaver AS ItemIsHeaver
+							     ,category.idCategory AS CategoryId
+							     ,category.label_fr AS CategoryLabelFr
+							     ,category.label_en AS CategoryLabelEn
+							     ,category.label_es AS CategoryLabelEs
+							     ,category.label_de AS CategoryLabelDe
+							     ,category.name AS CategoryName
+							     ,category.ordering AS CategoryOrdering
+							     ,itemAction.actionName AS ActionName
+							     ,itemProperty.propertyName AS PropertyName
+                                 ,twi.count AS WishlistCount
+				                 ,twi.priority AS WishlistPriority
+								 ,twi.depot AS WishlistDepot
+	                             ,t.idUserWishListUpdater AS LastUpdateInfoUserId
+	                             ,t.wishlistDateUpdate AS LastUpdateDateUpdate
+	                             ,userUpdater.name AS LastUpdateInfoUserName
+                              FROM TownWishListItem twi
+                              LEFT JOIN Item item ON item.idItem = twi.idItem
+                              LEFT JOIN Category category ON category.idCategory = item.idCategory
+                              LEFT JOIN ItemAction itemAction ON itemAction.idItem = item.idItem
+                              LEFT JOIN ItemProperty itemProperty ON itemProperty.idItem = item.idItem
+                              LEFT JOIN Town t ON t.idTown = twi.idTown
+                              LEFT JOIN Users userUpdater ON userUpdater.idUser = t.idUserWishListUpdater
+                              WHERE twi.idTown = @TownId";
+
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            var townWishlistItem = connection.Query<TownWishlistItemCompletModel>(query, new { TownId = townId });
+            var group = townWishlistItem.GroupBy(x => new TownWishlistItemCompletKeyModel(x)).ToList();
+            connection.Close();
+
+            var wishListItem = Mapper.Map<List<WishListItem>>(group);
+            wishListItem.ForEach(wishListItemComplet =>
+            {
+                IEnumerable<TownWishlistItemCompletModel> wishListItemCompletAssocie = townWishlistItem.Where(x => x.ItemId == wishListItemComplet.Item.Id);
+                var item = Mapper.Map<Item>(wishListItemCompletAssocie.First());
+                item.Properties = new List<string>(wishListItemCompletAssocie.Select(x => x.PropertyName).Distinct());
+                item.Actions = new List<string>(wishListItemCompletAssocie.Select(x => x.ActionName).Distinct());
+                wishListItemComplet.Item = item;
+            });
+            var wishlistWrapper = new WishListWrapper()
+            {
+                LastUpdateInfo = Mapper.Map<LastUpdateInfo>(townWishlistItem.First()),
+                WishList = wishListItem
+            };
+            return wishlistWrapper;
         }
 
         #endregion

@@ -4,12 +4,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
     public class WishListWrapper
     {
-        public Dictionary<string, WishListItem> WishList { get; set; }
+        public List<WishListItem> WishList { get; set; }
         public LastUpdateInfo LastUpdateInfo { get; set; }
 
         public WishListWrapper()
         {
-            WishList = new Dictionary<string, WishListItem>();
+            WishList = new List<WishListItem>();
         }
     }
 }
