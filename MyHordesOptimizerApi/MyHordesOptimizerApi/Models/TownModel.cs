@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyHordesOptimizerApi.Models
@@ -9,5 +10,11 @@ namespace MyHordesOptimizerApi.Models
         [Key]
         [Column("idTown")]
         public int IdTown { get; set; }
+
+        [Column("wishlistDateUpdate")]
+        public DateTime? WishlistDateUpdate { get; set; }
+
+        [Column("idUserWishListUpdater")]
+        public int? IdUserWishListUpdater { get; set; }
     }
 }

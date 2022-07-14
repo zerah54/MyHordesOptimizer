@@ -41,7 +41,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
-            if(request == null)
+            if (request == null)
             {
                 return BadRequest($"{nameof(request)} cannot be null");
             }
@@ -52,14 +52,9 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Add/{itemId}")]
-        public ActionResult AddItemToWishList(string userKey, int itemId)
+        public ActionResult AddItemToWishList(int townId, int itemId, int userId)
         {
-            if (string.IsNullOrWhiteSpace(userKey))
-            {
-                return BadRequest($"{nameof(userKey)} cannot be empty");
-            }
-            UserKeyProvider.UserKey = userKey;
-            _wishListService.AddItemToWishList(itemId);
+            _wishListService.AddItemToWishList(townId: townId, itemId: itemId, userId: userId);
             return Ok();
         }
 

@@ -61,10 +61,6 @@ CREATE TABLE Action(
 	name NVARCHAR(255) PRIMARY KEY NOT NULL
 );
 
-CREATE TABLE WishList(
-	idWishList INT PRIMARY KEY NOT NULL IDENTITY
-);
-
 
 CREATE TABLE Town (
 	idTown INT PRIMARY KEY NOT NULL
@@ -131,25 +127,17 @@ CREATE TABLE TownCitizen(
 	FOREIGN KEY(idLastUpdateInfo) REFERENCES LastUpdateInfo(idLastUpdateInfo)
 );
 
-CREATE TABLE TownWishList(
+CREATE TABLE TownWishListItem(
 	idTown INT,
-	idWishList INT,
-	idLastUpdateInfo INT,
-	PRIMARY KEY (idTown, idWishList, idLastUpdateInfo),
-	FOREIGN KEY(idTown) REFERENCES Town(idTown),
-	FOREIGN KEY(idWishList) REFERENCES WishList(idWishList),
-	FOREIGN KEY(idLastUpdateInfo) REFERENCES LastUpdateInfo(idLastUpdateInfo)
-);
-
-CREATE TABLE WishListItem(
-	idWishList INT,
 	idItem INT,
 	priority INT,
 	count INT,
-	PRIMARY KEY (idWishList, idItem),
-	FOREIGN KEY(idWishList) REFERENCES WishList(idWishList),
+	depot INT,
+	PRIMARY KEY (idTown, idItem),
+	FOREIGN KEY(idTown) REFERENCES Town(idTown),
 	FOREIGN KEY(idItem) REFERENCES Item(idItem)
 );
+
 
 CREATE TABLE ItemAction(
 	idItem INT,
@@ -195,6 +183,10 @@ CREATE TABLE RuinItemDrop(
 	FOREIGN KEY(idRuin) REFERENCES Ruin(idRuin),
 	FOREIGN KEY(idItem) REFERENCES Item(idItem)
 );
+GO
+
+ALTER TABLE Town ADD idUserWishListUpdater INT;
+ALTER TABLE Town ADD wishlistDateUpdate DATETIME2;
 GO
 
 CREATE VIEW ItemComplet 
@@ -273,3 +265,19 @@ SELECT r.name AS recipeName
   LEFT JOIN RecipeItemComponent ric ON r.name = ric.recipeName
   LEFT JOIN RecipeItemResult rir ON r.name = rir.recipeName
 GO
+
+CREATE PROC AddItemToWishList
+(
+	@TownId INT,
+	@UserId INT,
+	@ItemId INT,
+	@DateUpdate DATETIME2
+)
+AS
+BEGIN
+	IF(SELECT COUNT(*) FROM TownWishListItem WHERE idTown = @TownId AND idItem = @ItemId) = 0
+		BEGIN
+			UPDATE Town SET idUserWishListUpdater = @UserId, wishlistDateUpdate = @DateUpdate WHERE idTown = @TownId;
+			INSERT INTO TownWishListItem(idTown, idItem, priority, count, depot) VALUES(@TownId, @ItemId, 0, 1, 0);
+		END
+END

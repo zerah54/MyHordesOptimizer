@@ -8,8 +8,10 @@ using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
+using MyHordesOptimizerApi.Models.Views.Items.Bank;
 using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
+using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -40,21 +42,25 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             var sw = new Stopwatch();
             sw.Start();
-            using var connection = new SqlConnection(Configuration.ConnectionString);
-            connection.Open();
-            var exist = connection.ExecuteScalar<int?>("SELECT idTown FROM Town WHERE idTown = @TownId", new { TownId = town.Id });
-            if (!exist.HasValue)
-            {
-                var townModel = Mapper.Map<TownModel>(town);
-                connection.Insert(townModel);
-            }
-            connection.Close();
+            InsertTown(town.Id);
             Logger.LogTrace($"Insertion de la ville : {sw.ElapsedMilliseconds}");
             PatchCitizen(town.Id, town.Citizens);
             Logger.LogTrace($"PatchCitizen : {sw.ElapsedMilliseconds}");
             PutBank(town.Id, town.Bank);
             Logger.LogTrace($"PutBank : {sw.ElapsedMilliseconds}");
             sw.Stop();
+        }
+
+        private void InsertTown(int townId)
+        {
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var exist = connection.ExecuteScalar<int?>("SELECT idTown FROM Town WHERE idTown = @TownId", new { TownId = townId });
+            if (!exist.HasValue)
+            {
+                connection.Execute("INSERT INTO Town(idTown) VALUES(@TownId)", new { TownId = townId });
+            }
+            connection.Close();
         }
 
         public Town GetTown(int townId)
@@ -269,6 +275,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             var sw = new Stopwatch();
             sw.Start();
+            InsertTown(townId);
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
 
@@ -290,12 +297,81 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public BankWrapper GetBank(int townId)
         {
-            throw new NotImplementedException();
+            var query = @$"SELECT idTown AS TownId
+                                 ,item.idItem AS ItemId
+                                 ,item.uid AS ItemUid
+								 ,item.deco AS ItemDeco
+							     ,item.label_fr AS ItemLabelFr
+							     ,item.label_en AS ItemLabelEn
+							     ,item.label_es AS ItemLabelEs
+							     ,item.label_de AS ItemLabelDe
+							     ,item.description_fr AS ItemDescriptionFr
+							     ,item.description_en AS ItemDescriptionEn
+							     ,item.description_es AS ItemDescriptionEs
+							     ,item.description_de AS ItemDescriptionDe
+							     ,item.guard AS ItemGuard
+							     ,item.img AS ItemImg
+							     ,item.isHeaver AS ItemIsHeaver
+							     ,category.idCategory AS CategoryId
+							     ,category.label_fr AS CategoryLabelFr
+							     ,category.label_en AS CategoryLabelEn
+							     ,category.label_es AS CategoryLabelEs
+							     ,category.label_de AS CategoryLabelDe
+							     ,category.name AS CategoryName
+							     ,category.ordering AS CategoryOrdering
+							     ,itemAction.actionName AS ActionName
+							     ,itemProperty.propertyName AS PropertyName
+                                 ,tb.count AS BankCount
+				                 ,tb.isBroken AS BankIsBroken
+                                 ,tb.idLastUpdateInfo AS LastUpdateInfoId
+	                             ,lui.idUser AS LastUpdateInfoUserId
+	                             ,lui.dateUpdate AS LastUpdateDateUpdate
+	                             ,userUpdater.name AS LastUpdateInfoUserName
+                              FROM TownBankItem tb
+                              LEFT JOIN Item item ON item.idItem = tb.idItem
+                              LEFT JOIN Category category ON category.idCategory = item.idCategory
+                              LEFT JOIN ItemAction itemAction ON itemAction.idItem = item.idItem
+                              LEFT JOIN ItemProperty itemProperty ON itemProperty.idItem = item.idItem
+                              LEFT JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = tb.idLastUpdateInfo
+                              LEFT JOIN Users userUpdater ON userUpdater.idUser = lui.idUser
+                              WHERE tb.idTown = @idTown";
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            var townBankItem = connection.Query<BankItemCompletModel>(query, new { idTown = townId });
+            var mostRecent = townBankItem.Max(x => x.LastUpdateDateUpdate);
+            townBankItem = townBankItem.Where(x => x.LastUpdateDateUpdate == mostRecent);
+            var group = townBankItem.GroupBy(x => new BankItemCompletKeyModel(x)).ToList();
+            connection.Close();
+
+            var banksItems = Mapper.Map<List<BankItem>>(group);
+            banksItems.ForEach(bankItemComplet =>
+            {
+                IEnumerable<BankItemCompletModel> bankItemCompletAssocie = townBankItem.Where(x => x.ItemId == bankItemComplet.Item.Id && x.BankIsBroken == bankItemComplet.IsBroken);
+                var item = Mapper.Map<Item>(bankItemCompletAssocie.First());
+                item.Properties = new List<string>(bankItemCompletAssocie.Select(x => x.PropertyName).Distinct());
+                item.Actions = new List<string>(bankItemCompletAssocie.Select(x => x.ActionName).Distinct());
+                bankItemComplet.Item = item;
+            });
+            var bankWrapper = new BankWrapper()
+            {
+                LastUpdateInfo = Mapper.Map<LastUpdateInfo>(townBankItem.First()),
+                Bank = banksItems
+            };
+            return bankWrapper;
         }
 
         #endregion
 
         #region WishList
+
+        public void AddItemToWishlist(int townId, int itemId, int userId)
+        {
+            InsertTown(townId);
+            var query = @"EXECUTE AddItemToWishList @TownId, @UserId, @ItemId, @DateUpdate";
+            using var connection = new SqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Execute(query, new {TownId = townId, UserId = userId, ItemId = itemId, DateUpdate = DateTime.UtcNow});
+            connection.Close();
+        }
 
         public void PutWishList(int townId, WishListWrapper wishList)
         {
@@ -315,6 +391,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             var sw = new Stopwatch();
             sw.Start();
+            InsertTown(townId);
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
             var userIds = wrapper.Citizens.Select(x => x.Id).ToList();

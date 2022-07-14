@@ -6,9 +6,11 @@ using MyHordesOptimizerApi.MappingProfiles.Converters;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
+using MyHordesOptimizerApi.Models.Views.Items.Bank;
 using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace MyHordesOptimizerApi.MappingProfiles
@@ -99,7 +101,9 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             //Town
             CreateMap<Town, TownModel>()
-                .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => src.Id));
+                .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.WishlistDateUpdate, opt => opt.Ignore())
+                .ForMember(dest => dest.IdUserWishListUpdater, opt => opt.Ignore());
 
             //User
             CreateMap<Citizen, UsersModel>()
@@ -149,6 +153,36 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
                 .ForMember(dest => dest.IdTown, opt => opt.Ignore())
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore());
+
+            CreateMap<IGrouping<BankItemCompletKeyModel,BankItemCompletModel>, BankItem>()
+                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.First().BankCount))
+                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.First().BankIsBroken))
+                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => new Item() { Id = src.Key.ItemId }));
+
+            CreateMap<BankItemCompletModel, Item>()
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.ItemImg))
+                .ForMember(dest => dest.Actions, opt => opt.MapFrom(src => src.ActionName))
+                .ForMember(dest => dest.Deco, opt => opt.MapFrom(src => src.ItemDeco))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.ItemDescriptionFr }, { "en", src.ItemDescriptionEn }, { "es", src.ItemDescriptionEs }, { "de", src.ItemDescriptionDe } }))
+                .ForMember(dest => dest.IsHeaver, opt => opt.MapFrom(src => src.ItemIsHeaver))
+                .ForMember(dest => dest.Properties, opt => opt.Ignore())
+                .ForMember(dest => dest.Actions, opt => opt.Ignore())
+                .ForMember(dest => dest.Guard, opt => opt.MapFrom(src => src.ItemGuard))
+                .ForMember(dest => dest.BankCount, opt => opt.MapFrom(src => src.BankCount))
+                .ForMember(dest => dest.Label, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.ItemLabelFr }, { "en", src.ItemLabelEn }, { "es", src.ItemLabelEs }, { "de", src.ItemLabelDe } }))
+                .ForMember(dest => dest.Recipes, opt => opt.Ignore())
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => new Category() { IdCategory = src.CategoryId, Name = src.CategoryName, Ordering = src.CategoryOrdering ,Label = new Dictionary<string, string>() { { "fr", src.CategoryLabelFr }, { "en", src.CategoryLabelEn }, { "es", src.CategoryLabelEs }, { "de", src.CategoryLabelDe } } }))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ItemId))
+                .ForMember(dest => dest.Uid, opt => opt.MapFrom(src => src.ItemUid))
+                .ForMember(dest => dest.WishListCount, opt => opt.Ignore())
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.ItemImg));
+
+            CreateMap<BankItemCompletModel, LastUpdateInfo>()
+             .ForMember(dest => dest.UserKey, opt => opt.Ignore())
+             .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
+             .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
+             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
+
         }
 
         private string RemoveRandomNumber(string img)
