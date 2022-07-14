@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.64
+// @version      1.0.0-alpha.65
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -739,7 +739,7 @@ const wishlist_depot = [
         value: -1,
         label: {
             en: `Not defined`,
-            fr: `Non définie`,
+            fr: `Non défini`,
             de: `Nicht definiert`,
             es: `Indefinida`
         }
@@ -6371,7 +6371,6 @@ function updateWishlist() {
     .map((item) => {
         return {id: item.item.xmlId, priority: item.priority, depot: item.depot, count: item.count};
     });
-    console.log('item_list', item_list);
     startLoading();
     GM_xmlhttpRequest({
         method: 'PUT',
