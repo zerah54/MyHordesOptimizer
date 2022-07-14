@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.63
+// @version      1.0.0-alpha.64
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -1950,7 +1950,7 @@ function displayWishlist() {
                     let wishlist_item = {
                         item: item,
                         priority: 0,
-                        depot: 1,
+                        depot: 0,
                         count: 1,
                         bankCount: item.bankCount,
                     }
@@ -2077,7 +2077,7 @@ function createWishlistItemElement(item) {
 
     let item_depot_select = document.createElement('select');
     item_depot_select.addEventListener('change', () => {
-        item.priority = +item_depot_select.value;
+        item.depot = +item_depot_select.value;
     });
     item_depot_container.appendChild(item_depot_select);
 
@@ -3482,7 +3482,7 @@ function displayWishlistInApp() {
                 .forEach((header_cell_item) => {
                 let header_cell = document.createElement('div');
                 header_cell.classList.add('padded', 'cell');
-                header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : (header_cell_item.id === 'priority' ? 'rw-3' : 'rw-2'));
+                header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : ((header_cell_item.id === 'priority' || header_cell_item.id === 'depot') ? 'rw-3' : 'rw-2'));
                 header_cell.innerText = getI18N(header_cell_item.label);
                 list_header.appendChild(header_cell);
             });
@@ -3502,6 +3502,11 @@ function displayWishlistInApp() {
                 item_priority.classList.add('padded', 'cell', 'rw-3');
                 item_priority.innerHTML = `<span class="small">${getI18N(wishlist_priorities.find((priority) => item.priority.toString().slice(0, 1) === priority.value.toString().slice(0, 1)).label)}</span>`;
                 list_item.appendChild(item_priority);
+
+                let item_depot = document.createElement('span');
+                item_depot.classList.add('padded', 'cell', 'rw-3');
+                item_depot.innerHTML = `<span class="small">${getI18N(wishlist_depot.find((depot) => item.depot === depot.value).label)}</span>`;
+                list_item.appendChild(item_depot);
 
                 let bank_count = document.createElement('span');
                 bank_count.classList.add('padded', 'cell', 'rw-2');
@@ -3619,7 +3624,7 @@ function displayPriorityOnItems() {
 /** Affiche les tooltips avancés */
 function displayAdvancedTooltips() {
     if (mho_parameters.enhanced_tooltips && items) {
-      
+
         let tooltip_container = document.getElementById('tooltip_container');
         let advanced_tooltip_container = document.getElementById('mho-advanced-tooltip');
         if (tooltip_container.innerHTML) {
@@ -3638,9 +3643,9 @@ function displayAdvancedTooltips() {
                 let tooltip_content = tooltip_container.firstElementChild;
                 let item_deco = tooltip_content.getElementsByClassName('item-tag-deco')[0];
                 let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
-              
+
                 if (should_display_advanced_tooltip) {
-                  
+
                     if (!advanced_tooltip_container) {
                         advanced_tooltip_container = document.createElement('div');
                         advanced_tooltip_container.id = 'mho-advanced-tooltip';
@@ -6366,6 +6371,7 @@ function updateWishlist() {
     .map((item) => {
         return {id: item.item.xmlId, priority: item.priority, depot: item.depot, count: item.count};
     });
+    console.log('item_list', item_list);
     startLoading();
     GM_xmlhttpRequest({
         method: 'PUT',
