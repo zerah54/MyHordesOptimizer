@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.65
+// @version      1.0.0-alpha.66
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,8 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Dans la liste de courses, ajout de la possibilité de sélectionner un endroit où rapporter l'objet (banque ou zone de rapatriement) \n`
-+ `[Correctif] Ajout d'une phrase explicative sur le champ d'ajout d'un objet à la liste de courses \n`;
++ `[Nouveauté] Ajout d'un certificat de sécurité \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -55,8 +54,8 @@ let mh_user = GM_getValue(mh_user_key);
 // L'URL de L'API //
 ////////////////////
 
-const api_url = 'https://myhordesoptimizerapi.azurewebsites.net/';
-const api2_url = 'http://144.24.192.182';
+const api_url = 'https://api.myhordesoptimizer.fr';
+const api_url_2 = 'https://myhordesoptimizerapi.azurewebsites.net/';
 
 ///////////////////////////////////////////
 // Listes de constantes / Constants list //
@@ -1079,7 +1078,7 @@ let params_categories = [
         //     },
         //     help: {
         //         en: `Shows an icon next to the usernames in the forum, allowing to block / unblock a user. If a user is blocked, this option will hide their messages (while allowing to show again any message).`,
-        //         fr: `Affiche un icône devant les noms d'utilisateurs sur le forum, permettant de bloquer / débloquer un utilisateur. 
+        //         fr: `Affiche un icône devant les noms d'utilisateurs sur le forum, permettant de bloquer / débloquer un utilisateur.
         //         Si un utilisateur est bloqué, masque ses messages tout en permettant de réafficher chaque message au besoin.`,
         //         de: `TODO`,
         //         es: `Muestra un ícono junto a los nombres de usuario en el foro que permite bloquear / desbloquear a un usuario. Si un usuario ha sido bloqueado, sus mensajes serán ocultados (pero es posible volver a mostrar cualquier mensaje si se desea).`
@@ -1126,45 +1125,45 @@ let params_categories = [
 
 let informations = [
     {
-        id: `website`, 
+        id: `website`,
         label: {
             en: `Website`,
             fr: `Site web`,
             de: `Webseite`,
             es: `Sitio web`
-        }, 
+        },
         src: `https://myhordes-optimizer.web.app/`, action: () => {}, img: `emotes/explo.gif`
     },
     {
-        id: `version`, 
+        id: `version`,
         label: {
             en: `Changelog ${GM_info.script.version}`,
             fr: `Notes de version ${GM_info.script.version}`,
             de: `Changelog ${GM_info.script.version}`,
             es: `Notas de la versión ${GM_info.script.version}`
-        }, 
+        },
         src: undefined, action: () => {alert(changelog)}, img: `emotes/rptext.gif`
     },
     {
-        id: `discord-url-id`, 
+        id: `discord-url-id`,
         label: {
             en: `Bugs? Ideas?`,
             fr: `Des bugs ? Des idées ?`,
             de: `Fehler ? Ideen ?`,
             es: `¿Bugs? ¿Ideas?`
-        }, 
-        src: `https://discord.gg/ZQH7ZPWcCm`, 
-        action: undefined, 
+        },
+        src: `https://discord.gg/ZQH7ZPWcCm`,
+        action: undefined,
         img: `${repo_img_url}discord.ico`
     },
     {
-        id: `empty-app-id`, 
+        id: `empty-app-id`,
         label: {
             en: `Remove your external ID for apps`,
             fr: `Retirer votre ID d'app externe`,
             de: `TODO`,
             es: `Eliminar su ID externo para aplicaciones`
-        }, 
+        },
         src: undefined, action: () => removeExternalAppId(), img: `icons/small_remove.gif`
     }
 ];
@@ -1358,7 +1357,7 @@ function copyToClipboard(text) {
  */
 function removeExternalAppId() {
     GM_setValue(gm_mh_external_app_id_key, '')
-    
+
     external_app_id = GM_getValue(gm_mh_external_app_id_key);
 
     createOptimizerButtonContent();
@@ -1367,7 +1366,7 @@ function removeExternalAppId() {
 function createSelectWithSearch() {
 
     let select_complete = document.createElement('div');
-    
+
     let select = document.createElement('label');
 
     let input = document.createElement('input');
@@ -3281,11 +3280,11 @@ function createUpdateExternalToolsButton() {
         updater_title_mho_img.style.height = '24px';
         updater_title_mho_img.style.marginRight = '0.5em';
         updater_title.appendChild(updater_title_mho_img);
-        
+
         let updater_title_text = document.createElement('text');
         updater_title_text.innerHTML = GM_info.script.name;
         updater_title.appendChild(updater_title_text);
-        
+
         updater_bloc.appendChild(updater_title);
 
         let btn = document.createElement('button');
@@ -3361,7 +3360,7 @@ function displaySearchFieldOnBuildings() {
             });
 
             search_field_container.appendChild(search_field);
-            
+
             let header_mho_img = document.createElement('img');
             header_mho_img.src = mh_optimizer_icon;
             header_mho_img.style.height = '24px';
@@ -3585,7 +3584,7 @@ function displayWishlistInApp() {
         header_mho_img.style.height = '24px';
         header_mho_img.style.marginRight = '0.5em';
         header_title.appendChild(header_mho_img);
-        
+
         let header_label = document.createElement('span');
         header_label.innerText = getI18N(tabs_list.tools.find((tool) => tool.id === 'wishlist').label);
         header_title.appendChild(header_label);
@@ -4101,17 +4100,17 @@ function createDisplayMapButton() {
             btn_container.setAttribute('style', `right: ${position}px`);
 
             let btn = document.createElement('div');
-            
+
             let btn_mho_img = document.createElement('img');
             btn_mho_img.src = mh_optimizer_icon;
             btn_mho_img.style.height = '16px';
             btn_mho_img.style.marginRight = '0.5em';
             btn.appendChild(btn_mho_img);
-            
+
             let btn_img = document.createElement('img');
             btn_img.src = repo_img_hordes_url + 'emotes/explo.gif';
             btn.appendChild(btn_img);
-            
+
             btn.addEventListener('click', (event) => {
                 event.stopPropagation();
                 event.preventDefault();
@@ -4722,16 +4721,16 @@ function displayNbDeadZombies() {
                 let content_dead_zombie = document.createElement('div')
                 content_dead_zombie.classList.add('cell', 'rw-12', 'center');
                 zone_dead_zombies.appendChild(content_dead_zombie);
-                
+
                 let btn_mho_img = document.createElement('img');
                 btn_mho_img.src = mh_optimizer_icon;
                 btn_mho_img.style.height = '16px';
                 btn_mho_img.style.marginRight = '0.25em';
                 content_dead_zombie.appendChild(btn_mho_img);
-            
+
                 let nb_dead_zombies_text = document.createElement('text');
                 nb_dead_zombies_text.innerHTML = `${getI18N(texts.nb_dead_zombies)} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`;
-                
+
                 content_dead_zombie.appendChild(nb_dead_zombies_text);
 
                 zone_dist.parentNode.appendChild(zone_dead_zombies);
@@ -4778,7 +4777,7 @@ function displayTranslateTool() {
         btn_mho_img.style.position = 'relative';
         btn_mho_img.style.top = '-25px';
         label.insertBefore(btn_mho_img, label.lastElementChild);
-        
+
         let select = document.createElement('select');
         select.classList.add('small');
         select.setAttribute('style', 'height: 25px; width: 35px; font-size: 12px');
@@ -4818,16 +4817,16 @@ function blockUsersPosts() {
                 let user = post.querySelector('.username');
                 let user_id = user.getAttribute('x-user-id');
                 if (user_id === mh_user.id.toString()) return;
-              
+
                 let blacklist = GM_getValue(mho_blacklist_key);
                 if (!blacklist) {
                     blacklist = [];
                 }
-              
+
                 let is_user_in_blacklist = blacklist.some((blacklist_user_id) => blacklist_user_id === user_id) ;
                 let original_post_content = post.querySelector('.forum-post-content:not(.replace-original)');
                 let new_post_content = post.querySelector('.replace-original');
-              
+
                 if (!blacklisted_user) {
                     blacklisted_user = document.createElement('span');
                     blacklisted_user.id = 'blacklist';
@@ -4851,10 +4850,10 @@ function blockUsersPosts() {
                         GM_setValue(mho_blacklist_key, [...temp_blacklist]);
                         blacklist = [...GM_getValue(mho_blacklist_key)];
                     });
-                    
+
                     user.parentNode.insertBefore(blacklisted_user, user);
                 }
- 
+
                 if (is_user_in_blacklist) {
                     blacklisted_user.innerHTML = '&#10007;';
                     blacklisted_user.setAttribute('blacklisted', true);
@@ -4862,9 +4861,9 @@ function blockUsersPosts() {
                     if (!original_post_content.classList.contains('force-display')) {
                         original_post_content.style.display = 'none';
                     }
-                  
-                  
-                    if (!new_post_content) {  
+
+
+                    if (!new_post_content) {
                         new_post_content = document.createElement('div');
                         new_post_content.classList.add('forum-post-content', 'replace-original');
                         let link = document.createElement('a');
@@ -4922,9 +4921,9 @@ function createCopyButton(source, map, map_id, button_block_id) {
             fm_block: source === 'fm' && map === 'map' ? map_to_convert.outerHTML : (GM_getValue(mho_map_key) ? GM_getValue(mho_map_key).fm_block : undefined),
             ruin: map === 'ruin' ? map_to_convert.outerHTML : (GM_getValue(mho_map_key) ? GM_getValue(mho_map_key).ruin : undefined)
         });
-        
+
         copy_button.innerHTML = copyText(getI18N(texts.copy_map_end), getI18N(texts.copy_map_end_more));
-        
+
         setTimeout(() => {
             copy_button.innerHTML = copyText(getI18N(texts.copy_map), '');
         }, 5000)
@@ -5938,11 +5937,11 @@ async function getFMMap() {
 
         let map_html = document.createElement('div');
         map_html.innerHTML = GM_getValue(mho_map_key).fm_block;
-        
+
         let new_map = [];
         let map = Array.from(map_html.querySelector('#map').children);
         let x_mapping = Array.from(map[0].children).map((x) => x.innerText);
-        
+
         map
             .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
             .forEach((row) => {
@@ -6094,7 +6093,7 @@ function getItems() {
     startLoading();
     GM_xmlhttpRequest({
         method: 'GET',
-        url: api2_url + '/myhordesfetcher/items?userKey=' + external_app_id,
+        url: api_url + '/myhordesfetcher/items?userKey=' + external_app_id,
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
@@ -6136,7 +6135,7 @@ async function getRuins() {
             startLoading();
             GM_xmlhttpRequest({
                 method: 'GET',
-                url: api_url + 'myhordesfetcher/ruins?userKey=' + external_app_id,
+                url: api_url + '/myhordesfetcher/ruins?userKey=' + external_app_id,
                 responseType: 'json',
                 onload: function(response){
                     if (response.status === 200) {
@@ -6172,7 +6171,7 @@ function getMe() {
         startLoading();
         GM_xmlhttpRequest({
             method: 'GET',
-            url: api2_url + '/myhordesfetcher/me?userKey=' + external_app_id,
+            url: api_url + '/myhordesfetcher/me?userKey=' + external_app_id,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6209,7 +6208,7 @@ async function getTown() {
         startLoading();
         GM_xmlhttpRequest({
             method: 'GET',
-            url: api2_url + '/myhordesfetcher/town?userKey=' + external_app_id,
+            url: api_url + '/myhordesfetcher/town?userKey=' + external_app_id,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6238,7 +6237,7 @@ async function getCitizens() {
             startLoading();
             GM_xmlhttpRequest({
                 method: 'GET',
-                url: api2_url + '/myhordesfetcher/citizens?userKey=' + external_app_id,
+                url: api_url + '/myhordesfetcher/citizens?userKey=' + external_app_id,
                 responseType: 'json',
                 onload: function(response){
                     if (response.status === 200) {
@@ -6267,7 +6266,7 @@ async function getBank() {
         startLoading();
         GM_xmlhttpRequest({
             method: 'GET',
-            url: api2_url + '/myhordesfetcher/bank?userKey=' + external_app_id,
+            url: api_url + '/myhordesfetcher/bank?userKey=' + external_app_id,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6311,7 +6310,7 @@ function getWishlist() {
     startLoading();
     GM_xmlhttpRequest({
         method: 'GET',
-        url: api2_url + '/wishlist?userKey=' + external_app_id,
+        url: api_url + '/wishlist?userKey=' + external_app_id,
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
@@ -6342,7 +6341,7 @@ async function addItemToWishlist(item) {
         startLoading();
         GM_xmlhttpRequest({
             method: 'POST',
-            url: api2_url + '/wishlist/add/' + item.xmlId + '?userKey=' + external_app_id,
+            url: api_url + '/wishlist/add/' + item.xmlId + '?userKey=' + external_app_id,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6374,7 +6373,7 @@ function updateWishlist() {
     startLoading();
     GM_xmlhttpRequest({
         method: 'PUT',
-        url: api2_url + '/wishlist?userKey=' + external_app_id,
+        url: api_url + '/wishlist?userKey=' + external_app_id,
         data: JSON.stringify(item_list),
         responseType: 'json',
         headers: {
@@ -6410,7 +6409,7 @@ function updateExternalTools() {
     let btn = document.getElementById(mh_update_external_tools_id);
     GM_xmlhttpRequest({
         method: 'POST',
-        url: api2_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id,
+        url: api_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id,
         data: JSON.stringify(tools_to_update),
         headers: {
             'Content-Type': 'application/json'
@@ -6448,7 +6447,7 @@ async function getHeroSkills() {
             startLoading();
             GM_xmlhttpRequest({
                 method: 'GET',
-                url: api2_url + '/myhordesfetcher/heroSkills',
+                url: api_url + '/myhordesfetcher/heroSkills',
                 responseType: 'json',
                 onload: function(response){
                     if (response.status === 200) {
@@ -6490,7 +6489,7 @@ function getTranslation(string_to_translate, source_language, block_to_display) 
         startLoading();
         GM_xmlhttpRequest({
             method: 'GET',
-            url: api2_url + '/myhordestranslation?' + locale + '&' + sourceString,
+            url: api_url + '/myhordestranslation?' + locale + '&' + sourceString,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6589,7 +6588,7 @@ async function getRecipes() {
             startLoading();
             GM_xmlhttpRequest({
                 method: 'GET',
-                url: api2_url + '/myhordesfetcher/recipes',
+                url: api_url + '/myhordesfetcher/recipes',
                 responseType: 'json',
                 onload: function(response){
                     if (response.status === 200) {
@@ -6631,7 +6630,7 @@ async function getTodayEstimation(day, estimations, today) {
         startLoading();
         GM_xmlhttpRequest({
             method: 'POST',
-            url: api2_url + `:8080/${today ? 'attaque' : 'planif'}.php?day=${day}&id=${mh_user.townId}&type=normal&debug=false`,
+            url: api_url + `:8080/${today ? 'attaque' : 'planif'}.php?day=${day}&id=${mh_user.townId}&type=normal&debug=false`,
             data: JSON.stringify(estimations),
             responseType: 'text',
             onload: function(response){
@@ -6661,7 +6660,7 @@ async function getOptimalPath(map, html, button) {
         GM_xmlhttpRequest({
             method: 'POST',
             data: JSON.stringify(map),
-            url: api2_url + '/ruine/pathopti',
+            url: api_url + '/ruine/pathopti',
             responseType: 'json',
             headers: {
                 'Content-Type': 'application/json'
