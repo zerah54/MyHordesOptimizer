@@ -9,7 +9,7 @@
                     <table mat-table [dataSource]="datasource" matSort>
 
                         <ng-container matColumnDef="filters">
-                            <td mat-header-cell *matHeaderCellDef colspan="6">
+                            <td mat-header-cell *matHeaderCellDef colspan="7">
                                 <div class="table-filters">
                                     <mho-filter (filterChange)="applyFilter($event)"></mho-filter>
                                     <mat-form-field appearance="standard">
@@ -49,6 +49,16 @@
                                         </mat-form-field>
                                     </ng-container>
 
+                                    <ng-container *ngSwitchCase="'depot'">
+                                        <mat-form-field>
+                                            <mat-select [(value)]="row.depot">
+                                                <mat-option *ngFor="let depot of depots" [value]="depot.count">
+                                                    {{depot.label}}
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </ng-container>
+
                                     <ng-container *ngSwitchCase="'bank_count'">
                                         {{row.bank_count}}
                                     </ng-container>
@@ -77,7 +87,7 @@
 
                         <!-- Footer -->
                         <ng-container matColumnDef="save">
-                            <td mat-footer-cell *matFooterCellDef style="text-align: right;" colspan="6">
+                            <td mat-footer-cell *matFooterCellDef style="text-align: right;" colspan="7">
                                 <button mat-button [color]="'accent'" (click)="updateWishlist()" i18n>Enregistrer</button>
                             </td>
                         </ng-container>
