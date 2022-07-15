@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.66
+// @version      1.0.0-alpha.67
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Ajout d'un certificat de sécurité \n`;
++ `[Correctif] On essaie d'améliorer les performances \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1886,18 +1886,15 @@ function displayBank(tab_id) {
 
 /** Affiche les éléments présents dans la liste de courses */
 function displayWishlist() {
-    wishlist = undefined;
-    getWishlist();
-    let interval = setInterval(() => {
+    getWishlist().then(() => {
         if (wishlist) {
-            clearInterval(interval);
             let tab_content = document.getElementById('tab-content');
 
             let tab_content_header = document.createElement('div');
             tab_content_header.setAttribute('style', 'margin: 0 0.5em; display: flex; justify-content: space-between; height: 25px;');
             tab_content.appendChild(tab_content_header);
 
-             let last_update = document.createElement('span');
+            let last_update = document.createElement('span');
             last_update.classList.add('small');
             last_update.setAttribute('style', 'margin-right: 0.5em;');
             if (wishlist.lastUpdateInfo) {
@@ -1989,7 +1986,7 @@ function displayWishlist() {
                 wishlist_list.appendChild(createWishlistItemElement(item));
             });
         }
-    }, 500);
+    });
 }
 
 function createWishlistItemElement(item) {
@@ -3676,12 +3673,12 @@ function createAdvancedProperties(content, item, tooltip) {
         let bank_div = document.createElement('div');
         stock_div.appendChild(bank_div);
         stock_div.style.borderBottom = '1px solid white';
-        bank_div.innerText = getI18N(wishlist_headers[2].label) + ' : ' + item.bankCount;
+        bank_div.innerText = getI18N(wishlist_headers[3].label) + ' : ' + item.bankCount;
 
         if (item.wishListCount && item.wishListCount > 0) {
             let wishlist_wanted_div = document.createElement('div');
             stock_div.appendChild(wishlist_wanted_div);
-            wishlist_wanted_div.innerText = getI18N(wishlist_headers[3].label) + ' : ' + item.wishListCount;
+            wishlist_wanted_div.innerText = getI18N(wishlist_headers[4].label) + ' : ' + item.wishListCount;
         }
     }
     if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0) return;
@@ -4794,11 +4791,89 @@ function displayTranslateTool() {
 
         label.insertBefore(select, input);
 
-        let options = mho_display_translate_input_div.lastElementChild;
-        options.setAttribute('style', 'float: right; z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
+        let block_to_display = mho_display_translate_input_div.lastElementChild;
+        block_to_display.setAttribute('style', 'float: right; z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
         input.addEventListener('keyup', (event) => {
             if (event.key === 'Enter') {
-                getTranslation(input.value, select.value, options);
+                getTranslation(input.value, select.value).then((response) => {
+
+                    block_to_display.innerHTML = '';
+                    let show_exact_match = response.translations.some((translation) => translation.key.isExactMatch);
+
+                    if (show_exact_match) {
+                        let display_all = document.createElement('div');
+                        display_all.setAttribute('style', 'padding: 4px; border-bottom: 1px solid; cursor: pointer');
+                        let display_all_img = document.createElement('img');
+                        display_all_img.src = `${repo_img_hordes_url}/icons/small_more.gif`;
+                        display_all_img.setAttribute('style', 'margin-right: 8px');
+
+                        let display_all_text = document.createElement('text');
+                        display_all_text.innerText = getI18N(texts.display_all_search_result);
+
+                        display_all.appendChild(display_all_img);
+                        display_all.appendChild(display_all_text);
+                        block_to_display.appendChild(display_all);
+
+                        display_all.addEventListener('click', () => {
+                            show_exact_match = !show_exact_match;
+                            if (show_exact_match) {
+                                display_all_img.src = `${repo_img_hordes_url}/icons/small_more.gif`;
+                                display_all_text.innerHTML = getI18N(texts.display_all_search_result);
+                            } else {
+                                display_all_img.src = `${repo_img_hordes_url}/icons/small_less.gif`;
+                                display_all_text.innerHTML = getI18N(texts.display_exact_search_result);
+                            }
+                            let not_exact = Array.from(block_to_display.getElementsByClassName('not-exact'));
+                            not_exact.forEach((not_exact_item) => {
+                                not_exact_item.classList.toggle('hidden');
+                            })
+                        });
+                    }
+                    response.translations
+                        .forEach((translation) => {
+                        if (response.translations.length > 1) {
+                            let context_div = document.createElement('div');
+                            context_div.setAttribute('style', 'text-align: center; padding: 4px; font-variant: small-caps; font-size: 14px;');
+                            context_div.innerHTML = getI18N(texts.translation_file_context) + ` <img src="${repo_img_hordes_url}/emotes/arrowright.gif"> ` + translation.key.context;
+                            if (!translation.key.isExactMatch && show_exact_match) {
+                                context_div.classList.add('not-exact','hidden');
+                            }
+                            block_to_display.appendChild(context_div);
+                        }
+                        let key_index = 0;
+                        for (let lang_key in translation.value) {
+                            let lang = translation.value[lang_key];
+                            lang.forEach((result) => {
+                                let content_div = document.createElement('div');
+                                let img = document.createElement('img');
+                                img.src = `${repo_img_hordes_url}/lang/${lang_key}.png`
+                                img.setAttribute('style', 'margin-right: 8px');
+
+                                let button_div = document.createElement('div');
+                                let button = document.createElement('button');
+                                button_div.appendChild(button);
+                                button.innerHTML = '&#10697';
+                                button.setAttribute('style', 'font-size: 16px');
+                                button.addEventListener('click', () => {
+                                    copyToClipboard(result);
+                                });
+                                content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px;');
+
+                                if (key_index === Object.keys(translation.value).length - 1) {
+                                    content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid;');
+                                }
+                                content_div.innerHTML = `<div>${img.outerHTML}${result}</div>`;
+                                content_div.appendChild(button_div);
+
+                                if (!translation.key.isExactMatch && show_exact_match) {
+                                    content_div.classList.add('not-exact','hidden');
+                                }
+                                block_to_display.appendChild(content_div);
+                            });
+                            key_index ++;
+                        };
+                    });
+                });
             }
         });
         gma.appendChild(mho_display_translate_input_div);
@@ -6089,43 +6164,46 @@ async function getFMRuin() {
 // Appels API //
 ////////////////
 
-function getItems() {
-    startLoading();
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url: api_url + '/myhordesfetcher/items?userKey=' + external_app_id,
-        responseType: 'json',
-        onload: function(response){
-            if (response.status === 200) {
-                items = response.response
-                    .map((item) => {
-                    item.category = getCategory(item.category);
-                    item.img = item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
-                    return item;
-                })
-                    .sort((item_a, item_b) => {
-                    if (item_a.category.ordering > item_b.category.ordering) {
-                      return 1;
-                    } else if (item_a.category.ordering === item_b.category.ordering) {
-                      return 0;
-                    } else {
-                      return -1;
+async function getItems() {
+    return new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: api_url + '/myhordesfetcher/items?userKey=' + external_app_id,
+            responseType: 'json',
+            onload: function(response){
+                if (response.status === 200) {
+                    items = response.response
+                        .map((item) => {
+                        item.category = getCategory(item.category);
+                        item.img = item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
+                        return item;
+                    })
+                        .sort((item_a, item_b) => {
+                        if (item_a.category.ordering > item_b.category.ordering) {
+                            return 1;
+                        } else if (item_a.category.ordering === item_b.category.ordering) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    });
+                    console.log('items', items);
+                    let wiki_btn = document.getElementById(wiki_btn_id);
+                    if (wiki_btn) {
+                        wiki_btn.setAttribute('style', 'display: inherit');
                     }
-                });
-                console.log('items', items);
-                let wiki_btn = document.getElementById(wiki_btn_id);
-                if (wiki_btn) {
-                    wiki_btn.setAttribute('style', 'display: inherit');
+                    resolve(items);
+                } else {
+                    addError(response);
+                    reject(response);
                 }
-            } else {
-                addError(response);
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
+                reject(error);
             }
-            endLoading();
-        },
-        onerror: function(error){
-            endLoading();
-            addError(error);
-        }
+        });
     });
 }
 
@@ -6166,40 +6244,43 @@ async function getRuins() {
 }
 
 /** Récupère les informations de la ville */
-function getMe() {
-    if (external_app_id) {
-        startLoading();
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: api_url + '/myhordesfetcher/me?userKey=' + external_app_id,
-            responseType: 'json',
-            onload: function(response){
-                if (response.status === 200) {
-                    mh_user = response.response;
-                    if (mh_user.id === 0 && mh_user.townId === 0) {
-                        mh_user = '';
-                        GM_setValue(gm_mh_external_app_id_key, undefined);
-                        external_app_id = undefined;
-                    }
-                    GM_setValue(mh_user_key, mh_user);
-                    console.log('MHO - I am...', mh_user);
+async function getMe() {
+    return new Promise((resolve, reject) => {
+        if (external_app_id) {
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: api_url + '/myhordesfetcher/me?userKey=' + external_app_id,
+                responseType: 'json',
+                onload: function(response){
+                    if (response.status === 200) {
+                        mh_user = response.response;
+                        if (mh_user.id === 0 && mh_user.townId === 0) {
+                            mh_user = '';
+                            GM_setValue(gm_mh_external_app_id_key, undefined);
+                            external_app_id = undefined;
+                        }
+                        GM_setValue(mh_user_key, mh_user);
+                        console.log('MHO - I am...', mh_user);
 
-                    getItems();
+                        getItems();
 
-                    if (mh_user.townId) {
-                        getWishlist();
+                        if (mh_user.townId) {
+                            getWishlist();
+                        }
+                        resolve();
+                    } else {
+                        addError(response);
+                        reject(response);
                     }
-                } else {
-                    addError(response);
+                },
+                onerror: function(error){
+                    endLoading();
+                    addError(error);
+                    reject(error);
                 }
-                endLoading();
-            },
-            onerror: function(error){
-                endLoading();
-                addError(error);
-            }
-        });
-    }
+            });
+        }
+    });
 }
 
 /** Récupère les informations de la ville */
@@ -6306,29 +6387,33 @@ async function getBank() {
 }
 
 /** Récupère les informations de liste de course */
-function getWishlist() {
-    startLoading();
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url: api_url + '/wishlist?userKey=' + external_app_id,
-        responseType: 'json',
-        onload: function(response){
-            if (response.status === 200) {
-                wishlist = response.response;
-                wishlist.wishList = Object.keys(wishlist.wishList)
-                    .map((key) => wishlist.wishList[key])
-                    .sort((item_a, item_b) => item_b.priority > item_a.priority);
-                wishlist.wishList.forEach((item) => item.item.img = item.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3'));
-            } else {
-                wishlist;
-                addError(response);
+async function getWishlist() {
+    return new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: api_url + '/wishlist?userKey=' + external_app_id,
+            responseType: 'json',
+            onload: function(response){
+                if (response.status === 200) {
+                    wishlist = response.response;
+                    wishlist.wishList = Object.keys(wishlist.wishList)
+                        .map((key) => wishlist.wishList[key])
+                        .sort((item_a, item_b) => item_b.priority > item_a.priority);
+                    wishlist.wishList.forEach((item) => {
+                        item.item.img = item.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3')
+                    });
+                    resolve(response);
+                } else {
+                    wishlist = undefined;
+                    addError(response);
+                    reject(response);
+                }
+            },
+            onerror: function(error){
+                addError(error);
+                reject(error);
             }
-            endLoading();
-        },
-        onerror: function(error){
-            endLoading();
-            addError(error);
-        }
+        });
     });
 }
 
@@ -6481,104 +6566,33 @@ async function getHeroSkills() {
 
 
 /** Récupère les traductions de la chaine de caractères */
-function getTranslation(string_to_translate, source_language, block_to_display) {
-    block_to_display.innerHTML = '';
-    if (string_to_translate && string_to_translate !== '') {
-        let locale = 'locale=' + source_language;
-        let sourceString = 'sourceString=' + string_to_translate;
-        startLoading();
-        GM_xmlhttpRequest({
-            method: 'GET',
-            url: api_url + '/myhordestranslation?' + locale + '&' + sourceString,
-            responseType: 'json',
-            onload: function(response){
-                if (response.status === 200) {
-                    let show_exact_match = response.response.translations.some((translation) => translation.key.isExactMatch);
-
-                    if (show_exact_match) {
-                        let display_all = document.createElement('div');
-                        display_all.setAttribute('style', 'padding: 4px; border-bottom: 1px solid; cursor: pointer');
-                        let display_all_img = document.createElement('img');
-                        display_all_img.src = `${repo_img_hordes_url}/icons/small_more.gif`;
-                        display_all_img.setAttribute('style', 'margin-right: 8px');
-
-                        let display_all_text = document.createElement('text');
-                        display_all_text.innerText = getI18N(texts.display_all_search_result);
-
-                        display_all.appendChild(display_all_img);
-                        display_all.appendChild(display_all_text);
-                        block_to_display.appendChild(display_all);
-
-                        display_all.addEventListener('click', () => {
-                            show_exact_match = !show_exact_match;
-                            if (show_exact_match) {
-                                display_all_img.src = `${repo_img_hordes_url}/icons/small_more.gif`;
-                                display_all_text.innerHTML = getI18N(texts.display_all_search_result);
-                            } else {
-                                display_all_img.src = `${repo_img_hordes_url}/icons/small_less.gif`;
-                                display_all_text.innerHTML = getI18N(texts.display_exact_search_result);
-                            }
-                            let not_exact = Array.from(block_to_display.getElementsByClassName('not-exact'));
-                            not_exact.forEach((not_exact_item) => {
-                                not_exact_item.classList.toggle('hidden');
-                            })
-                        });
+async function getTranslation(string_to_translate, source_language) {
+    return new Promise((resolve, reject) => {
+        if (string_to_translate && string_to_translate !== '') {
+            let locale = 'locale=' + source_language;
+            let sourceString = 'sourceString=' + string_to_translate;
+            startLoading();
+            GM_xmlhttpRequest({
+                method: 'GET',
+                url: api_url + '/myhordestranslation?' + locale + '&' + sourceString,
+                responseType: 'json',
+                onload: function(response){
+                    if (response.status === 200) {
+                        resolve(response.response);
+                    } else {
+                        addError(response);
+                        reject(response);
                     }
-                    response.response.translations
-                        .forEach((translation) => {
-                        if (response.response.translations.length > 1) {
-                            let context_div = document.createElement('div');
-                            context_div.setAttribute('style', 'text-align: center; padding: 4px; font-variant: small-caps; font-size: 14px;');
-                            context_div.innerHTML = getI18N(texts.translation_file_context) + ` <img src="${repo_img_hordes_url}/emotes/arrowright.gif"> ` + translation.key.context;
-                            if (!translation.key.isExactMatch && show_exact_match) {
-                                context_div.classList.add('not-exact','hidden');
-                            }
-                            block_to_display.appendChild(context_div);
-                        }
-                        let key_index = 0;
-                        for (let lang_key in translation.value) {
-                            let lang = translation.value[lang_key];
-                            lang.forEach((result) => {
-                                let content_div = document.createElement('div');
-                                let img = document.createElement('img');
-                                img.src = `${repo_img_hordes_url}/lang/${lang_key}.png`
-                                img.setAttribute('style', 'margin-right: 8px');
-
-                                let button_div = document.createElement('div');
-                                let button = document.createElement('button');
-                                button_div.appendChild(button);
-                                button.innerHTML = '&#10697';
-                                button.setAttribute('style', 'font-size: 16px');
-                                button.addEventListener('click', () => {
-                                    copyToClipboard(result);
-                                });
-                                content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px;');
-
-                                if (key_index === Object.keys(translation.value).length - 1) {
-                                    content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid;');
-                                }
-                                content_div.innerHTML = `<div>${img.outerHTML}${result}</div>`;
-                                content_div.appendChild(button_div);
-
-                                if (!translation.key.isExactMatch && show_exact_match) {
-                                    content_div.classList.add('not-exact','hidden');
-                                }
-                                block_to_display.appendChild(content_div);
-                            });
-                            key_index ++;
-                        };
-                    });
-                } else {
-                    addError(response);
+                    endLoading();
+                },
+                onerror: function(error){
+                    endLoading();
+                    addError(error);
+                    reject(error);
                 }
-                endLoading();
-            },
-            onerror: function(error){
-                endLoading();
-                addError(error);
-            }
-        });
-    }
+            });
+        }
+    });
 }
 
 /** Récupère la liste complète des recettes */
@@ -6761,32 +6775,33 @@ async function getOptimalPath(map, html, button) {
             GM_setValue('version', version);
         }
 
-        getMe();
-        initOptions();
-        /** Gère le bouton de mise à jour des outils externes) */
-        if (!buttonOptimizerExists()) {
-            createStyles();
-            createOptimizerBtn();
-            createWindow();
-        }
+        getMe().then(() => {
+            initOptions();
+            /** Gère le bouton de mise à jour des outils externes) */
+            if (!buttonOptimizerExists()) {
+                createStyles();
+                createOptimizerBtn();
+                createWindow();
+            }
 
-        notifyOnSearchEnd();
+            notifyOnSearchEnd();
 
-        setInterval(() => {
-            createUpdateExternalToolsButton();
-            clickOnVotedToRedirect();
-            displaySearchFieldOnBuildings();
-            displayMinApOnBuildings();
-            displayWishlistInApp();
-            displayPriorityOnItems();
-            displayNbDeadZombies();
-            displayTranslateTool();
-            // blockUsersPosts();
-        }, 500);
+            setInterval(() => {
+                createUpdateExternalToolsButton();
+                clickOnVotedToRedirect();
+                displaySearchFieldOnBuildings();
+                displayMinApOnBuildings();
+                displayWishlistInApp();
+                displayPriorityOnItems();
+                displayNbDeadZombies();
+                displayTranslateTool();
+                // blockUsersPosts();
+            }, 500);
 
-        setInterval(() => {
-            displayAdvancedTooltips();
-        }, 100);
+            setInterval(() => {
+                displayAdvancedTooltips();
+            }, 100);
+        });
     }
 
 })();
