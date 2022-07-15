@@ -2,11 +2,13 @@
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
+using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace MyHordesOptimizerApi.Services.Impl
@@ -35,9 +37,14 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public WishListWrapper GetWishList(int townId)
         {
+            var sw = new Stopwatch();
+            sw.Start();
             var wishList = MyHordesOptimizerRepository.GetWishList(townId);
+            Logger.LogInformation($"[GetWishList] GetWishList : {sw.ElapsedMilliseconds}");
             var recipes = MyHordesOptimizerRepository.GetRecipes();
+            Logger.LogInformation($"[GetWishList] GetRecipes : {sw.ElapsedMilliseconds}");
             var bank = MyHordesOptimizerRepository.GetBank(townId);
+            Logger.LogInformation($"[GetWishList] GetBank : {sw.ElapsedMilliseconds}");
             foreach (var wishlistItem in wishList.WishList)
             {
                 var bankItem = bank.Bank.FirstOrDefault(x => x.Item.Id == wishlistItem.Item.Id);
@@ -52,6 +59,9 @@ namespace MyHordesOptimizerApi.Services.Impl
                 wishlistItem.IsWorkshop = recipes.Any(x => x.Type.StartsWith("WORKSHOP")
                                                              && (x.Components.Any(component => component.Id == wishlistItem.Item.Id) || x.Result.Any(result => result.Item.Id == wishlistItem.Item.Id)));
             }
+            Logger.LogInformation($"[GetWishList] Récupération bankcount : {sw.ElapsedMilliseconds}");
+            wishList.WishList.ForEach(wishlist => wishlist.Item.Recipes = recipes.GetRecipeForItem(wishlist.Item.Id));
+            Logger.LogInformation($"[GetWishList] Association des recipes : {sw.ElapsedMilliseconds}");
             return wishList;
         }
 

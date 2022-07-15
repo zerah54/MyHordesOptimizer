@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -124,6 +125,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             // Enregistrer en base
             MyHordesOptimizerRepository.PutBank(town.Id, town.Bank);
             town = MyHordesOptimizerRepository.GetTown(town.Id);
+            var recipes = MyHordesOptimizerRepository.GetRecipes();
             var bankWrapper = town.Bank;
 
             if (town.WishList != null && town.WishList.WishList != null)
@@ -141,6 +143,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     }
                 }
             }
+            bankWrapper.Bank.ForEach(bankItem => bankItem.Item.Recipes = recipes.GetRecipeForItem(bankItem.Item.Id));
             return bankWrapper;
         }
 
