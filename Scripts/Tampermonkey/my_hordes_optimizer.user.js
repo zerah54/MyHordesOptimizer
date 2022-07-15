@@ -6279,6 +6279,7 @@ async function getMe() {
                     reject(error);
                 }
             });
+        } else {
             resolve();
         }
     });
