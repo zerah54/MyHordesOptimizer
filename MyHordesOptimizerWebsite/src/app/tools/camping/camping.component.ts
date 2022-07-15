@@ -1,11 +1,13 @@
+import { Clipboard } from '@angular/cdk/clipboard';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import * as moment from 'moment';
+import { ApiServices } from 'src/app/_abstract_model/services/api.services';
+import { dtoToModelArray } from 'src/app/_abstract_model/types/_common.class';
 import { HORDES_IMG_REPO } from './../../_abstract_model/const';
 import { Ruin } from './../../_abstract_model/types/ruin.class';
 import { Dictionary } from './../../_abstract_model/types/_types';
-import { ApiServices } from 'src/app/_abstract_model/services/api.services';
-import { Component, OnInit } from '@angular/core';
-import * as moment from 'moment';
-import { dtoToModelArray } from 'src/app/_abstract_model/types/_common.class';
-import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
     selector: 'mho-camping',
@@ -219,36 +221,56 @@ export class CampingComponent implements OnInit {
     };
 
 
-    constructor(private api: ApiServices, private fb: FormBuilder) {
+    constructor(private api: ApiServices, private fb: FormBuilder, private route: ActivatedRoute, private clipboard: Clipboard, private router: Router) {
     }
 
     public ngOnInit(): void {
+        this.route.queryParams.subscribe((params: Record<string, string>) => {
+            const init_form: Record<string, unknown> | undefined = this.convertEasyReadableToForm(params);
+
+            this.api.getRuins().subscribe((ruins: Ruin[]) => {
+                this.ruins = [...this.added_ruins].concat([...ruins]);
 
 
-        this.api.getRuins().subscribe((ruins: Ruin[]) => {
-            this.ruins = this.added_ruins.concat(ruins);
-        })
+                this.configuration_form = this.fb.group(init_form ? init_form : {
+                    town: [<TownType>this.town_types.find((town_type: TownType) => town_type.id === 'rne')],
+                    job: [<Job>this.jobs.find((job: Job) => job.id === 'citizen')],
+                    distance: [1],
+                    campings: [0],
+                    pro: [false],
+                    hidden_campers: [0],
+                    objects: [0],
+                    vest: [false],
+                    tomb: [false],
+                    zombies: [0],
+                    night: [false],
+                    devastated: [false],
+                    phare: [false],
+                    improve: [0],
+                    object_improve: [0],
+                    ruin: [this.added_ruins[0]]
+                });
 
-        this.configuration_form = this.fb.group({
-            town: [<TownType>this.town_types.find((town_type: TownType) => town_type.id === 'rne')],
-            job: [<Job>this.jobs.find((job: Job) => job.id === 'citizen')],
-            distance: [1],
-            campings: [0],
-            pro: [false],
-            hidden_campers: [0],
-            objects: [0],
-            vest: [false],
-            tomb: [false],
-            zombies: [0],
-            night: [false],
-            devastated: [false],
-            phare: [false],
-            improve: [0],
-            object_improve: [0],
-            ruin: [this.added_ruins[0]]
+                this.configuration_form.valueChanges.subscribe(() => this.calculateProbabilities())
+
+                this.router.navigate(
+                    [],
+                    {
+                        relativeTo: this.route,
+                        queryParams: {},
+                        replaceUrl: true
+                    }
+                );
+
+            });
         });
+    }
 
-        this.configuration_form.valueChanges.subscribe(() => this.calculateProbabilities())
+    public shareCamping(): void {
+        let url: string = window.location.href;
+        console.log('sharecamping', url);
+        url += '?' + this.convertFormToEasyReadable();
+        this.clipboard.copy(url);
     }
 
     private calculateProbabilities(): void {
@@ -279,29 +301,83 @@ export class CampingComponent implements OnInit {
         chances += (this.configuration_form.get('hidden_campers')?.value > 7 ? this.hidden_campers_map[7] : this.hidden_campers_map[this.configuration_form.get('hidden_campers')?.value]);
 
         /** Nombre d'objets de protection dans l'inventaire */
-        chances += this.configuration_form.get('objects')?.value;
+        chances += +this.configuration_form.get('objects')?.value;
 
         /**
           * Nombre d'améliorations simples sur la case
           * @see ActionDataService.php : 'improve'
           */
-        chances += this.configuration_form.get('improve')?.value;
+        chances += +this.configuration_form.get('improve')?.value;
 
         /**
           * Nombre d'objets de défense installés sur la case
           * @see ActionDataService.php : 'cm_campsite_improve'
           */
-        chances += this.configuration_form.get('object_improve')?.value * 1.8;
+        chances += +this.configuration_form.get('object_improve')?.value * 1.8;
 
         /**
           * Bonus liés au bâtiment
           * @see RuinDataService.php
           */
-        chances += (<Ruin>this.ruins.find((ruin: Ruin) => (<Ruin>this.configuration_form.get('ruin')?.value)?.id === ruin.id)).camping;
+        chances += +(<Ruin>this.configuration_form.get('ruin')?.value)?.camping || 0;
 
         this.camping_result.probability = Math.min(Math.max((100.0 - (Math.abs(Math.min(0, chances)) * 5)) / 100.0, .1), ((<Job>this.configuration_form.get('job')?.value)?.camping_factor));
         this.camping_result.label = this.camping_results.find((camping_result) => camping_result.strict ? <number>this.camping_result.probability < camping_result.probability : <number>this.camping_result.probability <= camping_result.probability)?.label;
     };
+
+    private convertFormToEasyReadable(): string {
+        let url_string: string = '';
+        for (const key in this.configuration_form.value) {
+            const element = this.configuration_form.value[key];
+            if (element) {
+                console.log('element', element);
+                if (typeof element === 'string' || typeof element === 'number') {
+                    url_string += `&${key}=${element.toString()}`;
+                } else if (typeof element === 'boolean') {
+                    url_string += element ? `&${key}=true` : `&${key}=false`;
+                } else {
+                    url_string += `&${key}=${element.id}`;
+                }
+            } else {
+                url_string += `&${key}=`;
+            }
+        }
+        console.log('url_string;', url_string);
+        return url_string;
+    }
+
+    private convertEasyReadableToForm(params: Record<string, string>): Record<string, [unknown]> | undefined {
+        let init_form: Record<string, [unknown]> | undefined = undefined;
+        let index: number = 0;
+        for (const key in params) {
+            if (index === 0) {
+                init_form = {};
+            }
+            if (init_form) {
+                switch (key) {
+                    case "town":
+                        init_form[key] = [this.town_types.find((town_type: TownType) => town_type.id === params[key])];
+                        break;
+                    case "ruin":
+                        init_form[key] = [this.ruins.find((ruin: Ruin) => ruin.id === params[key])];
+                        break;
+                    case "job":
+                        init_form[key] = [this.jobs.find((job: Job) => job.id === params[key])];
+                        break;
+                    default:
+                        if (params[key] === "false") {
+                            init_form[key] = [false];
+                        } else if (params[key] === "true") {
+                            init_form[key] = [true];
+                        } else {
+                            init_form[key] = [params[key]];
+                        }
+                }
+            }
+            index++;
+        }
+        return init_form;
+    }
 }
 
 interface TownType {

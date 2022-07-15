@@ -24,8 +24,8 @@ import { WishlistInfo } from './../types/wishlist-info.class';
 import { WishlistItem } from './../types/wishlist-item.class';
 import { GlobalServices } from './global.services';
 
-const API_URL: string = 'https://myhordesoptimizerapi.azurewebsites.net/';
-const API_URL_2: string = 'http://144.24.192.182';
+const API_URL_2: string = 'https://api.myhordesoptimizer.fr';
+const API_URL: string = 'https://myhordesoptimizerapi.azurewebsites.net';
 
 @Injectable()
 export class ApiServices extends GlobalServices {
@@ -44,7 +44,7 @@ export class ApiServices extends GlobalServices {
      */
     public getItems(): Observable<Item[]> {
         return new Observable((sub: Subscriber<Item[]>) => {
-            super.get<ItemDTO[]>(API_URL + 'myhordesfetcher/items?userKey=' + getExternalAppId())
+            super.get<ItemDTO[]>(API_URL + '/myhordesfetcher/items?userKey=' + getExternalAppId())
                 .subscribe({
                     next: (response: HttpResponse<ItemDTO[]>) => {
                         sub.next(dtoToModelArray(Item, response.body));
@@ -70,7 +70,7 @@ export class ApiServices extends GlobalServices {
      */
     public getBank(): Observable<BankInfo> {
         return new Observable((sub: Subscriber<BankInfo>) => {
-            super.get<BankInfoDTO>(API_URL + 'myhordesfetcher/bank?userKey=' + getExternalAppId())
+            super.get<BankInfoDTO>(API_URL + '/myhordesfetcher/bank?userKey=' + getExternalAppId())
                 .subscribe({
                     next: (response: HttpResponse<BankInfoDTO>) => {
                         sub.next(new BankInfo(response.body));
@@ -87,7 +87,7 @@ export class ApiServices extends GlobalServices {
             isGestHordes: true
         };
 
-        super.post<any>(API_URL + 'externaltools/update?userKey=' + getExternalAppId() + '&userId=' + getUserId(), JSON.stringify(tools_to_update))
+        super.post<any>(API_URL + '/externaltools/update?userKey=' + getExternalAppId() + '&userId=' + getUserId(), JSON.stringify(tools_to_update))
             .subscribe({
                 next: () => {
                     this.snackbar.successSnackbar(`Les outils externes ont bien été mis à jour`);
@@ -158,7 +158,7 @@ export class ApiServices extends GlobalServices {
      */
     public estimateAttack(rows: Dictionary<string>, today: boolean, day: number): Observable<string> {
         return new Observable((sub: Subscriber<string>) => {
-            super.post<string>(API_URL_2 + `:8080/${today ? 'attack' : 'planif'}.php?day=${day}&id=${getTownId()}&type=normal&debug=false`, JSON.stringify(rows))
+            super.post<string>(API_URL + `:8080/${today ? 'attack' : 'planif'}.php?day=${day}&id=${getTownId()}&type=normal&debug=false`, JSON.stringify(rows))
                 .subscribe({
                     next: (response) => {
                         sub.next(response);
@@ -174,7 +174,7 @@ export class ApiServices extends GlobalServices {
      */
     public getRuins(): Observable<Ruin[]> {
         return new Observable((sub: Subscriber<Ruin[]>) => {
-            super.get<RuinDTO[]>(API_URL + 'myhordesfetcher/ruins')
+            super.get<RuinDTO[]>(API_URL + '/myhordesfetcher/ruins')
                 .subscribe({
                     next: (response: HttpResponse<RuinDTO[]>) => {
                         let ruins: Ruin[] = dtoToModelArray(Ruin, response.body).sort((a: Ruin, b: Ruin) => {
@@ -195,7 +195,7 @@ export class ApiServices extends GlobalServices {
      */
     public getHeroSkill(): Observable<HeroSkill[]> {
         return new Observable((sub: Subscriber<HeroSkill[]>) => {
-            super.get<HeroSkillDTO[]>(API_URL + 'myhordesfetcher/heroSkills')
+            super.get<HeroSkillDTO[]>(API_URL + '/myhordesfetcher/heroSkills')
                 .subscribe({
                     next: (response: HttpResponse<HeroSkillDTO[]>) => {
                         let skills: HeroSkill[] = dtoToModelArray(HeroSkill, response.body).sort((a: HeroSkill, b: HeroSkill) => {

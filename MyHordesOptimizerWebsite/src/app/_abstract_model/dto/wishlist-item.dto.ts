@@ -5,4 +5,5 @@ export interface WishlistItemDTO {
     bankCount: number;
     item: ItemDTO;
     priority: number;
+    depot: number;
 }

@@ -33,6 +33,7 @@ export class WishlistComponent {
     public readonly columns: WishlistColumns[] = [
         { id: 'name', header: $localize`Nom de l'objet` },
         { id: 'priority', header: $localize`Priorité` },
+        { id: 'depot', header: $localize`Dépôt` },
         { id: 'bank_count', header: $localize`Stock en banque` },
         { id: 'count', header: $localize`Stock souhaité` },
         { id: 'needed', header: $localize`Quantité manquante` },
@@ -44,12 +45,19 @@ export class WishlistComponent {
     public items: Item[] = [];
 
     /** La liste des priorités */
-    public readonly priorities: Priorities[] = [
+    public readonly priorities: PriorityOrDepot[] = [
         { count: -1000, label: $localize`Ne pas ramener` },
         { count: 0, label: $localize`Non définie` },
         { count: 1000, label: $localize`Basse` },
         { count: 2000, label: $localize`Moyenne` },
         { count: 3000, label: $localize`Haute` }
+    ]
+
+    /** La liste des dépôts */
+    public readonly depots: PriorityOrDepot[] = [
+        { count: -1, label: $localize`Non définie` },
+        { count: 0, label: $localize`Banque` },
+        { count: 1, label: $localize`Zone de rapatriement` },
     ]
 
     constructor(private api: ApiServices) {
@@ -116,7 +124,7 @@ export class WishlistComponent {
     }
 }
 
-interface Priorities {
+interface PriorityOrDepot {
     count: number;
     label: string;
 }
