@@ -4,4 +4,5 @@ export interface RecipeResultItemDTO {
     probability: number;
     weight: number;
     item: ItemDTO;
+    pictoUid: string;
 }

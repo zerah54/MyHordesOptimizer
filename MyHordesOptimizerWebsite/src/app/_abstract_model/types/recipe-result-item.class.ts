@@ -1,13 +1,12 @@
 import { RecipeResultItemDTO } from '../dto/recipe-result-item.dto';
-import { RecipeDTO } from './../dto/recipe.dto';
 import { Item } from './item.class';
-import { CommonModel, dtoToModelArray, modelToDtoArray } from "./_common.class";
-import { I18nLabels } from './_types';
+import { CommonModel } from "./_common.class";
 
 export class RecipeResultItem extends CommonModel<RecipeResultItemDTO> {
     public probability!: number;
     public weight!: number;
     public item!: Item;
+    public picto_uid!: string;
 
     constructor(dto?: RecipeResultItemDTO) {
         super();
@@ -18,7 +17,8 @@ export class RecipeResultItem extends CommonModel<RecipeResultItemDTO> {
         return {
             probability: this.probability,
             weight: this.weight,
-            item: this.item.modelToDto()
+            item: this.item.modelToDto(),
+            pictoUid: this.picto_uid
         }
     };
 
@@ -27,6 +27,7 @@ export class RecipeResultItem extends CommonModel<RecipeResultItemDTO> {
             this.item = new Item(dto.item);
             this.probability = dto.probability;
             this.weight = dto.weight;
+            this.picto_uid = dto.pictoUid;
         }
     };
 

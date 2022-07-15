@@ -1,20 +1,20 @@
 import { I18nLabels } from '../types/_types';
+import { CategoryDTO } from './category.dto';
 import { RecipeDTO } from './recipe.dto';
 
 export interface ItemDTO {
-    actions: string[];
-    bankCount: number;
-    category: string;
-    deco: number;
-    description: I18nLabels;
-    guard: number;
+    uid: string;
     img: string;
-    isHeaver: boolean;
-    jsonIdName: string;
     label: I18nLabels;
+    description: I18nLabels;
+    id: number;
+    category: CategoryDTO;
+    deco: number;
+    isHeaver: boolean;
+    guard: number;
     properties: string[];
+    actions: string[];
     recipes: RecipeDTO[];
+    bankCount: number;
     wishListCount: number;
-    xmlId: number;
-    xmlName: string;
 }

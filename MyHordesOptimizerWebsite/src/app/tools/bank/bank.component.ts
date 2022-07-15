@@ -41,7 +41,15 @@ export class BankComponent implements OnInit {
             this.bank = bank;
             if (this.bank) {
                 this.bank.bank_items = this.bank?.bank_items
-                    .sort((bank_item_a: BankItem, bank_item_b: BankItem) => bank_item_a.item.category.localeCompare(bank_item_b.item.category))
+                    .sort((bank_item_a: BankItem, bank_item_b: BankItem) =>{
+                        if (bank_item_a.item.category.ordering < bank_item_b.item.category.ordering) {
+                            return -1;
+                        } else if (bank_item_a.item.category.ordering === bank_item_b.item.category.ordering) {
+                            return 0;
+                        } else {
+                            return 1;
+                        }
+                    })
                 this.displayed_bank_items = [...this.bank.bank_items];
             }
         });

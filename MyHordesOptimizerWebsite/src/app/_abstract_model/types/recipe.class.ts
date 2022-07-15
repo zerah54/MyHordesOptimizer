@@ -10,7 +10,7 @@ export class Recipe extends CommonModel<RecipeDTO> {
     public is_shaman_only!: boolean;
     public name!: string;
     public result!: RecipeResultItem[];
-    public type!: "Workshop" | "Manual";
+    public type!: "WORKSHOP" | "MANUAL_ANYWHERE" | "WORKSHOP_SHAMAN";
 
     constructor(dto?: RecipeDTO) {
         super();
@@ -21,7 +21,6 @@ export class Recipe extends CommonModel<RecipeDTO> {
         return {
             actions: this.actions,
             components: modelToDtoArray(this.components),
-            isShamanOnly: this.is_shaman_only,
             name: this.name,
             result: modelToDtoArray(this.result),
             type: this.type
@@ -32,7 +31,6 @@ export class Recipe extends CommonModel<RecipeDTO> {
         if (dto) {
             this.actions = dto.actions;
             this.components = dtoToModelArray(Item, dto.components);
-            this.is_shaman_only = dto.isShamanOnly;
             this.name = dto.name;
             this.result = dtoToModelArray(RecipeResultItem, dto.result);
             this.type = dto.type;

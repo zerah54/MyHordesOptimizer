@@ -1,7 +1,7 @@
 import { Event, NavigationEnd, NavigationStart, Router, RouterEvent } from '@angular/router';
 import { Component, Inject, LOCALE_ID, OnInit, ViewChild } from '@angular/core';
 import * as moment from 'moment';
-import { getExternalAppId, getUserId } from 'src/app/shared/utilities/localstorage.util';
+import { getExternalAppId, getTownId, getUserId } from 'src/app/shared/utilities/localstorage.util';
 import { NavbarComponent } from './navbar/navbar.component';
 import { LoadingOverlayService } from './shared/services/loading-overlay.service';
 import { ApiServices } from './_abstract_model/services/api.services';
@@ -24,14 +24,7 @@ export class AppComponent implements OnInit {
     public ngOnInit(): void {
         moment.locale(this.locale_id);
         this.loaderOnRouting();
-        this.checkUserId();
-    }
-
-    private checkUserId(): void {
-        let user_id: number | null = getUserId();
-        if (!user_id && getExternalAppId()) {
-            this.api.getMe();
-        }
+        this.api.getMe();
     }
 
     private loaderOnRouting(): void {

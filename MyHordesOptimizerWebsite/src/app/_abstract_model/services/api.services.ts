@@ -1,30 +1,28 @@
-import { CitizenInfo } from './../types/citizen-info.class';
-import { CitizenInfoDTO } from './../dto/citizen-info.dto';
-import { Citizen } from './../types/citizen.class';
-import { RuinDTO } from './../dto/ruin.dto';
-import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
 import { getExternalAppId, getTownId, getUserId, setTownId, setUserId } from 'src/app/shared/utilities/localstorage.util';
+import { Dictionary } from 'src/app/_abstract_model/types/_types';
+import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { ItemDTO } from '../dto/item.dto';
+import { RecipeDTO } from '../dto/recipe.dto';
+import { HeroSkill } from '../types/hero-skill.class';
+import { Recipe } from '../types/recipe.class';
+import { Ruin } from '../types/ruin.class';
+import { dtoToModelArray } from '../types/_common.class';
 import { ToolsToUpdate } from '../types/_types';
 import { SnackbarService } from './../../shared/services/snackbar.service';
 import { BankInfoDTO } from './../dto/bank-info.dto';
+import { CitizenInfoDTO } from './../dto/citizen-info.dto';
+import { RuinDTO } from './../dto/ruin.dto';
 import { WishlistInfoDTO } from './../dto/wishlist-info.dto';
 import { BankInfo } from './../types/bank-info.class';
+import { CitizenInfo } from './../types/citizen-info.class';
 import { Item } from './../types/item.class';
 import { WishlistInfo } from './../types/wishlist-info.class';
 import { WishlistItem } from './../types/wishlist-item.class';
 import { GlobalServices } from './global.services';
-import { Ruin } from '../types/ruin.class';
-import { HeroSkill } from '../types/hero-skill.class';
-import { HeroSkillDTO } from '../dto/hero-skill.dto';
-import { dtoToModelArray } from '../types/_common.class';
-import { CitizenDTO } from '../dto/citizen.dto';
-import { Recipe } from '../types/recipe.class';
-import { RecipeDTO } from '../dto/recipe.dto';
 
 const API_URL: string = 'https://myhordesoptimizerapi.azurewebsites.net/';
 const API_URL_2: string = 'http://144.24.192.182';
@@ -57,11 +55,11 @@ export class ApiServices extends GlobalServices {
 
     /** Récupère l'identifiant de citoyen */
     public getMe(): void {
-        super.get<{ id: number }>(API_URL + 'myhordesfetcher/me?userKey=' + getExternalAppId())
-            .subscribe((response: HttpResponse<{ id: number } | null>) => {
+        super.get<{ id: number, townId: number }>(API_URL + 'myhordesfetcher/me?userKey=' + getExternalAppId())
+            .subscribe((response: HttpResponse<{ id: number, townId: number } | null>) => {
                 console.log('test', response.body);
                 setUserId(response.body ? response.body.id : null);
-                setTownId(response.body ? response.body.id : null);
+                setTownId(response.body ? response.body.townId : null);
             })
     }
 
@@ -104,7 +102,7 @@ export class ApiServices extends GlobalServices {
      */
     public getWishlist(): Observable<WishlistInfo> {
         return new Observable((sub: Subscriber<WishlistInfo>) => {
-            super.get<WishlistInfoDTO>(API_URL + 'wishlist?userKey=' + getExternalAppId())
+            super.get<WishlistInfoDTO>(API_URL + 'wishlist?townId=' + getTownId())
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         sub.next(new WishlistInfo(response.body));
@@ -125,9 +123,9 @@ export class ApiServices extends GlobalServices {
             let item_list: { id: number, priority: number, count: number }[] = wishlist_info.wishlist_items
                 .filter((wishlist_item: WishlistItem) => wishlist_item.count)
                 .map((wishlist_item: WishlistItem) => {
-                    return { id: wishlist_item.item.xml_id, priority: wishlist_item.priority, count: wishlist_item.count };
+                    return { id: wishlist_item.item.id, priority: wishlist_item.priority, count: wishlist_item.count };
                 });
-            super.put<WishlistInfoDTO>(API_URL + 'wishlist?userKey=' + getExternalAppId(), item_list)
+            super.put<WishlistInfoDTO>(API_URL + 'wishlist?townId=' + getTownId() + '&userId=' + getUserId(), item_list)
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         sub.next(new WishlistInfo(response.body));
@@ -143,7 +141,7 @@ export class ApiServices extends GlobalServices {
      */
     public addItemToWishlist(item: Item): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.post(API_URL + 'wishlist/add/' + item.xml_id + '?userKey=' + getExternalAppId(), undefined)
+            super.post(API_URL + 'wishlist/add/' + item.id + '?townId=' + getTownId() + '&userId=' + getUserId(), undefined)
                 .subscribe({
                     next: () => {
                         sub.next();

@@ -38,7 +38,15 @@ export class ItemsComponent implements OnInit {
         this.api.getItems().subscribe((items: Item[]) => {
             this.items = items;
             if (this.items) {
-                this.items = this.items.sort((item_a: Item, item_b: Item) => item_a.category.localeCompare(item_b.category));
+                this.items = this.items.sort((item_a: Item, item_b: Item) => {
+                    if (item_a.category.ordering < item_b.category.ordering) {
+                        return -1;
+                    } else if (item_a.category.ordering === item_b.category.ordering) {
+                        return 0;
+                    } else {
+                        return 1;
+                    }
+                });
                 this.displayed_items = [...this.items];
             }
         });

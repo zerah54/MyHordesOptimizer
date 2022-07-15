@@ -81,7 +81,7 @@ export class WishlistComponent {
 
     /** Retire une ligne de la liste */
     public remove(row: WishlistItem) {
-        let index = this.wishlist_info.wishlist_items.findIndex((wishlist_item: WishlistItem) => wishlist_item.item.xml_id === row.item.xml_id);
+        let index = this.wishlist_info.wishlist_items.findIndex((wishlist_item: WishlistItem) => wishlist_item.item.id === row.item.id);
         this.wishlist_info.wishlist_items.splice(index, 1);
         this.datasource.data = [...this.wishlist_info.wishlist_items];
     }
