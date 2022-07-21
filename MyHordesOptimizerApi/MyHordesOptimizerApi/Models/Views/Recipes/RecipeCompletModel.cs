@@ -1,4 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MyHordesOptimizerApi.Models.Views.Recipes
 {
@@ -32,5 +37,32 @@ namespace MyHordesOptimizerApi.Models.Views.Recipes
         [Column("resultWeight")]
         public int ResultWeight { get; set; }
 
+    }
+
+
+    public class RecipeCompletModel_ResultItemEqualityComparer : IEqualityComparer<RecipeCompletModel>
+    {
+        public bool Equals([AllowNull] RecipeCompletModel x, [AllowNull] RecipeCompletModel y)
+        {
+            return x.ResultItemId == y.ResultItemId;
+        }
+
+        public int GetHashCode([DisallowNull] RecipeCompletModel obj)
+        {
+            return HashCode.Combine(obj.ResultItemId);
+        }
+    }
+
+    public class RecipeCompletModel_ComponentItemEqualityComparer : IEqualityComparer<RecipeCompletModel>
+    {
+        public bool Equals([AllowNull] RecipeCompletModel x, [AllowNull] RecipeCompletModel y)
+        {
+            return x.ComponentItemId == y.ComponentItemId && x.ComponentCount == y.ComponentCount;
+        }
+
+        public int GetHashCode([DisallowNull] RecipeCompletModel obj)
+        {
+            return HashCode.Combine(obj.ComponentItemId, obj.ComponentCount);
+        }
     }
 }

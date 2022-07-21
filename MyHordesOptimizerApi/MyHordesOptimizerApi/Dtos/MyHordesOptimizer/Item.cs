@@ -1,5 +1,6 @@
 ﻿using MyHordesOptimizerApi.Attributes.Firebase;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using System;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
@@ -30,6 +31,17 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
             Description = new Dictionary<string, string>();
             Recipes = new List<ItemRecipe>();
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Item item &&
+                   Id == item.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id);
+        }
     }
 
     public class ItemResult
@@ -37,5 +49,16 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
         public double Probability { get; set; }
         public int Weight { get; set; }
         public Item Item { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ItemResult result &&
+                   EqualityComparer<Item>.Default.Equals(Item, result.Item);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Item);
+        }
     }
 }

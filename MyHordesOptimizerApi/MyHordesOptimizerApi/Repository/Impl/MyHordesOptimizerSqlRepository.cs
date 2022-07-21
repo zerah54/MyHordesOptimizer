@@ -249,9 +249,9 @@ namespace MyHordesOptimizerApi.Repository.Impl
             foreach (var recipe in recipes)
             {
                 IEnumerable<RecipeCompletModel> matchingComplet = recipeCompletModels.Where(r => r.RecipeName == recipe.Name);
-                recipe.Components = items.Where(i => matchingComplet.Any(x => x.ComponentItemId == i.Id)).ToList();
-                var resultsAsItems = items.Where(i => matchingComplet.Any(x => x.ResultItemId == i.Id));
-                var itemResults = matchingComplet.Where(x => resultsAsItems.Any(i => i.Id == x.ResultItemId)).Select(x => new ItemResult()
+                recipe.Components = items.Where(i => matchingComplet.Any(x => x.ComponentItemId == i.Id)).Distinct().ToList();
+                var resultsAsItems = items.Where(i => matchingComplet.Any(x => x.ResultItemId == i.Id)).Distinct();
+                var itemResults = matchingComplet.Where(x => resultsAsItems.Any(i => i.Id == x.ResultItemId)).Distinct(new RecipeCompletModel_ResultItemEqualityComparer()).Select(x => new ItemResult()
                 {
                     Item = items.First(i => i.Id == x.ResultItemId),
                     Probability = x.ResultProbability,
