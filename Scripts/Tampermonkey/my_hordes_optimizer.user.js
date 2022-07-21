@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.67
+// @version      1.0.0-alpha.69
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -16,9 +16,10 @@
 // @connect      http://144.24.192.182
 // @connect      *
 //
-// @match        https://myhordes.de/*
-// @match        https://myhordes.eu/*
-// @match        https://myhord.es/*
+// @match        *://myhordes.de/*
+// @match        *://myhordes.eu/*
+// @match        *://myhord.es/*
+// @match        *://myhordes.localhost/*
 //
 // @match        https://bbh.fred26.fr/*
 // @match        https://gest-hordes2.eragaming.fr/*
@@ -32,7 +33,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] On essaie d'améliorer les performances \n`;
++ `[Nouveauté] Ajout du calcul du nombre de zombies qui vont mourir par désespoir sur une case \n`
++ `[Nouveauté] Il n'est plus nécessaire de renseigner son id d'app externe \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -46,8 +48,8 @@ const mho_map_key = 'mho_map';
 const mho_blacklist_key = 'mho_blacklist'
 
 let mho_parameters = GM_getValue(gm_parameters_key) || {};
-let external_app_id = GM_getValue(gm_mh_external_app_id_key);
 let mh_user = GM_getValue(mh_user_key);
+let external_app_id;
 
 
 ////////////////////
@@ -75,8 +77,9 @@ const content_btn_id = 'optimizer-content-btn';
 const mh_header_id = 'header-reload-area';
 const mh_update_external_tools_id = 'mh-update-external-tools';
 const wiki_btn_id = 'wiki-btn-id';
-const zone_dead_zombies_id = 'zone-dead-zombies';
+const zone_info_zombies_id = 'zone-info-zombies';
 const nb_dead_zombies_id = 'nb-dead-zombies';
+const despair_deaths_id = 'despair-deaths';
 const mho_copy_map_id = 'mho-copy-map';
 const mho_opti_map_id = 'mho-opti-map';
 const mho_display_map_id = 'mho-display-map';
@@ -91,10 +94,10 @@ const texts = {
         es: `Guarde su identificador externo para aplicaciones`
     },
     external_app_id_help: {
-        en: `You have to fill your external ID for apps. <br />You can find it by following “My soul” > “Settings” > “Advanced” > “External Applications” `,
-        fr: `Vous devez renseigner votre ID externe pour les apps.<br />Celle-ci se trouve dans "Votre âme" > "Réglages" > "Avancés" > "Applications externes"`,
-        de: `Sie müssen Ihre externe ID für Apps eingeben. <br /> Sie können es finden indem Sie folgen “Deine Seele” > “Einstellungen” > “Erweitert” > “Externe Anwendungen” `,
-        es: `Ingrese su identificador externo para aplicaciones. <br />Este se encuentra en “Tu alma” > “Configuración” > “Avanzada” > “Aplicaciones Externas”`
+        en: `You must have an external ID for apps. <br />You can create it by following “My soul” > “Settings” > “Advanced” > “External Applications” `,
+        fr: `Vous devez posséder un ID externe pour les apps. <br />Vous pouvez la créer dans "Votre âme" > "Réglages" > "Avancés" > "Applications externes"`,
+        de: `Sie haben eine externe ID für Apps entwickelt. <br />Sie können es wie folgt erstellen “Deine Seele” > “Einstellungen” > “Erweitert” > “Externe Anwendungen” `,
+        es: `Debe tener una identificación externa para las aplicaciones. <br />Puedes crearlo siguiendo “Tu alma” > “Configuración” > “Avanzada” > “Aplicaciones Externas”`
     },
     external_app_id_help_label: {
         en: `Help`,
@@ -191,6 +194,12 @@ const texts = {
         fr: `Nombre de zombies morts sur cette case aujourd'hui`,
         de: `Anzahl der Zombies die heute hier gestorben sind`,
         es: `Número de zombis que han muerto aquí el día de hoy`
+    },
+    nb_despair_deaths: {
+        en: `TODO`,
+        fr: `Nombre de zombies qui vont mourir de désespoir`,
+        de: `TODO`,
+        es: `TODO`
     },
     copy_map: {
         en: `Copy map`,
@@ -1155,16 +1164,6 @@ let informations = [
         src: `https://discord.gg/ZQH7ZPWcCm`,
         action: undefined,
         img: `${repo_img_url}discord.ico`
-    },
-    {
-        id: `empty-app-id`,
-        label: {
-            en: `Remove your external ID for apps`,
-            fr: `Retirer votre ID d'app externe`,
-            de: `TODO`,
-            es: `Eliminar su ID externo para aplicaciones`
-        },
-        src: undefined, action: () => removeExternalAppId(), img: `icons/small_remove.gif`
     }
 ];
 
@@ -1255,6 +1254,7 @@ function pageIsForum() {
 
 
 function getI18N(item) {
+    if (!item) return;
     return item[lang] !== 'TODO' ? item[lang] : (item['en'] === 'TODO' ? item['fr'] : item['en'])
 }
 
@@ -1330,6 +1330,10 @@ function addError(error) {
     console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
 }
 
+/** Calcule le nombre de zombies qui vont mourir par désespoir */
+function calculateDespairDeaths(nb_killed_zombies) {
+    return Math.floor(Math.max(0, (nb_killed_zombies - 1 ) / 2));
+}
 
 function initOptions() {
     preventDangerousActions();
@@ -1350,17 +1354,6 @@ function copyToClipboard(text) {
 
     document.execCommand('copy');
     input.remove();
-}
-
-/**
- * Retire l'ID d'app externe de MHO
- */
-function removeExternalAppId() {
-    GM_setValue(gm_mh_external_app_id_key, '')
-
-    external_app_id = GM_getValue(gm_mh_external_app_id_key);
-
-    createOptimizerButtonContent();
 }
 
 function createSelectWithSearch() {
@@ -1450,7 +1443,7 @@ function createOptimizerButtonContent() {
     let content = document.getElementById(content_btn_id);
     content.innerHTML = '';
 
-    if (external_app_id && external_app_id !== '') {
+    if (external_app_id && external_app_id !== '' && external_app_id !== 'not set') {
         /////////////////////
         // SECTION BOUTONS //
         /////////////////////
@@ -1518,25 +1511,9 @@ function createOptimizerButtonContent() {
         content.appendChild(infomations_container);
 
     } else {
-        let help_button = createHelpButton(getI18N(texts.external_app_id_help));
-        content.appendChild(help_button);
-
-        let keytext = document.createElement('input');
-        keytext.setAttribute('type', 'text');
-
-        let keysend = document.createElement('a');
-        keysend.classList.add('button');
-        keysend.innerHTML = getI18N(texts.save_external_app_id);
-        keysend.addEventListener('click', () => {
-            GM_setValue(gm_mh_external_app_id_key, keytext.value);
-            external_app_id = GM_getValue(gm_mh_external_app_id_key);
-            getMe();
-            content.innerHTML = '';
-            createOptimizerButtonContent();
-        });
-
-        content.appendChild(keytext);
-        content.appendChild(keysend);
+        let no_external_app_id = document.createElement('div');
+        no_external_app_id.innerText = getI18N(texts.external_app_id_help);
+        content.appendChild(no_external_app_id);
     }
     optimizer_btn.appendChild(content);
 }
@@ -4699,47 +4676,53 @@ function notifyOnSearchEnd() {
 /** Affiche le nombre de zombies morts aujourd'hui */
 function displayNbDeadZombies() {
     if (mho_parameters.display_nb_dead_zombies && pageIsDesert()) {
-        let zone_dist = document.querySelectorAll(`.zone-dist:not(#${zone_dead_zombies_id})`)[0];
+        let zone_dist = document.querySelectorAll(`.zone-dist:not(#${zone_info_zombies_id})`)[0];
         if (zone_dist) {
-            let zone_dead_zombies = document.getElementById(zone_dead_zombies_id);
+            let zone_info_zombies = document.getElementById(zone_info_zombies_id);
             let nb_dead_zombies = document.querySelectorAll('.splatter').length;
+            let despair_deaths = calculateDespairDeaths(nb_dead_zombies);
 
-            if (!zone_dead_zombies) {
-                zone_dead_zombies = document.createElement('div');
-                zone_dead_zombies.id = zone_dead_zombies_id;
-                zone_dead_zombies.classList.add('row', 'zone-dist');
-                zone_dead_zombies.addEventListener('click', (event) => {
-                    console.log('event', event);
-                    event.preventDefault();
-                    event.stopPropagation();
-                    event.stopImmediatePropagation();
-                });
+            if (!zone_info_zombies) {
+                zone_info_zombies = document.createElement('div');
+                zone_info_zombies.id = zone_info_zombies_id;
+                zone_info_zombies.classList.add('row', 'zone-dist');
 
-                let content_dead_zombie = document.createElement('div')
-                content_dead_zombie.classList.add('cell', 'rw-12', 'center');
-                zone_dead_zombies.appendChild(content_dead_zombie);
+                let content_info_zombie = document.createElement('div');
+                content_info_zombie.style.display = 'flex';
+                content_info_zombie.classList.add('cell', 'rw-12', 'center');
+                zone_info_zombies.appendChild(content_info_zombie);
 
                 let btn_mho_img = document.createElement('img');
                 btn_mho_img.src = mh_optimizer_icon;
                 btn_mho_img.style.height = '16px';
-                btn_mho_img.style.marginRight = '0.25em';
-                content_dead_zombie.appendChild(btn_mho_img);
+                btn_mho_img.style.margin = 'auto 0.25em';
+                content_info_zombie.appendChild(btn_mho_img);
 
-                let nb_dead_zombies_text = document.createElement('text');
+                let rows_container_info_zombies = document.createElement('div');
+                rows_container_info_zombies.style.margin = 'auto 0.25em';
+                content_info_zombie.appendChild(rows_container_info_zombies);
+
+                let nb_dead_zombies_text = document.createElement('div');
                 nb_dead_zombies_text.innerHTML = `${getI18N(texts.nb_dead_zombies)} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`;
+                rows_container_info_zombies.appendChild(nb_dead_zombies_text);
 
-                content_dead_zombie.appendChild(nb_dead_zombies_text);
+                let despair_deaths_text = document.createElement('div');
+                despair_deaths_text.innerHTML = `${getI18N(texts.nb_despair_deaths)} : <b id="${despair_deaths_id}">${despair_deaths}</span>`;
+                rows_container_info_zombies.appendChild(despair_deaths_text);
 
-                zone_dist.parentNode.appendChild(zone_dead_zombies);
+                zone_dist.parentNode.appendChild(zone_info_zombies);
             } else {
                 let nb_dead_zombies_element = document.getElementById(nb_dead_zombies_id);
                 nb_dead_zombies.innerText = nb_dead_zombies;
+
+                let despair_deaths_element = document.getElementById(despair_deaths_id);
+                nb_dead_zombies.innerText = despair_deaths;
             }
         }
     } else {
-        let zone_dead_zombies = document.getElementById(zone_dead_zombies_id);
-        if (zone_dead_zombies) {
-            zone_dead_zombies.remove();
+        let zone_info_zombies = document.getElementById(zone_info_zombies_id);
+        if (zone_info_zombies) {
+            zone_info_zombies.remove();
         }
     }
 }
@@ -6457,6 +6440,7 @@ function updateWishlist() {
     .map((item) => {
         return {id: item.item.xmlId, priority: item.priority, depot: item.depot, count: item.count};
     });
+    console.log('item_list', item_list);
     startLoading();
     GM_xmlhttpRequest({
         method: 'PUT',
@@ -6699,6 +6683,44 @@ async function getOptimalPath(map, html, button) {
     });
 }
 
+async function getApiKey() {
+    return new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+            method: 'POST',
+            url: location.origin + '/jx/soul/settings',
+            responseType: 'document',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Request-Intent': 'WebNavigation',
+                'X-Render-Target': 'content'
+            },
+            data: JSON.stringify({}),
+            onload: function(response){
+                if (response.status === 200) {
+                    let temp_body = document.createElement('body');
+                    temp_body.innerHTML = response.response.body.innerHTML;
+                    let id = temp_body.querySelector('#app_ext');
+                    if (id && id !== '' && id !== 'not set') {
+                        // external_app_id = id.value;
+                        external_app_id = 'ccb715dd470a92e91ec2f1b28a9a75ce';
+                        resolve(external_app_id);
+                    } else {
+                        reject(response);
+                    }
+                } else {
+                    reject(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                reject(error);
+            }
+        });
+    });
+}
+
 
 ///////////////////////////
 //     MAIN FUNCTION     //
@@ -6777,32 +6799,34 @@ async function getOptimalPath(map, html, button) {
             GM_setValue('version', version);
         }
 
-        getMe().then(() => {
-            initOptions();
-            /** Gère le bouton de mise à jour des outils externes) */
-            if (!buttonOptimizerExists()) {
-                createStyles();
-                createOptimizerBtn();
-                createWindow();
-            }
+        getApiKey().then(() => {
+            getMe().then(() => {
+                initOptions();
+                /** Gère le bouton de mise à jour des outils externes) */
+                if (!buttonOptimizerExists()) {
+                    createStyles();
+                    createOptimizerBtn();
+                    createWindow();
+                }
 
-            notifyOnSearchEnd();
+                notifyOnSearchEnd();
 
-            setInterval(() => {
-                createUpdateExternalToolsButton();
-                clickOnVotedToRedirect();
-                displaySearchFieldOnBuildings();
-                displayMinApOnBuildings();
-                displayWishlistInApp();
-                displayPriorityOnItems();
-                displayNbDeadZombies();
-                displayTranslateTool();
-                // blockUsersPosts();
-            }, 500);
+                setInterval(() => {
+                    createUpdateExternalToolsButton();
+                    clickOnVotedToRedirect();
+                    displaySearchFieldOnBuildings();
+                    displayMinApOnBuildings();
+                    displayWishlistInApp();
+                    displayPriorityOnItems();
+                    displayNbDeadZombies();
+                    displayTranslateTool();
+                    // blockUsersPosts();
+                }, 500);
 
-            setInterval(() => {
-                displayAdvancedTooltips();
-            }, 100);
+                setInterval(() => {
+                    displayAdvancedTooltips();
+                }, 100);
+            });
         });
     }
 
