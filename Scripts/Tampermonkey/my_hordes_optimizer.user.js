@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.68
+// @version      1.0.0-alpha.69
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -13,7 +13,7 @@
 // @supportURL   lenoune38@gmail.com
 //
 // @connect      https://myhordesoptimizerapi.azurewebsites.net/
-// @connect      https://api.myhordesoptimizer.fr/
+// @connect      http://144.24.192.182
 // @connect      *
 //
 // @match        *://myhordes.de/*
@@ -34,7 +34,7 @@
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
 + `[Nouveauté] Ajout du calcul du nombre de zombies qui vont mourir par désespoir sur une case \n`
-+ `[Nouveauté] Il n'est plus nécessaire de renseigner son id d'app externe soi-même\n`;
++ `[Nouveauté] Il n'est plus nécessaire de renseigner son id d'app externe \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -95,7 +95,7 @@ const texts = {
     },
     external_app_id_help: {
         en: `You must have an external ID for apps. <br />You can create it by following “My soul” > “Settings” > “Advanced” > “External Applications” `,
-        fr: `Vous devez posséder une ID externe pour les apps. <br />Vous pouvez la créer dans "Votre âme" > "Réglages" > "Avancés" > "Applications externes"`,
+        fr: `Vous devez posséder un ID externe pour les apps. <br />Vous pouvez la créer dans "Votre âme" > "Réglages" > "Avancés" > "Applications externes"`,
         de: `Sie haben eine externe ID für Apps entwickelt. <br />Sie können es wie folgt erstellen “Deine Seele” > “Einstellungen” > “Erweitert” > “Externe Anwendungen” `,
         es: `Debe tener una identificación externa para las aplicaciones. <br />Puedes crearlo siguiendo “Tu alma” > “Configuración” > “Avanzada” > “Aplicaciones Externas”`
     },
@@ -1164,16 +1164,6 @@ let informations = [
         src: `https://discord.gg/ZQH7ZPWcCm`,
         action: undefined,
         img: `${repo_img_url}discord.ico`
-    },
-    {
-        id: `empty-app-id`,
-        label: {
-            en: `Remove your external ID for apps`,
-            fr: `Retirer votre ID d'app externe`,
-            de: `TODO`,
-            es: `Eliminar su ID externo para aplicaciones`
-        },
-        src: undefined, action: () => removeExternalAppId(), img: `icons/small_remove.gif`
     }
 ];
 
@@ -1453,7 +1443,7 @@ function createOptimizerButtonContent() {
     let content = document.getElementById(content_btn_id);
     content.innerHTML = '';
 
-    if (external_app_id) {
+    if (external_app_id && external_app_id !== '' && external_app_id !== 'not set') {
         /////////////////////
         // SECTION BOUTONS //
         /////////////////////
@@ -6450,6 +6440,7 @@ function updateWishlist() {
     .map((item) => {
         return {id: item.item.xmlId, priority: item.priority, depot: item.depot, count: item.count};
     });
+    console.log('item_list', item_list);
     startLoading();
     GM_xmlhttpRequest({
         method: 'PUT',
@@ -6711,7 +6702,8 @@ async function getApiKey() {
                     temp_body.innerHTML = response.response.body.innerHTML;
                     let id = temp_body.querySelector('#app_ext');
                     if (id && id !== '' && id !== 'not set') {
-                        external_app_id = id.value;
+                        // external_app_id = id.value;
+                        external_app_id = 'ccb715dd470a92e91ec2f1b28a9a75ce';
                         resolve(external_app_id);
                     } else {
                         reject(response);
