@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.69
+// @version      1.0.0-alpha.70
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -6702,8 +6702,7 @@ async function getApiKey() {
                     temp_body.innerHTML = response.response.body.innerHTML;
                     let id = temp_body.querySelector('#app_ext');
                     if (id && id !== '' && id !== 'not set') {
-                        // external_app_id = id.value;
-                        external_app_id = 'ccb715dd470a92e91ec2f1b28a9a75ce';
+                        external_app_id = id.value;
                         resolve(external_app_id);
                     } else {
                         reject(response);
