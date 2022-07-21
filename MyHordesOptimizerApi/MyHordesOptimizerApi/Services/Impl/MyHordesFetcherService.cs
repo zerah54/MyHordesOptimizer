@@ -36,7 +36,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             UserInfoProvider = userInfoProvider;
         }
 
-        public IEnumerable<Item> GetItems()
+        public IEnumerable<Item> GetItems(int? townId)
         {
             var items = MyHordesOptimizerRepository.GetItems();
             var recipes = MyHordesOptimizerRepository.GetRecipes();
@@ -47,19 +47,15 @@ namespace MyHordesOptimizerApi.Services.Impl
                 item.Recipes = recipesToAdd;
             }
 
-            var me = MyHordesJsonApiRepository.GetMe();
-            if (me.Map != null) // On ne récupère les info propres à la ville uniquement si on est incarné
+            if (townId.HasValue) // On ne récupère les info propres à la ville uniquement si on est incarné
             {
-                var town = MyHordesOptimizerRepository.GetTown(me.Map.Id);
-                if(town == null)
-                {
-                    town = GetTown();
-                }
+                var wishList = MyHordesOptimizerRepository.GetWishList(townId.Value);
+                var bank = MyHordesOptimizerRepository.GetBank(townId.Value);
                 foreach (var item in items)
                 {
-                    if (town.WishList != null && town.WishList.WishList != null)
+                    if (wishList != null && wishList.WishList != null)
                     {
-                        var wishlistItem = town.WishList.WishList.FirstOrDefault(x => x.Item.Id == item.Id);
+                        var wishlistItem = wishList.WishList.FirstOrDefault(x => x.Item.Id == item.Id);
                         if (wishlistItem != null)
                         {
                             item.WishListCount = wishlistItem.Count;
@@ -70,7 +66,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                         }
                     }
 
-                    var bankItem = town.Bank.Bank.FirstOrDefault(x => x.Item.Id == item.Id);
+                    var bankItem = bank.Bank.FirstOrDefault(x => x.Item.Id == item.Id);
                     if (bankItem != null)
                     {
                         item.BankCount = bankItem.Count;
@@ -154,8 +150,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
             // Enregistrer en base
             MyHordesOptimizerRepository.PatchCitizen(town.Id, town.Citizens);
-            town = MyHordesOptimizerRepository.GetTown(town.Id);
-            var citizens = town.Citizens;
+            var citizens = MyHordesOptimizerRepository.GetCitizens(town.Id);
 
             return citizens;
         }

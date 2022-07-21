@@ -6,7 +6,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
 {
     public interface IMyHordesFetcherService
     {
-        IEnumerable<Item> GetItems();
+        IEnumerable<Item> GetItems(int? townId);
         Town GetTown();
         SimpleMe GetSimpleMe();
         IEnumerable<HeroSkill> GetHeroSkills();

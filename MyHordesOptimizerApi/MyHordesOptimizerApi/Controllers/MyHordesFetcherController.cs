@@ -40,14 +40,9 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Items")]
-        public ActionResult<IEnumerable<Item>> GetItems(string userKey)
+        public ActionResult<IEnumerable<Item>> GetItems(int? townId)
         {
-            if (string.IsNullOrWhiteSpace(userKey))
-            {
-                return BadRequest($"{nameof(userKey)} cannot be empty");
-            }
-            UserKeyProvider.UserKey = userKey;
-            var items = _myHordesFetcherService.GetItems().ToList();
+            var items = _myHordesFetcherService.GetItems(townId).ToList();
             return items;
         }
 

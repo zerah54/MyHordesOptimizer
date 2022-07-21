@@ -143,8 +143,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
             foreach (var item in items)
             {
                 IEnumerable<ItemCompletModel> matchingItemComplet = itemsComplets.Where(i => i.IdItem == item.Id);
-                item.Actions = matchingItemComplet.Select(i => i.ActionName).Distinct();
-                item.Properties = matchingItemComplet.Select(i => i.PropertyName).Distinct();
+                item.Actions = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.ActionName)).Select(i => i.ActionName).Distinct();
+                item.Properties = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.ActionName)).Select(i => i.PropertyName).Distinct();
             }
             return items;
         }
@@ -445,7 +445,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             });
             var wishlistWrapper = new WishListWrapper()
             {
-                LastUpdateInfo = Mapper.Map<LastUpdateInfo>(townWishlistItem.First()),
+                LastUpdateInfo = Mapper.Map<LastUpdateInfo>(townWishlistItem.FirstOrDefault()),
                 WishList = wishListItem
             };
             return wishlistWrapper;
