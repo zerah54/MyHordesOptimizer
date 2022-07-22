@@ -104,12 +104,12 @@ $actions = [
         'lab_counter_below_6' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeLab', 'max' => 5 ] ] ],
         'lab_counter_below_9' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeLab', 'max' => 8 ] ] ],
 
-        'kitchen_counter_below_1' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeLab', 'max' => 0 ] ] ],
-        'kitchen_counter_below_2' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeLab', 'max' => 1 ] ] ],
-        'kitchen_counter_below_3' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeLab', 'max' => 2 ] ] ],
-        'kitchen_counter_below_4' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeLab', 'max' => 3 ] ] ],
-        'kitchen_counter_below_5' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeLab', 'max' => 4 ] ] ],
-        'kitchen_counter_below_6' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeLab', 'max' => 5 ] ] ],
+        'kitchen_counter_below_1' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeKitchen', 'max' => 0 ] ] ],
+        'kitchen_counter_below_2' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeKitchen', 'max' => 1 ] ] ],
+        'kitchen_counter_below_3' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeKitchen', 'max' => 2 ] ] ],
+        'kitchen_counter_below_4' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeKitchen', 'max' => 3 ] ] ],
+        'kitchen_counter_below_5' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeKitchen', 'max' => 4 ] ] ],
+        'kitchen_counter_below_6' => [ 'type' => 'Requirement::CrossOnFail', 'collection' => [ 'counter' => [ 'type' => 'ActionCounter::ActionTypeHomeKitchen', 'max' => 5 ] ] ],
 
         'must_be_terrorized'     => [ 'type' => 'Requirement::MessageOnFail', 'collection' => [ 'status' => [ 'enabled' => true,  'status' => 'terror' ] ], 'text' => 'Das brauchst du gerade nicht ...' ],
         'must_be_terrorized_hd'  => [ 'type' => 'Requirement::HideOnFail', 'collection' => [ 'status' => [ 'enabled' => true,  'status' => 'terror' ] ], 'text' => 'Das brauchst du gerade nicht ...' ],
@@ -375,7 +375,7 @@ $actions = [
             'shaman_immune'   => [ 'from' => null, 'to' => 'tg_shaman_immune' ],
 
             'increase_lab_counter'     => [ 'counter' => 'ActionCounter::ActionTypeHomeLab' ],
-            'increase_kitchen_counter' => [ 'counter' => 'ActionCounter::ActionTypeHomeLab' ],
+            'increase_kitchen_counter' => [ 'counter' => 'ActionCounter::ActionTypeHomeKitchen' ],
 
             'become_ghoul'    => [ 'role' => 'ghoul', 'enabled' => true  ],
             'become_ghoul_5'  => [ 'role' => 'ghoul', 'enabled' => true, 'hunger' => 5, 'force' => true  ],

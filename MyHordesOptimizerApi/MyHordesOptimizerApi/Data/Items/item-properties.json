@@ -4,6 +4,9 @@
         "can_opener",
         "box_opener"
     ],
+    "saw_tool_part_#00": [
+        "impoundable"
+    ],
     "can_opener_#00": [
         "weapon",
         "can_opener",
@@ -82,7 +85,6 @@
         "nw_ikea"
     ],
     "staff_#00": [
-        "impoundable",
         "weapon",
         "box_opener",
         "nw_armory",
@@ -97,6 +99,9 @@
         "nw_armory",
         "parcel_opener",
         "parcel_opener_h"
+    ],
+    "cigs_#00": [
+        "impoundable"
     ],
     "pc_#00": [
         "box_opener",
@@ -122,6 +127,9 @@
         "impoundable",
         "defence",
         "deco"
+    ],
+    "plate_row_#00": [
+        "impoundable"
     ],
     "torch_#00": [
         "impoundable",
@@ -156,6 +164,9 @@
         "impoundable",
         "defence",
         "deco"
+    ],
+    "concrete_#00": [
+        "impoundable"
     ],
     "concrete_wall_#00": [
         "impoundable",
@@ -208,6 +219,7 @@
         "ressource"
     ],
     "meca_parts_#00": [
+        "impoundable",
         "ressource"
     ],
     "explo_#00": [
@@ -218,7 +230,6 @@
         "defence"
     ],
     "mecanism_#00": [
-        "impoundable",
         "ressource",
         "hero_find_lucky"
     ],
@@ -250,7 +261,7 @@
         "esc_fixed",
         "nw_armory"
     ],
-    "pilegun_empty_#00": [
+    "pilegun_up_empty_#00": [
         "impoundable"
     ],
     "big_pgun_#00": [
@@ -392,9 +403,6 @@
         "nw_shooting",
         "nw_armory"
     ],
-    "watergun_empty_#00": [
-        "impoundable"
-    ],
     "jerrygun_#00": [
         "impoundable",
         "weapon",
@@ -505,6 +513,7 @@
         "nw_ikea"
     ],
     "water_#00": [
+        "impoundable",
         "can_poison",
         "hero_find",
         "esc_fixed",
@@ -558,6 +567,7 @@
         "lock"
     ],
     "pile_#00": [
+        "impoundable",
         "hero_find",
         "hero_find_lucky"
     ],
@@ -756,6 +766,9 @@
         "esc_fixed",
         "prevent_terror"
     ],
+    "lights_#00": [
+        "impoundable"
+    ],
     "rp_twin_#00": [
         "esc_fixed"
     ],
@@ -776,6 +789,7 @@
         "nw_ikea"
     ],
     "guitar_#00": [
+        "impoundable",
         "nw_ikea"
     ],
     "bureau_#00": [
@@ -786,6 +800,7 @@
         "weapon"
     ],
     "repair_one_#00": [
+        "impoundable",
         "hero_find_lucky"
     ],
     "electro_box_#00": [
