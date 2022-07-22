@@ -1,67 +1,109 @@
 {
     "ws001": {
         "type": "Recipe::WorkshopType",
-        "in": "repair_kit_part_#00",
-        "out": "repair_kit_#00",
+        "in": [
+            "repair_kit_part_#00"
+        ],
+        "out": [
+            "repair_kit_#00"
+        ],
         "action": "Wandeln"
     },
     "ws002": {
         "type": "Recipe::WorkshopType",
-        "in": "can_#00",
-        "out": "can_open_#00",
+        "in": [
+            "can_#00"
+        ],
+        "out": [
+            "can_open_#00"
+        ],
         "action": "Öffnen"
     },
     "ws003": {
         "type": "Recipe::WorkshopType",
-        "in": "plate_raw_#00",
-        "out": "plate_#00",
+        "in": [
+            "plate_raw_#00"
+        ],
+        "out": [
+            "plate_#00"
+        ],
         "action": "Wandeln"
     },
     "ws004": {
         "type": "Recipe::WorkshopType",
-        "in": "wood_log_#00",
-        "out": "wood2_#00",
+        "in": [
+            "wood_log_#00"
+        ],
+        "out": [
+            "wood2_#00"
+        ],
         "action": "Wandeln"
     },
     "ws005": {
         "type": "Recipe::WorkshopType",
-        "in": "wood_bad_#00",
-        "out": "wood2_#00",
+        "in": [
+            "wood_bad_#00"
+        ],
+        "out": [
+            "wood2_#00"
+        ],
         "action": "Wandeln"
     },
     "ws006": {
         "type": "Recipe::WorkshopType",
-        "in": "wood2_#00",
-        "out": "wood_beam_#00",
+        "in": [
+            "wood2_#00"
+        ],
+        "out": [
+            "wood_beam_#00"
+        ],
         "action": "Wandeln"
     },
     "ws007": {
         "type": "Recipe::WorkshopType",
-        "in": "wood_beam_#00",
-        "out": "wood2_#00",
+        "in": [
+            "wood_beam_#00"
+        ],
+        "out": [
+            "wood2_#00"
+        ],
         "action": "Wandeln"
     },
     "ws008": {
         "type": "Recipe::WorkshopType",
-        "in": "metal_bad_#00",
-        "out": "metal_#00",
+        "in": [
+            "metal_bad_#00"
+        ],
+        "out": [
+            "metal_#00"
+        ],
         "action": "Wandeln"
     },
     "ws009": {
         "type": "Recipe::WorkshopType",
-        "in": "metal_#00",
-        "out": "metal_beam_#00",
+        "in": [
+            "metal_#00"
+        ],
+        "out": [
+            "metal_beam_#00"
+        ],
         "action": "Wandeln"
     },
     "ws010": {
         "type": "Recipe::WorkshopType",
-        "in": "metal_beam_#00",
-        "out": "metal_#00",
+        "in": [
+            "metal_beam_#00"
+        ],
+        "out": [
+            "metal_#00"
+        ],
         "action": "Wandeln"
     },
     "ws011": {
         "type": "Recipe::WorkshopType",
-        "in": "electro_box_#00",
+        "in": [
+            "electro_box_#00"
+        ],
         "out": [
             [
                 "pile_#00",
@@ -92,7 +134,9 @@
     },
     "ws012": {
         "type": "Recipe::WorkshopType",
-        "in": "mecanism_#00",
+        "in": [
+            "mecanism_#00"
+        ],
         "out": [
             [
                 "metal_#00",
@@ -115,7 +159,9 @@
     },
     "ws013": {
         "type": "Recipe::WorkshopType",
-        "in": "chest_#00",
+        "in": [
+            "chest_#00"
+        ],
         "out": [
             [
                 "drug_#00",
@@ -150,7 +196,9 @@
     },
     "ws014": {
         "type": "Recipe::WorkshopType",
-        "in": "chest_xl_#00",
+        "in": [
+            "chest_xl_#00"
+        ],
         "out": [
             [
                 "watergun_opt_part_#00",
@@ -189,7 +237,9 @@
     },
     "ws015": {
         "type": "Recipe::WorkshopType",
-        "in": "chest_tools_#00",
+        "in": [
+            "chest_tools_#00"
+        ],
         "out": [
             [
                 "pile_#00",
@@ -220,7 +270,9 @@
     },
     "ws016": {
         "type": "Recipe::WorkshopType",
-        "in": "chest_food_#00",
+        "in": [
+            "chest_food_#00"
+        ],
         "out": [
             [
                 "food_bag_#00",
@@ -247,7 +299,9 @@
     },
     "ws017": {
         "type": "Recipe::WorkshopType",
-        "in": "deco_box_#00",
+        "in": [
+            "deco_box_#00"
+        ],
         "out": [
             [
                 "door_#00",
@@ -274,7 +328,9 @@
     },
     "ws018": {
         "type": "Recipe::WorkshopType",
-        "in": "catbox_#00",
+        "in": [
+            "catbox_#00"
+        ],
         "out": [
             [
                 "poison_part_#00",
@@ -293,38 +349,60 @@
     },
     "ws019": {
         "type": "Recipe::WorkshopType",
-        "in": "prints_#00",
-        "out": "magneticKey_#00",
+        "in": [
+            "prints_#00"
+        ],
+        "out": [
+            "magneticKey_#00"
+        ],
         "action": "Wandeln"
     },
     "ws020": {
         "type": "Recipe::WorkshopType",
-        "in": "prints_#01",
-        "out": "bumpKey_#00",
+        "in": [
+            "prints_#01"
+        ],
+        "out": [
+            "bumpKey_#00"
+        ],
         "action": "Wandeln"
     },
     "ws021": {
         "type": "Recipe::WorkshopType",
-        "in": "prints_#02",
-        "out": "classicKey_#00",
+        "in": [
+            "prints_#02"
+        ],
+        "out": [
+            "classicKey_#00"
+        ],
         "action": "Wandeln"
     },
     "ws023": {
         "type": "Recipe::WorkshopType",
-        "in": "food_xmas_#00",
-        "out": "wood_xmas_#00",
+        "in": [
+            "food_xmas_#00"
+        ],
+        "out": [
+            "wood_xmas_#00"
+        ],
         "action": "Wandeln"
     },
     "ws022": {
         "type": "Recipe::WorkshopTypeShamanSpecific",
-        "in": "soul_blue_#00",
-        "out": "soul_yellow_#00",
+        "in": [
+            "soul_blue_#00"
+        ],
+        "out": [
+            "soul_yellow_#00"
+        ],
         "action": "Wandeln",
         "picto": "r_mystic2_#00"
     },
     "com001": {
         "type": "Recipe::ManualAnywhere",
-        "out": "coffee_machine_#00",
+        "out": [
+            "coffee_machine_#00"
+        ],
         "provoking": "coffee_machine_part_#00",
         "in": [
             "coffee_machine_part_#00",
@@ -338,7 +416,9 @@
     },
     "com002": {
         "type": "Recipe::ManualAnywhere",
-        "out": "music_#00",
+        "out": [
+            "music_#00"
+        ],
         "provoking": "music_part_#00",
         "in": [
             "music_part_#00",
@@ -348,7 +428,9 @@
     },
     "com003": {
         "type": "Recipe::ManualAnywhere",
-        "out": "guitar_#00",
+        "out": [
+            "guitar_#00"
+        ],
         "provoking": "staff2_#00",
         "in": [
             "wire_#00",
@@ -358,7 +440,9 @@
     },
     "com004": {
         "type": "Recipe::ManualAnywhere",
-        "out": "car_door_#00",
+        "out": [
+            "car_door_#00"
+        ],
         "provoking": "car_door_part_#00",
         "in": [
             "car_door_part_#00",
@@ -369,7 +453,9 @@
     },
     "com005": {
         "type": "Recipe::ManualAnywhere",
-        "out": "torch_#00",
+        "out": [
+            "torch_#00"
+        ],
         "provoking": "lights_#00",
         "in": [
             "lights_#00",
@@ -378,7 +464,9 @@
     },
     "com006": {
         "type": "Recipe::ManualAnywhere",
-        "out": "wood_plate_#00",
+        "out": [
+            "wood_plate_#00"
+        ],
         "provoking": "wood_plate_part_#00",
         "in": [
             "wood_plate_part_#00",
@@ -387,7 +475,9 @@
     },
     "com007": {
         "type": "Recipe::ManualAnywhere",
-        "out": "concrete_wall_#00",
+        "out": [
+            "concrete_wall_#00"
+        ],
         "provoking": "concrete_#00",
         "in": [
             "concrete_#00",
@@ -396,7 +486,9 @@
     },
     "com008": {
         "type": "Recipe::ManualAnywhere",
-        "out": "chama_tasty_#00",
+        "out": [
+            "chama_tasty_#00"
+        ],
         "provoking": "chama_#00",
         "in": [
             "chama_#00",
@@ -408,7 +500,9 @@
     },
     "com009": {
         "type": "Recipe::ManualAnywhere",
-        "out": "food_noodles_hot_#00",
+        "out": [
+            "food_noodles_hot_#00"
+        ],
         "provoking": "spices_#00",
         "in": [
             "food_noodles_#00",
@@ -418,7 +512,9 @@
     },
     "com010": {
         "type": "Recipe::ManualAnywhere",
-        "out": "coffee_#00",
+        "out": [
+            "coffee_#00"
+        ],
         "provoking": "coffee_machine_#00",
         "in": [
             "pile_#00",
@@ -428,7 +524,9 @@
     },
     "com011": {
         "type": "Recipe::ManualAnywhere",
-        "out": "watergun_opt_empty_#00",
+        "out": [
+            "watergun_opt_empty_#00"
+        ],
         "provoking": "watergun_opt_part_#00",
         "in": [
             "watergun_opt_part_#00",
@@ -441,7 +539,9 @@
     },
     "com012": {
         "type": "Recipe::ManualAnywhere",
-        "out": "pilegun_up_empty_#00",
+        "out": [
+            "pilegun_up_empty_#00"
+        ],
         "provoking": "pilegun_upkit_#00",
         "in": [
             "pilegun_upkit_#00",
@@ -453,7 +553,9 @@
     },
     "com013": {
         "type": "Recipe::ManualAnywhere",
-        "out": "mixergun_empty_#00",
+        "out": [
+            "mixergun_empty_#00"
+        ],
         "provoking": "mixergun_part_#00",
         "in": [
             "mixergun_part_#00",
@@ -464,7 +566,9 @@
     },
     "com014": {
         "type": "Recipe::ManualAnywhere",
-        "out": "jerrygun_#00",
+        "out": [
+            "jerrygun_#00"
+        ],
         "provoking": "jerrygun_part_#00",
         "in": [
             "jerrygun_part_#00",
@@ -474,7 +578,9 @@
     },
     "com015": {
         "type": "Recipe::ManualAnywhere",
-        "out": "chainsaw_empty_#00",
+        "out": [
+            "chainsaw_empty_#00"
+        ],
         "provoking": "chainsaw_part_#00",
         "in": [
             "chainsaw_part_#00",
@@ -487,7 +593,9 @@
     },
     "com016": {
         "type": "Recipe::ManualAnywhere",
-        "out": "bgrenade_empty_#00",
+        "out": [
+            "bgrenade_empty_#00"
+        ],
         "provoking": "deto_#00",
         "in": [
             "explo_#00",
@@ -498,7 +606,9 @@
     },
     "com017": {
         "type": "Recipe::ManualAnywhere",
-        "out": "lawn_#00",
+        "out": [
+            "lawn_#00"
+        ],
         "provoking": "lawn_part_#00",
         "in": [
             "lawn_part_#00",
@@ -509,7 +619,9 @@
     },
     "com018": {
         "type": "Recipe::ManualAnywhere",
-        "out": "flash_#00",
+        "out": [
+            "flash_#00"
+        ],
         "provoking": "powder_#00",
         "in": [
             "powder_#00",
@@ -519,7 +631,9 @@
     },
     "com019": {
         "type": "Recipe::ManualAnywhere",
-        "out": "big_pgun_empty_#00",
+        "out": [
+            "big_pgun_empty_#00"
+        ],
         "provoking": "big_pgun_part_#00",
         "in": [
             "big_pgun_part_#00",
@@ -530,7 +644,9 @@
     },
     "com020": {
         "type": "Recipe::ManualAnywhere",
-        "out": "cart_#00",
+        "out": [
+            "cart_#00"
+        ],
         "provoking": "cart_part_#00",
         "in": [
             "cart_part_#00",
@@ -541,7 +657,9 @@
     },
     "com021": {
         "type": "Recipe::ManualAnywhere",
-        "out": "poison_#00",
+        "out": [
+            "poison_#00"
+        ],
         "provoking": "poison_part_#00",
         "in": [
             "poison_part_#00",
@@ -551,7 +669,9 @@
     },
     "com022": {
         "type": "Recipe::ManualAnywhere",
-        "out": "flesh_#00",
+        "out": [
+            "flesh_#00"
+        ],
         "provoking": "flesh_part_#00",
         "in": [
             "flesh_part_#00",
@@ -562,7 +682,9 @@
     },
     "com023": {
         "type": "Recipe::ManualAnywhere",
-        "out": "saw_tool_#00",
+        "out": [
+            "saw_tool_#00"
+        ],
         "provoking": "saw_tool_part_#00",
         "in": [
             "saw_tool_part_#00",
@@ -572,7 +694,9 @@
     },
     "com024": {
         "type": "Recipe::ManualAnywhere",
-        "out": "engine_#00",
+        "out": [
+            "engine_#00"
+        ],
         "provoking": "engine_part_#00",
         "in": [
             "engine_part_#00",
@@ -585,7 +709,9 @@
     },
     "com025": {
         "type": "Recipe::ManualAnywhere",
-        "out": "repair_kit_#00",
+        "out": [
+            "repair_kit_#00"
+        ],
         "provoking": "repair_kit_part_raw_#00",
         "in": [
             "repair_kit_part_raw_#00",
@@ -596,7 +722,9 @@
     },
     "com026": {
         "type": "Recipe::ManualAnywhere",
-        "out": "fruit_part_#00",
+        "out": [
+            "fruit_part_#00"
+        ],
         "provoking": "fruit_sub_part_#00",
         "in": [
             "fruit_sub_part_#00",
@@ -677,7 +805,9 @@
     },
     "com029": {
         "type": "Recipe::ManualAnywhere",
-        "out": "trapma_#00",
+        "out": [
+            "trapma_#00"
+        ],
         "provoking": "claymo_#00",
         "in": [
             "claymo_#00",
@@ -686,7 +816,9 @@
     },
     "com030": {
         "type": "Recipe::ManualAnywhere",
-        "out": "claymo_#00",
+        "out": [
+            "claymo_#00"
+        ],
         "provoking": "wire_#00",
         "in": [
             "wire_#00",
@@ -697,7 +829,9 @@
     },
     "com031": {
         "type": "Recipe::ManualAnywhere",
-        "out": "scope_#00",
+        "out": [
+            "scope_#00"
+        ],
         "provoking": "lens_#00",
         "in": [
             "tube_#00",
@@ -706,7 +840,9 @@
     },
     "com032": {
         "type": "Recipe::ManualAnywhere",
-        "out": "fungus_#00",
+        "out": [
+            "fungus_#00"
+        ],
         "provoking": "ryebag_#00",
         "in": [
             "ryebag_#00",
@@ -715,7 +851,9 @@
     },
     "com033": {
         "type": "Recipe::ManualAnywhere",
-        "out": "lsd_#00",
+        "out": [
+            "lsd_#00"
+        ],
         "provoking": "fungus_#00",
         "in": [
             "fungus_#00",
@@ -724,7 +862,9 @@
     },
     "com034": {
         "type": "Recipe::ManualAnywhere",
-        "out": "chkspk_#00",
+        "out": [
+            "chkspk_#00"
+        ],
         "provoking": "chudol_#00",
         "in": [
             "chudol_#00",
@@ -733,7 +873,9 @@
     },
     "com035": {
         "type": "Recipe::ManualAnywhere",
-        "out": "fruit_#00",
+        "out": [
+            "fruit_#00"
+        ],
         "provoking": "fruit_part_#00",
         "in": [
             "fruit_sub_part_#00",
@@ -744,7 +886,9 @@
     },
     "com036": {
         "type": "Recipe::ManualAnywhere",
-        "out": "dfhifi_#00",
+        "out": [
+            "dfhifi_#00"
+        ],
         "provoking": "cdelvi_#00",
         "in": [
             "cdelvi_#00",
@@ -753,7 +897,9 @@
     },
     "com037": {
         "type": "Recipe::ManualAnywhere",
-        "out": "hifiev_#00",
+        "out": [
+            "hifiev_#00"
+        ],
         "provoking": "cdphil_#00",
         "in": [
             "cdphil_#00",
@@ -762,7 +908,9 @@
     },
     "com038": {
         "type": "Recipe::ManualAnywhere",
-        "out": "hifiev_#00",
+        "out": [
+            "hifiev_#00"
+        ],
         "provoking": "cdbrit_#00",
         "in": [
             "cdbrit_#00",
@@ -771,7 +919,9 @@
     },
     "com039": {
         "type": "Recipe::ManualAnywhere",
-        "out": "dfhifi_#01",
+        "out": [
+            "dfhifi_#01"
+        ],
         "provoking": "bquies_#00",
         "in": [
             "hifiev_#00",
@@ -780,7 +930,9 @@
     },
     "com040": {
         "type": "Recipe::ManualAnywhere",
-        "out": "lpoint4_#00",
+        "out": [
+            "lpoint4_#00"
+        ],
         "provoking": "diode_#00",
         "in": [
             "wire_#00",
@@ -792,7 +944,9 @@
     },
     "com041": {
         "type": "Recipe::ManualAnywhere",
-        "out": "hmbrew_#00",
+        "out": [
+            "hmbrew_#00"
+        ],
         "provoking": "oilcan_#00",
         "in": [
             "fungus_#00",
@@ -802,7 +956,9 @@
     },
     "com042": {
         "type": "Recipe::ManualAnywhere",
-        "out": "wood_xmas_#00",
+        "out": [
+            "wood_xmas_#00"
+        ],
         "provoking": "food_xmas_#00",
         "in": [
             "food_xmas_#00",
@@ -811,7 +967,9 @@
     },
     "com043": {
         "type": "Recipe::ManualAnywhere",
-        "out": "gun_#00",
+        "out": [
+            "gun_#00"
+        ],
         "provoking": "gun_#00",
         "in": [
             "gun_#00",
@@ -820,7 +978,9 @@
     },
     "com044": {
         "type": "Recipe::ManualAnywhere",
-        "out": "machine_gun_#00",
+        "out": [
+            "machine_gun_#00"
+        ],
         "provoking": "machine_gun_#00",
         "in": [
             "machine_gun_#00",
@@ -829,7 +989,9 @@
     },
     "com045": {
         "type": "Recipe::ManualAnywhere",
-        "out": "christmas_suit_full_#00",
+        "out": [
+            "christmas_suit_full_#00"
+        ],
         "provoking": "christmas_suit_1_#00",
         "in": [
             "christmas_suit_1_#00",
@@ -839,7 +1001,9 @@
     },
     "com046": {
         "type": "Recipe::ManualAnywhere",
-        "out": "christmas_suit_full_#00",
+        "out": [
+            "christmas_suit_full_#00"
+        ],
         "provoking": "christmas_suit_2_#00",
         "in": [
             "christmas_suit_1_#00",
@@ -849,7 +1013,9 @@
     },
     "com047": {
         "type": "Recipe::ManualAnywhere",
-        "out": "christmas_suit_full_#00",
+        "out": [
+            "christmas_suit_full_#00"
+        ],
         "provoking": "christmas_suit_3_#00",
         "in": [
             "christmas_suit_1_#00",
@@ -859,7 +1025,9 @@
     },
     "com048": {
         "type": "Recipe::ManualAnywhere",
-        "out": "pumpkin_on_#00",
+        "out": [
+            "pumpkin_on_#00"
+        ],
         "provoking": "pumpkin_off_#00",
         "in": [
             "pumpkin_off_#00",
@@ -869,7 +1037,9 @@
     },
     "com049": {
         "type": "Recipe::ManualAnywhere",
-        "out": "angryc_#00",
+        "out": [
+            "angryc_#00"
+        ],
         "provoking": "pet_snake2_#00",
         "in": [
             "pet_snake2_#00",
@@ -878,7 +1048,9 @@
     },
     "com050": {
         "type": "Recipe::ManualAnywhere",
-        "out": "pumpkin_off_#00",
+        "out": [
+            "pumpkin_off_#00"
+        ],
         "provoking": "pumpkin_raw_#00",
         "in": [
             "pumpkin_raw_#00",
@@ -890,7 +1062,9 @@
     },
     "com051": {
         "type": "Recipe::ManualAnywhere",
-        "out": "infect_poison_#00",
+        "out": [
+            "infect_poison_#00"
+        ],
         "provoking": "infect_poison_part_#00",
         "in": [
             "infect_poison_part_#00",
