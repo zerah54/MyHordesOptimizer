@@ -19,7 +19,7 @@ import { LabelPipe } from './label.pipe';
         }
     ],
 })
-export class SelectComponent<T> implements ControlValueAccessor, Validator, MatFormFieldControl<T | string | undefined>, OnDestroy {
+export class SelectComponent<T> implements ControlValueAccessor, Validator, MatFormFieldControl<T | string | T[] | string[] | undefined>, OnDestroy {
 
     @HostBinding() id = `mho-select-${SelectComponent.nextId++}`;
 
@@ -55,7 +55,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     @Input() get disabled(): boolean { return this._disabled; }
 
-    @Output() filterChange: EventEmitter<T | string | undefined> = new EventEmitter<T | string | undefined>();
+    @Output() filterChange: EventEmitter<T | string | T[] | string[] | undefined> = new EventEmitter<T | string | T[] | string[] | undefined>();
 
     set required(req) {
         this._required = coerceBooleanProperty(req);
@@ -79,7 +79,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     private complete_options: (T | string)[] = [];
     //The internal data model for form control value access
-    private innerValue: T | string | undefined = undefined;
+    private innerValue: T | string | T[] | string[] | undefined = undefined;
     // errors for the form control will be stored in this array
     private errors: string[] = ['This field is required'];
     private touched: boolean = false;
@@ -118,17 +118,17 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         }
     }
 
-    get errorState(): boolean {
+    public get errorState(): boolean {
         return this.form_control.invalid && this.touched;
     }
 
     //get accessor
-    public get value(): T | string | undefined {
+    public get value(): T | string | T[] | string[] | undefined {
         return this.innerValue;
     };
 
     //set accessor including call the onchange callback
-    public set value(v: T | string | undefined) {
+    public set value(v: T | string | T[] | string[] | undefined) {
         if (v !== this.innerValue) {
             this.stateChanges.next();
             this.innerValue = v;
@@ -190,7 +190,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     }
 
     public get empty() {
-        return !this.value;
+        return this.value === undefined || this.value === null || this.value === '' || (Array.isArray(this.value) && this.value.length === 0);
     }
 
     public validate(control: AbstractControl): ValidationErrors | null {
