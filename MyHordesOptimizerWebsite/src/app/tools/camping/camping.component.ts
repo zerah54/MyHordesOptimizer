@@ -229,6 +229,7 @@ export class CampingComponent implements OnInit {
     public ngOnInit(): void {
         this.route.queryParams.subscribe((params: Record<string, string>) => {
             this.api.getRuins().subscribe((ruins: Ruin[]) => {
+                ruins = ruins.sort((ruin_a: Ruin, ruin_b: Ruin) => ruin_a.label[this.locale].toLocaleLowerCase().localeCompare(ruin_b.label[this.locale].toLocaleLowerCase()));
                 this.ruins = [...this.added_ruins].concat([...ruins]);
 
                 const init_form: Record<string, unknown> | undefined = this.convertEasyReadableToForm(params);
