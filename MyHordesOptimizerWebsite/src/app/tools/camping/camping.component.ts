@@ -1,4 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard';
+import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -122,7 +123,7 @@ export class CampingComponent implements OnInit {
 
     private readonly added_ruins: Ruin[] = dtoToModelArray(Ruin, [
         {
-            id: '', camping: 0, label: { en: `None`, fr: 'Aucun', de: `Kein`, es: `TODO` }, chance: 0, description: { en: ``, fr: ``, de: ``, es: `` },
+            id: 'none', camping: 0, label: { en: `None`, fr: 'Aucun', de: `Kein`, es: `TODO` }, chance: 0, description: { en: ``, fr: ``, de: ``, es: `` },
             explorable: false, img: '', minDist: 0, maxDist: 0, drops: []
         },
         {
@@ -221,16 +222,17 @@ export class CampingComponent implements OnInit {
     };
 
 
-    constructor(private api: ApiServices, private fb: FormBuilder, private route: ActivatedRoute, private clipboard: Clipboard, private router: Router) {
+    constructor(private api: ApiServices, private fb: FormBuilder, private route: ActivatedRoute, private clipboard: Clipboard, private router: Router,
+        private activated_route: ActivatedRoute, private location: Location) {
     }
 
     public ngOnInit(): void {
         this.route.queryParams.subscribe((params: Record<string, string>) => {
-            const init_form: Record<string, unknown> | undefined = this.convertEasyReadableToForm(params);
-
             this.api.getRuins().subscribe((ruins: Ruin[]) => {
+                ruins = ruins.sort((ruin_a: Ruin, ruin_b: Ruin) => ruin_a.label[this.locale].toLocaleLowerCase().localeCompare(ruin_b.label[this.locale].toLocaleLowerCase()));
                 this.ruins = [...this.added_ruins].concat([...ruins]);
 
+                const init_form: Record<string, unknown> | undefined = this.convertEasyReadableToForm(params);
 
                 this.configuration_form = this.fb.group(init_form ? init_form : {
                     town: [<TownType>this.town_types.find((town_type: TownType) => town_type.id === 'rne')],
@@ -250,25 +252,17 @@ export class CampingComponent implements OnInit {
                     object_improve: [0],
                     ruin: [this.added_ruins[0]]
                 });
-
+                this.calculateProbabilities();
                 this.configuration_form.valueChanges.subscribe(() => this.calculateProbabilities())
 
-                this.router.navigate(
-                    [],
-                    {
-                        relativeTo: this.route,
-                        queryParams: {},
-                        replaceUrl: true
-                    }
-                );
-
+                const url = this.router.createUrlTree([], {relativeTo: this.activated_route}).toString()
+                this.location.go(url);
             });
         });
     }
 
     public shareCamping(): void {
         let url: string = window.location.href;
-        console.log('sharecamping', url);
         url += '?' + this.convertFormToEasyReadable();
         this.clipboard.copy(url);
     }
@@ -286,8 +280,8 @@ export class CampingComponent implements OnInit {
         /** Phare */
         chances += this.configuration_form.get('phare')?.value ? 5 : 0;
         /** Zombies dans la zone */
-        let zombies_factor = this.configuration_form.get('vest') ? 0.6 : 1.4;
-        chances += -zombies_factor * this.configuration_form.get('zombies')?.value;
+        let zombies_factor = this.configuration_form.get('vest')?.value ? -0.6 : -1.4;
+        chances += zombies_factor * this.configuration_form.get('zombies')?.value;
 
         /** Nombre de campings */
         let nb_camping_town_type_mapping = (<TownType>this.configuration_form.get('town')?.value)?.id === 'pande' ? this.campings_map['pande'] : this.campings_map['normal'];
@@ -329,12 +323,9 @@ export class CampingComponent implements OnInit {
         let url_string: string = '';
         for (const key in this.configuration_form.value) {
             const element = this.configuration_form.value[key];
-            if (element) {
-                console.log('element', element);
-                if (typeof element === 'string' || typeof element === 'number') {
+            if (element !== null && element !== undefined && element !== '') {
+                if (typeof element === 'string' || typeof element === 'number' || typeof element === 'boolean') {
                     url_string += `&${key}=${element.toString()}`;
-                } else if (typeof element === 'boolean') {
-                    url_string += element ? `&${key}=true` : `&${key}=false`;
                 } else {
                     url_string += `&${key}=${element.id}`;
                 }
@@ -342,7 +333,6 @@ export class CampingComponent implements OnInit {
                 url_string += `&${key}=`;
             }
         }
-        console.log('url_string;', url_string);
         return url_string;
     }
 
@@ -356,13 +346,13 @@ export class CampingComponent implements OnInit {
             if (init_form) {
                 switch (key) {
                     case "town":
-                        init_form[key] = [this.town_types.find((town_type: TownType) => town_type.id === params[key])];
+                        init_form[key] = [this.town_types.find((town_type: TownType) => town_type.id.toString() === params[key].toString())];
                         break;
                     case "ruin":
-                        init_form[key] = [this.ruins.find((ruin: Ruin) => ruin.id === params[key])];
+                        init_form[key] = [this.ruins.find((ruin: Ruin) => ruin.id.toString() === params[key].toString())];
                         break;
                     case "job":
-                        init_form[key] = [this.jobs.find((job: Job) => job.id === params[key])];
+                        init_form[key] = [this.jobs.find((job: Job) => job.id.toString() === params[key].toString())];
                         break;
                     default:
                         if (params[key] === "false") {
