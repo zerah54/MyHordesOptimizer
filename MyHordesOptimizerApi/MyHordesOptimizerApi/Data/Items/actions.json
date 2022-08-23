@@ -113,7 +113,7 @@
             "drink_ap_1",
             "consume_item",
             {
-                "group": "g_immune_90"
+                "group": "g_immune_98"
             }
         ],
         "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut...",
@@ -136,7 +136,7 @@
             "reset_thirst_counter",
             "consume_item",
             {
-                "group": "g_immune_90"
+                "group": "g_immune_98"
             }
         ],
         "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut...",
@@ -160,7 +160,7 @@
             "drink_ap_2",
             "consume_item",
             {
-                "group": "g_immune_90"
+                "group": "g_immune_98"
             }
         ],
         "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut...",
@@ -183,7 +183,7 @@
             "drink_ap_2",
             "consume_item",
             {
-                "group": "g_immune_90"
+                "group": "g_immune_98"
             }
         ],
         "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut...",
@@ -205,7 +205,7 @@
             "drink_no_ap",
             "consume_item",
             {
-                "group": "g_immune_90"
+                "group": "g_immune_98"
             }
         ],
         "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut...",
@@ -225,7 +225,7 @@
             "inflict_wound",
             "consume_item",
             {
-                "group": "g_immune_90"
+                "group": "g_immune_98"
             }
         ],
         "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
@@ -248,7 +248,7 @@
             "drink_ap_1",
             "consume_item",
             {
-                "group": "g_immune_90"
+                "group": "g_immune_98"
             }
         ],
         "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!",
@@ -271,7 +271,7 @@
             "reset_thirst_counter",
             "consume_item",
             {
-                "group": "g_immune_90"
+                "group": "g_immune_98"
             }
         ],
         "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!",
@@ -295,7 +295,7 @@
             "drink_ap_2",
             "consume_item",
             {
-                "group": "g_immune_90"
+                "group": "g_immune_98"
             }
         ],
         "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!",
@@ -318,7 +318,7 @@
             "drink_ap_2",
             "consume_item",
             {
-                "group": "g_immune_90"
+                "group": "g_immune_98"
             }
         ],
         "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!",
@@ -340,7 +340,7 @@
             "drink_no_ap",
             "consume_item",
             {
-                "group": "g_immune_90"
+                "group": "g_immune_98"
             }
         ],
         "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!",
@@ -360,7 +360,7 @@
             "inflict_wound",
             "consume_item",
             {
-                "group": "g_immune_90"
+                "group": "g_immune_98"
             }
         ],
         "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!"
@@ -5083,7 +5083,7 @@
                                 }
                             }
                         ],
-                        99
+                        100
                     ]
                 ]
             }
@@ -5118,7 +5118,7 @@
                                 }
                             }
                         ],
-                        60
+                        66
                     ]
                 ]
             }
@@ -5153,7 +5153,7 @@
                                 }
                             }
                         ],
-                        30
+                        33
                     ]
                 ]
             }
