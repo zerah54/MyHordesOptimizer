@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.72
+// @version      1.0.0-alpha.73
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,7 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Suppression] Retrait de la fonctionnalité expérimentale de prévention des actions dangereuses (cyanure / dépendance) \n`;
++ `[Correctif] Réparation de la recherche de chantiers`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -3307,7 +3307,7 @@ function displaySearchFieldOnBuildings() {
             let buildings = Array.from(document.querySelectorAll('.buildings'));
             let building_rows = [];
             buildings.forEach((building) => {
-                building_rows.push(...Array.from(building.querySelectorAll('.row')));
+                building_rows.push(...Array.from(building.querySelectorAll('.row-flex')));
             })
             search_field.addEventListener('keyup', (event) => {
                 building_rows.forEach((building_row) => {
