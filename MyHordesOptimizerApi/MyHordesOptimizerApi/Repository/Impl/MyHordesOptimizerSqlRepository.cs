@@ -102,7 +102,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var models = connection.GetList<HeroSkillsModel>();
+            var models = connection.Query<HeroSkillsModel>("SELECT * FROM HeroSkills");
             connection.Close();
             var heroSkills = Mapper.Map<List<HeroSkill>>(models);
             return heroSkills;
@@ -136,7 +136,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var itemsComplets = connection.GetList<ItemCompletModel>();
+            var itemsComplets = connection.Query<ItemCompletModel>("SELECT * FROM ItemComplet");
             connection.Close();
 
             var items = Mapper.Map<List<Item>>(itemsComplets.Distinct(new ItemIdComparer()));
@@ -242,7 +242,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var items = GetItems();
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var recipeCompletModels = connection.GetList<RecipeCompletModel>();
+            var recipeCompletModels = connection.Query<RecipeCompletModel>("SELECT * FROM RecipeComplet");
             connection.Close();
 
             var recipes = Mapper.Map<List<ItemRecipe>>(recipeCompletModels.Distinct(new RecipeNameComparer()));
@@ -587,7 +587,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var items = GetItems();
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var ruinsComplet = connection.GetList<RuinCompletModel>();
+            var ruinsComplet = connection.Query<RuinCompletModel>("SELECT * FROM RuinComplete");
             connection.Close();
 
             var ruins = Mapper.Map<List<MyHordesOptimizerRuin>>(ruinsComplet.Distinct(new RuinIdComparer()));
@@ -656,7 +656,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var categories = connection.GetList<CategoryModel>();
+            var categories = connection.Query<CategoryModel>("SELECT * FROM Category");
             connection.Close();
             return categories;
         }
