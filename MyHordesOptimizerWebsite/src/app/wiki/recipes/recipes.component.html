@@ -22,13 +22,13 @@
                                 <ng-container [ngSwitch]="column.id">
                                     <ng-container *ngSwitchCase="'type'">
                                         <div>
-                                        <ng-container *ngIf="row[column.id] === 'MANUAL_ANYWHERE'; else workshop">
+                                        <ng-container *ngIf="row[column.id] === 'Recipe::ManualAnywhere'; else workshop">
                                             <img [src]="HORDES_IMG_REPO + 'log/citizen.gif'"><ng-container i18n>Action de citoyen</ng-container>
                                         </ng-container>
                                         <ng-template #workshop>
                                             <img [src]="HORDES_IMG_REPO + 'log/workshop.gif'">
-                                            <ng-container *ngIf="row[column.id] === 'WORKSHOP'" i18n>Atelier</ng-container>
-                                            <ng-container *ngIf="row[column.id] === 'WORKSHOP_SHAMAN'" i18n>Atelier, Chaman uniquement</ng-container>
+                                            <ng-container *ngIf="row[column.id] === 'Recipe::WorkshopType'" i18n>Atelier</ng-container>
+                                            <ng-container *ngIf="row[column.id] === 'Recipe::WorkshopTypeShamanSpecific'" i18n>Atelier, Chaman uniquement</ng-container>
                                         </ng-template>
                                         </div>
                                     </ng-container>
