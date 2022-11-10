@@ -55,7 +55,7 @@ export class ApiServices extends GlobalServices {
 
     /** Récupère l'identifiant de citoyen */
     public getMe(): void {
-        super.get<{ id: number, townId: number }>(API_URL + 'myhordesfetcher/me?userKey=' + getExternalAppId())
+        super.get<{ id: number, townId: number }>(API_URL + '/myhordesfetcher/me?userKey=' + getExternalAppId())
             .subscribe((response: HttpResponse<{ id: number, townId: number } | null>) => {
                 console.log('test', response.body);
                 setUserId(response.body ? response.body.id : null);
@@ -102,7 +102,7 @@ export class ApiServices extends GlobalServices {
      */
     public getWishlist(): Observable<WishlistInfo> {
         return new Observable((sub: Subscriber<WishlistInfo>) => {
-            super.get<WishlistInfoDTO>(API_URL + 'wishlist?townId=' + getTownId())
+            super.get<WishlistInfoDTO>(API_URL + '/wishlist?townId=' + getTownId())
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         sub.next(new WishlistInfo(response.body));
@@ -125,7 +125,7 @@ export class ApiServices extends GlobalServices {
                 .map((wishlist_item: WishlistItem) => {
                     return { id: wishlist_item.item.id, priority: wishlist_item.priority, count: wishlist_item.count };
                 });
-            super.put<WishlistInfoDTO>(API_URL + 'wishlist?townId=' + getTownId() + '&userId=' + getUserId(), item_list)
+            super.put<WishlistInfoDTO>(API_URL + '/wishlist?townId=' + getTownId() + '&userId=' + getUserId(), item_list)
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         sub.next(new WishlistInfo(response.body));
@@ -141,7 +141,7 @@ export class ApiServices extends GlobalServices {
      */
     public addItemToWishlist(item: Item): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.post(API_URL + 'wishlist/add/' + item.id + '?townId=' + getTownId() + '&userId=' + getUserId(), undefined)
+            super.post(API_URL + '/wishlist/add/' + item.id + '?townId=' + getTownId() + '&userId=' + getUserId(), undefined)
                 .subscribe({
                     next: () => {
                         sub.next();

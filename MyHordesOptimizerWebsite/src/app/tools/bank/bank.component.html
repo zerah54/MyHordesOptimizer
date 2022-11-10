@@ -7,8 +7,11 @@
             <ng-container *ngIf="displayed_bank_items">
                 <div class="filter">
                     <mho-filter (filterChange)="filter_value = $event; applyFilters()"></mho-filter>
-                    <mat-form-field style="margin-left: 1em;">
-                        <mho-select [multiple]="true" [options]="options" [bindLabel]="'value.label'" [(ngModel)]="select_value" (filterChange)="applyFilters()"></mho-select>
+                    <mat-form-field class="properties-filter">
+                        <mat-label i18n>Chercher des objets par propriétés</mat-label>
+                        <mho-select [multiple]="true" [options]="options" [bindLabel]="'value.label'"
+                            [(ngModel)]="select_value" (filterChange)="applyFilters()">
+                        </mho-select>
                     </mat-form-field>
                 </div>
                 <ul>
