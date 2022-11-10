@@ -102,7 +102,19 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var models = connection.Query<HeroSkillsModel>("SELECT * FROM HeroSkills");
+            var models = connection.Query<HeroSkillsModel>(@"SELECT name
+                                                              ,daysNeeded
+                                                              ,description_fr AS DescriptionFr
+                                                              ,description_en AS DescriptionEn
+                                                              ,description_es AS DescriptionEs
+                                                              ,description_de AS DescriptionDe
+                                                              ,icon
+                                                              ,label_fr AS LabelFr
+                                                              ,label_en AS LabelEn
+                                                              ,label_es AS LabelEs
+                                                              ,label_de AS LabelDe
+                                                              ,nbUses
+                                                          FROM HeroSkills");
             connection.Close();
             var heroSkills = Mapper.Map<List<HeroSkill>>(models);
             return heroSkills;
@@ -136,7 +148,32 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var itemsComplets = connection.Query<ItemCompletModel>("SELECT * FROM ItemComplet");
+            var itemsComplets = connection.Query<ItemCompletModel>(@"SELECT idItem
+                                                                  ,idCategory
+                                                                  ,itemUid
+                                                                  ,itemDeco
+                                                                  ,itemLabel_fr AS ItemLabelFr
+                                                                  ,itemLabel_en AS ItemLabelEn
+                                                                  ,itemLabel_es AS ItemLabelEs
+                                                                  ,itemLabel_de AS ItemLabelDe
+                                                                  ,itemDescription_fr AS ItemDescriptionFr
+                                                                  ,itemDescription_en AS ItemDescriptionEn
+                                                                  ,itemDescription_es AS ItemDescriptionEs
+                                                                  ,itemDescription_de AS ItemDescriptionDe
+                                                                  ,itemGuard
+                                                                  ,itemImg
+                                                                  ,itemIsHeaver
+                                                                  ,itemDropRate_praf AS ItemDropRatePraf
+                                                                  ,itemDropRate_notPraf AS ItemDropRateNotPraf
+                                                                  ,catName
+                                                                  ,catOrdering
+                                                                  ,catLabel_fr AS CatLabelFr
+                                                                  ,catLabel_en AS CatLabelEn
+                                                                  ,catLabel_es AS CatLabelEs
+                                                                  ,catLabel_de AS CatLabelDe
+                                                                  ,actionName
+                                                                  ,propertyName
+                                                              FROM ItemComplet");
             connection.Close();
 
             var items = Mapper.Map<List<Item>>(itemsComplets.Distinct(new ItemIdComparer()));
@@ -587,7 +624,27 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var items = GetItems();
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var ruinsComplet = connection.Query<RuinCompletModel>("SELECT * FROM RuinComplete");
+            var ruinsComplet = connection.Query<RuinCompletModel>(@"SELECT idRuin
+                                                                  ,ruinLabel_fr AS RuinLabelFr
+                                                                  ,ruinLabel_en AS RuinLabelEn
+                                                                  ,ruinLabel_es AS RuinLabelEs
+                                                                  ,ruinLabel_de AS RuinLabelDe
+                                                                  ,ruinDescription_fr AS RuinDescriptionFr
+                                                                  ,ruinDescription_en AS RuinDescriptionEn
+                                                                  ,ruinDescription_es AS RuinDescriptionEs
+                                                                  ,ruinDescription_de AS RuinDescriptionDe
+                                                                  ,ruinExplorable
+                                                                  ,ruinImg
+                                                                  ,ruinCamping
+                                                                  ,ruinMinDist
+                                                                  ,ruinMaxDist
+                                                                  ,ruinChance
+                                                                  ,idItem
+                                                                  ,itemUid
+                                                                  ,itemLabel_fr AS ItemLabelFr
+                                                                  ,dropProbability
+                                                                  ,dropWeight
+                                                              FROM RuinComplete");
             connection.Close();
 
             var ruins = Mapper.Map<List<MyHordesOptimizerRuin>>(ruinsComplet.Distinct(new RuinIdComparer()));
@@ -656,7 +713,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new SqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var categories = connection.Query<CategoryModel>("SELECT * FROM Category");
+            var categories = connection.Query<CategoryModel>(@"SELECT idCategory
+                                                              ,name
+                                                              ,label_fr AS LabelFr
+                                                              ,label_en AS LabelEn
+                                                              ,label_es AS LabelEs
+                                                              ,label_de AS LabelDe
+                                                              ,ordering
+                                                          FROM Category");
             connection.Close();
             return categories;
         }
