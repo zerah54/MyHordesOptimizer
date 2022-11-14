@@ -2,8 +2,14 @@
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
+using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Controllers
 {
@@ -40,6 +46,24 @@ namespace MyHordesOptimizerApi.Controllers
             UserKeyProvider.UserId = userId;
             var response = ExternalToolsService.UpdateExternalsTools(updateRequestDto);
             return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("UpdateGHZoneRegen")]
+        public ActionResult<List<CaseGH>> UpdateGHZoneRegen([FromBody] UpdateZoneRegenDto requestDto)
+        {
+            if (requestDto == null)
+            {
+                return BadRequest($"{nameof(requestDto)} cannot be null");
+            }
+            requestDto.DynamicsCells = new List<dynamic>();
+            foreach (var cell in requestDto.Cells)
+            {
+                requestDto.DynamicsCells.Add(JObject.Parse(cell.ToString()));
+            }
+            var cases = ExternalToolsService.UpdateGHZoneRegen(requestDto);
+            Logger.LogTrace($"[ExternalToolsController][UpdateGHZoneRegen] {requestDto.ToJson()} {Environment.NewLine} {cases.ToJson()}");
+            return cases;
         }
     }
 }

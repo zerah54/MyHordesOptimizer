@@ -42,9 +42,9 @@ namespace MyHordesOptimizerApi.Controllers
             //var min = 3406;
             //var min = 14000;
             //var max = 22225;
-            var min = 3325;
-            var max = 5675;
-            var day = 19;
+            var min = 4025;
+            var max = 6725;
+            var day = 20;
             var dayAttaque = day + 1;
             var max_ratio = 1;
             var ratio_min = dayAttaque <= 3 ? 0.66 : max_ratio;
