@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.70
+// @version      1.0.0-beta.01
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -13,7 +13,7 @@
 // @supportURL   lenoune38@gmail.com
 //
 // @connect      https://myhordesoptimizerapi.azurewebsites.net/
-// @connect      http://144.24.192.182
+// @connect      https://api.myhordesoptimizer.fr/
 // @connect      *
 //
 // @match        *://myhordes.de/*
@@ -33,8 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Ajout du calcul du nombre de zombies qui vont mourir par désespoir sur une case \n`
-+ `[Nouveauté] Il n'est plus nécessaire de renseigner son id d'app externe \n`;
++ `[important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -57,7 +56,7 @@ let external_app_id;
 ////////////////////
 
 const api_url = 'https://api.myhordesoptimizer.fr';
-const api_url_2 = 'https://myhordesoptimizerapi.azurewebsites.net/';
+const api_url_2 = 'https://myhordesoptimizerapi.azurewebsites.net';
 
 ///////////////////////////////////////////
 // Listes de constantes / Constants list //
@@ -497,97 +496,6 @@ const camping_results = [
     },
 ];
 
-const categories_mapping = {
-    armor : {
-        id: 'armor',
-        img : '',
-        label : {
-            de : `Verteidigung`,
-            en : `Defences`,
-            es : `Defensas`,
-            fr : `Défenses`
-        },
-        ordering : 4
-    },
-    box : {
-        id: 'box',
-        img : '',
-        label : {
-            de : `Taschen und Behälter`,
-            en : `Containers and boxes`,
-            es : `Contenedores y cajas`,
-            fr : `Conteneurs et boîtes`
-        },
-        ordering : 3
-    },
-    drug : {
-        id: 'drug',
-        img : '',
-        label : {
-            de : `Apotheke und Labor`,
-            en : `Pharmacy`,
-            es : `Farmacia`,
-            fr : `Pharmacie`
-        },
-        ordering : 5
-    },
-    food : {
-        id: 'food',
-        img : '',
-        label : {
-            de : `Grundnahrungsmittel`,
-            en : `Food`,
-            es : `Provisiones`,
-            fr : `Provisions`
-        },
-        ordering : 6
-    },
-    furniture : {
-        id: 'furniture',
-        img : '',
-        label : {
-            de : `Einrichtungen`,
-            en : `Facilities`,
-            es : `Objetos caseros`,
-            fr : `Aménagements`
-        },
-        ordering : 1
-    },
-    misc : {
-        id: 'misc',
-        img : '',
-        label : {
-            de : `Sonstiges`,
-            en : `Miscellaneous`,
-            es : `Otros`,
-            fr : `Divers`
-        },
-        ordering : 7
-    },
-    rsc : {
-        id: 'rsc',
-        img : '',
-        label : {
-            de : `Baustoffe`,
-            en : `Resources`,
-            es : `Recursos`,
-            fr : `Ressources`
-        },
-        ordering : 0
-    },
-    weapon : {
-        id: 'weapon',
-        img : '',
-        label : {
-            de : `Waffenarsenal`,
-            en : `Armoury`,
-            es : `Armería`,
-            fr : `Armurerie`
-        },
-        ordering : 2
-    }
-}
-
 const jobs = [
     {
         id: 'citizen',
@@ -690,8 +598,9 @@ const api_texts = {
 };
 
 const action_types = [
-    {id: `Manual`, label: {en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante`}, ordering: 1},
-    {id: `Workshop`, label: {en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller`}, ordering: 0},
+    {id: `Recipe::ManualAnywhere`, label: {en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante`}, ordering: 1},
+    {id: `Recipe::WorkshopType`, label: {en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller`}, ordering: 0},
+    {id: `Recipe::WorkshopTypeShamanSpecific`, label: {en: `TODO`, fr: `Atelier - Chaman`, de: `TODO`, es: `TODO`}, ordering: 2},
 ];
 
 const wishlist_priorities = [
@@ -1107,12 +1016,6 @@ let params_categories = [
             de: `Bestätigung anfordern bevor Abreise ohne automatische Eskorte`,
             es: `Pedir confirmación antes de cerrar la página sin haber puesto la escolta automática`
         }, parent_id: null},
-        {id: `prevent_dangerous_actions`, label: {
-            en: `[Experimental] Request confirmation before performing hazardous actions`,
-            fr: `[Expérimental] Demander confirmation avant d'effectuer des actions dangereuses`,
-            de: `[Experimentell] Bestätigung anfordern, bevor Ausführung gefährliche Aktionen`,
-            es: `[Experimental] Pedir confirmación antes de efectuar acciones peligrosas`
-        }, parent_id: null},
         {
             id: `notify_on_search_end`,
             label: {
@@ -1252,7 +1155,6 @@ function pageIsForum() {
     return document.URL.indexOf('forum') > -1;
 }
 
-
 function getI18N(item) {
     if (!item) return;
     return item[lang] !== 'TODO' ? item[lang] : (item['en'] === 'TODO' ? item['fr'] : item['en'])
@@ -1335,8 +1237,8 @@ function calculateDespairDeaths(nb_killed_zombies) {
     return Math.floor(Math.max(0, (nb_killed_zombies - 1 ) / 2));
 }
 
+
 function initOptions() {
-    preventDangerousActions();
     preventFromLeaving();
     createDisplayMapButton();
 }
@@ -1391,15 +1293,6 @@ function createSelectWithSearch() {
     return select_complete;
 }
 
-/**
-* TODO Supprimer une fois les données remontées proprement de la base
-* @param {string} category
-* @return la catégorie complète associé au string passé en paramètre
-*/
-function getCategory(category) {
-    return categories_mapping[category.toLowerCase()];
-}
-
 /** Create Optimize button */
 function createOptimizerBtn() {
     setTimeout(() => {
@@ -1443,7 +1336,7 @@ function createOptimizerButtonContent() {
     let content = document.getElementById(content_btn_id);
     content.innerHTML = '';
 
-    if (external_app_id && external_app_id !== '' && external_app_id !== 'not set') {
+    if (external_app_id) {
         /////////////////////
         // SECTION BOUTONS //
         /////////////////////
@@ -1856,7 +1749,7 @@ function filterItems(source_items) {
 function displayBank(tab_id) {
     getBank().then((bank) => {
         if (bank) {
-            displayItems(bank.bank, tab_id);
+            displayItems(bank, tab_id);
         }
     });
 }
@@ -2129,16 +2022,12 @@ function displayItems(filtered_items, tab_id) {
     tab_content.appendChild(item_list);
 
     filtered_items.forEach((item, index) => {
-        if (index === 0 || filtered_items[index - 1].category !== item.category) {
-            let category_img = document.createElement('img');
-            category_img.src = item.category.img;
-
+        if (index === 0 || filtered_items[index - 1].category.idCategory !== item.category.idCategory) {
             let category_text = document.createElement('span');
-            category_text.innerText = getI18N(item.category.label);
+            category_text.innerText = item.category.label[lang];
 
             let category_container = document.createElement('div');
             category_container.classList.add('mho-category', 'mho-header');
-            category_container.appendChild(category_img);
             category_container.appendChild(category_text);
 
             item_list.appendChild(category_container);
@@ -2179,10 +2068,10 @@ function displayItems(filtered_items, tab_id) {
         item_icon.src = repo_img_hordes_url + item.img;
         icon_container.appendChild(item_icon);
 
-        if (tab_id === 'bank' && item.count > 1) {
+        if (tab_id === 'bank' && item.bankCount > 1) {
             let item_count = document.createElement('span');
             item_count.setAttribute('style', 'vertical-align: sub; font-size: 10px;')
-            item_count.innerText = item.count;
+            item_count.innerText = item.bankCount;
             icon_container.appendChild(item_count);
         }
 
@@ -3070,13 +2959,13 @@ function displayRuins() {
                                 item_div.title = getI18N(item.item.label);
 
                                 let item_img = document.createElement('img');
-                                item_img.src = hordes_img_url + item.item.img;
+                                item_img.src = repo_img_hordes_url + item.item.img;
                                 item_img.style.display = 'block';
                                 item_img.style.margin = 'auto';
                                 // let item_label = document.createElement('span');
                                 // item_label.innerText = getI18N(item.item.label);
                                 let item_proba = document.createElement('span');
-                                item_proba.innerText = Math.round(item.probability * 100) + '%';
+                                item_proba.innerText = Math.round(item.probability * 1000)/10 + '%';
                                 item_proba.style.display = 'block';
                                 item_proba.style.margin = 'auto';
 
@@ -3314,7 +3203,7 @@ function displaySearchFieldOnBuildings() {
 
             let buidings_block = document.getElementsByClassName('clear')[0];
             let buildings = Array.from(buidings_block.getElementsByClassName('buildings'));
-            let building_rows = Array.from(buidings_block.getElementsByClassName('row'));
+            let building_rows = Array.from(buidings_block.getElementsByClassName('row-flex'));
             search_field.addEventListener('keyup', (event) => {
                 building_rows.forEach((building_row) => {
                     if (building_row.getElementsByTagName('span')[0].innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {
@@ -4053,6 +3942,8 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'alarm_clock':
             item_action.classList.remove('item-tag');
             break;
+        case null:
+            break;
         default:
             console.log(property_or_action);
             break;
@@ -4596,40 +4487,6 @@ function preventFromLeaving() {
 
         window.addEventListener('beforeunload', prevent_function, false);
     }
-}
-
-/** Affiche une demande de confirmation avant d'effectuer une action dangereuse (drogue si état drogué / cyanure) */
-function preventDangerousActions() {
-    let interval = setInterval(() => {
-        if (mho_parameters.prevent_dangerous_actions && items) {
-
-            let actions = Array.from(document.getElementsByClassName('actions'));
-
-            if (actions && actions.length > 0) {
-
-                let drugs = items.filter((item) => item.properties && item.properties.indexOf('drug') > -1);
-                let dead = items.filter((item) => item.actions && item.actions.indexOf('cyanide') > -1);
-                let status_drugged = Array.from(document.getElementsByClassName('status link')[0].getElementsByClassName('status')).some((status) => status.firstElementChild.src.indexOf('status_drugged') > -1);
-                let filtered_actions = Array.from(actions).filter((action) => {
-                    let action_img = action.firstElementChild ? action.firstElementChild.src : undefined;
-                    return (action_img === drugs.some((item) => item.icon === action_img) && status_drugged) || action_img === dead.some((item) => item.icon === action_img);
-                });
-                filtered_actions.forEach((action) => {
-                    action.addEventListener('click', (event) => {
-                        if (!confirm(`${GM_info.script.name}\n\nÊtes-vous sûr de vouloir effectuer cette action ?`)) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            event.stopImmediatePropagation();
-                        } else {
-                            preventDangerousActions();
-                        }
-                    }, true);
-                });
-
-                clearInterval(interval);
-            }
-        }
-    }, 500);
 }
 
 /** Affiche une notification 5 secondes avant la fin de la fouille en cours */
@@ -6151,16 +6008,11 @@ async function getItems() {
     return new Promise((resolve, reject) => {
         GM_xmlhttpRequest({
             method: 'GET',
-            url: api_url + '/myhordesfetcher/items?userKey=' + external_app_id,
+            url: api_url + '/myhordesfetcher/items?townId=' + mh_user.townId,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
                     items = response.response
-                        .map((item) => {
-                        item.category = getCategory(item.category);
-                        item.img = item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
-                        return item;
-                    })
                         .sort((item_a, item_b) => {
                         if (item_a.category.ordering > item_b.category.ordering) {
                             return 1;
@@ -6170,7 +6022,6 @@ async function getItems() {
                             return -1;
                         }
                     });
-                    console.log('items', items);
                     let wiki_btn = document.getElementById(wiki_btn_id);
                     if (wiki_btn) {
                         wiki_btn.setAttribute('style', 'display: inherit');
@@ -6237,20 +6088,19 @@ async function getMe() {
                 onload: function(response){
                     if (response.status === 200) {
                         mh_user = response.response;
-                        if (mh_user.id === 0 && mh_user.townId === 0) {
+                        if (!mh_user || mh_user.id === 0 && mh_user.townId === 0) {
                             mh_user = '';
                             GM_setValue(gm_mh_external_app_id_key, undefined);
-                            external_app_id = undefined;
                         }
                         GM_setValue(mh_user_key, mh_user);
                         console.log('MHO - I am...', mh_user);
-
-                        getItems();
-
                         if (mh_user.townId) {
-                            getWishlist();
+                            getTown().then(() => {
+                                getItems();
+                                getWishlist();
+                                resolve();
+                            });
                         }
-                        resolve();
                     } else {
                         addError(response);
                         reject(response);
@@ -6336,17 +6186,12 @@ async function getBank() {
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
-                    let bank = response.response;
-                    bank.bank = Object.keys(bank.bank).map((key) => bank.bank[key])
-                        .map((bank_info) => {
-                        bank_info.item.category = getCategory(bank_info.item.category);
-                        bank_info.item.count = bank_info.count;
-                        bank_info.item.wishListCount = bank_info.wishListCount;
-                        bank_info.item.img = bank_info.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3')
-                        bank_info = bank_info.item;
-                        return bank_info;
-                    })
-                        .sort((item_a, item_b) => {
+                    let bank = [];
+                    response.response.bank.forEach((bank_item) => {
+                        bank_item.item.broken = bank_item.isBroken;
+                        bank.push(bank_item.item);
+                    });
+                    bank = bank.sort((item_a, item_b) => {
                         if (item_a.category.ordering > item_b.category.ordering) {
                             return 1;
                         } else if (item_a.category.ordering === item_b.category.ordering) {
@@ -6376,7 +6221,7 @@ async function getWishlist() {
     return new Promise((resolve, reject) => {
         GM_xmlhttpRequest({
             method: 'GET',
-            url: api_url + '/wishlist?userKey=' + external_app_id,
+            url: api_url + '/wishlist?townId=' + mh_user.townId,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6411,7 +6256,7 @@ async function addItemToWishlist(item) {
         startLoading();
         GM_xmlhttpRequest({
             method: 'POST',
-            url: api_url + '/wishlist/add/' + item.xmlId + '?userKey=' + external_app_id,
+            url: api_url + '/wishlist/add/' + item.xmlId + '?userId=' + mh_user.id + '&townId=' + mh_user.townId,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6440,11 +6285,10 @@ function updateWishlist() {
     .map((item) => {
         return {id: item.item.xmlId, priority: item.priority, depot: item.depot, count: item.count};
     });
-    console.log('item_list', item_list);
     startLoading();
     GM_xmlhttpRequest({
         method: 'PUT',
-        url: api_url + '/wishlist?userKey=' + external_app_id,
+        url: api_url + '/wishlist?userId=' + mh_user.id + '&townId=' + mh_user.townId,
         data: JSON.stringify(item_list),
         responseType: 'json',
         headers: {
@@ -6701,8 +6545,8 @@ async function getApiKey() {
                     let temp_body = document.createElement('body');
                     temp_body.innerHTML = response.response.body.innerHTML;
                     let id = temp_body.querySelector('#app_ext');
-                    if (id && id !== '' && id !== 'not set') {
-                        external_app_id = id.value;
+                    if (id) {
+                        external_app_id = id.value && id.value !== '' && id.value !== 'not set' ? id.value : undefined;
                         resolve(external_app_id);
                     } else {
                         reject(response);
@@ -6713,6 +6557,7 @@ async function getApiKey() {
                 endLoading();
             },
             onerror: function(error){
+                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
                 endLoading();
                 reject(error);
             }
@@ -6725,7 +6570,6 @@ async function getApiKey() {
 //     MAIN FUNCTION     //
 ///////////////////////////
 (function() {
-
     if (document.URL.startsWith('https://bbh.fred26.fr/') || document.URL.startsWith('https://gest-hordes2.eragaming.fr/') || document.URL.startsWith('https://fatamorgana.md26.eu/')) {
         let current_key = '';
         let map_block_id = '';
@@ -6798,6 +6642,7 @@ async function getApiKey() {
             GM_setValue('version', version);
         }
 
+
         getApiKey().then(() => {
             getMe().then(() => {
                 initOptions();
@@ -6828,5 +6673,4 @@ async function getApiKey() {
             });
         });
     }
-
 })();

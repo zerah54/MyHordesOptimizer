@@ -41,7 +41,9 @@ export abstract class CommonEnum {
         const elements: T[] = <T[]>this.getAllValues<CommonEnum>();
         const element: T | undefined = elements.find((_element: T) => _element.key === key)
         if (!element) {
-            console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);
+            if (key !== null) {// TODO TEMPORAIRE
+                // console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);
+            }
             return;
         } else {
             return element;

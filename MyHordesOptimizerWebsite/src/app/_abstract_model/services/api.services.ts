@@ -24,8 +24,8 @@ import { WishlistInfo } from './../types/wishlist-info.class';
 import { WishlistItem } from './../types/wishlist-item.class';
 import { GlobalServices } from './global.services';
 
-const API_URL_2: string = 'https://api.myhordesoptimizer.fr';
-const API_URL: string = 'https://myhordesoptimizerapi.azurewebsites.net';
+const API_URL: string = 'https://api.myhordesoptimizer.fr';
+const API_URL_2: string = 'https://myhordesoptimizerapi.azurewebsites.net';
 
 @Injectable()
 export class ApiServices extends GlobalServices {
@@ -44,7 +44,7 @@ export class ApiServices extends GlobalServices {
      */
     public getItems(): Observable<Item[]> {
         return new Observable((sub: Subscriber<Item[]>) => {
-            super.get<ItemDTO[]>(API_URL + '/myhordesfetcher/items?userKey=' + getExternalAppId())
+            super.get<ItemDTO[]>(API_URL + '/myhordesfetcher/items?townId=' + getUserId())
                 .subscribe({
                     next: (response: HttpResponse<ItemDTO[]>) => {
                         sub.next(dtoToModelArray(Item, response.body));

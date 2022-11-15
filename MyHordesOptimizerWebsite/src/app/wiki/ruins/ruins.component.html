@@ -34,7 +34,7 @@
                                             <div class="drops-list">
                                                 <div *ngFor="let drop of row[column.id]" [title]="drop.item.label[locale]">
                                                     <img [src]="HORDES_IMG_REPO + drop.item.img">
-                                                    <div>{{(drop.probability * 100) | number:'1.0-0':locale}}%</div>
+                                                    <div>{{(drop.probability * 100) | number:'1.1-1':locale}}%</div>
                                                 </div>
                                             </div>
                                     </ng-container>
