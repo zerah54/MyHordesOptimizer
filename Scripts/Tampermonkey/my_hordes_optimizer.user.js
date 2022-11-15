@@ -3204,7 +3204,7 @@ function displaySearchFieldOnBuildings() {
             let buildings = Array.from(document.querySelectorAll('.buildings'));
             let building_rows = [];
             buildings.forEach((building) => {
-                building_rows.push(...Array.from(building.querySelectorAll('.row-flex-flex')));
+                building_rows.push(...Array.from(building.querySelectorAll('.row-flex')));
             })
             search_field.addEventListener('keyup', (event) => {
                 building_rows.forEach((building_row) => {
