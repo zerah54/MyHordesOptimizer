@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-alpha.70
+// @version      1.0.0-alpha.73
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,8 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Ajout du calcul du nombre de zombies qui vont mourir par désespoir sur une case \n`
-+ `[Nouveauté] Il n'est plus nécessaire de renseigner son id d'app externe \n`;
++ `[Correctif] Réparation de la recherche de chantiers`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1107,12 +1106,6 @@ let params_categories = [
             de: `Bestätigung anfordern bevor Abreise ohne automatische Eskorte`,
             es: `Pedir confirmación antes de cerrar la página sin haber puesto la escolta automática`
         }, parent_id: null},
-        {id: `prevent_dangerous_actions`, label: {
-            en: `[Experimental] Request confirmation before performing hazardous actions`,
-            fr: `[Expérimental] Demander confirmation avant d'effectuer des actions dangereuses`,
-            de: `[Experimentell] Bestätigung anfordern, bevor Ausführung gefährliche Aktionen`,
-            es: `[Experimental] Pedir confirmación antes de efectuar acciones peligrosas`
-        }, parent_id: null},
         {
             id: `notify_on_search_end`,
             label: {
@@ -1336,7 +1329,6 @@ function calculateDespairDeaths(nb_killed_zombies) {
 }
 
 function initOptions() {
-    preventDangerousActions();
     preventFromLeaving();
     createDisplayMapButton();
 }
@@ -3312,9 +3304,11 @@ function displaySearchFieldOnBuildings() {
             search_field.classList.add('inline');
             search_field.setAttribute('style', 'min-width: 250px; margin-top: 1em; padding-left: 24px;');
 
-            let buidings_block = document.getElementsByClassName('clear')[0];
-            let buildings = Array.from(buidings_block.getElementsByClassName('buildings'));
-            let building_rows = Array.from(buidings_block.getElementsByClassName('row'));
+            let buildings = Array.from(document.querySelectorAll('.buildings'));
+            let building_rows = [];
+            buildings.forEach((building) => {
+                building_rows.push(...Array.from(building.querySelectorAll('.row-flex')));
+            })
             search_field.addEventListener('keyup', (event) => {
                 building_rows.forEach((building_row) => {
                     if (building_row.getElementsByTagName('span')[0].innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {
@@ -4596,40 +4590,6 @@ function preventFromLeaving() {
 
         window.addEventListener('beforeunload', prevent_function, false);
     }
-}
-
-/** Affiche une demande de confirmation avant d'effectuer une action dangereuse (drogue si état drogué / cyanure) */
-function preventDangerousActions() {
-    let interval = setInterval(() => {
-        if (mho_parameters.prevent_dangerous_actions && items) {
-
-            let actions = Array.from(document.getElementsByClassName('actions'));
-
-            if (actions && actions.length > 0) {
-
-                let drugs = items.filter((item) => item.properties && item.properties.indexOf('drug') > -1);
-                let dead = items.filter((item) => item.actions && item.actions.indexOf('cyanide') > -1);
-                let status_drugged = Array.from(document.getElementsByClassName('status link')[0].getElementsByClassName('status')).some((status) => status.firstElementChild.src.indexOf('status_drugged') > -1);
-                let filtered_actions = Array.from(actions).filter((action) => {
-                    let action_img = action.firstElementChild ? action.firstElementChild.src : undefined;
-                    return (action_img === drugs.some((item) => item.icon === action_img) && status_drugged) || action_img === dead.some((item) => item.icon === action_img);
-                });
-                filtered_actions.forEach((action) => {
-                    action.addEventListener('click', (event) => {
-                        if (!confirm(`${GM_info.script.name}\n\nÊtes-vous sûr de vouloir effectuer cette action ?`)) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            event.stopImmediatePropagation();
-                        } else {
-                            preventDangerousActions();
-                        }
-                    }, true);
-                });
-
-                clearInterval(interval);
-            }
-        }
-    }, 500);
 }
 
 /** Affiche une notification 5 secondes avant la fin de la fouille en cours */

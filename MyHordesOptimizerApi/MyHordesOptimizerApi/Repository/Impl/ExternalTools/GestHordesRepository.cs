@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Abstract;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,33 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
             GestHordesConfiguration = gestHordesConfiguration;
         }
 
+        public void UpdateGHZoneRegen(string sessid, List<dynamic> cellToUpdate)
+        {
+            var majHeaders = new Dictionary<string, string>()
+            {
+                {"Cookie", $"PHPSESSID={sessid}" }
+            };
+            majHeaders.Add("X-Requested-With", "XMLHttpRequest");
+            foreach(var cell in cellToUpdate)
+            {
+                var cellAsJObject = cell as JObject;
+                var body = cellAsJObject.ToObject<Dictionary<string, object>>();
+                var majResponse = base.Post<GestHordesUpdateCaseResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajCasePath}", body: body, customHeader: majHeaders, mediaTypeIn : "application/x-www-form-urlencoded");
+            }
+        }
+
         public void Update()
+        {
+            Dictionary<string, string> majHeaders = GetGHHeaders();
+
+            var majBody = new GestHordesMajRequest()
+            {
+                Key = UserKeyProvider.UserKey
+            };
+            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}", body: majBody, customHeader: majHeaders);
+        }
+
+        private Dictionary<string, string> GetGHHeaders()
         {
             var loginUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.LoginPath}";
             var loginRequestDto = new GestHordesLoginRequest()
@@ -63,12 +90,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
             {
                 {"Cookie", $"PHPSESSID={sessid};REMEMBERME={rememberMe}" }
             };
-
-            var majBody = new GestHordesMajRequest()
-            {
-                Key = UserKeyProvider.UserKey
-            };
-            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}", body: majBody, customHeader: majHeaders);
+            return majHeaders;
         }
 
         protected override void CustomizeHttpClient(HttpClient client)

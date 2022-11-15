@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces.ExternalTools
 {
     public interface IGestHordesRepository
     {
         void Update();
+        void UpdateGHZoneRegen(string sessid, List<dynamic> cellToUpdate);
     }
 }

@@ -11,30 +11,42 @@ namespace MyHordesOptimizerApi.Extensions
         public static FormUrlEncodedContent ToFormUrlEncodedContent(this object obj)
         {
             var type = obj.GetType();
-            var keyValuesPair = new List<KeyValuePair<string, string>>();
-            foreach (var prop in obj.GetType().GetProperties())
+            if(type == typeof(Dictionary<string, object>))
             {
-                var name = prop.Name;
-                var jsonNameAttribute = prop.GetCustomAttribute<JsonPropertyNameAttribute>();
-                if (jsonNameAttribute != null)
+                var keyValuesPair = new List<KeyValuePair<string, string>>();
+                foreach (var kvp in obj as Dictionary<string, object>)
                 {
-                    name = jsonNameAttribute.Name;
-                } 
-                else
-                {
-                    var jsonAttribute = prop.GetCustomAttribute<JsonPropertyAttribute>();
-                    if (jsonAttribute != null)
-                    {
-                        name = jsonAttribute.PropertyName;
-                    }
+                    keyValuesPair.Add(new KeyValuePair<string, string>(kvp.Key, kvp.Value.ToString()));
                 }
-               
-                var value = type.GetProperty(prop.Name).GetValue(obj);
-                keyValuesPair.Add(new KeyValuePair<string, string>(name, value?.ToString()));
+                return new FormUrlEncodedContent(keyValuesPair);
             }
+            else
+            {
+                var keyValuesPair = new List<KeyValuePair<string, string>>();
+                foreach (var prop in obj.GetType().GetProperties())
+                {
+                    var name = prop.Name;
+                    var jsonNameAttribute = prop.GetCustomAttribute<JsonPropertyNameAttribute>();
+                    if (jsonNameAttribute != null)
+                    {
+                        name = jsonNameAttribute.Name;
+                    }
+                    else
+                    {
+                        var jsonAttribute = prop.GetCustomAttribute<JsonPropertyAttribute>();
+                        if (jsonAttribute != null)
+                        {
+                            name = jsonAttribute.PropertyName;
+                        }
+                    }
+
+                    var value = type.GetProperty(prop.Name).GetValue(obj);
+                    keyValuesPair.Add(new KeyValuePair<string, string>(name, value?.ToString()));
+                }
 
 
-            return new FormUrlEncodedContent(keyValuesPair);
+                return new FormUrlEncodedContent(keyValuesPair);
+            }   
         }
     }
 }
