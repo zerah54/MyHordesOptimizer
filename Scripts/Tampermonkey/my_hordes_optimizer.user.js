@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.02
+// @version      1.0.0-beta.03
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -34,6 +34,7 @@
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
 + `[important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.`;
++ `[fix] Bascule temporaire sur une autre structure pour essayer de résoudre les problèmes d'instabilité liés à la livraison de la version beta`
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -55,8 +56,8 @@ let external_app_id;
 // L'URL de L'API //
 ////////////////////
 
-const api_url = 'https://api.myhordesoptimizer.fr';
-const api_url_2 = 'https://myhordesoptimizerapi.azurewebsites.net';
+const api_url_2 = 'https://api.myhordesoptimizer.fr';
+const api_url = 'https://myhordesoptimizerapi.azurewebsites.net';
 
 ///////////////////////////////////////////
 // Listes de constantes / Constants list //
