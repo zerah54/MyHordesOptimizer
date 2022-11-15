@@ -401,7 +401,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         public void AddItemToWishlist(int townId, int itemId, int userId)
         {
             InsertTown(townId);
-            var query = @"EXECUTE AddItemToWishList @TownId, @UserId, @ItemId, @DateUpdate";
+            var query = @"CALL AddItemToWishList(@TownId, @UserId, @ItemId, @DateUpdate)";
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             connection.Execute(query, new { TownId = townId, UserId = userId, ItemId = itemId, DateUpdate = DateTime.UtcNow });
