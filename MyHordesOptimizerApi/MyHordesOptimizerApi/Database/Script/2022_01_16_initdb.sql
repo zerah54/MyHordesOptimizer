@@ -1,5 +1,5 @@
 ﻿CREATE TABLE Category(
-	idCategory INT PRIMARY KEY NOT NULL IDENTITY,
+	idCategory INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	name NVARCHAR(255) NOT NULL,
 	label_fr NVARCHAR(255),
 	label_en NVARCHAR(255),
@@ -43,7 +43,7 @@ CREATE TABLE Item(
 	guard INT,
 	img NVARCHAR(255),
 	isHeaver BIT,
-	FOREIGN KEY(idCategory) REFERENCES Category(idCategory),
+	FOREIGN KEY(idCategory) REFERENCES Category(idCategory)
 );
 
 CREATE TABLE Recipe(
@@ -92,8 +92,8 @@ CREATE TABLE Ruin(
 );
 
 CREATE TABLE LastUpdateInfo(
-	idLastUpdateInfo INT PRIMARY KEY NOT NULL IDENTITY,
-	dateUpdate DATETIME2 NOT NULL,
+	idLastUpdateInfo INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	dateUpdate datetime NOT NULL,
 	idUser INT,
 	FOREIGN KEY(idUser) REFERENCES Users(idUser)
 );
@@ -186,8 +186,7 @@ CREATE TABLE RuinItemDrop(
 GO
 
 ALTER TABLE Town ADD idUserWishListUpdater INT;
-ALTER TABLE Town ADD wishlistDateUpdate DATETIME2;
-GO
+ALTER TABLE Town ADD wishlistDateUpdate datetime;
 
 CREATE VIEW ItemComplet 
 AS SELECT item.idItem AS idItem
@@ -219,7 +218,6 @@ AS SELECT item.idItem AS idItem
   LEFT JOIN Action a ON a.name = ie.actionName
   LEFT JOIN ItemProperty ip ON ip.idItem = item.idItem
   LEFT JOIN Property p ON ip.propertyName = p.name;
-  GO
 
 CREATE VIEW RuinComplete AS 
 SELECT r.idRuin AS idRuin
@@ -242,10 +240,9 @@ SELECT r.idRuin AS idRuin
 	  ,i.label_fr AS itemLabel_fr
 	  ,rid.probability AS dropProbability
 	  ,rid.weight AS dropWeight
-  FROM renack_myhordesoptimizer.dbo.Ruin r
+  FROM Ruin r
   LEFT JOIN RuinItemDrop rid ON rid.idRuin = r.idRuin
-  LEFT JOIN Item i ON i.idItem = rid.idItem
-  GO
+  LEFT JOIN Item i ON i.idItem = rid.idItem;
 
 CREATE VIEW RecipeComplet AS
 SELECT r.name AS recipeName
@@ -263,21 +260,21 @@ SELECT r.name AS recipeName
 	  ,rir.weight AS resultWeight
   FROM Recipe r
   LEFT JOIN RecipeItemComponent ric ON r.name = ric.recipeName
-  LEFT JOIN RecipeItemResult rir ON r.name = rir.recipeName
-GO
+  LEFT JOIN RecipeItemResult rir ON r.name = rir.recipeName;
 
-CREATE PROC AddItemToWishList
+
+DELIMITER $$
+CREATE PROCEDURE AddItemToWishList
 (
-	@TownId INT,
-	@UserId INT,
-	@ItemId INT,
-	@DateUpdate DATETIME2
+	IN TownId INT,
+	IN UserId INT,
+	IN ItemId INT,
+	IN DateUpdate datetime 
 )
-AS
 BEGIN
-	IF(SELECT COUNT(*) FROM TownWishListItem WHERE idTown = @TownId AND idItem = @ItemId) = 0
-		BEGIN
-			UPDATE Town SET idUserWishListUpdater = @UserId, wishlistDateUpdate = @DateUpdate WHERE idTown = @TownId;
-			INSERT INTO TownWishListItem(idTown, idItem, priority, count, depot) VALUES(@TownId, @ItemId, 0, 1, 0);
-		END
-END
+	IF (SELECT COUNT(*) FROM TownWishListItem WHERE idTown = TownId AND idItem = ItemId) = 0 THEN
+			UPDATE Town SET idUserWishListUpdater = UserId, wishlistDateUpdate = DateUpdate WHERE idTown = TownId;
+			INSERT INTO TownWishListItem(idTown, idItem, priority, count, depot) VALUES(TownId, ItemId, 0, 1, 0);
+		END IF;
+END $$
+DELIMITER ;

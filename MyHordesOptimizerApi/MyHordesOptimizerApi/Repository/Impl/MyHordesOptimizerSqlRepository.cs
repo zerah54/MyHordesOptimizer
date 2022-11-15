@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Dapper;
-using DapperExtensions;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
@@ -13,9 +12,9 @@ using MyHordesOptimizerApi.Models.Views.Items.Wishlist;
 using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
 using MyHordesOptimizerApi.Repository.Interfaces;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 
@@ -53,7 +52,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         private void InsertTown(int townId)
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var exist = connection.ExecuteScalar<int?>("SELECT idTown FROM Town WHERE idTown = @TownId", new { TownId = townId });
             if (!exist.HasValue)
@@ -81,7 +80,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchHeroSkill(List<HeroSkillsModel> heroSkills)
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var existings = connection.Query<HeroSkillsModel>("SELECT * FROM HeroSkills");
             foreach (var skill in heroSkills)
@@ -100,9 +99,21 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public List<HeroSkill> GetHeroSkills()
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var models = connection.Query<HeroSkillsModel>("SELECT * FROM HeroSkills");
+            var models = connection.Query<HeroSkillsModel>(@"SELECT name
+                                                              ,daysNeeded
+                                                              ,description_fr AS DescriptionFr
+                                                              ,description_en AS DescriptionEn
+                                                              ,description_es AS DescriptionEs
+                                                              ,description_de AS DescriptionDe
+                                                              ,icon
+                                                              ,label_fr AS LabelFr
+                                                              ,label_en AS LabelEn
+                                                              ,label_es AS LabelEs
+                                                              ,label_de AS LabelDe
+                                                              ,nbUses
+                                                          FROM HeroSkills");
             connection.Close();
             var heroSkills = Mapper.Map<List<HeroSkill>>(models);
             return heroSkills;
@@ -115,7 +126,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchItems(List<ItemModel> items)
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var existings = connection.Query<ItemModel>("SELECT * FROM Item");
             foreach (var item in items)
@@ -134,9 +145,34 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public List<Item> GetItems()
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var itemsComplets = connection.Query<ItemCompletModel>("SELECT * FROM ItemComplet");
+            var itemsComplets = connection.Query<ItemCompletModel>(@"SELECT idItem
+                                                                  ,idCategory
+                                                                  ,itemUid
+                                                                  ,itemDeco
+                                                                  ,itemLabel_fr AS ItemLabelFr
+                                                                  ,itemLabel_en AS ItemLabelEn
+                                                                  ,itemLabel_es AS ItemLabelEs
+                                                                  ,itemLabel_de AS ItemLabelDe
+                                                                  ,itemDescription_fr AS ItemDescriptionFr
+                                                                  ,itemDescription_en AS ItemDescriptionEn
+                                                                  ,itemDescription_es AS ItemDescriptionEs
+                                                                  ,itemDescription_de AS ItemDescriptionDe
+                                                                  ,itemGuard
+                                                                  ,itemImg
+                                                                  ,itemIsHeaver
+                                                                  ,itemDropRate_praf AS ItemDropRatePraf
+                                                                  ,itemDropRate_notPraf AS ItemDropRateNotPraf
+                                                                  ,catName
+                                                                  ,catOrdering
+                                                                  ,catLabel_fr AS CatLabelFr
+                                                                  ,catLabel_en AS CatLabelEn
+                                                                  ,catLabel_es AS CatLabelEs
+                                                                  ,catLabel_de AS CatLabelDe
+                                                                  ,actionName
+                                                                  ,propertyName
+                                                              FROM ItemComplet");
             connection.Close();
 
             var items = Mapper.Map<List<Item>>(itemsComplets.Distinct(new ItemIdComparer()));
@@ -155,7 +191,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchRecipes(List<RecipeModel> recipes)
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var existings = connection.Query<RecipeModel>("SELECT * FROM Recipe");
             foreach (var recipe in recipes)
@@ -174,7 +210,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void DeleteAllRecipeComponents()
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             connection.Execute("DELETE FROM RecipeItemComponent");
             connection.Close();
@@ -182,7 +218,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void DeleteAllRecipeResults()
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             connection.Execute("DELETE FROM RecipeItemResult");
             connection.Close();
@@ -190,7 +226,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchRecipeComponents(string recipeName, List<string> componentUids)
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var grouping = componentUids.GroupBy(x => x).Select(x => new { Count = x.Count(), Uid = x.Key });
             foreach (var group in grouping)
@@ -214,7 +250,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchRecipeResults(List<RecipeItemResultModel> results)
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             foreach (var result in results)
             {
@@ -240,7 +276,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         public List<ItemRecipe> GetRecipes()
         {
             var items = GetItems();
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var recipeCompletModels = connection.Query<RecipeCompletModel>("SELECT * FROM RecipeComplet");
             connection.Close();
@@ -271,13 +307,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var sw = new Stopwatch();
             sw.Start();
             InsertTown(townId);
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
 
             var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(bank.LastUpdateInfo);
             var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
-                                                                   OUTPUT INSERTED.idLastUpdateInfo
-                                                                   VALUES (@DateUpdate, @IdUser)", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
+                                                                   VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
             Logger.LogTrace($"[PutBank] Insert LastUpdate : {sw.ElapsedMilliseconds}");
 
             var townBankItemModels = Mapper.Map<List<TownBankItemModel>>(bank.Bank);
@@ -330,7 +365,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                               LEFT JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = tb.idLastUpdateInfo
                               LEFT JOIN Users userUpdater ON userUpdater.idUser = lui.idUser
                               WHERE tb.idTown = @idTown";
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             var townBankItem = connection.Query<BankItemCompletModel>(query, new { idTown = townId });
             connection.Close();
 
@@ -367,7 +402,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             InsertTown(townId);
             var query = @"EXECUTE AddItemToWishList @TownId, @UserId, @ItemId, @DateUpdate";
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             connection.Execute(query, new { TownId = townId, UserId = userId, ItemId = itemId, DateUpdate = DateTime.UtcNow });
             connection.Close();
@@ -380,7 +415,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var updateTownQuery = @"UPDATE Town SET idUserWishListUpdater = @UserId, wishlistDateUpdate = @DateUpdate WHERE idTown = @TownId;";
             var cleanWishListQuery = @"DELETE FROM TownWishListItem WHERE idTown = @TownId;";
             var dico = new Dictionary<string, Func<TownWishlistItemModel, object>>() { { "idTown", x => x.IdTown }, { "idItem", x => x.IdItem }, { "count", x => x.Count }, { "priority", x => x.Priority }, { "depot", x => x.Depot } };
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             connection.Execute(updateTownQuery, new { UserId = userId, DateUpdate = DateTime.UtcNow, TownId = townId });
             connection.Execute(cleanWishListQuery, new { TownId = townId });
@@ -429,7 +464,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                               LEFT JOIN Users userUpdater ON userUpdater.idUser = t.idUserWishListUpdater
                               WHERE twi.idTown = @TownId";
 
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             var townWishlistItem = connection.Query<TownWishlistItemCompletModel>(query, new { TownId = townId });
             var group = townWishlistItem.GroupBy(x => new TownWishlistItemCompletKeyModel(x)).ToList();
             connection.Close();
@@ -460,7 +495,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var sw = new Stopwatch();
             sw.Start();
             InsertTown(townId);
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var userIds = wrapper.Citizens.Select(x => x.Id).ToList();
             var existingUsers = connection.Query<UsersModel>("SELECT * FROM Users WHERE idUser IN @UserIds", new { UserIds = userIds });
@@ -482,8 +517,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             Logger.LogTrace($"[PatchCitizen] Update des users : {sw.ElapsedMilliseconds}");
             var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(wrapper.LastUpdateInfo);
             var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
-                                                                   OUTPUT INSERTED.idLastUpdateInfo
-                                                                   VALUES (@DateUpdate, @IdUser)", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
+                                                                   VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
             Logger.LogTrace($"[PatchCitizen] Insert LastUpdate : {sw.ElapsedMilliseconds}");
             var townCitizenModels = Mapper.Map<List<TownCitizenModel>>(wrapper.Citizens);
             townCitizenModels.ForEach(x => { x.IdTown = townId; x.IdLastUpdateInfo = idLastUpdateInfo; });
@@ -515,7 +549,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                               INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = tc.idLastUpdateInfo 
                               INNER JOIN Users userUpdater ON userUpdater.idUser = lui.idUser
                               WHERE tc.idTown = @idTown";
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             var citizens = connection.Query<TownCitizenCompletModel>(query, new { idTown = townId });
             var mostRecent = citizens.Max(x => x.LastUpdateDateUpdate);
             citizens = citizens.Where(x => x.LastUpdateDateUpdate == mostRecent);
@@ -536,7 +570,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         public void PatchRuins(List<MyHordesOptimizerRuin> ruins)
         {
             var model = Mapper.Map<List<RuinModel>>(ruins);
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var existings = connection.Query<RuinModel>("SELECT * FROM Ruin");
             foreach (var ruin in model)
@@ -585,9 +619,29 @@ namespace MyHordesOptimizerApi.Repository.Impl
         public List<MyHordesOptimizerRuin> GetRuins()
         {
             var items = GetItems();
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var ruinsComplet = connection.Query<RuinCompletModel>("SELECT * FROM RuinComplete");
+            var ruinsComplet = connection.Query<RuinCompletModel>(@"SELECT idRuin
+                                                                  ,ruinLabel_fr AS RuinLabelFr
+                                                                  ,ruinLabel_en AS RuinLabelEn
+                                                                  ,ruinLabel_es AS RuinLabelEs
+                                                                  ,ruinLabel_de AS RuinLabelDe
+                                                                  ,ruinDescription_fr AS RuinDescriptionFr
+                                                                  ,ruinDescription_en AS RuinDescriptionEn
+                                                                  ,ruinDescription_es AS RuinDescriptionEs
+                                                                  ,ruinDescription_de AS RuinDescriptionDe
+                                                                  ,ruinExplorable
+                                                                  ,ruinImg
+                                                                  ,ruinCamping
+                                                                  ,ruinMinDist
+                                                                  ,ruinMaxDist
+                                                                  ,ruinChance
+                                                                  ,idItem
+                                                                  ,itemUid
+                                                                  ,itemLabel_fr AS ItemLabelFr
+                                                                  ,dropProbability
+                                                                  ,dropWeight
+                                                              FROM RuinComplete");
             connection.Close();
 
             var ruins = Mapper.Map<List<MyHordesOptimizerRuin>>(ruinsComplet.Distinct(new RuinIdComparer()));
@@ -614,7 +668,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchCategories(List<CategoryModel> categories)
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             foreach (var category in categories)
             {
@@ -654,9 +708,16 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public IEnumerable<CategoryModel> GetCategories()
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var categories = connection.Query<CategoryModel>("SELECT * FROM Category");
+            var categories = connection.Query<CategoryModel>(@"SELECT idCategory
+                                                              ,name
+                                                              ,label_fr AS LabelFr
+                                                              ,label_en AS LabelEn
+                                                              ,label_es AS LabelEs
+                                                              ,label_de AS LabelDe
+                                                              ,ordering
+                                                          FROM Category");
             connection.Close();
             return categories;
         }
@@ -667,7 +728,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchProperties(List<string> properties)
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             foreach (var propertie in properties)
             {
@@ -692,7 +753,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void DeleteAllPropertiesItem()
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             connection.Execute("DELETE FROM ItemProperty");
             connection.Close();
@@ -700,7 +761,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchPropertiesItem(string itemUid, List<string> properties)
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             try
             {
@@ -733,7 +794,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchActions(List<string> allActions)
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             foreach (var action in allActions)
             {
@@ -758,7 +819,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void DeleteAllActionsItem()
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             connection.Execute("DELETE FROM ItemAction");
             connection.Close();
@@ -766,7 +827,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchActionsItem(string itemUid, List<string> actions)
         {
-            using var connection = new SqlConnection(Configuration.ConnectionString);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             try
             {

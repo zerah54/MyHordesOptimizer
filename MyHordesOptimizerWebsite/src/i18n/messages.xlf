@@ -242,7 +242,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">315</context>
+          <context context-type="linenumber">298</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9108179050199310445" datatype="html">
@@ -253,7 +253,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">267</context>
+          <context context-type="linenumber">250</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2320471616446434954" datatype="html">
@@ -431,53 +431,39 @@
           <context context-type="linenumber">239,242</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8556922128412931033" datatype="html">
-        <source> [Expérimental] Avertissement en cas d&apos;action dangereuse </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">247,250</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="7565066300245013073" datatype="html">
-        <source>Vous pouvez cocher le bouton &quot;Demander confirmation avant d&apos;effectuer des actions dangeureuses&quot;. Si cette option est cochée, vous devriez recevoir une demande de confirmation avant de consommer un cyanure, et avant de consommer une drogue si vous avez déjà consommé une droue aujourd&apos;hui.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">253,259</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="6781966251152970619" datatype="html">
         <source>Liste des objets</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">270</context>
+          <context context-type="linenumber">253</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2491470695189160268" datatype="html">
         <source>Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur sujet). <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/> Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">273,281</context>
+          <context context-type="linenumber">256,264</context>
         </context-group>
       </trans-unit>
       <trans-unit id="890592421729297617" datatype="html">
         <source>Liste des recettes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">286</context>
+          <context context-type="linenumber">269</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6739215722471437099" datatype="html">
         <source>Affiche la liste de toutes les recettes de l&apos;application.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">289,290</context>
+          <context context-type="linenumber">272,273</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1327848898002802119" datatype="html">
         <source>Pouvoirs</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">293</context>
+          <context context-type="linenumber">276</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.html</context>
@@ -492,14 +478,14 @@
         <source>Présente tout simplement la liste des pouvoirs héros, leur description et le nombre de jours avant obtention.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">296,298</context>
+          <context context-type="linenumber">279,281</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8819719048481824214" datatype="html">
         <source>Bâtiments</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">301</context>
+          <context context-type="linenumber">284</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.html</context>
@@ -514,14 +500,14 @@
         <source>Affiche la liste de tous les bâtiments existant dans le jeu, leur distance de la ville, ainsi que la liste des objets qu&apos;on peut obtenir en les fouillant et leurs probabilités d&apos;obtention .</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">304,308</context>
+          <context context-type="linenumber">287,291</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5382458688695417420" datatype="html">
         <source>Banque</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">318</context>
+          <context context-type="linenumber">301</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/bank/bank.component.html</context>
@@ -540,14 +526,14 @@
         <source>Affiche la liste des objets de la banque et leur quantité. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/> Si vous êtes incarnés, les objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">321,329</context>
+          <context context-type="linenumber">304,312</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8100821574049291929" datatype="html">
         <source>Liste de courses</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">334</context>
+          <context context-type="linenumber">317</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/tools.component.ts</context>
@@ -562,28 +548,32 @@
         <source>Affiche une liste de courses contenant les objets ajoutés via les pages de liste d&apos;objets et de banque. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/> Vous pouvez modifier la priorité de chaque objet, ainsi que la quantité requise.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">337,344</context>
+          <context context-type="linenumber">320,327</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1910935492369364964" datatype="html">
         <source> (En cours) Liste des citoyens </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">349,351</context>
+          <context context-type="linenumber">332,334</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3041060767908691760" datatype="html">
         <source>Affiche une liste des citoyens de la ville, ainsi qu&apos;une liste des pouvoirs héros disponibles pour lesquels il existe une action héroïque associée. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/> (à venir) Permet de changer son nombre de jours héros et de recalculer automatiquement le dernier pouvoir gagné, ainsi que de modifier ses actions disponibles.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">354,362</context>
+          <context context-type="linenumber">337,345</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2287398703048181232" datatype="html">
         <source>Camping</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">367</context>
+          <context context-type="linenumber">350</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">5</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/tools.component.ts</context>
@@ -594,35 +584,35 @@
         <source>Affiche un outil de prédiction des chances de survie en camping. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">370,372</context>
+          <context context-type="linenumber">353,355</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7419787782755641631" datatype="html">
         <source>Installation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">398</context>
+          <context context-type="linenumber">381</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5533636342207968001" datatype="html">
         <source>Lien vers le script : </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">400</context>
+          <context context-type="linenumber">383</context>
         </context-group>
       </trans-unit>
       <trans-unit id="385117475076003880" datatype="html">
         <source>Installer le script</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">407</context>
+          <context context-type="linenumber">390</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1183541937079182130" datatype="html">
         <source>Ce fichier contient un script qui fonctionne avec des outils comme Tampermonkey ou Violentmonkey. Pour le faire fonctionner, il faut que Tampermonkey ou Violentmonkey soit installé sur votre navigateur. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/><x id="START_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;ul&gt;"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li&gt;"/> Sur ordinateur, il suffit d&apos;installer l&apos;application de script de votre choix. <x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li&gt;"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li&gt;"/> Sur Android, il faut : <x id="START_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;ul&gt;"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li&gt;"/>Installer Kiwi Browser ;<x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li&gt;"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li&gt;"/> Rechercher le script de votre choix dans votre barre de recherche ; <x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li&gt;"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li&gt;"/>Installer l&apos;extension pour Chrome ;<x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li&gt;"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li&gt;"/> Cliquer sur le lien d&apos;installation du script. <x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li&gt;"/><x id="CLOSE_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;/ul&gt;"/><x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li&gt;"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li&gt;"/> Sur iOS, il faut : <x id="START_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;ul&gt;"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li&gt;"/>Installer Gear Browser ;<x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li&gt;"/><x id="START_LIST_ITEM" ctype="x-li" equiv-text="&lt;li&gt;"/> Cliquer sur le lien d&apos;installation du script. <x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li&gt;"/><x id="CLOSE_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;/ul&gt;"/><x id="CLOSE_LIST_ITEM" ctype="x-li" equiv-text="&lt;/li&gt;"/><x id="CLOSE_UNORDERED_LIST" ctype="x-ul" equiv-text="&lt;/ul&gt;"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/> Une fois le script installé, vous verrez apparaittre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenête s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses fonctionnalités. <x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/><x id="START_TAG_STRONG" ctype="x-strong" equiv-text="&lt;strong&gt;"/>Attention :<x id="CLOSE_TAG_STRONG" ctype="x-strong" equiv-text="&lt;/strong&gt;"/><x id="LINE_BREAK" ctype="lb" equiv-text="&lt;br /&gt;"/> Vous allez d&apos;abord devoir renseigner votre ID d&apos;apps externes. Lors de la validation de l&apos;ID d&apos;apps, une confirmation sera demandée. Il faut l&apos;autoriser.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/script/script.component.html</context>
-          <context context-type="linenumber">412,457</context>
+          <context context-type="linenumber">395,440</context>
         </context-group>
       </trans-unit>
       <trans-unit id="673430564078029527" datatype="html">
@@ -658,13 +648,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
           <context context-type="linenumber">34,37</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="4007837524874800043" datatype="html">
-        <source> Camping </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">4,6</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4328907410933636413" datatype="html">
@@ -815,126 +798,126 @@
         <source>Petite carte</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">22</context>
+          <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3774627028364286981" datatype="html">
         <source>Région éloignée</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="linenumber">24</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3131499204058979166" datatype="html">
         <source>Pandémonium</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">25</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4432237988758794872" datatype="html">
         <source>Vous estimez que vos chances de survie ici sont quasi nulles… Autant gober du cyanure tout de suite.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">41</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6213763127342156699" datatype="html">
         <source>Vous estimez que vos chances de survie ici sont très faibles. Peut-être que vous aimez jouer à pile ou face ?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">46</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7504642152507572973" datatype="html">
         <source>Vous estimez que vos chances de survie ici sont faibles. Difficile à dire.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">50</context>
+          <context context-type="linenumber">51</context>
         </context-group>
       </trans-unit>
       <trans-unit id="231606051471459055" datatype="html">
         <source>Vous estimez que vos chances de survie ici sont limitées, bien que ça puisse se tenter. Mais un accident est vite arrivé...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">56</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5761136900658164502" datatype="html">
         <source>Vous estimez que vos chances de survie ici sont à peu près satisfaisantes, pour peu qu&apos;aucun imprévu ne vous tombe dessus.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="79698220406071142" datatype="html">
         <source>Vous estimez que vos chances de survie ici sont correctes : il ne vous reste plus qu&apos;à croiser les doigts !</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">65</context>
+          <context context-type="linenumber">66</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1576211583593529594" datatype="html">
         <source>Vous estimez que vos chances de survie ici sont élevées : vous devriez pouvoir passer la nuit ici.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">71</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4766424387273938786" datatype="html">
         <source>Vous estimez que vos chances de survie ici sont optimales : personne ne vous verrait même en vous pointant du doigt.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8263357425236059440" datatype="html">
         <source>Habitant</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">82</context>
+          <context context-type="linenumber">83</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8999093564615496242" datatype="html">
         <source>Fouineur</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">89</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5692239162610982878" datatype="html">
         <source>Éclaireur</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6969224440581200019" datatype="html">
         <source>Gardien</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">101</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6227779130323052819" datatype="html">
         <source>Ermite</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">106</context>
+          <context context-type="linenumber">107</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6520359063458937943" datatype="html">
         <source>Apprivoiseur</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">112</context>
+          <context context-type="linenumber">113</context>
         </context-group>
       </trans-unit>
       <trans-unit id="144888502729862279" datatype="html">
         <source>Technicien</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">118</context>
+          <context context-type="linenumber">119</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6373263061828099513" datatype="html">

@@ -26,6 +26,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
         [FirebaseSerializeIgnore]
         public int BankCount { get; set; }
 
+        public double DropRatePraf { get; set; }
+        public double DropRateNotPraf { get; set; }
+
         public Item()
         {
             Description = new Dictionary<string, string>();

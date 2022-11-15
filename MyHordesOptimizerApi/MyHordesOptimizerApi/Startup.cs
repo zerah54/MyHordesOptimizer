@@ -93,8 +93,6 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<ITranslationService, TranslationService>();
             services.AddSingleton<IMyHordesRuineService, MyHordesRuineService>();
 
-            DapperExtensions.DapperExtensions.DefaultMapper = typeof(MyClassMapper<>);
-
             services.AddApplicationInsightsTelemetry();
         }
 

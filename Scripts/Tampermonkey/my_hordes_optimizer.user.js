@@ -3201,9 +3201,11 @@ function displaySearchFieldOnBuildings() {
             search_field.classList.add('inline');
             search_field.setAttribute('style', 'min-width: 250px; margin-top: 1em; padding-left: 24px;');
 
-            let buidings_block = document.getElementsByClassName('clear')[0];
-            let buildings = Array.from(buidings_block.getElementsByClassName('buildings'));
-            let building_rows = Array.from(buidings_block.getElementsByClassName('row-flex'));
+            let buildings = Array.from(document.querySelectorAll('.buildings'));
+            let building_rows = [];
+            buildings.forEach((building) => {
+                building_rows.push(...Array.from(building.querySelectorAll('.row-flex-flex')));
+            })
             search_field.addEventListener('keyup', (event) => {
                 building_rows.forEach((building_row) => {
                     if (building_row.getElementsByTagName('span')[0].innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {

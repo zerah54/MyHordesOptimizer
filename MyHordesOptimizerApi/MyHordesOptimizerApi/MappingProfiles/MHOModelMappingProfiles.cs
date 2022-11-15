@@ -37,7 +37,9 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Deco, opt => opt.MapFrom(src => src.Value.Deco))
                 .ForMember(dest => dest.Guard, opt => opt.MapFrom(src => src.Value.Guard))
                 .ForMember(dest => dest.IsHeaver, opt => opt.MapFrom(src => src.Value.Heavy))
-                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Value.Id));
+                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Value.Id))
+                .ForMember(dest => dest.DropRateNotPraf, opt => opt.Ignore())
+                .ForMember(dest => dest.DropRatePraf, opt => opt.Ignore());
 
             CreateMap<ItemCompletModel, Item>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IdItem))
@@ -53,7 +55,9 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Deco, opt => opt.MapFrom(src => src.ItemDeco))
                 .ForMember(dest => dest.Guard, opt => opt.MapFrom(src => src.ItemGuard))
                 .ForMember(dest => dest.IsHeaver, opt => opt.MapFrom(src => src.ItemIsHeaver))
-                .ForMember(dest => dest.Uid, opt => opt.MapFrom(src => src.ItemUid));
+                .ForMember(dest => dest.Uid, opt => opt.MapFrom(src => src.ItemUid))
+                .ForMember(dest => dest.DropRatePraf, opt => opt.MapFrom(src => src.DropRatePraf))
+                .ForMember(dest => dest.DropRateNotPraf, opt => opt.MapFrom(src => src.DropRateNotPraf));
 
             // Ruins
             CreateMap<MyHordesOptimizerRuin, RuinModel>()
