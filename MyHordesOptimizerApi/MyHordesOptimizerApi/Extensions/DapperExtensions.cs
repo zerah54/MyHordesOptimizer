@@ -1,14 +1,14 @@
 ﻿using Dapper;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Text;
 
 namespace MyHordesOptimizerApi.Extensions
 {
     public static class DapperExtensions
     {
-        public static void BulkInsert<TModel>(this SqlConnection connection, string tableName, Dictionary<string, Func<TModel, object>> dico, List<TModel> models)
+        public static void BulkInsert<TModel>(this MySqlConnection connection, string tableName, Dictionary<string, Func<TModel, object>> dico, List<TModel> models)
         {
             var sb = new StringBuilder($"INSERT INTO {tableName}({string.Join(",", dico.Keys)}) VALUES ");
             var param = new DynamicParameters();
