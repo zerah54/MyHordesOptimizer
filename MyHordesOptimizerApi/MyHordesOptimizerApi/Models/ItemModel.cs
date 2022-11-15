@@ -37,6 +37,9 @@ namespace MyHordesOptimizerApi.Models
         public string Img { get; set; }
         [Column("isHeaver")]
         public bool IsHeaver { get; set; }
-
+        [Column("dropRate_praf")]
+        public double DropRatePraf { get; set; }
+        [Column("dropRate_notPraf")]
+        public double DropRateNotPraf { get; set; }
     }
 }

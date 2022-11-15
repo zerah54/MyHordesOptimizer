@@ -39,7 +39,7 @@ namespace MyHordesOptimizerApi.Controllers
             }
 
             UserKeyProvider.UserKey = userKey;
-            MyHordesImportService.ImportItems();
+            MyHordesImportService.ImportItemsAsync();
             return Ok();
         }
 
@@ -61,6 +61,20 @@ namespace MyHordesOptimizerApi.Controllers
         public async Task<ActionResult> ImportCategories()
         {
             await MyHordesImportService.ImportCategoriesAsync();
+            return Ok();
+        }
+
+
+        [HttpPost]
+        [Route("All")]
+        public async Task<ActionResult> ImportAll(string userKey)
+        {
+            if (string.IsNullOrWhiteSpace(userKey))
+            {
+                return BadRequest($"{nameof(userKey)} cannot be empty");
+            }
+            UserKeyProvider.UserKey = userKey;
+            await MyHordesImportService.ImportAllAsync();
             return Ok();
         }
     }

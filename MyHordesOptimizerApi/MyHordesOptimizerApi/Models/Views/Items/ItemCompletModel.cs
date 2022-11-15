@@ -51,6 +51,10 @@ namespace MyHordesOptimizerApi.Models.Views.Items
         public string ActionName { get; set; }
         [Column("propertyName")]
         public string PropertyName { get; set; }
+        [Column("itemDropRate_praf")]
+        public double DropRatePraf { get; set; }
+        [Column("itemDropRate_notPraf")]
+        public double DropRateNotPraf { get; set; }
 
     }
 }

@@ -45,6 +45,15 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             Logger = logger;
         }
 
+
+        public async Task ImportAllAsync()
+        {
+            await ImportHeroSkill();
+            await ImportCategoriesAsync();
+            await ImportItemsAsync();
+            ImportRuins();
+        }
+
         #region HeroSkill
 
         public async Task ImportHeroSkill()
@@ -80,11 +89,35 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         #region Items
 
-        public async Task ImportItems()
+        public async Task ImportItemsAsync()
         {
             // Récupération des items
             var myHordesItems = MyHordesApiRepository.GetItems();
             var mhoItems = Mapper.Map<List<ItemModel>>(myHordesItems);
+            // Enrichissement avec les droprates
+            var droprates = MyHordesCodeRepository.GetItemsDropRates();
+            var listOfPrafDrops = droprates.GetValueOrDefault("empty_dig");
+            var totalWeightPraf = 0.0;
+            listOfPrafDrops.ForEach(x => totalWeightPraf += x.Weight);  
+            var listOfNotPrafDrops = droprates.GetValueOrDefault("base_dig");
+            var totalWeightNotPraf = 0.0;
+            listOfNotPrafDrops.ForEach(x => totalWeightNotPraf += x.Weight);
+            mhoItems.ForEach(item =>
+            {
+                var myHordesItemDropCodeModel = listOfPrafDrops.FirstOrDefault(x => x.ItemUid == item.Uid);
+                if(myHordesItemDropCodeModel != null)
+                {
+                    item.DropRatePraf = myHordesItemDropCodeModel.Weight / totalWeightPraf;
+                }
+            });
+            mhoItems.ForEach(item =>
+            {
+                var myHordesItemDropCodeModel = listOfNotPrafDrops.FirstOrDefault(x => x.ItemUid == item.Uid);
+                if( myHordesItemDropCodeModel != null)
+                {
+                    item.DropRateNotPraf = myHordesItemDropCodeModel.Weight / totalWeightNotPraf;
+                }
+            });
             MyHordesOptimizerRepository.PatchItems(mhoItems);
 
             // Récupération des properties
@@ -184,6 +217,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     Logger.LogError(e, $"Erreur lors de l'enregistrement des réulstats de la recette {recipeName}");
                 }
             }
+
+            // Récupération des droprates dans l'OM
         }
 
         #endregion

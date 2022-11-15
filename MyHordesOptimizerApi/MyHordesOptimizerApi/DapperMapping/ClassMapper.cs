@@ -1,11 +1,6 @@
-﻿using DapperExtensions.Mapper;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection;
-
-namespace MyHordesOptimizerApi.DapperMapping
+﻿namespace MyHordesOptimizerApi.DapperMapping
 {
-    public sealed class MyClassMapper<TModel> : ClassMapper<TModel> where TModel : class
+    /* public sealed class MyClassMapper<TModel> : ClassMapper<TModel> where TModel : class
     {
         public MyClassMapper()
         {
@@ -36,5 +31,5 @@ namespace MyHordesOptimizerApi.DapperMapping
             }
             AutoMap();
         }
-    }
+    }*/
 }

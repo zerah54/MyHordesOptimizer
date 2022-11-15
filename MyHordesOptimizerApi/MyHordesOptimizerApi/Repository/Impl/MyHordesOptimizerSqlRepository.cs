@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Dapper;
-using DapperExtensions;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
@@ -16,7 +15,6 @@ using MyHordesOptimizerApi.Repository.Interfaces;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 
@@ -314,8 +312,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
             var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(bank.LastUpdateInfo);
             var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
-                                                                   OUTPUT INSERTED.idLastUpdateInfo
-                                                                   VALUES (@DateUpdate, @IdUser)", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
+                                                                   VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
             Logger.LogTrace($"[PutBank] Insert LastUpdate : {sw.ElapsedMilliseconds}");
 
             var townBankItemModels = Mapper.Map<List<TownBankItemModel>>(bank.Bank);
@@ -520,8 +517,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             Logger.LogTrace($"[PatchCitizen] Update des users : {sw.ElapsedMilliseconds}");
             var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(wrapper.LastUpdateInfo);
             var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
-                                                                   OUTPUT INSERTED.idLastUpdateInfo
-                                                                   VALUES (@DateUpdate, @IdUser)", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
+                                                                   VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
             Logger.LogTrace($"[PatchCitizen] Insert LastUpdate : {sw.ElapsedMilliseconds}");
             var townCitizenModels = Mapper.Map<List<TownCitizenModel>>(wrapper.Citizens);
             townCitizenModels.ForEach(x => { x.IdTown = townId; x.IdLastUpdateInfo = idLastUpdateInfo; });
