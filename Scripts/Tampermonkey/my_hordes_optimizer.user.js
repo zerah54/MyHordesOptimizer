@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.01
+// @version      1.0.0-beta.02
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -1873,7 +1873,7 @@ function createWishlistItemElement(item) {
 
     let item_element = document.createElement('li');
     item_element.draggable = true;
-    item_element.setAttribute('itemId', item.item.xmlId);
+    item_element.setAttribute('itemId', item.item.id);
     item_element.addEventListener('dragstart', (event) => {
         let target = getLi(event.target);
         dragged.element = target;
@@ -6258,7 +6258,7 @@ async function addItemToWishlist(item) {
         startLoading();
         GM_xmlhttpRequest({
             method: 'POST',
-            url: api_url + '/wishlist/add/' + item.xmlId + '?userId=' + mh_user.id + '&townId=' + mh_user.townId,
+            url: api_url + '/wishlist/add/' + item.id + '?userId=' + mh_user.id + '&townId=' + mh_user.townId,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6285,7 +6285,7 @@ function updateWishlist() {
     let item_list = wishlist.wishList
     .filter((item) => item.count)
     .map((item) => {
-        return {id: item.item.xmlId, priority: item.priority, depot: item.depot, count: item.count};
+        return {id: item.item.id, priority: item.priority, depot: item.depot, count: item.count};
     });
     startLoading();
     GM_xmlhttpRequest({
