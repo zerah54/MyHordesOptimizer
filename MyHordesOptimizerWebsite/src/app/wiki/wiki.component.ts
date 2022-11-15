@@ -19,7 +19,8 @@ export class WikiComponent extends PageWithSidenav implements OnInit {
         { label: $localize`Objets`, id: 'items'},
         { label: $localize`Recettes`, id: 'recipes'},
         { label: $localize`Pouvoirs`, id: 'hero-skills'},
-        { label: $localize`Bâtiments`, id: 'ruins'}
+        { label: $localize`Bâtiments`, id: 'ruins'},
+        { label: $localize`Morts par désespoir`, id: 'despair-deaths'}
     ]
 
     constructor(public media: MediaObserver, private sidenav: SidenavService) {

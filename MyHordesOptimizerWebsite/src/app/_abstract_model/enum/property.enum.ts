@@ -28,6 +28,7 @@ const WEAPON_KEY: string = 'weapon';
 const RESSOURCE_KEY: string = 'ressource';
 const DEFENCE_KEY: string = 'defence';
 const PET_KEY: string = 'pet';
+const DECO_KEY: string = 'deco';
 
 
 const ESC_FIXED_DATA: PropertyData = { label: $localize`Ne peut pas être déposé par le chef d'escorte`, category: '', img: '' };
@@ -57,6 +58,7 @@ const WEAPON_DATA: PropertyData = { label: $localize`Arme`, category: 'category'
 const RESSOURCE_DATA: PropertyData = { label: $localize`Ressource`, category: 'category', img: '' };
 const DEFENCE_DATA: PropertyData = { label: $localize`Objet de défense`, category: 'category', img: '' };
 const PET_DATA: PropertyData = { label: $localize`Animal`, category: 'category', img: '' };
+const DECO_DATA: PropertyData = { label: $localize`Décoration`, category: 'category', img: '' };
 
 /** Type de champs de propriétés existants */
 export class Property extends CommonEnum {
@@ -86,6 +88,7 @@ export class Property extends CommonEnum {
     static RESSOURCE: Property = new Property(RESSOURCE_KEY, RESSOURCE_DATA);
     static DEFENCE: Property = new Property(DEFENCE_KEY, DEFENCE_DATA);
     static PET: Property = new Property(PET_KEY, PET_DATA);
+    static DECO: Property = new Property(DECO_KEY, DECO_DATA);
 
 
     /**
