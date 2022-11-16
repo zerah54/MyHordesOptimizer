@@ -11,7 +11,7 @@ namespace MyHordesOptimizerApi.Extensions
         public static FormUrlEncodedContent ToFormUrlEncodedContent(this object obj)
         {
             var type = obj.GetType();
-            if(type == typeof(Dictionary<string, object>))
+            if(typeof(IDictionary<string, object>).IsAssignableFrom(type))
             {
                 var keyValuesPair = new List<KeyValuePair<string, string>>();
                 foreach (var kvp in obj as Dictionary<string, object>)

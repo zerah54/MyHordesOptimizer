@@ -13,13 +13,6 @@ namespace MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes
         [JsonProperty("nbrZombie")]
         public int NbrZombie { get; set; }
         [JsonProperty("epuise")]
-        public int Epuise { get; set; }
-        [JsonProperty("dataObjet[0][idObjet]")]
-        public int IdPelle => 5001;
-        [JsonProperty("dataObjet[0][nbr]")]
-        public int NbrPelle => 1;
-        [JsonProperty("dataObjet[0][type]")]
-        public int TypePelle => 4;
-        
+        public int Epuise { get; set; }        
     }
 }

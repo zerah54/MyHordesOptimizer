@@ -6,5 +6,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces.ExternalTools
     {
         void Update();
         void UpdateGHZoneRegen(string sessid, List<dynamic> cellToUpdate);
+        void UpdateCell(IDictionary<string, object> dictionnary);
     }
 }

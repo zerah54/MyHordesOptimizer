@@ -24,7 +24,15 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             CreateMap<MyHordesMeResponseDto, SimpleMe>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.TownId, opt => { opt.MapFrom(src => src.Map.Id); opt.Condition(src => src.Map != null); });
+                .ForMember(dest => dest.TownDetails, opt => opt.MapFrom(src => src));
+
+            CreateMap<MyHordesMeResponseDto, SimpleMeTownDetailDto>()
+                .ForMember(dest => dest.TownId, opt => { opt.MapFrom(src => src.Map.Id); opt.Condition(src => src.Map != null); })
+                .ForMember(dest => dest.TownX, opt => { opt.MapFrom(src => src.Map.City.X); opt.Condition(src => src.Map != null && src.Map.City != null); })
+                .ForMember(dest => dest.TownY, opt => { opt.MapFrom(src => src.Map.City.Y); opt.Condition(src => src.Map != null && src.Map.City != null); })
+                .ForMember(dest => dest.TownMaxX, opt => { opt.MapFrom(src => src.Map.Wid); opt.Condition(src => src.Map != null); })
+                .ForMember(dest => dest.TownMaxY, opt => { opt.MapFrom(src => src.Map.Hei); opt.Condition(src => src.Map != null); })
+                .ForMember(dest => dest.IsDevaste, opt => { opt.MapFrom(src => src.Map.City.Devast); opt.Condition(src => src.Map != null && src.Map.City != null); });
 
             CreateMap<KeyValuePair<string, MyHordesApiRuinDto>, MyHordesOptimizerRuin>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Value.Id))

@@ -183,7 +183,6 @@ CREATE TABLE RuinItemDrop(
 	FOREIGN KEY(idRuin) REFERENCES Ruin(idRuin),
 	FOREIGN KEY(idItem) REFERENCES Item(idItem)
 );
-GO
 
 ALTER TABLE Town ADD idUserWishListUpdater INT;
 ALTER TABLE Town ADD wishlistDateUpdate datetime;

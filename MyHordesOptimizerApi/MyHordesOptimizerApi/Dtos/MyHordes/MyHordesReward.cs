@@ -1,0 +1,29 @@
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+
+namespace MyHordesOptimizerApi.Dtos.MyHordes
+{
+    public class MyHordesReward
+    {
+        [JsonProperty("id")]
+        public int Id { get; set; }
+
+        [JsonProperty("rare")]
+        public int Rare { get; set; }
+
+        [JsonProperty("number")]
+        public int Number { get; set; }
+
+        [JsonProperty("img")]
+        public string Img { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("desc")]
+        public string Desc { get; set; }
+
+        [JsonProperty("titles")]
+        public List<string> Titles { get; set; }
+    }
+}

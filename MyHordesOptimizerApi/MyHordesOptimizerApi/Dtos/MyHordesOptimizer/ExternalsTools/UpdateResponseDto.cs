@@ -11,9 +11,9 @@
 
         public UpdateResponseDto(UpdateRequestDto updateRequestDto)
         {
-            FataMorganaStatus = updateRequestDto.IsFataMorgana ? _okStatus : _notActivatedStatus;
-            BigBrothHordesStatus = updateRequestDto.IsBigBrothHordes ? _okStatus : _notActivatedStatus;
-            GestHordesStatus = updateRequestDto.IsGestHordes ? _okStatus : _notActivatedStatus;
+            FataMorganaStatus = !UpdateRequestToolsDetailsDto.IsNone(updateRequestDto.Tools.IsFataMorgana) ? _okStatus : _notActivatedStatus;
+            BigBrothHordesStatus = !UpdateRequestToolsDetailsDto.IsNone(updateRequestDto.Tools.IsBigBrothHordes) ? _okStatus : _notActivatedStatus;
+            GestHordesStatus = !UpdateRequestToolsDetailsDto.IsNone(updateRequestDto.Tools.IsGestHordes) ? _okStatus : _notActivatedStatus;
         }
     }
 }

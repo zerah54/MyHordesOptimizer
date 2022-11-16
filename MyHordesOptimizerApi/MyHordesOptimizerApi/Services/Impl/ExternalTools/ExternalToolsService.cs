@@ -1,5 +1,8 @@
-﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
+﻿using AutoMapper;
+using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
@@ -16,19 +19,25 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         protected IBigBrothHordesRepository BigBrothHordesRepository { get; private set; }
         protected IFataMorganaRepository FataMorganaRepository { get; private set; }
         protected IGestHordesRepository GestHordesRepository { get; private set; }
+        protected IMapper Mapper { get; private set; }
 
-        public ExternalToolsService(IBigBrothHordesRepository bigBrothHordesRepository, IFataMorganaRepository fataMorganaRepository, IGestHordesRepository gestHordesRepository)
+
+        public ExternalToolsService(IBigBrothHordesRepository bigBrothHordesRepository, IFataMorganaRepository fataMorganaRepository, IGestHordesRepository gestHordesRepository, IMapper mapper)
         {
             BigBrothHordesRepository = bigBrothHordesRepository;
             FataMorganaRepository = fataMorganaRepository;
             GestHordesRepository = gestHordesRepository;
+            Mapper = mapper;
         }
 
         public UpdateResponseDto UpdateExternalsTools(UpdateRequestDto updateRequestDto)
         {
             var response = new UpdateResponseDto(updateRequestDto);
 
-            if (updateRequestDto.IsBigBrothHordes)
+            var bbh = updateRequestDto.Tools.IsBigBrothHordes;
+            var gh = updateRequestDto.Tools.IsGestHordes;
+            var fata = updateRequestDto.Tools.IsFataMorgana;
+            if (UpdateRequestToolsDetailsDto.IsApi(bbh))
             {
                 try
                 {
@@ -40,7 +49,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 }
             }
 
-            if (updateRequestDto.IsFataMorgana)
+            if (UpdateRequestToolsDetailsDto.IsApi(fata))
             {
                 try
                 {
@@ -52,16 +61,49 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 }
             }
 
-            if (updateRequestDto.IsGestHordes)
+            if (UpdateRequestToolsDetailsDto.IsApi(gh) || UpdateRequestToolsDetailsDto.IsCell(gh))
             {
                 try
                 {
                     GestHordesRepository.Update();
-
                 }
                 catch (Exception e)
                 {
-
+                    response.GestHordesStatus = e.Message;
+                }
+            }
+            if(UpdateRequestToolsDetailsDto.IsCell(gh))
+            {
+                try
+                {
+                    var cell = updateRequestDto.Cell;
+                    if (cell.IsDevaste || cell.DeadZombies > 0)
+                    {
+                        var request = Mapper.Map<GestHordesUpdateCaseRequest>(cell);
+                        var dictionnary = request.ToDictionnary();
+                        var count = 0;
+                        foreach (var item in cell.Objects)
+                        {
+                            dictionnary.Add($"dataObjet[{count}][idObjet]", item.Id);
+                            dictionnary.Add($"dataObjet[{count}][nbr]", item.Count);
+                            if (item.IsBroken)
+                            {
+                                dictionnary.Add($"dataObjet[{count}][type]", 1);
+                            }
+                            else
+                            {
+                                dictionnary.Add($"dataObjet[{count}][type]", 2);
+                            }
+                            count++;
+                        }
+                        dictionnary.Add($"dataObjet[{count}][idObjet]", 5004);
+                        dictionnary.Add($"dataObjet[{count}][nbr]", cell.DeadZombies);
+                        dictionnary.Add($"dataObjet[{count}][type]", 4);
+                        GestHordesRepository.UpdateCell(dictionnary);
+                    }
+                }
+                catch (Exception e)
+                {
                     response.GestHordesStatus = e.Message;
                 }
             }

@@ -1,6 +1,8 @@
 ﻿using MyHordesOptimizerApi.Attributes.Firebase;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace MyHordesOptimizerApi.Extensions
@@ -10,6 +12,13 @@ namespace MyHordesOptimizerApi.Extensions
         public static string ToJson(this object obj)
         {
             return JsonConvert.SerializeObject(obj);
+        }
+
+        public static IDictionary<string, object> ToDictionnary(this object obj)
+        {
+            var json = obj.ToJson();
+            var jObject = JObject.Parse(json);
+            return jObject.ToObject<Dictionary<string, object>>();
         }
 
         public static string ToFirebaseJson(this object obj)

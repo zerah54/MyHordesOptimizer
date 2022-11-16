@@ -59,6 +59,14 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
             var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}", body: majBody, customHeader: majHeaders);
         }
 
+
+        public void UpdateCell(IDictionary<string, object> dictionnary)
+        {
+            Dictionary<string, string> majHeaders = GetGHHeaders();
+            majHeaders.Add("X-Requested-With", "XMLHttpRequest");
+            var majResponse = base.Post<GestHordesUpdateCaseResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajCasePath}", body: dictionnary, customHeader: majHeaders, mediaTypeIn: "application/x-www-form-urlencoded");
+        }
+
         private Dictionary<string, string> GetGHHeaders()
         {
             var loginUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.LoginPath}";
@@ -96,7 +104,6 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
         protected override void CustomizeHttpClient(HttpClient client)
         {
             base.CustomizeHttpClient(client);
-            // client.DefaultRequestHeaders.Add("Cookie", $"{Cookie_MyHordesKey_Key}={UserKeyProvider.UserKey};connexion=1;{Cookie_MyHordesId_Key}={UserKeyProvider.UserId}");
         }
     }
 }

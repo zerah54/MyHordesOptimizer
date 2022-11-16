@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordes.Me
 {
@@ -10,5 +11,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Me
         public string Name { get; set; }
         [JsonProperty("map")]
         public MyHordesMap Map { get; set; }
+
+        [JsonProperty("rewards")]
+        public List<MyHordesReward> Rewards { get; set; }
     }
 }

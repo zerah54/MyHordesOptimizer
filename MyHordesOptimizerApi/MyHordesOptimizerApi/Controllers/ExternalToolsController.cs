@@ -38,6 +38,17 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(updateRequestDto)} cannot be null");
             }
+            var bbh = updateRequestDto.Tools.IsBigBrothHordes;
+            var fata = updateRequestDto.Tools.IsFataMorgana;
+            if (UpdateRequestToolsDetailsDto.IsCell(bbh))
+            {
+                return BadRequest($"IsBigBrothHordes ne peut pas avoir une valeur autre que \"api\" ou \"none\"");
+            }
+            if (UpdateRequestToolsDetailsDto.IsCell(fata))
+            {
+                return BadRequest($"IsFataMorgana ne peut pas avoir une valeur autre que \"api\" ou \"none\"");
+            }
+
             UserKeyProvider.UserKey = userKey;
             UserKeyProvider.UserId = userId;
             var response = ExternalToolsService.UpdateExternalsTools(updateRequestDto);
