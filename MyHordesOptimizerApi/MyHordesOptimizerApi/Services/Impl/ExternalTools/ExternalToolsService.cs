@@ -86,7 +86,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         {
                             dictionnary.Add($"dataObjet[{count}][idObjet]", item.Id);
                             dictionnary.Add($"dataObjet[{count}][nbr]", item.Count);
-                            if (item.IsBroken)
+                            if (!item.IsBroken)
                             {
                                 dictionnary.Add($"dataObjet[{count}][type]", 1);
                             }
