@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.05
+// @version      1.0.0-beta.06
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -34,8 +34,7 @@
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
 + `[important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.\n\n`
-+ `[new] Interface permettant de récupérer les évolutions de chaque citoyen (dans la page de citoyens)\n`
-+ `[new] Nouvelle option permettant d'envoyer à GH le nombre de zombies tués sur la case afin de mettre des marqueurs zombies`;
++ `[fix] Correctif de l'enregistrement du nombre de zombies tués sur GH\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -967,7 +966,7 @@ let params_categories = [
                 id: `update_gh_without_api`,
                 label: {
                     en: `TODO`,
-                    fr: `Mettre à jour le nombre de zombies tués. Mettre à jour GH quand la ville est dévastée.`,
+                    fr: `Ajouter des marqueurs zombies sur la case GH pour indiquer les zombies tués. Mettre à jour quand la ville est dévastée.`,
                     de: `TODO`,
                     es: `TODO`
                 },
@@ -6550,7 +6549,7 @@ function updateExternalTools() {
     let tools_to_update = {
         isBigBrothHordes: mho_parameters && mho_parameters.update_bbh ? 'api' : 'none',
         isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
-        isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && (nb_dead_zombies.dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
+        isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
     };
     data.tools = tools_to_update;
 
@@ -6587,7 +6586,7 @@ function updateExternalTools() {
             objects: object_map
         }
 
-        if (content.dead_zombies > 0 || mh_user.townDetails.devasted) {
+        if (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) {
             data.cell = content;
         }
     }
