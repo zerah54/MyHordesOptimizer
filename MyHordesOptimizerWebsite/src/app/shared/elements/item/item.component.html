@@ -1,12 +1,12 @@
 <li [ngClass]="['mho-item', display_mode]" *ngIf="item || bankItem">
-    <div>
+    <div [class.broken]="item ? false : bankItem.is_broken">
         <div class="title-part" (click)="toggleAdvancedMode()">
             <div class="item_title">
                 <div class="item_img">
                     <img [src]="HORDES_IMG_REPO + (item ? item.img : bankItem.item.img)" />
                     <span class="item_count" *ngIf="bankItem && bankItem.count > 1">{{bankItem.count}}</span>
                 </div>
-                <span class="item_label">{{item ? item.label[locale] : bankItem.item.label[locale]}}</span>
+                <span class="item_label">{{item ? item.label[locale] : bankItem.item.label[locale]}}<ng-container *ngIf="bankItem?.is_broken">&nbsp;(<ng-container i18n>Cassé</ng-container>)</ng-container></span>
             </div>
             <div class="add_to_wishlist" *ngIf="item ? item.wishlist_count === 0 : bankItem.wishlist_count === 0">
                 <button mat-icon-button type="button" (click)="$event.stopPropagation(); addItemToWishlist(item ? item : bankItem.item)">

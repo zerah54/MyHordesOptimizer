@@ -55,4 +55,12 @@
             }
         }
     }
+
+    .broken {
+        .item_img {
+            img {
+                border: 1px dashed red;
+            }
+        }
+    }
 }

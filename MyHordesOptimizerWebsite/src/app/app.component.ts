@@ -1,11 +1,10 @@
-import { Event, NavigationEnd, NavigationStart, Router, RouterEvent } from '@angular/router';
 import { Component, Inject, LOCALE_ID, OnInit, ViewChild } from '@angular/core';
+import { Event, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import * as moment from 'moment';
-import { getExternalAppId, getTownId, getUserId } from 'src/app/shared/utilities/localstorage.util';
+import { filter } from 'rxjs';
 import { NavbarComponent } from './navbar/navbar.component';
 import { LoadingOverlayService } from './shared/services/loading-overlay.service';
 import { ApiServices } from './_abstract_model/services/api.services';
-import { filter } from 'rxjs';
 
 @Component({
     selector: 'mho-root',

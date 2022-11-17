@@ -586,7 +586,13 @@
                 <source>Filtrer</source>
                 <target state="new">Filtrer</target>
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/filter-field/filter-field.component.html</context><context context-type="linenumber">2</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/filter-field/filter-field.component.html</context><context context-type="linenumber">2</context></context-group></trans-unit><trans-unit id="7575458120113095745" datatype="html">
+        <source>Cassé</source><target state="new">Cassé</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
             <trans-unit id="4977912145007192180" datatype="html">
                 <source>Enregistrer</source>
                 <target state="new">Enregistrer</target>

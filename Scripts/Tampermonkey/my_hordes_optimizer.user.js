@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.04
+// @version      1.0.0-beta.05
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,8 +33,9 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.`;
-+ `[fix] Stabilité de l'application`
++ `[important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.\n\n`
++ `[new] Interface permettant de récupérer les évolutions de chaque citoyen (dans la page de citoyens)\n`
++ `[new] Nouvelle option permettant d'envoyer à GH le nombre de zombies tués sur la case afin de mettre des marqueurs zombies`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -85,6 +86,7 @@ const mho_opti_map_id = 'mho-opti-map';
 const mho_display_map_id = 'mho-display-map';
 const mho_search_building_field_id = 'mho-search-building-field';
 const mho_display_translate_input_id = 'mho-display-translate-input';
+const mho_more_citizens_info_id = 'mho-more-citizens-info';
 
 const texts = {
     save_external_app_id: {
@@ -411,6 +413,18 @@ const texts = {
         fr: `Rechercher un objet à ajouter`,
         de: `Suchen Sie ein hinzuzufügendes Objekt`,
         es: `Encuentre un objeto para agregar`,
+    },
+    broken: {
+        en: `Broken`,
+        fr: `Cassé`,
+        de: `TODO`,
+        es: `TODO`,
+    },
+    more_citizens_info: {
+        en: `TODO`,
+        fr: `Informations complémentaires`,
+        de: `TODO`,
+        es: `TODO`,
     }
 };
 
@@ -741,6 +755,64 @@ const wishlist_headers = [
     },
 ];
 
+const more_citizen_info_headers = [
+    {
+        id: 'avatar',
+        label: {
+            en: `TODO`,
+            fr: `Citoyens`,
+            de: `TODO`,
+            es: `TODO`
+        },
+        header_class: ['padded', 'cell', 'rw-6', 'left'],
+        content_class: [] // récupéré automatiquement
+    },
+    {
+        id: 'username',
+        label: {
+            en: ``,
+            fr: ``,
+            de: ``,
+            es: ``
+        },
+        header_class: [],
+        content_class: [] // récupéré automatiquement
+    },
+    {
+        id: 'plaintes',
+        label: {
+            en: `TODO`,
+            fr: `Plaintes`,
+            de: `TODO`,
+            es: `TODO`
+        },
+        header_class: ['padded', 'cell', 'rw-1'],
+        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box']
+    },
+    {
+        id: 'gossips',
+        label: {
+            en: `TODO`,
+            fr: `Rumeurs`,
+            de: `TODO`,
+            es: `TODO`
+        },
+        header_class: ['padded', 'cell', 'rw-8'],
+        content_class: ['padded', 'cell', 'rw-8', 'small', 'citizen-box']
+    },
+    {
+        id: 'travaux',
+        label: {
+            en: `TODO`,
+            fr: `Travaux`,
+            de: `TODO`,
+            es: `TODO`
+        },
+        header_class: ['padded', 'cell', 'rw-4'],
+        content_class: ['padded', 'cell', 'rw-4', 'small', 'citizen-box']
+    },
+]
+
 //////////////////////////////////
 // La liste des onglets du wiki //
 //////////////////////////////////
@@ -862,131 +934,190 @@ let tabs_list = {
 //////////////////////////////////////////////
 
 let params_categories = [
-    {id: `external_tools`, label: {
-        en: `External tools`,
-        fr: `Outils externes`,
-        de: `Externen Tool`,
-        es: `Aplicaciones externas`
-    }, params: [
-        {id: `update_bbh`, label: {
-            en: `Update BigBroth’Hordes`,
-            fr: `Mettre à jour BigBroth'Hordes`,
-            de: `BigBroth’Hordes Aktualisieren`,
-            es: `Actualizar BigBroth'Hordes`
-        }, parent_id: null},
-        {id: `update_gh`, label: {
-            en: `Update Gest’Hordes`,
-            fr: `Mettre à jour Gest'Hordes`,
-            de: `Gest’Hordes aktualisieren`,
-            es: `Actualizar Gest'Hordes`
-        }, parent_id: null},
-        {id: `update_fata`, label: {
-            en: `Update Fata Morgana`,
-            fr: `Mettre à jour Fata Morgana`,
-            de: `Fata Morgana aktualisieren`,
-            es: `Actualizar Fata Morgana`
-        }, parent_id: null},
-        {
-            id: `display_map`,
-            label: {
-                en: `Allow to show a map from external tools`,
-                fr: `Permettre d'afficher une carte issue des outils externes`,
-                de: `Anzeigen einer Karte von externen Tools ermöglichen`,
-                es: `Permitir que se muestre un mapa proveniente de las aplicaciones externas`
-            },
-            help: {
-                en: `In any external tool, it will be possible to copy the town or ruin map and to paste it into MyHordes`,
-                fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`,
-                de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
-                es: `En toda aplicación externa, es posible copiar el mapa del pueblo o de la ruina y pegarlo en MyHordes`
-            },
-            parent_id: null
-        }
-    ]},
-    {id: `display`, label: {
-        en: `Interface improvements`,
-        fr: `Améliorations de l'interface`,
-        de: `Benutzeroberfläche Verbesserungen`,
-        es: `Mejoras de la interfaz`
-    }, params: [
-        {id: `enhanced_tooltips`, label: {
-            en: `Show detailed tooltips`,
-            fr: `Afficher des tooltips détaillés`,
-            de: `Detaillierte Tooltips anzeigen`,
-            es: `Mostrar tooltips detallados`
-        }, parent_id: null},
-        {id: `click_on_voted`, label: {
-            en: `Quick navigation to recommended construction site`,
-            fr: `Navigation rapide vers le chantier recommandé`,
-            de: `Schnelle Navigation zur empfohlenen Baustelle`,
-            es: `Navegación rápida hacia la construcción recomendada`
-        }, parent_id: null},
-        {id: `display_search_field_on_buildings`, label: {
-            en: `Show a search field for construction sites`,
-            fr: `Afficher un champ de recherche pour les chantiers`,
-            de: `Ein Suchfeld für Baustellen anzeigen`,
-            es: `Mostrar la barra buscadora para construcciones`
-        }, parent_id: null},
-        {id: `display_wishlist`, label: {
-            en: `Display wishlist in interface`,
-            fr: `Afficher la liste de courses dans l'interface`,
-            de: `Wunschzettel in der Benutzeroberfläche anzeigen`,
-            es: `Mostrar la lista de deseos en la interfaz`
-        }, parent_id: null},
-        {id: `display_wishlist_closed`, label: {
-            en: `Wishlish folded by default`,
-            fr: `Liste de courses repliée par défaut`,
-            de: `Wunschzettel standardmäßig gefaltet`,
-            es: `Lista de deseos minimizada por defecto`
-        }, parent_id: `display_wishlist`},
-        {
-            id: `display_nb_dead_zombies`,
-            label: {
-                en: `Show the number of zombie that died today`,
-                fr: `Afficher le nombre de zombies morts aujourd'hui`,
-                de: `Anzahl der Zombies die heute hier gestorben sind anzeigen`,
-                es: `Mostrar la cantidad de zombis que murieron hoy`
-            },
-            help: {
-                en: `Allows to display the number of blood splatters on the map`,
-                fr: `Permet d'afficher le nombre de tâches de sang sur la carte`,
-                de: `Ermöglicht die Anzeige der Anzahl der Blutfleck auf der Karte`,
-                es: `Permite mostrar la cantidad de manchas de sangre en el mapa`
-            },
-            parent_id: null
+    {
+        id: `external_tools`,
+        label: {
+            en: `External tools`,
+            fr: `Outils externes`,
+            de: `Externen Tool`,
+            es: `Aplicaciones externas`
         },
-        {
-            id: `display_translate_tool`,
-            label: {
-                en: `Show MyHordes' item translation bar`,
-                fr: `Afficher la barre de traduction des éléments de MyHordes`,
-                de: `Übersetzungsleiste für MyHordes Elemente anzeigen`,
-                es: `Mostrar la barra de traducción de elementos de MyHordes`
+        params: [
+            {
+                id: `update_bbh`,
+                label: {
+                    en: `Update BigBroth’Hordes`,
+                    fr: `Mettre à jour BigBroth'Hordes`,
+                    de: `BigBroth’Hordes Aktualisieren`,
+                    es: `Actualizar BigBroth'Hordes`
+                },
+                parent_id: null
             },
-            help: {
-                en: `Shows a translation bar. You must choose the initial language, then type the searched element to get the other translations.`,
-                fr: `Affiche une barre de traduction. Vous devez choisir la langue initiale, puis saisir l'élément recherché pour en récupérer les différentes traductions.`,
-                de: `Zeigt eine Übersetzungsleiste an. Sie müssen die Ausgangssprache auswählen, und dann die Zielelemente eingeben um die Übersetzungen zu generieren.`,
-                es: `Muestra una barra de traducción. Primero se debe escoger el idioma inicial, y luego ingresar el elemento buscado en la barra para obtener las distintas traducciones.`
+            {
+                id: `update_gh`,
+                label: {
+                    en: `Update Gest’Hordes`,
+                    fr: `Mettre à jour Gest'Hordes`,
+                    de: `Gest’Hordes aktualisieren`,
+                    es: `Actualizar Gest'Hordes`
+                },
+                parent_id: null
             },
-            parent_id: null
+            {
+                id: `update_gh_without_api`,
+                label: {
+                    en: `TODO`,
+                    fr: `Mettre à jour le nombre de zombies tués. Mettre à jour GH quand la ville est dévastée.`,
+                    de: `TODO`,
+                    es: `TODO`
+                },
+                parent_id: `update_gh`
+            },
+            {
+                id: `update_fata`,
+                label: {
+                    en: `Update Fata Morgana`,
+                    fr: `Mettre à jour Fata Morgana`,
+                    de: `Fata Morgana aktualisieren`,
+                    es: `Actualizar Fata Morgana`
+                },
+                parent_id: null
+            },
+            {
+                id: `display_map`,
+                label: {
+                    en: `Allow to show a map from external tools`,
+                    fr: `Permettre d'afficher une carte issue des outils externes`,
+                    de: `Anzeigen einer Karte von externen Tools ermöglichen`,
+                    es: `Permitir que se muestre un mapa proveniente de las aplicaciones externas`
+                },
+                help: {
+                    en: `In any external tool, it will be possible to copy the town or ruin map and to paste it into MyHordes`,
+                    fr: `Dans les outils externes, il sera possible de copier la carte de la ville ou de la ruine, et une fois copiée de l'afficher dans MyHordes`,
+                    de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
+                    es: `En toda aplicación externa, es posible copiar el mapa del pueblo o de la ruina y pegarlo en MyHordes`
+                },
+                parent_id: null
+            }
+        ]
+    },
+    {
+        id: `display`,
+        label: {
+            en: `Interface improvements`,
+            fr: `Améliorations de l'interface`,
+            de: `Benutzeroberfläche Verbesserungen`,
+            es: `Mejoras de la interfaz`
         },
-        {
-            id: `display_missing_ap_for_buildings_to_be_safe`,
-            label: {
-                en: `Show missing AP to repair construction sites`,
-                fr: `Afficher les PA manquants pour réparer les chantiers`,
-                de: `Fehlende AP anzeigen, um Konstruktionen zu reparieren`,
-                es: `Mostrar los PA faltantes para reparar las construcciones`
+        params: [
+            {
+                id: `enhanced_tooltips`,
+                label: {
+                    en: `Show detailed tooltips`,
+                    fr: `Afficher des tooltips détaillés`,
+                    de: `Detaillierte Tooltips anzeigen`,
+                    es: `Mostrar tooltips detallados`
+                },
+                parent_id: null
             },
-            help: {
-                en: `In Pandemonium (Hardcore towns), the construction sites are damaged during the attack. The damages can amount to 70% max of the construction's life points (rounded up to the nearest whole number). This option displays over the constructions the number of AP needed to keep them safe.`,
-                fr: `En Pandémonium, les bâtiments prennent des dégâts lors de l'attaque. Ces dégâts équivalent à un maximum de 70% des points de vie du bâtiment (arrondi à l'entier supérieur). Cette option affiche sur les bâtiments les PA à investir pour que le bâtiment soit en sécurité.`,
-                de: `TODO`,
-                es: `En Pandemonio, las construcciones sufren daños durante el ataque. Estos daños equivalen a un máximo de 70% de los puntos de vida de la construcción (redondeados al entero superior). Esta opción muestra sobre las construcciones la cantidad de PA a invertir para evitar que puedan ser destruidas.`
+            {
+                id: `click_on_voted`,
+                label: {
+                    en: `Quick navigation to recommended construction site`,
+                    fr: `Navigation rapide vers le chantier recommandé`,
+                    de: `Schnelle Navigation zur empfohlenen Baustelle`,
+                    es: `Navegación rápida hacia la construcción recomendada`
+                },
+                parent_id: null
             },
-            parent_id: null
-        },
+            {
+                id: `display_search_field_on_buildings`,
+                label: {
+                    en: `Show a search field for construction sites`,
+                    fr: `Afficher un champ de recherche pour les chantiers`,
+                    de: `Ein Suchfeld für Baustellen anzeigen`,
+                    es: `Mostrar la barra buscadora para construcciones`
+                },
+                parent_id: null
+            },
+            {
+                id: `display_wishlist`,
+                label: {
+                    en: `Display wishlist in interface`,
+                    fr: `Afficher la liste de courses dans l'interface`,
+                    de: `Wunschzettel in der Benutzeroberfläche anzeigen`,
+                    es: `Mostrar la lista de deseos en la interfaz`
+                },
+                parent_id: null
+            },
+            {
+                id: `display_wishlist_closed`,
+                label: {
+                    en: `Wishlish folded by default`,
+                    fr: `Liste de courses repliée par défaut`,
+                    de: `Wunschzettel standardmäßig gefaltet`,
+                    es: `Lista de deseos minimizada por defecto`
+                },
+                parent_id: `display_wishlist`
+            },
+            {
+                id: `display_nb_dead_zombies`,
+                label: {
+                    en: `Show the number of zombie that died today`,
+                    fr: `Afficher le nombre de zombies morts aujourd'hui`,
+                    de: `Anzahl der Zombies die heute hier gestorben sind anzeigen`,
+                    es: `Mostrar la cantidad de zombis que murieron hoy`
+                },
+                help: {
+                    en: `Allows to display the number of blood splatters on the map`,
+                    fr: `Permet d'afficher le nombre de tâches de sang sur la carte`,
+                    de: `Ermöglicht die Anzeige der Anzahl der Blutfleck auf der Karte`,
+                    es: `Permite mostrar la cantidad de manchas de sangre en el mapa`
+                },
+                parent_id: null
+            },
+            {
+                id: `display_translate_tool`,
+                label: {
+                    en: `Show MyHordes' item translation bar`,
+                    fr: `Afficher la barre de traduction des éléments de MyHordes`,
+                    de: `Übersetzungsleiste für MyHordes Elemente anzeigen`,
+                    es: `Mostrar la barra de traducción de elementos de MyHordes`
+                },
+                help: {
+                    en: `Shows a translation bar. You must choose the initial language, then type the searched element to get the other translations.`,
+                    fr: `Affiche une barre de traduction. Vous devez choisir la langue initiale, puis saisir l'élément recherché pour en récupérer les différentes traductions.`,
+                    de: `Zeigt eine Übersetzungsleiste an. Sie müssen die Ausgangssprache auswählen, und dann die Zielelemente eingeben um die Übersetzungen zu generieren.`,
+                    es: `Muestra una barra de traducción. Primero se debe escoger el idioma inicial, y luego ingresar el elemento buscado en la barra para obtener las distintas traducciones.`
+                },
+                parent_id: null
+            },
+            {
+                id: `display_missing_ap_for_buildings_to_be_safe`,
+                label: {
+                    en: `Show missing AP to repair construction sites`,
+                    fr: `Afficher les PA manquants pour réparer les chantiers`,
+                    de: `Fehlende AP anzeigen, um Konstruktionen zu reparieren`,
+                    es: `Mostrar los PA faltantes para reparar las construcciones`
+                },
+                help: {
+                    en: `In Pandemonium (Hardcore towns), the construction sites are damaged during the attack. The damages can amount to 70% max of the construction's life points (rounded up to the nearest whole number). This option displays over the constructions the number of AP needed to keep them safe.`,
+                    fr: `En Pandémonium, les bâtiments prennent des dégâts lors de l'attaque. Ces dégâts équivalent à un maximum de 70% des points de vie du bâtiment (arrondi à l'entier supérieur). Cette option affiche sur les bâtiments les PA à investir pour que le bâtiment soit en sécurité.`,
+                    de: `TODO`,
+                    es: `En Pandemonio, las construcciones sufren daños durante el ataque. Estos daños equivalen a un máximo de 70% de los puntos de vida de la construcción (redondeados al entero superior). Esta opción muestra sobre las construcciones la cantidad de PA a invertir para evitar que puedan ser destruidas.`
+                },
+                parent_id: null
+            },
+            {
+                id: `more_citizens_info`,
+                label: {
+                    en: `TODO`,
+                    fr: `Afficher un onglet contenant des informations supplémentaires sur la page des citoyens`,
+                    de: `TODO`,
+                    es: `TODO`
+                },
+                parent_id: null
+            }
         // {
         //     id: `block_users`,
         //     label: {
@@ -1004,36 +1135,45 @@ let params_categories = [
         //     },
         //     parent_id: null
         // }
-    ]},
-    {id: `notifications`, label: {
-        en: `Notifications and warnings`,
-        fr: `Notifications et avertissements`,
-        de: `Hinweise und Warnungen`,
-        es: `Notificaciones y advertencias`
-    }, params: [
-        {id: `prevent_from_leaving`, label: {
-            en: `Request confirmation before leaving without automatic escort`,
-            fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`,
-            de: `Bestätigung anfordern bevor Abreise ohne automatische Eskorte`,
-            es: `Pedir confirmación antes de cerrar la página sin haber puesto la escolta automática`
-        }, parent_id: null},
-        {
-            id: `notify_on_search_end`,
-            label: {
-                en: `Notify me at the end of a search `,
-                fr: `Me notifier à la fin de la fouille`,
-                de: `Mich Benachrichtigen am Ende einer Grabungsaktion`,
-                es: `Notificarme al final de la búsquedas`
+        ]
+    },
+    {
+        id: `notifications`,
+        label: {
+            en: `Notifications and warnings`,
+            fr: `Notifications et avertissements`,
+            de: `Hinweise und Warnungen`,
+            es: `Notificaciones y advertencias`
+        },
+        params: [
+            {
+                id: `prevent_from_leaving`,
+                label: {
+                    en: `Request confirmation before leaving without automatic escort`,
+                    fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`,
+                    de: `Bestätigung anfordern bevor Abreise ohne automatische Eskorte`,
+                    es: `Pedir confirmación antes de cerrar la página sin haber puesto la escolta automática`
+                },
+                parent_id: null
             },
-            help: {
-                en: `Allows to receive a notification when a search ends if the page was not closed in the meantime`,
-                fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`,
-                de: `Ermöglicht den Erhalt einer Benachrichtigung wann eine Grabungsaktion endet wenn die Seite in der Zwischenzeit nicht geschlossen wurde`,
-                es: `Permite recibir una notificación al terminar una búsqueda si la página no ha sido cerrada entre tanto`
-            },
-            parent_id: null
-        }
-    ]}
+            {
+                id: `notify_on_search_end`,
+                label: {
+                    en: `Notify me at the end of a search `,
+                    fr: `Me notifier à la fin de la fouille`,
+                    de: `Mich Benachrichtigen am Ende einer Grabungsaktion`,
+                    es: `Notificarme al final de la búsquedas`
+                },
+                help: {
+                    en: `Allows to receive a notification when a search ends if the page was not closed in the meantime`,
+                    fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`,
+                    de: `Ermöglicht den Erhalt einer Benachrichtigung wann eine Grabungsaktion endet wenn die Seite in der Zwischenzeit nicht geschlossen wurde`,
+                    es: `Permite recibir una notificación al terminar una búsqueda si la página no ha sido cerrada entre tanto`
+                },
+                parent_id: null
+            }
+        ]
+    }
 ];
 
 let informations = [
@@ -1140,6 +1280,10 @@ function pageIsWorkshop() {
     return document.URL.endsWith('workshop');
 }
 
+/** @return {boolean}    true si la page de l'utilisateur est la liste des citoyens */
+function pageIsCitizens() {
+    return document.URL.endsWith('citizens');
+}
 
 /** @return {boolean}    true si la page de l'utilisateur est la page des chantiers */
 function pageIsConstructions() {
@@ -1544,7 +1688,7 @@ function createTabs(window_type) {
     let tabs_ul = document.createElement('ul');
 
     let current_tabs_list = tabs_list[window_type]
-    .filter((tab) => mh_user.townId || !tab.needs_town)
+    .filter((tab) => mh_user.townDetails.townId || !tab.needs_town)
     .sort((a, b) => {
         if (a.ordering > b.ordering) {
             return 1;
@@ -2041,7 +2185,7 @@ function displayItems(filtered_items, tab_id) {
         item_title_container.setAttribute('style', 'flex: 1; cursor: pointer;');
         item_title_and_add_container.appendChild(item_title_container)
 
-        if ((tab_id === 'bank' || tab_id === 'items') && item.wishListCount === 0 && mh_user.townId) {
+        if ((tab_id === 'bank' || tab_id === 'items') && item.wishListCount === 0 && mh_user.townDetails.townId) {
             let item_add_to_wishlist = document.createElement('div');
             item_add_to_wishlist.classList.add('add-to-wishlist');
             item_title_and_add_container.appendChild(item_add_to_wishlist);
@@ -2066,6 +2210,9 @@ function displayItems(filtered_items, tab_id) {
         item_title_container.appendChild(icon_container);
 
         let item_icon = document.createElement('img');
+        if (item.broken) {
+            item_icon.style.border = '1px dashed red';
+        }
         item_icon.src = repo_img_hordes_url + item.img;
         icon_container.appendChild(item_icon);
 
@@ -2078,7 +2225,7 @@ function displayItems(filtered_items, tab_id) {
 
         let item_title = document.createElement('span');
         item_title.classList.add('label_text');
-        item_title.innerText = getI18N(item.label);
+        item_title.innerText = getI18N(item.label) + (item.broken ? ' (' + getI18N(texts.broken) + ')' : '');
         item_title_container.appendChild(item_title);
 
         let item_properties_container = document.createElement('div');
@@ -4725,6 +4872,84 @@ function displayTranslateTool() {
     }
 }
 
+
+function displayMoreCitizensInformations() {
+    if (mho_parameters.more_citizens_info && pageIsCitizens()) {
+        let mho_more_citizens_tab = document.querySelector(`li#${mho_more_citizens_info_id}`);
+        if (!mho_more_citizens_tab) {
+            let tabs = document.querySelector('ul.tabs');
+            mho_more_citizens_tab = document.createElement('li');
+            mho_more_citizens_tab.id = mho_more_citizens_info_id;
+            mho_more_citizens_tab.classList.add('tab');
+
+            let mho_more_citizens_tab_title = document.createElement('div');
+            mho_more_citizens_tab_title.innerHTML = `<img src="${mh_optimizer_icon}" style="height: 16px; margin-right: 0.5em">${getI18N(texts.more_citizens_info)}`;
+            mho_more_citizens_tab_title.classList.add('tab-link');
+            mho_more_citizens_tab.appendChild(mho_more_citizens_tab_title);
+
+            let citizens_list = document.querySelector('.citizens-list');
+            if (citizens_list) {
+                let usernames = Array.from(citizens_list.querySelectorAll('.citizen-box-name, .citizen-box-name-me'));
+                let avatars = Array.from(citizens_list.querySelectorAll('.avatar'));
+                let citizens_houses = Array.from(citizens_list.querySelectorAll('.citizen-box.location')).map((div, index) => { return {username: usernames[index], avatar: avatars[index], link: div.getAttribute('x-ajax-href')}});
+
+                mho_more_citizens_tab.addEventListener('click', () => {
+                    let selected = document.querySelector('.tab.selected');
+                    selected.classList.remove('selected');
+
+                    mho_more_citizens_tab.classList.add('selected');
+
+                    citizens_list.innerHTML = '';
+
+                    let new_table_header = document.createElement('div');
+                    new_table_header.classList.add('row-flex','header');
+
+                    more_citizen_info_headers.forEach((header) => {
+                        let header_div = document.createElement('div');
+                        header_div.innerText = getI18N(header.label);
+                        header_div.classList.add(...header.header_class);
+
+                        new_table_header.appendChild(header_div);
+                    });
+
+                    citizens_list.appendChild(new_table_header);
+
+                    for (let citizen_house of citizens_houses) {
+                        getCitizenHouseContent(citizen_house.link).then((more_info) => {
+                            citizen_house.gossips = more_info.gossips;
+                            citizen_house.plaintes = more_info.plaintes;
+                            citizen_house.travaux = more_info.travaux;
+
+                            let new_table_row = document.createElement('div');
+                            new_table_row.classList.add('row-flex', 'stretch', 'pointer');
+
+                            more_citizen_info_headers.forEach((cell) => {
+                                if (cell.id === 'username' || cell.id === 'avatar') {
+                                    new_table_row.appendChild(citizen_house[cell.id] || document.createElement('div'));
+                                } else {
+                                    let cell_div = document.createElement('div');
+                                    cell_div.classList.add(...cell.content_class);
+                                    if (typeof citizen_house[cell.id] === 'string' || !citizen_house[cell.id]) {
+                                        cell_div.innerText = citizen_house[cell.id] || '';
+                                    } else {
+                                        cell_div.appendChild(citizen_house[cell.id] || document.createElement('div'));
+                                    }
+                                    new_table_row.appendChild(cell_div);
+                                }
+                            });
+                            citizens_list.appendChild(new_table_row);
+                        });
+                    };
+                });
+
+                // a faire en dernier
+                tabs.appendChild(mho_more_citizens_tab);
+            }
+        }
+
+    }
+}
+
 /** Permet de bloquer / débloquer des utilisateurs et de masquer les posts des utilisateurs bloqués */
 function blockUsersPosts() {
     if (mho_parameters.block_users && pageIsForum()) {
@@ -5664,7 +5889,7 @@ async function getBBHMap() {
 
         GM_xmlhttpRequest({
             method: 'GET',
-            url: `https://bbh.fred26.fr/?cid=5-${mh_user.townId}&pg=map`,
+            url: `https://bbh.fred26.fr/?cid=5-${mh_user.townDetails.townId}&pg=map`,
             responseType: 'document',
             onload: function(response){
                 if (response.status === 200) {
@@ -6011,7 +6236,7 @@ async function getItems() {
     return new Promise((resolve, reject) => {
         GM_xmlhttpRequest({
             method: 'GET',
-            url: api_url + '/myhordesfetcher/items?townId=' + mh_user.townId,
+            url: api_url + '/myhordesfetcher/items?townId=' + mh_user.townDetails.townId,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6091,18 +6316,19 @@ async function getMe() {
                 onload: function(response){
                     if (response.status === 200) {
                         mh_user = response.response;
-                        if (!mh_user || mh_user.id === 0 && mh_user.townId === 0) {
+                        if (!mh_user || mh_user.id === 0 && mh_user.townDetails.townId === 0) {
                             mh_user = '';
                             GM_setValue(gm_mh_external_app_id_key, undefined);
                         }
                         GM_setValue(mh_user_key, mh_user);
                         console.log('MHO - I am...', mh_user);
-                        if (mh_user.townId) {
+                        if (mh_user.townDetails.townId) {
                             getTown().then(() => {
-                                getItems();
+                                getItems().then(() => resolve());
                                 getWishlist();
-                                resolve();
                             });
+                        } else {
+                            getItems().then(() => resolve());
                         }
                     } else {
                         addError(response);
@@ -6224,7 +6450,7 @@ async function getWishlist() {
     return new Promise((resolve, reject) => {
         GM_xmlhttpRequest({
             method: 'GET',
-            url: api_url + '/wishlist?townId=' + mh_user.townId,
+            url: api_url + '/wishlist?townId=' + mh_user.townDetails.townId,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6259,7 +6485,7 @@ async function addItemToWishlist(item) {
         startLoading();
         GM_xmlhttpRequest({
             method: 'POST',
-            url: api_url + '/wishlist/add/' + item.id + '?userId=' + mh_user.id + '&townId=' + mh_user.townId,
+            url: api_url + '/wishlist/add/' + item.id + '?userId=' + mh_user.id + '&townId=' + mh_user.townDetails.townId,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6291,7 +6517,7 @@ function updateWishlist() {
     startLoading();
     GM_xmlhttpRequest({
         method: 'PUT',
-        url: api_url + '/wishlist?userId=' + mh_user.id + '&townId=' + mh_user.townId,
+        url: api_url + '/wishlist?userId=' + mh_user.id + '&townId=' + mh_user.townDetails.townId,
         data: JSON.stringify(item_list),
         responseType: 'json',
         headers: {
@@ -6319,16 +6545,58 @@ function updateWishlist() {
 /** Met à jour les outils externes (BBH, GH et Fata) en fonction des paramètres sélectionnés */
 function updateExternalTools() {
     startLoading();
+    let data = {};
+    let nb_dead_zombies = +document.querySelectorAll('.actor.splatter').length;
     let tools_to_update = {
-        isBigBrothHordes: mho_parameters ? mho_parameters.update_bbh : false,
-        isFataMorgana: mho_parameters ? mho_parameters.update_fata : false,
-        isGestHordes: mho_parameters ? mho_parameters.update_gh : false
+        isBigBrothHordes: mho_parameters && mho_parameters.update_bbh ? 'api' : 'none',
+        isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
+        isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && (nb_dead_zombies.dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
     };
+    data.tools = tools_to_update;
+
+    if (mho_parameters.update_gh_without_api) {
+        let objects = Array.from(document.querySelector('.inventory.desert').querySelectorAll('li.item')).map((desert_item) => {
+            let item = items.find((item) => desert_item.querySelector('img').src.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3').indexOf(item.img) > 0);
+            return {id: item.id, isBroken: desert_item.classList.contains('broken')};
+        });
+
+        let object_map = [];
+
+        objects.forEach((object) => {
+            let object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id);
+            if (object_in_map) {
+                object_in_map.count += 1;
+            } else {
+                object.count = 1;
+                object_map.push(object);
+            }
+        })
+
+        let position = document.querySelector('.current-location').innerText.substr('-5').split(' / ');
+
+        let content = {
+            townX: mh_user.townDetails.townX,
+            townY: mh_user.townDetails.townY,
+            townid: mh_user.townDetails.townId,
+            isDevaste: mh_user.townDetails.isDevaste,
+            x: +position[0],
+            y: +position[1],
+            zombies: +document.querySelectorAll('.actor.zombie').length,
+            deadZombies: nb_dead_zombies,
+            zoneEmpty: !!document.querySelector('.mgd-empty-zone-note'),
+            objects: object_map
+        }
+
+        if (content.dead_zombies > 0 || mh_user.townDetails.devasted) {
+            data.cell = content;
+        }
+    }
+
     let btn = document.getElementById(mh_update_external_tools_id);
     GM_xmlhttpRequest({
         method: 'POST',
         url: api_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id,
-        data: JSON.stringify(tools_to_update),
+        data: JSON.stringify(data),
         headers: {
             'Content-Type': 'application/json'
         },
@@ -6477,7 +6745,7 @@ async function getTodayEstimation(day, estimations, today) {
         startLoading();
         GM_xmlhttpRequest({
             method: 'POST',
-            url: api_url + `:8080/${today ? 'attaque' : 'planif'}.php?day=${day}&id=${mh_user.townId}&type=normal&debug=false`,
+            url: api_url + `:8080/${today ? 'attaque' : 'planif'}.php?day=${day}&id=${mh_user.townDetails.townId}&type=normal&debug=false`,
             data: JSON.stringify(estimations),
             responseType: 'text',
             onload: function(response){
@@ -6568,6 +6836,65 @@ async function getApiKey() {
     });
 }
 
+/** Récupère le contenu de la maison d'un citoyen pour tout afficher dans la nouvelle page de l'onglet citoyens */
+async function getCitizenHouseContent(link) {
+    return new Promise((resolve, reject) => {
+         GM_xmlhttpRequest({
+            method: 'POST',
+            url: location.origin + link,
+            responseType: 'document',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Request-Intent': 'WebNavigation',
+                'X-Render-Target': 'content'
+            },
+            data: JSON.stringify({}),
+            onload: function(response){
+                if (response.status === 200) {
+                    let temp_body = document.createElement('body');
+                    temp_body.innerHTML = response.response.body.innerHTML;
+                    let more_info = {};
+
+                    let citizen_home = temp_body.querySelector('.citizen-home');
+                    let lightbox = temp_body.querySelector('.lightbox').firstElementChild;
+                    let town_summary = temp_body.querySelector('.town-summary');
+
+                    let gossips_div = document.createElement('div');
+                    let gossips_title = citizen_home.querySelector('.citizen-gossips');
+                    let gossips = gossips_title ? gossips_title.nextElementSibling : undefined
+                    if (gossips_title) {
+                        gossips_div.appendChild(gossips_title);
+                        if (gossips) {
+                            gossips.classList.remove('gossips');
+                            gossips.classList.add('citizen-gossips');
+                            gossips_div.appendChild(gossips);
+                        }
+                    }
+                    more_info.gossips = gossips_div;
+
+                    let plaintes = citizen_home.querySelector('.note');
+                    let nb_plaintes = plaintes ? plaintes.querySelector('b').innerText : '';
+                    more_info.plaintes = nb_plaintes;
+
+
+                    let travaux_row = lightbox ? lightbox.querySelectorAll('.row')[3] : undefined;
+                    let travaux = travaux_row ? travaux_row.lastElementChild : town_summary.querySelectorAll('.row-detail')[1];
+                    more_info.travaux = travaux ? travaux.innerHTML.replaceAll('<b>', '').replaceAll('</b>', '').replaceAll(' , ', '') : '';
+                    resolve(more_info);
+                } else {
+                    reject(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
+                endLoading();
+                reject(error);
+            }
+        });
+    });
+}
 
 ///////////////////////////
 //     MAIN FUNCTION     //
@@ -6667,6 +6994,7 @@ async function getApiKey() {
                     displayPriorityOnItems();
                     displayNbDeadZombies();
                     displayTranslateTool();
+                    displayMoreCitizensInformations();
                     // blockUsersPosts();
                 }, 500);
 

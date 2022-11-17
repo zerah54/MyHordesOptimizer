@@ -1,7 +1,7 @@
 export interface ToolsToUpdate {
-    isBigBrothHordes: boolean;
-    isFataMorgana: boolean;
-    isGestHordes: boolean;
+    isBigBrothHordes: 'none' | 'cell' | 'api';
+    isFataMorgana: 'none' | 'cell' | 'api';
+    isGestHordes: 'none' | 'cell' | 'api';
 };
 
 export interface SidenavLinks {
