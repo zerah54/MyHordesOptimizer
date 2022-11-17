@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.06
+// @version      1.0.0-beta.07
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,8 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[important] Nous avons changé la structure de la base de données. Nous n'avons pas récupéré les listes de courses existantes. Si vous avez besoin de conserver votre liste de course, merci de nous contacter sur le discord de MHO pour qu'on vous la récupère.\n\n`
-+ `[fix] Correctif de l'enregistrement du nombre de zombies tués sur GH\n`;
++ `[fix] Correctif de l'enregistrement de l'état de case épuisée sur GH\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -6582,7 +6581,7 @@ function updateExternalTools() {
             y: +position[1],
             zombies: +document.querySelectorAll('.actor.zombie').length,
             deadZombies: nb_dead_zombies,
-            zoneEmpty: !!document.querySelector('.mgd-empty-zone-note'),
+            zoneEmpty: !!document.querySelector('#mgd-empty-zone-note'),
             objects: object_map
         }
 
