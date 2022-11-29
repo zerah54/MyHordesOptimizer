@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.08
+// @version      1.0.0-beta.09
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,9 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[fix] Correctifs divers pour essayer de faire fonctionner le script pour les utilisateurs ios.\n`
-+ `[fix] Retrait d'un objet remonté par l'API MH mais qui n'existe plus\n`
-+ `[fix] Affichage d'une erreur lorsqu'on met à jour les app externes sans les avoir toutes cochées (alors que la mise à jour se passe bien)` ;
++ `[fix] Correction d'un problème de coordonnées dans la mise à jour GH`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -6616,7 +6614,7 @@ function updateExternalTools() {
             }
         })
 
-        let position = document.querySelector('.current-location').innerText.substr('-5').split(' / ');
+        let position = document.querySelector('.current-location').innerText.replace(/.*: ?/, '').split('/');
 
         let content = {
             townX: mh_user.townDetails.townX,
@@ -6631,7 +6629,7 @@ function updateExternalTools() {
             objects: object_map
         }
 
-        console.log('content', content);
+        console.log('Voici l\'état de ma case :', content);
         if (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) {
             data.cell = content;
         }
