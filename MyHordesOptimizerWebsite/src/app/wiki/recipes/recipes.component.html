@@ -48,7 +48,7 @@
                                             <div>
                                                 <img [src]="HORDES_IMG_REPO + result.item.img">
                                                 {{result.item.label[locale]}}
-                                                <small *ngIf="result.probability !== 1">({{result.probability | number:'1.0-2':locale}}%)</small>
+                                                <small *ngIf="result.probability !== 1">({{result.probability * 100 | number:'1.0-2':locale}}%)</small>
                                             </div>
                                         </ng-container>
                                     </ng-container>

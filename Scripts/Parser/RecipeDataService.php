@@ -39,7 +39,7 @@ $recipes = [
     'com005' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['torch_#00'],              'provoking' => 'lights_#00',             'in' => ['lights_#00', 'wood_bad_#00'] ],
     'com006' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['wood_plate_#00'],         'provoking' => 'wood_plate_part_#00',    'in' => ['wood_plate_part_#00', 'wood2_#00'] ],
     'com007' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['concrete_wall_#00'],      'provoking' => 'concrete_#00',           'in' => ['concrete_#00', 'water_#00'] ],
-    'com008' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['chama_tasty_#00'],        'provoking' => 'chama_#00',              'in' => ['chama_#00', 'torch_#00'], 'keep' => ['torch_#00'] ],
+    'com008' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['chama_tasty_#00'],        'provoking' => 'chama_#00',              'in' => ['chama_#00', 'torch_#00'], 'keep' => ['torch_#00'], 'tooltip' => 'Du hast {item_list} in {item} verwandelt.' ],
     'com009' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['food_noodles_hot_#00'],   'provoking' => 'spices_#00',             'in' => ['food_noodles_#00', 'spices_#00', 'water_#00'] ],
     'com010' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['coffee_#00'],             'provoking' => 'coffee_machine_#00',     'in' => ['pile_#00', 'pharma_#00', 'wood_bad_#00'] ],
 
@@ -87,7 +87,7 @@ $recipes = [
     'com048' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['pumpkin_on_#00'],           'provoking' => 'pumpkin_off_#00',       'in' => ['pumpkin_off_#00', 'lights_#00', 'pharma_#00'] ],
     'com049' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['angryc_#00'],               'provoking' => 'pet_snake2_#00',        'in' => ['pet_snake2_#00', 'cutter_#00'] ],
     'com050' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['pumpkin_off_#00'],          'provoking' => 'pumpkin_raw_#00',       'in' => ['pumpkin_raw_#00', 'small_knife_#00'], 'keep' => ['small_knife_#00'] ],
-    'com051' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['infect_poison_#00'],   'provoking' => 'infect_poison_part_#00','in' => ['infect_poison_part_#00', 'drug_#00', 'pharma_#00', 'water_#00', 'drug_water_#00' ] ],
+    'com051' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['infect_poison_#00'],        'provoking' => 'infect_poison_part_#00','in' => ['infect_poison_part_#00', 'drug_#00', 'pharma_#00', 'water_#00', 'drug_water_#00' ] ],
 ];
 
 $new_recipes = json_encode($recipes, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

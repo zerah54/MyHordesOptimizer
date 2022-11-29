@@ -49,7 +49,7 @@ export class ApiServices extends GlobalServices {
             super.get<ItemDTO[]>(API_URL + '/myhordesfetcher/items?townId=' + getUserId())
                 .subscribe({
                     next: (response: HttpResponse<ItemDTO[]>) => {
-                        sub.next(dtoToModelArray(Item, response.body));
+                        sub.next(dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302 ));
                     }
                 });
         });

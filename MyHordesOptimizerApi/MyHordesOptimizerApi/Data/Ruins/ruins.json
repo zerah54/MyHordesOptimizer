@@ -6,6 +6,7 @@
         "min_dist": 1,
         "max_dist": 4,
         "chance": 686,
+        "empty": 0.25,
         "drops": {
             "can_#00": 237,
             "chest_citizen_#00": 128,
@@ -22,6 +23,7 @@
         "min_dist": 6,
         "max_dist": 9,
         "chance": 686,
+        "empty": 0.25,
         "drops": {
             "drug_hero_#00": 91,
             "meat_#00": 91,
@@ -42,6 +44,7 @@
         "min_dist": 16,
         "max_dist": 19,
         "chance": 184,
+        "empty": 0.25,
         "drops": {
             "money_#00": 106,
             "machine_1_#00": 26,
@@ -65,6 +68,7 @@
         "min_dist": 3,
         "max_dist": 6,
         "chance": 401,
+        "empty": 0.25,
         "drops": {
             "jerrycan_#00": 331,
             "oilcan_#00": 23,
@@ -82,6 +86,7 @@
         "min_dist": 4,
         "max_dist": 7,
         "chance": 159,
+        "empty": 0.25,
         "drops": {
             "pocket_belt_#00": 27,
             "tube_#00": 19,
@@ -98,6 +103,7 @@
         "min_dist": 10,
         "max_dist": 13,
         "chance": 464,
+        "empty": 0.25,
         "drops": {
             "metal_#00": 114,
             "wood2_#00": 113,
@@ -117,6 +123,7 @@
         "min_dist": 16,
         "max_dist": 19,
         "chance": 205,
+        "empty": 0.25,
         "drops": {
             "drug_random_#00": 67,
             "pharma_#00": 39,
@@ -139,6 +146,7 @@
         "min_dist": 12,
         "max_dist": 15,
         "chance": 129,
+        "empty": 0.25,
         "drops": {
             "metal_beam_#00": 62,
             "electro_box_#00": 28,
@@ -163,6 +171,7 @@
         "min_dist": 6,
         "max_dist": 9,
         "chance": 640,
+        "empty": 0.25,
         "drops": {
             "drug_hero_#00": 58,
             "taser_empty_#00": 53,
@@ -194,6 +203,7 @@
         "min_dist": 10,
         "max_dist": 13,
         "chance": 499,
+        "empty": 0.25,
         "drops": {
             "drug_hero_#00": 127,
             "tagger_#00": 66,
@@ -222,6 +232,7 @@
         "min_dist": 6,
         "max_dist": 9,
         "chance": 320,
+        "empty": 0.25,
         "drops": {
             "coffee_#00": 55,
             "food_chick_#00": 55,
@@ -241,6 +252,7 @@
         "min_dist": 8,
         "max_dist": 11,
         "chance": 460,
+        "empty": 0.25,
         "drops": {
             "pet_rat_#00": 32,
             "food_bar2_#00": 25,
@@ -264,6 +276,7 @@
         "min_dist": 3,
         "max_dist": 6,
         "chance": 304,
+        "empty": 0.25,
         "drops": {
             "metal_#00": 112,
             "plate_raw_#00": 24,
@@ -287,6 +300,7 @@
         "min_dist": 21,
         "max_dist": 28,
         "chance": 41,
+        "empty": 0.25,
         "drops": {
             "pet_dog_#00": 10,
             "rhum_#00": 9,
@@ -306,6 +320,7 @@
         "min_dist": 5,
         "max_dist": 8,
         "chance": 409,
+        "empty": 0.25,
         "drops": {
             "repair_kit_#00": 74,
             "chest_#00": 36,
@@ -338,6 +353,7 @@
         "min_dist": 6,
         "max_dist": 9,
         "chance": 475,
+        "empty": 0.25,
         "drops": {
             "mecanism_#00": 31,
             "trestle_#00": 26,
@@ -366,6 +382,7 @@
         "min_dist": 3,
         "max_dist": 6,
         "chance": 181,
+        "empty": 0.25,
         "drops": {
             "meat_#00": 15,
             "vegetable_#00": 10,
@@ -385,6 +402,7 @@
         "min_dist": 12,
         "max_dist": 15,
         "chance": 148,
+        "empty": 0.25,
         "drops": {
             "drug_hero_#00": 40,
             "rhum_#00": 27,
@@ -406,6 +424,7 @@
         "min_dist": 2,
         "max_dist": 5,
         "chance": 70,
+        "empty": 0.25,
         "drops": {
             "wood_bad_#00": 28,
             "hmeat_#00": 3,
@@ -426,6 +445,7 @@
         "min_dist": 12,
         "max_dist": 15,
         "chance": 341,
+        "empty": 0.25,
         "drops": {
             "powder_#00": 191,
             "explo_#00": 39,
@@ -442,6 +462,7 @@
         "min_dist": 3,
         "max_dist": 6,
         "chance": 71,
+        "empty": 0.25,
         "drops": {
             "concrete_#00": 9,
             "chest_tools_#00": 9,
@@ -459,6 +480,7 @@
         "min_dist": 21,
         "max_dist": 28,
         "chance": 15,
+        "empty": 0.25,
         "drops": {
             "metal_bad_#00": 6,
             "plate_raw_#00": 2,
@@ -473,6 +495,7 @@
         "min_dist": 4,
         "max_dist": 7,
         "chance": 242,
+        "empty": 0.25,
         "drops": {
             "deco_box_#00": 49,
             "wood_plate_part_#00": 28,
@@ -496,6 +519,7 @@
         "min_dist": 3,
         "max_dist": 6,
         "chance": 68,
+        "empty": 0.25,
         "drops": {
             "hmeat_#00": 24,
             "gun_#00": 17,
@@ -512,6 +536,7 @@
         "min_dist": 6,
         "max_dist": 9,
         "chance": 710,
+        "empty": 0.25,
         "drops": {
             "coffee_#00": 178,
             "meat_#00": 94,
@@ -533,6 +558,7 @@
         "min_dist": 4,
         "max_dist": 7,
         "chance": 155,
+        "empty": 0.25,
         "drops": {
             "tube_#00": 13,
             "chest_#00": 13,
@@ -560,6 +586,7 @@
         "min_dist": 6,
         "max_dist": 9,
         "chance": 624,
+        "empty": 0.25,
         "drops": {
             "digger_#00": 136,
             "electro_box_#00": 62,
@@ -586,6 +613,7 @@
         "min_dist": 4,
         "max_dist": 7,
         "chance": 466,
+        "empty": 0.25,
         "drops": {
             "cart_part_#00": 54,
             "meat_#00": 48,
@@ -620,6 +648,7 @@
         "min_dist": 3,
         "max_dist": 6,
         "chance": 73,
+        "empty": 0.25,
         "drops": {
             "hmeat_#00": 13,
             "chest_#00": 13,
@@ -638,6 +667,7 @@
         "min_dist": 3,
         "max_dist": 6,
         "chance": 181,
+        "empty": 0.25,
         "drops": {
             "bone_#00": 115,
             "bone_meat_#00": 13,
@@ -655,6 +685,7 @@
         "min_dist": 5,
         "max_dist": 8,
         "chance": 215,
+        "empty": 0.25,
         "drops": {
             "grenade_empty_#00": 53,
             "watergun_empty_#00": 18,
@@ -679,6 +710,7 @@
         "min_dist": 2,
         "max_dist": 5,
         "chance": 381,
+        "empty": 0.25,
         "drops": {
             "pharma_#00": 50,
             "water_#00": 35,
@@ -705,6 +737,7 @@
         "min_dist": 5,
         "max_dist": 8,
         "chance": 472,
+        "empty": 0.25,
         "drops": {
             "jerrycan_#00": 300,
             "water_#00": 21,
@@ -720,6 +753,7 @@
         "min_dist": 2,
         "max_dist": 5,
         "chance": 180,
+        "empty": 0.25,
         "drops": {
             "pharma_#00": 30,
             "pet_rat_#00": 27,
@@ -744,6 +778,7 @@
         "min_dist": 2,
         "max_dist": 5,
         "chance": 183,
+        "empty": 0.25,
         "drops": {
             "drug_random_#00": 57,
             "pharma_#00": 46,
@@ -762,6 +797,7 @@
         "min_dist": 15,
         "max_dist": 18,
         "chance": 219,
+        "empty": 0.25,
         "drops": {
             "rsc_pack_1_#00": 86,
             "chest_food_#00": 84,
@@ -781,6 +817,7 @@
         "min_dist": 3,
         "max_dist": 6,
         "chance": 335,
+        "empty": 0.25,
         "drops": {
             "metal_beam_#00": 119,
             "repair_one_#00": 38,
@@ -804,6 +841,7 @@
         "min_dist": 21,
         "max_dist": 28,
         "chance": 83,
+        "empty": 0.25,
         "drops": {
             "chain_#00": 20,
             "home_def_#00": 16,
@@ -826,6 +864,7 @@
         "min_dist": 12,
         "max_dist": 15,
         "chance": 292,
+        "empty": 0.25,
         "drops": {
             "door_carpet_#00": 8,
             "chest_#00": 5,
@@ -846,6 +885,7 @@
         "min_dist": 16,
         "max_dist": 19,
         "chance": 212,
+        "empty": 0.25,
         "drops": {
             "coffee_#00": 68,
             "machine_gun_#00": 62,
@@ -864,6 +904,7 @@
         "min_dist": 8,
         "max_dist": 11,
         "chance": 177,
+        "empty": 0.25,
         "drops": {
             "rp_letter_#00": 41,
             "postal_box_#00": 39,
@@ -883,6 +924,7 @@
         "min_dist": 2,
         "max_dist": 5,
         "chance": 196,
+        "empty": 0.25,
         "drops": {
             "chest_citizen_#00": 52,
             "chest_tools_#00": 33,
@@ -900,6 +942,7 @@
         "min_dist": 5,
         "max_dist": 8,
         "chance": 216,
+        "empty": 0.25,
         "drops": {
             "concrete_#00": 104,
             "bgrenade_empty_#00": 33,
@@ -915,6 +958,7 @@
         "min_dist": 6,
         "max_dist": 9,
         "chance": 204,
+        "empty": 0.25,
         "drops": {
             "deco_box_#00": 77,
             "rp_scroll_#00": 16,
@@ -937,6 +981,7 @@
         "min_dist": 8,
         "max_dist": 11,
         "chance": 913,
+        "empty": 0.25,
         "drops": {
             "cigs_#00": 77,
             "jerrycan_#00": 75,
@@ -962,6 +1007,7 @@
         "min_dist": 16,
         "max_dist": 19,
         "chance": 81,
+        "empty": 0.25,
         "drops": {
             "book_gen_letter_#00": 4,
             "mecanism_#00": 4,
@@ -978,6 +1024,7 @@
         "min_dist": 2,
         "max_dist": 5,
         "chance": 177,
+        "empty": 0.25,
         "drops": {
             "chest_food_#00": 58,
             "chest_tools_#00": 22,
@@ -1000,6 +1047,7 @@
         "min_dist": 3,
         "max_dist": 6,
         "chance": 165,
+        "empty": 0.25,
         "drops": {
             "hmeat_#00": 42,
             "watergun_empty_#00": 21,
@@ -1018,6 +1066,7 @@
         "min_dist": 10,
         "max_dist": 13,
         "chance": 519,
+        "empty": 0.25,
         "drops": {
             "mecanism_#00": 82,
             "chair_basic_#00": 74,
@@ -1044,6 +1093,7 @@
         "min_dist": 3,
         "max_dist": 6,
         "chance": 338,
+        "empty": 0.25,
         "drops": {
             "can_#00": 63,
             "pile_#00": 32,
@@ -1074,6 +1124,7 @@
         "min_dist": 4,
         "max_dist": 7,
         "chance": 481,
+        "empty": 0.25,
         "drops": {
             "metal_beam_#00": 103,
             "repair_kit_#00": 64,
@@ -1099,6 +1150,7 @@
         "min_dist": 17,
         "max_dist": 20,
         "chance": 221,
+        "empty": 0.25,
         "drops": {
             "water_#00": 121,
             "water_cup_part_#00": 38,
@@ -1113,6 +1165,7 @@
         "min_dist": 8,
         "max_dist": 11,
         "chance": 482,
+        "empty": 0.25,
         "drops": {
             "jerrycan_#00": 321
         },
@@ -1125,6 +1178,7 @@
         "min_dist": 4,
         "max_dist": 7,
         "chance": 42,
+        "empty": 0.25,
         "drops": {
             "concrete_wall_#00": 18,
             "plate_raw_#00": 9,
@@ -1144,6 +1198,7 @@
         "min_dist": 4,
         "max_dist": 7,
         "chance": 102,
+        "empty": 0.25,
         "drops": {
             "watergun_empty_#00": 12,
             "vegetable_#00": 11,
@@ -1155,6 +1210,7 @@
             "wood2_#00": 3,
             "game_box_#00": 3,
             "ryebag_#00": 1,
+            "watergun_opt_part_#00": 1,
             "pet_pig_#00": 1
         },
         "desc": "Ein Ort des Friedens und der Gelassenheit... Wenn Sie bewaffnet und bereit sind, um Ihr Leben zu kämpfen. Die umgebende Vegetation ist unheimlich und riecht stark nach Tod, unidentifizierte Kreaturen lauern im Schatten... Sie haben das überwältigende Gefühl, dass eine Kreatur aus einer Hecke ausbrechen und Sie angreifen wird."
@@ -1166,6 +1222,7 @@
         "min_dist": 5,
         "max_dist": 8,
         "chance": 121,
+        "empty": 0.25,
         "drops": {
             "gun_#00": 35,
             "cutcut_#00": 22,
@@ -1187,6 +1244,7 @@
         "min_dist": 2,
         "max_dist": 5,
         "chance": 181,
+        "empty": 0.25,
         "drops": {
             "chest_food_#00": 43,
             "chest_citizen_#00": 34,
@@ -1201,6 +1259,7 @@
         "min_dist": 12,
         "max_dist": 15,
         "chance": 202,
+        "empty": 0.25,
         "drops": {
             "chest_hero_#00": 72,
             "lamp_#00": 36,
@@ -1230,6 +1289,7 @@
         "min_dist": 4,
         "max_dist": 7,
         "chance": 458,
+        "empty": 0.25,
         "drops": {
             "pharma_#00": 316,
             "cyanure_#00": 37,
@@ -1250,6 +1310,7 @@
         "min_dist": 5,
         "max_dist": 8,
         "chance": 432,
+        "empty": 0.25,
         "drops": {
             "rhum_#00": 76,
             "meat_#00": 60,
@@ -1273,6 +1334,7 @@
         "explorable": true,
         "explorable_skin": "bunker",
         "explorable_desc": null,
+        "empty": 1,
         "drops": {
             "bbplan_u_#00": 12,
             "bbplan_r_#00": 7,
@@ -1331,39 +1393,40 @@
         "explorable": true,
         "explorable_skin": "hotel",
         "explorable_desc": null,
+        "empty": 1,
         "drops": {
-            "hbplan_u_#00": 6,
-            "hbplan_r_#00": 4,
-            "hbplan_e_#00": 2,
-            "water_#00": 9,
-            "bumpKey_#00": 3,
-            "classicKey_#00": 3,
-            "can_#00": 6,
-            "food_bag_#00": 6,
-            "chair_basic_#00": 3,
-            "table_#00": 2,
-            "food_bar2_#00": 4,
-            "spices_#00": 3,
-            "bed_#00": 2,
-            "chest_food_#00": 3,
-            "concrete_wall_#00": 3,
-            "bag_#00": 3,
-            "food_noodles_#00": 4,
-            "food_pims_#00": 3,
-            "food_bar1_#00": 3,
-            "food_bar3_#00": 3,
-            "food_chick_#00": 3,
-            "distri_#00": 2,
-            "rlaunc_#00": 2,
-            "dish_#00": 3,
-            "food_sandw_#00": 3,
-            "bureau_#00": 2,
-            "deco_box_#00": 4,
-            "lamp_#00": 4,
+            "hbplan_u_#00": 6000,
+            "hbplan_r_#00": 4000,
+            "hbplan_e_#00": 2000,
+            "water_#00": 9000,
+            "bumpKey_#00": 3000,
+            "classicKey_#00": 3000,
+            "can_#00": 6000,
+            "food_bag_#00": 6000,
+            "chair_basic_#00": 3000,
+            "table_#00": 2000,
+            "food_bar2_#00": 4000,
+            "spices_#00": 3000,
+            "bed_#00": 2000,
+            "chest_food_#00": 3000,
+            "concrete_wall_#00": 3000,
+            "bag_#00": 3000,
+            "food_noodles_#00": 4000,
+            "food_pims_#00": 3000,
+            "food_bar1_#00": 3000,
+            "food_bar3_#00": 3000,
+            "food_chick_#00": 3000,
+            "distri_#00": 2000,
+            "rlaunc_#00": 2000,
+            "dish_#00": 3000,
+            "food_sandw_#00": 3000,
+            "bureau_#00": 2000,
+            "deco_box_#00": 4000,
+            "lamp_#00": 4000,
             "teddy_#01": 2,
-            "teddy_#00": 2,
-            "carpet_#00": 2,
-            "game_box_#00": 2
+            "teddy_#00": 2000,
+            "carpet_#00": 2000,
+            "game_box_#00": 2000
         },
         "namedDrops": {
             "with-toxin": {
@@ -1385,6 +1448,7 @@
         "explorable": true,
         "explorable_skin": "hospital",
         "explorable_desc": null,
+        "empty": 1,
         "drops": {
             "mbplan_u_#00": 20,
             "mbplan_r_#00": 12,

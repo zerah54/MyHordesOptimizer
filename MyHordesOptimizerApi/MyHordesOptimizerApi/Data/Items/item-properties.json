@@ -276,8 +276,7 @@
         "nw_armory"
     ],
     "big_pgun_empty_#00": [
-        "impoundable",
-        "esc_fixed"
+        "impoundable"
     ],
     "big_pgun_part_#00": [
         "impoundable"
@@ -544,7 +543,8 @@
         "impoundable"
     ],
     "water_cup_#00": [
-        "is_water"
+        "is_water",
+        "esc_fixed"
     ],
     "potion_#00": [
         "impoundable",

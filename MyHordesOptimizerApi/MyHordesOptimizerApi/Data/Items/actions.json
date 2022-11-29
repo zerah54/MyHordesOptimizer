@@ -18,7 +18,8 @@
             "drink_ap_1",
             "consume_item"
         ],
-        "escort_message_key": "escort_water_drink"
+        "escort_message_key": "escort_water_drink",
+        "message_key": "water_drink"
     },
     "water_tl1a": {
         "label": "Trinken",
@@ -38,7 +39,8 @@
             "drink_ap_2",
             "consume_item"
         ],
-        "escort_message_key": "escort_water_drink"
+        "escort_message_key": "escort_water_drink",
+        "message_key": "water_drink"
     },
     "water_tl1b": {
         "label": "Trinken",
@@ -57,7 +59,8 @@
             "drink_ap_2",
             "consume_item"
         ],
-        "escort_message_key": "escort_water_drink"
+        "escort_message_key": "escort_water_drink",
+        "message_key": "water_drink"
     },
     "water_tl2": {
         "label": "Trinken",
@@ -384,7 +387,8 @@
             "drink_ap_1",
             "produce_watercan2"
         ],
-        "escort_message_key": "escort_water_drink"
+        "escort_message_key": "escort_water_drink",
+        "message_key": "water_drink"
     },
     "watercan3_tl1a": {
         "label": "Trinken",
@@ -404,7 +408,8 @@
             "drink_ap_2",
             "produce_watercan2"
         ],
-        "escort_message_key": "escort_water_drink"
+        "escort_message_key": "escort_water_drink",
+        "message_key": "water_drink"
     },
     "watercan3_tl1b": {
         "label": "Trinken",
@@ -423,7 +428,8 @@
             "drink_ap_2",
             "produce_watercan2"
         ],
-        "escort_message_key": "escort_water_drink"
+        "escort_message_key": "escort_water_drink",
+        "message_key": "water_drink"
     },
     "watercan3_tl2": {
         "label": "Trinken",
@@ -480,7 +486,8 @@
             "drink_ap_1",
             "produce_watercan1"
         ],
-        "escort_message_key": "escort_water_drink"
+        "escort_message_key": "escort_water_drink",
+        "message_key": "water_drink"
     },
     "watercan2_tl1a": {
         "label": "Trinken",
@@ -500,7 +507,8 @@
             "drink_ap_2",
             "produce_watercan1"
         ],
-        "escort_message_key": "escort_water_drink"
+        "escort_message_key": "escort_water_drink",
+        "message_key": "water_drink"
     },
     "watercan2_tl1b": {
         "label": "Trinken",
@@ -519,7 +527,8 @@
             "drink_ap_2",
             "produce_watercan1"
         ],
-        "escort_message_key": "escort_water_drink"
+        "escort_message_key": "escort_water_drink",
+        "message_key": "water_drink"
     },
     "watercan2_tl2": {
         "label": "Trinken",
@@ -576,7 +585,8 @@
             "drink_ap_1",
             "produce_watercan0"
         ],
-        "escort_message_key": "escort_water_drink"
+        "escort_message_key": "escort_water_drink",
+        "message_key": "water_drink"
     },
     "watercan1_tl1a": {
         "label": "Trinken",
@@ -596,7 +606,8 @@
             "drink_ap_2",
             "produce_watercan0"
         ],
-        "escort_message_key": "escort_water_drink"
+        "escort_message_key": "escort_water_drink",
+        "message_key": "water_drink"
     },
     "watercan1_tl1b": {
         "label": "Trinken",
@@ -615,7 +626,8 @@
             "drink_ap_2",
             "produce_watercan0"
         ],
-        "escort_message_key": "escort_water_drink"
+        "escort_message_key": "escort_water_drink",
+        "message_key": "water_drink"
     },
     "watercan1_tl2": {
         "label": "Trinken",
@@ -5196,7 +5208,7 @@
                 ]
             }
         ],
-        "message": "<t-flare_ok>Du hast die Zone {zone} entdeckt.</t-flare_ok><t-flare_fail>Es gibt keine weitere Zone zu entdecken.</t-flare_fail>"
+        "message": "<t-flare_ok>Die Leuchtrakete hat neue Informationen zu folgender Zone geliefert: {zone}</t-flare_ok><t-flare_ok_ruin>Mit Hilfe der Leuchrakete wurde ein neues Gebäude entdeckt: {zone_ruin}. Seine Koordinaten lauten: {zone}</t-flare_ok_ruin><t-flare_fail>Es gibt keine weitere Zone zu entdecken.</t-flare_fail>"
     },
     "hero_tamer_1": {
         "label": "Zur Bank schicken",
@@ -5300,6 +5312,14 @@
             {
                 "type": "Requirement::MessageOnFail",
                 "collection": {
+                    "custom": [
+                        100
+                    ]
+                }
+            },
+            {
+                "type": "Requirement::MessageOnFail",
+                "collection": {
                     "zombies": {
                         "min": 0,
                         "block": false,
@@ -5341,6 +5361,11 @@
                 "custom": [
                     8
                 ]
+            },
+            {
+                "message": {
+                    "text": "Mit deiner letzten Kraft hast du dich *in die Stadt geschleppt*... *Ein Wunder*!"
+                }
             }
         ]
     },
@@ -5508,7 +5533,10 @@
                         [
                             {
                                 "zone": {
-                                    "escape": 600
+                                    "escape": [
+                                        "armag",
+                                        600
+                                    ]
                                 }
                             },
                             {
@@ -5553,7 +5581,10 @@
                         [
                             {
                                 "zone": {
-                                    "escape": 600
+                                    "escape": [
+                                        "armag",
+                                        600
+                                    ]
                                 }
                             },
                             {
@@ -5598,7 +5629,10 @@
                         [
                             {
                                 "zone": {
-                                    "escape": 600
+                                    "escape": [
+                                        "armag",
+                                        600
+                                    ]
                                 }
                             },
                             {
@@ -5902,7 +5936,7 @@
                 }
             }
         ],
-        "message": "<t-zone>Du hast eine neue Ruine auf {zone} entdeckt!</t-zone><nt-zone>Es scheint, als gäbe es nichts mehr zu entdecken ...</nt-zone>"
+        "message": "<t-zone>Du hast ein neues Gebäude bei den Koordinaten {zone} entdeckt!</t-zone><nt-zone>Du suchst den gesamten Horizont mit deinen Adleraugen ab. Aber es scheint keine weiteren Gebäude zu entdecken zu geben.</nt-zone>"
     },
     "home_fillwater": {
         "label": "Wasserwaffen füllen",
@@ -6463,6 +6497,7 @@
     },
     "brew_shamanic_potion": {
         "label": "Herstellung eines Mystischern Trank",
+        "poison": "ItemAction::PoisonHandlerTransgress",
         "tooltip": "Du kannst einen schamanischen Trank zubereiten, der den Rezipienten vor bösen Geistern schützt.",
         "meta": [
             "must_be_inside",

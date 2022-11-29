@@ -496,7 +496,8 @@
         ],
         "keep": [
             "torch_#00"
-        ]
+        ],
+        "tooltip": "Du hast {item_list} in {item} verwandelt."
     },
     "com009": {
         "type": "Recipe::ManualAnywhere",

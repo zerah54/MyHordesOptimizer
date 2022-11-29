@@ -10,7 +10,9 @@
         ],
         "items_alt": [
             "basic_suit_dirt_#00"
-        ]
+        ],
+        "nightwatch_def_bonus": 0,
+        "nightwatch_surv_bonus": 0
     },
     {
         "hero": false,
@@ -24,7 +26,9 @@
         "items_alt": [
             "basic_suit_dirt_#00"
         ],
-        "picto": "r_jbasic_#00"
+        "picto": "r_jbasic_#00",
+        "nightwatch_def_bonus": 0,
+        "nightwatch_surv_bonus": 0
     },
     {
         "hero": true,
@@ -39,7 +43,9 @@
         "items_alt": [
             "basic_suit_dirt_#00"
         ],
-        "picto": "r_jcolle_#00"
+        "picto": "r_jcolle_#00",
+        "nightwatch_def_bonus": 0,
+        "nightwatch_surv_bonus": 0
     },
     {
         "hero": true,
@@ -54,7 +60,9 @@
         "items_alt": [
             "basic_suit_dirt_#00"
         ],
-        "picto": "r_jguard_#00"
+        "picto": "r_jguard_#00",
+        "nightwatch_def_bonus": 30,
+        "nightwatch_surv_bonus": 0.04
     },
     {
         "hero": true,
@@ -70,7 +78,9 @@
             "basic_suit_dirt_#00",
             "vest_off_#00"
         ],
-        "picto": "r_jrangr_#00"
+        "picto": "r_jrangr_#00",
+        "nightwatch_def_bonus": 0,
+        "nightwatch_surv_bonus": 0
     },
     {
         "hero": true,
@@ -87,7 +97,9 @@
             "tamed_pet_drug_#00",
             "tamed_pet_off_#00"
         ],
-        "picto": "r_jtamer_#00"
+        "picto": "r_jtamer_#00",
+        "nightwatch_def_bonus": 20,
+        "nightwatch_surv_bonus": 0
     },
     {
         "hero": true,
@@ -102,7 +114,9 @@
         "items_alt": [
             "basic_suit_dirt_#00"
         ],
-        "picto": "r_jtech_#00"
+        "picto": "r_jtech_#00",
+        "nightwatch_def_bonus": 0,
+        "nightwatch_surv_bonus": 0
     },
     {
         "hero": true,
@@ -117,7 +131,9 @@
         "items_alt": [
             "basic_suit_dirt_#00"
         ],
-        "picto": "r_jsham_#00"
+        "picto": "r_jsham_#00",
+        "nightwatch_def_bonus": 0,
+        "nightwatch_surv_bonus": 0
     },
     {
         "hero": true,
@@ -132,6 +148,8 @@
         "items_alt": [
             "basic_suit_dirt_#00"
         ],
-        "picto": "r_jermit_#00"
+        "picto": "r_jermit_#00",
+        "nightwatch_def_bonus": 0,
+        "nightwatch_surv_bonus": 0
     }
 ]
