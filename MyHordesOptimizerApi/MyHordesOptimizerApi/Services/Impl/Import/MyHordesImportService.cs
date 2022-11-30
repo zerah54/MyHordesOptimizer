@@ -98,24 +98,36 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var droprates = MyHordesCodeRepository.GetItemsDropRates();
             var listOfPrafDrops = droprates.GetValueOrDefault("empty_dig");
             var totalWeightPraf = 0.0;
-            listOfPrafDrops.ForEach(x => totalWeightPraf += x.Weight);  
+            foreach (var kvp in listOfPrafDrops)
+            {
+                totalWeightPraf += kvp.Value;
+            }
             var listOfNotPrafDrops = droprates.GetValueOrDefault("base_dig");
             var totalWeightNotPraf = 0.0;
-            listOfNotPrafDrops.ForEach(x => totalWeightNotPraf += x.Weight);
+            foreach (var kvp in listOfNotPrafDrops)
+            {
+                totalWeightNotPraf += kvp.Value;
+            }
             mhoItems.ForEach(item =>
             {
-                var myHordesItemDropCodeModel = listOfPrafDrops.FirstOrDefault(x => x.ItemUid == item.Uid);
-                if(myHordesItemDropCodeModel != null)
+                if(listOfPrafDrops.TryGetValue(item.Uid, out var dropWeight))
                 {
-                    item.DropRatePraf = myHordesItemDropCodeModel.Weight / totalWeightPraf;
+                    item.DropRatePraf = dropWeight / totalWeightPraf;
+                }
+                else
+                {
+                    item.DropRatePraf = 0;
                 }
             });
             mhoItems.ForEach(item =>
             {
-                var myHordesItemDropCodeModel = listOfNotPrafDrops.FirstOrDefault(x => x.ItemUid == item.Uid);
-                if( myHordesItemDropCodeModel != null)
+                if (listOfNotPrafDrops.TryGetValue(item.Uid, out var dropWeight))
                 {
-                    item.DropRateNotPraf = myHordesItemDropCodeModel.Weight / totalWeightNotPraf;
+                    item.DropRateNotPraf = dropWeight / totalWeightPraf;
+                }
+                else
+                {
+                    item.DropRateNotPraf = 0;
                 }
             });
             MyHordesOptimizerRepository.PatchItems(mhoItems);

@@ -96,9 +96,12 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             }
                             count++;
                         }
-                        dictionnary.Add($"dataObjet[{count}][idObjet]", 5004);
-                        dictionnary.Add($"dataObjet[{count}][nbr]", cell.DeadZombies);
-                        dictionnary.Add($"dataObjet[{count}][type]", 4);
+                        if(cell.DeadZombies > 0)
+                        {
+                            dictionnary.Add($"dataObjet[{count}][idObjet]", 5004);
+                            dictionnary.Add($"dataObjet[{count}][nbr]", cell.DeadZombies);
+                            dictionnary.Add($"dataObjet[{count}][type]", 4);
+                        }
                         GestHordesRepository.UpdateCell(dictionnary);
                     }
                 }

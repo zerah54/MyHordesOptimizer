@@ -11,7 +11,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         List<MyHordesCategoryCodeModel> GetCategories();
         Dictionary<string, List<string>> GetItemsProperties();
         Dictionary<string, List<string>> GetItemsActions();
-        Dictionary<string, List<MyHordesItemDropCodeModel>> GetItemsDropRates();
+        Dictionary<string, Dictionary<string, int>> GetItemsDropRates();
         List<MyHordesHerosCapacitiesCodeModel> GetHeroCapacities();
         Dictionary<string, MyHordesRecipeCodeModel> GetRecipes();
     }
