@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.07
+// @version      1.0.0-beta.09
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -25,15 +25,15 @@
 // @match        https://gest-hordes2.eragaming.fr/*
 // @match        https://fatamorgana.md26.eu/*
 //
-// @grant        GM_setValue
-// @grant        GM_getValue
-// @grant        GM_xmlhttpRequest
+// @grant        GM.setValue
+// @grant        GM.getValue
+// @grant        GM.xmlHttpRequest
 // @grant        GM_notification
 //
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[fix] Correctif de l'enregistrement de l'état de case épuisée sur GH\n`;
++ `[fix] Correction d'un problème de coordonnées dans la mise à jour GH`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -46,9 +46,12 @@ const mh_user_key = 'mh_user';
 const mho_map_key = 'mho_map';
 const mho_blacklist_key = 'mho_blacklist'
 
-let mho_parameters = GM_getValue(gm_parameters_key) || {};
-let mh_user = GM_getValue(mh_user_key);
+let mho_parameters;
+GM.getValue(gm_parameters_key).then((params) => {mho_parameters = params || {}});
+let mh_user;
+GM.getValue(mh_user_key).then((user) => {mh_user = user});
 let external_app_id;
+GM.getValue(gm_mh_external_app_id_key).then((app_id) => {external_app_id = app_id});
 
 
 ////////////////////
@@ -423,6 +426,12 @@ const texts = {
         fr: `Informations complémentaires`,
         de: `TODO`,
         es: `TODO`,
+    },
+    manually_add_app_id_key: {
+        en: `TODO`,
+        fr: `Votre identifiant n'a pas pu être récupéré automatiquement. Vous pouvez le saisir manuellement ici.`,
+        de: `TODO`,
+        es: `TODO`,
     }
 };
 
@@ -431,80 +440,80 @@ const camping_results = [
         probability: 0.1,
         strict: false,
         label: {
-        en: `You reckon your chances of surviving here are hee haw... Might as well take some cyanide now.`,
-        fr: `Vous estimez que vos chances de survie ici sont quasi nulles… Autant gober du cyanure tout de suite.`,
-        de: `Du schätzt, dass deine Überlebenschancen hier quasi Null sind... Besser gleich 'ne Zyanidkapsel schlucken.`,
-        es: `Crees que tus posibilidades de sobrevivir aquí son casi nulas... ¿Cianuro?`,
+            en: `You reckon your chances of surviving here are hee haw... Might as well take some cyanide now.`,
+            fr: `Vous estimez que vos chances de survie ici sont quasi nulles… Autant gober du cyanure tout de suite.`,
+            de: `Du schätzt, dass deine Überlebenschancen hier quasi Null sind... Besser gleich 'ne Zyanidkapsel schlucken.`,
+            es: `Crees que tus posibilidades de sobrevivir aquí son casi nulas... ¿Cianuro?`,
         }
     },
     {
         probability: 0.3,
         strict: false,
         label: {
-        en: `You reckon your chances of surviving here are really poor. Maybe you should play heads or tails?`,
-        fr: `Vous estimez que vos chances de survie ici sont très faibles. Peut-être que vous aimez jouer à pile ou face ?`,
-        de: `Du schätzt, dass deine Überlebenschancen hier sehr gering sind. Vielleicht hast du ja Bock 'ne Runde Kopf oder Zahl zu spielen?`,
-        es: `Crees que tus posibilidades de sobrevivir aquí son muy pocas. ¿Apostamos?`,
+            en: `You reckon your chances of surviving here are really poor. Maybe you should play heads or tails?`,
+            fr: `Vous estimez que vos chances de survie ici sont très faibles. Peut-être que vous aimez jouer à pile ou face ?`,
+            de: `Du schätzt, dass deine Überlebenschancen hier sehr gering sind. Vielleicht hast du ja Bock 'ne Runde Kopf oder Zahl zu spielen?`,
+            es: `Crees que tus posibilidades de sobrevivir aquí son muy pocas. ¿Apostamos?`,
         }
     },
     {
         probability: 0.5,
         strict: false,
         label: {
-        en: `You reckon your chances of surviving here are poor. Difficult to say.`,
-        fr: `Vous estimez que vos chances de survie ici sont faibles. Difficile à dire.`,
-        de: `Du schätzt, dass deine Überlebenschancen hier gering sind. Hmmm... schwer zu sagen, wie das hier ausgeht.`,
-        es: `Crees que tus posibilidades de sobrevivir aquí son pocas. Quién sabe...`,
+            en: `You reckon your chances of surviving here are poor. Difficult to say.`,
+            fr: `Vous estimez que vos chances de survie ici sont faibles. Difficile à dire.`,
+            de: `Du schätzt, dass deine Überlebenschancen hier gering sind. Hmmm... schwer zu sagen, wie das hier ausgeht.`,
+            es: `Crees que tus posibilidades de sobrevivir aquí son pocas. Quién sabe...`,
         }
     },
     {
         probability: 0.65,
         strict: false,
         label: {
-        en: `You reckon your chances of surviving here are limited, but tempting. However, accidents happen...`,
-        fr: `Vous estimez que vos chances de survie ici sont limitées, bien que ça puisse se tenter. Mais un accident est vite arrivé...`,
-        de: `Du schätzt, dass deine Überlebenschancen hier mittelmäßig sind. Ist allerdings einen Versuch wert.. obwohl, Unfälle passieren schnell...`,
-        es: `Crees que tus posibilidades de sobrevivir aquí son reducidas, aunque se puede intentar. Tú sabes, podrías sufrir un accidente...`,
+            en: `You reckon your chances of surviving here are limited, but tempting. However, accidents happen...`,
+            fr: `Vous estimez que vos chances de survie ici sont limitées, bien que ça puisse se tenter. Mais un accident est vite arrivé...`,
+            de: `Du schätzt, dass deine Überlebenschancen hier mittelmäßig sind. Ist allerdings einen Versuch wert.. obwohl, Unfälle passieren schnell...`,
+            es: `Crees que tus posibilidades de sobrevivir aquí son reducidas, aunque se puede intentar. Tú sabes, podrías sufrir un accidente...`,
         }
     },
     {
         probability: 0.8,
         strict: false,
         label: {
-        en: `You reckon your chances of surviving here are largely satisfactory, as long as nothing unforeseen happens.`,
-        fr: `Vous estimez que vos chances de survie ici sont à peu près satisfaisantes, pour peu qu'aucun imprévu ne vous tombe dessus.`,
-        de: `Du schätzt, dass deine Überlebenschancen hier zufriedenstellend sind - vorausgesetzt du erlebst keine böse Überraschung.`,
-        es: `Crees que tus posibilidades de sobrevivir aquí son aceptables, esperando que no suceda ningún imprevisto.`,
+            en: `You reckon your chances of surviving here are largely satisfactory, as long as nothing unforeseen happens.`,
+            fr: `Vous estimez que vos chances de survie ici sont à peu près satisfaisantes, pour peu qu'aucun imprévu ne vous tombe dessus.`,
+            de: `Du schätzt, dass deine Überlebenschancen hier zufriedenstellend sind - vorausgesetzt du erlebst keine böse Überraschung.`,
+            es: `Crees que tus posibilidades de sobrevivir aquí son aceptables, esperando que no suceda ningún imprevisto.`,
         }
     },
     {
         probability: 0.9,
         strict: false,
         label: {
-        en: `You reckon your chances of surviving here are decent: you just have to hope for the best!`,
-        fr: `Vous estimez que vos chances de survie ici sont correctes : il ne vous reste plus qu'à croiser les doigts !`,
-        de: `Du schätzt, dass deine Überlebenschancen hier korrekt sind. Jetzt heißt's nur noch Daumen drücken!`,
-        es: `Crees que tus posibilidades de sobrevivir aquí son buenas. ¡Cruza los dedos!`,
+            en: `You reckon your chances of surviving here are decent: you just have to hope for the best!`,
+            fr: `Vous estimez que vos chances de survie ici sont correctes : il ne vous reste plus qu'à croiser les doigts !`,
+            de: `Du schätzt, dass deine Überlebenschancen hier korrekt sind. Jetzt heißt's nur noch Daumen drücken!`,
+            es: `Crees que tus posibilidades de sobrevivir aquí son buenas. ¡Cruza los dedos!`,
         }
     },
     {
         probability: 1,
         strict: true,
         label: {
-        en: `You reckon your chances of surviving here are good, you should be able to spend the night here.`,
-        fr: `Vous estimez que vos chances de survie ici sont élevées : vous devriez pouvoir passer la nuit ici.`,
-        de: `Du schätzt, dass deine Überlebenschancen hier gut sind. Du müsstest hier problemlos die Nacht verbringen können.`,
-        es: `Crees que tus posibilidades de sobrevivir aquí son altas. Podías pasar la noche aquí.`,
+            en: `You reckon your chances of surviving here are good, you should be able to spend the night here.`,
+            fr: `Vous estimez que vos chances de survie ici sont élevées : vous devriez pouvoir passer la nuit ici.`,
+            de: `Du schätzt, dass deine Überlebenschancen hier gut sind. Du müsstest hier problemlos die Nacht verbringen können.`,
+            es: `Crees que tus posibilidades de sobrevivir aquí son altas. Podías pasar la noche aquí.`,
         }
     },
     {
         probability: 1,
         strict: false,
         label: {
-        en: `You reckon your chances of surviving here are optimal. Nobody would see you, even if they were looking straight at you.`,
-        fr: `Vous estimez que vos chances de survie ici sont optimales : personne ne vous verrait même en vous pointant du doigt.`,
-        de: `Du schätzt, dass deine Überlebenschancen hier optimal sind. Niemand wird dich sehen - selbst wenn man mit dem Finger auf dich zeigt.`,
-        es: `Crees que tus posibilidades de sobrevivir aquí son óptimas. Nadie te verá, ni señalándote con el dedo`,
+            en: `You reckon your chances of surviving here are optimal. Nobody would see you, even if they were looking straight at you.`,
+            fr: `Vous estimez que vos chances de survie ici sont optimales : personne ne vous verrait même en vous pointant du doigt.`,
+            de: `Du schätzt, dass deine Überlebenschancen hier optimal sind. Niemand wird dich sehen - selbst wenn man mit dem Finger auf dich zeigt.`,
+            es: `Crees que tus posibilidades de sobrevivir aquí son óptimas. Nadie te verá, ni señalándote con el dedo`,
         }
     },
 ];
@@ -1116,23 +1125,23 @@ let params_categories = [
                 },
                 parent_id: null
             }
-        // {
-        //     id: `block_users`,
-        //     label: {
-        //         en: `Allows to block users`,
-        //         fr: `Permettre de bloquer des utilisateurs`,
-        //         de: `TODO`,
-        //         es: `Permite bloquear usuarios`
-        //     },
-        //     help: {
-        //         en: `Shows an icon next to the usernames in the forum, allowing to block / unblock a user. If a user is blocked, this option will hide their messages (while allowing to show again any message).`,
-        //         fr: `Affiche un icône devant les noms d'utilisateurs sur le forum, permettant de bloquer / débloquer un utilisateur.
-        //         Si un utilisateur est bloqué, masque ses messages tout en permettant de réafficher chaque message au besoin.`,
-        //         de: `TODO`,
-        //         es: `Muestra un ícono junto a los nombres de usuario en el foro que permite bloquear / desbloquear a un usuario. Si un usuario ha sido bloqueado, sus mensajes serán ocultados (pero es posible volver a mostrar cualquier mensaje si se desea).`
-        //     },
-        //     parent_id: null
-        // }
+            // {
+            //     id: `block_users`,
+            //     label: {
+            //         en: `Allows to block users`,
+            //         fr: `Permettre de bloquer des utilisateurs`,
+            //         de: `TODO`,
+            //         es: `Permite bloquear usuarios`
+            //     },
+            //     help: {
+            //         en: `Shows an icon next to the usernames in the forum, allowing to block / unblock a user. If a user is blocked, this option will hide their messages (while allowing to show again any message).`,
+            //         fr: `Affiche un icône devant les noms d'utilisateurs sur le forum, permettant de bloquer / débloquer un utilisateur.
+            //         Si un utilisateur est bloqué, masque ses messages tout en permettant de réafficher chaque message au besoin.`,
+            //         de: `TODO`,
+            //         es: `Muestra un ícono junto a los nombres de usuario en el foro que permite bloquear / desbloquear a un usuario. Si un usuario ha sido bloqueado, sus mensajes serán ocultados (pero es posible volver a mostrar cualquier mensaje si se desea).`
+            //     },
+            //     parent_id: null
+            // }
         ]
     },
     {
@@ -1183,7 +1192,9 @@ let informations = [
             de: `Webseite`,
             es: `Sitio web`
         },
-        src: `https://myhordes-optimizer.web.app/`, action: () => {}, img: `emotes/explo.gif`
+        src: `https://myhordes-optimizer.web.app/`,
+        action: () => {},
+        img: `emotes/explo.gif`
     },
     {
         id: `version`,
@@ -1193,7 +1204,9 @@ let informations = [
             de: `Changelog ${GM_info.script.version}`,
             es: `Notas de la versión ${GM_info.script.version}`
         },
-        src: undefined, action: () => {alert(changelog)}, img: `emotes/rptext.gif`
+        src: undefined,
+        action: () => {alert(changelog)},
+        img: `emotes/rptext.gif`
     },
     {
         id: `discord-url-id`,
@@ -1206,6 +1219,21 @@ let informations = [
         src: `https://discord.gg/ZQH7ZPWcCm`,
         action: undefined,
         img: `${repo_img_url}discord.ico`
+    },
+    {
+        id: `clean-app-id`,
+        label: {
+            en: `TODO`,
+            fr: `Réinitialiser mon ID d'app externe`,
+            de: `TODO`,
+            es: `TODO`
+        },
+        src: undefined,
+        action: () => {
+            GM.setValue(gm_mh_external_app_id_key, undefined);
+            external_app_id = undefined;
+        },
+        img: `icons/small_remove.gif`
     }
 ];
 
@@ -1441,7 +1469,7 @@ function createOptimizerBtn() {
     setTimeout(() => {
         let header_zone = document.getElementById(mh_header_id);
         let last_header_child = header_zone.lastChild;
-        let left_position = last_header_child ? last_header_child.offsetLeft + last_header_child.offsetWidth + 5 : 43;
+        let left_position = last_header_child ? last_header_child.offsetLeft + last_header_child.offsetWidth + 5 : (document.querySelector('#apps')?.getBoundingClientRect().width + 16);
 
         let img = document.createElement('img');
         img.src = mh_optimizer_icon;
@@ -1595,8 +1623,8 @@ function createParams() {
                     new_params = mho_parameters;
                 }
                 new_params[param.id] = event.target.checked;
-                GM_setValue(gm_parameters_key, new_params);
-                mho_parameters = GM_getValue(gm_parameters_key);
+                GM.setValue(gm_parameters_key, new_params);
+                GM.getValue(gm_parameters_key).then((params) => {mho_parameters = params});
 
                 /** Si l'option a des "enfants" alors on les affiche uniquement si elle est cochée */
                 if (param_children.length > 0) {
@@ -3363,10 +3391,10 @@ function displaySearchFieldOnBuildings() {
 
                 buildings.forEach((building) => {
                     if(Array.from(building.children).every((child) => child.classList.contains('hidden'))) {
-                       building.classList.add('hidden');
-                       } else {
-                           building.classList.remove('hidden');
-                       }
+                        building.classList.add('hidden');
+                    } else {
+                        building.classList.remove('hidden');
+                    }
                 });
             });
 
@@ -3678,7 +3706,7 @@ function displayAdvancedTooltips() {
 function createAdvancedProperties(content, item, tooltip) {
     let item_deco;
     if (tooltip) {
-         item_deco = tooltip.getElementsByClassName('item-tag-deco')[0];
+        item_deco = tooltip.getElementsByClassName('item-tag-deco')[0];
     }
     content.innerHtml = '';
     if (tooltip) {
@@ -4091,6 +4119,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.classList.remove('item-tag');
             break;
         case null:
+            item_action.classList.remove('item-tag');
             break;
         default:
             console.log(property_or_action);
@@ -4401,31 +4430,32 @@ function displayMap() {
         content.appendChild(table);
     }
 
-    let mho_map = GM_getValue(mho_map_key);
-    if (mho_map) {
-        if (mho_map.source === 'gh') {
-            if (mho_map.map === 'ruin') {
-                getGHRuin().then((map) => transformRuinMapping(map));
-            } else {
-                getGHMap().then((map) => transformMapping(map));
+    GM.getValue(mho_map_key).then((mho_map) => {
+        if (mho_map) {
+            if (mho_map.source === 'gh') {
+                if (mho_map.map === 'ruin') {
+                    getGHRuin().then((map) => transformRuinMapping(map));
+                } else {
+                    getGHMap().then((map) => transformMapping(map));
+                }
+            } else if (mho_map.source === 'bbh') {
+                if (mho_map.map === 'ruin') {
+                    getBBHRuin().then((map) => transformRuinMapping(map));
+                } else {
+                    getBBHMap().then((map) => transformMapping(map));
+                }
+            } else if (mho_map.source === 'fm') {
+                if (mho_map.map === 'ruin') {
+                    getFMRuin().then((map) => transformRuinMapping(map));
+                } else {
+                    getFMMap().then((map) => transformMapping(map));
+                }
             }
-        } else if (mho_map.source === 'bbh') {
-            if (mho_map.map === 'ruin') {
-                getBBHRuin().then((map) => transformRuinMapping(map));
-            } else {
-                getBBHMap().then((map) => transformMapping(map));
-            }
-        } else if (mho_map.source === 'fm') {
-            if (mho_map.map === 'ruin') {
-                getFMRuin().then((map) => transformRuinMapping(map));
-            } else {
-                getFMMap().then((map) => transformMapping(map));
-            }
+            // if (mho_map.map === 'ruin') {
+            //     createOptimizePathButton();
+            // }
         }
-        // if (mho_map.map === 'ruin') {
-        //     createOptimizePathButton();
-        // }
-    }
+    });
 }
 
 
@@ -4438,8 +4468,8 @@ function createOptimizePathButton() {
     opti_button.addEventListener('click', () => {
         opti_button.disabled = true;
         getOptimalPath(mapToOptimize()).then((optimal_path) => displayOptimalPath(optimal_path));
-      });
-      opti_button_parent.appendChild(opti_button);
+    });
+    opti_button_parent.appendChild(opti_button);
 }
 
 function mapToOptimize() {
@@ -4454,41 +4484,41 @@ function mapToOptimize() {
     rows.forEach((row, row_index) => {
         let cols = Array.from(row.querySelectorAll('td'));
         let final_cols = cols
-            .filter((col) => !col.classList.contains('around-map')) // Colonne d'index
-            .map((col, col_index) => {
-                if (col.classList.contains('empty')) {
-                    // Pas de passage
-                    return 0;
-                } else {
-                    // Porte
-                    if (col.classList.contains('door')) {
-                        doors_positions.push({colIndex: col_index, rowIndex: row_index});
-                    }
-                    // Entrée
-                    if (col.classList.contains('exit')) {
-                        entrance = {colIndex: col_index, rowIndex: row_index};
-                    }
-                    return 1;
+        .filter((col) => !col.classList.contains('around-map')) // Colonne d'index
+        .map((col, col_index) => {
+            if (col.classList.contains('empty')) {
+                // Pas de passage
+                return 0;
+            } else {
+                // Porte
+                if (col.classList.contains('door')) {
+                    doors_positions.push({colIndex: col_index, rowIndex: row_index});
                 }
-            });
-          final_rows.push(final_cols);
+                // Entrée
+                if (col.classList.contains('exit')) {
+                    entrance = {colIndex: col_index, rowIndex: row_index};
+                }
+                return 1;
+            }
+        });
+        final_rows.push(final_cols);
     });
-  return {
-      map: final_rows,
-      doors: doors_positions,
-      entrance: entrance
-  }
+    return {
+        map: final_rows,
+        doors: doors_positions,
+        entrance: entrance
+    }
 }
 
 function displayOptimalPath(html, response) {
     console.log('display opti');
     let rows = Array.from(html.querySelectorAll('tr'))
-        .filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
-            return !col.classList.contains('bordCarteRuine') // Ligne d'index
-        }))
-        .map((row) => {
-            return Array.from(row.querySelectorAll('td')).filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
-        });
+    .filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
+        return !col.classList.contains('bordCarteRuine') // Ligne d'index
+    }))
+    .map((row) => {
+        return Array.from(row.querySelectorAll('td')).filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
+    });
 
     rows.forEach((row, row_index) => {
         let response_pos_in_row = response.filter((response_pos) => response_pos.row === row_index);
@@ -4595,7 +4625,7 @@ function preventFromLeaving() {
             let ae_button;
             for (let button of buttons) {
                 if (button.getAttribute('x-toggle-escort') && !button.classList.contains('inline') && button.getAttribute('x-toggle-escort') === '1') {
-                   ae_button = button;
+                    ae_button = button;
 
                     let mho_leaving_info = document.getElementById('mho-leaving-info');
                     if (!mho_leaving_info) {
@@ -4952,86 +4982,89 @@ function displayMoreCitizensInformations() {
 function blockUsersPosts() {
     if (mho_parameters.block_users && pageIsForum()) {
         let posts = document.querySelectorAll('.forum-post');
-          if (posts) {
+        if (posts) {
             Array.from(posts).forEach((post) => {
                 let blacklisted_user = post.querySelector("#blacklist")
                 let user = post.querySelector('.username');
                 let user_id = user.getAttribute('x-user-id');
                 if (user_id === mh_user.id.toString()) return;
 
-                let blacklist = GM_getValue(mho_blacklist_key);
-                if (!blacklist) {
-                    blacklist = [];
-                }
+                GM.getValue(mho_blacklist_key).then((blacklist) => {
+                    if (!blacklist) {
+                        blacklist = [];
+                    }
 
-                let is_user_in_blacklist = blacklist.some((blacklist_user_id) => blacklist_user_id === user_id) ;
-                let original_post_content = post.querySelector('.forum-post-content:not(.replace-original)');
-                let new_post_content = post.querySelector('.replace-original');
+                    let is_user_in_blacklist = blacklist.some((blacklist_user_id) => blacklist_user_id === user_id) ;
+                    let original_post_content = post.querySelector('.forum-post-content:not(.replace-original)');
+                    let new_post_content = post.querySelector('.replace-original');
 
-                if (!blacklisted_user) {
-                    blacklisted_user = document.createElement('span');
-                    blacklisted_user.id = 'blacklist';
-                    blacklisted_user.innerHTML = '&#10003;';
-                    blacklisted_user.style.marginRight = '0.5em';
-                    blacklisted_user.style.cursor = 'pointer';
-                    blacklisted_user.addEventListener('click', () => {
-                        let temp_blacklist = [...GM_getValue(mho_blacklist_key)];
-                        if (!blacklisted_user.getAttribute('blacklisted')) {
-                            temp_blacklist.push(user_id);
-                            blacklisted_user.setAttribute('blacklisted', true);
-                            let user_posts = Array.from(document.querySelectorAll(`.username[x-user-id="${user_id}"]`)).map((user_tag) => user_tag.parentElement.parentElement.querySelector('.original'));
-                            user_posts.forEach((user_post) => user_post.classList.remove('force-display'));
+                    if (!blacklisted_user) {
+                        blacklisted_user = document.createElement('span');
+                        blacklisted_user.id = 'blacklist';
+                        blacklisted_user.innerHTML = '&#10003;';
+                        blacklisted_user.style.marginRight = '0.5em';
+                        blacklisted_user.style.cursor = 'pointer';
+                        blacklisted_user.addEventListener('click', () => {
+                            GM.getValue(mho_blacklist_key).then((keys) => {
+                                let temp_blacklist = [...keys];
+                                if (!blacklisted_user.getAttribute('blacklisted')) {
+                                    temp_blacklist.push(user_id);
+                                    blacklisted_user.setAttribute('blacklisted', true);
+                                    let user_posts = Array.from(document.querySelectorAll(`.username[x-user-id="${user_id}"]`)).map((user_tag) => user_tag.parentElement.parentElement.querySelector('.original'));
+                                    user_posts.forEach((user_post) => user_post.classList.remove('force-display'));
+                                } else {
+                                    let index = temp_blacklist.findIndex((blacklisted_user_id) => blacklisted_user_id === user_id);
+                                    if (index > -1) {
+                                        temp_blacklist.splice(index, 1);
+                                        blacklisted_user.removeAttribute('blacklisted');
+                                    }
+                                }
+                                GM.setValue(mho_blacklist_key, [...temp_blacklist]);
+                                blacklist = [...GM.getValue(mho_blacklist_key)];
+                            })
+                        });
+
+                        user.parentNode.insertBefore(blacklisted_user, user);
+                    }
+
+                    if (is_user_in_blacklist) {
+                        blacklisted_user.innerHTML = '&#10007;';
+                        blacklisted_user.setAttribute('blacklisted', true);
+                        original_post_content.classList.add('original');
+                        if (!original_post_content.classList.contains('force-display')) {
+                            original_post_content.style.display = 'none';
+                        }
+
+
+                        if (!new_post_content) {
+                            new_post_content = document.createElement('div');
+                            new_post_content.classList.add('forum-post-content', 'replace-original');
+                            let link = document.createElement('a');
+                            link.innerText = 'Cliquez ici pour afficher ce message.';
+                            link.style.cursor = 'pointer';
+                            link.addEventListener('click', ($event) => {
+                                new_post_content.style.display = 'none';
+                                original_post_content.style.display = 'block';
+                                original_post_content.classList.add('force-display');
+                            });
+                            new_post_content.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 30px !important; vertical-align: middle; margin-right: 0.5em;"><i>L'utilisateur a été bloqué.</i><br />`;
+                            new_post_content.appendChild(link);
+                            original_post_content.parentNode.insertBefore(new_post_content, original_post_content);
                         } else {
-                            let index = temp_blacklist.findIndex((blacklisted_user_id) => blacklisted_user_id === user_id);
-                            if (index > -1) {
-                                temp_blacklist.splice(index, 1);
-                                blacklisted_user.removeAttribute('blacklisted');
+                            if (!original_post_content.classList.contains('force-display')) {
+                                new_post_content.style.display = 'block';
                             }
                         }
-                        GM_setValue(mho_blacklist_key, [...temp_blacklist]);
-                        blacklist = [...GM_getValue(mho_blacklist_key)];
-                    });
-
-                    user.parentNode.insertBefore(blacklisted_user, user);
-                }
-
-                if (is_user_in_blacklist) {
-                    blacklisted_user.innerHTML = '&#10007;';
-                    blacklisted_user.setAttribute('blacklisted', true);
-                    original_post_content.classList.add('original');
-                    if (!original_post_content.classList.contains('force-display')) {
-                        original_post_content.style.display = 'none';
-                    }
-
-
-                    if (!new_post_content) {
-                        new_post_content = document.createElement('div');
-                        new_post_content.classList.add('forum-post-content', 'replace-original');
-                        let link = document.createElement('a');
-                        link.innerText = 'Cliquez ici pour afficher ce message.';
-                        link.style.cursor = 'pointer';
-                        link.addEventListener('click', ($event) => {
-                            new_post_content.style.display = 'none';
-                            original_post_content.style.display = 'block';
-                            original_post_content.classList.add('force-display');
-                        });
-                        new_post_content.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 30px !important; vertical-align: middle; margin-right: 0.5em;"><i>L'utilisateur a été bloqué.</i><br />`;
-                        new_post_content.appendChild(link);
-                        original_post_content.parentNode.insertBefore(new_post_content, original_post_content);
                     } else {
-                        if (!original_post_content.classList.contains('force-display')) {
-                            new_post_content.style.display = 'block';
-                        }
-                    }
-                } else {
-                    blacklisted_user.innerHTML = '&#10003;';
-                    blacklisted_user.removeAttribute('blacklisted');
+                        blacklisted_user.innerHTML = '&#10003;';
+                        blacklisted_user.removeAttribute('blacklisted');
 
-                    if (new_post_content) {
-                      new_post_content.style.display = 'none';
+                        if (new_post_content) {
+                            new_post_content.style.display = 'none';
+                        }
+                        original_post_content.style.display = 'block';
                     }
-                    original_post_content.style.display = 'block';
-                }
+                });
             });
         }
     }
@@ -5056,11 +5089,13 @@ function createCopyButton(source, map, map_id, button_block_id) {
             map = document.querySelector('#ruinmap-wrapper') && document.querySelector('#ruinmap-wrapper').offsetParent === null ? 'map' : 'ruin';
             map_to_convert = map === 'ruin' ? document.getElementById('ruinmap') : document.getElementById('map');
         }
-        GM_setValue(mho_map_key, {
-            source: source,
-            map: map,
-            fm_block: source === 'fm' && map === 'map' ? map_to_convert.outerHTML : (GM_getValue(mho_map_key) ? GM_getValue(mho_map_key).fm_block : undefined),
-            ruin: map === 'ruin' ? map_to_convert.outerHTML : (GM_getValue(mho_map_key) ? GM_getValue(mho_map_key).ruin : undefined)
+        GM.getValue(mho_map_key).then((mho_map) => {
+            GM.setValue(mho_map_key, {
+                source: source,
+                map: map,
+                fm_block: source === 'fm' && map === 'map' ? map_to_convert.outerHTML : (mho_map ? mho_map.fm_block : undefined),
+                ruin: map === 'ruin' ? map_to_convert.outerHTML : (mho_map ? mho_map.ruin : undefined)
+            });
         });
 
         copy_button.innerHTML = copyText(getI18N(texts.copy_map_end), getI18N(texts.copy_map_end_more));
@@ -5704,7 +5739,7 @@ async function getGHMap() {
                     return {direction: 'none', type: 'point', source: 'middle', length: 'none', position: 'middle'};
             }
         }
-        GM_xmlhttpRequest({
+        GM.xmlHttpRequest({
             method: 'GET',
             url: 'https://gest-hordes2.eragaming.fr/carte',
             responseType: 'document',
@@ -5765,116 +5800,118 @@ async function getGHMap() {
 async function getGHRuin() {
     return new Promise((resolve, reject) => {
         startLoading();
-        if (GM_getValue(mho_map_key).ruin) {
-            let map_html = document.createElement('div');
-            map_html.innerHTML = GM_getValue(mho_map_key).ruin;
+        GM.getValue(mho_map_key).then((mho_map) => {
+            if (mho_map.ruin) {
+                let map_html = document.createElement('div');
+                map_html.innerHTML = mho_map.ruin;
 
-            let new_map = [];
-            let rows = Array.from(map_html.querySelector('#carteRuine').querySelector('tbody').children);
-            let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
-            rows
-                .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('caseCarteRuine')))
-                .forEach((row, row_index, rows_array) => {
-                let new_cells = [];
-                let cells = Array.from(row.children);
-                let y;
-                cells.forEach((cell, cell_index, cell_array) => {
-                    if (cell.classList.contains('bordCarteRuine')) {
-                        y = cell.innerText;
-                    } else {
+                let new_map = [];
+                let rows = Array.from(map_html.querySelector('#carteRuine').querySelector('tbody').children);
+                let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
+                rows
+                    .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('caseCarteRuine')))
+                    .forEach((row, row_index, rows_array) => {
+                    let new_cells = [];
+                    let cells = Array.from(row.children);
+                    let y;
+                    cells.forEach((cell, cell_index, cell_array) => {
+                        if (cell.classList.contains('bordCarteRuine')) {
+                            y = cell.innerText;
+                        } else {
 
-                        let cell_parts = Array.from(cell.children);
-                        let new_cell = {
-                            horizontal: y,
-                            vertical: x_mapping[cell_index],
-                            borders: '0000',
-                            zombies: cell.firstElementChild.getAttribute('data-z')
-                        };
+                            let cell_parts = Array.from(cell.children);
+                            let new_cell = {
+                                horizontal: y,
+                                vertical: x_mapping[cell_index],
+                                borders: '0000',
+                                zombies: cell.firstElementChild.getAttribute('data-z')
+                            };
 
-                        let img_path = cell.querySelector('.ruineCarte').firstElementChild.href.baseVal.replace(/^(.*)#/, '');
-                        switch (img_path) {
-                            case 'ruineCarte_0':
-                                new_cell.borders = '0101';
-                                break;
-                            case 'ruineCarte_1':
-                                new_cell.borders = '1010';
-                                break;
-                            case 'ruineCarte_2':
-                                new_cell.borders = '1100';
-                                break;
-                            case 'ruineCarte_3':
-                                new_cell.borders = '0110';
-                                break;
-                            case 'ruineCarte_4':
-                                new_cell.borders = '1001';
-                                break;
-                            case 'ruineCarte_5':
-                                new_cell.borders = '0011';
-                                break;
-                            case 'ruineCarte_6':
-                                new_cell.borders = '1111';
-                                break;
-                            case 'ruineCarte_7':
-                                new_cell.borders = '0111';
-                                break;
-                            case 'ruineCarte_8':
-                                new_cell.borders = '1101';
-                                break;
-                            case 'ruineCarte_9':
-                                new_cell.borders = '1110';
-                                break;
-                            case 'ruineCarte_10':
-                                new_cell.borders = '1011';
-                                break;
-                            case 'ruineCarte_11':
-                                new_cell.borders = '1000';
-                                break;
-                            case 'ruineCarte_12':
-                                new_cell.borders = '0100';
-                                break;
-                            case 'ruineCarte_13':
-                                new_cell.borders = '0001';
-                                break;
-                            case 'ruineCarte_14':
-                                new_cell.borders = '0010';
-                                break;
-                            case 'ruineCarte_15':
-                                new_cell.borders = 'exit';
-                                break;
-                            case 'ruineCarte_17':
-                                new_cell.borders = '1010';
-                                break;
-                            default:
-                                new_cell.borders = '0000';
-                                break;
-                        };
+                            let img_path = cell.querySelector('.ruineCarte').firstElementChild.href.baseVal.replace(/^(.*)#/, '');
+                            switch (img_path) {
+                                case 'ruineCarte_0':
+                                    new_cell.borders = '0101';
+                                    break;
+                                case 'ruineCarte_1':
+                                    new_cell.borders = '1010';
+                                    break;
+                                case 'ruineCarte_2':
+                                    new_cell.borders = '1100';
+                                    break;
+                                case 'ruineCarte_3':
+                                    new_cell.borders = '0110';
+                                    break;
+                                case 'ruineCarte_4':
+                                    new_cell.borders = '1001';
+                                    break;
+                                case 'ruineCarte_5':
+                                    new_cell.borders = '0011';
+                                    break;
+                                case 'ruineCarte_6':
+                                    new_cell.borders = '1111';
+                                    break;
+                                case 'ruineCarte_7':
+                                    new_cell.borders = '0111';
+                                    break;
+                                case 'ruineCarte_8':
+                                    new_cell.borders = '1101';
+                                    break;
+                                case 'ruineCarte_9':
+                                    new_cell.borders = '1110';
+                                    break;
+                                case 'ruineCarte_10':
+                                    new_cell.borders = '1011';
+                                    break;
+                                case 'ruineCarte_11':
+                                    new_cell.borders = '1000';
+                                    break;
+                                case 'ruineCarte_12':
+                                    new_cell.borders = '0100';
+                                    break;
+                                case 'ruineCarte_13':
+                                    new_cell.borders = '0001';
+                                    break;
+                                case 'ruineCarte_14':
+                                    new_cell.borders = '0010';
+                                    break;
+                                case 'ruineCarte_15':
+                                    new_cell.borders = 'exit';
+                                    break;
+                                case 'ruineCarte_17':
+                                    new_cell.borders = '1010';
+                                    break;
+                                default:
+                                    new_cell.borders = '0000';
+                                    break;
+                            };
 
-                        switch (cell.firstElementChild.getAttribute('data-porte')) {
-                            case 'pC':
-                                new_cell.door = 'item_lock';
-                                break;
-                            case 'p':
-                                new_cell.door = 'item_door';
-                                break;
-                            case 'pD':
-                                new_cell.door = 'item_classicKey';
-                                break;
-                            case 'pP':
-                                new_cell.door = 'item_bumpKey';
-                                break;
-                            case 'pM':
-                                new_cell.door = 'item_magneticKey';
-                                break;
-                            default:
-                                break;
+                            switch (cell.firstElementChild.getAttribute('data-porte')) {
+                                case 'pC':
+                                    new_cell.door = 'item_lock';
+                                    break;
+                                case 'p':
+                                    new_cell.door = 'item_door';
+                                    break;
+                                case 'pD':
+                                    new_cell.door = 'item_classicKey';
+                                    break;
+                                case 'pP':
+                                    new_cell.door = 'item_bumpKey';
+                                    break;
+                                case 'pM':
+                                    new_cell.door = 'item_magneticKey';
+                                    break;
+                                default:
+                                    break;
+                            }
+                            new_cells.push(new_cell);
                         }
-                        new_cells.push(new_cell);
-                    }
+                    });
+                    new_map.push(new_cells);
                 });
-                new_map.push(new_cells);
-            });
-            resolve({map: new_map, vertical_mapping: x_mapping});
-        }
+                resolve({map: new_map, vertical_mapping: x_mapping});
+            }
+        })
         endLoading();
     });
 }
@@ -5885,7 +5922,7 @@ async function getBBHMap() {
     return new Promise((resolve, reject) => {
         startLoading();
 
-        GM_xmlhttpRequest({
+        GM.xmlHttpRequest({
             method: 'GET',
             url: `https://bbh.fred26.fr/?cid=5-${mh_user.townDetails.townId}&pg=map`,
             responseType: 'document',
@@ -5920,7 +5957,7 @@ async function getBBHMap() {
                                         empty_bat: cell.querySelector('.mark1'),
                                         ruin: cell.querySelector('.tag_11')
                                     };
-                                        cells.push(new_cell);
+                                    cells.push(new_cell);
                                 });
                                 new_map.push(cells);
                             });
@@ -5948,125 +5985,127 @@ async function getBBHMap() {
 async function getBBHRuin() {
     return new Promise((resolve, reject) => {
         startLoading();
-        if (GM_getValue(mho_map_key).ruin) {
-            let map_html = document.createElement('div');
-            map_html.innerHTML = GM_getValue(mho_map_key).ruin;
+        GM.getValue(mho_map_key).then((mho_map) => {
+            if (mho_map.ruin) {
+                let map_html = document.createElement('div');
+                map_html.innerHTML = mho_map.ruin;
 
-            let new_map = [];
-            let rows = Array.from(map_html.querySelector('#plan').firstElementChild.children);
-            let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
-            rows
-                .filter((row) => Array.from(row.children).some((cell) => cell.querySelector('.divs')))
-                .forEach((row, row_index, rows_array) => {
-                let new_cells = [];
-                let cells = Array.from(row.children);
-                let y;
-                cells.forEach((cell, cell_index, cell_array) => {
-                    if (!cell.querySelector('.divs')) {
-                        y = cell.innerText;
-                    } else {
+                let new_map = [];
+                let rows = Array.from(map_html.querySelector('#plan').firstElementChild.children);
+                let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
+                rows
+                    .filter((row) => Array.from(row.children).some((cell) => cell.querySelector('.divs')))
+                    .forEach((row, row_index, rows_array) => {
+                    let new_cells = [];
+                    let cells = Array.from(row.children);
+                    let y;
+                    cells.forEach((cell, cell_index, cell_array) => {
+                        if (!cell.querySelector('.divs')) {
+                            y = cell.innerText;
+                        } else {
 
-                        let cell_parts = Array.from(cell.firstElementChild.children);
+                            let cell_parts = Array.from(cell.firstElementChild.children);
 
-                        let div_zombies = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('z')))
-                        let zombies = div_zombies ? Array.from(div_zombies.classList).find(() => (class_name) => class_name.startsWith('z')) : undefined;
+                            let div_zombies = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('z')))
+                            let zombies = div_zombies ? Array.from(div_zombies.classList).find(() => (class_name) => class_name.startsWith('z')) : undefined;
 
-                        let new_cell = {
-                            horizontal: y,
-                            vertical: x_mapping[cell_index],
-                            borders: '0000',
-                            zombies: zombies ? zombies[1] : ''
-                        };
+                            let new_cell = {
+                                horizontal: y,
+                                vertical: x_mapping[cell_index],
+                                borders: '0000',
+                                zombies: zombies ? zombies[1] : ''
+                            };
 
-                        let div_path = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('m')))
-                        let img_path = div_path ? Array.from(div_path.classList).find(() => (class_name) => class_name.startsWith('m')) : undefined;
-                        switch (img_path) {
-                            case 'm1':
-                                new_cell.borders = 'exit';
-                                break;
-                            case 'm2':
-                                new_cell.borders = '0000';
-                                break;
-                            case 'm11':
-                                new_cell.borders = '0101';
-                                break;
-                            case 'm12':
-                                new_cell.borders = '1010';
-                                break;
-                            case 'm13':
-                                new_cell.borders = '1111';
-                                break;
-                            case 'm21':
-                                new_cell.borders = '0111';
-                                break;
-                            case 'm22':
-                                new_cell.borders = '1110';
-                                break;
-                            case 'm23':
-                                new_cell.borders = '1101';
-                                break;
-                            case 'm24':
-                                new_cell.borders = '1011';
-                                break;
-                            case 'm31':
-                                new_cell.borders = '0110';
-                                break;
-                            case 'm32':
-                                new_cell.borders = '1100';
-                                break;
-                            case 'm33':
-                                new_cell.borders = '0011';
-                                break;
-                            case 'm34':
-                                new_cell.borders = '1001';
-                                break;
-                            case 'm41':
-                                new_cell.borders = '0100';
-                                break;
-                            case 'm42':
-                                new_cell.borders = '1000';
-                                break;
-                            case 'm43':
-                                new_cell.borders = '0001';
-                                break;
-                            case 'm44':
-                                new_cell.borders = '0010';
-                                break
-                            default:
-                                new_cell.borders = '0000';
-                                break;
-                        };
-
-                        let div_door = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('p')))
-                        let img_door = div_door ? Array.from(div_door.classList).find(() => (class_name) => class_name.startsWith('p')) : undefined;
-                        if (img_door) {
-                            switch (img_door) {
-                                case 'p2':
-                                    new_cell.door = 'item_lock';
+                            let div_path = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('m')))
+                            let img_path = div_path ? Array.from(div_path.classList).find(() => (class_name) => class_name.startsWith('m')) : undefined;
+                            switch (img_path) {
+                                case 'm1':
+                                    new_cell.borders = 'exit';
                                     break;
-                                case 'p1':
-                                    new_cell.door = 'item_door';
+                                case 'm2':
+                                    new_cell.borders = '0000';
                                     break;
-                                case 'p5':
-                                    new_cell.door = 'item_classicKey';
+                                case 'm11':
+                                    new_cell.borders = '0101';
                                     break;
-                                case 'p4':
-                                    new_cell.door = 'item_bumpKey';
+                                case 'm12':
+                                    new_cell.borders = '1010';
                                     break;
-                                case 'p3':
-                                    new_cell.door = 'item_magneticKey';
+                                case 'm13':
+                                    new_cell.borders = '1111';
                                     break;
+                                case 'm21':
+                                    new_cell.borders = '0111';
+                                    break;
+                                case 'm22':
+                                    new_cell.borders = '1110';
+                                    break;
+                                case 'm23':
+                                    new_cell.borders = '1101';
+                                    break;
+                                case 'm24':
+                                    new_cell.borders = '1011';
+                                    break;
+                                case 'm31':
+                                    new_cell.borders = '0110';
+                                    break;
+                                case 'm32':
+                                    new_cell.borders = '1100';
+                                    break;
+                                case 'm33':
+                                    new_cell.borders = '0011';
+                                    break;
+                                case 'm34':
+                                    new_cell.borders = '1001';
+                                    break;
+                                case 'm41':
+                                    new_cell.borders = '0100';
+                                    break;
+                                case 'm42':
+                                    new_cell.borders = '1000';
+                                    break;
+                                case 'm43':
+                                    new_cell.borders = '0001';
+                                    break;
+                                case 'm44':
+                                    new_cell.borders = '0010';
+                                    break
                                 default:
+                                    new_cell.borders = '0000';
                                     break;
+                            };
+
+                            let div_door = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('p')))
+                            let img_door = div_door ? Array.from(div_door.classList).find(() => (class_name) => class_name.startsWith('p')) : undefined;
+                            if (img_door) {
+                                switch (img_door) {
+                                    case 'p2':
+                                        new_cell.door = 'item_lock';
+                                        break;
+                                    case 'p1':
+                                        new_cell.door = 'item_door';
+                                        break;
+                                    case 'p5':
+                                        new_cell.door = 'item_classicKey';
+                                        break;
+                                    case 'p4':
+                                        new_cell.door = 'item_bumpKey';
+                                        break;
+                                    case 'p3':
+                                        new_cell.door = 'item_magneticKey';
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
+                            new_cells.push(new_cell);
                         }
-                        new_cells.push(new_cell);
-                    }
+                    });
+                    new_map.push(new_cells);
                 });
-                new_map.push(new_cells);
-            });
-            resolve({map: new_map, vertical_mapping: x_mapping});
-        }
+                resolve({map: new_map, vertical_mapping: x_mapping});
+            }
+        })
         endLoading();
     });
 }
@@ -6077,45 +6116,48 @@ async function getFMMap() {
         startLoading();
 
         let map_html = document.createElement('div');
-        map_html.innerHTML = GM_getValue(mho_map_key).fm_block;
 
-        let new_map = [];
-        let map = Array.from(map_html.querySelector('#map').children);
-        let x_mapping = Array.from(map[0].children).map((x) => x.innerText);
+        GM.getValue(mho_map_key).then((mho_map) => {
+            map_html.innerHTML = mho_map.fm_block;
 
-        map
-            .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
-            .forEach((row) => {
-            let cells = [];
-            let y;
-            Array.from(row.children).forEach((cell, index) => {
-                if (cell.classList.contains('mapruler')) {
-                    y = cell.innerText;
-                } else {
-                    let cell_parts = Array.from(cell.children);
+            let new_map = [];
+            let map = Array.from(map_html.querySelector('#map').children);
+            let x_mapping = Array.from(map[0].children).map((x) => x.innerText);
 
-                    let new_cell = {
-                        horizontal: y,
-                        vertical: x_mapping[index],
-                        town: cell.classList.contains('city'),
-                        bat: cell_parts.some((cell_part) => cell_part.classList.contains('building')),
-                        my_pos: cell_parts.some((cell_part) => cell_part.classList.contains('posJoueur')),
-                        expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('route-counter')),
-                        expedition_arrows: [],
-                        not_yet_visited: cell.classList.contains('nyv'),
-                        not_visited_today: cell.classList.contains('nvt'),
-                        zombies: Array.from(cell.classList).filter((class_name) => class_name.startsWith('danger')).map((class_name) => class_name.replace('danger', ''))[0],
-                        empty: !cell.querySelector('.zone-status-full'),
-                        empty_bat: cell.querySelector('.depleted-building'),
-                        ruin: cell.querySelector('.explorable-building'),
-                    };
-                    cells.push(new_cell);
-                }
+            map
+                .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
+                .forEach((row) => {
+                let cells = [];
+                let y;
+                Array.from(row.children).forEach((cell, index) => {
+                    if (cell.classList.contains('mapruler')) {
+                        y = cell.innerText;
+                    } else {
+                        let cell_parts = Array.from(cell.children);
+
+                        let new_cell = {
+                            horizontal: y,
+                            vertical: x_mapping[index],
+                            town: cell.classList.contains('city'),
+                            bat: cell_parts.some((cell_part) => cell_part.classList.contains('building')),
+                            my_pos: cell_parts.some((cell_part) => cell_part.classList.contains('posJoueur')),
+                            expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('route-counter')),
+                            expedition_arrows: [],
+                            not_yet_visited: cell.classList.contains('nyv'),
+                            not_visited_today: cell.classList.contains('nvt'),
+                            zombies: Array.from(cell.classList).filter((class_name) => class_name.startsWith('danger')).map((class_name) => class_name.replace('danger', ''))[0],
+                            empty: !cell.querySelector('.zone-status-full'),
+                            empty_bat: cell.querySelector('.depleted-building'),
+                            ruin: cell.querySelector('.explorable-building'),
+                        };
+                        cells.push(new_cell);
+                    }
+                });
+                new_map.push(cells);
             });
-            new_map.push(cells);
+            resolve({map: new_map, vertical_mapping: x_mapping});
+            endLoading();
         });
-        resolve({map: new_map, vertical_mapping: x_mapping});
-        endLoading();
     });
 }
 
@@ -6123,105 +6165,107 @@ async function getFMMap() {
 async function getFMRuin() {
     return new Promise((resolve, reject) => {
         startLoading();
-        if (GM_getValue(mho_map_key).ruin) {
-            let map_html = document.createElement('div');
-            map_html.innerHTML = GM_getValue(mho_map_key).ruin;
+        GM.getValue(mho_map_key).then((mho_map) => {
+            if (mho_map.ruin) {
+                let map_html = document.createElement('div');
+                map_html.innerHTML = mho_map.ruin;
 
-            let new_map = [];
-            let rows = Array.from(map_html.querySelector('#ruinmap').children);
-            let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
-            rows
-                .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
-                .forEach((row, row_index, rows_array) => {
-                let new_cells = [];
-                let cells = Array.from(row.children);
-                let y;
-                cells.forEach((cell, cell_index, cell_array) => {
-                    if (cell.classList.contains('mapruler')) {
-                        y = cell.innerText;
-                    } else {
-                        let new_cell = {
-                            horizontal: y,
-                            vertical: x_mapping[cell_index],
-                            borders: '0000',
-                            zombies: cell.getAttribute('z')
-                        };
+                let new_map = [];
+                let rows = Array.from(map_html.querySelector('#ruinmap').children);
+                let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
+                rows
+                    .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
+                    .forEach((row, row_index, rows_array) => {
+                    let new_cells = [];
+                    let cells = Array.from(row.children);
+                    let y;
+                    cells.forEach((cell, cell_index, cell_array) => {
+                        if (cell.classList.contains('mapruler')) {
+                            y = cell.innerText;
+                        } else {
+                            let new_cell = {
+                                horizontal: y,
+                                vertical: x_mapping[cell_index],
+                                borders: '0000',
+                                zombies: cell.getAttribute('z')
+                            };
 
-                        let img = Array.from(cell.classList).find((class_name) => class_name.startsWith('tile-'));
-                        switch (img) {
-                            case 'tile-1':
-                                new_cell.borders = '0100';
-                                break;
-                            case 'tile-2':
-                                new_cell.borders = '0010';
-                                break;
-                            case 'tile-3':
-                                new_cell.borders = '0001';
-                                break;
-                            case 'tile-4':
-                                new_cell.borders = '1000';
-                                break;
-                            case 'tile-5':
-                                if (cell.classList.contains('ruinEntry')) {
-                                    new_cell.borders = 'exit';
-                                } else {
-                                    new_cell.borders = '0101';
-                                }
-                                break;
-                            case 'tile-6':
-                                new_cell.borders = '1010';
-                                break;
-                            case 'tile-7':
-                                new_cell.borders = '1111';
-                                break;
-                            case 'tile-8':
-                                new_cell.borders = '0110';
-                                break;
-                            case 'tile-9':
-                                new_cell.borders = '0011';
-                                break;
-                            case 'tile-10':
-                                new_cell.borders = '1001';
-                                break;
-                            case 'tile-11':
-                                new_cell.borders = '1100';
-                                break;
-                            case 'tile-12':
-                                new_cell.borders = '1110';
-                                break;
-                            case 'tile-13':
-                                new_cell.borders = '0111';
-                                break;
-                            case 'tile-14':
-                                new_cell.borders = '1011';
-                                break;
-                            case 'tile-15':
-                                new_cell.borders = '1101';
-                                break;
-                            case 'tile-0':
-                            default:
-                                new_cell.borders = '0000';
-                                break;
-                        };
+                            let img = Array.from(cell.classList).find((class_name) => class_name.startsWith('tile-'));
+                            switch (img) {
+                                case 'tile-1':
+                                    new_cell.borders = '0100';
+                                    break;
+                                case 'tile-2':
+                                    new_cell.borders = '0010';
+                                    break;
+                                case 'tile-3':
+                                    new_cell.borders = '0001';
+                                    break;
+                                case 'tile-4':
+                                    new_cell.borders = '1000';
+                                    break;
+                                case 'tile-5':
+                                    if (cell.classList.contains('ruinEntry')) {
+                                        new_cell.borders = 'exit';
+                                    } else {
+                                        new_cell.borders = '0101';
+                                    }
+                                    break;
+                                case 'tile-6':
+                                    new_cell.borders = '1010';
+                                    break;
+                                case 'tile-7':
+                                    new_cell.borders = '1111';
+                                    break;
+                                case 'tile-8':
+                                    new_cell.borders = '0110';
+                                    break;
+                                case 'tile-9':
+                                    new_cell.borders = '0011';
+                                    break;
+                                case 'tile-10':
+                                    new_cell.borders = '1001';
+                                    break;
+                                case 'tile-11':
+                                    new_cell.borders = '1100';
+                                    break;
+                                case 'tile-12':
+                                    new_cell.borders = '1110';
+                                    break;
+                                case 'tile-13':
+                                    new_cell.borders = '0111';
+                                    break;
+                                case 'tile-14':
+                                    new_cell.borders = '1011';
+                                    break;
+                                case 'tile-15':
+                                    new_cell.borders = '1101';
+                                    break;
+                                case 'tile-0':
+                                default:
+                                    new_cell.borders = '0000';
+                                    break;
+                            };
 
-                        if (cell.classList.contains('doorlock-1')) {
-                            new_cell.door = 'item_lock';
-                        } else if (cell.classList.contains('doorlock-2')) {
-                            new_cell.door = 'item_door';
-                        } else if (cell.classList.contains('doorlock-3')) {
-                            new_cell.door = 'item_classicKey';
-                        } else if (cell.classList.contains('doorlock-4')) {
-                            new_cell.door = 'item_bumpKey';
-                        } else if (cell.classList.contains('doorlock-5')) {
-                            new_cell.door = 'item_magneticKey';
+                            if (cell.classList.contains('doorlock-1')) {
+                                new_cell.door = 'item_lock';
+                            } else if (cell.classList.contains('doorlock-2')) {
+                                new_cell.door = 'item_door';
+                            } else if (cell.classList.contains('doorlock-3')) {
+                                new_cell.door = 'item_classicKey';
+                            } else if (cell.classList.contains('doorlock-4')) {
+                                new_cell.door = 'item_bumpKey';
+                            } else if (cell.classList.contains('doorlock-5')) {
+                                new_cell.door = 'item_magneticKey';
+                            }
+                            new_cells.push(new_cell);
                         }
-                        new_cells.push(new_cell);
-                    }
+                    });
+                    new_map.push(new_cells);
                 });
-                new_map.push(new_cells);
-            });
-            resolve({map: new_map, vertical_mapping: x_mapping});
-        }
+                resolve({map: new_map, vertical_mapping: x_mapping});
+            }
+        })
         endLoading();
     });
 }
@@ -6232,9 +6276,9 @@ async function getFMRuin() {
 
 async function getItems() {
     return new Promise((resolve, reject) => {
-        GM_xmlhttpRequest({
+        GM.xmlHttpRequest({
             method: 'GET',
-            url: api_url + '/myhordesfetcher/items?townId=' + mh_user.townDetails.townId,
+            url: api_url + '/myhordesfetcher/items' + (mh_user && mh_user.townDetails ? ('?townId=' + mh_user.townDetails.townId) : ''),
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
@@ -6247,7 +6291,8 @@ async function getItems() {
                         } else {
                             return -1;
                         }
-                    });
+                    })
+                    .filter((item) => +item.id !== 302);
                     let wiki_btn = document.getElementById(wiki_btn_id);
                     if (wiki_btn) {
                         wiki_btn.setAttribute('style', 'display: inherit');
@@ -6271,7 +6316,7 @@ async function getRuins() {
     return new Promise((resolve, reject) => {
         if (!ruins) {
             startLoading();
-            GM_xmlhttpRequest({
+            GM.xmlHttpRequest({
                 method: 'GET',
                 url: api_url + '/myhordesfetcher/ruins?userKey=' + external_app_id,
                 responseType: 'json',
@@ -6307,7 +6352,7 @@ async function getRuins() {
 async function getMe() {
     return new Promise((resolve, reject) => {
         if (external_app_id) {
-            GM_xmlhttpRequest({
+            GM.xmlHttpRequest({
                 method: 'GET',
                 url: api_url + '/myhordesfetcher/me?userKey=' + external_app_id,
                 responseType: 'json',
@@ -6316,17 +6361,20 @@ async function getMe() {
                         mh_user = response.response;
                         if (!mh_user || mh_user.id === 0 && mh_user.townDetails.townId === 0) {
                             mh_user = '';
-                            GM_setValue(gm_mh_external_app_id_key, undefined);
                         }
-                        GM_setValue(mh_user_key, mh_user);
+                        GM.setValue(mh_user_key, mh_user);
                         console.log('MHO - I am...', mh_user);
-                        if (mh_user.townDetails.townId) {
+                        if (mh_user !== '' && mh_user.townDetails.townId) {
                             getTown().then(() => {
-                                getItems().then(() => resolve());
-                                getWishlist();
+                                getItems().then(() => {
+                                    resolve();
+                                });
+                                getWishlist().then();
                             });
                         } else {
-                            getItems().then(() => resolve());
+                            getItems().then(() => {
+                                resolve();
+                            });
                         }
                     } else {
                         addError(response);
@@ -6334,7 +6382,6 @@ async function getMe() {
                     }
                 },
                 onerror: function(error){
-                    endLoading();
                     addError(error);
                     reject(error);
                 }
@@ -6348,14 +6395,12 @@ async function getMe() {
 /** Récupère les informations de la ville */
 async function getTown() {
     return new Promise((resolve, reject) => {
-        startLoading();
-        GM_xmlhttpRequest({
+        GM.xmlHttpRequest({
             method: 'GET',
             url: api_url + '/myhordesfetcher/town?userKey=' + external_app_id,
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
-                    console.log('town', response.response);
                     resolve(response.response);
                 } else {
                     addError(response);
@@ -6364,7 +6409,6 @@ async function getTown() {
                 endLoading();
             },
             onerror: function(error){
-                endLoading();
                 addError(error);
                 reject(error);
             }
@@ -6378,7 +6422,7 @@ async function getCitizens() {
     return new Promise((resolve, reject) => {
         getHeroSkills().then((hero_skills) => {
             startLoading();
-            GM_xmlhttpRequest({
+            GM.xmlHttpRequest({
                 method: 'GET',
                 url: api_url + '/myhordesfetcher/citizens?userKey=' + external_app_id,
                 responseType: 'json',
@@ -6407,7 +6451,7 @@ async function getCitizens() {
 async function getBank() {
     return new Promise((resolve, reject) => {
         startLoading();
-        GM_xmlhttpRequest({
+        GM.xmlHttpRequest({
             method: 'GET',
             url: api_url + '/myhordesfetcher/bank?userKey=' + external_app_id,
             responseType: 'json',
@@ -6446,7 +6490,7 @@ async function getBank() {
 /** Récupère les informations de liste de course */
 async function getWishlist() {
     return new Promise((resolve, reject) => {
-        GM_xmlhttpRequest({
+        GM.xmlHttpRequest({
             method: 'GET',
             url: api_url + '/wishlist?townId=' + mh_user.townDetails.townId,
             responseType: 'json',
@@ -6481,7 +6525,7 @@ async function getWishlist() {
 async function addItemToWishlist(item) {
     return new Promise((resolve, reject) => {
         startLoading();
-        GM_xmlhttpRequest({
+        GM.xmlHttpRequest({
             method: 'POST',
             url: api_url + '/wishlist/add/' + item.id + '?userId=' + mh_user.id + '&townId=' + mh_user.townDetails.townId,
             responseType: 'json',
@@ -6513,7 +6557,7 @@ function updateWishlist() {
         return {id: item.item.id, priority: item.priority, depot: item.depot, count: item.count};
     });
     startLoading();
-    GM_xmlhttpRequest({
+    GM.xmlHttpRequest({
         method: 'PUT',
         url: api_url + '/wishlist?userId=' + mh_user.id + '&townId=' + mh_user.townDetails.townId,
         data: JSON.stringify(item_list),
@@ -6570,7 +6614,7 @@ function updateExternalTools() {
             }
         })
 
-        let position = document.querySelector('.current-location').innerText.substr('-5').split(' / ');
+        let position = document.querySelector('.current-location').innerText.replace(/.*: ?/, '').split('/');
 
         let content = {
             townX: mh_user.townDetails.townX,
@@ -6585,13 +6629,14 @@ function updateExternalTools() {
             objects: object_map
         }
 
+        console.log('Voici l\'état de ma case :', content);
         if (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) {
             data.cell = content;
         }
     }
 
     let btn = document.getElementById(mh_update_external_tools_id);
-    GM_xmlhttpRequest({
+    GM.xmlHttpRequest({
         method: 'POST',
         url: api_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id,
         data: JSON.stringify(data),
@@ -6601,11 +6646,11 @@ function updateExternalTools() {
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
-                if (response.response.bigBrothHordesStatus.toLowerCase() === 'ok') GM_setValue(gm_bbh_updated_key, true);
-                if (response.response.fataMorganaStatus.toLowerCase() === 'ok') GM_setValue(gm_gh_updated_key, true);
-                if (response.response.fataMorganaStatus.toLowerCase() === 'ok') GM_setValue(gm_fata_updated_key, true);
+                if (response.response.bigBrothHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_bbh_updated_key, true);
+                if (response.response.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
+                if (response.response.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
 
-                let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
+                let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool !== 'none').length;
                 let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
                 let tools_success = response_items.filter((tool_response) => tool_response.value.toLowerCase() === 'ok');
                 let tools_fail = response_items.filter((tool_response) => tool_response.value.toLowerCase() !== 'ok' && tool_response.value.toLowerCase() !== 'not activated');
@@ -6629,7 +6674,7 @@ async function getHeroSkills() {
     return new Promise((resolve, reject) => {
         if (!hero_skills) {
             startLoading();
-            GM_xmlhttpRequest({
+            GM.xmlHttpRequest({
                 method: 'GET',
                 url: api_url + '/myhordesfetcher/heroSkills',
                 responseType: 'json',
@@ -6671,7 +6716,7 @@ async function getTranslation(string_to_translate, source_language) {
             let locale = 'locale=' + source_language;
             let sourceString = 'sourceString=' + string_to_translate;
             startLoading();
-            GM_xmlhttpRequest({
+            GM.xmlHttpRequest({
                 method: 'GET',
                 url: api_url + '/myhordestranslation?' + locale + '&' + sourceString,
                 responseType: 'json',
@@ -6699,7 +6744,7 @@ async function getRecipes() {
     return new Promise((resolve, reject) => {
         if (!recipes) {
             startLoading();
-            GM_xmlhttpRequest({
+            GM.xmlHttpRequest({
                 method: 'GET',
                 url: api_url + '/myhordesfetcher/recipes',
                 responseType: 'json',
@@ -6741,7 +6786,7 @@ async function getRecipes() {
 async function getTodayEstimation(day, estimations, today) {
     return new Promise((resolve, reject) => {
         startLoading();
-        GM_xmlhttpRequest({
+        GM.xmlHttpRequest({
             method: 'POST',
             url: api_url + `:8080/${today ? 'attaque' : 'planif'}.php?day=${day}&id=${mh_user.townDetails.townId}&type=normal&debug=false`,
             data: JSON.stringify(estimations),
@@ -6770,7 +6815,7 @@ async function getOptimalPath(map, html, button) {
         map.doors = map.doors.slice(2);
         console.log('map before send', map);
         startLoading();
-        GM_xmlhttpRequest({
+        GM.xmlHttpRequest({
             method: 'POST',
             data: JSON.stringify(map),
             url: api_url + '/ruine/pathopti',
@@ -6798,46 +6843,64 @@ async function getOptimalPath(map, html, button) {
 
 async function getApiKey() {
     return new Promise((resolve, reject) => {
-        GM_xmlhttpRequest({
-            method: 'POST',
-            url: location.origin + '/jx/soul/settings',
-            responseType: 'document',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-Request-Intent': 'WebNavigation',
-                'X-Render-Target': 'content'
-            },
-            data: JSON.stringify({}),
-            onload: function(response){
-                if (response.status === 200) {
-                    let temp_body = document.createElement('body');
-                    temp_body.innerHTML = response.response.body.innerHTML;
-                    let id = temp_body.querySelector('#app_ext');
-                    if (id) {
-                        external_app_id = id.value && id.value !== '' && id.value !== 'not set' ? id.value : undefined;
-                        resolve(external_app_id);
+        if (!external_app_id || external_app_id === '') {
+            GM.xmlHttpRequest({
+                method: 'POST',
+                url: location.origin + '/jx/soul/settings',
+                responseType: 'document',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-Request-Intent': 'WebNavigation',
+                    'X-Render-Target': 'content'
+                },
+                data: JSON.stringify({}),
+                onload: function(response){
+                    if (response.status === 200) {
+                        let manual = () => {
+                            let manual_app_id_key = prompt(getI18N(texts.manually_add_app_id_key));
+                            if (manual_app_id_key) {
+                                external_app_id = manual_app_id_key;
+                                GM.setValue(gm_mh_external_app_id_key, external_app_id);
+                                resolve(external_app_id);
+                            } else {
+                                reject(response);
+                            }
+                        }
+
+                        let temp_body = document.createElement('body');
+                        if (response.response && response.response.body && response.response.body.innerHTML) {
+                            temp_body.innerHTML = response.response.body.innerHTML;
+                            let id = temp_body.querySelector('#app_ext');
+                            if (id && id !== '' && id !== 'not set') {
+                                external_app_id = id.value && id.value !== '' && id.value !== 'not set' ? id.value : undefined;
+                                GM.setValue(gm_mh_external_app_id_key, external_app_id);
+                                resolve(external_app_id);
+                            } else {
+                                manual();
+                            }
+                        } else {
+                            manual();
+                        }
                     } else {
                         reject(response);
                     }
-                } else {
-                    reject(response);
+                },
+                onerror: function(error){
+                    console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
+                    reject(error);
                 }
-                endLoading();
-            },
-            onerror: function(error){
-                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
-                endLoading();
-                reject(error);
-            }
-        });
+            });
+        } else {
+            resolve(external_app_id);
+        }
     });
 }
 
 /** Récupère le contenu de la maison d'un citoyen pour tout afficher dans la nouvelle page de l'onglet citoyens */
 async function getCitizenHouseContent(link) {
     return new Promise((resolve, reject) => {
-         GM_xmlhttpRequest({
+        GM.xmlHttpRequest({
             method: 'POST',
             url: location.origin + link,
             responseType: 'document',
@@ -6931,10 +6994,12 @@ async function getCitizenHouseContent(link) {
 
         // Si on est sur le site de BBH ou GH ou Fata et que BBH ou GH ou Fata a été mis à jour depuis MyHordes, alors on recharge BBH ou GH ou Fata au moment de revenir sur l'onglet
         document.addEventListener('visibilitychange', function() {
-            if (GM_getValue(current_key) && !document.hidden) {
-                GM_setValue(current_key, false);
-                location.reload();
-            }
+            GM.getValue(current_key).then((current) => {
+                if (current && !document.hidden) {
+                    GM.setValue(current_key, false);
+                    location.reload();
+                }
+            });
         });
 
         let interval = setInterval(() => {
@@ -6960,45 +7025,45 @@ async function getCitizenHouseContent(link) {
     } else {
 
         /** Affiche le changelog de la version au premier chargement après la mise à jour */
-        let version = GM_getValue('version');
-        if (!version || !version[GM_info.script.version]) {
-            if (!version) {
-                version = {};
-            }
-
-            version[GM_info.script.version] = confirm(changelog);
-            GM_setValue('version', version);
-        }
-
-
-        getApiKey().then(() => {
-            getMe().then(() => {
-                initOptions();
-                /** Gère le bouton de mise à jour des outils externes) */
-                if (!buttonOptimizerExists()) {
-                    createStyles();
-                    createOptimizerBtn();
-                    createWindow();
+        GM.getValue('version').then((version) => {
+            if (!version || !version[GM_info.script.version]) {
+                if (!version) {
+                    version = {};
                 }
 
-                notifyOnSearchEnd();
+                version[GM_info.script.version] = confirm(changelog);
+                GM.setValue('version', version);
+            }
 
-                setInterval(() => {
-                    createUpdateExternalToolsButton();
-                    clickOnVotedToRedirect();
-                    displaySearchFieldOnBuildings();
-                    displayMinApOnBuildings();
-                    displayWishlistInApp();
-                    displayPriorityOnItems();
-                    displayNbDeadZombies();
-                    displayTranslateTool();
-                    displayMoreCitizensInformations();
-                    // blockUsersPosts();
-                }, 500);
+            getApiKey().then(() => {
+                getMe().then(() => {
+                    initOptions();
+                    /** Gère le bouton de mise à jour des outils externes) */
+                    if (!buttonOptimizerExists()) {
+                        createStyles();
+                        createOptimizerBtn();
+                        createWindow();
+                    }
 
-                setInterval(() => {
-                    displayAdvancedTooltips();
-                }, 100);
+                    notifyOnSearchEnd();
+
+                    setInterval(() => {
+                        createUpdateExternalToolsButton();
+                        clickOnVotedToRedirect();
+                        displaySearchFieldOnBuildings();
+                        displayMinApOnBuildings();
+                        displayWishlistInApp();
+                        displayPriorityOnItems();
+                        displayNbDeadZombies();
+                        displayTranslateTool();
+                        displayMoreCitizensInformations();
+                        // blockUsersPosts();
+                    }, 500);
+
+                    setInterval(() => {
+                        displayAdvancedTooltips();
+                    }, 100);
+                });
             });
         });
     }
