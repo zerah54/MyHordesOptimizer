@@ -180,7 +180,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             {
                 IEnumerable<ItemCompletModel> matchingItemComplet = itemsComplets.Where(i => i.IdItem == item.Id);
                 item.Actions = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.ActionName)).Select(i => i.ActionName).Distinct();
-                item.Properties = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.ActionName)).Select(i => i.PropertyName).Distinct();
+                item.Properties = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.PropertyName)).Select(i => i.PropertyName).Distinct();
             }
             return items;
         }
