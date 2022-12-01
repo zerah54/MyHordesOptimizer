@@ -4,7 +4,7 @@
 // @description  Ajoute les blocs manquants à la carte alternative de GH ainsi que 0 en nombre de zombies quand la case n'a jamais été visitée. Ajoute des boutons pour choisir une direction de regénération du scrutateur sur laquelle appliquer un ajout de marqueurs pelles. Permet de bouger le bloc des infos de la ville.
 // @author       Zerah
 //
-// @downloadURL  https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/gesthordes_fix_carte_alternative.user.js
+// @downloadURL  https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/amelio_gesthordes.user.js
 // @updateURL    https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/amelio_gesthordes.user.js
 //
 // @match        https://gest-hordes2.eragaming.fr/carte/*
