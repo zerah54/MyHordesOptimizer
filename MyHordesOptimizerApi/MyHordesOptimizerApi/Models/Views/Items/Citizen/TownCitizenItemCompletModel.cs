@@ -30,6 +30,7 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
         public double DropRatePraf { get; set; }
         public double DropRateNotPraf { get; set; }
         public int TownId { get; set; }
+        public string Avatar { get; set; }
         public int CitizenId { get; set; }
         public string CitizenName { get; set; }
         public string CitizenHomeMessage { get; set; }

@@ -11,3 +11,6 @@
 	FOREIGN KEY(idUser) REFERENCES Users(idUser),
 	FOREIGN KEY(idLastUpdateInfo) REFERENCES LastUpdateInfo(idLastUpdateInfo)
 );
+
+ALTER TABLE TownCitizen
+ADD COLUMN avatar VARCHAR(255) NULL DEFAULT NULL AFTER idLastUpdateInfo;

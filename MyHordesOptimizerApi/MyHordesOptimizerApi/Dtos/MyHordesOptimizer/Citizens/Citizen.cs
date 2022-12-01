@@ -15,7 +15,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 
         public string HomeMessage { get; set; }
 
-        public object Avatar { get; set; }
+        public string Avatar { get; set; }
 
         public string JobName { get; set; }
 

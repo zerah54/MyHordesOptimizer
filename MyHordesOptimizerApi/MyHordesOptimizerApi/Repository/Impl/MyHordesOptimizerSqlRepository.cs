@@ -70,7 +70,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             {
                 Id = townId
             };
-            town.Citizens = GetCitizens(townId);
+            town.Citizens = GetCitizensWithBag(townId);
             town.Bank = GetBank(townId);
             town.WishList = GetWishList(townId);
             return town;
@@ -527,46 +527,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var townCitizenModels = Mapper.Map<List<TownCitizenModel>>(wrapper.Citizens);
             townCitizenModels.ForEach(x => { x.IdTown = townId; x.IdLastUpdateInfo = idLastUpdateInfo; });
             Logger.LogTrace($"[PatchCitizen] Automapper TownCitizenModel : {sw.ElapsedMilliseconds}");
-            var dico = new Dictionary<string, Func<TownCitizenModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser }, { "homeMessage", x => x.HomeMessage }, { "jobName", x => x.JobName }, { "jobUID", x => x.JobUID }, { "positionX", x => x.PositionX }, { "positionY", x => x.PositionY }, { "isGhost", x => x.IsGhost }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo } };
+            var dico = new Dictionary<string, Func<TownCitizenModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser }, { "homeMessage", x => x.HomeMessage }, { "jobName", x => x.JobName }, { "jobUID", x => x.JobUID }, { "positionX", x => x.PositionX }, { "positionY", x => x.PositionY }, { "isGhost", x => x.IsGhost }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo }, { "avatar", x => x.Avatar } };
             connection.BulkInsert("TownCitizen", dico, townCitizenModels);
             connection.ExecuteScalar("DELETE FROM TownCitizen WHERE idTown = @IdTown AND idLastUpdateInfo != @IdLastUpdateInfo", new { IdTown = townId, IdLastUpdateInfo = idLastUpdateInfo });
             connection.Close();
             Logger.LogTrace($"[PatchCitizen] Insert TownCitiern : {sw.ElapsedMilliseconds}");
             sw.Stop();
-        }
-
-        public CitizensWrapper GetCitizens(int townId)
-        {
-            var query = $@"SELECT idTown AS TownId
-                                  ,citizen.idUser AS CitizenId
-	                              ,citizen.name AS CitizenName
-                                  ,homeMessage AS CitizenHomeMessage
-                                  ,jobName AS CitizenJobName
-                                  ,jobUID AS CitizenJobUID
-                                  ,positionX AS CitizenPositionX
-                                  ,positionY AS CitizenPositionY
-                                  ,isGhost AS CitizenIsGhost
-                                  ,tc.idLastUpdateInfo AS LastUpdateInfoId
-	                              ,lui.idUser AS LastUpdateInfoUserId
-	                              ,lui.dateUpdate AS LastUpdateDateUpdate
-	                              ,userUpdater.name AS LastUpdateInfoUserName
-                              FROM TownCitizen tc
-                              INNER JOIN Users citizen ON citizen.idUser = tc.idUser
-                              INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = tc.idLastUpdateInfo 
-                              INNER JOIN Users userUpdater ON userUpdater.idUser = lui.idUser
-                              WHERE tc.idTown = @idTown";
-            using var connection = new MySqlConnection(Configuration.ConnectionString);
-            var citizens = connection.Query<TownCitizenCompletModel>(query, new { idTown = townId });
-            var mostRecent = citizens.Max(x => x.LastUpdateDateUpdate);
-            citizens = citizens.Where(x => x.LastUpdateDateUpdate == mostRecent);
-            connection.Close();
-
-            var citizenWrapper = new CitizensWrapper()
-            {
-                LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.First()),
-                Citizens = Mapper.Map<List<Citizen>>(citizens)
-            };
-            return citizenWrapper;
         }
 
         public CitizensWrapper GetCitizensWithBag(int townId)
@@ -581,6 +547,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                   ,positionY AS CitizenPositionY
                                   ,isGhost AS CitizenIsGhost
                                   ,tc.idLastUpdateInfo AS LastUpdateInfoId
+                                  ,tc.avatar
 	                              ,lui.idUser AS LastUpdateInfoUserId
 	                              ,lui.dateUpdate AS LastUpdateDateUpdate
 	                              ,userUpdater.name AS LastUpdateInfoUserName

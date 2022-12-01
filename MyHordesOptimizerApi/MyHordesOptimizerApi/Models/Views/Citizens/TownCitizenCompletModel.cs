@@ -7,6 +7,7 @@ namespace MyHordesOptimizerApi.Models.Views.Citizens
 		public int TownId { get; set; }
 		public int CitizenId { get; set; }
 		public string CitizenName { get; set; }
+		public string Avatar { get; set; }
 		public string CitizenHomeMessage { get; set; }
 		public string CitizenJobName { get; set; }
 		public string CitizenJobUID { get; set; }
