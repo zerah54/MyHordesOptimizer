@@ -96,12 +96,13 @@ namespace MyHordesOptimizerApi.Services.Impl
         public SimpleMe GetSimpleMe()
         {
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
-            myHordeMeResponse.Map.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            var town = Mapper.Map<Town>(myHordeMeResponse.Map);
+            if(myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
+            {
+                myHordeMeResponse.Map.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+                var town = Mapper.Map<Town>(myHordeMeResponse.Map);
 
-            // Enregistrer en base
-            MyHordesOptimizerRepository.PatchTown(town);
-
+                MyHordesOptimizerRepository.PatchTown(town);
+            }
             var simpleMe = Mapper.Map<SimpleMe>(myHordeMeResponse);
 
             return simpleMe;

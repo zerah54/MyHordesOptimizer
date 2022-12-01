@@ -172,6 +172,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                                                   ,catLabel_de AS CatLabelDe
                                                                   ,actionName
                                                                   ,propertyName
+                                                                  ,dropRate_praf AS DropRatePraf
+                                                                  ,dropRate_notPraf AS DropRateNotPraf
                                                               FROM ItemComplet");
             connection.Close();
 
