@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
@@ -25,5 +26,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         #endregion
 
         public int NombreJourHero { get; set; }
+
+        public List<CitizenItem> Bag { get; set; }
+
+        public Citizen()
+        {
+            Bag = new List<CitizenItem>();
+        }
     }
 }

@@ -28,6 +28,8 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
 
         void PatchCitizen(int townId, CitizensWrapper citizens);
         CitizensWrapper GetCitizens(int townId);
+        CitizensWrapper GetCitizensWithBag(int townId);
+
 
         void AddItemToWishlist(int townId, int itemId, int userId);
         void PutWishList(int townId, int userId, List<TownWishlistItemModel> items);
@@ -46,5 +48,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PatchActions(List<string> allActions);
         void DeleteAllActionsItem();
         void PatchActionsItem(string itemUid, List<string> actions);
+
+        void PatchCitizenBags(int townId, LastUpdateInfo lastUpdateInfo, List<TownCitizenItemModel> modeles);
     }
 }

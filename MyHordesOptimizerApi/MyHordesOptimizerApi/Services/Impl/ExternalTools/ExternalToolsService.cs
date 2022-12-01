@@ -3,7 +3,10 @@ using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
 using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
+using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using Newtonsoft.Json.Linq;
@@ -20,14 +23,23 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         protected IFataMorganaRepository FataMorganaRepository { get; private set; }
         protected IGestHordesRepository GestHordesRepository { get; private set; }
         protected IMapper Mapper { get; private set; }
+        protected IUserInfoProvider UserInfoProvider { get; private set; }
+        protected IMyHordesOptimizerRepository MyHordesOptimizerRepository { get; private set; }
 
 
-        public ExternalToolsService(IBigBrothHordesRepository bigBrothHordesRepository, IFataMorganaRepository fataMorganaRepository, IGestHordesRepository gestHordesRepository, IMapper mapper)
+        public ExternalToolsService(IBigBrothHordesRepository bigBrothHordesRepository, 
+            IFataMorganaRepository fataMorganaRepository,
+            IGestHordesRepository gestHordesRepository, 
+            IMapper mapper,
+            IUserInfoProvider userInfoProvider,
+            IMyHordesOptimizerRepository myHordesOptimizerRepository)
         {
             BigBrothHordesRepository = bigBrothHordesRepository;
             FataMorganaRepository = fataMorganaRepository;
             GestHordesRepository = gestHordesRepository;
             Mapper = mapper;
+            UserInfoProvider = userInfoProvider;
+            MyHordesOptimizerRepository = myHordesOptimizerRepository;
         }
 
         public UpdateResponseDto UpdateExternalsTools(UpdateRequestDto updateRequestDto)
@@ -37,6 +49,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             var bbh = updateRequestDto.Tools.IsBigBrothHordes;
             var gh = updateRequestDto.Tools.IsGestHordes;
             var fata = updateRequestDto.Tools.IsFataMorgana;
+            var townDetails = updateRequestDto.TownDetails;
             if (UpdateRequestToolsDetailsDto.IsApi(bbh))
             {
                 try
@@ -77,9 +90,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 try
                 {
                     var cell = updateRequestDto.Cell;
-                    if (cell.IsDevaste || cell.DeadZombies > 0)
+                    if (townDetails.IsDevaste || cell.DeadZombies > 0)
                     {
-                        var request = Mapper.Map<GestHordesUpdateCaseRequest>(cell);
+                        var request = Mapper.Map<UpdateRequestDto>(cell);
                         var dictionnary = request.ToDictionnary();
                         var count = 0;
                         foreach (var item in cell.Objects)
@@ -110,8 +123,29 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     response.GestHordesStatus = e.Message;
                 }
             }
-
+            UpdateBags(townDetails.TownId, updateRequestDto.Bags);
             return response;
+        }
+
+        private void UpdateBags(int townId, List<UpdateBagDto> bags)
+        {
+            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            var modeles = new List<TownCitizenItemModel>();
+            foreach(var bag in bags)
+            {
+                foreach(var item in bag.Objects)
+                {
+                    modeles.Add(new TownCitizenItemModel()
+                    {
+                        Count = item.Count,
+                        IdItem = item.Id,
+                        IdTown = townId,
+                        IdUser = bag.UserId,
+                        IsBroken = item.IsBroken
+                    });
+                }
+            }
+            MyHordesOptimizerRepository.PatchCitizenBags(townId, lastUpdateInfo, modeles);
         }
 
         public List<CaseGH> UpdateGHZoneRegen(UpdateZoneRegenDto requestDto)

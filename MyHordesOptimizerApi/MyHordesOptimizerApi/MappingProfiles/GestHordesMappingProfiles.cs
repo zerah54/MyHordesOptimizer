@@ -8,12 +8,12 @@ namespace MyHordesOptimizerApi.MappingProfiles
     {
         public GestHordesMappingProfiles()
         {
-            CreateMap<UpdateCellInfoDto, GestHordesUpdateCaseRequest>()
-                .ForMember(dest => dest.NbrZombie, opt => opt.MapFrom(src => src.Zombies))
-                .ForMember(dest => dest.IdMap, opt => opt.MapFrom(src => src.TownId))
-                .ForMember(dest => dest.Epuise, opt => opt.MapFrom(src => src.ZoneEmpty))
-                .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.TownY - src.Y))
-                .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.TownX + src.X));
+            CreateMap<UpdateRequestDto, GestHordesUpdateCaseRequest>()
+                .ForMember(dest => dest.NbrZombie, opt => opt.MapFrom(src => src.Cell.Zombies))
+                .ForMember(dest => dest.IdMap, opt => opt.MapFrom(src => src.TownDetails.TownId))
+                .ForMember(dest => dest.Epuise, opt => opt.MapFrom(src => src.Cell.ZoneEmpty))
+                .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.TownDetails.TownY - src.Cell.Y))
+                .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.TownDetails.TownX + src.Cell.X));
         }
     }
 }

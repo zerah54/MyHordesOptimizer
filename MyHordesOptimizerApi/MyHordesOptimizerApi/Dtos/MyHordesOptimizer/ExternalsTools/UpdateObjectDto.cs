@@ -2,7 +2,7 @@
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
 {
-    public class UpdateCellObjectDto
+    public class UpdateObjectDto
     {
         [JsonProperty("id")]
         public int Id { get; set; }
@@ -10,7 +10,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
         [JsonProperty("count")]
         public int Count { get; set; }
 
-        [JsonProperty("fuckit")]
+        [JsonProperty("isBroken")]
         public bool IsBroken { get; set; }
     }
 }

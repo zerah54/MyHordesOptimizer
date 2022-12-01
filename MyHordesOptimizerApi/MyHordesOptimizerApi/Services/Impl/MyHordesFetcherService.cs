@@ -157,8 +157,8 @@ namespace MyHordesOptimizerApi.Services.Impl
 
             // Enregistrer en base
             MyHordesOptimizerRepository.PatchCitizen(town.Id, town.Citizens);
-            var citizens = MyHordesOptimizerRepository.GetCitizens(town.Id);
-
+            //var citizens = MyHordesOptimizerRepository.GetCitizens(town.Id);
+            var citizens = MyHordesOptimizerRepository.GetCitizensWithBag(town.Id);
             return citizens;
         }
 

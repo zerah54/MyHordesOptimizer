@@ -3,11 +3,13 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Items.Bank;
+using MyHordesOptimizerApi.Models.Views.Items.Citizen;
 using MyHordesOptimizerApi.Models.Views.Items.Wishlist;
 using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
@@ -527,7 +529,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             Logger.LogTrace($"[PatchCitizen] Automapper TownCitizenModel : {sw.ElapsedMilliseconds}");
             var dico = new Dictionary<string, Func<TownCitizenModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser }, { "homeMessage", x => x.HomeMessage }, { "jobName", x => x.JobName }, { "jobUID", x => x.JobUID }, { "positionX", x => x.PositionX }, { "positionY", x => x.PositionY }, { "isGhost", x => x.IsGhost }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo } };
             connection.BulkInsert("TownCitizen", dico, townCitizenModels);
-            connection.ExecuteScalar("DELETE FROM TownCitizen WHERE idTown = @IdTown AND idLastUpdateInfo != @IdLastUpdateInfo", new { IdTown = townId, IdLastUpdateInfo = idLastUpdateInfo});
+            connection.ExecuteScalar("DELETE FROM TownCitizen WHERE idTown = @IdTown AND idLastUpdateInfo != @IdLastUpdateInfo", new { IdTown = townId, IdLastUpdateInfo = idLastUpdateInfo });
             connection.Close();
             Logger.LogTrace($"[PatchCitizen] Insert TownCitiern : {sw.ElapsedMilliseconds}");
             sw.Stop();
@@ -564,6 +566,89 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.First()),
                 Citizens = Mapper.Map<List<Citizen>>(citizens)
             };
+            return citizenWrapper;
+        }
+
+        public CitizensWrapper GetCitizensWithBag(int townId)
+        {
+            var query = $@"SELECT tc.idTown AS TownId
+                                  ,citizen.idUser AS CitizenId
+	                              ,citizen.name AS CitizenName
+                                  ,homeMessage AS CitizenHomeMessage
+                                  ,jobName AS CitizenJobName
+                                  ,jobUID AS CitizenJobUID
+                                  ,positionX AS CitizenPositionX
+                                  ,positionY AS CitizenPositionY
+                                  ,isGhost AS CitizenIsGhost
+                                  ,tc.idLastUpdateInfo AS LastUpdateInfoId
+	                              ,lui.idUser AS LastUpdateInfoUserId
+	                              ,lui.dateUpdate AS LastUpdateDateUpdate
+	                              ,userUpdater.name AS LastUpdateInfoUserName
+								  ,i.idItem
+								  ,i.idCategory
+								  ,i.itemUid
+								  ,i.itemDeco
+								  ,i.itemLabel_fr AS ItemLabelFr
+								  ,i.itemLabel_en AS ItemLabelEn
+								  ,i.itemLabel_es AS ItemLabelEs
+								  ,i.itemLabel_de AS ItemLabelDe
+								  ,i.itemDescription_fr AS ItemDescriptionFr
+								  ,i.itemDescription_en AS ItemDescriptionEn
+								  ,i.itemDescription_es AS ItemDescriptionEs
+								  ,i.itemDescription_de AS ItemDescriptionDe
+								  ,i.itemGuard
+								  ,i.itemImg
+								  ,i.itemIsHeaver
+								  ,i.itemDropRate_praf AS ItemDropRatePraf
+								  ,i.itemDropRate_notPraf AS ItemDropRateNotPraf
+								  ,i.catName
+								  ,i.catOrdering
+								  ,i.catLabel_fr AS CatLabelFr
+								  ,i.catLabel_en AS CatLabelEn
+								  ,i.catLabel_es AS CatLabelEs
+								  ,i.catLabel_de AS CatLabelDe
+								  ,i.actionName
+								  ,i.propertyName
+								  ,i.dropRate_praf AS DropRatePraf
+								  ,i.dropRate_notPraf AS DropRateNotPraf
+                                  ,tci.count AS ItemCount
+                                  ,tci.isBroken AS IsBroken
+                              FROM TownCitizen tc
+                              INNER JOIN Users citizen ON citizen.idUser = tc.idUser
+                              INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = tc.idLastUpdateInfo 
+                              INNER JOIN Users userUpdater ON userUpdater.idUser = lui.idUser
+                              LEFT JOIN TownCitizenItem tci ON tci.idUser = citizen.idUser
+                              LEFT JOIN ItemComplet i ON i.idItem = tci.idItem
+                              WHERE tc.idTown = @idTown";
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            var citizens = connection.Query<TownCitizenItemCompletModel>(query, new { idTown = townId });
+            var mostRecent = citizens.Max(x => x.LastUpdateDateUpdate);
+            citizens = citizens.Where(x => x.LastUpdateDateUpdate == mostRecent);
+            connection.Close();
+
+
+            var distinctCitizenItem = citizens.Where(x => x.IdItem != 0).Distinct(new TownCitizenItemComparer());
+            var items = Mapper.Map<List<Item>>(citizens.Where(x => x.IdItem != 0).Distinct(new ItemIdComparer()));
+
+            foreach (var item in items)
+            {
+                IEnumerable<TownCitizenItemCompletModel> matchingItemComplet = citizens.Where(i => i.IdItem == item.Id);
+                item.Actions = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.ActionName)).Select(i => i.ActionName).Distinct();
+                item.Properties = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.PropertyName)).Select(i => i.PropertyName).Distinct();
+            }
+            var citizenWrapper = new CitizensWrapper()
+            {
+                LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.First()),
+                Citizens = Mapper.Map<List<Citizen>>(citizens.Distinct(new CitizenIdComparer()))
+            };
+            citizenWrapper.Citizens.ForEach(citizen =>
+            {
+                var citizenItems = distinctCitizenItem.Where(x => x.CitizenId == citizen.Id);
+                foreach(var item in citizenItems)
+                {
+                    citizen.Bag.Add(Mapper.Map<CitizenItem>(item));
+                }
+            });
             return citizenWrapper;
         }
 
@@ -854,6 +939,23 @@ namespace MyHordesOptimizerApi.Repository.Impl
             {
                 Logger.LogError($@"{e}{Environment.NewLine}{itemUid}", e);
             }
+            connection.Close();
+        }
+
+        #endregion
+
+        #region Bags
+
+        public void PatchCitizenBags(int townId, LastUpdateInfo lastUpdateInfo, List<TownCitizenItemModel> modeles)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
+                                                                   VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.UpdateTime, IdUser = lastUpdateInfo.UserId });
+            modeles.ForEach(x => x.IdLastUpdateInfo = idLastUpdateInfo);
+            var dico = new Dictionary<string, Func<TownCitizenItemModel, object>>() { { "idTown", x => x.IdTown }, { "idItem", x => x.IdItem }, { "count", x => x.Count }, { "isBroken", x => x.IsBroken }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo }, { "idUser", x => x.IdUser } };
+            connection.ExecuteScalar("DELETE FROM TownCitizenItem WHERE idTown = @IdTown AND idLastUpdateInfo != @IdLastUpdateInfo", new { IdTown = townId, IdLastUpdateInfo = idLastUpdateInfo });
+            connection.BulkInsert("TownCitizenItem", dico, modeles);
             connection.Close();
         }
 

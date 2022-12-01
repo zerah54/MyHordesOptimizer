@@ -2,12 +2,14 @@
 using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.MappingProfiles.Converters;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Items.Bank;
+using MyHordesOptimizerApi.Models.Views.Items.Citizen;
 using MyHordesOptimizerApi.Models.Views.Items.Wishlist;
 using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
@@ -58,6 +60,30 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Uid, opt => opt.MapFrom(src => src.ItemUid))
                 .ForMember(dest => dest.DropRatePraf, opt => opt.MapFrom(src => src.DropRatePraf))
                 .ForMember(dest => dest.DropRateNotPraf, opt => opt.MapFrom(src => src.DropRateNotPraf));
+
+            CreateMap<TownCitizenItemCompletModel, Item>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IdItem))
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.ItemImg))
+                .ForMember(dest => dest.Actions, opt => opt.Ignore())
+                .ForMember(dest => dest.Properties, opt => opt.Ignore())
+                .ForMember(dest => dest.BankCount, opt => opt.Ignore())
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => new Category() { IdCategory = src.IdCategory, Name = src.CatName, Ordering = src.CatOrdering, Label = new Dictionary<string, string>() { { "fr", src.CatLabelFr }, { "en", src.CatLabelEn }, { "es", src.CatLabelEs }, { "de", src.CatLabelDe } } }))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.ItemDescriptionFr }, { "en", src.ItemDescriptionEn }, { "es", src.ItemDescriptionEs }, { "de", src.ItemDescriptionDe } }))
+                .ForMember(dest => dest.Label, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.ItemLabelFr }, { "en", src.ItemLabelEn }, { "es", src.ItemLabelEs }, { "de", src.ItemLabelDe } }))
+                .ForMember(dest => dest.WishListCount, opt => opt.Ignore())
+                .ForMember(dest => dest.Recipes, opt => opt.Ignore())
+                .ForMember(dest => dest.Deco, opt => opt.MapFrom(src => src.ItemDeco))
+                .ForMember(dest => dest.Guard, opt => opt.MapFrom(src => src.ItemGuard))
+                .ForMember(dest => dest.IsHeaver, opt => opt.MapFrom(src => src.ItemIsHeaver))
+                .ForMember(dest => dest.Uid, opt => opt.MapFrom(src => src.ItemUid))
+                .ForMember(dest => dest.DropRatePraf, opt => opt.MapFrom(src => src.DropRatePraf))
+                .ForMember(dest => dest.DropRateNotPraf, opt => opt.MapFrom(src => src.DropRateNotPraf));
+
+            CreateMap<TownCitizenItemCompletModel, CitizenItem>()
+               .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src))
+               .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
+               .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.ItemCount));
+            
 
             // Ruins
             CreateMap<MyHordesOptimizerRuin, RuinModel>()
@@ -138,7 +164,20 @@ namespace MyHordesOptimizerApi.MappingProfiles
                  .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.CitizenIsGhost))
                  .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.CitizenJobName))
                  .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.CitizenPositionX))
-                 .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.CitizenPositionY));
+                 .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.CitizenPositionY))
+                 .ForMember(dest => dest.Bag, opt => opt.Ignore());
+
+            CreateMap<TownCitizenItemCompletModel, Citizen>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CitizenName))
+                .ForMember(dest => dest.NombreJourHero, opt => opt.Ignore())
+                .ForMember(dest => dest.Avatar, opt => opt.Ignore())
+                .ForMember(dest => dest.HomeMessage, opt => opt.MapFrom(src => src.CitizenHomeMessage))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CitizenId))
+                .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.CitizenIsGhost))
+                .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.CitizenJobName))
+                .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.CitizenPositionX))
+                .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.CitizenPositionY))
+                .ForMember(dest => dest.Bag, opt => opt.Ignore());
 
             //LastUpdate
             CreateMap<LastUpdateInfo, LastUpdateInfoModel>()
@@ -147,6 +186,12 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore());
 
             CreateMap<TownCitizenCompletModel, LastUpdateInfo>()
+               .ForMember(dest => dest.UserKey, opt => opt.Ignore())
+               .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
+               .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
+               .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
+
+            CreateMap<TownCitizenItemCompletModel, LastUpdateInfo>()
                .ForMember(dest => dest.UserKey, opt => opt.Ignore())
                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
                .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))

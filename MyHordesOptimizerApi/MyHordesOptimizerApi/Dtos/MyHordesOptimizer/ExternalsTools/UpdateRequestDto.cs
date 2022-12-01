@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
 {
@@ -8,6 +9,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
         public UpdateRequestToolsDetailsDto Tools { get; set; }
         [JsonProperty("cell")]
         public UpdateCellInfoDto Cell { get; set; }
+        [JsonProperty("bags")]
+        public List<UpdateBagDto> Bags { get; set; }
+        [JsonProperty("townDetails")]
+        public UpdateTownDetailsDto TownDetails { get; set; }
     }
 
     public class UpdateRequestToolsDetailsDto
