@@ -1,5 +1,6 @@
 import { CitizenDTO } from '../dto/citizen.dto';
-import { CommonModel } from './_common.class';
+import { ItemCount } from './item-count.class';
+import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 
 export class Citizen extends CommonModel<CitizenDTO> {
     public avatar!: string;
@@ -11,6 +12,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
     public nombre_jour_hero!: number;
     public x!: number;
     public y!: number;
+    public bag!: ItemCount[]
 
     constructor(dto?: CitizenDTO) {
         super();
@@ -27,7 +29,8 @@ export class Citizen extends CommonModel<CitizenDTO> {
             nombreJourHero: this.nombre_jour_hero,
             x: this.x,
             y: this.y,
-            name: this.name
+            name: this.name,
+            bag: modelToDtoArray(this.bag)
         }
     };
 
@@ -42,6 +45,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.x = dto.x;
             this.y = dto.y;
             this.name = dto.name;
+            this.bag = dtoToModelArray(ItemCount, dto.bag)
         }
     };
 }

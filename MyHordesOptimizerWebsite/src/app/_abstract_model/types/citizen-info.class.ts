@@ -24,6 +24,15 @@ export class CitizenInfo extends CommonModel<CitizenInfoDTO> {
     protected dtoToModel(dto?: CitizenInfoDTO | null): void {
         if (dto) {
             this.citizens = dtoToModelArray(Citizen, <CitizenDTO[]>DictionaryUtils.getValues(dto.citizens));
+            this.citizens.sort((citizen_a: Citizen, citizen_b: Citizen) => {
+                if (citizen_a.name.localeCompare(citizen_b.name) > 0) {
+                    return 1;
+                }
+                if (citizen_a.name.localeCompare(citizen_b.name) < 0) {
+                    return -1;
+                }
+                return 0;
+            })
             this.update_info = new UpdateInfo(dto.lastUpdateInfo)
         }
     };

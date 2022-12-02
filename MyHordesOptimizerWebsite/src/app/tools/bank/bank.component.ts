@@ -51,7 +51,6 @@ export class BankComponent implements OnInit {
                         }
                     })
                 this.displayed_bank_items = [...this.bank.bank_items];
-                console.log('displayed', this.displayed_bank_items);
             }
         });
     }

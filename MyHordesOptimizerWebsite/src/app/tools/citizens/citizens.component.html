@@ -16,10 +16,11 @@
                             </td>
                         </ng-container>
 
-                        <ng-container *ngFor="let column of columns" [matColumnDef]="column.id" [sticky]="column.id === 'name'">
+                        <ng-container *ngFor="let column of columns" [matColumnDef]="column.id"
+                            [sticky]="column.id === 'name'">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header>{{column.header}}</th>
 
-                            <td mat-cell *matCellDef="let row" [class.center]="column.id === 'avatar'">
+                            <td mat-cell *matCellDef="let row" [ngClass]="[column.id]">
                                 <ng-container [ngSwitch]="column.id">
                                     <ng-container *ngSwitchCase="'avatar'">
                                         <img *ngIf="row.avatar" [src]="row.avatar" />
@@ -30,13 +31,60 @@
                                     <ng-container *ngSwitchCase="'home_message'">
                                         {{row.home_message}}
                                     </ng-container>
+                                    <ng-container *ngSwitchCase="'bag'">
+                                        <div class="bag-container">
+                                            <div class="bag">
+                                                <ng-container *ngFor="let item of row.bag">
+                                                    <img *ngFor="let i of [].constructor(item.count)"
+                                                        [src]="HORDES_IMG_REPO + item.item.img">
+                                                </ng-container>
+                                            </div>
+                                            <div class="add-remove">
+                                                <img [src]="HORDES_IMG_REPO + 'icons/small_more.gif'"
+                                                    [mat-menu-trigger-for]="menuAdd">
+                                                <img [src]="HORDES_IMG_REPO + 'icons/small_less.gif'"
+                                                    *ngIf="row.bag.length > 0" [mat-menu-trigger-for]="menuRemove">
+
+                                                <mat-menu #menuAdd="matMenu" class="menu-add">
+                                                    <div class="search" (click) = "$event.stopPropagation()">
+                                                        <mat-form-field>
+                                                            <mat-label i18n>Ajouter au sac</mat-label>
+                                                            <input matInput #searchItem>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <div class="items">
+                                                        <ng-container *ngFor="let item of all_items">
+                                                        <img *ngIf="item.label[locale].startsWith(searchItem.value)"
+                                                            [src]="HORDES_IMG_REPO + item.img"
+                                                            (click)="addItem(row.id, item.id)">
+                                                        </ng-container>
+                                                    </div>
+                                                </mat-menu>
+                                                <mat-menu #menuRemove="matMenu" class="menu-remove">
+                                                    <div class="search" (click) = "$event.stopPropagation()">
+                                                        <mat-form-field>
+                                                            <mat-label i18n>Retirer du sac</mat-label>
+                                                            <input matInput #searchItem>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <div class="items">
+                                                        <ng-container *ngFor="let item of row.bag">
+                                                            <img *ngFor="let i of [].constructor(item.count)"
+                                                                [src]="HORDES_IMG_REPO + item.item.img"
+                                                                (click)="removeItem(row.id, item.item.id)">
+                                                        </ng-container>
+                                                    </div>
+                                                </mat-menu>
+                                            </div>
+                                        </div>
+                                    </ng-container>
 
                                 </ng-container>
                             </td>
                         </ng-container>
 
                         <!-- Footer -->
-    <!--                    <ng-container matColumnDef="save">
+                        <!--                    <ng-container matColumnDef="save">
                             <td mat-footer-cell *matFooterCellDef style="text-align: right;" colspan="6">
                                 <button mat-button [color]="'accent'" (click)="updateCitizens()" i18n>Enregistrer</button>
                             </td>
@@ -50,8 +98,10 @@
                         <!-- Row shown when there is no matching data. -->
                         <tr class="mat-row" *matNoDataRow>
                             <td class="mat-cell" colspan="6">
-                                <ng-container *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
-                                    <ng-container *i18n> objet ne correspond au filtre "{{filterInput.nativeElement.value}}"</ng-container>
+                                <ng-container
+                                    *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
+                                    <ng-container *i18n> objet ne correspond au filtre
+                                        "{{filterInput.nativeElement.value}}"</ng-container>
                                 </ng-container>
                                 <ng-template #emptyTable>
                                     <ng-container i18n>La liste est vide</ng-container>

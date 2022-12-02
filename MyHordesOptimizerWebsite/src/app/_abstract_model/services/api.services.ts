@@ -8,7 +8,9 @@ import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { ItemDTO } from '../dto/item.dto';
 import { MeDTO } from '../dto/me.dto';
 import { RecipeDTO } from '../dto/recipe.dto';
+import { Citizen } from '../types/citizen.class';
 import { HeroSkill } from '../types/hero-skill.class';
+import { ItemCount } from '../types/item-count.class';
 import { Recipe } from '../types/recipe.class';
 import { Ruin } from '../types/ruin.class';
 import { TownDetails } from '../types/town-details.class';
@@ -26,8 +28,8 @@ import { WishlistInfo } from './../types/wishlist-info.class';
 import { WishlistItem } from './../types/wishlist-item.class';
 import { GlobalServices } from './global.services';
 
-const API_URL: string = 'https://api.myhordesoptimizer.fr';
-const API_URL_2: string = 'https://myhordesoptimizerapi.azurewebsites.net';
+// const API_URL_2: string = 'https://api.myhordesoptimizer.fr';
+const API_URL: string = 'https://myhordesoptimizerapi.azurewebsites.net';
 
 @Injectable()
 export class ApiServices extends GlobalServices {
@@ -49,7 +51,7 @@ export class ApiServices extends GlobalServices {
             super.get<ItemDTO[]>(API_URL + '/myhordesfetcher/items?townId=' + getUserId())
                 .subscribe({
                     next: (response: HttpResponse<ItemDTO[]>) => {
-                        sub.next(dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302 ));
+                        sub.next(dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302));
                     }
                 });
         });
@@ -59,7 +61,6 @@ export class ApiServices extends GlobalServices {
     public getMe(): void {
         super.get<MeDTO>(API_URL + '/myhordesfetcher/me?userKey=' + getExternalAppId())
             .subscribe((response: HttpResponse<MeDTO | null>) => {
-                console.log('test', response.body);
                 setUserId(response.body ? response.body.id : null);
                 setTown(response.body ? new TownDetails(response.body.townDetails) : null);
             })
@@ -89,7 +90,7 @@ export class ApiServices extends GlobalServices {
             isGestHordes: 'api'
         };
 
-        super.post<any>(API_URL + '/externaltools/update?userKey=' + getExternalAppId() + '&userId=' + getUserId(), JSON.stringify({tools: tools_to_update}))
+        super.post<any>(API_URL + '/externaltools/update?userKey=' + getExternalAppId() + '&userId=' + getUserId(), JSON.stringify({ tools: tools_to_update }))
             .subscribe({
                 next: () => {
                     this.snackbar.successSnackbar(`Les outils externes ont bien été mis à jour`);
@@ -104,7 +105,7 @@ export class ApiServices extends GlobalServices {
      */
     public getWishlist(): Observable<WishlistInfo> {
         return new Observable((sub: Subscriber<WishlistInfo>) => {
-            super.get<WishlistInfoDTO>(API_URL + '/wishlist?townId=' + getTown()?.town_id)
+            super.get<WishlistInfoDTO>(API_URL + `/wishlist?townId=${getTown()?.town_id}` )
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         sub.next(new WishlistInfo(response.body));
@@ -127,7 +128,7 @@ export class ApiServices extends GlobalServices {
                 .map((wishlist_item: WishlistItem) => {
                     return { id: wishlist_item.item.id, priority: wishlist_item.priority, count: wishlist_item.count };
                 });
-            super.put<WishlistInfoDTO>(API_URL + '/wishlist?townId=' + getTown()?.town_id + '&userId=' + getUserId(), item_list)
+            super.put<WishlistInfoDTO>(API_URL + `/wishlist?townId=${getTown()?.town_id}&userId=${getUserId()}`, item_list)
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         sub.next(new WishlistInfo(response.body));
@@ -143,7 +144,7 @@ export class ApiServices extends GlobalServices {
      */
     public addItemToWishlist(item: Item): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.post(API_URL + '/wishlist/add/' + item.id + '?townId=' + getTown()?.town_id + '&userId=' + getUserId(), undefined)
+            super.post(API_URL + `/wishlist/add/${item.id}?townId=${getTown()?.town_id}&userId=${getUserId()}`, undefined)
                 .subscribe({
                     next: () => {
                         sub.next();
@@ -218,7 +219,7 @@ export class ApiServices extends GlobalServices {
      */
     public getCitizens(): Observable<CitizenInfo> {
         return new Observable((sub: Subscriber<CitizenInfo>) => {
-            super.get<CitizenInfoDTO>(API_URL + '/myhordesfetcher/citizens?userKey=' + getExternalAppId())
+            super.get<CitizenInfoDTO>(API_URL + `/myhordesfetcher/citizens?userKey=${getExternalAppId()}`)
                 .subscribe({
                     next: (response: HttpResponse<CitizenInfoDTO>) => {
                         sub.next(new CitizenInfo(response.body));
@@ -237,8 +238,18 @@ export class ApiServices extends GlobalServices {
             super.get<RecipeDTO[]>(API_URL + '/myhordesfetcher/recipes')
                 .subscribe({
                     next: (response: HttpResponse<RecipeDTO[]>) => {
-                        console.log('recipeDTO', response.body);
                         sub.next(dtoToModelArray(Recipe, response.body));
+                    }
+                })
+        })
+    }
+
+    public updateBag(citizen: Citizen) {
+        return new Observable((sub: Subscriber<string>) => {
+            super.post<void>(API_URL + `/ExternalTools/Bag?townId=${getTown()?.town_id}&userId=${citizen.id}`, JSON.stringify(citizen.bag.map((item: ItemCount) => item.toShortItemCount())))
+                .subscribe({
+                    next: () => {
+                        sub.next();
                     }
                 })
         })

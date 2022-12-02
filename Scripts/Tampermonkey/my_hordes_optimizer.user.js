@@ -33,7 +33,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[fix] Correction d'un problème de coordonnées dans la mise à jour GH`;
++ `[Nouveauté] Il est désormais possible d'enregistrer le contenu de son sac via le bouton de mise à jour des outils externes. Les sacs sont consultables et modifiables depuis la liste des citoyens du site web de MHO.\nN'oubliez pas d'activer l'option associée depuis vos paramètres pour rendre cette mise à jour possible ! \n\n`
++ `[Traductions] Merci à isaaclw qui nous a fourni quelques traductions en anglais ! Si vous voulez contribuer à la traduction, n'hésitez pas à rejoindre le discord, ou à me contacter en MP\n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -951,6 +952,16 @@ let params_categories = [
         },
         params: [
             {
+                id: `update_mho`,
+                label: {
+                    en: `Update MHO`,
+                    fr: `Mettre à jour MHO`,
+                    de: `MHO Aktualisieren`,
+                    es: `Actualizar MHO`
+                },
+                parent_id: null
+            },
+            {
                 id: `update_bbh`,
                 label: {
                     en: `Update BigBroth’Hordes`,
@@ -973,7 +984,7 @@ let params_categories = [
             {
                 id: `update_gh_without_api`,
                 label: {
-                    en: `TODO`,
+                    en: `Add zombie markers to the GH box to indicate zombies killed. Update when the city is devastated.`,
                     fr: `Ajouter des marqueurs zombies sur la case GH pour indiquer les zombies tués. Mettre à jour quand la ville est dévastée.`,
                     de: `TODO`,
                     es: `TODO`
@@ -1118,7 +1129,7 @@ let params_categories = [
             {
                 id: `more_citizens_info`,
                 label: {
-                    en: `TODO`,
+                    en: `Display a tab with additional information on the citizens page in town`,
                     fr: `Afficher un onglet contenant des informations supplémentaires sur la page des citoyens`,
                     de: `TODO`,
                     es: `TODO`
@@ -3295,7 +3306,8 @@ function createUpdateExternalToolsButton() {
     let tools_to_update = {
         isBigBrothHordes: mho_parameters ? mho_parameters.update_bbh : false,
         isFataMorgana: mho_parameters ? mho_parameters.update_fata : false,
-        isGestHordes: mho_parameters ? mho_parameters.update_gh : false
+        isGestHordes: mho_parameters ? mho_parameters.update_gh : false,
+        isMHO: mho_parameters ? mho_parameters.update_mho : false
     };
 
     let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
@@ -6364,17 +6376,12 @@ async function getMe() {
                         }
                         GM.setValue(mh_user_key, mh_user);
                         console.log('MHO - I am...', mh_user);
+                        getItems().then(() => {
+                            resolve();
+                        });
+
                         if (mh_user !== '' && mh_user.townDetails.townId) {
-                            getTown().then(() => {
-                                getItems().then(() => {
-                                    resolve();
-                                });
-                                getWishlist().then();
-                            });
-                        } else {
-                            getItems().then(() => {
-                                resolve();
-                            });
+                            getWishlist().then();
                         }
                     } else {
                         addError(response);
@@ -6587,23 +6594,13 @@ function updateWishlist() {
 /** Met à jour les outils externes (BBH, GH et Fata) en fonction des paramètres sélectionnés */
 function updateExternalTools() {
     startLoading();
-    let data = {};
-    let nb_dead_zombies = +document.querySelectorAll('.actor.splatter').length;
-    let tools_to_update = {
-        isBigBrothHordes: mho_parameters && mho_parameters.update_bbh ? 'api' : 'none',
-        isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
-        isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
-    };
-    data.tools = tools_to_update;
 
-    if (mho_parameters.update_gh_without_api) {
-        let objects = Array.from(document.querySelector('.inventory.desert').querySelectorAll('li.item')).map((desert_item) => {
-            let item = items.find((item) => desert_item.querySelector('img').src.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3').indexOf(item.img) > 0);
-            return {id: item.id, isBroken: desert_item.classList.contains('broken')};
-        });
+    let convertImgToItem = (img) => {
+        return items.find((item) => img.src.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3').indexOf(item.img) > 0);
+    }
 
+    let convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
         let object_map = [];
-
         objects.forEach((object) => {
             let object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id);
             if (object_in_map) {
@@ -6612,29 +6609,83 @@ function updateExternalTools() {
                 object.count = 1;
                 object_map.push(object);
             }
-        })
+        });
+        return object_map;
+    }
 
-        let position = document.querySelector('.current-location').innerText.replace(/.*: ?/, '').split('/');
+    let data = {};
+    let nb_dead_zombies = +document.querySelectorAll('.actor.splatter').length;
+    let tools_to_update = {
+        isBigBrothHordes: mho_parameters && mho_parameters.update_bbh ? 'api' : 'none',
+        isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
+        isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none',
+        isMHO: mho_parameters && mho_parameters.update_mho ? 'api' : 'none',
+    };
+    data.tools = tools_to_update;
 
-        let content = {
+    if (mho_parameters.update_gh_without_api || mho_parameters.update_mho) {
+        data.townDetails = {
             townX: mh_user.townDetails.townX,
             townY: mh_user.townDetails.townY,
             townid: mh_user.townDetails.townId,
             isDevaste: mh_user.townDetails.isDevaste,
+        };
+    }
+
+    if (mho_parameters.update_gh_without_api) {
+        let objects = Array.from(document.querySelector('.inventory.desert').querySelectorAll('li.item')).map((desert_item) => {
+            let item = convertImgToItem(desert_item.querySelector('img'));
+            return {id: item.id, isBroken: desert_item.classList.contains('broken')};
+        });
+
+        let position = document.querySelector('.current-location').innerText.replace(/.*: ?/, '').split('/');
+
+        let content = {
             x: +position[0],
             y: +position[1],
             zombies: +document.querySelectorAll('.actor.zombie').length,
             deadZombies: nb_dead_zombies,
             zoneEmpty: !!document.querySelector('#mgd-empty-zone-note'),
-            objects: object_map
+            objects: convertListOfSingleObjectsIntoListOfCountedObjects(objects)
         }
-
-        console.log('Voici l\'état de ma case :', content);
         if (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) {
             data.cell = content;
         }
     }
 
+    if (mho_parameters.update_mho) {
+        let rucksacks = [];
+        let my_rusksack = Array.from(document.querySelector('.pointer.rucksack').querySelectorAll('li.item:not(.locked)')).map((rucksack_item) => {
+            let item = convertImgToItem(rucksack_item.querySelector('img'));
+            return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
+        });
+
+        rucksacks.push({
+            userId: mh_user.id,
+            objects: convertListOfSingleObjectsIntoListOfCountedObjects(my_rusksack),
+        });
+
+        if (pageIsDesert()) {
+            let escorts = Array.from(document.querySelectorAll('.beyond-escort-on'));
+            escorts.forEach((escort) => {
+                let escort_id = +escort.querySelector('span.username').getAttribute('x-user-id');
+                let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort').querySelectorAll('li.item:not(.locked):not(.plus)')).map((rucksack_item) => {
+                    let item = convertImgToItem(rucksack_item.querySelector('img'));
+                    return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
+                });
+
+                rucksacks.push({
+                    userId: escort_id,
+                    objects: convertListOfSingleObjectsIntoListOfCountedObjects(escort_rucksack),
+                });
+            })
+        }
+
+        data.bags = rucksacks;
+    }
+
+
+    console.log('Voici ce que j\'envoie :', data);
     let btn = document.getElementById(mh_update_external_tools_id);
     GM.xmlHttpRequest({
         method: 'POST',

@@ -970,11 +970,25 @@
           <context context-type="linenumber">21</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="6019139638926667991" datatype="html">
+        <source>Ajouter au sac</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6402922979065903259" datatype="html">
+        <source>Retirer du sac</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8265078634979801865" datatype="html">
         <source>La liste est vide</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context>
-          <context context-type="linenumber">57</context>
+          <context context-type="linenumber">107</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.html</context>
@@ -985,21 +999,28 @@
         <source>Avatar</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">35</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6975093736711169035" datatype="html">
         <source>Nom du citoyen</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7213858055094818881" datatype="html">
+        <source>Sac à dos</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
+          <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8066608938393600549" datatype="html">
         <source>Message</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
       <trans-unit id="626566591049088014" datatype="html">

@@ -17,7 +17,6 @@ export class DespairDeathsComponent {
     public readonly columns_ids: string[] = this.columns.map((column: DespairDeathsColumn) => column.id);
 
     constructor() {
-        console.log('datasource', this.datasource);
     }
 }
 

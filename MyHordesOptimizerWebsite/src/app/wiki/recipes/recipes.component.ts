@@ -37,7 +37,6 @@ export class RecipesComponent implements OnInit {
 
     ngOnInit(): void {
         this.api.getRecipes().subscribe((recipes: Recipe[]) => {
-            console.log('recipes', recipes);
             this.recipes = recipes;
             this.datasource.data = [...recipes];
             this.datasource.filterPredicate = this.customFilter;
