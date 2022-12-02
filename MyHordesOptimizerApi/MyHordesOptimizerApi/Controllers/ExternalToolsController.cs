@@ -72,5 +72,14 @@ namespace MyHordesOptimizerApi.Controllers
             Logger.LogTrace($"[ExternalToolsController][UpdateGHZoneRegen] {requestDto.ToJson()} {Environment.NewLine} {cases.ToJson()}");
             return cases;
         }
+
+        [HttpPost]
+        [Route("Bag")]
+        public ActionResult UpdateCitizenBag([FromQuery] int townId, [FromQuery] int userId, [FromBody] List<UpdateObjectDto> bag)
+        {
+            UserKeyProvider.UserId = userId;
+            ExternalToolsService.UpdateBag(townId, userId, bag);
+            return Ok();
+        }
     }
 }

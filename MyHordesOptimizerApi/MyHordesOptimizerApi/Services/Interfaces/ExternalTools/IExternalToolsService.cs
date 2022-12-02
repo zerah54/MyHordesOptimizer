@@ -9,5 +9,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces.ExternalTools
     {
         public UpdateResponseDto UpdateExternalsTools(UpdateRequestDto updateRequestDto);
         List<CaseGH> UpdateGHZoneRegen(UpdateZoneRegenDto requestDto);
+        void UpdateBag(int townId, int userId, List<UpdateObjectDto> bag);
     }
 }
