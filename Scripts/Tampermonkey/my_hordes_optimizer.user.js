@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.10
+// @version      1.0.0-beta.11
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,8 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Il est désormais possible d'enregistrer le contenu de son sac via le bouton de mise à jour des outils externes. Les sacs sont consultables et modifiables depuis la liste des citoyens du site web de MHO.\nN'oubliez pas d'activer l'option associée depuis vos paramètres pour rendre cette mise à jour possible ! \n\n`
-+ `[Traductions] Merci à isaaclw qui nous a fourni quelques traductions en anglais ! Si vous voulez contribuer à la traduction, n'hésitez pas à rejoindre le discord, ou à me contacter en MP\n\n`;
++ `[fix] L'affichage du bouton suite à des mises à jour devrait être corrigé !`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -6618,8 +6617,7 @@ function updateExternalTools() {
     let tools_to_update = {
         isBigBrothHordes: mho_parameters && mho_parameters.update_bbh ? 'api' : 'none',
         isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
-        isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none',
-        isMHO: mho_parameters && mho_parameters.update_mho ? 'api' : 'none',
+        isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
     };
     data.tools = tools_to_update;
 
@@ -6666,7 +6664,7 @@ function updateExternalTools() {
         });
 
         if (pageIsDesert()) {
-            let escorts = Array.from(document.querySelectorAll('.beyond-escort-on'));
+            let escorts = Array.from(document.querySelectorAll('.beyond-escort-on:not(.beyond-escort-on-all)'));
             escorts.forEach((escort) => {
                 let escort_id = +escort.querySelector('span.username').getAttribute('x-user-id');
                 let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort').querySelectorAll('li.item:not(.locked):not(.plus)')).map((rucksack_item) => {
@@ -6701,11 +6699,10 @@ function updateExternalTools() {
                 if (response.response.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
                 if (response.response.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
 
-                let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool !== 'none').length;
                 let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
                 let tools_success = response_items.filter((tool_response) => tool_response.value.toLowerCase() === 'ok');
                 let tools_fail = response_items.filter((tool_response) => tool_response.value.toLowerCase() !== 'ok' && tool_response.value.toLowerCase() !== 'not activated');
-                btn.innerHTML = nb_tools_to_update === tools_success.length ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
+                btn.innerHTML = tools_fail.length === 0 ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
                 : `<img src ="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_success.map((item) => item.key.replace('Status', ' : OK')).join('<br>')}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
             } else {
                 addError(response);
