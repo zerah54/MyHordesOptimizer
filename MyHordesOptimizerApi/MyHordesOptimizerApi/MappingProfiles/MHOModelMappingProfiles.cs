@@ -291,7 +291,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
             }
             else
             {
-
                 return null;
             }
         }
@@ -300,11 +299,10 @@ namespace MyHordesOptimizerApi.MappingProfiles
             var first = src.FirstOrDefault();
             if (first != null)
             {
-                return first.LastUpdateInfoUserName;
+                return first.BagLastUpdateUserName;
             }
             else
             {
-
                 return null;
             }
         }

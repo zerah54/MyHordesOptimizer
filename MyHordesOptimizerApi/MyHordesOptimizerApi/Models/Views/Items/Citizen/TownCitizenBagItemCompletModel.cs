@@ -43,7 +43,7 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
         public int LastUpdateInfoUserId { get; set; }
         public DateTime LastUpdateDateUpdate { get; set; }
         public string LastUpdateInfoUserName { get; set; } 
-        public DateTime BagLastUpdateDateUpdate { get; set; }
+        public DateTime? BagLastUpdateDateUpdate { get; set; }
         public string BagLastUpdateUserName { get; set; }
         public int ItemCount { get; set; }
         public bool IsBroken { get; set; }

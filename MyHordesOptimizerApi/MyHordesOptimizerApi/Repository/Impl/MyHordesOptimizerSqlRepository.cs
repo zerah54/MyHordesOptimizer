@@ -533,10 +533,10 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.BulkInsert("TownCitizen", dico, townCitizenModelsToInsert);
 
             var townCitizenModelsToUpdate = townCitizenModels.Where(x => existings.Any(existing => existing.idUser == x.IdUser)).ToList();
-            foreach(var citizenToUpdate in townCitizenModelsToUpdate)
+            foreach (var citizenToUpdate in townCitizenModelsToUpdate)
             {
                 citizenToUpdate.IdBag = existings.Single(existing => existing.idUser == citizenToUpdate.IdUser).idBag;
-                var keys = new Dictionary<string, Func<TownCitizenModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser }};
+                var keys = new Dictionary<string, Func<TownCitizenModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser } };
                 connection.Update(citizenToUpdate, keys);
             }
             //connection.ExecuteScalar("DELETE FROM TownCitizen WHERE idTown = @IdTown AND idLastUpdateInfo != @IdLastUpdateInfo", new { IdTown = townId, IdLastUpdateInfo = idLastUpdateInfo });
@@ -608,6 +608,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
 
 
+            //  var distinctCitizenItem = citizens.Where(x => x.IdItem != 0).Distinct(new TownCitizenItemComparer());
             var distinctCitizenItem = citizens.Where(x => x.IdItem != 0).Distinct(new TownCitizenItemComparer());
             var items = Mapper.Map<List<Item>>(citizens.Where(x => x.IdItem != 0).Distinct(new ItemIdComparer()));
 
@@ -626,6 +627,13 @@ namespace MyHordesOptimizerApi.Repository.Impl
             {
                 var citizenItems = distinctCitizenItem.Where(x => x.CitizenId == citizen.Id);
                 citizen.Bag = Mapper.Map<CitizenBag>(citizenItems);
+                if (!citizenItems.Any()) // Si y'a pas d'item dans le sac, il faut aller chercher l'info du last update dans la liste sans le distinct !
+                {
+                    var c = citizens.First(x => x.CitizenId == citizen.Id);
+                    citizen.Bag.LastUpdateDateUpdate = c.BagLastUpdateDateUpdate;
+                    citizen.Bag.LastUpdateUserName = c.BagLastUpdateUserName;
+                    citizen.Bag.IdBag = c.BagId;
+                }
             });
             return citizenWrapper;
         }
@@ -950,7 +958,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                     });
                 }
             }
-            if(modeles.Any())
+            if (modeles.Any())
             {
                 connection.BulkInsert("BagItem", dico, modeles);
             }

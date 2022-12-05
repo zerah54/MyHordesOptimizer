@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System;
