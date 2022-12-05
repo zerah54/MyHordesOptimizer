@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.11
+// @version      1.0.0-beta.12
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,7 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[fix] L'affichage du bouton suite à des mises à jour devrait être corrigé !`;
++ `[fix] Correctif des erreurs liées à la mise à jour du contenu des sacs`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -6430,7 +6430,7 @@ async function getCitizens() {
             startLoading();
             GM.xmlHttpRequest({
                 method: 'GET',
-                url: api_url + '/myhordesfetcher/citizens?userKey=' + external_app_id,
+                url: api_url + `/myhordesfetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails.townId}`,
                 responseType: 'json',
                 onload: function(response){
                     if (response.status === 200) {
@@ -6620,15 +6620,12 @@ function updateExternalTools() {
         isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
     };
     data.tools = tools_to_update;
-
-    if (mho_parameters.update_gh_without_api || mho_parameters.update_mho) {
-        data.townDetails = {
-            townX: mh_user.townDetails.townX,
-            townY: mh_user.townDetails.townY,
-            townid: mh_user.townDetails.townId,
-            isDevaste: mh_user.townDetails.isDevaste,
-        };
-    }
+    data.townDetails = {
+        townX: mh_user.townDetails.townX,
+        townY: mh_user.townDetails.townY,
+        townid: mh_user.townDetails.townId,
+        isDevaste: mh_user.townDetails.isDevaste,
+    };
 
     if (mho_parameters.update_gh_without_api) {
         let objects = Array.from(document.querySelector('.inventory.desert').querySelectorAll('li.item')).map((desert_item) => {
