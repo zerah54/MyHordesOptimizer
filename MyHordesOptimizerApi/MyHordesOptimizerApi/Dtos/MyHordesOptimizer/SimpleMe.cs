@@ -3,7 +3,7 @@
     public class SimpleMe
     {
         public int Id { get; set; }
-
+        public string UserName { get; set; }
         public SimpleMeTownDetailDto TownDetails { get; set; }
 
         public SimpleMe()

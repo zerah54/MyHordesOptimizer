@@ -150,15 +150,9 @@ namespace MyHordesOptimizerApi.Services.Impl
             return bankWrapper;
         }
 
-        public CitizensWrapper GetCitizens()
+        public CitizensWrapper GetCitizens(int townId)
         {
-            var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
-            var town = Mapper.Map<Town>(myHordeMeResponse.Map);
-
-            // Enregistrer en base
-            MyHordesOptimizerRepository.PatchCitizen(town.Id, town.Citizens);
-            //var citizens = MyHordesOptimizerRepository.GetCitizens(town.Id);
-            var citizens = MyHordesOptimizerRepository.GetCitizensWithBag(town.Id);
+            var citizens = MyHordesOptimizerRepository.GetCitizensWithBag(townId);
             return citizens;
         }
 

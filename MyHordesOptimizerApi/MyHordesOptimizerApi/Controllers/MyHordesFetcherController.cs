@@ -98,14 +98,18 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Citizens")]
-        public ActionResult<CitizensWrapper> GetCitizens(string userKey)
+        public ActionResult<CitizensWrapper> GetCitizens(int? townId, int? userId)
         {
-            if (string.IsNullOrWhiteSpace(userKey))
+            if (!townId.HasValue)
             {
-                return BadRequest($"{nameof(userKey)} cannot be empty");
+                return BadRequest($"{nameof(townId)} cannot be empty");
             }
-            UserKeyProvider.UserKey = userKey;
-            var citizens = _myHordesFetcherService.GetCitizens();
+            if (!userId.HasValue)
+            {
+                return BadRequest($"{nameof(userId)} cannot be empty");
+            }
+            UserKeyProvider.UserId = userId.Value;
+            var citizens = _myHordesFetcherService.GetCitizens(townId.Value);
             return citizens;
         }
 

@@ -4,14 +4,14 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MyHordesOptimizerApi.Models.Views.Items
 {
-    internal class ItemIdComparer : IEqualityComparer<ItemCompletModel>, IEqualityComparer<TownCitizenItemCompletModel>
+    internal class ItemIdComparer : IEqualityComparer<ItemCompletModel>, IEqualityComparer<TownCitizenBagItemCompletModel>
     {
         public bool Equals([AllowNull] ItemCompletModel x, [AllowNull] ItemCompletModel y)
         {
             return x.IdItem == y.IdItem;
         }
 
-        public bool Equals([AllowNull] TownCitizenItemCompletModel x, [AllowNull] TownCitizenItemCompletModel y)
+        public bool Equals([AllowNull] TownCitizenBagItemCompletModel x, [AllowNull] TownCitizenBagItemCompletModel y)
         {
             return x.IdItem == y.IdItem;
         }
@@ -21,7 +21,7 @@ namespace MyHordesOptimizerApi.Models.Views.Items
             return obj.IdItem.GetHashCode();
         }
 
-        public int GetHashCode([DisallowNull] TownCitizenItemCompletModel obj)
+        public int GetHashCode([DisallowNull] TownCitizenBagItemCompletModel obj)
         {
             return obj.IdItem.GetHashCode();
         }

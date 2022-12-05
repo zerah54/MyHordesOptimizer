@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
@@ -497,8 +498,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchCitizen(int townId, CitizensWrapper wrapper)
         {
-            var sw = new Stopwatch();
-            sw.Start();
             InsertTown(townId);
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
@@ -519,20 +518,29 @@ namespace MyHordesOptimizerApi.Repository.Impl
                     connection.Insert(userModel);
                 }
             }
-            Logger.LogTrace($"[PatchCitizen] Update des users : {sw.ElapsedMilliseconds}");
             var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(wrapper.LastUpdateInfo);
             var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
                                                                    VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
-            Logger.LogTrace($"[PatchCitizen] Insert LastUpdate : {sw.ElapsedMilliseconds}");
+
             var townCitizenModels = Mapper.Map<List<TownCitizenModel>>(wrapper.Citizens);
             townCitizenModels.ForEach(x => { x.IdTown = townId; x.IdLastUpdateInfo = idLastUpdateInfo; });
-            Logger.LogTrace($"[PatchCitizen] Automapper TownCitizenModel : {sw.ElapsedMilliseconds}");
+
             var dico = new Dictionary<string, Func<TownCitizenModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser }, { "homeMessage", x => x.HomeMessage }, { "jobName", x => x.JobName }, { "jobUID", x => x.JobUID }, { "positionX", x => x.PositionX }, { "positionY", x => x.PositionY }, { "isGhost", x => x.IsGhost }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo }, { "avatar", x => x.Avatar } };
-            connection.BulkInsert("TownCitizen", dico, townCitizenModels);
-            connection.ExecuteScalar("DELETE FROM TownCitizen WHERE idTown = @IdTown AND idLastUpdateInfo != @IdLastUpdateInfo", new { IdTown = townId, IdLastUpdateInfo = idLastUpdateInfo });
+
+            var existings = connection.Query("SELECT idUser, idBag FROM TownCitizen WHERE idTown = @IdTown", new { IdTown = townId });
+
+            var townCitizenModelsToInsert = townCitizenModels.Where(x => !existings.Any(existing => existing.idUser == x.IdUser)).ToList();
+            connection.BulkInsert("TownCitizen", dico, townCitizenModelsToInsert);
+
+            var townCitizenModelsToUpdate = townCitizenModels.Where(x => existings.Any(existing => existing.idUser == x.IdUser)).ToList();
+            foreach(var citizenToUpdate in townCitizenModelsToUpdate)
+            {
+                citizenToUpdate.IdBag = existings.Single(existing => existing.idUser == citizenToUpdate.IdUser).idBag;
+                var keys = new Dictionary<string, Func<TownCitizenModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser }};
+                connection.Update(citizenToUpdate, keys);
+            }
+            //connection.ExecuteScalar("DELETE FROM TownCitizen WHERE idTown = @IdTown AND idLastUpdateInfo != @IdLastUpdateInfo", new { IdTown = townId, IdLastUpdateInfo = idLastUpdateInfo });
             connection.Close();
-            Logger.LogTrace($"[PatchCitizen] Insert TownCitiern : {sw.ElapsedMilliseconds}");
-            sw.Stop();
         }
 
         public CitizensWrapper GetCitizensWithBag(int townId)
@@ -578,17 +586,23 @@ namespace MyHordesOptimizerApi.Repository.Impl
 								  ,i.propertyName
 								  ,i.dropRate_praf AS DropRatePraf
 								  ,i.dropRate_notPraf AS DropRateNotPraf
-                                  ,tci.count AS ItemCount
-                                  ,tci.isBroken AS IsBroken
+                                  ,bi.count AS ItemCount
+                                  ,bi.isBroken AS IsBroken
+                                  ,bagLuiUser.name AS BagLastUpdateUserName
+                                  ,bagLui.dateUpdate AS BagLastUpdateDateUpdate
+                                  ,tc.idBag AS BagId
                               FROM TownCitizen tc
                               INNER JOIN Users citizen ON citizen.idUser = tc.idUser
                               INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = tc.idLastUpdateInfo 
                               INNER JOIN Users userUpdater ON userUpdater.idUser = lui.idUser
-                              LEFT JOIN TownCitizenItem tci ON tci.idUser = citizen.idUser
-                              LEFT JOIN ItemComplet i ON i.idItem = tci.idItem
+                              LEFT JOIN Bag bag ON bag.idBag = tc.idBag
+                              LEFT JOIN LastUpdateInfo bagLui ON bagLui.idLastUpdateInfo = bag.idLastUpdateInfo 
+                              LEFT JOIN Users bagLuiUser ON bagLuiUser.idUser = bagLui.idUser
+                              LEFT JOIN BagItem bi on bi.idBag = bag.idBag
+                              LEFT JOIN ItemComplet i ON i.idItem = bi.idItem
                               WHERE tc.idTown = @idTown";
             using var connection = new MySqlConnection(Configuration.ConnectionString);
-            var citizens = connection.Query<TownCitizenItemCompletModel>(query, new { idTown = townId });
+            var citizens = connection.Query<TownCitizenBagItemCompletModel>(query, new { idTown = townId });
             var mostRecent = citizens.Max(x => x.LastUpdateDateUpdate);
             citizens = citizens.Where(x => x.LastUpdateDateUpdate == mostRecent);
             connection.Close();
@@ -599,7 +613,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
             foreach (var item in items)
             {
-                IEnumerable<TownCitizenItemCompletModel> matchingItemComplet = citizens.Where(i => i.IdItem == item.Id);
+                IEnumerable<TownCitizenBagItemCompletModel> matchingItemComplet = citizens.Where(i => i.IdItem == item.Id);
                 item.Actions = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.ActionName)).Select(i => i.ActionName).Distinct();
                 item.Properties = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.PropertyName)).Select(i => i.PropertyName).Distinct();
             }
@@ -611,10 +625,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             citizenWrapper.Citizens.ForEach(citizen =>
             {
                 var citizenItems = distinctCitizenItem.Where(x => x.CitizenId == citizen.Id);
-                foreach(var item in citizenItems)
-                {
-                    citizen.Bag.Add(Mapper.Map<CitizenItem>(item));
-                }
+                citizen.Bag = Mapper.Map<CitizenBag>(citizenItems);
             });
             return citizenWrapper;
         }
@@ -913,17 +924,101 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #region Bags
 
-        public void PatchCitizenBags(int townId, LastUpdateInfo lastUpdateInfo, List<TownCitizenItemModel> modeles)
+        public void PatchCitizenBags(int townId, LastUpdateInfo lastUpdateInfo, List<Citizen> citizens)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
                                                                    VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.UpdateTime, IdUser = lastUpdateInfo.UserId });
-            modeles.ForEach(x => x.IdLastUpdateInfo = idLastUpdateInfo);
-            var dico = new Dictionary<string, Func<TownCitizenItemModel, object>>() { { "idTown", x => x.IdTown }, { "idItem", x => x.IdItem }, { "count", x => x.Count }, { "isBroken", x => x.IsBroken }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo }, { "idUser", x => x.IdUser } };
-            connection.ExecuteScalar("DELETE FROM TownCitizenItem WHERE idTown = @IdTown AND idLastUpdateInfo != @IdLastUpdateInfo", new { IdTown = townId, IdLastUpdateInfo = idLastUpdateInfo });
-            connection.BulkInsert("TownCitizenItem", dico, modeles);
+
+            var param = new DynamicParameters();
+            StringBuilder inBuilder = GenerateInQuery(citizens.Select(x => x.Bag.IdBag), param);
+            connection.ExecuteScalar($"DELETE FROM BagItem WHERE idBag {inBuilder}", param);
+
+            var dico = new Dictionary<string, Func<BagItem, object>>() { { "idBag", x => x.IdBag }, { "idItem", x => x.IdItem }, { "count", x => x.Count }, { "isBroken", x => x.IsBroken } };
+            var modeles = new List<BagItem>();
+            foreach (var citizen in citizens)
+            {
+                foreach (var item in citizen.Bag.Items)
+                {
+                    modeles.Add(new BagItem()
+                    {
+                        Count = item.Count,
+                        IsBroken = item.IsBroken,
+                        IdItem = item.Item.Id,
+                        IdBag = citizen.Bag.IdBag.Value
+                    });
+                }
+            }
+            if(modeles.Any())
+            {
+                connection.BulkInsert("BagItem", dico, modeles);
+            }
+
+            param = new DynamicParameters();
+            param.Add("IdLastUpdateInfo", idLastUpdateInfo);
+            inBuilder = GenerateInQuery(citizens.Select(x => x.Bag.IdBag), param);
+            connection.ExecuteScalar($"UPDATE Bag SET idLastUpdateInfo = @IdLastUpdateInfo WHERE idBag {inBuilder}", param);
+
             connection.Close();
+        }
+
+        public IDictionary<int, int> GetCitizenBagsId(int townId, IEnumerable<int> userIds)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            var param = new DynamicParameters();
+            param.Add("IdTown", townId);
+            connection.Open();
+            var bagIds = new Dictionary<int, int>();
+            StringBuilder inBuilder = GenerateInQuery(userIds, param);
+            var dynamics = connection.Query($"SELECT idBag, idUser FROM TownCitizen WHERE idTown = @IdTown AND idUser {inBuilder.ToString()}", param);
+            foreach (var result in dynamics)
+            {
+                if (result.idBag == null)
+                {
+                    var bagId = connection.ExecuteScalar<int>(@"INSERT INTO Bag() VALUES (); SELECT LAST_INSERT_ID()");
+                    connection.ExecuteScalar("UPDATE TownCitizen SET idBag = @IdBag WHERE idUser = @IdUser", new { IdBag = bagId, IdUser = result.idUser });
+                    bagIds.Add(result.idUser, bagId);
+                }
+                else
+                {
+                    bagIds.Add(result.idUser, result.idBag);
+                }
+            }
+            connection.Close();
+            return bagIds;
+        }
+
+        private static StringBuilder GenerateInQuery<TObject>(IEnumerable<TObject> objects, DynamicParameters param)
+        {
+            var inBuilder = new StringBuilder();
+            if (objects.Any())
+            {
+                int count = 1;
+                var list = new List<string>();
+                foreach (var obj in objects)
+                {
+                    list.Add($"@{count}");
+                    param.Add($"{count}", obj);
+                    count++;
+                }
+                inBuilder.Append($"IN ({string.Join(",", list)})");
+            }
+            return inBuilder;
+        }
+
+        public int GetCitizenBagId(int townId, int userId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var bagId = connection.QuerySingle<int?>("SELECT idBag FROM TownCitizen WHERE idTown = @IdTown AND idUser = @IdUser ", new { IdTown = townId, IdUser = userId });
+            if (bagId == null)
+            {
+                bagId = connection.ExecuteScalar<int>(@"INSERT INTO Bag() VALUES (); SELECT LAST_INSERT_ID()");
+                connection.ExecuteScalar("UPDATE TownCitizen SET idBag = @IdBag WHERE idUser = @IdUser", new { IdBag = bagId, IdUser = userId });
+            }
+            connection.Close();
+            return bagId.Value;
         }
 
         #endregion

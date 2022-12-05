@@ -48,6 +48,8 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void DeleteAllActionsItem();
         void PatchActionsItem(string itemUid, List<string> actions);
 
-        void PatchCitizenBags(int townId, LastUpdateInfo lastUpdateInfo, List<TownCitizenItemModel> modeles);
+        void PatchCitizenBags(int townId, LastUpdateInfo lastUpdateInfo, List<Citizen> citizens);
+        IDictionary<int,int> GetCitizenBagsId(int townId, IEnumerable<int> userIds);
+        int GetCitizenBagId(int townId, int userId);
     }
 }

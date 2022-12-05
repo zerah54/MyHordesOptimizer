@@ -1,5 +1,8 @@
-﻿namespace MyHordesOptimizerApi.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace MyHordesOptimizerApi.Models
 {
+	[Table("TownCitizen")]
     public class TownCitizenModel
     {
 		public int IdTown { get; set; }
@@ -12,5 +15,6 @@
 		public int PositionY { get; set; }
 		public bool IsGhost { get; set; }
 		public int IdLastUpdateInfo { get; set; }
+		public int? IdBag { get; set; }
 	}
 }

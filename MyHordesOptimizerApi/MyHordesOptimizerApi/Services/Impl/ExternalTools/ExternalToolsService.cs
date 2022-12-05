@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
 using MyHordesOptimizerApi.Extensions;
@@ -14,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 {
@@ -42,7 +45,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             MyHordesOptimizerRepository = myHordesOptimizerRepository;
         }
 
-        public UpdateResponseDto UpdateExternalsTools(UpdateRequestDto updateRequestDto)
+        public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto)
         {
             var response = new UpdateResponseDto(updateRequestDto);
 
@@ -50,125 +53,110 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             var gh = updateRequestDto.Tools.IsGestHordes;
             var fata = updateRequestDto.Tools.IsFataMorgana;
             var townDetails = updateRequestDto.TownDetails;
+            var tasks = new List<Task>();
             if (UpdateRequestToolsDetailsDto.IsApi(bbh))
             {
-                try
+                var bbhTask = Task.Run(() =>
                 {
-                    BigBrothHordesRepository.Update();
-                }
-                catch (Exception e)
-                {
-                    response.BigBrothHordesStatus = e.Message;
-                }
+                    try
+                    {
+                        BigBrothHordesRepository.Update();
+                    }
+                    catch (Exception e)
+                    {
+                        response.BigBrothHordesStatus = e.Message;
+                    }
+                });
+                tasks.Add(bbhTask);
             }
 
             if (UpdateRequestToolsDetailsDto.IsApi(fata))
             {
-                try
+                var fataTask = Task.Run(() =>
                 {
-                    FataMorganaRepository.Update();
-                }
-                catch (Exception e)
-                {
-                    response.FataMorganaStatus = e.Message;
-                }
+
+                    try
+                    {
+                        FataMorganaRepository.Update();
+                    }
+                    catch (Exception e)
+                    {
+                        response.FataMorganaStatus = e.Message;
+                    }
+                });
+                tasks.Add(fataTask);
             }
 
-            if (UpdateRequestToolsDetailsDto.IsApi(gh) || UpdateRequestToolsDetailsDto.IsCell(gh))
+            var ghTask = Task.Run(() =>
             {
-                try
+                if (UpdateRequestToolsDetailsDto.IsApi(gh) || UpdateRequestToolsDetailsDto.IsCell(gh))
                 {
-                    GestHordesRepository.Update();
-                }
-                catch (Exception e)
-                {
-                    response.GestHordesStatus = e.Message;
-                }
-            }
-            if (UpdateRequestToolsDetailsDto.IsCell(gh))
-            {
-                try
-                {
-                    var cell = updateRequestDto.Cell;
-                    if (townDetails.IsDevaste || cell.DeadZombies > 0)
+                    try
                     {
-                        var request = Mapper.Map<GestHordesUpdateCaseRequest>(updateRequestDto);
-                        var dictionnary = request.ToDictionnary();
-                        var count = 0;
-                        foreach (var item in cell.Objects)
-                        {
-                            dictionnary.Add($"dataObjet[{count}][idObjet]", item.Id);
-                            dictionnary.Add($"dataObjet[{count}][nbr]", item.Count);
-                            if (!item.IsBroken)
-                            {
-                                dictionnary.Add($"dataObjet[{count}][type]", 1);
-                            }
-                            else
-                            {
-                                dictionnary.Add($"dataObjet[{count}][type]", 2);
-                            }
-                            count++;
-                        }
-                        if (cell.DeadZombies > 0)
-                        {
-                            dictionnary.Add($"dataObjet[{count}][idObjet]", 5004);
-                            dictionnary.Add($"dataObjet[{count}][nbr]", cell.DeadZombies);
-                            dictionnary.Add($"dataObjet[{count}][type]", 4);
-                        }
-                        GestHordesRepository.UpdateCell(dictionnary);
+                        GestHordesRepository.Update();
+                    }
+                    catch (Exception e)
+                    {
+                        response.GestHordesStatus = e.Message;
                     }
                 }
+                if (UpdateRequestToolsDetailsDto.IsCell(gh))
+                {
+                    try
+                    {
+                        var cell = updateRequestDto.Cell;
+                        if (townDetails.IsDevaste || cell.DeadZombies > 0)
+                        {
+                            var request = Mapper.Map<GestHordesUpdateCaseRequest>(updateRequestDto);
+                            var dictionnary = request.ToDictionnary();
+                            var count = 0;
+                            foreach (var item in cell.Objects)
+                            {
+                                dictionnary.Add($"dataObjet[{count}][idObjet]", item.Id);
+                                dictionnary.Add($"dataObjet[{count}][nbr]", item.Count);
+                                if (!item.IsBroken)
+                                {
+                                    dictionnary.Add($"dataObjet[{count}][type]", 1);
+                                }
+                                else
+                                {
+                                    dictionnary.Add($"dataObjet[{count}][type]", 2);
+                                }
+                                count++;
+                            }
+                            if (cell.DeadZombies > 0)
+                            {
+                                dictionnary.Add($"dataObjet[{count}][idObjet]", 5004);
+                                dictionnary.Add($"dataObjet[{count}][nbr]", cell.DeadZombies);
+                                dictionnary.Add($"dataObjet[{count}][type]", 4);
+                            }
+                            GestHordesRepository.UpdateCell(dictionnary);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        response.GestHordesStatus = e.Message;
+                    }
+                }
+            });
+            tasks.Add(ghTask);
+
+            var bagTask = Task.Run(() =>
+            {
+                try
+                {
+                    UpdateBags(townDetails.TownId, updateRequestDto.Bags);
+
+                }
                 catch (Exception e)
                 {
-                    response.GestHordesStatus = e.Message;
-                }
-            }
-            UpdateBags(townDetails.TownId, updateRequestDto.Bags);
+                    response.MhoStatus = e.Message;
+                }            });
+            tasks.Add(bagTask);
+            await Task.WhenAll(tasks);
             return response;
         }
 
-
-        public void UpdateBag(int townId, int userId, List<UpdateObjectDto> bag)
-        {
-            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            var modeles = new List<TownCitizenItemModel>();
-            foreach (var item in bag)
-            {
-                modeles.Add(new TownCitizenItemModel()
-                {
-                    Count = item.Count,
-                    IdItem = item.Id,
-                    IdTown = townId,
-                    IdUser = userId,
-                    IsBroken = item.IsBroken
-                });
-            }
-            MyHordesOptimizerRepository.PatchCitizenBags(townId, lastUpdateInfo, modeles);
-        }
-
-        private void UpdateBags(int townId, List<UpdateBagDto> bags)
-        {
-            if (bags != null)
-            {
-                var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-                var modeles = new List<TownCitizenItemModel>();
-                foreach (var bag in bags)
-                {
-                    foreach (var item in bag.Objects)
-                    {
-                        modeles.Add(new TownCitizenItemModel()
-                        {
-                            Count = item.Count,
-                            IdItem = item.Id,
-                            IdTown = townId,
-                            IdUser = bag.UserId,
-                            IsBroken = item.IsBroken
-                        });
-                    }
-                }
-                MyHordesOptimizerRepository.PatchCitizenBags(townId, lastUpdateInfo, modeles);
-            }
-        }
 
         public List<CaseGH> UpdateGHZoneRegen(UpdateZoneRegenDto requestDto)
         {
@@ -386,6 +374,62 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         }
 
         #endregion
+
+        #endregion
+
+        #region Bags
+
+        private void UpdateBags(int townId, List<UpdateBagDto> bags)
+        {
+            if (bags != null)
+            {
+                var bagsId = MyHordesOptimizerRepository.GetCitizenBagsId(townId, bags.Select(x => x.UserId));
+                var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+                var citizens = new List<Citizen>();
+                foreach (var bag in bags)
+                {
+                    var citizen = new Citizen();
+                    citizen.Bag.IdBag = bagsId[bag.UserId];
+
+                    foreach (var item in bag.Objects)
+                    {
+                        var citizenItem = new CitizenItem()
+                        {
+                            Count = item.Count,
+                            IsBroken = item.IsBroken
+                        };
+                        citizenItem.Item.Id = item.Id;
+                        citizen.Bag.Items.Add(citizenItem);
+                    }
+                    citizens.Add(citizen);
+                }
+                MyHordesOptimizerRepository.PatchCitizenBags(townId, lastUpdateInfo, citizens);
+            }
+        }
+
+        public LastUpdateInfo UpdateBag(int townId, int userId, List<UpdateObjectDto> bag)
+        {
+            var bagId = MyHordesOptimizerRepository.GetCitizenBagId(townId, userId);
+            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            var citizen = new Citizen();
+            var citizens = new List<Citizen>()
+            {
+                citizen
+            };
+            citizen.Bag.IdBag = bagId;
+            foreach (var item in bag)
+            {
+                var citizenItem = new CitizenItem()
+                {
+                    Count = item.Count,
+                    IsBroken = item.IsBroken
+                };
+                citizenItem.Item.Id = item.Id;
+                citizen.Bag.Items.Add(citizenItem);
+            }
+            MyHordesOptimizerRepository.PatchCitizenBags(townId, lastUpdateInfo, citizens);
+            return lastUpdateInfo;
+        }
 
         #endregion
     }

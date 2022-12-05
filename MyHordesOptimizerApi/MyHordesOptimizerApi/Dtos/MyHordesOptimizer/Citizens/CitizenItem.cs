@@ -7,5 +7,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
         public Item Item { get; set; }
         public bool IsBroken { get; set; }
         public int Count { get; set; }
+
+        public CitizenItem()
+        {
+            Item = new Item();
+        }
     }
 }

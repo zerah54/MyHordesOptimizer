@@ -12,7 +12,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         IEnumerable<HeroSkill> GetHeroSkills();
         IEnumerable<ItemRecipe> GetRecipes();
         BankWrapper GetBank();
-        CitizensWrapper GetCitizens();
+        CitizensWrapper GetCitizens(int townId);
         IEnumerable<MyHordesOptimizerRuin> GetRuins();
     }
 }

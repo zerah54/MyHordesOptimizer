@@ -2,7 +2,7 @@
 
 namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
 {
-    public class TownCitizenItemCompletModel
+    public class TownCitizenBagItemCompletModel
     {
         public int IdItem { get; set; }
         public int IdCategory { get; set; }
@@ -42,8 +42,11 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
         public int LastUpdateInfoId { get; set; }
         public int LastUpdateInfoUserId { get; set; }
         public DateTime LastUpdateDateUpdate { get; set; }
-        public string LastUpdateInfoUserName { get; set; }
+        public string LastUpdateInfoUserName { get; set; } 
+        public DateTime BagLastUpdateDateUpdate { get; set; }
+        public string BagLastUpdateUserName { get; set; }
         public int ItemCount { get; set; }
         public bool IsBroken { get; set; }
+        public int? BagId { get; set; }
     }
 }

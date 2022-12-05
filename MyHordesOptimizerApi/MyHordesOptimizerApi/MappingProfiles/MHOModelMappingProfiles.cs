@@ -13,6 +13,7 @@ using MyHordesOptimizerApi.Models.Views.Items.Citizen;
 using MyHordesOptimizerApi.Models.Views.Items.Wishlist;
 using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -61,7 +62,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.DropRatePraf, opt => opt.MapFrom(src => src.DropRatePraf))
                 .ForMember(dest => dest.DropRateNotPraf, opt => opt.MapFrom(src => src.DropRateNotPraf));
 
-            CreateMap<TownCitizenItemCompletModel, Item>()
+            CreateMap<TownCitizenBagItemCompletModel, Item>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IdItem))
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.ItemImg))
                 .ForMember(dest => dest.Actions, opt => opt.Ignore())
@@ -79,11 +80,16 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.DropRatePraf, opt => opt.MapFrom(src => src.DropRatePraf))
                 .ForMember(dest => dest.DropRateNotPraf, opt => opt.MapFrom(src => src.DropRateNotPraf));
 
-            CreateMap<TownCitizenItemCompletModel, CitizenItem>()
+            CreateMap<TownCitizenBagItemCompletModel, CitizenItem>()
                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src))
                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.ItemCount));
-            
+
+            CreateMap<IEnumerable<TownCitizenBagItemCompletModel>, CitizenBag>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src))
+                .ForMember(dest => dest.LastUpdateDateUpdate, opt => opt.MapFrom(src => GetLastUpdateDateWithNullCheck(src)))
+                .ForMember(dest => dest.LastUpdateUserName, opt => opt.MapFrom(src => GetLastUpdateUserNameWithNullCheck(src)))
+                .ForMember(dest => dest.IdBag, opt => opt.MapFrom(src => GetBagIdWithNullCheck(src)));
 
             // Ruins
             CreateMap<MyHordesOptimizerRuin, RuinModel>()
@@ -153,7 +159,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.PositionX, opt => opt.MapFrom(src => src.X))
                 .ForMember(dest => dest.JobUID, opt => opt.MapFrom(src => src.JobName))
                 .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.JobName))
-                .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.IsGhost));
+                .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.IsGhost))
+                .ForMember(dest => dest.IdBag, opt => opt.Ignore());
 
             CreateMap<TownCitizenCompletModel, Citizen>()
                  .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CitizenName))
@@ -167,7 +174,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                  .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.CitizenPositionY))
                  .ForMember(dest => dest.Bag, opt => opt.Ignore());
 
-            CreateMap<TownCitizenItemCompletModel, Citizen>()
+            CreateMap<TownCitizenBagItemCompletModel, Citizen>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CitizenName))
                 .ForMember(dest => dest.NombreJourHero, opt => opt.Ignore())
                 .ForMember(dest => dest.Avatar, opt => opt.MapFrom(src => src.Avatar))
@@ -191,7 +198,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
 
-            CreateMap<TownCitizenItemCompletModel, LastUpdateInfo>()
+            CreateMap<TownCitizenBagItemCompletModel, LastUpdateInfo>()
                .ForMember(dest => dest.UserKey, opt => opt.Ignore())
                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
                .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
@@ -273,6 +280,46 @@ namespace MyHordesOptimizerApi.MappingProfiles
                  .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
                  .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
                  .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
+        }
+
+        private DateTime? GetLastUpdateDateWithNullCheck(IEnumerable<TownCitizenBagItemCompletModel> src)
+        {
+            var first = src.FirstOrDefault();
+            if (first != null)
+            {
+                return first.BagLastUpdateDateUpdate;
+            }
+            else
+            {
+
+                return null;
+            }
+        }
+        private string GetLastUpdateUserNameWithNullCheck(IEnumerable<TownCitizenBagItemCompletModel> src)
+        {
+            var first = src.FirstOrDefault();
+            if (first != null)
+            {
+                return first.LastUpdateInfoUserName;
+            }
+            else
+            {
+
+                return null;
+            }
+        }
+        private int? GetBagIdWithNullCheck(IEnumerable<TownCitizenBagItemCompletModel> src)
+        {
+            var first = src.FirstOrDefault();
+            if (first != null)
+            {
+                return first.BagId;
+            }
+            else
+            {
+
+                return null;
+            }
         }
 
         private string RemoveRandomNumber(string img)

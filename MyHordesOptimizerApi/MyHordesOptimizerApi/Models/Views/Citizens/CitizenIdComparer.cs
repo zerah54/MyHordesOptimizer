@@ -5,14 +5,14 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MyHordesOptimizerApi.Models.Views.Citizens
 {
-    public class CitizenIdComparer : IEqualityComparer<TownCitizenItemCompletModel>
+    public class CitizenIdComparer : IEqualityComparer<TownCitizenBagItemCompletModel>
     {
-        public bool Equals([AllowNull] TownCitizenItemCompletModel x, [AllowNull] TownCitizenItemCompletModel y)
+        public bool Equals([AllowNull] TownCitizenBagItemCompletModel x, [AllowNull] TownCitizenBagItemCompletModel y)
         {
             return x.CitizenId == y.CitizenId;
         }
 
-        public int GetHashCode([DisallowNull] TownCitizenItemCompletModel obj)
+        public int GetHashCode([DisallowNull] TownCitizenBagItemCompletModel obj)
         {
             return obj.CitizenId.GetHashCode();
         }

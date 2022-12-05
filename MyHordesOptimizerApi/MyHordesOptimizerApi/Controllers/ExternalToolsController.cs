@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
 using MyHordesOptimizerApi.Extensions;
@@ -10,6 +11,7 @@ using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Controllers
 {
@@ -28,7 +30,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Update")]
-        public ActionResult<UpdateResponseDto> UpdateExternalsTools(string userKey, int userId, [FromBody] UpdateRequestDto updateRequestDto)
+        public async Task<ActionResult<UpdateResponseDto>> UpdateExternalsTools(string userKey, int userId, [FromBody] UpdateRequestDto updateRequestDto)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
@@ -37,6 +39,10 @@ namespace MyHordesOptimizerApi.Controllers
             if (updateRequestDto == null)
             {
                 return BadRequest($"{nameof(updateRequestDto)} cannot be null");
+            }
+            if (updateRequestDto.TownDetails==null || updateRequestDto.TownDetails.TownId == 0)
+            {
+                return BadRequest($"{nameof(updateRequestDto.TownDetails)} cannot be empty");
             }
             var bbh = updateRequestDto.Tools.IsBigBrothHordes;
             var fata = updateRequestDto.Tools.IsFataMorgana;
@@ -51,7 +57,7 @@ namespace MyHordesOptimizerApi.Controllers
 
             UserKeyProvider.UserKey = userKey;
             UserKeyProvider.UserId = userId;
-            var response = ExternalToolsService.UpdateExternalsTools(updateRequestDto);
+            var response = await ExternalToolsService.UpdateExternalsTools(updateRequestDto);
             return Ok(response);
         }
 
@@ -75,11 +81,11 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Bag")]
-        public ActionResult UpdateCitizenBag([FromQuery] int townId, [FromQuery] int userId, [FromBody] List<UpdateObjectDto> bag)
+        public ActionResult<LastUpdateInfo> UpdateCitizenBag([FromQuery] int townId, [FromQuery] int userId, [FromBody] List<UpdateObjectDto> bag)
         {
             UserKeyProvider.UserId = userId;
-            ExternalToolsService.UpdateBag(townId, userId, bag);
-            return Ok();
+            var lastUpdateInfo = ExternalToolsService.UpdateBag(townId, userId, bag);
+            return Ok(lastUpdateInfo);
         }
     }
 }
