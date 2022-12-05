@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
 import { SharedModule } from '../shared/shared.module';
-import { DespairDeathsComponent } from './despair-deaths/despair-deaths.component';
-import { DespairDeathsPipe } from './despair-deaths/despair-deaths.pipe';
 import { HeroSkillsComponent } from './hero-skills/hero-skills.component';
 import { ItemsComponent } from './items/items.component';
+import { MiscellaneousInfoComponent } from './miscellaneous-info/miscellaneous-info.component';
+import { DespairDeathsPipe } from './miscellaneous-info/miscellaneous-info.pipe';
 import { RecipesComponent } from './recipes/recipes.component';
 import { RuinsComponent } from './ruins/ruins.component';
 import { WikiComponent } from './wiki.component';
 import { WikiRoutingModule } from './wiki.routing.module';
 
-let components: any[] = [WikiComponent, HeroSkillsComponent, ItemsComponent, RecipesComponent, RuinsComponent, DespairDeathsComponent];
+let components: any[] = [WikiComponent, HeroSkillsComponent, ItemsComponent, RecipesComponent, RuinsComponent, MiscellaneousInfoComponent];
 let local_components: any[] = [DespairDeathsPipe];
 
 @NgModule({

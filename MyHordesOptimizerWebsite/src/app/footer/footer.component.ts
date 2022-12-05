@@ -22,6 +22,14 @@ export class FooterComponent {
         { code: 'de', label: 'Deutsch' }
     ];
 
+    public themes: Theme[] = [
+        {label: $localize`Par défaut`, class: ''},
+        {label: $localize`Rose`, class: 'pink'},
+    ]
+
+    public selected_theme: Theme | undefined = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'))
+    || this.themes.find((theme: Theme) => theme.class === '');
+
     /** La langue sélectionnée pour l'affichage de l'application */
     public site_language: Language | undefined;
 
@@ -55,10 +63,21 @@ export class FooterComponent {
             minWidth: '250px',
         });
     }
+
+
+    public changeTheme(theme: Theme): void {
+        localStorage.setItem('theme', theme.class);
+        location.reload();
+    }
 }
 
 interface Language {
     code: string;
     label: string;
     default?: boolean;
+}
+
+interface Theme {
+    label: string;
+    class: string;
 }

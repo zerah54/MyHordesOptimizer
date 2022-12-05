@@ -1,12 +1,38 @@
 .mho-citizens {
     table {
         width: 100%;
-        tr {
-            > td.center {
-                text-align: center;
 
-                > img {
-                    margin-right: 1em;
+        tr {
+
+            >td {
+                padding: 0 0.5em;
+
+                &.avatar {
+                    >img {
+                        width: 100px;
+                        height: 100px;
+                    }
+                }
+
+                .bag-container {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 0.5em;
+
+                    .bag {
+                        display: flex;
+                        gap: 0.25em;
+                        align-items: center;
+                    }
+
+                    .add-remove {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5em;
+                        > img {
+                            cursor: pointer;
+                        }
+                    }
                 }
             }
         }
@@ -14,6 +40,22 @@
         .table-filters {
             display: flex;
             justify-content: space-between;
+        }
+    }
+}
+
+
+
+.menu-add, .menu-remove {
+    .mat-menu-content {
+        padding: 8px;
+        .items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25em;
+            > img {
+                cursor: pointer;
+            }
         }
     }
 }

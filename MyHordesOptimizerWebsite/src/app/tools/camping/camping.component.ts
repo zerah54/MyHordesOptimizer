@@ -1,7 +1,7 @@
 import { Clipboard } from '@angular/cdk/clipboard';
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import * as moment from 'moment';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
@@ -25,7 +25,7 @@ export class CampingComponent implements OnInit {
         { id: 'pande', label: $localize`Pandémonium` }
     ]
 
-    public configuration_form!: FormGroup;
+    public configuration_form!: UntypedFormGroup;
     public camping_result: CampingResult = {
         label: '',
         probability: 0
@@ -222,7 +222,7 @@ export class CampingComponent implements OnInit {
     };
 
 
-    constructor(private api: ApiServices, private fb: FormBuilder, private route: ActivatedRoute, private clipboard: Clipboard, private router: Router,
+    constructor(private api: ApiServices, private fb: UntypedFormBuilder, private route: ActivatedRoute, private clipboard: Clipboard, private router: Router,
         private activated_route: ActivatedRoute, private location: Location) {
     }
 

@@ -20,7 +20,7 @@ export class WikiComponent extends PageWithSidenav implements OnInit {
         { label: $localize`Recettes`, id: 'recipes'},
         { label: $localize`Pouvoirs`, id: 'hero-skills'},
         { label: $localize`Bâtiments`, id: 'ruins'},
-        { label: $localize`Morts par désespoir`, id: 'despair-deaths'}
+        { label: $localize`Informations diverses`, id: 'miscellaneous-info'}
     ]
 
     constructor(public media: MediaObserver, private sidenav: SidenavService) {

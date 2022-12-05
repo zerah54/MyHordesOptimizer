@@ -33,7 +33,8 @@
                             "src/assets/img"
                         ],
                         "styles": [
-                            "src/styles.scss"
+                            "src/styles.scss",
+                            "src/assets/scss/material-theme/theming.scss"
                         ],
                         "stylePreprocessorOptions": {
                             "includePaths": [
@@ -127,6 +128,5 @@
                 }
             }
         }
-    },
-    "defaultProject": "MyHordesOptimizerWebsite"
+    }
 }

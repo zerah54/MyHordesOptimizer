@@ -29,12 +29,12 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
 
     protected dtoToModel(dto?: TownDetailsDTO): void {
         if (dto) {
-            this.town_id = this.town_id;
-            this.town_x = this.town_x;
-            this.town_y = this.town_y;
-            this.town_max_x = this.town_max_x;
-            this.town_max_y = this.town_max_y;
-            this.is_devaste = this.is_devaste;
+            this.town_id = dto.townId;
+            this.town_x = dto.townX;
+            this.town_y = dto.townY;
+            this.town_max_x = dto.townMaxX;
+            this.town_max_y = dto.townMaxY;
+            this.is_devaste = dto.isDevaste;
         }
     };
 }

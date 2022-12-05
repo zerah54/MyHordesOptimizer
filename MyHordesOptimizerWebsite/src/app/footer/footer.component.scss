@@ -5,11 +5,11 @@
     overflow-y: hidden;
 
     .mat-toolbar-row {
-        height: 24px;
-        font-size: 12px;
-        font-weight: normal;
-        overflow-x: hidden;
-        overflow-x: visible;
+        height: 24px !important;
+        font-size: 12px !important;
+        font-weight: normal !important;
+        overflow-x: hidden !important;
+        overflow-x: visible !important;
         &:first-child {
             margin-top: auto;
         }

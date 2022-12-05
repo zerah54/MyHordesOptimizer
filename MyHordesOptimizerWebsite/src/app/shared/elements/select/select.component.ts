@@ -1,6 +1,6 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { Component, ElementRef, HostBinding, Input, OnDestroy, Optional, Output, Self, ViewChild, EventEmitter } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, FormControl, NgControl, ValidationErrors, Validator, Validators } from '@angular/forms';
+import { AbstractControl, ControlValueAccessor, UntypedFormControl, NgControl, ValidationErrors, Validator, Validators } from '@angular/forms';
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSelect } from '@angular/material/select';
@@ -35,7 +35,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     @Input() bindLabel!: string;
     @Input() emptyOption: boolean = false;
     //current form control input. helpful in validating and accessing form control
-    @Input() form_control: AbstractControl = new FormControl();
+    @Input() form_control: AbstractControl = new UntypedFormControl();
 
 
     @Input() set options(options: (T | string)[]) {
