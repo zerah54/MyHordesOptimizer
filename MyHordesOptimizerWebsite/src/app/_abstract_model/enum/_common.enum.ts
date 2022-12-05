@@ -1,3 +1,5 @@
+import { environment } from "src/environments/environment";
+
 export abstract class CommonEnum {
 
     /**
@@ -14,7 +16,9 @@ export abstract class CommonEnum {
         if (property_descriptor) {
             return property_descriptor.value.valueOf();
         } else {
-            console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);
+            if (!environment.production) {
+                console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);
+            }
             return undefined;
         }
     }

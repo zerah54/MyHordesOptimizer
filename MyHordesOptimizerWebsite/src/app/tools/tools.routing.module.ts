@@ -23,5 +23,5 @@ let routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule]
 })
-export class WikiRoutingModule {
+export class ToolsRoutingModule {
 }

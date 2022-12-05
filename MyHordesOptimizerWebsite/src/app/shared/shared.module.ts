@@ -9,7 +9,6 @@ import { ApiServices } from './../_abstract_model/services/api.services';
 import { ElementsModule } from './elements/elements.module';
 import { MaterialModule } from './material-modules.module';
 import { LoadingOverlayService } from './services/loading-overlay.service';
-import { SidenavService } from './services/sidenav.service';
 import { SnackbarService } from './services/snackbar.service';
 
 let custom_modules: any[] = [MaterialModule, ElementsModule];
@@ -27,7 +26,7 @@ let custom_components: any[] = [PageWithSidenav];
         ...custom_components
     ],
     declarations: custom_components,
-    providers: [ApiServices, LoadingOverlayService, SnackbarService, SidenavService]
+    providers: [ApiServices, LoadingOverlayService, SnackbarService]
 })
 
 export class SharedModule {

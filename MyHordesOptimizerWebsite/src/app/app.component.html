@@ -1,17 +1,18 @@
-<div [ngClass]="['mho-main', theme]" style="height: 100vh; width: 100vw;">
-    <mho-navbar #navbar></mho-navbar>
-    <div #content class="mho-content"
-        [style.height]="'calc(100% - ' + (navbar?.mat_toolbar?._elementRef?.nativeElement.clientHeight || 0) + 'px)'">
-        <div
-            [ngStyle]="{'min-height': 'calc(' + content.clientHeight + 'px - ' + footer?.mat_toolbar?._elementRef?.nativeElement.clientHeight + 'px)'}">
-            <router-outlet></router-outlet>
-            <button *ngIf="false" mat-mini-fab style="position: absolute; bottom: 80px; right: 1em; z-index: 1000"
-                (click)="updateExternalTools()">
-                <mat-icon>upload</mat-icon>
-            </button>
-        </div>
+<div [ngClass]="['mho-main', theme]">
+    <mho-header #header (changeSidenavStatus)="sidenav.toggle()"></mho-header>
+
+    <mat-sidenav-container class="mho-container">
+        <mat-sidenav #sidenav [mode]="media.isActive('gt-xs') ? 'side' : 'over'" [opened]="media.isActive('gt-xs')">
+            <mho-menu></mho-menu>
+        </mat-sidenav>
+        <mat-sidenav-content class="mho-content">
+            <mat-card>
+                <router-outlet></router-outlet>
+            </mat-card>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+
     <mho-footer #footer></mho-footer>
-    </div>
     <ng-container *ngIf="loading_service.is_loading_obs | async">
         <div class="mho-loading">
             <mat-spinner [color]="'accent'"></mat-spinner>

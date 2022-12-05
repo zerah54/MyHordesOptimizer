@@ -1,4 +1,4 @@
-import { ItemCountDTO } from "./item-count.dto";
+import { BagDTO } from "./bag.dto";
 
 export interface CitizenDTO {
     avatar: string;
@@ -10,5 +10,5 @@ export interface CitizenDTO {
     nombreJourHero: number;
     x: number;
     y: number;
-    bag: ItemCountDTO[];
+    bag: BagDTO;
 };

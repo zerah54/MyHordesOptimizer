@@ -1,14 +1,11 @@
 {
     "hosting": {
+        "site": "myhordes-optimizer",
         "public": "dist/my-hordes-optimizer-website",
         "ignore": [
             "firebase.json",
             "**/.*",
             "**/node_modules/**"
-        ],
-        "rewrites": [ {
-            "source": "**",
-            "destination": "/index.html"
-          } ]
+        ]
     }
 }

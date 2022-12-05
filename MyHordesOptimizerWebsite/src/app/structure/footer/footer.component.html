@@ -1,0 +1,22 @@
+<mat-toolbar class="mho-footer" color="primary">
+    <mat-toolbar-row>
+        <div>
+            <ng-container i18n>Développé par&nbsp;<a color="accent" href="https://myhordes.eu/jx/soul/6042">Zerah</a> et <a color="accent" href="https://myhordes.eu/jx/soul/6173">Renack</a></ng-container>
+            <ng-container *ngTemplateOutlet="spacer"></ng-container>
+            <a color="accent" href="https://discord.gg/ZQH7ZPWcCm" i18n>Discord</a>
+            <ng-container *ngTemplateOutlet="spacer"></ng-container>
+            <a color="accent" (click)="openThanks()" i18n>Remerciements</a>
+        </div>
+    </mat-toolbar-row>
+    <mat-toolbar-row>
+        <div>
+            <ng-container i18n>Ce site n'est pas affilié à&nbsp;<a color="accent" href="https://motion-twin.com/fr/" target="_blank">Motion Twin</a>&nbsp;ou à&nbsp;<a color="accent" href="https://myhord.es" target="_blank">MyHordes</a></ng-container>
+            <ng-container *ngTemplateOutlet="spacer"></ng-container>
+            <ng-container i18n>Certains éléments graphiques appartiennent à&nbsp;<a color="accent" href="https://motion-twin.com/fr/" target="_blank">Motion Twin</a>&nbsp;ou à&nbsp;<a color="accent" href="https://myhord.es" target="_blank">MyHordes</a></ng-container>
+        </div>
+    </mat-toolbar-row>
+</mat-toolbar>
+
+<ng-template #spacer>
+    <span style="margin-left: 1em; margin-right: 1em;">-</span>
+</ng-template>

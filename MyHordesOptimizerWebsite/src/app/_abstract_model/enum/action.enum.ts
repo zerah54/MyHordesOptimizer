@@ -1,3 +1,4 @@
+import { environment } from "src/environments/environment";
 import { CommonEnum, CommonEnumData } from "./_common.enum";
 
 
@@ -62,9 +63,9 @@ export class Action extends CommonEnum {
         const elements: T[] = <T[]>this.getAllValues<CommonEnum>();
         const element: T | undefined = elements.find((_element: T) => _element.key === key)
         if (!element) {
-            // if (key !== null) {// TODO TEMPORAIRE
+            if (!environment.production) {
                 console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);
-            // }
+            }
             return;
         } else {
             return element;
