@@ -24,7 +24,7 @@ body {
     .mat-list-item {
         text-decoration: none;
         &.link-selected {
-            color: $accent;
+            color: $accent !important;
         }
     }
 }

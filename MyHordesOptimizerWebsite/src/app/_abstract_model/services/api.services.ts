@@ -28,8 +28,8 @@ import { WishlistInfo } from './../types/wishlist-info.class';
 import { WishlistItem } from './../types/wishlist-item.class';
 import { GlobalServices } from './global.services';
 
-// const API_URL_2: string = 'https://api.myhordesoptimizer.fr';
-const API_URL: string = 'https://myhordesoptimizerapi.azurewebsites.net';
+const API_URL: string = 'https://api.myhordesoptimizer.fr';
+const API_URL_2: string = 'https://myhordesoptimizerapi.azurewebsites.net';
 
 @Injectable()
 export class ApiServices extends GlobalServices {

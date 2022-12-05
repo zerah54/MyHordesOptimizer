@@ -1,0 +1,18 @@
+@use "@angular/material" as mat;
+
+@import "default-theme";
+@import "pink-theme";
+
+@include mat.core();
+
+@include mat.all-component-themes($default-theme);
+/* .mat-drawer-container, */ .cdk-overlay-container, .mho-main {
+  &:not(.pink) {
+    @include default-theme($default-theme);
+  }
+
+  &.pink {
+    @include mat.all-component-themes($pink-theme);
+    @include pink-theme($pink-theme);
+  }
+}

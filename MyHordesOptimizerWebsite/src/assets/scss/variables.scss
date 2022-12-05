@@ -1,11 +1,7 @@
-@use 'sass:map';
-@use '@angular/material' as mat;
+$primary: var(--primary);
+$accent: var(--accent);
+$warn: var(--warn);
 
-@import 'material-theme/material-theme.scss';
-
-$color-config: mat.get-color-config($theme);
-$primary: mat.get-color-from-palette(map.get($color-config, 'primary'));
-$accent: mat.get-color-from-palette(map.get($color-config, 'accent'));
-$warn: mat.get-color-from-palette(map.get($color-config, 'warn'));
-$is-dark-theme: map.get($color-config, 'is-dark');
-$sidenav_bg_color: mat.get-color-from-palette(map.get($color-config, 'primary'), 'lighter');
+$footer-color: var(--footer-color);
+$sidenav_bg_color: var(--sidenav-bg-color);
+$item_color: var(--item-color);

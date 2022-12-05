@@ -113,15 +113,21 @@
                 
             <context-group purpose="location"><context context-type="sourcefile">src/app/footer/footer.component.html</context><context context-type="linenumber">8</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/thanks/thanks.component.html</context><context context-type="linenumber">4</context></context-group></trans-unit><trans-unit id="5186837657495593523" datatype="html">
         <source>Ce site n'est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> ou à <x id="START_LINK_1" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></source><target state="new">Ce site n'est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> ou à <x id="START_LINK_1" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/footer/footer.component.html</context>
-          <context context-type="linenumber">28</context>
-        </context-group>
-      </trans-unit><trans-unit id="239352375316430833" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/footer/footer.component.html</context><context context-type="linenumber">45</context></context-group></trans-unit><trans-unit id="239352375316430833" datatype="html">
         <source>Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> ou à <x id="START_LINK_1" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></source><target state="new">Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> ou à <x id="START_LINK_1" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/footer/footer.component.html</context><context context-type="linenumber">47</context></context-group></trans-unit><trans-unit id="1687689412386216543" datatype="html">
+        <source>Par défaut</source><target state="new">Par défaut</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/footer/footer.component.html</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="sourcefile">src/app/footer/footer.component.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit><trans-unit id="5786363460327756403" datatype="html">
+        <source>Rose</source><target state="new">Rose</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/footer/footer.component.ts</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit><trans-unit id="4322254668478976610" datatype="html">
         <source>Identifiant d'app externe</source><target state="new">Identifiant d'app externe</target>
@@ -695,23 +701,33 @@
           <context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">60</context>
         </context-group>
-      </trans-unit><trans-unit id="757106111800013949" datatype="html">
-        <source>Tableau des morts par désespoir</source><target state="new">Tableau des morts par désespoir</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/despair-deaths/despair-deaths.component.html</context>
-          <context context-type="linenumber">4</context>
-        </context-group>
       </trans-unit><trans-unit id="5956852334684853126" datatype="html">
         <source>Zombies morts sur la case depuis la dernière attaque</source><target state="new">Zombies morts sur la case depuis la dernière attaque</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/despair-deaths/despair-deaths.component.ts</context>
-          <context context-type="linenumber">13</context>
-        </context-group>
-      </trans-unit><trans-unit id="4971475201644632296" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context><context context-type="linenumber">13</context></context-group></trans-unit><trans-unit id="4971475201644632296" datatype="html">
         <source>Zombies qui vont mourir par désespoir</source><target state="new">Zombies qui vont mourir par désespoir</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context><context context-type="linenumber">14</context></context-group></trans-unit><trans-unit id="4662161850057541821" datatype="html">
+        <source>Nombre de jours validés</source><target state="new">Nombre de jours validés</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/despair-deaths/despair-deaths.component.ts</context>
-          <context context-type="linenumber">14</context>
+          <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit><trans-unit id="5965127672037869671" datatype="html">
+        <source>Nombre de points d'âmes gagnés</source><target state="new">Nombre de points d'âmes gagnés</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit><trans-unit id="5647002638062965583" datatype="html">
+        <source>Nombre de points clean gagnés</source><target state="new">Nombre de points clean gagnés</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit><trans-unit id="7031255060364978694" datatype="html">
         <source>Jours héros nécessaires</source><target state="new">Jours héros nécessaires</target>
@@ -735,7 +751,17 @@
                 <target state="new">Objets</target>
                 
                 
-            <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/items/items.component.html</context><context context-type="linenumber">4</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context><context context-type="linenumber">32</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/wiki.component.ts</context><context context-type="linenumber">19</context></context-group></trans-unit>
+            <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/items/items.component.html</context><context context-type="linenumber">4</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context><context context-type="linenumber">32</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/wiki.component.ts</context><context context-type="linenumber">19</context></context-group></trans-unit><trans-unit id="3057503085450181091" datatype="html">
+        <source>Informations diverses</source><target state="new">Informations diverses</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/wiki.component.ts</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
             <trans-unit id="530325689928281558" datatype="html">
                 <source>Recettes</source>
                 <target state="new">Recettes</target>
@@ -779,9 +805,18 @@
         </context-group>
       </trans-unit><trans-unit id="6606510916077285969" datatype="html">
         <source>Morts par désespoir</source><target state="new">Morts par désespoir</target>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.html</context><context context-type="linenumber">12</context></context-group></trans-unit><trans-unit id="1275317502767727996" datatype="html">
+        <source>Points d'âme</source><target state="new">Points d'âme</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/wiki.component.ts</context>
-          <context context-type="linenumber">23</context>
+          <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit><trans-unit id="4453660283289554845" datatype="html">
+        <source>Points clean</source><target state="new">Points clean</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.html</context>
+          <context context-type="linenumber">48</context>
         </context-group>
       </trans-unit>
         </body>
