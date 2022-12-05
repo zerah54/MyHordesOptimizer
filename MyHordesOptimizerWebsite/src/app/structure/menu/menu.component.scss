@@ -1,0 +1,36 @@
+@import "variables.scss";
+
+.app-menu {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 200px;
+}
+
+.mat-list-item:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.mat-list-item {
+    text-decoration: none;
+
+    &.link-selected {
+        color: $primary !important;
+    }
+
+    &.lvl-1 {
+        padding-left: 1em;
+        width: calc(100% - 1em);
+    }
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+
+    button {
+        text-align: left;
+    }
+}

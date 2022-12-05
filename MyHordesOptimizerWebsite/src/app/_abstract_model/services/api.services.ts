@@ -2,18 +2,21 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
-import { getExternalAppId, getTown, getUserId, setTown, setUserId } from 'src/app/shared/utilities/localstorage.util';
+import { getExternalAppId, getTown, getUserId, setTown, setUser } from 'src/app/shared/utilities/localstorage.util';
 import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { ItemDTO } from '../dto/item.dto';
 import { MeDTO } from '../dto/me.dto';
 import { RecipeDTO } from '../dto/recipe.dto';
+import { UpdateInfoDTO } from '../dto/update-info.dto';
 import { Citizen } from '../types/citizen.class';
 import { HeroSkill } from '../types/hero-skill.class';
 import { ItemCount } from '../types/item-count.class';
+import { Me } from '../types/me.class';
 import { Recipe } from '../types/recipe.class';
 import { Ruin } from '../types/ruin.class';
 import { TownDetails } from '../types/town-details.class';
+import { UpdateInfo } from '../types/update-info.class';
 import { dtoToModelArray } from '../types/_common.class';
 import { ToolsToUpdate } from '../types/_types';
 import { SnackbarService } from './../../shared/services/snackbar.service';
@@ -61,7 +64,7 @@ export class ApiServices extends GlobalServices {
     public getMe(): void {
         super.get<MeDTO>(API_URL + '/myhordesfetcher/me?userKey=' + getExternalAppId())
             .subscribe((response: HttpResponse<MeDTO | null>) => {
-                setUserId(response.body ? response.body.id : null);
+                setUser(response.body ? new Me(response.body) : null);
                 setTown(response.body ? new TownDetails(response.body.townDetails) : null);
             })
     }
@@ -105,7 +108,7 @@ export class ApiServices extends GlobalServices {
      */
     public getWishlist(): Observable<WishlistInfo> {
         return new Observable((sub: Subscriber<WishlistInfo>) => {
-            super.get<WishlistInfoDTO>(API_URL + `/wishlist?townId=${getTown()?.town_id}` )
+            super.get<WishlistInfoDTO>(API_URL + `/wishlist?townId=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         sub.next(new WishlistInfo(response.body));
@@ -219,7 +222,7 @@ export class ApiServices extends GlobalServices {
      */
     public getCitizens(): Observable<CitizenInfo> {
         return new Observable((sub: Subscriber<CitizenInfo>) => {
-            super.get<CitizenInfoDTO>(API_URL + `/myhordesfetcher/citizens?userKey=${getExternalAppId()}`)
+            super.get<CitizenInfoDTO>(API_URL + `/myhordesfetcher/citizens?townId=${getTown()?.town_id}&userId=${getUserId()}`)
                 .subscribe({
                     next: (response: HttpResponse<CitizenInfoDTO>) => {
                         sub.next(new CitizenInfo(response.body));
@@ -244,12 +247,12 @@ export class ApiServices extends GlobalServices {
         })
     }
 
-    public updateBag(citizen: Citizen) {
-        return new Observable((sub: Subscriber<string>) => {
-            super.post<void>(API_URL + `/ExternalTools/Bag?townId=${getTown()?.town_id}&userId=${citizen.id}`, JSON.stringify(citizen.bag.map((item: ItemCount) => item.toShortItemCount())))
+    public updateBag(citizen: Citizen): Observable<UpdateInfo> {
+        return new Observable((sub: Subscriber<UpdateInfo>) => {
+            super.post<UpdateInfoDTO>(API_URL + `/ExternalTools/Bag?townId=${getTown()?.town_id}&userId=${citizen.id}`, JSON.stringify(citizen.bag.items.map((item: ItemCount) => item.toShortItemCount())))
                 .subscribe({
-                    next: () => {
-                        sub.next();
+                    next: (response: UpdateInfoDTO) => {
+                        sub.next(new UpdateInfo(response));
                     }
                 })
         })

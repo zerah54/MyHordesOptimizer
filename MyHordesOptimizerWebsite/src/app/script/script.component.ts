@@ -2,30 +2,21 @@ import { AfterViewInit, Component, ElementRef, OnInit } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { skip } from 'rxjs';
 import { PageWithSidenav } from './../shared/page-with-sidenav/page-with-sidenav.component';
-import { SidenavService } from './../shared/services/sidenav.service';
 
 @Component({
     selector: 'mho-script',
     templateUrl: './script.component.html',
     styleUrls: ['./script.component.scss']
 })
-export class ScriptComponent extends PageWithSidenav implements OnInit, AfterViewInit {
+export class ScriptComponent extends PageWithSidenav implements AfterViewInit {
     /** L'état d'ouverture de la sidenav */
     public opened_sidenav: boolean = this.media.isActive('gt-xs');
 
     /** Le sommaire de la page */
     public titles: Title[] = [];
 
-    constructor(public media: MediaObserver, private sidenav: SidenavService, private element: ElementRef) {
+    constructor(public media: MediaObserver, private element: ElementRef) {
         super();
-    }
-
-    public ngOnInit(): void {
-        this.sidenav.toggle_sidenav_obs
-            .pipe(skip(1))
-            .subscribe(() => {
-                this.opened_sidenav = !this.opened_sidenav;
-            })
     }
 
     public override ngAfterViewInit(): void {

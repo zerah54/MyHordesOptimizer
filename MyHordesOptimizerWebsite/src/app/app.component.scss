@@ -1,11 +1,4 @@
-.mho-content {
-    overflow: auto;
-    > div {
-        > :last-child > div {
-            background-color: red;
-        }
-    }
-}
+@import "variables.scss";
 
 .mho-loading {
     position: absolute;
@@ -19,5 +12,39 @@
 
     .mat-spinner {
         margin: auto;
+    }
+}
+
+.mho-main {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: $sidenav_bg_color;
+
+    .mho-container {
+        flex: 1;
+        overflow: hidden;
+        background-color: $sidenav_bg_color !important;
+
+        .mat-sidenav,
+        .mho-content {
+            background-color: $sidenav_bg_color;
+            border-width: 0;
+        }
+
+        .mho-content {
+            overflow: hidden;
+
+            .mat-card {
+                overflow: hidden;
+                margin: 0.5em;
+                height: calc(100% - 32px - 1em);
+
+                .mat-card-content {
+                    overflow: auto;
+                    height: calc(100% - 32px);
+                }
+            }
+        }
     }
 }

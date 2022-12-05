@@ -6,10 +6,9 @@ import { MiscellaneousInfoComponent } from './miscellaneous-info/miscellaneous-i
 import { DespairDeathsPipe } from './miscellaneous-info/miscellaneous-info.pipe';
 import { RecipesComponent } from './recipes/recipes.component';
 import { RuinsComponent } from './ruins/ruins.component';
-import { WikiComponent } from './wiki.component';
 import { WikiRoutingModule } from './wiki.routing.module';
 
-let components: any[] = [WikiComponent, HeroSkillsComponent, ItemsComponent, RecipesComponent, RuinsComponent, MiscellaneousInfoComponent];
+let components: any[] = [HeroSkillsComponent, ItemsComponent, RecipesComponent, RuinsComponent, MiscellaneousInfoComponent];
 let local_components: any[] = [DespairDeathsPipe];
 
 @NgModule({

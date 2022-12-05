@@ -1,18 +1,19 @@
-import { Component, EventEmitter, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Title } from '@angular/platform-browser';
 import { getExternalAppId, setExternalAppId } from 'src/app/shared/utilities/localstorage.util';
-import { SidenavService } from './../shared/services/sidenav.service';
-import { ApiServices } from './../_abstract_model/services/api.services';
+import { ApiServices } from '../../_abstract_model/services/api.services';
 
 @Component({
-    selector: 'mho-navbar',
-    templateUrl: './navbar.component.html',
-    styleUrls: ['./navbar.component.scss']
+    selector: 'mho-header',
+    templateUrl: './header.component.html',
+    styleUrls: ['./header.component.scss']
 })
-export class NavbarComponent {
+export class HeaderComponent {
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
+
+    @Output() changeSidenavStatus: EventEmitter<void> = new EventEmitter();
 
     /** Le titre de l'application */
     public title: string = '';
@@ -22,17 +23,7 @@ export class NavbarComponent {
     /** L'idendifiant d'app externe si il existe */
     public saved_external_app_id: string | null = getExternalAppId();
 
-    /** Informe d'un clic sur le bouton d'ouverture / fermeture de la sidenav */
-    public toggle_sidenav_event: EventEmitter<void> = new EventEmitter();
-
-    /** La liste des onglets à afficher */
-    public tabs: Tabs[] = [
-        { label: $localize`Script`, url: 'script' },
-        { label: $localize`Outils`, url: 'tools' },
-        { label: $localize`Wiki`, url: 'wiki' }
-    ]
-
-    public constructor(public media: MediaObserver, public sidenav: SidenavService, private title_service: Title, private api: ApiServices) {
+    public constructor(public media: MediaObserver, private title_service: Title, private api: ApiServices) {
         this.title = this.title_service.getTitle();
     }
 
@@ -47,10 +38,4 @@ export class NavbarComponent {
     public updateExternalTools() {
         this.api.updateExternalTools();
     }
-}
-
-/** Les informations d'un onglet */
-interface Tabs {
-    label: string;
-    url: string;
 }

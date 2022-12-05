@@ -1,36 +1,45 @@
 @import "variables.scss";
 
 .mho-script {
-    .sidenav {
-        .mat-list-item:hover {
-            background-color: rgba(0, 0, 0, 0.2);
-        }
+    display: flex;
+    gap: 1em;
 
-        @for $i from 1 through 5 {
-            $base: 16px;
-            $padding: calc(($i - 1) * $base);
-            .level-#{$i} {
-                text-decoration: none;
-                padding-left: $padding;
-                width: calc(100% - $padding);
-            }
+    .mat-list-item:hover {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    @for $i from 1 through 5 {
+        $base: 16px;
+        $padding: calc(($i - 1) * $base);
+
+        .level-#{$i} {
+            text-decoration: none;
+            padding-left: $padding;
+            width: calc(100% - $padding);
         }
     }
 
-    .sidenav-content {
-        .mat-card {
-            overflow: auto;
+    @for $i from 1 through 5 {
+        h#{$i} {
+            scroll-margin: 100px;
         }
-        @for $i from 1 through 5 {
-            h#{$i} {
-                scroll-margin: 100px;
-            }
-        }
+    }
 
-        ul {
-            li {
-                list-style: none;
-            }
+    ul {
+        li {
+            list-style: none;
+        }
+    }
+
+    .summary {
+        padding: 0;
+        margin: 3em auto auto;
+        border: 1px solid $item_color;
+        border-radius: 0.5em;
+        min-width: 225px;
+
+        .title, .title:hover {
+            background-color: $item_color;
         }
     }
 }

@@ -4,11 +4,6 @@ export interface ToolsToUpdate {
     isGestHordes: 'none' | 'cell' | 'api';
 };
 
-export interface SidenavLinks {
-    label: string;
-    id: string;
-}
-
 export type I18nLabels = Dictionary<string>;
 
 export interface Dictionary<T> {

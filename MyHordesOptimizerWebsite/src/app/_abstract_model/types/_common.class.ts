@@ -22,7 +22,7 @@ export function modelArrayToDictionnary<DTO, MODEL extends CommonModel<DTO>>(mod
     let items: Dictionary<DTO> = <Dictionary<DTO>><unknown>[];
     models.forEach((model_item: MODEL) => {
         let key_parts: string[] = key.split('.');
-        let item_key: any = model_item; 
+        let item_key: any = model_item;
         key_parts.forEach((key_part: string) => {
             item_key = item_key[<any>key_part];
         })

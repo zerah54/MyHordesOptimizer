@@ -2,10 +2,12 @@ import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/co
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
+import { getUser } from 'src/app/shared/utilities/localstorage.util';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { ItemCount } from 'src/app/_abstract_model/types/item-count.class';
 import { Item } from 'src/app/_abstract_model/types/item.class';
+import { UpdateInfo } from 'src/app/_abstract_model/types/update-info.class';
 import { CitizenInfo } from './../../_abstract_model/types/citizen-info.class';
 import { Citizen } from './../../_abstract_model/types/citizen.class';
 
@@ -68,18 +70,21 @@ export class CitizensComponent {
     public addItem(citizen_id: number, item_id: number): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen) {
-            const item_in_datasource: ItemCount | undefined = citizen.bag.find((item_in_bag: ItemCount) => item_in_bag.item.id === item_id);
+            const item_in_datasource: ItemCount | undefined = citizen.bag.items.find((item_in_bag: ItemCount) => item_in_bag.item.id === item_id);
             if (item_in_datasource) {
                 item_in_datasource.count += 1;
             } else {
-                citizen.bag.push(new ItemCount({
+                citizen.bag.items.push(new ItemCount({
                     count: 1,
                     isBroken: false,
                     item: (<Item>this.all_items.find((item: Item) => item.id === item_id)).modelToDto()
                 }))
             }
 
-            this.api.updateBag(citizen).subscribe();
+            this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
+                citizen.bag.last_update_user_name = getUser().username;
+                citizen.bag.last_update_date_update = update_info.update_time;
+            });
         }
     }
 
@@ -93,14 +98,17 @@ export class CitizensComponent {
     public removeItem(citizen_id: number, item_id: number): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen) {
-            const item_in_datasource_index: number | undefined = citizen.bag.findIndex((item_in_bag: ItemCount) => item_in_bag.item.id === item_id);
+            const item_in_datasource_index: number | undefined = citizen.bag.items.findIndex((item_in_bag: ItemCount) => item_in_bag.item.id === item_id);
             if (item_in_datasource_index && item_in_datasource_index > -1) {
-                citizen.bag[item_in_datasource_index].count -= 1;
-                if (citizen.bag[item_in_datasource_index].count <= 0) {
-                    citizen.bag.splice(item_in_datasource_index);
+                citizen.bag.items[item_in_datasource_index].count -= 1;
+                if (citizen.bag.items[item_in_datasource_index].count <= 0) {
+                    citizen.bag.items.splice(item_in_datasource_index, 1);
                 }
             }
-            this.api.updateBag(citizen).subscribe();
+            this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
+                citizen.bag.last_update_user_name = getUser().username;
+                citizen.bag.last_update_date_update = update_info.update_time;
+            });
         }
     }
 

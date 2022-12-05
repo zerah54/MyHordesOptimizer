@@ -1,25 +1,26 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { Component, Inject, LOCALE_ID, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, LOCALE_ID, OnInit, VERSION, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Event, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import * as moment from 'moment';
 import { filter } from 'rxjs';
-import { NavbarComponent } from './navbar/navbar.component';
+import { HeaderComponent } from './structure/header/header.component';
 import { LoadingOverlayService } from './shared/services/loading-overlay.service';
 import { ApiServices } from './_abstract_model/services/api.services';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { MediaObserver } from '@angular/flex-layout';
 
 @Component({
     selector: 'mho-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss']
+    styleUrls: ['./app.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit {
 
-    @ViewChild(NavbarComponent) navbar!: NavbarComponent;
-    
     public readonly theme: string | null = localStorage.getItem('theme');
 
-    constructor(public loading_service: LoadingOverlayService, private api: ApiServices, private router: Router,
-        @Inject(LOCALE_ID) private locale_id: string, private overlay_container: OverlayContainer) {
+    constructor(public media: MediaObserver, public loading_service: LoadingOverlayService, private api: ApiServices, private router: Router,
+        @Inject(LOCALE_ID) private locale_id: string, private overlay_container: OverlayContainer, public breakpoint_observer: BreakpointObserver) {
 
     }
 

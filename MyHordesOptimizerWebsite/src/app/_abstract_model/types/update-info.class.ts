@@ -7,6 +7,7 @@ export class UpdateInfo extends CommonModel<UpdateInfoDTO> {
     public update_time!: Moment;
     public user_id!: string;
     public username!: string;
+    public userkey!: string;
 
     constructor(dto?: UpdateInfoDTO | null) {
         super();
@@ -17,7 +18,8 @@ export class UpdateInfo extends CommonModel<UpdateInfoDTO> {
         return {
             updateTime: this.update_time.toDate().toDateString(),
             userId: this.user_id,
-            userName: this.username
+            userName: this.username,
+            userKey: this.userkey
         }
 
     };
@@ -27,6 +29,7 @@ export class UpdateInfo extends CommonModel<UpdateInfoDTO> {
             this.update_time = moment(dto.updateTime);
             this.user_id = dto.userId;
             this.username = dto.userName;
+            this.userkey = dto.userKey;
         }
     };
 
