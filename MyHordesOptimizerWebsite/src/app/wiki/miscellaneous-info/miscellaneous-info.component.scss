@@ -1,7 +1,12 @@
 .mho-miscellaneous-info {
-    .mat-elevation-z8:not(:first-child) {
-        margin-top: 1em;
+
+    .mat-elevation-z8 {
+        overflow: auto;
+        &:not(:first-child) {
+            margin-top: 1em;
+        }
     }
+
     table {
         width: 100%;
 
@@ -12,18 +17,22 @@
         }
     }
 
-    .despair-deaths, .soul-points, .clean-points {
+    .despair-deaths,
+    .soul-points,
+    .clean-points {
         .header {
             min-width: 150px;
             max-width: 275px;
         }
+
         .cell {
             text-align: center;
             min-width: 20px;
         }
     }
 
-    .soul-points, .clean-points {
+    .soul-points,
+    .clean-points {
 
         .cell {
             min-width: 40px;

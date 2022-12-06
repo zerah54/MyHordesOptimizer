@@ -250,12 +250,13 @@ export class CampingComponent implements OnInit {
                     phare: [false],
                     improve: [0],
                     object_improve: [0],
+                    complete_improve: [0],
                     ruin: [this.added_ruins[0]]
                 });
                 this.calculateProbabilities();
                 this.configuration_form.valueChanges.subscribe(() => this.calculateProbabilities())
 
-                const url = this.router.createUrlTree([], {relativeTo: this.activated_route}).toString()
+                const url = this.router.createUrlTree([], { relativeTo: this.activated_route }).toString()
                 this.location.go(url);
             });
         });
@@ -270,52 +271,57 @@ export class CampingComponent implements OnInit {
     private calculateProbabilities(): void {
         let chances = 0;
         /** Type de ville */
-        chances += (<TownType>this.configuration_form.get('town')?.value)?.id === 'pande' ? -14 : 0;
+        chances += (<TownType>this.configuration_form.get('town')?.value)?.id === 'pande' ? -14 * 100 : 0;
         /** Tombe creusée */
-        chances += this.configuration_form.get('tomb')?.value ? 1.6 : 0;
+        chances += this.configuration_form.get('tomb')?.value ? 1.6 * 100 : 0;
         /** Mode nuit */
-        chances += this.configuration_form.get('night')?.value ? 2 : 0;
+        chances += this.configuration_form.get('night')?.value ? 2 * 100: 0;
         /** Ville devastée */
-        chances += this.configuration_form.get('devastated')?.value ? -10 : 0;
+        chances += this.configuration_form.get('devastated')?.value ? -10 * 100 : 0;
         /** Phare */
-        chances += this.configuration_form.get('phare')?.value ? 5 : 0;
+        chances += this.configuration_form.get('phare')?.value ? 5 * 100 : 0;
         /** Zombies dans la zone */
         let zombies_factor = this.configuration_form.get('vest')?.value ? -0.6 : -1.4;
-        chances += zombies_factor * this.configuration_form.get('zombies')?.value;
+        chances += zombies_factor * 100 * this.configuration_form.get('zombies')?.value;
 
         /** Nombre de campings */
         let nb_camping_town_type_mapping = (<TownType>this.configuration_form.get('town')?.value)?.id === 'pande' ? this.campings_map['pande'] : this.campings_map['normal'];
         let nb_camping_mapping = this.configuration_form.get('pro')?.value ? nb_camping_town_type_mapping['pro'] : nb_camping_town_type_mapping['nonpro'];
-        chances += (this.configuration_form.get('campings')?.value > 9 ? nb_camping_mapping[9] : nb_camping_mapping[this.configuration_form.get('campings')?.value]);
+        chances += (this.configuration_form.get('campings')?.value > 9 ? nb_camping_mapping[9] : nb_camping_mapping[this.configuration_form.get('campings')?.value]) * 100;
 
         /** Distance de la ville */
-        chances += (this.configuration_form.get('distance')?.value > 16 ? this.distance_map[16] : this.distance_map[this.configuration_form.get('distance')?.value]);
+        chances += (this.configuration_form.get('distance')?.value > 16 ? this.distance_map[16] : this.distance_map[this.configuration_form.get('distance')?.value]) * 100;
 
         /** Nombre de personnes déjà cachées */
-        chances += (this.configuration_form.get('hidden_campers')?.value > 7 ? this.hidden_campers_map[7] : this.hidden_campers_map[this.configuration_form.get('hidden_campers')?.value]);
+        chances += (this.configuration_form.get('hidden_campers')?.value > 7 ? this.hidden_campers_map[7] : this.hidden_campers_map[this.configuration_form.get('hidden_campers')?.value]) * 100;
 
         /** Nombre d'objets de protection dans l'inventaire */
-        chances += +this.configuration_form.get('objects')?.value;
+        chances += +this.configuration_form.get('objects')?.value * 100;
 
-        /**
-          * Nombre d'améliorations simples sur la case
-          * @see ActionDataService.php : 'improve'
-          */
-        chances += +this.configuration_form.get('improve')?.value;
+        if (+this.configuration_form.get('complete_improve')?.value > 0) {
+            /** Nombre total d'améliorations sur la case */
+            chances += +this.configuration_form.get('complete_improve')?.value * 100;
+        } else {
+            /**
+              * Nombre d'améliorations simples sur la case
+              * @see ActionDataService.php : 'improve'
+              */
+            chances += +this.configuration_form.get('improve')?.value * 100;
 
-        /**
-          * Nombre d'objets de défense installés sur la case
-          * @see ActionDataService.php : 'cm_campsite_improve'
-          */
-        chances += +this.configuration_form.get('object_improve')?.value * 1.8;
+            /**
+              * Nombre d'objets de défense installés sur la case
+              * @see ActionDataService.php : 'cm_campsite_improve'
+              */
+            chances += +this.configuration_form.get('object_improve')?.value * 1.8 * 100;
+        }
 
         /**
           * Bonus liés au bâtiment
           * @see RuinDataService.php
           */
-        chances += +(<Ruin>this.configuration_form.get('ruin')?.value)?.camping || 0;
+        chances += (<Ruin>this.configuration_form.get('ruin')?.value)?.camping * 100 || 0;
 
-        this.camping_result.probability = Math.min(Math.max((100.0 - (Math.abs(Math.min(0, chances)) * 5)) / 100.0, .1), ((<Job>this.configuration_form.get('job')?.value)?.camping_factor));
+        this.camping_result.probability = Math.min(Math.max((100 - (Math.abs(Math.min(0, chances)) * 5 / 100)) / 100, 0.1), ((<Job>this.configuration_form.get('job')?.value)?.camping_factor));
         this.camping_result.label = this.camping_results.find((camping_result) => camping_result.strict ? <number>this.camping_result.probability < camping_result.probability : <number>this.camping_result.probability <= camping_result.probability)?.label;
     };
 

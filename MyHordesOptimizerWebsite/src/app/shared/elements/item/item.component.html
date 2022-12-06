@@ -6,15 +6,30 @@
                     <img [src]="HORDES_IMG_REPO + (item ? item.img : bankItem.item.img)" />
                     <span class="item_count" *ngIf="bankItem && bankItem.count > 1">{{bankItem.count}}</span>
                 </div>
-                <span class="item_label">{{item ? item.label[locale] : bankItem.item.label[locale]}}<ng-container *ngIf="bankItem?.is_broken">&nbsp;(<ng-container i18n>Cassé</ng-container>)</ng-container></span>
+                <span class="item_label">{{item ? item.label[locale] : bankItem.item.label[locale]}}<ng-container
+                        *ngIf="bankItem?.is_broken">&nbsp;(<ng-container i18n>Cassé</ng-container>)</ng-container>
+                    </span>
             </div>
             <div class="add_to_wishlist" *ngIf="item ? item.wishlist_count === 0 : bankItem.wishlist_count === 0">
-                <button mat-icon-button type="button" (click)="$event.stopPropagation(); addItemToWishlist(item ? item : bankItem.item)">
+                <button mat-icon-button type="button"
+                    (click)="$event.stopPropagation(); addItemToWishlist(item ? item : bankItem.item)">
                     <img [src]="HORDES_IMG_REPO + 'item/item_cart.gif'">
                 </button>
             </div>
         </div>
         <div *ngIf="display_mode === 'advanced'" class="advanced-part">
+            <ng-container *ngIf="item.drop_rate_praf > 0 || item.drop_rate_not_praf > 0">
+                <hr>
+                <div *ngIf="item.drop_rate_praf > 0">
+                    <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone praf</ng-container>
+                    {{(item ? item.drop_rate_praf : bankItem.item.drop_rate_praf) * 100 | number:'1.0-2':locale}}%
+                </div>
+                <div *ngIf="item.drop_rate_not_praf > 0">
+                    <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone non-praf</ng-container>
+                    {{(item ? item.drop_rate_not_praf : bankItem.item.drop_rate_not_praf) * 100 |
+                    number:'1.0-2':locale}}%
+                </div>
+            </ng-container>
             <hr>
             <div>{{item ? item.description[locale] : bankItem.item.description[locale]}}</div>
             <hr>
@@ -25,19 +40,23 @@
                 <hr>
             </ng-container>
 
-            <ng-container *ngIf="item ? (item.properties && item.properties.length > 0) : (bankItem.item.properties && bankItem.item.properties.length > 0)">
+            <ng-container
+                *ngIf="item ? (item.properties && item.properties.length > 0) : (bankItem.item.properties && bankItem.item.properties.length > 0)">
                 <div *ngFor="let property of (item ? item.properties : bankItem.item.properties)">
                     <ng-container *ngIf="property">
-                        <img *ngIf="property.value.img && property.value.img !== ''" [src]="HORDES_IMG_REPO + property.value.img">{{property.value.label}}
+                        <img *ngIf="property.value.img && property.value.img !== ''"
+                            [src]="HORDES_IMG_REPO + property.value.img">{{property.value.label}}
                     </ng-container>
                 </div>
                 <hr>
             </ng-container>
 
-            <ng-container *ngIf="item ? (item.actions && item.actions.length > 0) : (bankItem.item.actions && bankItem.item.actions.length > 0)">
+            <ng-container
+                *ngIf="item ? (item.actions && item.actions.length > 0) : (bankItem.item.actions && bankItem.item.actions.length > 0)">
                 <div *ngFor="let action of (item ? item.actions : bankItem.item.actions)">
                     <ng-container *ngIf="action">
-                        <img *ngIf="action.value.img && action.value.img !== ''" [src]="HORDES_IMG_REPO + action.value.img">{{action.value.label}}
+                        <img *ngIf="action.value.img && action.value.img !== ''"
+                            [src]="HORDES_IMG_REPO + action.value.img">{{action.value.label}}
                     </ng-container>
                 </div>
                 <hr>

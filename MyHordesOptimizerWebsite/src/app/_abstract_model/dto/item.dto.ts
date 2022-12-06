@@ -17,4 +17,6 @@ export interface ItemDTO {
     recipes: RecipeDTO[];
     bankCount: number;
     wishListCount: number;
+    dropRateNotPraf: number;
+    dropRatePraf: number;
 }

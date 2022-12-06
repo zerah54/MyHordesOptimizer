@@ -99,7 +99,7 @@ export class CitizensComponent {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen) {
             const item_in_datasource_index: number | undefined = citizen.bag.items.findIndex((item_in_bag: ItemCount) => item_in_bag.item.id === item_id);
-            if (item_in_datasource_index && item_in_datasource_index > -1) {
+            if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
                 citizen.bag.items[item_in_datasource_index].count -= 1;
                 if (citizen.bag.items[item_in_datasource_index].count <= 0) {
                     citizen.bag.items.splice(item_in_datasource_index, 1);

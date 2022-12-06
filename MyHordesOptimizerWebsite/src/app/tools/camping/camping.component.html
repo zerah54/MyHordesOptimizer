@@ -9,9 +9,11 @@
 <mat-card-content class="mho-camping">
     <form [formGroup]="configuration_form" *ngIf="configuration_form">
         <div class="camping-params">
-            <ng-container *ngTemplateOutlet="citizenInfo"></ng-container>
+            <div>
+                <ng-container *ngTemplateOutlet="citizenInfo"></ng-container>
+                <ng-container *ngTemplateOutlet="cellInfo"></ng-container>
+            </div>
             <ng-container *ngTemplateOutlet="townInfo"></ng-container>
-            <ng-container *ngTemplateOutlet="cellInfo"></ng-container>
         </div>
         <ng-container *ngTemplateOutlet="campingResult"></ng-container>
 
@@ -102,9 +104,19 @@
                     </mat-form-field>
 
                     <mat-form-field>
+                        <mat-label><img [src]="HORDES_IMG_REPO + 'emotes/human.gif'">
+                            <ng-container i18n>Nombre de campeurs déjà cachés sur la case</ng-container>
+                        </mat-label>
+                        <input matInput type="number" [formControlName]="'hidden_campers'">
+                    </mat-form-field>
+
+                    <mat-divider style="margin: 0.5em 0"></mat-divider>
+
+                    <h3 i18n>Améliorations</h3>
+                    <h5>Il faut en soustraire 3 après chaque attaque</h5>
+                    <mat-form-field>
                         <mat-label><img [src]="HORDES_IMG_REPO + 'icons/home_recycled.gif'">
-                            <ng-container i18n>Nombre d'améliorations simples faites sur la case (il faut en
-                                soustraire 3 après chaque attaque)</ng-container>
+                            <ng-container i18n>Nombre d'améliorations simples faites sur la case</ng-container>
                         </mat-label>
                         <input matInput type="number" [formControlName]="'improve'">
                     </mat-form-field>
@@ -115,14 +127,14 @@
                         </mat-label>
                         <input matInput type="number" [formControlName]="'object_improve'">
                     </mat-form-field>
-
+                    <div i18n class="or">ou</div>
                     <mat-form-field>
-                        <mat-label><img [src]="HORDES_IMG_REPO + 'emotes/human.gif'">
-                            <ng-container i18n>Nombre de campeurs déjà cachés sur la case</ng-container>
+                        <mat-label><img [src]="HORDES_IMG_REPO + 'icons/home_recycled.gif'"> + <img
+                                [src]="HORDES_IMG_REPO + 'icons/home.gif'">
+                            <ng-container i18n>Nombre total d'améliotations sur la case</ng-container>
                         </mat-label>
-                        <input matInput type="number" [formControlName]="'hidden_campers'">
+                        <input matInput type="number" [formControlName]="'complete_improve'">
                     </mat-form-field>
-
                 </div>
             </div>
         </ng-template>
@@ -130,7 +142,7 @@
         <ng-template #campingResult>
             <ng-container *ngIf="camping_result && camping_result.label && camping_result.label !== ''">
                 <h3 i18n>Résultat</h3>
-                <div>{{ camping_result.label }} ({{ camping_result.probability * 100 }}%)</div>
+                <div>{{ camping_result.label }} ({{ camping_result.probability * 100 | number:'1.0-2':locale }}%)</div>
             </ng-container>
         </ng-template>
 

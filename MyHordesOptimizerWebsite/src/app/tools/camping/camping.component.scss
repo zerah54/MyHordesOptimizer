@@ -3,19 +3,22 @@
         display: flex;
         flex-wrap: wrap;
 
-        > div {
+        >div {
             flex: 1;
             min-width: 300px;
 
             &:not(:first-child) {
                 padding-left: 0.25em;
             }
+
             &:not(:last-child) {
                 padding-right: 0.25em;
             }
+
             h3 {
                 margin-bottom: 0.5em;
             }
+
             .mat-form-field,
             .mat-checkbox {
                 display: block;
@@ -24,6 +27,10 @@
                 img {
                     margin-right: 0.5em;
                 }
+            }
+
+            .or {
+                text-align: center;
             }
         }
     }

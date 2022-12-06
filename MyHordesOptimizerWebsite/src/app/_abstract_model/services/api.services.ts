@@ -54,6 +54,7 @@ export class ApiServices extends GlobalServices {
             super.get<ItemDTO[]>(API_URL + '/myhordesfetcher/items?townId=' + getUserId())
                 .subscribe({
                     next: (response: HttpResponse<ItemDTO[]>) => {
+                        console.log('response', response.body);
                         sub.next(dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302));
                     }
                 });
@@ -62,7 +63,7 @@ export class ApiServices extends GlobalServices {
 
     /** Récupère l'identifiant de citoyen */
     public getMe(): void {
-        super.get<MeDTO>(API_URL + '/myhordesfetcher/me?userKey=' + getExternalAppId())
+        super.get<MeDTO>(API_URL + `/myhordesfetcher/me?userKey=${getExternalAppId()}`)
             .subscribe((response: HttpResponse<MeDTO | null>) => {
                 setUser(response.body ? new Me(response.body) : null);
                 setTown(response.body ? new TownDetails(response.body.townDetails) : null);
@@ -76,7 +77,7 @@ export class ApiServices extends GlobalServices {
      */
     public getBank(): Observable<BankInfo> {
         return new Observable((sub: Subscriber<BankInfo>) => {
-            super.get<BankInfoDTO>(API_URL + '/myhordesfetcher/bank?userKey=' + getExternalAppId())
+            super.get<BankInfoDTO>(API_URL + `/myhordesfetcher/bank?userKey=${getExternalAppId()}`)
                 .subscribe({
                     next: (response: HttpResponse<BankInfoDTO>) => {
                         sub.next(new BankInfo(response.body));
@@ -93,7 +94,7 @@ export class ApiServices extends GlobalServices {
             isGestHordes: 'api'
         };
 
-        super.post<any>(API_URL + '/externaltools/update?userKey=' + getExternalAppId() + '&userId=' + getUserId(), JSON.stringify({ tools: tools_to_update }))
+        super.post<any>(API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`, JSON.stringify({ tools: tools_to_update }))
             .subscribe({
                 next: () => {
                     this.snackbar.successSnackbar(`Les outils externes ont bien été mis à jour`);

@@ -1,6 +1,6 @@
 import { Me } from 'src/app/_abstract_model/types/me.class';
 import { TownDetails } from 'src/app/_abstract_model/types/town-details.class';
-import { EXTERNAL_APP_ID_KEY, TOWN_KEY, USER_ID_KEY, USER_KEY } from '../../_abstract_model/const';
+import { EXTERNAL_APP_ID_KEY, TOWN_KEY, USER_KEY } from '../../_abstract_model/const';
 
 
 export function setUser(user: Me | null): void {
@@ -13,7 +13,7 @@ export function getUser(): Me {
 }
 
 export function getUserId(): number | null {
-    let user_id: string | null = localStorage.getItem(USER_ID_KEY);
+    let user_id: number | undefined = getUser()?.id;
     return user_id ? +user_id : null;
 }
 

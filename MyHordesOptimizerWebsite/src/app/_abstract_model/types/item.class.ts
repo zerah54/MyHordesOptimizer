@@ -1,3 +1,4 @@
+import { NumberValueAccessor } from '@angular/forms';
 import { Action } from '../enum/action.enum';
 import { Property } from '../enum/property.enum';
 import { ItemDTO } from './../dto/item.dto';
@@ -21,6 +22,8 @@ export class Item extends CommonModel<ItemDTO> {
     public recipes: Recipe[] = [];
     public bank_count!: number;
     public wishlist_count!: number;
+    public drop_rate_not_praf!: number;
+    public drop_rate_praf!: number;
 
     constructor(dto?: ItemDTO) {
         super();
@@ -42,7 +45,9 @@ export class Item extends CommonModel<ItemDTO> {
             recipes: modelToDtoArray(this.recipes),
             wishListCount: this.wishlist_count,
             id: this.id,
-            uid: this.uid
+            uid: this.uid,
+            dropRateNotPraf: this.drop_rate_not_praf,
+            dropRatePraf: this.drop_rate_praf,
         };
     }
 
@@ -62,6 +67,8 @@ export class Item extends CommonModel<ItemDTO> {
             this.wishlist_count = dto.wishListCount;
             this.uid = dto.uid;
             this.id = dto.id;
+            this.drop_rate_not_praf = dto.dropRateNotPraf;
+            this.drop_rate_praf = dto.dropRatePraf;
         }
     };
 
