@@ -41,6 +41,7 @@ export class CitizensComponent {
     ];
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: CitizenColumn) => column.id);
+    public moment = moment;
 
     constructor(private api: ApiServices) {
 
@@ -82,8 +83,8 @@ export class CitizensComponent {
             }
 
             this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.bag.last_update_user_name = getUser().username;
-                citizen.bag.last_update_date_update = update_info.update_time;
+                citizen.bag.username = getUser().username;
+                citizen.bag.update_time = update_info.update_time;
             });
         }
     }
@@ -106,8 +107,8 @@ export class CitizensComponent {
                 }
             }
             this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.bag.last_update_user_name = getUser().username;
-                citizen.bag.last_update_date_update = update_info.update_time;
+                citizen.bag.username = getUser().username;
+                citizen.bag.update_time = update_info.update_time;
             });
         }
     }

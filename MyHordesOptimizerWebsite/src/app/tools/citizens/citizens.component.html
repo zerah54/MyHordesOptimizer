@@ -75,10 +75,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <small *ngIf="row.bag.last_update_date_update; else bagNeverUpdated"  i18n>
-                                        Mis à jour par {{row.bag.last_update_user_name}} le {{row.bag.last_update_date_update | date:'medium'}}
-                                    </small>
-                                    <ng-template #bagNeverUpdated><small i18n>Jamais mis à jour</small></ng-template>
+                                    <mho-last-update [lastUpdateInfo]="row.bag" [thresholds]="[30, 120, 120*2, 120*3]"></mho-last-update>
                                 </div>
                             </ng-container>
 

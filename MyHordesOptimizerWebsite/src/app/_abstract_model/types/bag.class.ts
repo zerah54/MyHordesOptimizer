@@ -7,8 +7,8 @@ import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 export class Bag extends CommonModel<BagDTO> {
     public bag_id!: number;
     public items!: ItemCount[];
-    public last_update_date_update?: Moment;
-    public last_update_user_name!: string;
+    public update_time?: Moment;
+    public username!: string;
 
     constructor(dto?: BagDTO) {
         super();
@@ -19,8 +19,8 @@ export class Bag extends CommonModel<BagDTO> {
         return {
             idBag: this.bag_id,
             items: modelToDtoArray(this.items),
-            lastUpdateDateUpdate: this.last_update_date_update ? this.last_update_date_update.toDate() : new Date(),
-            lastUpdateUserName: this.last_update_user_name
+            lastUpdateDateUpdate: this.update_time ? this.update_time.toDate() : new Date(),
+            lastUpdateUserName: this.username
         };
     }
 
@@ -28,8 +28,8 @@ export class Bag extends CommonModel<BagDTO> {
         if (dto) {
             this.bag_id = dto.idBag;
             this.items = dtoToModelArray(ItemCount, dto.items);
-            this.last_update_date_update = dto.lastUpdateDateUpdate ? moment(dto.lastUpdateDateUpdate) : undefined;
-            this.last_update_user_name = dto.lastUpdateUserName;
+            this.update_time = dto.lastUpdateDateUpdate ? moment.parseZone(dto.lastUpdateDateUpdate).local() : undefined;
+            this.username = dto.lastUpdateUserName;
         }
     };
 

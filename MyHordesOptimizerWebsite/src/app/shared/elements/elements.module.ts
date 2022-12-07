@@ -8,11 +8,12 @@ import { RouterModule } from '@angular/router';
 import { MaterialModule } from './../material-modules.module';
 import { FilterFieldComponent } from './filter-field/filter-field.component';
 import { ItemComponent } from './item/item.component';
+import { LastUpdateComponent } from './last-update/last-update.component';
 import { RecipeComponent } from './recipe/recipe.component';
 import { LabelPipe } from './select/label.pipe';
 import { SelectComponent } from './select/select.component';
 
-let components: any[] = [ItemComponent, SelectComponent, RecipeComponent, FilterFieldComponent];
+let components: any[] = [ItemComponent, SelectComponent, RecipeComponent, FilterFieldComponent, LastUpdateComponent];
 let local_components: any[] = [LabelPipe]
 let custom_modules: any[] = [MaterialModule]
 let angular_modules: any[] = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule]

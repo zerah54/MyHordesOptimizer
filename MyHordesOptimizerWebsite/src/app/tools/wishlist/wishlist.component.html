@@ -86,7 +86,10 @@
                 <!-- Footer -->
                 <ng-container matColumnDef="save">
                     <td mat-footer-cell *matFooterCellDef style="text-align: right;" colspan="7">
-                        <button mat-button [color]="'accent'" (click)="updateWishlist()" i18n>Enregistrer</button>
+                        <div style="display: flex; flex-direction: row; justify-content: end; align-content: center; align-items: center;" >
+                            <mho-last-update [lastUpdateInfo]="wishlist_info.update_info" [thresholds]="[24*60, 24*2*60, 24*3*60, 24*4]"></mho-last-update>
+                            <button mat-button [color]="'accent'" (click)="updateWishlist()" i18n>Enregistrer</button>
+                        </div>
                     </td>
                 </ng-container>
 

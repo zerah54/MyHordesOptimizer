@@ -26,7 +26,7 @@ export class UpdateInfo extends CommonModel<UpdateInfoDTO> {
 
     protected dtoToModel(dto?: UpdateInfoDTO | null): void {
         if (dto) {
-            this.update_time = moment(dto.updateTime);
+            this.update_time = moment.parseZone(dto.updateTime).local();
             this.user_id = dto.userId;
             this.username = dto.userName;
             this.userkey = dto.userKey;
