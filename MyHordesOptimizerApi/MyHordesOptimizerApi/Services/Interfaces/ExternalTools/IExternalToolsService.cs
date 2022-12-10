@@ -1,5 +1,6 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using System.Collections.Generic;

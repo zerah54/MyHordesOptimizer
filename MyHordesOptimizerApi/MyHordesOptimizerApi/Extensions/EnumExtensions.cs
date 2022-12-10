@@ -37,5 +37,6 @@ namespace MyHordesOptimizerApi.Extensions
             }
             return enumerationValue.ToString();
         }
+
     }
 }

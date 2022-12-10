@@ -3,7 +3,9 @@ using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
@@ -48,13 +50,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto)
         {
             var response = new UpdateResponseDto(updateRequestDto);
-
-            var bbh = updateRequestDto.Tools.IsBigBrothHordes;
-            var gh = updateRequestDto.Tools.IsGestHordes;
-            var fata = updateRequestDto.Tools.IsFataMorgana;
             var townDetails = updateRequestDto.TownDetails;
             var tasks = new List<Task>();
-            if (UpdateRequestToolsDetailsDto.IsApi(bbh))
+
+            #region Maps
+            var bbh = updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes;
+            var gh = updateRequestDto.Map.ToolsToUpdate.IsGestHordes;
+            var fata = updateRequestDto.Map.ToolsToUpdate.IsFataMorgana;
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(bbh))
             {
                 var bbhTask = Task.Run(() =>
                 {
@@ -64,13 +67,12 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
-                        response.BigBrothHordesStatus = e.Message;
+                        response.MapResponseDto.BigBrothHordesStatus = e.Message;
                     }
                 });
                 tasks.Add(bbhTask);
             }
-
-            if (UpdateRequestToolsDetailsDto.IsApi(fata))
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(fata))
             {
                 var fataTask = Task.Run(() =>
                 {
@@ -81,15 +83,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
-                        response.FataMorganaStatus = e.Message;
+                        response.MapResponseDto.FataMorganaStatus = e.Message;
                     }
                 });
                 tasks.Add(fataTask);
             }
-
             var ghTask = Task.Run(() =>
             {
-                if (UpdateRequestToolsDetailsDto.IsApi(gh) || UpdateRequestToolsDetailsDto.IsCell(gh))
+                if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(gh) || UpdateRequestMapToolsToUpdateDetailsDto.IsCell(gh))
                 {
                     try
                     {
@@ -97,14 +98,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
-                        response.GestHordesStatus = e.Message;
+                        response.MapResponseDto.GestHordesApiStatus = e.Message;
                     }
                 }
-                if (UpdateRequestToolsDetailsDto.IsCell(gh))
+                if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(gh))
                 {
                     try
                     {
-                        var cell = updateRequestDto.Cell;
+                        var cell = updateRequestDto.Map.Cell;
                         if (townDetails.IsDevaste || cell.DeadZombies > 0)
                         {
                             var request = Mapper.Map<GestHordesUpdateCaseRequest>(updateRequestDto);
@@ -135,24 +136,31 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
-                        response.GestHordesStatus = e.Message;
+                        response.MapResponseDto.GestHordesCellsStatus = e.Message;
                     }
                 }
             });
             tasks.Add(ghTask);
+            #endregion
 
-            var bagTask = Task.Run(() =>
+            #region Bag
+            if(updateRequestDto.Bags != null && updateRequestDto.Bags.ToolsToUpdate.IsMyHordesOptimizer)
             {
-                try
+                var mHOBagTask = Task.Run(() =>
                 {
-                    UpdateBags(townDetails.TownId, updateRequestDto.Bags);
+                    try
+                    {
+                        UpdateBags(townDetails.TownId, updateRequestDto.Bags.Contents);
 
-                }
-                catch (Exception e)
-                {
-                    response.MhoStatus = e.Message;
-                }            });
-            tasks.Add(bagTask);
+                    }
+                    catch (Exception e)
+                    {
+                        response.BagsResponseDto.MhoStatus = e.Message;
+                    }
+                });
+                tasks.Add(mHOBagTask);
+            }
+            #endregion
             await Task.WhenAll(tasks);
             return response;
         }
@@ -379,7 +387,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         #region Bags
 
-        private void UpdateBags(int townId, List<UpdateBagDto> bags)
+        private void UpdateBags(int townId, List<UpdateBagsContentsDto> bags)
         {
             if (bags != null)
             {

@@ -16,6 +16,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         protected const string _parameterAppKey = "appkey";
         protected const string _parameterUserKey = "userkey";
         protected const string _parameterFields = "fields";
+        protected const string _parameterLanguages = "languages";
 
         protected const string EndpointItems = "items";
         protected const string EndpointMe = "me";
@@ -37,6 +38,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             var query = HttpUtility.ParseQueryString(uriBulder.Query);
             query[_parameterAppKey] = MyHordesApiConfiguration.AppKey;
             query[_parameterUserKey] = UserKeyProvider.UserKey;
+            query[_parameterLanguages] = "fr,es,en,de";
             uriBulder.Query = query.ToString();
             var url = uriBulder.ToString();
             return url;

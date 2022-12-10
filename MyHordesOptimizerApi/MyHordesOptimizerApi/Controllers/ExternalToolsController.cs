@@ -3,7 +3,9 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -44,13 +46,13 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(updateRequestDto.TownDetails)} cannot be empty");
             }
-            var bbh = updateRequestDto.Tools.IsBigBrothHordes;
-            var fata = updateRequestDto.Tools.IsFataMorgana;
-            if (UpdateRequestToolsDetailsDto.IsCell(bbh))
+            var bbh = updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes;
+            var fata = updateRequestDto.Map.ToolsToUpdate.IsFataMorgana;
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(bbh))
             {
                 return BadRequest($"IsBigBrothHordes ne peut pas avoir une valeur autre que \"api\" ou \"none\"");
             }
-            if (UpdateRequestToolsDetailsDto.IsCell(fata))
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(fata))
             {
                 return BadRequest($"IsFataMorgana ne peut pas avoir une valeur autre que \"api\" ou \"none\"");
             }

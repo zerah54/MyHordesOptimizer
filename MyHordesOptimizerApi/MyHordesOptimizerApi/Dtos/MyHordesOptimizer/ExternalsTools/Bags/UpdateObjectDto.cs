@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
+namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags
 {
     public class UpdateObjectDto
     {

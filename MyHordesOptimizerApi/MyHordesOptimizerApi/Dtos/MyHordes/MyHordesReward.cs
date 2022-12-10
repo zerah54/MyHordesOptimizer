@@ -18,12 +18,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         public string Img { get; set; }
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public MyHordesLangString Name { get; set; }
 
         [JsonProperty("desc")]
-        public string Desc { get; set; }
+        public MyHordesLangString Desc { get; set; }
 
         [JsonProperty("titles")]
-        public List<string> Titles { get; set; }
+        public List<MyHordesLangString> Titles { get; set; }
     }
 }
