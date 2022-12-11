@@ -11,7 +11,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
         public UpdateResponseDto(UpdateRequestDto updateRequestDto)
         {
             MapResponseDto = new UpdateMapResponseDto(updateRequestDto);
-            BagsResponseDto = new BagsResponseDto();
+            BagsResponseDto = new BagsResponseDto(updateRequestDto);
         }
     }
 }
