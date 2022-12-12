@@ -3,7 +3,6 @@ using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.MappingProfiles.Converters;
@@ -165,18 +164,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.IsGhost))
                 .ForMember(dest => dest.IdBag, opt => opt.Ignore());
 
-            CreateMap<TownCitizenCompletModel, Citizen>()
-                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CitizenName))
-                 .ForMember(dest => dest.NombreJourHero, opt => opt.Ignore())
-                 .ForMember(dest => dest.Avatar, opt => opt.MapFrom(src => src.Avatar))
-                 .ForMember(dest => dest.HomeMessage, opt => opt.MapFrom(src => src.CitizenHomeMessage))
-                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CitizenId))
-                 .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.CitizenIsGhost))
-                 .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.CitizenJobName))
-                 .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.CitizenPositionX))
-                 .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.CitizenPositionY))
-                 .ForMember(dest => dest.Bag, opt => opt.Ignore());
-
             CreateMap<TownCitizenBagItemCompletModel, Citizen>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CitizenName))
                 .ForMember(dest => dest.NombreJourHero, opt => opt.Ignore())
@@ -187,6 +174,9 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.CitizenJobName))
                 .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.CitizenPositionX))
                 .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.CitizenPositionY))
+                .ForMember(dest => dest.Home, opt => opt.MapFrom(src => src))
+                .ForMember(dest => dest.ActionsHeroic, opt => opt.MapFrom(src => src))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src))
                 .ForMember(dest => dest.Bag, opt => opt.Ignore());
 
             //LastUpdate
@@ -194,12 +184,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.DateUpdate, opt => opt.MapFrom(src => src.UpdateTime))
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore());
-
-            CreateMap<TownCitizenCompletModel, LastUpdateInfo>()
-               .ForMember(dest => dest.UserKey, opt => opt.Ignore())
-               .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
-               .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
-               .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
 
             CreateMap<TownCitizenBagItemCompletModel, LastUpdateInfo>()
                .ForMember(dest => dest.UserKey, opt => opt.Ignore())
@@ -326,6 +310,10 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.KitchenLevel, opt => opt.MapFrom(src => src.Kitchen))
                 .ForMember(dest => dest.LaboLevel, opt => opt.MapFrom(src => src.Lab))
                 .ForMember(dest => dest.RestLevel, opt => opt.MapFrom(src => src.Rest));
+
+            CreateMap<TownCitizenBagItemCompletModel, CitizenHome>();
+            CreateMap<TownCitizenBagItemCompletModel, CitizenStatus>();
+            CreateMap<TownCitizenBagItemCompletModel, CitizenActionsHeroic>();
         }
 
         private DateTime? GetLastUpdateDateWithNullCheck(IEnumerable<TownCitizenBagItemCompletModel> src)
