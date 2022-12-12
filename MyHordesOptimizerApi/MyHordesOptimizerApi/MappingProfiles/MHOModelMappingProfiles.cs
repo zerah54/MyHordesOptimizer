@@ -3,9 +3,12 @@ using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.MappingProfiles.Converters;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.Citizen;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Items.Bank;
@@ -280,6 +283,49 @@ namespace MyHordesOptimizerApi.MappingProfiles
                  .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
                  .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
                  .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
+
+            CreateMap<HomeUpgradeDetailsDto, TownCitizenDetailModel>()
+                .ForMember(dest => dest.ApagCharges, opt => opt.Ignore())
+                .ForMember(dest => dest.ChestLevel, opt => opt.MapFrom(src => src.Chest))
+                .ForMember(dest => dest.HasAlarm, opt => opt.MapFrom(src => src.Alarm))
+                .ForMember(dest => dest.HasCheatDeath, opt => opt.Ignore())
+                .ForMember(dest => dest.HasCurtain, opt => opt.MapFrom(src => src.Curtain))
+                .ForMember(dest => dest.HasHeroicReturn, opt => opt.Ignore())
+                .ForMember(dest => dest.HasLock, opt => opt.MapFrom(src => src.Lock))
+                .ForMember(dest => dest.HasLuckyFind, opt => opt.Ignore())
+                .ForMember(dest => dest.HasRescue, opt => opt.Ignore())
+                .ForMember(dest => dest.HasSecondWind, opt => opt.Ignore())
+                .ForMember(dest => dest.HasUppercut, opt => opt.Ignore())
+                .ForMember(dest => dest.HouseDefense, opt => opt.MapFrom(src => src.Defense))
+                .ForMember(dest => dest.HouseLevel, opt => opt.MapFrom(src => src.House))
+                .ForMember(dest => dest.IdTown, opt => opt.Ignore())
+                .ForMember(dest => dest.IdUser, opt => opt.Ignore())
+                .ForMember(dest => dest.IsAddict, opt => opt.Ignore())
+                .ForMember(dest => dest.IsArmWounded, opt => opt.Ignore())
+                .ForMember(dest => dest.IsCamper, opt => opt.Ignore())
+                .ForMember(dest => dest.IsCheatingDeathActive, opt => opt.Ignore())
+                .ForMember(dest => dest.IsCleanBody, opt => opt.Ignore())
+                .ForMember(dest => dest.IsConvalescent, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDesy, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDrugged, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDrunk, opt => opt.Ignore())
+                .ForMember(dest => dest.IsEyeWounded, opt => opt.Ignore())
+                .ForMember(dest => dest.IsFootWounded, opt => opt.Ignore())
+                .ForMember(dest => dest.IsGhoul, opt => opt.Ignore())
+                .ForMember(dest => dest.IsHandWounded, opt => opt.Ignore())
+                .ForMember(dest => dest.IsHangOver, opt => opt.Ignore())
+                .ForMember(dest => dest.IsHeadWounded, opt => opt.Ignore())
+                .ForMember(dest => dest.IsImmune, opt => opt.Ignore())
+                .ForMember(dest => dest.IsInfected, opt => opt.Ignore())
+                .ForMember(dest => dest.IsLegWounded, opt => opt.Ignore())
+                .ForMember(dest => dest.IsQuenched, opt => opt.Ignore())
+                .ForMember(dest => dest.IsSated, opt => opt.Ignore())
+                .ForMember(dest => dest.IsTerrorised, opt => opt.Ignore())
+                .ForMember(dest => dest.IsThirsty, opt => opt.Ignore())
+                .ForMember(dest => dest.IsTired, opt => opt.Ignore())
+                .ForMember(dest => dest.KitchenLevel, opt => opt.MapFrom(src => src.Kitchen))
+                .ForMember(dest => dest.LaboLevel, opt => opt.MapFrom(src => src.Lab))
+                .ForMember(dest => dest.RestLevel, opt => opt.MapFrom(src => src.Rest));
         }
 
         private DateTime? GetLastUpdateDateWithNullCheck(IEnumerable<TownCitizenBagItemCompletModel> src)

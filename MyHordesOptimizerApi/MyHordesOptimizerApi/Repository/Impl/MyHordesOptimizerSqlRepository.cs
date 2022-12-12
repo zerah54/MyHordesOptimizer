@@ -6,6 +6,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.Citizen;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Items.Bank;
@@ -71,7 +72,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             {
                 Id = townId
             };
-            town.Citizens = GetCitizensWithBag(townId);
+            town.Citizens = GetCitizens(townId);
             town.Bank = GetBank(townId);
             town.WishList = GetWishList(townId);
             return town;
@@ -539,11 +540,19 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 var keys = new Dictionary<string, Func<TownCitizenModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser } };
                 connection.Update(citizenToUpdate, keys);
             }
-            //connection.ExecuteScalar("DELETE FROM TownCitizen WHERE idTown = @IdTown AND idLastUpdateInfo != @IdLastUpdateInfo", new { IdTown = townId, IdLastUpdateInfo = idLastUpdateInfo });
             connection.Close();
         }
 
-        public CitizensWrapper GetCitizensWithBag(int townId)
+        public void PatchCitizenDetail(int townId, TownCitizenDetailModel citizenDetail)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var keys = new Dictionary<string, Func<TownCitizenDetailModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser } };
+            connection.Update(citizenDetail, keys, ignoreNull: true);
+            connection.Close();
+        }
+
+        public CitizensWrapper GetCitizens(int townId)
         {
             var query = $@"SELECT tc.idTown AS TownId
                                   ,citizen.idUser AS CitizenId
@@ -556,6 +565,45 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                   ,isGhost AS CitizenIsGhost
                                   ,tc.idLastUpdateInfo AS LastUpdateInfoId
                                   ,tc.avatar
+                                  ,tc.hasRescue
+                                  ,tc.APAGcharges
+                                  ,tc.hasUppercut
+                                  ,tc.hasSecondWind
+                                  ,tc.hasLuckyFind
+                                  ,tc.hasCheatDeath
+                                  ,tc.hasHeroicReturn
+                                  ,tc.houseLevel
+                                  ,tc.hasAlarm
+                                  ,tc.chestLevel
+                                  ,tc.hasCurtain
+                                  ,tc.houseDefense
+                                  ,tc.kitchenLevel
+                                  ,tc.laboLevel
+                                  ,tc.hasLock
+                                  ,tc.restLevel
+                                  ,tc.isCleanBody
+                                  ,tc.isCamper
+                                  ,tc.isAddict
+                                  ,tc.isDrugged
+                                  ,tc.isDrunk
+                                  ,tc.isGhoul
+                                  ,tc.isQuenched
+                                  ,tc.isConvalescent
+                                  ,tc.isSated
+                                  ,tc.isCheatingDeathActive
+                                  ,tc.isHangOver
+                                  ,tc.isImmune
+                                  ,tc.isInfected
+                                  ,tc.isTerrorised
+                                  ,tc.isThirsty
+                                  ,tc.isDesy
+                                  ,tc.isTired
+                                  ,tc.isHeadWounded
+                                  ,tc.isHandWounded
+                                  ,tc.isArmWounded
+                                  ,tc.isLegWounded
+                                  ,tc.isEyeWounded
+                                  ,tc.isFootWounded
 	                              ,lui.idUser AS LastUpdateInfoUserId
 	                              ,lui.dateUpdate AS LastUpdateDateUpdate
 	                              ,userUpdater.name AS LastUpdateInfoUserName

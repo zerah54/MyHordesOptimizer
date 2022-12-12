@@ -38,7 +38,7 @@ namespace MyHordesOptimizerApi.Extensions
             }      
         }
 
-        public static void Update<TModel>(this MySqlConnection connection, TModel model, Dictionary<string, Func<TModel, object>> keys = null)
+        public static void Update<TModel>(this MySqlConnection connection, TModel model, Dictionary<string, Func<TModel, object>> keys = null, bool ignoreNull = false)
         {
             var type = model.GetType();
             var tableAttribute = Attribute.GetCustomAttributes(type).FirstOrDefault(attr => attr.GetType() == typeof(TableAttribute)) as TableAttribute;
@@ -66,9 +66,13 @@ namespace MyHordesOptimizerApi.Extensions
                 }
                 else
                 {
-                    values.Add($"@{name}");
-                    setClauses.Add($"{name} = @{name}");
-                    param.Add(name, prop.GetValue(model, null));
+                    object value = prop.GetValue(model, null);
+                    if (ignoreNull && value != null)
+                    {
+                        values.Add($"@{name}");
+                        setClauses.Add($"{name} = @{name}");
+                        param.Add(name, value);
+                    }      
                 }
                 param.Add(name, prop.GetValue(model, null));
             }

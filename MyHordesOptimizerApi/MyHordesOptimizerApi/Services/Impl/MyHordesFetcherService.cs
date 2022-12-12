@@ -152,7 +152,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public CitizensWrapper GetCitizens(int townId)
         {
-            var citizens = MyHordesOptimizerRepository.GetCitizensWithBag(townId);
+            var citizens = MyHordesOptimizerRepository.GetCitizens(townId);
             return citizens;
         }
 
