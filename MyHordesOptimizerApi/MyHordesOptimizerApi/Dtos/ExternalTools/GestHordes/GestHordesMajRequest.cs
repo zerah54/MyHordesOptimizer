@@ -4,7 +4,7 @@ namespace MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes
 {
     public class GestHordesMajRequest
     {
-        [JsonProperty("userKey")]
+        [JsonProperty("key")]
         public string Key { get; set; }
     }
 }
