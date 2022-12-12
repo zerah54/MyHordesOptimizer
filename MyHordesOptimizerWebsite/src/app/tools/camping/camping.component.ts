@@ -2,8 +2,9 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
+import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { dtoToModelArray } from 'src/app/_abstract_model/types/_common.class';
 import { HORDES_IMG_REPO } from './../../_abstract_model/const';
@@ -222,7 +223,7 @@ export class CampingComponent implements OnInit {
     };
 
 
-    constructor(private api: ApiServices, private fb: UntypedFormBuilder, private route: ActivatedRoute, private clipboard: Clipboard, private router: Router,
+    constructor(private api: ApiServices, private fb: UntypedFormBuilder, private route: ActivatedRoute, private clipboard: ClipboardService, private router: Router,
         private activated_route: ActivatedRoute, private location: Location) {
     }
 
@@ -265,7 +266,7 @@ export class CampingComponent implements OnInit {
     public shareCamping(): void {
         let url: string = window.location.href;
         url += '?' + this.convertFormToEasyReadable();
-        this.clipboard.copy(url);
+        this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
     private calculateProbabilities(): void {

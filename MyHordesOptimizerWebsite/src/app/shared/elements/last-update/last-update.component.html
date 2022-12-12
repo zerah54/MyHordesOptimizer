@@ -1,7 +1,5 @@
 <div class="mho-last-update">
     <small *ngIf="lastUpdateInfo.update_time; else neverUpdated">
-        <span i18n>Mis à jour par {{lastUpdateInfo.username}} {{lastUpdateInfo.update_time.fromNow()}}</span>
-
         <ng-container *ngFor="let diff of [moment().diff(lastUpdateInfo.update_time, 'minutes')]">
             {{log(diff)}}
             <ng-container *ngIf="diff <= thresholds[0]; else threshold2">
@@ -26,11 +24,12 @@
                 </ng-template>
             </ng-template>
         </ng-container>
+        <span i18n>Mis à jour par {{lastUpdateInfo.username}} {{lastUpdateInfo.update_time.fromNow()}}</span>
     </small>
     <ng-template #neverUpdated>
         <small>
-            <span i18n>Jamais mis à jour</span>
             <img [src]="'assets/img/time-ago/no_update.svg'">
+            <span i18n>Jamais mis à jour</span>
         </small>
     </ng-template>
 

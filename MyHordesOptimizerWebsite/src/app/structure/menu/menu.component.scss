@@ -24,6 +24,10 @@
         padding-left: 1em;
         width: calc(100% - 1em);
     }
+    &.lvl-2 {
+        padding-left: 2em;
+        width: calc(100% - 2em);
+    }
 }
 
 .actions {

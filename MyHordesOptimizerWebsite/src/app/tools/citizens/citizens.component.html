@@ -71,6 +71,10 @@
                                                         (click)="removeItem(row.id, item.item.id)">
                                                 </ng-container>
                                             </div>
+                                            <div mat-menu-item class="empty-bag" (click)="emptyBag(row.id)">
+                                                <img [src]="HORDES_IMG_REPO + 'icons/b_close.png'" style="margin-right: 0.5em">
+                                                <span i18n>Vider le sac</span>
+                                            </div>
                                         </mat-menu>
                                     </div>
                                 </div>
