@@ -1,6 +1,10 @@
 <div [ngClass]="['mho-main', theme]">
     <mho-header #header (changeSidenavStatus)="sidenav.toggle()"></mho-header>
 
+    <ul class="lightrope" *ngIf="theme === 'noel'">
+        <li *ngFor="let i of [].constructor(50);"></li>
+    </ul>
+
     <mat-sidenav-container class="mho-container">
         <mat-sidenav #sidenav [mode]="media.isActive('gt-xs') ? 'side' : 'over'" [opened]="media.isActive('gt-xs')">
             <mho-menu></mho-menu>

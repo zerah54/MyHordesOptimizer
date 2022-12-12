@@ -1,13 +1,12 @@
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { Component, Inject, LOCALE_ID, OnInit, VERSION, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, Inject, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { MediaObserver } from '@angular/flex-layout';
 import { Event, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import * as moment from 'moment';
 import { filter } from 'rxjs';
-import { HeaderComponent } from './structure/header/header.component';
 import { LoadingOverlayService } from './shared/services/loading-overlay.service';
 import { ApiServices } from './_abstract_model/services/api.services';
-import { BreakpointObserver } from '@angular/cdk/layout';
-import { MediaObserver } from '@angular/flex-layout';
 
 @Component({
     selector: 'mho-root',

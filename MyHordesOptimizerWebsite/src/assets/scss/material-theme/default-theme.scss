@@ -35,7 +35,7 @@ $default-theme: mat.define-light-theme(
     $accent: mat.get-color-from-palette(map.get($color-config, "accent"));
 
     $footer-color: mat.get-color-from-palette(map.get($color-config, "primary"), "darker");
-    $sidenav-bg-color: mat.get-color-from-palette(map.get($color-config, 'primary'), 'lighter');
+    $sidenav-bg-color: mat.get-color-from-palette(map.get($color-config, "primary"), "lighter");
     $item-color: rgba($primary, 0.25);
 
     --primary: #{$primary};

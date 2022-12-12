@@ -7,6 +7,7 @@ import { EstimationComponent } from './estimation/estimation.component';
 import { WishlistComponent } from './wishlist/wishlist.component';
 
 let routes: Routes = [
+    { path: '', redirectTo: 'tools/bank', pathMatch: 'full'},
     {path: 'tools', redirectTo: 'tools/bank'},
     {
         path: 'tools', children: [

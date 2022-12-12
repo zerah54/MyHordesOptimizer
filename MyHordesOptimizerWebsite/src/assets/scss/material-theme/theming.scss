@@ -1,18 +1,24 @@
 @use "@angular/material" as mat;
 
 @import "default-theme";
+@import "noel-theme";
 @import "pink-theme";
 
 @include mat.core();
 
 @include mat.all-component-themes($default-theme);
 /* .mat-drawer-container, */ .cdk-overlay-container, .mho-main {
-  &:not(.pink) {
+  &:not(.pink):not(.noel), &.brown {
     @include default-theme($default-theme);
   }
 
   &.pink {
     @include mat.all-component-themes($pink-theme);
     @include pink-theme($pink-theme);
+  }
+
+  &.noel {
+    @include mat.all-component-themes($noel-theme);
+    @include noel-theme($noel-theme);
   }
 }

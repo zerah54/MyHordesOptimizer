@@ -1,4 +1,5 @@
 import { Component, Inject, LOCALE_ID } from '@angular/core';
+import * as moment from 'moment';
 
 @Component({
     selector: 'mho-menu',
@@ -8,12 +9,12 @@ import { Component, Inject, LOCALE_ID } from '@angular/core';
 export class MenuComponent {
 
     public themes: Theme[] = [
-        {label: $localize`Par défaut`, class: ''},
-        {label: $localize`Rose`, class: 'pink'},
+        { label: $localize`Par défaut`, class: '' },
+        { label: $localize`Rose`, class: 'pink' },
+        { label: $localize`Brun`, class: 'brown' },
     ]
 
-    public selected_theme: Theme | undefined = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'))
-    || this.themes.find((theme: Theme) => theme.class === '');
+    public selected_theme: Theme | undefined = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
 
 
     /** La liste des langues disponibles */
@@ -46,16 +47,39 @@ export class MenuComponent {
                 { label: $localize`Informations diverses`, path: 'wiki/miscellaneous-info', displayed: false, lvl: 1, authorized: () => true }
             ]
         },
-        { label: $localize`Script`, path: 'script', lvl: 0, displayed: true, authorized: () => true },
+        {
+            label: $localize`Tutoriels`, lvl: 0, displayed: true, authorized: () => true, expanded: false, children: [
+                {
+                    label: $localize`Script`, displayed: false, lvl: 1, authorized: () => true, expanded: false, children: [
+                        { label: $localize`Installation`, path: 'tutorials/script/installation', displayed: false, lvl: 2, authorized: () => true },
+                        { label: $localize`Documentation`, path: 'tutorials/script/documentation', displayed: false, lvl: 2, authorized: () => true }
+                    ]
+                },
+            ]
+        }
     ];
 
-    constructor(@Inject(LOCALE_ID) private locale_id: string, ) {
+    constructor(@Inject(LOCALE_ID) private locale_id: string,) {
         /** Si il y a une langue enregistrée, on l'utilise, sinon on utilise le français */
         let used_locale: string = this.locale_id;
         /** Si dans la liste des langues supportées on trouve la langue ci-dessus, on l'utilise, sinon on utilise le français */
         this.site_language = this.language_list.some((language: Language) => used_locale === language.code)
             ? this.language_list.find((language: Language) => used_locale === language.code)
             : this.language_list.find((language: Language) => language.default);
+
+        if (moment().isSameOrAfter(moment(`01-12-${moment().year()} 00:00:00`, 'DD-MM-YYYY HH:mm:ss'))
+            && moment().isSameOrBefore(moment(`25-12-${moment().year()} 23:59:59`, 'DD-MM-YYYY HH:mm:ss'))) {
+            this.themes.push({ label: $localize`Noël`, class: 'noel' });
+            this.themes.splice(0, 1);
+            if (this.selected_theme?.class === '') {
+                this.changeTheme(this.themes[this.themes.length - 1])
+            }
+        } else if (this.selected_theme?.class === 'noel') {
+            this.changeTheme(this.themes[0])
+        }
+
+        this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'))
+            || this.themes.find((theme: Theme) => theme.class === '')
     }
 
     public toggleDisplayChildren(route: SidenavLinks): void {
@@ -68,9 +92,12 @@ export class MenuComponent {
         }
     }
 
-    public changeTheme(theme: Theme): void {
-        localStorage.setItem('theme', theme.class);
-        location.reload();
+    public changeTheme(new_theme: Theme): void {
+        this.selected_theme = new_theme;
+        localStorage.setItem('theme', new_theme.class);
+        setTimeout(() => {
+            location.reload();
+        })
     }
 
     /**

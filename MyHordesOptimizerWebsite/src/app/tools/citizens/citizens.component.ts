@@ -113,6 +113,23 @@ export class CitizensComponent {
         }
     }
 
+    /**
+     * On vide complètement le dac
+     *
+     * @param {number} citizen_id
+     */
+    public emptyBag(citizen_id: number): void {
+        const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
+        if (citizen) {
+            citizen.bag.items = [];
+            this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
+                citizen.bag.username = getUser().username;
+                citizen.bag.update_time = update_info.update_time;
+            });
+        }
+    }
+
+
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: Citizen, filter: string): boolean {
         if (data.name.toLowerCase().indexOf(filter.toLowerCase()) > -1) return true;

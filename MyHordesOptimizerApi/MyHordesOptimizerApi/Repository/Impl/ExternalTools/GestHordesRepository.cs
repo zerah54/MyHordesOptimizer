@@ -56,7 +56,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
             {
                 Key = UserKeyProvider.UserKey
             };
-            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}", body: majBody, customHeader: majHeaders);
+            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}", body: majBody, customHeader: majHeaders, mediaTypeIn : "application/x-www-form-urlencoded");
         }
 
 

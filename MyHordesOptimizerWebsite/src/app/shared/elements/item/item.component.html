@@ -8,7 +8,7 @@
                 </div>
                 <span class="item_label">{{item ? item.label[locale] : bankItem.item.label[locale]}}<ng-container
                         *ngIf="bankItem?.is_broken">&nbsp;(<ng-container i18n>Cassé</ng-container>)</ng-container>
-                    </span>
+                </span>
             </div>
             <div class="add_to_wishlist" *ngIf="item ? item.wishlist_count === 0 : bankItem.wishlist_count === 0">
                 <button mat-icon-button type="button"
@@ -18,13 +18,14 @@
             </div>
         </div>
         <div *ngIf="display_mode === 'advanced'" class="advanced-part">
-            <ng-container *ngIf="item.drop_rate_praf > 0 || item.drop_rate_not_praf > 0">
+            <ng-container
+                *ngIf="item ? (item.drop_rate_praf > 0 || item.drop_rate_not_praf > 0) : (bankItem.item.drop_rate_praf > 0 || bankItem.item.drop_rate_not_praf > 0)">
                 <hr>
-                <div *ngIf="item.drop_rate_praf > 0">
+                <div *ngIf="item ? item.drop_rate_praf > 0 : bankItem.item.drop_rate_praf">
                     <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone praf</ng-container>
                     {{(item ? item.drop_rate_praf : bankItem.item.drop_rate_praf) * 100 | number:'1.0-2':locale}}%
                 </div>
-                <div *ngIf="item.drop_rate_not_praf > 0">
+                <div *ngIf="item ? item.drop_rate_not_praf > 0 : bankItem.item.drop_rate_not_praf">
                     <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone non-praf</ng-container>
                     {{(item ? item.drop_rate_not_praf : bankItem.item.drop_rate_not_praf) * 100 |
                     number:'1.0-2':locale}}%

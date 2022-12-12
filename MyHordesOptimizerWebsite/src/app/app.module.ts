@@ -3,25 +3,25 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { LOCALE_ID, NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ScriptModule } from './script/script.module';
 import { LoadingInterceptor } from './shared/services/loading-interceptor.service';
 import { SharedModule } from './shared/shared.module';
 import { ThanksModule } from './thanks/thanks.module';
 import { ToolsModule } from './tools/tools.module';
 import { WikiModule } from './wiki/wiki.module';
+import { StructureModule } from './structure/structure.module';
+import { TutorialsModule } from './tutorials/tutorials.module';
 
 import localeDE from '@angular/common/locales/de';
 import localeEN from '@angular/common/locales/en';
 import localeES from '@angular/common/locales/es';
 import localeFR from '@angular/common/locales/fr';
-import { StructureModule } from './structure/structure.module';
 
 registerLocaleData(localeDE);
 registerLocaleData(localeEN);
 registerLocaleData(localeES);
 registerLocaleData(localeFR);
 
-let app_modules: any[] = [ScriptModule, StructureModule, WikiModule, ThanksModule, ToolsModule];
+let app_modules: any[] = [StructureModule, WikiModule, ThanksModule, ToolsModule, TutorialsModule];
 @NgModule({
     declarations: [AppComponent],
     imports: [

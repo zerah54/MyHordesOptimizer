@@ -2,10 +2,12 @@
     <div style="overflow: auto">
         <ng-container *ngTemplateOutlet="overview"></ng-container>
         <ng-container *ngTemplateOutlet="features"></ng-container>
-        <ng-container *ngTemplateOutlet="install"></ng-container>
     </div>
     <mat-list class="summary">
-        <a mat-list-item class="title"><mat-icon>list</mat-icon><ng-container i18n>Sommaire</ng-container></a>
+        <a mat-list-item class="title">
+            <mat-icon>list</mat-icon>
+            <ng-container i18n>Sommaire</ng-container>
+        </a>
         <a mat-list-item (click)="scrollToTitle(title.id)" [routerLink]="['./']" [fragment]="title.id"
             [ngClass]="'level-' + title.level" *ngFor="let title of titles">{{ title.label }}</a>
     </mat-list>
@@ -41,6 +43,10 @@
                                 dans votre navigateur, alors la prochaine fois
                                 que vous naviguerez vers son onglet celui-ci
                                 sera automatiquement rafraîchi.
+                                <br />
+                                <br />
+                                En cochant les bonnes options, le script pourra également lire le contenu de la page du
+                                jeu et envoyer des informations complémentaires non-contenues dans l'API.
                             </ng-container>
                         </p>
                     </li>
@@ -169,6 +175,27 @@
                                 être un texte de MyHordes, puisque nous allons
                                 en chercher la traduction dans les fichiers de
                                 traduction du jeu.</ng-container>
+                        </p>
+                    </li>
+                    <li>
+                        <h3 id="display-missing-ap" i18n>
+                            Afficher les PA manquants pour réparer les chantiers
+                        </h3>
+                        <p>
+                            <ng-container i18n>En pandé, les chantiers subissent des dégats lors de l'attaque. Cette
+                                option va montrer combien de pa manquent pour que le chantier ne risque pas d'être
+                                détruit lors de la prochaine attaque.</ng-container>
+                        </p>
+                    </li>
+                    <li>
+                        <h3 id="display-more-citizen-info" i18n>
+                            Afficher un onglet contenant des informations supplémentaires sur la page des citoyens
+                        </h3>
+                        <p>
+                            <ng-container i18n>En cochant cette option, un nouvel onglet apparaitra dans la page
+                                "citoyens" de votre ville. Cette page contient les rumeurs disponibles sur la page de
+                                citoyen, ainsi que tous les travaux effectués dans la maison de chaque citoyen.
+                            </ng-container>
                         </p>
                     </li>
                 </ul>
@@ -326,55 +353,5 @@
                 </ul> -->
             </li>
         </ul>
-    </ng-template>
-    <ng-template #install>
-        <h1 id="install" i18n>Installation</h1>
-        <p>
-            <ng-container i18n>Lien vers le script : </ng-container><a mat-button color="accent"
-                href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js"
-                target="_blank" i18n>Installer le script</a>
-            <br />
-            <br />
-            <ng-container i18n>Ce fichier contient un script qui fonctionne avec des outils
-                comme Tampermonkey ou Violentmonkey. Pour le faire fonctionner,
-                il faut que Tampermonkey ou Violentmonkey soit installé sur
-                votre navigateur.
-                <br />
-                <ul>
-                    <li>
-                        Sur ordinateur, il suffit d'installer l'application de
-                        script de votre choix.
-                    </li>
-                    <li>
-                        Sur Android, il faut :
-                        <ul>
-                            <li>Installer Kiwi Browser ;</li>
-                            <li>
-                                Rechercher le script de votre choix dans votre
-                                barre de recherche ;
-                            </li>
-                            <li>Installer l'extension pour Chrome ;</li>
-                            <li>
-                                Cliquer sur le lien d'installation du script.
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        Sur iOS, il faut :
-                        <ul>
-                            <li>Installer Gear Browser ;</li>
-                            <li>
-                                Cliquer sur le lien d'installation du script.
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-                <br />
-                Une fois le script installé, vous verrez apparaitre un nouveau
-                bouton en haut de votre page MyHordes. Au survol, une fenête
-                s'affiche, donnant accès aux options du script ainsi qu'à
-                certaines de ses fonctionnalités.
-            </ng-container>
-        </p>
     </ng-template>
 </div>
