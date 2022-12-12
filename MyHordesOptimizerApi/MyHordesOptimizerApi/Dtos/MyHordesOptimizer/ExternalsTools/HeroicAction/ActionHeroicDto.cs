@@ -9,8 +9,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
         [JsonProperty("label")]
         public string Label { get; set; }
 
-        [JsonProperty("langue")]
-        public string Langue { get; set; }
+        [JsonProperty("locale")]
+        public string Locale { get; set; }
 
         [JsonProperty("value")]
         public int Value { get; set; }

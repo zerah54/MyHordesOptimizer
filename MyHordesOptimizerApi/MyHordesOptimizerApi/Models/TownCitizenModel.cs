@@ -30,7 +30,7 @@ namespace MyHordesOptimizerApi.Models
 		public bool HasCurtain { get; set; }
 		public int HouseDefense { get; set; }
 		public int KitchenLevel { get; set; }
-		public int LabelLevel { get; set; }
+		public int LaboLevel { get; set; }
 		public int RestLevel { get; set; }
 		public bool HasLock { get; set; }
 		public bool IsCleanBody { get; set; }

@@ -182,7 +182,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     {
                         foreach (ActionHeroicType heroicType in Enum.GetValues(typeof(ActionHeroicType)))
                         {
-                            if (heroicType.IsEquivalentToLabel(action.Langue, action.Label))
+                            if (heroicType.IsEquivalentToLabel(action.Locale, action.Label))
                             {
                                 switch (heroicType)
                                 {

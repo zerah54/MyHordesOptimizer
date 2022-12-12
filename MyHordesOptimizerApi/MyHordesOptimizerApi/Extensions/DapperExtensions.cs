@@ -14,7 +14,7 @@ namespace MyHordesOptimizerApi.Extensions
     {
         public static void BulkInsert<TModel>(this MySqlConnection connection, string tableName, Dictionary<string, Func<TModel, object>> dico, List<TModel> models)
         {
-            if(models.Any())
+            if (models.Any())
             {
                 var sb = new StringBuilder($"INSERT INTO {tableName}({string.Join(",", dico.Keys)}) VALUES ");
                 var param = new DynamicParameters();
@@ -35,7 +35,7 @@ namespace MyHordesOptimizerApi.Extensions
                 sb.Append($"{string.Join(",", listValues)}");
                 var query = sb.ToString();
                 connection.Execute(query, param);
-            }      
+            }
         }
 
         public static void Update<TModel>(this MySqlConnection connection, TModel model, Dictionary<string, Func<TModel, object>> keys = null, bool ignoreNull = false)
@@ -67,16 +67,16 @@ namespace MyHordesOptimizerApi.Extensions
                 else
                 {
                     object value = prop.GetValue(model, null);
-                    if (ignoreNull && value != null)
+                    if (!ignoreNull || (ignoreNull && value != null))
                     {
                         values.Add($"@{name}");
                         setClauses.Add($"{name} = @{name}");
                         param.Add(name, value);
-                    }      
+                    }
                 }
                 param.Add(name, prop.GetValue(model, null));
             }
-            if(keys != null && keys.Any())
+            if (keys != null && keys.Any())
             {
                 var count = 1;
                 var list = new List<string>();
@@ -99,46 +99,46 @@ namespace MyHordesOptimizerApi.Extensions
                 connection.Execute(query, param);
             }
         }
-/*
-        public static void BulkUpdate<TModel>(this MySqlConnection connection, List<TModel> models)
-        {
-            var type = typeof(TModel);
-            var tableAttribute = Attribute.GetCustomAttributes(type).FirstOrDefault(attr => attr.GetType() == typeof(TableAttribute)) as TableAttribute;
-            var tableName = tableAttribute == null ? type.Name : tableAttribute.Name;
-            var values = new List<string>();
-            var param = new DynamicParameters();
-            var setClauses = new List<string>();
-            var keyName = string.Empty;
-            foreach (var prop in type.GetProperties())
-            {
-                var keyAttr = prop.GetCustomAttributes().FirstOrDefault(attr => attr.GetType() == typeof(KeyAttribute)) as KeyAttribute;
-                var columnAttr = prop.GetCustomAttributes().FirstOrDefault(attr => attr.GetType() == typeof(ColumnAttribute)) as ColumnAttribute;
-                var name = string.Empty;
-                if (columnAttr == null)
+        /*
+                public static void BulkUpdate<TModel>(this MySqlConnection connection, List<TModel> models)
                 {
-                    name = prop.Name;
+                    var type = typeof(TModel);
+                    var tableAttribute = Attribute.GetCustomAttributes(type).FirstOrDefault(attr => attr.GetType() == typeof(TableAttribute)) as TableAttribute;
+                    var tableName = tableAttribute == null ? type.Name : tableAttribute.Name;
+                    var values = new List<string>();
+                    var param = new DynamicParameters();
+                    var setClauses = new List<string>();
+                    var keyName = string.Empty;
+                    foreach (var prop in type.GetProperties())
+                    {
+                        var keyAttr = prop.GetCustomAttributes().FirstOrDefault(attr => attr.GetType() == typeof(KeyAttribute)) as KeyAttribute;
+                        var columnAttr = prop.GetCustomAttributes().FirstOrDefault(attr => attr.GetType() == typeof(ColumnAttribute)) as ColumnAttribute;
+                        var name = string.Empty;
+                        if (columnAttr == null)
+                        {
+                            name = prop.Name;
+                        }
+                        else
+                        {
+                            name = columnAttr.Name;
+                        }
+                        if (keyAttr != null)
+                        {
+                            keyName = name;
+                        }
+                        else
+                        {
+                            values.Add($"@{name}");
+                            setClauses.Add($"{name} = CASE WHEN {keyName} = @{keyName} THEN @{name}");
+                            param.Add(name, prop.GetValue(model, null));
+                        }
+                        param.Add(name, prop.GetValue(model, null));
+                    }
+                    var sb = new StringBuilder($"UPDATE {tableName} SET {string.Join(",", setClauses)} WHERE {keyName} IN @{keyValues}");
+                    var query = sb.ToString();
+                    connection.Execute(query, param);
                 }
-                else
-                {
-                    name = columnAttr.Name;
-                }
-                if (keyAttr != null)
-                {
-                    keyName = name;
-                }
-                else
-                {
-                    values.Add($"@{name}");
-                    setClauses.Add($"{name} = CASE WHEN {keyName} = @{keyName} THEN @{name}");
-                    param.Add(name, prop.GetValue(model, null));
-                }
-                param.Add(name, prop.GetValue(model, null));
-            }
-            var sb = new StringBuilder($"UPDATE {tableName} SET {string.Join(",", setClauses)} WHERE {keyName} IN @{keyValues}");
-            var query = sb.ToString();
-            connection.Execute(query, param);
-        }
-        */
+                */
         public static void Insert<TModel>(this MySqlConnection connection, TModel model)
         {
             var type = model.GetType();
