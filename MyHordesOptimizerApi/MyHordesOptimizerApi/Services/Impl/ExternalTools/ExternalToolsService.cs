@@ -285,7 +285,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                         statusDetail.IsQuenched = true;
                                         break;
                                     case StatusValue.Sated:
-                                        statusDetail.IsAddict = true;
+                                        statusDetail.IsSated = true;
                                         break;
                                     case StatusValue.Terrorised:
                                         statusDetail.IsTerrorised = true;
