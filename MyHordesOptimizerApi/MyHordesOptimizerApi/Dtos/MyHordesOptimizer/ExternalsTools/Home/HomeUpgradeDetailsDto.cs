@@ -22,6 +22,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home
         [JsonProperty("defense")]
         public int Defense { get; set; }
 
+        [JsonProperty("fence")]
+        public int Fence { get; set; }
+
         [JsonProperty("lab")]
         public int Lab { get; set; }
 

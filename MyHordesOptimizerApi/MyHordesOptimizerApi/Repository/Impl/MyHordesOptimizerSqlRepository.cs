@@ -544,7 +544,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
         }
 
-        public void PatchCitizenDetail(int townId, TownCitizenDetailModel citizenDetail)
+        public void PatchCitizenDetail(TownCitizenDetailModel citizenDetail)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
@@ -577,7 +577,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                   ,tc.hasAlarm
                                   ,tc.chestLevel
                                   ,tc.hasCurtain
-                                  ,tc.houseDefense
+                                  ,tc.renfortLevel
+                                  ,tc.hasFence
                                   ,tc.kitchenLevel
                                   ,tc.laboLevel
                                   ,tc.hasLock
@@ -592,7 +593,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                   ,tc.isConvalescent
                                   ,tc.isSated
                                   ,tc.isCheatingDeathActive
-                                  ,tc.isHangOver
+                                  ,tc.isHungOver
                                   ,tc.isImmune
                                   ,tc.isInfected
                                   ,tc.isTerrorised
@@ -679,6 +680,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 item.Actions = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.ActionName)).Select(i => i.ActionName).Distinct();
                 item.Properties = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.PropertyName)).Select(i => i.PropertyName).Distinct();
             }
+
             var citizenWrapper = new CitizensWrapper()
             {
                 LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.First()),

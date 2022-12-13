@@ -27,18 +27,19 @@ namespace MyHordesOptimizerApi.Models.Citizen
         public bool? HasLuckyFind { get; set; }
         public bool? HasCheatDeath { get; set; }
         public bool? HasHeroicReturn { get; set; }
-        public int? idLastUpdateInfoHeroicAction { get; set; }
+        public int? IdLastUpdateInfoHeroicAction { get; set; }
 
         public int HouseLevel { get; set; }
         public bool HasAlarm { get; set; }
         public int ChestLevel { get; set; }
         public bool HasCurtain { get; set; }
-        public int HouseDefense { get; set; }
+        public int RenfortLevel { get; set; }
+        public bool HasFence { get; set; }
         public int KitchenLevel { get; set; }
         public int LaboLevel { get; set; }
         public int RestLevel { get; set; }
         public bool HasLock { get; set; }
-        public int? idLastUpdateInfoHome { get; set; }
+        public int? IdLastUpdateInfoHome { get; set; }
 
 
         public bool IsCleanBody { get; set; }
@@ -51,7 +52,7 @@ namespace MyHordesOptimizerApi.Models.Citizen
         public bool IsConvalescent { get; set; }
         public bool IsSated { get; set; }
         public bool IsCheatingDeathActive { get; set; }
-        public bool IsHangOver { get; set; }
+        public bool IsHungOver { get; set; }
         public bool IsImmune { get; set; }
         public bool IsInfected { get; set; }
         public bool IsTerrorised { get; set; }
@@ -64,7 +65,7 @@ namespace MyHordesOptimizerApi.Models.Citizen
         public bool IsLegWounded { get; set; }
         public bool IsEyeWounded { get; set; }
         public bool IsFootWounded { get; set; }
-        public int? idLastUpdateInfoStatus { get; set; }
+        public int? IdLastUpdateInfoStatus { get; set; }
 
         internal void ImportHomeDetail(TownCitizenDetailModel homeDetail)
         {
@@ -72,7 +73,7 @@ namespace MyHordesOptimizerApi.Models.Citizen
             HasAlarm = homeDetail.HasAlarm;
             ChestLevel = homeDetail.ChestLevel;
             HasCurtain = homeDetail.HasCurtain;
-            HouseDefense = homeDetail.HouseDefense;
+            RenfortLevel = homeDetail.RenfortLevel;
             KitchenLevel = homeDetail.KitchenLevel;
             LaboLevel = homeDetail.LaboLevel;
             RestLevel = homeDetail.RestLevel;
@@ -103,7 +104,7 @@ namespace MyHordesOptimizerApi.Models.Citizen
             IsConvalescent = statusDetail.IsConvalescent;
             IsSated = statusDetail.IsSated;
             IsCheatingDeathActive = statusDetail.IsCheatingDeathActive;
-            IsHangOver = statusDetail.IsHangOver;
+            IsHungOver = statusDetail.IsHungOver;
             IsImmune = statusDetail.IsImmune;
             IsInfected = statusDetail.IsInfected;
             IsTerrorised = statusDetail.IsTerrorised;

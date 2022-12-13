@@ -63,7 +63,8 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
         public bool HasAlarm { get; set; }
         public int ChestLevel { get; set; }
         public bool HasCurtain { get; set; }
-        public int HouseDefense { get; set; }
+        public int RenfortLevel { get; set; }
+        public bool HasFence { get; set; }
         public int KitchenLevel { get; set; }
         public int LaboLevel { get; set; }
         public int RestLevel { get; set; }

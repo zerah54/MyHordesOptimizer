@@ -28,7 +28,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         BankWrapper GetBank(int townId);
 
         void PatchCitizen(int townId, CitizensWrapper citizens);
-        void PatchCitizenDetail(int townId, TownCitizenDetailModel citizenDetail);
+        void PatchCitizenDetail(TownCitizenDetailModel citizenDetail);
         CitizensWrapper GetCitizens(int townId);
 
 

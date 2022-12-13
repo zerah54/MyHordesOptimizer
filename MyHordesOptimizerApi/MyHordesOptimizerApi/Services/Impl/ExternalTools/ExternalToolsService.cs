@@ -200,19 +200,19 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             if (patchHomeMho)
                             {
                                 var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
-                                townCitizenDetail.idLastUpdateInfoHome = homeLastUpdateInfo;
+                                townCitizenDetail.IdLastUpdateInfoHome = homeLastUpdateInfo;
                             }
                             if (patchStatusMho)
                             {
                                 var statusLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
-                                townCitizenDetail.idLastUpdateInfoStatus = statusLastUpdateInfo;
+                                townCitizenDetail.IdLastUpdateInfoStatus = statusLastUpdateInfo;
                             }
                             if (patchHeroicActionMho)
                             {
                                 var heroicActionLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
-                                townCitizenDetail.idLastUpdateInfoHeroicAction = heroicActionLastUpdateInfo;
+                                townCitizenDetail.IdLastUpdateInfoHeroicAction = heroicActionLastUpdateInfo;
                             }
-                            MyHordesOptimizerRepository.PatchCitizenDetail(townId: townDetails.TownId, citizenDetail: townCitizenDetail);
+                            MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: townCitizenDetail);
                         }
                         catch (Exception e)
                         {
@@ -518,8 +518,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
             var citizenDetail = Mapper.Map<TownCitizenDetailModel>(homeDetails);
             citizenDetail.IdUser = userId;
-            citizenDetail.idLastUpdateInfoHome = homeLastUpdateInfo;
-            MyHordesOptimizerRepository.PatchCitizenDetail(townId: townId, citizenDetail: citizenDetail);
+            citizenDetail.IdTown = townId;
+            citizenDetail.IdLastUpdateInfoHome = homeLastUpdateInfo;
+            MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
             return lastUpdateInfo;
         }
 
@@ -531,8 +532,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
             var citizenDetail = GetTownCitizenStatusDetail(status);
             citizenDetail.IdUser = userId;
-            citizenDetail.idLastUpdateInfoHome = homeLastUpdateInfo;
-            MyHordesOptimizerRepository.PatchCitizenDetail(townId: townId, citizenDetail: citizenDetail);
+            citizenDetail.IdTown = townId;
+            citizenDetail.IdLastUpdateInfoHome = homeLastUpdateInfo;
+            MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
             return lastUpdateInfo;
         }
 
@@ -587,7 +589,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 statusDetail.IsHandWounded = true;
                                 break;
                             case StatusValue.HangOver:
-                                statusDetail.IsHangOver = true;
+                                statusDetail.IsHungOver = true;
                                 break;
                             case StatusValue.HeadWounded:
                                 statusDetail.IsHeadWounded = true;
@@ -633,8 +635,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
             var citizenDetail = GetHeroicActionCitizenDetail(actionHeroics);
             citizenDetail.IdUser = userId;
-            citizenDetail.idLastUpdateInfoHome = homeLastUpdateInfo;
-            MyHordesOptimizerRepository.PatchCitizenDetail(townId: townId, citizenDetail: citizenDetail);
+            citizenDetail.IdTown = townId;
+            citizenDetail.IdLastUpdateInfoHome = homeLastUpdateInfo;
+            MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
             return lastUpdateInfo;
         }
 
