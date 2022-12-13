@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.12
+// @version      1.0.0-beta.13
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,7 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[fix] Correctif des erreurs liées à la mise à jour du contenu des sacs`;
++ `[fix] Correctif du comportement à la mise à jour de GH`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -6693,7 +6693,7 @@ function updateExternalTools() {
         onload: function(response){
             if (response.status === 200) {
                 if (response.response.bigBrothHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_bbh_updated_key, true);
-                if (response.response.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
+                if (response.response.gestHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
                 if (response.response.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
 
                 let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
