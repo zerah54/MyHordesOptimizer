@@ -639,6 +639,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                   ,bi.isBroken AS IsBroken
                                   ,bagLuiUser.name AS BagLastUpdateUserName
                                   ,bagLui.dateUpdate AS BagLastUpdateDateUpdate
+                                  ,heroicActionLuiUser.name AS HeroicActionLastUpdateInfoUserName
+                                  ,heroicActionLui.dateUpdate AS HeroicActionLastUpdateDateUpdate
+                                  ,homeLuiUser.name AS HomeLastUpdateInfoUserName
+                                  ,homeLui.dateUpdate AS HomeLastUpdateDateUpdate
+                                  ,statusLuiUser.name AS StatusLastUpdateInfoUserName
+                                  ,statusLui.dateUpdate AS StatusLastUpdateDateUpdate
                                   ,tc.idBag AS BagId
                               FROM TownCitizen tc
                               INNER JOIN Users citizen ON citizen.idUser = tc.idUser
@@ -649,6 +655,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
                               LEFT JOIN Users bagLuiUser ON bagLuiUser.idUser = bagLui.idUser
                               LEFT JOIN BagItem bi on bi.idBag = bag.idBag
                               LEFT JOIN ItemComplet i ON i.idItem = bi.idItem
+                              LEFT JOIN LastUpdateInfo heroicActionLui ON heroicActionLui.idLastUpdateInfo = tc.idLastUpdateInfoHeroicAction 
+                              LEFT JOIN Users heroicActionLuiUser ON heroicActionLuiUser.idUser = heroicActionLui.idUser
+                              LEFT JOIN LastUpdateInfo homeLui ON homeLui.idLastUpdateInfo = tc.idLastUpdateInfoHome 
+                              LEFT JOIN Users homeLuiUser ON homeLuiUser.idUser = homeLui.idUser
+                              LEFT JOIN LastUpdateInfo statusLui ON statusLui.idLastUpdateInfo = tc.idLastUpdateInfoStatus 
+                              LEFT JOIN Users statusLuiUser ON statusLuiUser.idUser = statusLui.idUser
                               WHERE tc.idTown = @idTown";
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             var citizens = connection.Query<TownCitizenBagItemCompletModel>(query, new { idTown = townId });
@@ -1079,5 +1091,16 @@ namespace MyHordesOptimizerApi.Repository.Impl
         }
 
         #endregion
+
+        public int CreateLastUpdateInfo(LastUpdateInfo lastUpdateInfo)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
+                                                                   VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.UpdateTime, IdUser = lastUpdateInfo.UserId });
+            connection.Close();
+            return idLastUpdateInfo;
+        }
+
     }
 }

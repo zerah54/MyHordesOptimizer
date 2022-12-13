@@ -56,6 +56,9 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
         public bool HasLuckyFind { get; set; }
         public bool HasCheatDeath { get; set; }
         public bool HasHeroicReturn { get; set; }
+        public DateTime? HeroicActionLastUpdateDateUpdate { get; set; }
+        public string? HeroicActionLastUpdateInfoUserName { get; set; }
+
         public int HouseLevel { get; set; }
         public bool HasAlarm { get; set; }
         public int ChestLevel { get; set; }
@@ -65,6 +68,9 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
         public int LabelLevel { get; set; }
         public int RestLevel { get; set; }
         public bool HasLock { get; set; }
+        public DateTime? HomeLastUpdateDateUpdate { get; set; }
+        public string? HomeLastUpdateInfoUserName { get; set; }
+
         public bool IsCleanBody { get; set; }
         public bool IsCamper { get; set; }
         public bool IsAddict { get; set; }
@@ -88,5 +94,7 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
         public bool IsLegWounded { get; set; }
         public bool IsEyeWounded { get; set; }
         public bool IsFootWounded { get; set; }
+        public DateTime? StatusLastUpdateDateUpdate { get; set; }
+        public string? StatusLastUpdateInfoUserName { get; set; }
     }
 }

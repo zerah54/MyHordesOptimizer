@@ -27,6 +27,8 @@ namespace MyHordesOptimizerApi.Models.Citizen
         public bool? HasLuckyFind { get; set; }
         public bool? HasCheatDeath { get; set; }
         public bool? HasHeroicReturn { get; set; }
+        public int? idLastUpdateInfoHeroicAction { get; set; }
+
         public int HouseLevel { get; set; }
         public bool HasAlarm { get; set; }
         public int ChestLevel { get; set; }
@@ -36,6 +38,8 @@ namespace MyHordesOptimizerApi.Models.Citizen
         public int LaboLevel { get; set; }
         public int RestLevel { get; set; }
         public bool HasLock { get; set; }
+        public int? idLastUpdateInfoHome { get; set; }
+
 
         public bool IsCleanBody { get; set; }
         public bool IsCamper { get; set; }
@@ -60,6 +64,7 @@ namespace MyHordesOptimizerApi.Models.Citizen
         public bool IsLegWounded { get; set; }
         public bool IsEyeWounded { get; set; }
         public bool IsFootWounded { get; set; }
+        public int? idLastUpdateInfoStatus { get; set; }
 
         internal void ImportHomeDetail(TownCitizenDetailModel homeDetail)
         {

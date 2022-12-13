@@ -310,6 +310,22 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     {
                         try
                         {
+                            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+                            if(patchHomeMho)
+                            {
+                                var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+                                townCitizenDetail.idLastUpdateInfoHome = homeLastUpdateInfo;
+                            }
+                            if(patchStatusMho)
+                            {
+                                var statusLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+                                townCitizenDetail.idLastUpdateInfoStatus = statusLastUpdateInfo;
+                            }
+                            if (patchHeroicActionMho)
+                            {
+                                var heroicActionLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+                                townCitizenDetail.idLastUpdateInfoHeroicAction = heroicActionLastUpdateInfo;
+                            }
                             MyHordesOptimizerRepository.PatchCitizenDetail(townId: townDetails.TownId, citizenDetail: townCitizenDetail);
                         }
                         catch (Exception e)

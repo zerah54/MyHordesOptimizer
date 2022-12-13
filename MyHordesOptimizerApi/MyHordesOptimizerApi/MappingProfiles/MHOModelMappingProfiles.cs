@@ -4,11 +4,12 @@ using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.MappingProfiles.Converters;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
-using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Items.Bank;
 using MyHordesOptimizerApi.Models.Views.Items.Citizen;
@@ -89,8 +90,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             CreateMap<IEnumerable<TownCitizenBagItemCompletModel>, CitizenBag>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src))
-                .ForMember(dest => dest.LastUpdateDateUpdate, opt => opt.MapFrom(src => GetLastUpdateDateWithNullCheck(src)))
-                .ForMember(dest => dest.LastUpdateUserName, opt => opt.MapFrom(src => GetLastUpdateUserNameWithNullCheck(src)))
+                .ForMember(dest => dest.LastUpdateDateUpdate, opt => opt.MapFrom(src => GetBagLastUpdateDateWithNullCheck(src)))
+                .ForMember(dest => dest.LastUpdateUserName, opt => opt.MapFrom(src => GetBagLastUpdateUserNameWithNullCheck(src)))
                 .ForMember(dest => dest.IdBag, opt => opt.MapFrom(src => GetBagIdWithNullCheck(src)));
 
             // Ruins
@@ -311,12 +312,125 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.LaboLevel, opt => opt.MapFrom(src => src.Lab))
                 .ForMember(dest => dest.RestLevel, opt => opt.MapFrom(src => src.Rest));
 
-            CreateMap<TownCitizenBagItemCompletModel, CitizenHome>();
-            CreateMap<TownCitizenBagItemCompletModel, CitizenStatus>();
-            CreateMap<TownCitizenBagItemCompletModel, CitizenActionsHeroic>();
+            CreateMap<TownCitizenBagItemCompletModel, CitizenHome>()
+                .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src))
+                .ForMember(dest => dest.LastUpdateDateUpdate, opt => opt.MapFrom(src => src.HomeLastUpdateDateUpdate))
+                .ForMember(dest => dest.LastUpdateUserName, opt => opt.MapFrom(src => src.HomeLastUpdateInfoUserName));
+            CreateMap<TownCitizenBagItemCompletModel, CitizenStatus>()
+                .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src))
+                .ForMember(dest => dest.LastUpdateDateUpdate, opt => opt.MapFrom(src => src.StatusLastUpdateDateUpdate))
+                .ForMember(dest => dest.LastUpdateUserName, opt => opt.MapFrom(src => src.StatusLastUpdateInfoUserName))
+                .ForMember(dest => dest.Icons, opt => opt.MapFrom(src => GetStatusIcons(src)));
+            CreateMap<TownCitizenBagItemCompletModel, CitizenActionsHeroic>()
+                .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src))
+                .ForMember(dest => dest.LastUpdateDateUpdate, opt => opt.MapFrom(src => src.HeroicActionLastUpdateDateUpdate))
+                .ForMember(dest => dest.LastUpdateUserName, opt => opt.MapFrom(src => src.HeroicActionLastUpdateInfoUserName));
+
+
+            CreateMap<TownCitizenBagItemCompletModel, CitizenHomeValue>();
+            CreateMap<TownCitizenBagItemCompletModel, CitizenStatusValue>();
+            CreateMap<TownCitizenBagItemCompletModel, CitizenActionsHeroicValue>();
         }
 
-        private DateTime? GetLastUpdateDateWithNullCheck(IEnumerable<TownCitizenBagItemCompletModel> src)
+        private List<string> GetStatusIcons(TownCitizenBagItemCompletModel src)
+        {
+            var result = new List<string>();
+            if (src.IsCleanBody)
+            {
+                result.Add(StatusValue.CleanBody.GetDescription());
+            }
+            if (src.IsCamper)
+            {
+                result.Add(StatusValue.Camper.GetDescription());
+            }
+            if (src.IsAddict)
+            {
+                result.Add(StatusValue.Addict.GetDescription());
+            }
+            if (src.IsDrugged)
+            {
+                result.Add(StatusValue.Drugged.GetDescription());
+            }
+            if (src.IsDrunk)
+            {
+                result.Add(StatusValue.Drunk.GetDescription());
+            }
+            if (src.IsGhoul)
+            {
+                result.Add(StatusValue.Ghoul.GetDescription());
+            }
+            if (src.IsQuenched)
+            {
+                result.Add(StatusValue.Quenched.GetDescription());
+            }
+            if (src.IsConvalescent)
+            {
+                result.Add(StatusValue.Convalescent.GetDescription());
+            }
+            if (src.IsSated)
+            {
+                result.Add(StatusValue.Sated.GetDescription());
+            }
+            if (src.IsCheatingDeathActive)
+            {
+                result.Add(StatusValue.CheatingDeathActive.GetDescription());
+            }
+            if (src.IsHangOver)
+            {
+                result.Add(StatusValue.HangOver.GetDescription());
+            }
+            if (src.IsImmune)
+            {
+                result.Add(StatusValue.Immune.GetDescription());
+            }
+            if (src.IsInfected)
+            {
+                result.Add(StatusValue.Infected.GetDescription());
+            }
+            if (src.IsTerrorised)
+            {
+                result.Add(StatusValue.Terrorised.GetDescription());
+            }
+            if (src.IsThirsty)
+            {
+                result.Add(StatusValue.Thirsty.GetDescription());
+            }
+            if (src.IsDesy)
+            {
+                result.Add(StatusValue.Desy.GetDescription());
+            }
+            if (src.IsTired)
+            {
+                result.Add(StatusValue.Tired.GetDescription());
+            }
+            if (src.IsHeadWounded)
+            {
+                result.Add(StatusValue.HeadWounded.GetDescription());
+            }
+            if (src.IsHandWounded)
+            {
+                result.Add(StatusValue.HandWounded.GetDescription());
+            }
+            if (src.IsArmWounded)
+            {
+                result.Add(StatusValue.ArmWounded.GetDescription());
+            }
+            if (src.IsLegWounded)
+            {
+                result.Add(StatusValue.LegWounded.GetDescription());
+            }
+            if (src.IsEyeWounded)
+            {
+                result.Add(StatusValue.EyeWounded.GetDescription());
+            }
+            if (src.IsFootWounded)
+            {
+                result.Add(StatusValue.FootWounded.GetDescription());
+            }
+            return result;
+        }
+
+        private DateTime? GetBagLastUpdateDateWithNullCheck(IEnumerable<TownCitizenBagItemCompletModel> src)
         {
             var first = src.FirstOrDefault();
             if (first != null)
@@ -328,7 +442,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 return null;
             }
         }
-        private string GetLastUpdateUserNameWithNullCheck(IEnumerable<TownCitizenBagItemCompletModel> src)
+        private string GetBagLastUpdateUserNameWithNullCheck(IEnumerable<TownCitizenBagItemCompletModel> src)
         {
             var first = src.FirstOrDefault();
             if (first != null)

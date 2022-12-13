@@ -20,6 +20,9 @@ ADD COLUMN hasCheatDeath BIT NULL DEFAULT NULL;
 ALTER TABLE TownCitizen
 ADD COLUMN hasHeroicReturn BIT NULL DEFAULT NULL;
 
+ALTER TABLE TownCitizen
+ADD COLUMN idLastUpdateInfoHeroicAction INT NULL DEFAULT NULL REFERENCES LastUpdateInfo(idLastUpdateInfo) AFTER hasHeroicReturn; 
+
 -- Home
 ALTER TABLE TownCitizen
 ADD COLUMN houseLevel INT NULL DEFAULT 0;
@@ -47,6 +50,9 @@ ADD COLUMN hasLock BIT NULL DEFAULT 0;
 
 ALTER TABLE TownCitizen
 ADD COLUMN restLevel INT NULL DEFAULT 0;
+
+ALTER TABLE TownCitizen
+ADD COLUMN idLastUpdateInfoHome INT NULL DEFAULT NULL REFERENCES LastUpdateInfo(idLastUpdateInfo) AFTER restLevel; 
 
 -- Status
 ALTER TABLE TownCitizen
@@ -117,3 +123,6 @@ ADD COLUMN isEyeWounded BIT NULL DEFAULT 0;
 
 ALTER TABLE TownCitizen
 ADD COLUMN isFootWounded BIT NULL DEFAULT 0;
+
+ALTER TABLE TownCitizen
+ADD COLUMN idLastUpdateInfoStatus INT NULL DEFAULT NULL REFERENCES LastUpdateInfo(idLastUpdateInfo) AFTER isFootWounded; 
