@@ -6,6 +6,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
 using MyHordesOptimizerApi.Extensions;
@@ -177,129 +178,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 var patchHeroicActionMho = false;
                 if (updateRequestDto.HeroicActions != null && updateRequestDto.HeroicActions.ToolsToUpdate.IsMyHordesOptimizer)
                 {
-                    var heroicActionDetail = new TownCitizenDetailModel();
-                    foreach (var action in updateRequestDto.HeroicActions.Actions)
-                    {
-                        foreach (ActionHeroicType heroicType in Enum.GetValues(typeof(ActionHeroicType)))
-                        {
-                            if (heroicType.IsEquivalentToLabel(action.Locale, action.Label))
-                            {
-                                switch (heroicType)
-                                {
-                                    case ActionHeroicType.Apag:
-                                        heroicActionDetail.ApagCharges = action.Value;
-                                        break;
-                                    case ActionHeroicType.CheatDeath:
-                                        heroicActionDetail.IsCheatingDeathActive = Convert.ToBoolean(action.Value);
-                                        break;
-                                    case ActionHeroicType.HeroicReturn:
-                                        heroicActionDetail.HasHeroicReturn = Convert.ToBoolean(action.Value);
-                                        break;
-                                    case ActionHeroicType.LuckyFind:
-                                        heroicActionDetail.HasLuckyFind = Convert.ToBoolean(action.Value);
-                                        break;
-                                    case ActionHeroicType.Rescue:
-                                        heroicActionDetail.HasRescue = Convert.ToBoolean(action.Value);
-                                        break;
-                                    case ActionHeroicType.SecondWind:
-                                        heroicActionDetail.HasSecondWind = Convert.ToBoolean(action.Value);
-                                        break;
-                                    case ActionHeroicType.Uppercut:
-                                        heroicActionDetail.HasUppercut = Convert.ToBoolean(action.Value);
-                                        break;                    
-                                }
-                            }
-                        }
-                    }
+                    var heroicActionDetail = GetHeroicActionCitizenDetail(updateRequestDto.HeroicActions.Actions);
                     townCitizenDetail.ImportHeroicActionDetail(heroicActionDetail);
                     patchHeroicActionMho = true;
                 }
                 var patchStatusMho = false;
                 if (updateRequestDto.Status != null && updateRequestDto.Status.ToolsToUpdate.IsMyHordesOptimizer)
                 {
-
-                    var statusDetail = new TownCitizenDetailModel();
-                    foreach (var status in updateRequestDto.Status.Values)
-                    {
-                        foreach (StatusValue statusValue in Enum.GetValues(typeof(StatusValue)))
-                        {
-                            if (statusValue.GetDescription() == status)
-                            {
-                                switch (statusValue)
-                                {
-                                    case StatusValue.Addict:
-                                        statusDetail.IsAddict = true;
-                                        break;
-                                    case StatusValue.ArmWounded:
-                                        statusDetail.IsArmWounded = true;
-                                        break;
-                                    case StatusValue.Camper:
-                                        statusDetail.IsCamper = true;
-                                        break;
-                                    case StatusValue.CheatingDeathActive:
-                                        statusDetail.IsCheatingDeathActive = true;
-                                        break;
-                                    case StatusValue.CleanBody:
-                                        statusDetail.IsCleanBody = true;
-                                        break;
-                                    case StatusValue.Convalescent:
-                                        statusDetail.IsConvalescent = true;
-                                        break;
-                                    case StatusValue.Desy:
-                                        statusDetail.IsDesy = true;
-                                        break;
-                                    case StatusValue.Drugged:
-                                        statusDetail.IsDrugged = true;
-                                        break;
-                                    case StatusValue.Drunk:
-                                        statusDetail.IsDrunk = true;
-                                        break;
-                                    case StatusValue.EyeWounded:
-                                        statusDetail.IsEyeWounded = true;
-                                        break;
-                                    case StatusValue.FootWounded:
-                                        statusDetail.IsFootWounded = true;
-                                        break;
-                                    case StatusValue.Ghoul:
-                                        statusDetail.IsGhoul = true;
-                                        break;
-                                    case StatusValue.HandWounded:
-                                        statusDetail.IsHandWounded = true;
-                                        break;
-                                    case StatusValue.HangOver:
-                                        statusDetail.IsHangOver = true;
-                                        break;
-                                    case StatusValue.HeadWounded:
-                                        statusDetail.IsHeadWounded = true;
-                                        break;
-                                    case StatusValue.Immune:
-                                        statusDetail.IsImmune = true;
-                                        break;
-                                    case StatusValue.Infected:
-                                        statusDetail.IsInfected = true;
-                                        break;
-                                    case StatusValue.LegWounded:
-                                        statusDetail.IsLegWounded = true;
-                                        break;
-                                    case StatusValue.Quenched:
-                                        statusDetail.IsQuenched = true;
-                                        break;
-                                    case StatusValue.Sated:
-                                        statusDetail.IsSated = true;
-                                        break;
-                                    case StatusValue.Terrorised:
-                                        statusDetail.IsTerrorised = true;
-                                        break;
-                                    case StatusValue.Thirsty:
-                                        statusDetail.IsThirsty = true;
-                                        break;
-                                    case StatusValue.Tired:
-                                        statusDetail.IsTired = true;
-                                        break;
-                                }
-                            }
-                        }
-                    }
+                    var statusDetail = GetTownCitizenStatusDetail(updateRequestDto.Status.Values);
                     townCitizenDetail.ImportStatusDetail(statusDetail);
                     patchStatusMho = true;
                 }
@@ -311,12 +197,12 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         try
                         {
                             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-                            if(patchHomeMho)
+                            if (patchHomeMho)
                             {
                                 var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
                                 townCitizenDetail.idLastUpdateInfoHome = homeLastUpdateInfo;
                             }
-                            if(patchStatusMho)
+                            if (patchStatusMho)
                             {
                                 var statusLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
                                 townCitizenDetail.idLastUpdateInfoStatus = statusLastUpdateInfo;
@@ -350,7 +236,6 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             await Task.WhenAll(tasks);
             return response;
         }
-
 
         public List<CaseGH> UpdateGHZoneRegen(UpdateZoneRegenDto requestDto)
         {
@@ -601,7 +486,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             }
         }
 
-        public LastUpdateInfo UpdateBag(int townId, int userId, List<UpdateObjectDto> bag)
+        public LastUpdateInfo UpdateCitizenBag(int townId, int userId, List<UpdateObjectDto> bag)
         {
             var bagId = MyHordesOptimizerRepository.GetCitizenBagId(townId, userId);
             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
@@ -623,6 +508,173 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             }
             MyHordesOptimizerRepository.PatchCitizenBags(townId, lastUpdateInfo, citizens);
             return lastUpdateInfo;
+        }
+
+        #endregion
+
+        public LastUpdateInfo UpdateCitizenHome(int townId, int userId, HomeUpgradeDetailsDto homeDetails)
+        {
+            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            var citizenDetail = Mapper.Map<TownCitizenDetailModel>(homeDetails);
+            citizenDetail.IdUser = userId;
+            citizenDetail.idLastUpdateInfoHome = homeLastUpdateInfo;
+            MyHordesOptimizerRepository.PatchCitizenDetail(townId: townId, citizenDetail: citizenDetail);
+            return lastUpdateInfo;
+        }
+
+        #region CitizenStatus
+
+        public LastUpdateInfo UpdateCitizenStatus(int townId, int userId, List<string> status)
+        {
+            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            var citizenDetail = GetTownCitizenStatusDetail(status);
+            citizenDetail.IdUser = userId;
+            citizenDetail.idLastUpdateInfoHome = homeLastUpdateInfo;
+            MyHordesOptimizerRepository.PatchCitizenDetail(townId: townId, citizenDetail: citizenDetail);
+            return lastUpdateInfo;
+        }
+
+        private TownCitizenDetailModel GetTownCitizenStatusDetail(List<string> statusValues)
+        {
+            var statusDetail = new TownCitizenDetailModel();
+            foreach (var status in statusValues)
+            {
+                foreach (StatusValue statusValue in Enum.GetValues(typeof(StatusValue)))
+                {
+                    if (statusValue.GetDescription() == status)
+                    {
+                        switch (statusValue)
+                        {
+                            case StatusValue.Addict:
+                                statusDetail.IsAddict = true;
+                                break;
+                            case StatusValue.ArmWounded:
+                                statusDetail.IsArmWounded = true;
+                                break;
+                            case StatusValue.Camper:
+                                statusDetail.IsCamper = true;
+                                break;
+                            case StatusValue.CheatingDeathActive:
+                                statusDetail.IsCheatingDeathActive = true;
+                                break;
+                            case StatusValue.CleanBody:
+                                statusDetail.IsCleanBody = true;
+                                break;
+                            case StatusValue.Convalescent:
+                                statusDetail.IsConvalescent = true;
+                                break;
+                            case StatusValue.Desy:
+                                statusDetail.IsDesy = true;
+                                break;
+                            case StatusValue.Drugged:
+                                statusDetail.IsDrugged = true;
+                                break;
+                            case StatusValue.Drunk:
+                                statusDetail.IsDrunk = true;
+                                break;
+                            case StatusValue.EyeWounded:
+                                statusDetail.IsEyeWounded = true;
+                                break;
+                            case StatusValue.FootWounded:
+                                statusDetail.IsFootWounded = true;
+                                break;
+                            case StatusValue.Ghoul:
+                                statusDetail.IsGhoul = true;
+                                break;
+                            case StatusValue.HandWounded:
+                                statusDetail.IsHandWounded = true;
+                                break;
+                            case StatusValue.HangOver:
+                                statusDetail.IsHangOver = true;
+                                break;
+                            case StatusValue.HeadWounded:
+                                statusDetail.IsHeadWounded = true;
+                                break;
+                            case StatusValue.Immune:
+                                statusDetail.IsImmune = true;
+                                break;
+                            case StatusValue.Infected:
+                                statusDetail.IsInfected = true;
+                                break;
+                            case StatusValue.LegWounded:
+                                statusDetail.IsLegWounded = true;
+                                break;
+                            case StatusValue.Quenched:
+                                statusDetail.IsQuenched = true;
+                                break;
+                            case StatusValue.Sated:
+                                statusDetail.IsSated = true;
+                                break;
+                            case StatusValue.Terrorised:
+                                statusDetail.IsTerrorised = true;
+                                break;
+                            case StatusValue.Thirsty:
+                                statusDetail.IsThirsty = true;
+                                break;
+                            case StatusValue.Tired:
+                                statusDetail.IsTired = true;
+                                break;
+                        }
+                    }
+                }
+            }
+            return statusDetail;
+        }
+
+        #endregion
+
+        #region CitizenHeroicAction
+
+        public LastUpdateInfo UpdateCitizenHeroicActions(int townId, int userId, List<ActionHeroicDto> actionHeroics)
+        {
+            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            var citizenDetail = GetHeroicActionCitizenDetail(actionHeroics);
+            citizenDetail.IdUser = userId;
+            citizenDetail.idLastUpdateInfoHome = homeLastUpdateInfo;
+            MyHordesOptimizerRepository.PatchCitizenDetail(townId: townId, citizenDetail: citizenDetail);
+            return lastUpdateInfo;
+        }
+
+        private TownCitizenDetailModel GetHeroicActionCitizenDetail(List<ActionHeroicDto> heroicActions)
+        {
+            var heroicActionDetail = new TownCitizenDetailModel();
+            foreach (var action in heroicActions)
+            {
+                foreach (ActionHeroicType heroicType in Enum.GetValues(typeof(ActionHeroicType)))
+                {
+                    if (heroicType.IsEquivalentToLabel(action.Locale, action.Label))
+                    {
+                        switch (heroicType)
+                        {
+                            case ActionHeroicType.Apag:
+                                heroicActionDetail.ApagCharges = action.Value;
+                                break;
+                            case ActionHeroicType.CheatDeath:
+                                heroicActionDetail.IsCheatingDeathActive = Convert.ToBoolean(action.Value);
+                                break;
+                            case ActionHeroicType.HeroicReturn:
+                                heroicActionDetail.HasHeroicReturn = Convert.ToBoolean(action.Value);
+                                break;
+                            case ActionHeroicType.LuckyFind:
+                                heroicActionDetail.HasLuckyFind = Convert.ToBoolean(action.Value);
+                                break;
+                            case ActionHeroicType.Rescue:
+                                heroicActionDetail.HasRescue = Convert.ToBoolean(action.Value);
+                                break;
+                            case ActionHeroicType.SecondWind:
+                                heroicActionDetail.HasSecondWind = Convert.ToBoolean(action.Value);
+                                break;
+                            case ActionHeroicType.Uppercut:
+                                heroicActionDetail.HasUppercut = Convert.ToBoolean(action.Value);
+                                break;
+                        }
+                    }
+                }
+            }
+            return heroicActionDetail;
         }
 
         #endregion

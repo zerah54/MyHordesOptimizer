@@ -2,9 +2,12 @@
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
@@ -86,7 +89,34 @@ namespace MyHordesOptimizerApi.Controllers
         public ActionResult<LastUpdateInfo> UpdateCitizenBag([FromQuery] int townId, [FromQuery] int userId, [FromBody] List<UpdateObjectDto> bag)
         {
             UserKeyProvider.UserId = userId;
-            var lastUpdateInfo = ExternalToolsService.UpdateBag(townId, userId, bag);
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenBag(townId, userId, bag);
+            return Ok(lastUpdateInfo);
+        }
+
+        [HttpPost]
+        [Route("Status")]
+        public ActionResult<LastUpdateInfo> UpdateCitizenStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] List<string> status)
+        {
+            UserKeyProvider.UserId = userId;
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenStatus(townId, userId, status);
+            return Ok(lastUpdateInfo);
+        }
+
+        [HttpPost]
+        [Route("HeroicActions")]
+        public ActionResult<LastUpdateInfo> UpdateCitizenHeroicActions([FromQuery] int townId, [FromQuery] int userId, [FromBody] List<ActionHeroicDto> actionHeroics)
+        {
+            UserKeyProvider.UserId = userId;
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenHeroicActions(townId, userId, actionHeroics);
+            return Ok(lastUpdateInfo);
+        }
+
+        [HttpPost]
+        [Route("Home")]
+        public ActionResult<LastUpdateInfo> UpdateCitizenHome([FromQuery] int townId, [FromQuery] int userId, [FromBody] HomeUpgradeDetailsDto homeDetails)
+        {
+            UserKeyProvider.UserId = userId;
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenHome(townId, userId, homeDetails);
             return Ok(lastUpdateInfo);
         }
     }
