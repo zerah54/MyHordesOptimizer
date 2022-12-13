@@ -90,8 +90,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             CreateMap<IEnumerable<TownCitizenBagItemCompletModel>, CitizenBag>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src))
-                .ForMember(dest => dest.LastUpdateDateUpdate, opt => opt.MapFrom(src => GetBagLastUpdateDateWithNullCheck(src)))
-                .ForMember(dest => dest.LastUpdateUserName, opt => opt.MapFrom(src => GetBagLastUpdateUserNameWithNullCheck(src)))
+                .ForMember(dest => dest.LastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = GetBagLastUpdateDateWithNullCheck(src).Value, UserName = GetBagLastUpdateUserNameWithNullCheck(src) }); opt.PreCondition(src => GetBagLastUpdateDateWithNullCheck(src).HasValue); })
                 .ForMember(dest => dest.IdBag, opt => opt.MapFrom(src => GetBagIdWithNullCheck(src)));
 
             // Ruins
@@ -314,17 +313,14 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             CreateMap<TownCitizenBagItemCompletModel, CitizenHome>()
                 .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src))
-                .ForMember(dest => dest.LastUpdateDateUpdate, opt => opt.MapFrom(src => src.HomeLastUpdateDateUpdate))
-                .ForMember(dest => dest.LastUpdateUserName, opt => opt.MapFrom(src => src.HomeLastUpdateInfoUserName));
+                .ForMember(dest => dest.LastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.HomeLastUpdateDateUpdate.Value, UserName = src.HomeLastUpdateInfoUserName }); opt.PreCondition(src => src.HomeLastUpdateDateUpdate.HasValue); });
             CreateMap<TownCitizenBagItemCompletModel, CitizenStatus>()
                 .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src))
-                .ForMember(dest => dest.LastUpdateDateUpdate, opt => opt.MapFrom(src => src.StatusLastUpdateDateUpdate))
-                .ForMember(dest => dest.LastUpdateUserName, opt => opt.MapFrom(src => src.StatusLastUpdateInfoUserName))
+                .ForMember(dest => dest.LastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.StatusLastUpdateDateUpdate.Value, UserName = src.StatusLastUpdateInfoUserName }); opt.PreCondition(src => src.StatusLastUpdateDateUpdate.HasValue); })
                 .ForMember(dest => dest.Icons, opt => opt.MapFrom(src => GetStatusIcons(src)));
             CreateMap<TownCitizenBagItemCompletModel, CitizenActionsHeroic>()
                 .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src))
-                .ForMember(dest => dest.LastUpdateDateUpdate, opt => opt.MapFrom(src => src.HeroicActionLastUpdateDateUpdate))
-                .ForMember(dest => dest.LastUpdateUserName, opt => opt.MapFrom(src => src.HeroicActionLastUpdateInfoUserName));
+                .ForMember(dest => dest.LastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.HeroicActionLastUpdateDateUpdate.Value, UserName = src.HeroicActionLastUpdateInfoUserName }); opt.PreCondition(src => src.HeroicActionLastUpdateDateUpdate.HasValue); });
 
 
             CreateMap<TownCitizenBagItemCompletModel, CitizenHomeValue>();

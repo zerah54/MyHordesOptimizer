@@ -691,8 +691,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 if (!citizenItems.Any()) // Si y'a pas d'item dans le sac, il faut aller chercher l'info du last update dans la liste sans le distinct !
                 {
                     var c = citizens.First(x => x.CitizenId == citizen.Id);
-                    citizen.Bag.LastUpdateDateUpdate = c.BagLastUpdateDateUpdate;
-                    citizen.Bag.LastUpdateUserName = c.BagLastUpdateUserName;
+                    if(c.BagLastUpdateDateUpdate.HasValue)
+                    {
+                        citizen.Bag.LastUpdateInfo = new LastUpdateInfo()
+                        {
+                            UpdateTime = c.BagLastUpdateDateUpdate.Value,
+                            UserName = c.BagLastUpdateUserName
+                        };
+                    }        
                     citizen.Bag.IdBag = c.BagId;
                 }
             });

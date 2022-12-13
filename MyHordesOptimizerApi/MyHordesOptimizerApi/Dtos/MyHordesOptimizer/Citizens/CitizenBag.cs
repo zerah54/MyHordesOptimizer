@@ -7,8 +7,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
     {
         public List<CitizenItem> Items { get; set; }
         public int? IdBag { get; set; }
-        public DateTime? LastUpdateDateUpdate { get; set; }
-        public string? LastUpdateUserName { get; set; }
+
+        public LastUpdateInfo? LastUpdateInfo { get; set; }
 
         public CitizenBag()
         {
