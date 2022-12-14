@@ -27,6 +27,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public int NombreJourHero { get; set; }
 
         public CitizenBag Bag { get; set; }
+        public CitizenHome Home { get; set; }
+        public CitizenStatus Status { get; set; }
+        public CitizenActionsHeroic ActionsHeroic { get; set; }
 
         public Citizen()
         {

@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
+namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map
 {
     public class UpdateCellInfoDto
     {

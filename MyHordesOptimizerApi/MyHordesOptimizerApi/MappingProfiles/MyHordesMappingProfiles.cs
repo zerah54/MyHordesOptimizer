@@ -3,6 +3,7 @@ using MyHordesOptimizerApi.Data.Ruins;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.MappingProfiles.Resolvers;
 using System.Collections.Generic;
 
@@ -15,7 +16,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<MyHordesMap, Town>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.MyHordesMap, opt => opt.MapFrom(src => src))
-                //.ForMember(dest => dest.Citizens, opt => opt.MapFrom(src => src.Citizens.ToDictionary(citizen => citizen.Name, citizen => citizen)))
                 .ForMember(dest => dest.Citizens, opt => opt.MapFrom<TownCitizensResolver>())
                 .ForMember(dest => dest.Bank, opt => opt.MapFrom<TownBankResolver>());
 
@@ -25,7 +25,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<MyHordesMeResponseDto, SimpleMe>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.TownDetails, opt => opt.MapFrom(src => src));
+                .ForMember(dest => dest.TownDetails, opt => opt.MapFrom(src => src))
+                .ForMember(dest => dest.JobDetails, opt => opt.MapFrom(src => src));
 
             CreateMap<MyHordesMeResponseDto, SimpleMeTownDetailDto>()
                 .ForMember(dest => dest.TownId, opt => { opt.MapFrom(src => src.Map.Id); opt.Condition(src => src.Map != null); })
@@ -33,7 +34,15 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.TownY, opt => { opt.MapFrom(src => src.Map.City.Y); opt.Condition(src => src.Map != null && src.Map.City != null); })
                 .ForMember(dest => dest.TownMaxX, opt => { opt.MapFrom(src => src.Map.Wid); opt.Condition(src => src.Map != null); })
                 .ForMember(dest => dest.TownMaxY, opt => { opt.MapFrom(src => src.Map.Hei); opt.Condition(src => src.Map != null); })
-                .ForMember(dest => dest.IsDevaste, opt => { opt.MapFrom(src => src.Map.City.Devast); opt.Condition(src => src.Map != null && src.Map.City != null); });
+                .ForMember(dest => dest.IsDevaste, opt => { opt.MapFrom(src => src.Map.City.Devast); opt.Condition(src => src.Map != null && src.Map.City != null); })
+                .ForMember(dest => dest.TownType, opt => { opt.MapFrom(src => src.Map.GetTownType()); });
+
+            CreateMap<MyHordesMeResponseDto, SimpleMeJobDetailDto>()
+                .ForMember(dest => dest.Id, opt => { opt.MapFrom(src => src.Job.Id); opt.Condition(src => src.Job != null); })
+                .ForMember(dest => dest.Uid, opt => { opt.MapFrom(src => src.Job.Uid); opt.Condition(src => src.Job != null); })
+                .ForMember(dest => dest.Label, opt => { opt.MapFrom(src => src.Job.Name.ToDictionnary()); opt.Condition(src => src.Job != null); })
+                .ForMember(dest => dest.Description, opt => { opt.MapFrom(src => src.Job.Desc.ToDictionnary()); opt.Condition(src => src.Job != null); });
+
 
             CreateMap<KeyValuePair<string, MyHordesApiRuinDto>, MyHordesOptimizerRuin>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Value.Id))

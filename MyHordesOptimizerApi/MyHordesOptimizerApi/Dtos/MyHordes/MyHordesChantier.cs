@@ -11,10 +11,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         public string Icon { get; set; }
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public MyHordesLangString Name { get; set; }
 
         [JsonProperty("desc")]
-        public string Desc { get; set; }
+        public MyHordesLangString Desc { get; set; }
 
         [JsonProperty("pa")]
         public int Pa { get; set; }

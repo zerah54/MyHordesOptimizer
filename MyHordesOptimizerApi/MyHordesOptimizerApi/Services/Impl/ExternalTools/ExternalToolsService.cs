@@ -3,9 +3,14 @@ using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
 using MyHordesOptimizerApi.Extensions;
-using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.Citizen;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -48,13 +53,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto)
         {
             var response = new UpdateResponseDto(updateRequestDto);
-
-            var bbh = updateRequestDto.Tools.IsBigBrothHordes;
-            var gh = updateRequestDto.Tools.IsGestHordes;
-            var fata = updateRequestDto.Tools.IsFataMorgana;
             var townDetails = updateRequestDto.TownDetails;
             var tasks = new List<Task>();
-            if (UpdateRequestToolsDetailsDto.IsApi(bbh))
+
+            #region Maps
+            var bbh = updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes;
+            var gh = updateRequestDto.Map.ToolsToUpdate.IsGestHordes;
+            var fata = updateRequestDto.Map.ToolsToUpdate.IsFataMorgana;
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(bbh))
             {
                 var bbhTask = Task.Run(() =>
                 {
@@ -64,13 +70,12 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
-                        response.BigBrothHordesStatus = e.Message;
+                        response.MapResponseDto.BigBrothHordesStatus = e.Message;
                     }
                 });
                 tasks.Add(bbhTask);
             }
-
-            if (UpdateRequestToolsDetailsDto.IsApi(fata))
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(fata))
             {
                 var fataTask = Task.Run(() =>
                 {
@@ -81,15 +86,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
-                        response.FataMorganaStatus = e.Message;
+                        response.MapResponseDto.FataMorganaStatus = e.Message;
                     }
                 });
                 tasks.Add(fataTask);
             }
-
             var ghTask = Task.Run(() =>
             {
-                if (UpdateRequestToolsDetailsDto.IsApi(gh) || UpdateRequestToolsDetailsDto.IsCell(gh))
+                if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(gh) || UpdateRequestMapToolsToUpdateDetailsDto.IsCell(gh))
                 {
                     try
                     {
@@ -97,14 +101,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
-                        response.GestHordesStatus = e.Message;
+                        response.MapResponseDto.GestHordesApiStatus = e.Message;
                     }
                 }
-                if (UpdateRequestToolsDetailsDto.IsCell(gh))
+                if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(gh))
                 {
                     try
                     {
-                        var cell = updateRequestDto.Cell;
+                        var cell = updateRequestDto.Map.Cell;
                         if (townDetails.IsDevaste || cell.DeadZombies > 0)
                         {
                             var request = Mapper.Map<GestHordesUpdateCaseRequest>(updateRequestDto);
@@ -135,28 +139,103 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
-                        response.GestHordesStatus = e.Message;
+                        response.MapResponseDto.GestHordesCellsStatus = e.Message;
                     }
                 }
             });
             tasks.Add(ghTask);
+            #endregion
 
-            var bagTask = Task.Run(() =>
+            #region Bag
+            if (updateRequestDto.Bags != null && updateRequestDto.Bags.ToolsToUpdate.IsMyHordesOptimizer)
             {
-                try
+                var mHOBagTask = Task.Run(() =>
                 {
-                    UpdateBags(townDetails.TownId, updateRequestDto.Bags);
+                    try
+                    {
+                        UpdateBags(townDetails.TownId, updateRequestDto.Bags.Contents);
 
-                }
-                catch (Exception e)
+                    }
+                    catch (Exception e)
+                    {
+                        response.BagsResponseDto.MhoStatus = e.Message;
+                    }
+                });
+                tasks.Add(mHOBagTask);
+            }
+            #endregion
+
+            try
+            {
+                var patchHomeMho = false;
+                var townCitizenDetail = new TownCitizenDetailModel(townDetails.TownId, UserInfoProvider.UserId);
+                if (updateRequestDto.Amelios != null && updateRequestDto.Amelios.ToolsToUpdate.IsMyHordesOptimizer)
                 {
-                    response.MhoStatus = e.Message;
-                }            });
-            tasks.Add(bagTask);
+                    var homeDetail = Mapper.Map<TownCitizenDetailModel>(updateRequestDto.Amelios.Values);
+                    townCitizenDetail.ImportHomeDetail(homeDetail);
+                    patchHomeMho = true;
+                }
+                var patchHeroicActionMho = false;
+                if (updateRequestDto.HeroicActions != null && updateRequestDto.HeroicActions.ToolsToUpdate.IsMyHordesOptimizer)
+                {
+                    var heroicActionDetail = GetHeroicActionCitizenDetail(updateRequestDto.HeroicActions.Actions);
+                    townCitizenDetail.ImportHeroicActionDetail(heroicActionDetail);
+                    patchHeroicActionMho = true;
+                }
+                var patchStatusMho = false;
+                if (updateRequestDto.Status != null && updateRequestDto.Status.ToolsToUpdate.IsMyHordesOptimizer)
+                {
+                    var statusDetail = GetTownCitizenStatusDetail(updateRequestDto.Status.Values);
+                    townCitizenDetail.ImportStatusDetail(statusDetail);
+                    patchStatusMho = true;
+                }
+
+                if (patchHomeMho || patchStatusMho || patchHeroicActionMho)
+                {
+                    var mHOCitizenDetailTask = Task.Run(() =>
+                    {
+                        try
+                        {
+                            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+                            if (patchHomeMho)
+                            {
+                                var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+                                townCitizenDetail.IdLastUpdateInfoHome = homeLastUpdateInfo;
+                            }
+                            if (patchStatusMho)
+                            {
+                                var statusLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+                                townCitizenDetail.IdLastUpdateInfoStatus = statusLastUpdateInfo;
+                            }
+                            if (patchHeroicActionMho)
+                            {
+                                var heroicActionLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+                                townCitizenDetail.IdLastUpdateInfoHeroicAction = heroicActionLastUpdateInfo;
+                            }
+                            MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: townCitizenDetail);
+                        }
+                        catch (Exception e)
+                        {
+                            response.HeroicActionsResponseDto.MhoStatus = e.Message;
+                            response.StatusResponseDto.MhoStatus = e.Message;
+                            response.HomeResponseDto.MhoStatus = e.Message;
+                        }
+                    });
+                    tasks.Add(mHOCitizenDetailTask);
+                }
+            }
+            catch (Exception e)
+            {
+                response.HeroicActionsResponseDto.MhoStatus = e.Message;
+                response.HeroicActionsResponseDto.GestHordesStatus = e.Message;
+                response.StatusResponseDto.MhoStatus = e.Message;
+                response.HomeResponseDto.MhoStatus = e.Message;
+                response.HomeResponseDto.GestHordesStatus = e.Message;
+            }
+
             await Task.WhenAll(tasks);
             return response;
         }
-
 
         public List<CaseGH> UpdateGHZoneRegen(UpdateZoneRegenDto requestDto)
         {
@@ -379,7 +458,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         #region Bags
 
-        private void UpdateBags(int townId, List<UpdateBagDto> bags)
+        private void UpdateBags(int townId, List<UpdateBagsContentsDto> bags)
         {
             if (bags != null)
             {
@@ -407,7 +486,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             }
         }
 
-        public LastUpdateInfo UpdateBag(int townId, int userId, List<UpdateObjectDto> bag)
+        public LastUpdateInfo UpdateCitizenBag(int townId, int userId, List<UpdateObjectDto> bag)
         {
             var bagId = MyHordesOptimizerRepository.GetCitizenBagId(townId, userId);
             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
@@ -429,6 +508,176 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             }
             MyHordesOptimizerRepository.PatchCitizenBags(townId, lastUpdateInfo, citizens);
             return lastUpdateInfo;
+        }
+
+        #endregion
+
+        public LastUpdateInfo UpdateCitizenHome(int townId, int userId, CitizenHomeValue homeDetails)
+        {
+            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            var citizenDetail = Mapper.Map<TownCitizenDetailModel>(homeDetails);
+            citizenDetail.IdUser = userId;
+            citizenDetail.IdTown = townId;
+            citizenDetail.IdLastUpdateInfoHome = homeLastUpdateInfo;
+            MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
+            return lastUpdateInfo;
+        }
+
+        #region CitizenStatus
+
+        public LastUpdateInfo UpdateCitizenStatus(int townId, int userId, List<string> status)
+        {
+            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            var statusLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            var citizenDetail = GetTownCitizenStatusDetail(status);
+            citizenDetail.IdUser = userId;
+            citizenDetail.IdTown = townId;
+            citizenDetail.IdLastUpdateInfoStatus = statusLastUpdateInfo;
+            MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
+            return lastUpdateInfo;
+        }
+
+        private TownCitizenDetailModel GetTownCitizenStatusDetail(List<string> statusValues)
+        {
+            var statusDetail = new TownCitizenDetailModel();
+            foreach (var status in statusValues)
+            {
+                foreach (StatusValue statusValue in Enum.GetValues(typeof(StatusValue)))
+                {
+                    if (statusValue.GetDescription() == status)
+                    {
+                        switch (statusValue)
+                        {
+                            case StatusValue.Addict:
+                                statusDetail.IsAddict = true;
+                                break;
+                            case StatusValue.ArmWounded:
+                                statusDetail.IsArmWounded = true;
+                                break;
+                            case StatusValue.Camper:
+                                statusDetail.IsCamper = true;
+                                break;
+                            case StatusValue.CheatingDeathActive:
+                                statusDetail.IsCheatingDeathActive = true;
+                                break;
+                            case StatusValue.CleanBody:
+                                statusDetail.IsCleanBody = true;
+                                break;
+                            case StatusValue.Convalescent:
+                                statusDetail.IsConvalescent = true;
+                                break;
+                            case StatusValue.Desy:
+                                statusDetail.IsDesy = true;
+                                break;
+                            case StatusValue.Drugged:
+                                statusDetail.IsDrugged = true;
+                                break;
+                            case StatusValue.Drunk:
+                                statusDetail.IsDrunk = true;
+                                break;
+                            case StatusValue.EyeWounded:
+                                statusDetail.IsEyeWounded = true;
+                                break;
+                            case StatusValue.FootWounded:
+                                statusDetail.IsFootWounded = true;
+                                break;
+                            case StatusValue.Ghoul:
+                                statusDetail.IsGhoul = true;
+                                break;
+                            case StatusValue.HandWounded:
+                                statusDetail.IsHandWounded = true;
+                                break;
+                            case StatusValue.HangOver:
+                                statusDetail.IsHungOver = true;
+                                break;
+                            case StatusValue.HeadWounded:
+                                statusDetail.IsHeadWounded = true;
+                                break;
+                            case StatusValue.Immune:
+                                statusDetail.IsImmune = true;
+                                break;
+                            case StatusValue.Infected:
+                                statusDetail.IsInfected = true;
+                                break;
+                            case StatusValue.LegWounded:
+                                statusDetail.IsLegWounded = true;
+                                break;
+                            case StatusValue.Quenched:
+                                statusDetail.IsQuenched = true;
+                                break;
+                            case StatusValue.Sated:
+                                statusDetail.IsSated = true;
+                                break;
+                            case StatusValue.Terrorised:
+                                statusDetail.IsTerrorised = true;
+                                break;
+                            case StatusValue.Thirsty:
+                                statusDetail.IsThirsty = true;
+                                break;
+                            case StatusValue.Tired:
+                                statusDetail.IsTired = true;
+                                break;
+                        }
+                    }
+                }
+            }
+            return statusDetail;
+        }
+
+        #endregion
+
+        #region CitizenHeroicAction
+
+        public LastUpdateInfo UpdateCitizenHeroicActions(int townId, int userId, CitizenActionsHeroicValue actionHeroics)
+        {
+            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            var heroicActionLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            var citizenDetail = Mapper.Map<TownCitizenDetailModel>(actionHeroics);
+            citizenDetail.IdUser = userId;
+            citizenDetail.IdTown = townId;
+            citizenDetail.IdLastUpdateInfoHeroicAction = heroicActionLastUpdateInfo;
+            MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
+            return lastUpdateInfo;
+        }
+
+        private TownCitizenDetailModel GetHeroicActionCitizenDetail(List<ActionHeroicDto> heroicActions)
+        {
+            var heroicActionDetail = new TownCitizenDetailModel();
+            foreach (var action in heroicActions)
+            {
+                foreach (ActionHeroicType heroicType in Enum.GetValues(typeof(ActionHeroicType)))
+                {
+                    if (heroicType.IsEquivalentToLabel(action.Locale, action.Label))
+                    {
+                        switch (heroicType)
+                        {
+                            case ActionHeroicType.Apag:
+                                heroicActionDetail.ApagCharges = action.Value;
+                                break;
+                            case ActionHeroicType.CheatDeath:
+                                heroicActionDetail.HasCheatDeath = Convert.ToBoolean(action.Value);
+                                break;
+                            case ActionHeroicType.HeroicReturn:
+                                heroicActionDetail.HasHeroicReturn = Convert.ToBoolean(action.Value);
+                                break;
+                            case ActionHeroicType.LuckyFind:
+                                heroicActionDetail.HasLuckyFind = Convert.ToBoolean(action.Value);
+                                break;
+                            case ActionHeroicType.Rescue:
+                                heroicActionDetail.HasRescue = Convert.ToBoolean(action.Value);
+                                break;
+                            case ActionHeroicType.SecondWind:
+                                heroicActionDetail.HasSecondWind = Convert.ToBoolean(action.Value);
+                                break;
+                            case ActionHeroicType.Uppercut:
+                                heroicActionDetail.HasUppercut = Convert.ToBoolean(action.Value);
+                                break;
+                        }
+                    }
+                }
+            }
+            return heroicActionDetail;
         }
 
         #endregion

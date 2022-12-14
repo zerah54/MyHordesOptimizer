@@ -6,6 +6,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.Citizen;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Items.Bank;
@@ -71,7 +72,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             {
                 Id = townId
             };
-            town.Citizens = GetCitizensWithBag(townId);
+            town.Citizens = GetCitizens(townId);
             town.Bank = GetBank(townId);
             town.WishList = GetWishList(townId);
             return town;
@@ -536,14 +537,23 @@ namespace MyHordesOptimizerApi.Repository.Impl
             foreach (var citizenToUpdate in townCitizenModelsToUpdate)
             {
                 citizenToUpdate.IdBag = existings.Single(existing => existing.idUser == citizenToUpdate.IdUser).idBag;
-                var keys = new Dictionary<string, Func<TownCitizenModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser } };
-                connection.Update(citizenToUpdate, keys);
+                connection.Execute(@"UPDATE TownCitizen 
+                                     SET HomeMessage = @HomeMessage, JobName = @JobName, JobUID = @JobUID, Avatar = @Avatar, PositionX = @PositionX, PositionY = @PositionY, IsGhost = @IsGhost, IdLastUpdateInfo = @IdLastUpdateInfo 
+                                     WHERE IdTown = @IdTown AND IdUser = @IdUser", new { HomeMessage = citizenToUpdate.HomeMessage, JobName = citizenToUpdate.JobName, JobUID = citizenToUpdate.JobUID, Avatar = citizenToUpdate.Avatar, PositionX = citizenToUpdate.PositionX, PositionY = citizenToUpdate.PositionY, IsGhost = citizenToUpdate.IsGhost, IdLastUpdateInfo = citizenToUpdate.IdLastUpdateInfo, IdTown = townId, IdUser = citizenToUpdate.IdUser});
             }
-            //connection.ExecuteScalar("DELETE FROM TownCitizen WHERE idTown = @IdTown AND idLastUpdateInfo != @IdLastUpdateInfo", new { IdTown = townId, IdLastUpdateInfo = idLastUpdateInfo });
             connection.Close();
         }
 
-        public CitizensWrapper GetCitizensWithBag(int townId)
+        public void PatchCitizenDetail(TownCitizenDetailModel citizenDetail)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var keys = new Dictionary<string, Func<TownCitizenDetailModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser } };
+            connection.Update(citizenDetail, keys, ignoreNull: true);
+            connection.Close();
+        }
+
+        public CitizensWrapper GetCitizens(int townId)
         {
             var query = $@"SELECT tc.idTown AS TownId
                                   ,citizen.idUser AS CitizenId
@@ -556,6 +566,46 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                   ,isGhost AS CitizenIsGhost
                                   ,tc.idLastUpdateInfo AS LastUpdateInfoId
                                   ,tc.avatar
+                                  ,tc.hasRescue
+                                  ,tc.APAGcharges
+                                  ,tc.hasUppercut
+                                  ,tc.hasSecondWind
+                                  ,tc.hasLuckyFind
+                                  ,tc.hasCheatDeath
+                                  ,tc.hasHeroicReturn
+                                  ,tc.houseLevel
+                                  ,tc.hasAlarm
+                                  ,tc.chestLevel
+                                  ,tc.hasCurtain
+                                  ,tc.renfortLevel
+                                  ,tc.hasFence
+                                  ,tc.kitchenLevel
+                                  ,tc.laboLevel
+                                  ,tc.hasLock
+                                  ,tc.restLevel
+                                  ,tc.isCleanBody
+                                  ,tc.isCamper
+                                  ,tc.isAddict
+                                  ,tc.isDrugged
+                                  ,tc.isDrunk
+                                  ,tc.isGhoul
+                                  ,tc.isQuenched
+                                  ,tc.isConvalescent
+                                  ,tc.isSated
+                                  ,tc.isCheatingDeathActive
+                                  ,tc.isHungOver
+                                  ,tc.isImmune
+                                  ,tc.isInfected
+                                  ,tc.isTerrorised
+                                  ,tc.isThirsty
+                                  ,tc.isDesy
+                                  ,tc.isTired
+                                  ,tc.isHeadWounded
+                                  ,tc.isHandWounded
+                                  ,tc.isArmWounded
+                                  ,tc.isLegWounded
+                                  ,tc.isEyeWounded
+                                  ,tc.isFootWounded
 	                              ,lui.idUser AS LastUpdateInfoUserId
 	                              ,lui.dateUpdate AS LastUpdateDateUpdate
 	                              ,userUpdater.name AS LastUpdateInfoUserName
@@ -590,6 +640,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                   ,bi.isBroken AS IsBroken
                                   ,bagLuiUser.name AS BagLastUpdateUserName
                                   ,bagLui.dateUpdate AS BagLastUpdateDateUpdate
+                                  ,heroicActionLuiUser.name AS HeroicActionLastUpdateInfoUserName
+                                  ,heroicActionLui.dateUpdate AS HeroicActionLastUpdateDateUpdate
+                                  ,homeLuiUser.name AS HomeLastUpdateInfoUserName
+                                  ,homeLui.dateUpdate AS HomeLastUpdateDateUpdate
+                                  ,statusLuiUser.name AS StatusLastUpdateInfoUserName
+                                  ,statusLui.dateUpdate AS StatusLastUpdateDateUpdate
                                   ,tc.idBag AS BagId
                               FROM TownCitizen tc
                               INNER JOIN Users citizen ON citizen.idUser = tc.idUser
@@ -600,6 +656,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
                               LEFT JOIN Users bagLuiUser ON bagLuiUser.idUser = bagLui.idUser
                               LEFT JOIN BagItem bi on bi.idBag = bag.idBag
                               LEFT JOIN ItemComplet i ON i.idItem = bi.idItem
+                              LEFT JOIN LastUpdateInfo heroicActionLui ON heroicActionLui.idLastUpdateInfo = tc.idLastUpdateInfoHeroicAction 
+                              LEFT JOIN Users heroicActionLuiUser ON heroicActionLuiUser.idUser = heroicActionLui.idUser
+                              LEFT JOIN LastUpdateInfo homeLui ON homeLui.idLastUpdateInfo = tc.idLastUpdateInfoHome 
+                              LEFT JOIN Users homeLuiUser ON homeLuiUser.idUser = homeLui.idUser
+                              LEFT JOIN LastUpdateInfo statusLui ON statusLui.idLastUpdateInfo = tc.idLastUpdateInfoStatus 
+                              LEFT JOIN Users statusLuiUser ON statusLuiUser.idUser = statusLui.idUser
                               WHERE tc.idTown = @idTown";
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             var citizens = connection.Query<TownCitizenBagItemCompletModel>(query, new { idTown = townId });
@@ -618,6 +680,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 item.Actions = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.ActionName)).Select(i => i.ActionName).Distinct();
                 item.Properties = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.PropertyName)).Select(i => i.PropertyName).Distinct();
             }
+
             var citizenWrapper = new CitizensWrapper()
             {
                 LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.First()),
@@ -630,8 +693,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 if (!citizenItems.Any()) // Si y'a pas d'item dans le sac, il faut aller chercher l'info du last update dans la liste sans le distinct !
                 {
                     var c = citizens.First(x => x.CitizenId == citizen.Id);
-                    citizen.Bag.LastUpdateDateUpdate = c.BagLastUpdateDateUpdate;
-                    citizen.Bag.LastUpdateUserName = c.BagLastUpdateUserName;
+                    if(c.BagLastUpdateDateUpdate.HasValue)
+                    {
+                        citizen.Bag.LastUpdateInfo = new LastUpdateInfo()
+                        {
+                            UpdateTime = c.BagLastUpdateDateUpdate.Value,
+                            UserName = c.BagLastUpdateUserName
+                        };
+                    }        
                     citizen.Bag.IdBag = c.BagId;
                 }
             });
@@ -1030,5 +1099,16 @@ namespace MyHordesOptimizerApi.Repository.Impl
         }
 
         #endregion
+
+        public int CreateLastUpdateInfo(LastUpdateInfo lastUpdateInfo)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
+                                                                   VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.UpdateTime, IdUser = lastUpdateInfo.UserId });
+            connection.Close();
+            return idLastUpdateInfo;
+        }
+
     }
 }

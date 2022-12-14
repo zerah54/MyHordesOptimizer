@@ -2,8 +2,13 @@
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -44,13 +49,13 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(updateRequestDto.TownDetails)} cannot be empty");
             }
-            var bbh = updateRequestDto.Tools.IsBigBrothHordes;
-            var fata = updateRequestDto.Tools.IsFataMorgana;
-            if (UpdateRequestToolsDetailsDto.IsCell(bbh))
+            var bbh = updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes;
+            var fata = updateRequestDto.Map.ToolsToUpdate.IsFataMorgana;
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(bbh))
             {
                 return BadRequest($"IsBigBrothHordes ne peut pas avoir une valeur autre que \"api\" ou \"none\"");
             }
-            if (UpdateRequestToolsDetailsDto.IsCell(fata))
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(fata))
             {
                 return BadRequest($"IsFataMorgana ne peut pas avoir une valeur autre que \"api\" ou \"none\"");
             }
@@ -84,7 +89,34 @@ namespace MyHordesOptimizerApi.Controllers
         public ActionResult<LastUpdateInfo> UpdateCitizenBag([FromQuery] int townId, [FromQuery] int userId, [FromBody] List<UpdateObjectDto> bag)
         {
             UserKeyProvider.UserId = userId;
-            var lastUpdateInfo = ExternalToolsService.UpdateBag(townId, userId, bag);
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenBag(townId, userId, bag);
+            return Ok(lastUpdateInfo);
+        }
+
+        [HttpPost]
+        [Route("Status")]
+        public ActionResult<LastUpdateInfo> UpdateCitizenStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] List<string> status)
+        {
+            UserKeyProvider.UserId = userId;
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenStatus(townId, userId, status);
+            return Ok(lastUpdateInfo);
+        }
+
+        [HttpPost]
+        [Route("HeroicActions")]
+        public ActionResult<LastUpdateInfo> UpdateCitizenHeroicActions([FromQuery] int townId, [FromQuery] int userId, [FromBody] CitizenActionsHeroicValue actionHeroics)
+        {
+            UserKeyProvider.UserId = userId;
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenHeroicActions(townId, userId, actionHeroics);
+            return Ok(lastUpdateInfo);
+        }
+
+        [HttpPost]
+        [Route("Home")]
+        public ActionResult<LastUpdateInfo> UpdateCitizenHome([FromQuery] int townId, [FromQuery] int userId, [FromBody] CitizenHomeValue homeDetails)
+        {
+            UserKeyProvider.UserId = userId;
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenHome(townId, userId, homeDetails);
             return Ok(lastUpdateInfo);
         }
     }
