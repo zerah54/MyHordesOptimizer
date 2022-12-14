@@ -529,11 +529,11 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         public LastUpdateInfo UpdateCitizenStatus(int townId, int userId, List<string> status)
         {
             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            var statusLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
             var citizenDetail = GetTownCitizenStatusDetail(status);
             citizenDetail.IdUser = userId;
             citizenDetail.IdTown = townId;
-            citizenDetail.IdLastUpdateInfoHome = homeLastUpdateInfo;
+            citizenDetail.IdLastUpdateInfoStatus = statusLastUpdateInfo;
             MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
             return lastUpdateInfo;
         }
@@ -632,11 +632,11 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         public LastUpdateInfo UpdateCitizenHeroicActions(int townId, int userId, CitizenActionsHeroicValue actionHeroics)
         {
             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            var heroicActionLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
             var citizenDetail = Mapper.Map<TownCitizenDetailModel>(actionHeroics);
             citizenDetail.IdUser = userId;
             citizenDetail.IdTown = townId;
-            citizenDetail.IdLastUpdateInfoHome = homeLastUpdateInfo;
+            citizenDetail.IdLastUpdateInfoHeroicAction = heroicActionLastUpdateInfo;
             MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
             return lastUpdateInfo;
         }
