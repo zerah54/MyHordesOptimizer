@@ -6,5 +6,6 @@
         public string LoginPath { get; }
         public string MajPath { get; }
         public string MajCasePath { get; }
+        public string MajCitizen { get; }
     }
 }

@@ -12,6 +12,7 @@ namespace MyHordesOptimizerApi.Configuration.Impl.ExternalTools
         public string MajPath => _configuration.GetValue<string>("MajPath");
 
         public string MajCasePath => _configuration.GetValue<string>("MajCasePath");
+        public string MajCitizen => _configuration.GetValue<string>("MajCitizen");
 
         private IConfigurationSection _configuration;
 

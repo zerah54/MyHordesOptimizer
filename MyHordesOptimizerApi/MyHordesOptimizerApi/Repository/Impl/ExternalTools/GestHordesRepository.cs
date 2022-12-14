@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes;
+using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.Citizen;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Abstract;
@@ -99,6 +100,11 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
                 {"Cookie", $"PHPSESSID={sessid};REMEMBERME={rememberMe}" }
             };
             return majHeaders;
+        }
+
+        public void UpdateCitizen(GestHordesMajCitizenRequest ghUpdateCitizenRequest)
+        {
+            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajCitizen}", body: ghUpdateCitizenRequest);
         }
 
         protected override void CustomizeHttpClient(HttpClient client)

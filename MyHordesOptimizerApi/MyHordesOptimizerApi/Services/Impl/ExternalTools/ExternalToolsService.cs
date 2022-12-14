@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes;
+using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.Citizen;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
@@ -167,29 +168,62 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
             try
             {
-                var patchHomeMho = false;
                 var townCitizenDetail = new TownCitizenDetailModel(townDetails.TownId, UserInfoProvider.UserId);
-                if (updateRequestDto.Amelios != null && updateRequestDto.Amelios.ToolsToUpdate.IsMyHordesOptimizer)
+                var ghUpdateCitizenRequest = new GestHordesMajCitizenRequest(UserInfoProvider.UserId, UserInfoProvider.UserKey);
+
+                var patchHomeMho = false;
+                var patchHomeGh = false;
+                if (updateRequestDto.Amelios != null)
                 {
-                    var homeDetail = Mapper.Map<TownCitizenDetailModel>(updateRequestDto.Amelios.Values);
-                    townCitizenDetail.ImportHomeDetail(homeDetail);
-                    patchHomeMho = true;
-                }
-                var patchHeroicActionMho = false;
-                if (updateRequestDto.HeroicActions != null && updateRequestDto.HeroicActions.ToolsToUpdate.IsMyHordesOptimizer)
-                {
-                    var heroicActionDetail = GetHeroicActionCitizenDetail(updateRequestDto.HeroicActions.Actions);
-                    townCitizenDetail.ImportHeroicActionDetail(heroicActionDetail);
-                    patchHeroicActionMho = true;
-                }
-                var patchStatusMho = false;
-                if (updateRequestDto.Status != null && updateRequestDto.Status.ToolsToUpdate.IsMyHordesOptimizer)
-                {
-                    var statusDetail = GetTownCitizenStatusDetail(updateRequestDto.Status.Values);
-                    townCitizenDetail.ImportStatusDetail(statusDetail);
-                    patchStatusMho = true;
+                    if (updateRequestDto.Amelios.ToolsToUpdate.IsMyHordesOptimizer)
+                    {
+                        var homeDetail = Mapper.Map<TownCitizenDetailModel>(updateRequestDto.Amelios.Values);
+                        townCitizenDetail.ImportHomeDetail(homeDetail);
+                        patchHomeMho = true;
+                    }
+                    if (updateRequestDto.Amelios.ToolsToUpdate.IsGestHordes)
+                    {
+                        ghUpdateCitizenRequest.Maison = Mapper.Map<GestHordesMajCitizenMaisonDto>(updateRequestDto.Amelios.Values);
+                        patchHomeGh = true;
+                    }
                 }
 
+                var patchHeroicActionMho = false;
+                var patchHeroicActionGh = false;
+                if(updateRequestDto.HeroicActions != null)
+                {
+                    var heroicActionDetail = GetHeroicActionCitizenDetail(updateRequestDto.HeroicActions.Actions);
+                    if (updateRequestDto.HeroicActions.ToolsToUpdate.IsMyHordesOptimizer)
+                    {
+                        townCitizenDetail.ImportHeroicActionDetail(heroicActionDetail);
+                        patchHeroicActionMho = true;
+                    }
+                    if (updateRequestDto.HeroicActions.ToolsToUpdate.IsGestHordes)
+                    {
+                        var ghActionHero = Mapper.Map<GestHordesMajCitizenActionsHeroDto>(heroicActionDetail);
+                        ghUpdateCitizenRequest.ActionsHero.ImportHeroicActionDetail(ghActionHero);
+                        patchHeroicActionGh = true;
+                    }
+                }
+            
+                var patchStatusMho = false;
+                var patchStatusGh = false;
+                if(updateRequestDto.Status != null)
+                {
+                    var statusDetail = GetTownCitizenStatusDetail(updateRequestDto.Status.Values);
+                    if (updateRequestDto.Status.ToolsToUpdate.IsMyHordesOptimizer)
+                    {
+                        townCitizenDetail.ImportStatusDetail(statusDetail);
+                        patchStatusMho = true;
+                    }
+                    if (updateRequestDto.Status.ToolsToUpdate.IsGestHordes)
+                    {
+                        var ghStatus = Mapper.Map<GestHordesMajCitizenActionsHeroDto>(statusDetail);
+                        ghUpdateCitizenRequest.ActionsHero.ImportStatusDetail(ghStatus);
+                        patchStatusGh = true;
+                    }
+                }
+              
                 if (patchHomeMho || patchStatusMho || patchHeroicActionMho)
                 {
                     var mHOCitizenDetailTask = Task.Run(() =>
@@ -222,6 +256,24 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         }
                     });
                     tasks.Add(mHOCitizenDetailTask);
+                }
+
+                if (patchHomeGh || patchStatusGh || patchHeroicActionGh)
+                {
+                    var gHCitizenDetailTask = Task.Run(() =>
+                    {
+                        try
+                        {
+                            GestHordesRepository.UpdateCitizen(ghUpdateCitizenRequest);
+                        }
+                        catch (Exception e)
+                        {
+                            response.HeroicActionsResponseDto.GestHordesStatus = e.Message;
+                            response.StatusResponseDto.GestHordesStatus = e.Message;
+                            response.HomeResponseDto.GestHordesStatus = e.Message;
+                        }
+                    });
+                    tasks.Add(gHCitizenDetailTask);
                 }
             }
             catch (Exception e)
