@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.13
+// @version      1.0.0-beta.14
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,7 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[fix] Correctif du comportement à la mise à jour de GH`;
++ `[Nouveautés] Possibilité d'enregistrer des informations complémentaires dans MHO. Pensez à cocher les options associées !`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -78,6 +78,7 @@ const btn_id = 'optimizer-btn';
 const content_btn_id = 'optimizer-content-btn';
 const mh_header_id = 'header-reload-area';
 const mh_update_external_tools_id = 'mh-update-external-tools';
+const mho_camping_predict_id = 'mho-camping-predict';
 const wiki_btn_id = 'wiki-btn-id';
 const zone_info_zombies_id = 'zone-info-zombies';
 const nb_dead_zombies_id = 'nb-dead-zombies';
@@ -896,18 +897,18 @@ let tabs_list = {
             icon: repo_img_hordes_url + `item/item_cart.gif`,
             needs_town: true,
         },
-        {
-            ordering: 2,
-            id: `citizens`,
-            label: {
-                en: `Citizens`,
-                fr: `Citoyens`,
-                de: `Bürger`,
-                es: `Habitantes`
-            },
-            icon: repo_img_hordes_url + `icons/small_human.gif`,
-            needs_town: true,
-        },
+        // {
+        //     ordering: 2,
+        //     id: `citizens`,
+        //     label: {
+        //         en: `Citizens`,
+        //         fr: `Citoyens`,
+        //         de: `Bürger`,
+        //         es: `Habitantes`
+        //     },
+        //     icon: repo_img_hordes_url + `icons/small_human.gif`,
+        //     needs_town: true,
+        // },
         // {
         //     ordering: 3,
         //     id: `estimations`,
@@ -961,6 +962,56 @@ let params_categories = [
                 parent_id: null
             },
             {
+                id: `update_mho_actions`,
+                label: {
+                    en: `TODO`,
+                    fr: `Actions héroïques`,
+                    de: `TODO`,
+                    es: `TODO`
+                },
+                parent_id: `update_mho`
+            },
+            {
+                id: `update_mho_house`,
+                label: {
+                    en: `TODO`,
+                    fr: `Améliorations de maison`,
+                    de: `TODO`,
+                    es: `TODO`
+                },
+                parent_id: `update_mho`
+            },
+            {
+                id: `update_mho_bags`,
+                label: {
+                    en: `TODO`,
+                    fr: `Détail de mon sac et de ceux de mon escorte`,
+                    de: `TODO`,
+                    es: `TODO`
+                },
+                parent_id: `update_mho`
+            },
+            // {
+            //     id: `update_mho_chest`,
+            //     label: {
+            //         en: `TODO`,
+            //         fr: `Contenu de mon coffre`,
+            //         de: `TODO`,
+            //         es: `TODO`
+            //     },
+            //     parent_id: `update_mho`
+            // },
+            {
+                id: `update_mho_status`,
+                label: {
+                    en: `TODO`,
+                    fr: `Statuts`,
+                    de: `TODO`,
+                    es: `TODO`
+                },
+                parent_id: `update_mho`
+            },
+            {
                 id: `update_bbh`,
                 label: {
                     en: `Update BigBroth’Hordes`,
@@ -983,13 +1034,39 @@ let params_categories = [
             {
                 id: `update_gh_without_api`,
                 label: {
-                    en: `Add zombie markers to the GH box to indicate zombies killed. Update when the city is devastated.`,
-                    fr: `Ajouter des marqueurs zombies sur la case GH pour indiquer les zombies tués. Mettre à jour quand la ville est dévastée.`,
+                    en: `Additional information on the map`,
+                    fr: `Informations complémentaires sur la carte`,
+                    de: `TODO`,
+                    es: `TODO`
+                },
+                help: {
+                    en: `Killed zombies markers ; Update when the city is devastated`,
+                    fr: `Marqueurs zombies tués ; Mise à jour en ville dévastée.`,
                     de: `TODO`,
                     es: `TODO`
                 },
                 parent_id: `update_gh`
             },
+            // {
+            //     id: `update_gh_ah`,
+            //     label: {
+            //         en: `Heroic actions`,
+            //         fr: `Actions héroiques`,
+            //         de: `TODO`,
+            //         es: `TODO`
+            //     },
+            //     parent_id: `update_gh`
+            // },
+            // {
+            //     id: `update_gh_amelios`,
+            //     label: {
+            //         en: `House upgrades`,
+            //         fr: `Améliorations de maison`,
+            //         de: `TODO`,
+            //         es: `TODO`
+            //     },
+            //     parent_id: `update_gh`
+            // },
             {
                 id: `update_fata`,
                 label: {
@@ -1134,7 +1211,17 @@ let params_categories = [
                     es: `TODO`
                 },
                 parent_id: null
-            }
+            },
+            // {
+            //     id: `display_camping_predict`,
+            //     label: {
+            //         en: `TODO`,
+            //         fr: `Dans le désert, afficher des prédictions de camping directement dans la page`,
+            //         de: `TODO`,
+            //         es: `TODO`
+            //     },
+            //     parent_id: null
+            // }
             // {
             //     id: `block_users`,
             //     label: {
@@ -1276,6 +1363,12 @@ const added_ruins = [
     {id: 'nondig', camping: 8, label: {en: `Buried building`, fr: 'Bâtiment non déterré', de: `Verschüttete Ruine`, es: `Edificio no desenterrado`}}
 ];
 
+const town_type = [
+    {id: 'rne', label: {de: 'Kleine Stadt', en: 'Small Town', es: 'Amateur', fr: 'Petite carte'}},
+    {id: 're', label: {de: 'Entfernte Regionen', en: 'Distant Region', es: 'Leyenda', fr: 'Région éloignée'}},
+    {id: 'pande', label: {de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium'}}
+];
+
 //////////////////////////////////////
 // Les éléments récupérés via l'API //
 //////////////////////////////////////
@@ -1316,6 +1409,12 @@ function pageIsWorkshop() {
     return document.URL.endsWith('workshop');
 }
 
+/** @return {boolean}    true si la page de l'utilisateur est la page de sa maison */
+function pageIsHouse() {
+    return document.URL.indexOf('town/house') > -1;
+}
+
+
 /** @return {boolean}    true si la page de l'utilisateur est la liste des citoyens */
 function pageIsCitizens() {
     return document.URL.endsWith('citizens');
@@ -1331,7 +1430,7 @@ function pageIsDesert() {
     return document.URL.indexOf('desert') > -1;
 }
 
-/** @return {boolean}    true si la page de l'utilisateur est la page du désert */
+/** @return {boolean}    true si la page de l'utilisateur est la page du forum */
 function pageIsForum() {
     return document.URL.indexOf('forum') > -1;
 }
@@ -2493,6 +2592,413 @@ function displayCamping() {
         camping_tab_content.classList.add('camping-tab');
         tab_content.appendChild(camping_tab_content);
 
+        let conf = {
+            town: 'rne',
+            job: 'citizen',
+            distance: 1,
+            campings: 0,
+            pro: false,
+            hidden_campers: 0,
+            objects: 0,
+            vest: false,
+            tomb: false,
+            zombies: 0,
+            night: false,
+            devastated: false,
+            phare: false,
+            improve: 0,
+            object_improve: 0,
+            ruin: ''
+        }
+
+        let my_info = document.createElement('div');
+        camping_tab_content.appendChild(my_info);
+
+        let my_info_title = document.createElement('h3');
+        my_info_title.innerText = getI18N(texts.camping_citizen);
+        my_info.appendChild(my_info_title);
+
+        let my_info_content = document.createElement('div');
+        my_info.appendChild(my_info_content);
+
+        let town_info = document.createElement('div');
+        camping_tab_content.appendChild(town_info);
+
+        let town_info_title = document.createElement('h3');
+        town_info_title.innerText = getI18N(texts.camping_town);
+        town_info.appendChild(town_info_title);
+
+        let town_info_content = document.createElement('div');
+        town_info.appendChild(town_info_content);
+
+        let cell_info = document.createElement('div');
+        camping_tab_content.appendChild(cell_info);
+
+        let cell_info_title = document.createElement('h3');
+        cell_info_title.innerText = getI18N(texts.camping_ruin);
+        cell_info.appendChild(cell_info_title);
+
+        let cell_info_content = document.createElement('div');
+        cell_info.appendChild(cell_info_content);
+
+        let result = document.createElement('div');
+        camping_tab_content.appendChild(result);
+
+        let result_title = document.createElement('h3');
+        result_title.innerText = getI18N(texts.result);
+        result.appendChild(result_title);
+
+        let result_content = document.createElement('div');
+        result_content.id = 'camping-result';
+        result.appendChild(result_content);
+
+        /** Type de ville */
+        let town_div = document.createElement('div');
+        town_info_content.appendChild(town_div);
+
+        let select_town_label = document.createElement('label');
+        select_town_label.htmlFor = 'select-town';
+        select_town_label.classList.add('spaced-label');
+        select_town_label.innerText = getI18N(texts.town_type);
+        let select_town = document.createElement('select');
+        select_town.id = 'select-town';
+        select_town.value = conf.town;
+        select_town.classList.add('small');
+        town_type.forEach((town) => {
+            let town_option = document.createElement('option');
+            town_option.value = town.id;
+            town_option.label = getI18N(town.label);
+            select_town.appendChild(town_option);
+        });
+        select_town.addEventListener('change', ($event) => {
+            conf.town = $event.srcElement.value;
+            calculateCampingProbabilities(conf);
+        })
+        town_div.appendChild(select_town_label);
+        town_div.appendChild(select_town);
+
+
+        /** Métier */
+        let job_div = document.createElement('div');
+        my_info_content.appendChild(job_div);
+
+        let select_job_label = document.createElement('label');
+        select_job_label.htmlFor = 'select-job';
+        select_job_label.innerText = getI18N(texts.job);
+        select_job_label.classList.add('spaced-label');
+        let select_job = document.createElement('select');
+        select_job.id = 'select-job';
+        select_job.value = conf.job;
+        select_job.classList.add('small');
+        jobs.forEach((job) => {
+            let job_option = document.createElement('option');
+            job_option.value = job.id;
+            job_option.label = getI18N(job.label);
+            select_job.appendChild(job_option);
+        });
+        select_job.addEventListener('change', ($event) => {
+            conf.job = $event.srcElement.value;
+            let vest_field = document.querySelector('#vest-field');
+            if (conf.job !== 'scout') {
+                conf.vest = false;
+                vest_field.style.display = 'none';
+            } else {
+                vest_field.style.display = 'initial';
+            }
+            calculateCampingProbabilities(conf);
+        })
+
+        job_div.appendChild(select_job_label);
+        job_div.appendChild(select_job);
+
+        /** Capuche ? */
+        let vest_div = document.createElement('div');
+        vest_div.id = 'vest-field';
+        vest_div.style.display = 'none';
+        my_info_content.appendChild(vest_div);
+
+        let vest_label = document.createElement('label');
+        vest_label.htmlFor = 'vest';
+        vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
+        let vest = document.createElement('input');
+        vest.type = 'checkbox';
+        vest.id = 'vest';
+        vest.checked = conf.vest;
+        vest.addEventListener('change', ($event) => {
+            conf.vest = $event.srcElement.checked;
+            calculateCampingProbabilities(conf);
+        })
+        vest_div.appendChild(vest);
+        vest_div.appendChild(vest_label);
+
+        /** Campeur pro ? */
+        let pro_camper_div = document.createElement('div');
+        my_info_content.appendChild(pro_camper_div);
+
+        let pro_camper_label = document.createElement('label');
+        pro_camper_label.htmlFor = 'pro';
+        pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
+        let pro_camper = document.createElement('input');
+        pro_camper.type = 'checkbox';
+        pro_camper.id = 'pro';
+        pro_camper.checked = conf.pro;
+        pro_camper.addEventListener('change', ($event) => {
+            conf.pro = $event.srcElement.checked;
+            calculateCampingProbabilities(conf);
+        })
+        pro_camper_div.appendChild(pro_camper);
+        pro_camper_div.appendChild(pro_camper_label);
+
+        /** Tombe ? */
+        let tomb_div = document.createElement('div');
+        my_info_content.appendChild(tomb_div);
+
+        let tomb_label = document.createElement('label');
+        tomb_label.htmlFor = 'tomb';
+        tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
+        let tomb = document.createElement('input');
+        tomb.type = 'checkbox';
+        tomb.id = 'tomb';
+        tomb.checked = conf.tomb;
+        tomb.addEventListener('change', ($event) => {
+            conf.tomb = $event.srcElement.checked;
+            calculateCampingProbabilities(conf);
+        })
+        tomb_div.appendChild(tomb);
+        tomb_div.appendChild(tomb_label);
+
+        /** Nombre de nuits déjà campées */
+        let nb_campings_div = document.createElement('div');
+        my_info_content.appendChild(nb_campings_div);
+
+        let nb_campings_label = document.createElement('label');
+        nb_campings_label.htmlFor = 'nb-campings';
+        nb_campings_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
+        nb_campings_label.classList.add('spaced-label');
+        let nb_campings = document.createElement('input');
+        nb_campings.type = 'number';
+        nb_campings.id = 'nb-campings';
+        nb_campings.value = conf.campings;
+        nb_campings.classList.add('inline');
+        nb_campings.addEventListener('change', ($event) => {
+            conf.campings = +$event.srcElement.value;
+            calculateCampingProbabilities(conf);
+        })
+        nb_campings_div.appendChild(nb_campings_label);
+        nb_campings_div.appendChild(nb_campings);
+
+        /** Nombre de toiles de tente ou pelure de peau */
+        let objects_in_bag_div = document.createElement('div');
+        my_info_content.appendChild(objects_in_bag_div);
+
+        let objects_in_bag_label = document.createElement('label');
+        objects_in_bag_label.htmlFor = 'nb-objects';
+        objects_in_bag_label.innerText = getI18N(texts.objects_in_bag);
+        objects_in_bag_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
+        objects_in_bag_label.classList.add('spaced-label');
+        let objects_in_bag = document.createElement('input');
+        objects_in_bag.type = 'number';
+        objects_in_bag.id = 'nb-objects';
+        objects_in_bag.value = conf.objects;
+        objects_in_bag.classList.add('inline');
+        objects_in_bag.addEventListener('change', ($event) => {
+            conf.objects = +$event.srcElement.value;
+            calculateCampingProbabilities(conf);
+        })
+        objects_in_bag_div.appendChild(objects_in_bag_label);
+        objects_in_bag_div.appendChild(objects_in_bag);
+
+
+        /** Type de bâtiment */
+        let ruin_type_div = document.createElement('div');
+        cell_info_content.appendChild(ruin_type_div);
+
+        let select_ruin_label = document.createElement('label');
+        select_ruin_label.htmlFor = 'select-ruin';
+        select_ruin_label.innerText = getI18N(texts.ruin);
+        select_ruin_label.classList.add('spaced-label');
+        let select_ruin = document.createElement('select');
+        select_ruin.id = 'select-ruin';
+        select_ruin.value = conf.ruin;
+        select_ruin.classList.add('small');
+        all_ruins.forEach((ruin) => {
+            let ruin_option = document.createElement('option');
+            ruin_option.value = ruin.id;
+            ruin_option.label = getI18N(ruin.label);
+            select_ruin.appendChild(ruin_option);
+        });
+        select_ruin.addEventListener('change', ($event) => {
+            conf.ruin = $event.srcElement.value;
+            calculateCampingProbabilities(conf);
+        })
+        ruin_type_div.appendChild(select_ruin_label);
+        ruin_type_div.appendChild(select_ruin);
+
+        /** Distance de la ville */
+        let distance_div = document.createElement('div');
+        cell_info_content.appendChild(distance_div);
+
+        let distance_label = document.createElement('label');
+        distance_label.htmlFor = 'distance';
+        distance_label.innerText = getI18N(texts.distance).replace('%VAR%', '');
+        distance_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/explo.gif"> ${getI18N(texts.distance).replace('%VAR%', '')}`;
+        distance_label.classList.add('spaced-label');
+        let distance = document.createElement('input');
+        distance.type = 'number';
+        distance.id = 'distance';
+        distance.value = conf.distance;
+        distance.classList.add('inline');
+        distance.addEventListener('change', ($event) => {
+            conf.distance = +$event.srcElement.value;
+            calculateCampingProbabilities(conf);
+        })
+        distance_div.appendChild(distance_label);
+        distance_div.appendChild(distance);
+
+        /** Nombre de zombies sur la case */
+        let zombies_div = document.createElement('div');
+        cell_info_content.appendChild(zombies_div);
+
+        let zombies_label = document.createElement('label');
+        zombies_label.htmlFor = 'nb-zombies';
+        zombies_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
+        zombies_label.classList.add('spaced-label');
+        let zombies = document.createElement('input');
+        zombies.type = 'number';
+        zombies.id = 'nb-zombies';
+        zombies.value = conf.zombies;
+        zombies.classList.add('inline');
+        zombies.addEventListener('change', ($event) => {
+            conf.zombies = +$event.srcElement.value;
+            calculateCampingProbabilities(conf);
+        })
+        zombies_div.appendChild(zombies_label);
+        zombies_div.appendChild(zombies);
+
+        /** Nombre d'améliorations simples sur la case */
+        let improve_div = document.createElement('div');
+        cell_info_content.appendChild(improve_div);
+
+        let improve_label = document.createElement('label');
+        improve_label.htmlFor = 'nb-improve';
+        improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
+        improve_label.classList.add('spaced-label');
+        let improve = document.createElement('input');
+        improve.type = 'number';
+        improve.id = 'nb-improve';
+        improve.value = conf.improve;
+        improve.classList.add('inline');
+        improve.addEventListener('change', ($event) => {
+            conf.improve = +$event.srcElement.value;
+            calculateCampingProbabilities(conf);
+        })
+        improve_div.appendChild(improve_label);
+        improve_div.appendChild(improve);
+
+        /** Nombre d'objets de campement installés sur la case */
+        let object_improve_div = document.createElement('div');
+        cell_info_content.appendChild(object_improve_div);
+
+        let object_improve_label = document.createElement('label');
+        object_improve_label.htmlFor = 'nb-object-improve';
+        object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
+        object_improve_label.classList.add('spaced-label');
+        let object_improve = document.createElement('input');
+        object_improve.type = 'number';
+        object_improve.id = 'nb-object-improve';
+        object_improve.value = conf.object_improve;
+        object_improve.classList.add('inline');
+        object_improve.addEventListener('change', ($event) => {
+            conf.object_improve = +$event.srcElement.value;
+            calculateCampingProbabilities(conf);
+        })
+        object_improve_div.appendChild(object_improve_label);
+        object_improve_div.appendChild(object_improve);
+
+        /** Nombre de personnes déjà cachées */
+        let hidden_campers_div = document.createElement('div');
+        cell_info_content.appendChild(hidden_campers_div);
+
+        let hidden_campers_label = document.createElement('label');
+        hidden_campers_label.htmlFor = 'hidden-campers';
+        hidden_campers_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
+        hidden_campers_label.classList.add('spaced-label');
+        let hidden_campers = document.createElement('input');
+        hidden_campers.type = 'number';
+        hidden_campers.id = 'hidden-campers';
+        hidden_campers.value = conf.hidden_campers;
+        hidden_campers.classList.add('inline');
+        hidden_campers.addEventListener('change', ($event) => {
+            conf.hidden_campers = +$event.srcElement.value;
+            calculateCampingProbabilities(conf);
+        })
+        hidden_campers_div.appendChild(hidden_campers_label);
+        hidden_campers_div.appendChild(hidden_campers);
+
+        /** Nuit ? */
+        let night_div = document.createElement('div');
+        town_info_content.appendChild(night_div);
+
+        let night_label = document.createElement('label');
+        night_label.htmlFor = 'night';
+        night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
+        let night = document.createElement('input');
+        night.type = 'checkbox';
+        night.id = 'night';
+        night.checked = conf.night;
+        night.addEventListener('change', ($event) => {
+            conf.night = $event.srcElement.checked;
+            calculateCampingProbabilities(conf);
+        })
+        night_div.appendChild(night);
+        night_div.appendChild(night_label);
+
+        /** Ville dévastée ? */
+        let devastated_div = document.createElement('div');
+        town_info_content.appendChild(devastated_div);
+
+        let devastated_label = document.createElement('label');
+        devastated_label.htmlFor = 'devastated';
+        devastated_label.innerHTML = `<img src="${repo_img_hordes_url}item/item_out_def_broken.gif"> ${getI18N(texts.devastated)}`;
+        let devastated = document.createElement('input');
+        devastated.type = 'checkbox';
+        devastated.id = 'devastated';
+        devastated.checked = conf.devastated;
+        devastated.addEventListener('change', ($event) => {
+            conf.devastated = $event.srcElement.checked;
+            calculateCampingProbabilities(conf);
+        })
+        devastated_div.appendChild(devastated);
+        devastated_div.appendChild(devastated_label);
+
+        /** Phare construit ? */
+        let phare_div = document.createElement('div');
+        town_info_content.appendChild(phare_div);
+
+        let phare_label = document.createElement('label');
+        phare_label.htmlFor = 'phare';
+        phare_label.innerText = getI18N(texts.phare);
+        phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
+        let phare = document.createElement('input');
+        phare.type = 'checkbox';
+        phare.id = 'phare';
+        phare.checked = conf.phare;
+        phare.addEventListener('change', ($event) => {
+            conf.phare = $event.srcElement.checked;
+            calculateCampingProbabilities(conf);
+        })
+        phare_div.appendChild(phare);
+        phare_div.appendChild(phare_label);
+
+
+        calculateCampingProbabilities(conf);
+    });
+}
+
+function calculateCampingProbabilities(conf) {
+    getRuins().then((ruins) => {
+        let all_ruins = [...added_ruins];
+        all_ruins = all_ruins.concat(ruins);
         /** @see CitizenHandler > getCampingValues > $distance_map */
         let distance_map = {
             1: -24,
@@ -2581,469 +3087,59 @@ function displayCamping() {
             7: -26
         };
 
-        let calculateProbabilities = (conf) => {
-            let chances = 0;
-            /** Type de ville */
-            chances += conf.town === 'pande' ? -14 : 0;
-            /** Tombe creusée */
-            chances += conf.tomb ? 1.6 : 0;
-            /** Mode nuit */
-            chances += conf.night ? 2 : 0;
-            /** Ville devastée */
-            chances += conf.devastated ? -10 : 0;
-            /** Phare */
-            chances += conf.phare ? 5 : 0;
-            /** Zombies dans la zone */
-            let zombies_factor = conf.vest ? 0.6 : 1.4;
-            chances += -zombies_factor * conf.zombies;
-
-            /** Nombre de campings */
-            let nb_camping_town_type_mapping = conf.town === 'pande' ? campings_map.pande : campings_map.normal;
-            let nb_camping_mapping = conf.pro ? nb_camping_town_type_mapping.pro : nb_camping_town_type_mapping.nonpro;
-            chances += (conf.campings > 9 ? nb_camping_mapping[9] : nb_camping_mapping[conf.campings]);
-
-            /** Distance de la ville */
-            chances += (conf.distance > 16 ? distance_map[16] : distance_map[conf.distance]);
-
-            /** Nombre de personnes déjà cachées */
-            chances += (conf.hidden_campers > 7 ? hidden_campers_map[7] : hidden_campers_map[conf.hidden_campers]);
-
-            /** Nombre d'objets de protection dans l'inventaire */
-            chances += conf.objects;
-
-            /**
-              * Nombre d'améliorations simples sur la case
-              * @see ActionDataService.php : 'improve'
-              */
-            chances += conf.improve;
-
-            /**
-              * Nombre d'objets de défense installés sur la case
-              * @see ActionDataService.php : 'cm_campsite_improve'
-              */
-            chances += conf.object_improve * 1.8;
-
-            /**
-              * Bonus liés au bâtiment
-              * @see RuinDataService.php
-              */
-            chances += parseInt(all_ruins.find((ruin) => conf.ruin.toString() === ruin.id.toString()).camping, 10);
-
-            let probability = Math.min(Math.max((100.0 - (Math.abs(Math.min(0, chances)) * 5)) / 100.0, .1), (conf.job === 'survivalist' ? 1.0 : 0.9));
-            let camping_result_text = camping_results.find((camping_result) => camping_result.string ? probability < camping_result.probability : probability <= camping_result.probability);
-            let result = document.querySelector('#camping-result');
-            result.innerText = `${camping_result_text ? getI18N(camping_result_text.label) : ''} (${probability * 100}%)`;
-        };
-
-        let conf = {
-            town: 'rne',
-            job: 'citizen',
-            distance: 1,
-            campings: 0,
-            pro: false,
-            hidden_campers: 0,
-            objects: 0,
-            vest: false,
-            tomb: false,
-            zombies: 0,
-            night: false,
-            devastated: false,
-            phare: false,
-            improve: 0,
-            object_improve: 0,
-            ruin: ''
-        }
-
-        let town_type = [
-            {id: 'rne', label: {de: 'Kleine Stadt', en: 'Small Town', es: 'Amateur', fr: 'Petite carte'}},
-            {id: 're', label: {de: 'Entfernte Regionen', en: 'Distant Region', es: 'Leyenda', fr: 'Région éloignée'}},
-            {id: 'pande', label: {de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium'}}
-        ]
-
-        let my_info = document.createElement('div');
-        camping_tab_content.appendChild(my_info);
-
-        let my_info_title = document.createElement('h3');
-        my_info_title.innerText = getI18N(texts.camping_citizen);
-        my_info.appendChild(my_info_title);
-
-        let my_info_content = document.createElement('div');
-        my_info.appendChild(my_info_content);
-
-        let town_info = document.createElement('div');
-        camping_tab_content.appendChild(town_info);
-
-        let town_info_title = document.createElement('h3');
-        town_info_title.innerText = getI18N(texts.camping_town);
-        town_info.appendChild(town_info_title);
-
-        let town_info_content = document.createElement('div');
-        town_info.appendChild(town_info_content);
-
-        let cell_info = document.createElement('div');
-        camping_tab_content.appendChild(cell_info);
-
-        let cell_info_title = document.createElement('h3');
-        cell_info_title.innerText = getI18N(texts.camping_ruin);
-        cell_info.appendChild(cell_info_title);
-
-        let cell_info_content = document.createElement('div');
-        cell_info.appendChild(cell_info_content);
-
-        let result = document.createElement('div');
-        camping_tab_content.appendChild(result);
-
-        let result_title = document.createElement('h3');
-        result_title.innerText = getI18N(texts.result);
-        result.appendChild(result_title);
-
-        let result_content = document.createElement('div');
-        result_content.id = 'camping-result';
-        result.appendChild(result_content);
-
+        let chances = 0;
         /** Type de ville */
-        let town_div = document.createElement('div');
-        town_info_content.appendChild(town_div);
+        chances += conf.town === 'pande' ? -14 : 0;
+        /** Tombe creusée */
+        chances += conf.tomb ? 1.6 : 0;
+        /** Mode nuit */
+        chances += conf.night ? 2 : 0;
+        /** Ville devastée */
+        chances += conf.devastated ? -10 : 0;
+        /** Phare */
+        chances += conf.phare ? 5 : 0;
+        /** Zombies dans la zone */
+        let zombies_factor = conf.vest ? 0.6 : 1.4;
+        chances += -zombies_factor * conf.zombies;
 
-        let select_town_label = document.createElement('label');
-        select_town_label.htmlFor = 'select-town';
-        select_town_label.classList.add('spaced-label');
-        select_town_label.innerText = getI18N(texts.town_type);
-        let select_town = document.createElement('select');
-        select_town.id = 'select-town';
-        select_town.value = conf.town;
-        select_town.classList.add('small');
-        town_type.forEach((town) => {
-            let town_option = document.createElement('option');
-            town_option.value = town.id;
-            town_option.label = getI18N(town.label);
-            select_town.appendChild(town_option);
-        });
-        select_town.addEventListener('change', ($event) => {
-            conf.town = $event.srcElement.value;
-            calculateProbabilities(conf);
-        })
-        town_div.appendChild(select_town_label);
-        town_div.appendChild(select_town);
-
-
-        /** Métier */
-        let job_div = document.createElement('div');
-        my_info_content.appendChild(job_div);
-
-        let select_job_label = document.createElement('label');
-        select_job_label.htmlFor = 'select-job';
-        select_job_label.innerText = getI18N(texts.job);
-        select_job_label.classList.add('spaced-label');
-        let select_job = document.createElement('select');
-        select_job.id = 'select-job';
-        select_job.value = conf.job;
-        select_job.classList.add('small');
-        jobs.forEach((job) => {
-            let job_option = document.createElement('option');
-            job_option.value = job.id;
-            job_option.label = getI18N(job.label);
-            select_job.appendChild(job_option);
-        });
-        select_job.addEventListener('change', ($event) => {
-            conf.job = $event.srcElement.value;
-            let vest_field = document.querySelector('#vest-field');
-            if (conf.job !== 'scout') {
-                conf.vest = false;
-                vest_field.style.display = 'none';
-            } else {
-                vest_field.style.display = 'initial';
-            }
-            calculateProbabilities(conf);
-        })
-
-        job_div.appendChild(select_job_label);
-        job_div.appendChild(select_job);
-
-        /** Capuche ? */
-        let vest_div = document.createElement('div');
-        vest_div.id = 'vest-field';
-        vest_div.style.display = 'none';
-        my_info_content.appendChild(vest_div);
-
-        let vest_label = document.createElement('label');
-        vest_label.htmlFor = 'vest';
-        vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
-        let vest = document.createElement('input');
-        vest.type = 'checkbox';
-        vest.id = 'vest';
-        vest.checked = conf.vest;
-        vest.addEventListener('change', ($event) => {
-            conf.vest = $event.srcElement.checked;
-            calculateProbabilities(conf);
-        })
-        vest_div.appendChild(vest);
-        vest_div.appendChild(vest_label);
-
-        /** Campeur pro ? */
-        let pro_camper_div = document.createElement('div');
-        my_info_content.appendChild(pro_camper_div);
-
-        let pro_camper_label = document.createElement('label');
-        pro_camper_label.htmlFor = 'pro';
-        pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
-        let pro_camper = document.createElement('input');
-        pro_camper.type = 'checkbox';
-        pro_camper.id = 'pro';
-        pro_camper.checked = conf.pro;
-        pro_camper.addEventListener('change', ($event) => {
-            conf.pro = $event.srcElement.checked;
-            calculateProbabilities(conf);
-        })
-        pro_camper_div.appendChild(pro_camper);
-        pro_camper_div.appendChild(pro_camper_label);
-
-        /** Tombe ? */
-        let tomb_div = document.createElement('div');
-        my_info_content.appendChild(tomb_div);
-
-        let tomb_label = document.createElement('label');
-        tomb_label.htmlFor = 'tomb';
-        tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
-        let tomb = document.createElement('input');
-        tomb.type = 'checkbox';
-        tomb.id = 'tomb';
-        tomb.checked = conf.tomb;
-        tomb.addEventListener('change', ($event) => {
-            conf.tomb = $event.srcElement.checked;
-            calculateProbabilities(conf);
-        })
-        tomb_div.appendChild(tomb);
-        tomb_div.appendChild(tomb_label);
-
-        /** Nombre de nuits déjà campées */
-        let nb_campings_div = document.createElement('div');
-        my_info_content.appendChild(nb_campings_div);
-
-        let nb_campings_label = document.createElement('label');
-        nb_campings_label.htmlFor = 'nb-campings';
-        nb_campings_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
-        nb_campings_label.classList.add('spaced-label');
-        let nb_campings = document.createElement('input');
-        nb_campings.type = 'number';
-        nb_campings.id = 'nb-campings';
-        nb_campings.value = conf.campings;
-        nb_campings.classList.add('inline');
-        nb_campings.addEventListener('change', ($event) => {
-            conf.campings = +$event.srcElement.value;
-            calculateProbabilities(conf);
-        })
-        nb_campings_div.appendChild(nb_campings_label);
-        nb_campings_div.appendChild(nb_campings);
-
-        /** Nombre de toiles de tente ou pelure de peau */
-        let objects_in_bag_div = document.createElement('div');
-        my_info_content.appendChild(objects_in_bag_div);
-
-        let objects_in_bag_label = document.createElement('label');
-        objects_in_bag_label.htmlFor = 'nb-objects';
-        objects_in_bag_label.innerText = getI18N(texts.objects_in_bag);
-        objects_in_bag_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
-        objects_in_bag_label.classList.add('spaced-label');
-        let objects_in_bag = document.createElement('input');
-        objects_in_bag.type = 'number';
-        objects_in_bag.id = 'nb-objects';
-        objects_in_bag.value = conf.objects;
-        objects_in_bag.classList.add('inline');
-        objects_in_bag.addEventListener('change', ($event) => {
-            conf.objects = +$event.srcElement.value;
-            calculateProbabilities(conf);
-        })
-        objects_in_bag_div.appendChild(objects_in_bag_label);
-        objects_in_bag_div.appendChild(objects_in_bag);
-
-
-        /** Type de bâtiment */
-        let ruin_type_div = document.createElement('div');
-        cell_info_content.appendChild(ruin_type_div);
-
-        let select_ruin_label = document.createElement('label');
-        select_ruin_label.htmlFor = 'select-ruin';
-        select_ruin_label.innerText = getI18N(texts.ruin);
-        select_ruin_label.classList.add('spaced-label');
-        let select_ruin = document.createElement('select');
-        select_ruin.id = 'select-ruin';
-        select_ruin.value = conf.ruin;
-        select_ruin.classList.add('small');
-        all_ruins.forEach((ruin) => {
-            let ruin_option = document.createElement('option');
-            ruin_option.value = ruin.id;
-            ruin_option.label = getI18N(ruin.label);
-            select_ruin.appendChild(ruin_option);
-        });
-        select_ruin.addEventListener('change', ($event) => {
-            conf.ruin = $event.srcElement.value;
-            calculateProbabilities(conf);
-        })
-        ruin_type_div.appendChild(select_ruin_label);
-        ruin_type_div.appendChild(select_ruin);
+        /** Nombre de campings */
+        let nb_camping_town_type_mapping = conf.town === 'pande' ? campings_map.pande : campings_map.normal;
+        let nb_camping_mapping = conf.pro ? nb_camping_town_type_mapping.pro : nb_camping_town_type_mapping.nonpro;
+        chances += (conf.campings > 9 ? nb_camping_mapping[9] : nb_camping_mapping[conf.campings]);
 
         /** Distance de la ville */
-        let distance_div = document.createElement('div');
-        cell_info_content.appendChild(distance_div);
-
-        let distance_label = document.createElement('label');
-        distance_label.htmlFor = 'distance';
-        distance_label.innerText = getI18N(texts.distance).replace('%VAR%', '');
-        distance_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/explo.gif"> ${getI18N(texts.distance).replace('%VAR%', '')}`;
-        distance_label.classList.add('spaced-label');
-        let distance = document.createElement('input');
-        distance.type = 'number';
-        distance.id = 'distance';
-        distance.value = conf.distance;
-        distance.classList.add('inline');
-        distance.addEventListener('change', ($event) => {
-            conf.distance = +$event.srcElement.value;
-            calculateProbabilities(conf);
-        })
-        distance_div.appendChild(distance_label);
-        distance_div.appendChild(distance);
-
-        /** Nombre de zombies sur la case */
-        let zombies_div = document.createElement('div');
-        cell_info_content.appendChild(zombies_div);
-
-        let zombies_label = document.createElement('label');
-        zombies_label.htmlFor = 'nb-zombies';
-        zombies_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
-        zombies_label.classList.add('spaced-label');
-        let zombies = document.createElement('input');
-        zombies.type = 'number';
-        zombies.id = 'nb-zombies';
-        zombies.value = conf.zombies;
-        zombies.classList.add('inline');
-        zombies.addEventListener('change', ($event) => {
-            conf.zombies = +$event.srcElement.value;
-            calculateProbabilities(conf);
-        })
-        zombies_div.appendChild(zombies_label);
-        zombies_div.appendChild(zombies);
-
-        /** Nombre d'améliorations simples sur la case */
-        let improve_div = document.createElement('div');
-        cell_info_content.appendChild(improve_div);
-
-        let improve_label = document.createElement('label');
-        improve_label.htmlFor = 'nb-improve';
-        improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
-        improve_label.classList.add('spaced-label');
-        let improve = document.createElement('input');
-        improve.type = 'number';
-        improve.id = 'nb-improve';
-        improve.value = conf.improve;
-        improve.classList.add('inline');
-        improve.addEventListener('change', ($event) => {
-            conf.improve = +$event.srcElement.value;
-            calculateProbabilities(conf);
-        })
-        improve_div.appendChild(improve_label);
-        improve_div.appendChild(improve);
-
-        /** Nombre d'objets de campement installés sur la case */
-        let object_improve_div = document.createElement('div');
-        cell_info_content.appendChild(object_improve_div);
-
-        let object_improve_label = document.createElement('label');
-        object_improve_label.htmlFor = 'nb-object-improve';
-        object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
-        object_improve_label.classList.add('spaced-label');
-        let object_improve = document.createElement('input');
-        object_improve.type = 'number';
-        object_improve.id = 'nb-object-improve';
-        object_improve.value = conf.object_improve;
-        object_improve.classList.add('inline');
-        object_improve.addEventListener('change', ($event) => {
-            conf.object_improve = +$event.srcElement.value;
-            calculateProbabilities(conf);
-        })
-        object_improve_div.appendChild(object_improve_label);
-        object_improve_div.appendChild(object_improve);
+        chances += (conf.distance > 16 ? distance_map[16] : distance_map[conf.distance]);
 
         /** Nombre de personnes déjà cachées */
-        let hidden_campers_div = document.createElement('div');
-        cell_info_content.appendChild(hidden_campers_div);
+        chances += (conf.hidden_campers > 7 ? hidden_campers_map[7] : hidden_campers_map[conf.hidden_campers]);
 
-        let hidden_campers_label = document.createElement('label');
-        hidden_campers_label.htmlFor = 'hidden-campers';
-        hidden_campers_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
-        hidden_campers_label.classList.add('spaced-label');
-        let hidden_campers = document.createElement('input');
-        hidden_campers.type = 'number';
-        hidden_campers.id = 'hidden-campers';
-        hidden_campers.value = conf.hidden_campers;
-        hidden_campers.classList.add('inline');
-        hidden_campers.addEventListener('change', ($event) => {
-            conf.hidden_campers = +$event.srcElement.value;
-            calculateProbabilities(conf);
-        })
-        hidden_campers_div.appendChild(hidden_campers_label);
-        hidden_campers_div.appendChild(hidden_campers);
+        /** Nombre d'objets de protection dans l'inventaire */
+        chances += conf.objects;
 
-        /** Nuit ? */
-        let night_div = document.createElement('div');
-        town_info_content.appendChild(night_div);
+        /**
+         * Nombre d'améliorations simples sur la case
+         * @see ActionDataService.php : 'improve'
+         */
+        chances += conf.improve;
 
-        let night_label = document.createElement('label');
-        night_label.htmlFor = 'night';
-        night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
-        let night = document.createElement('input');
-        night.type = 'checkbox';
-        night.id = 'night';
-        night.checked = conf.night;
-        night.addEventListener('change', ($event) => {
-            conf.night = $event.srcElement.checked;
-            calculateProbabilities(conf);
-        })
-        night_div.appendChild(night);
-        night_div.appendChild(night_label);
+        /**
+         * Nombre d'objets de défense installés sur la case
+         * @see ActionDataService.php : 'cm_campsite_improve'
+         */
+        chances += conf.object_improve * 1.8;
 
-        /** Ville dévastée ? */
-        let devastated_div = document.createElement('div');
-        town_info_content.appendChild(devastated_div);
+        /**
+         * Bonus liés au bâtiment
+         * @see RuinDataService.php
+         */
+        chances += parseInt(all_ruins.find((ruin) => conf.ruin.toString() === ruin.id.toString()).camping, 10);
 
-        let devastated_label = document.createElement('label');
-        devastated_label.htmlFor = 'devastated';
-        devastated_label.innerHTML = `<img src="${repo_img_hordes_url}item/item_out_def_broken.gif"> ${getI18N(texts.devastated)}`;
-        let devastated = document.createElement('input');
-        devastated.type = 'checkbox';
-        devastated.id = 'devastated';
-        devastated.checked = conf.devastated;
-        devastated.addEventListener('change', ($event) => {
-            conf.devastated = $event.srcElement.checked;
-            calculateProbabilities(conf);
-        })
-        devastated_div.appendChild(devastated);
-        devastated_div.appendChild(devastated_label);
-
-        /** Phare construit ? */
-        let phare_div = document.createElement('div');
-        town_info_content.appendChild(phare_div);
-
-        let phare_label = document.createElement('label');
-        phare_label.htmlFor = 'phare';
-        phare_label.innerText = getI18N(texts.phare);
-        phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
-        let phare = document.createElement('input');
-        phare.type = 'checkbox';
-        phare.id = 'phare';
-        phare.checked = conf.phare;
-        phare.addEventListener('change', ($event) => {
-            conf.phare = $event.srcElement.checked;
-            calculateProbabilities(conf);
-        })
-        phare_div.appendChild(phare);
-        phare_div.appendChild(phare_label);
-
-
-        calculateProbabilities(conf);
+        let probability = Math.min(Math.max((100.0 - (Math.abs(Math.min(0, chances)) * 5)) / 100.0, .1), (conf.job === 'survivalist' ? 1.0 : 0.9));
+        let camping_result_text = camping_results.find((camping_result) => camping_result.string ? probability < camping_result.probability : probability <= camping_result.probability);
+        let result = document.querySelector('#camping-result');
+        result.innerText = `${camping_result_text ? getI18N(camping_result_text.label) : ''} (${probability * 100}%)`;
     });
-}
-
+};
 
 /** Affiche la liste des pouvoirs */
 function displaySkills() {
@@ -3306,19 +3402,20 @@ function createUpdateExternalToolsButton() {
         isBigBrothHordes: mho_parameters ? mho_parameters.update_bbh : false,
         isFataMorgana: mho_parameters ? mho_parameters.update_fata : false,
         isGestHordes: mho_parameters ? mho_parameters.update_gh : false,
-        isMHO: mho_parameters ? mho_parameters.update_mho : false
+        isMyHordesOptimizer: mho_parameters ? mho_parameters.update_mho : false
     };
 
     let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
 
     let update_external_tools_btn = document.getElementById(mh_update_external_tools_id);
     const zone_marker = document.getElementById('zone-marker');
+    const chest = document.querySelector('.inventory.chest');
 
     /** Cette fonction ne doit s'exécuter que si on a un id d'app externe ET au moins l'une des options qui est cochée dans les paramètres ET qu'on est hors de la ville */
-    if (nb_tools_to_update > 0 && external_app_id && zone_marker) {
+    if (nb_tools_to_update > 0 && external_app_id && (zone_marker || chest) ) {
         if (update_external_tools_btn) return;
 
-        let el = zone_marker.parentElement.parentElement.parentElement;
+        let el = zone_marker?.parentElement.parentElement.parentElement || chest.parentElement;
 
         let updater_bloc = document.createElement('div');
         el.appendChild(updater_bloc);
@@ -4234,11 +4331,11 @@ function displayMap() {
                 } else if (cell.not_visited_today) {
                     td.style.backgroundColor = 'darkslategray';
                 } else {
-                    if (cell.zombies === '1') {
+                    if (+cell.zombies === 1) {
                         td.style.backgroundColor = 'goldenrod';
-                    } else if (cell.zombies === '2') {
+                    } else if (+cell.zombies === 2) {
                         td.style.backgroundColor = 'chocolate';
-                    } else if (+cell.zombies >= '3') {
+                    } else if (+cell.zombies >= 3) {
                         td.style.backgroundColor = 'firebrick';
                     } else {
                         td.style.backgroundColor = 'green';
@@ -4986,6 +5083,358 @@ function displayMoreCitizensInformations() {
             }
         }
 
+    }
+}
+
+function displayCampingPredict() {
+    let camping_predict_container = document.getElementById(mho_camping_predict_id);
+
+    let zone_camp = document.querySelector('.zone-camp');
+    if (mho_parameters.display_camping_predict && pageIsDesert() && zone_camp) {
+        if (camping_predict_container) return;
+
+        getRuins().then((ruins) => {
+            let all_ruins = [...added_ruins];
+            all_ruins = all_ruins.concat(ruins);
+
+            let zone_camp_info = zone_camp.querySelector('.zone-camp-info');
+            let zone_camp_label = zone_camp.querySelector('label');
+            zone_camp_label.addEventListener('click', () => {
+                camping_predict_container.style.display = camping_predict_container.style.display === 'none' ? 'block' : 'none'
+            });
+
+            console.log('zone_camp_label', zone_camp_label);
+            camping_predict_container = document.createElement('div');
+            camping_predict_container.id = mho_camping_predict_id;
+            camping_predict_container.style.border = '1px solid';
+            camping_predict_container.style.padding = '0.5em';
+            camping_predict_container.style.margin = '0.5em 0';
+            console.log(zone_camp_info)
+            camping_predict_container.style.display = window.getComputedStyle(zone_camp_info).getPropertyValue('max-height') === '0px' ? 'none' : 'block';
+            zone_camp.appendChild(camping_predict_container);
+
+            let updater_title = document.createElement('h5');
+            updater_title.style.marginTop = '0.5em';
+            let updater_title_mho_img = document.createElement('img');
+            updater_title_mho_img.src = mh_optimizer_icon;
+            updater_title_mho_img.style.height = '24px';
+            updater_title_mho_img.style.marginRight = '0.5em';
+            updater_title.appendChild(updater_title_mho_img);
+
+            let updater_title_text = document.createElement('text');
+            updater_title_text.innerHTML = GM_info.script.name;
+            updater_title_text.style.fontSize = '1.5em';
+            updater_title.appendChild(updater_title_text);
+
+            camping_predict_container.appendChild(updater_title);
+
+            let conf = {
+                town: mh_user.townDetails.townType.toLowerCase(),
+                job: jobs.find((job) => mh_user.jobDetails.uid === job.img),
+                distance: document.querySelector('.zone-dist > div > b').innerText.replace('km', ''), // OK
+                campings: 0,
+                pro: false,
+                hidden_campers: 0,
+                objects: 0,
+                vest: false,
+                tomb: false,
+                zombies: 0,
+                night: false,
+                devastated: mh_user.townDetails.isDevaste,
+                phare: false,
+                improve: 0,
+                object_improve: 0,
+                ruin: ''
+            }
+            console.log('conf', conf);
+
+            let my_info = document.createElement('div');
+            camping_predict_container.appendChild(my_info);
+
+            let my_info_title = document.createElement('h3');
+            my_info_title.innerText = getI18N(texts.camping_citizen);
+            my_info.appendChild(my_info_title);
+
+            let my_info_content = document.createElement('div');
+            my_info.appendChild(my_info_content);
+
+            let town_info = document.createElement('div');
+            camping_predict_container.appendChild(town_info);
+
+            let town_info_title = document.createElement('h3');
+            town_info_title.innerText = getI18N(texts.camping_town);
+            town_info.appendChild(town_info_title);
+
+            let town_info_content = document.createElement('div');
+            town_info.appendChild(town_info_content);
+
+            let cell_info = document.createElement('div');
+            camping_predict_container.appendChild(cell_info);
+
+            let cell_info_title = document.createElement('h3');
+            cell_info_title.innerText = getI18N(texts.camping_ruin);
+            cell_info.appendChild(cell_info_title);
+
+            let cell_info_content = document.createElement('div');
+            cell_info.appendChild(cell_info_content);
+
+            let result = document.createElement('div');
+            camping_predict_container.appendChild(result);
+
+            let result_title = document.createElement('h3');
+            result_title.innerText = getI18N(texts.result);
+            result.appendChild(result_title);
+
+            let result_content = document.createElement('div');
+            result_content.id = 'camping-result';
+            result.appendChild(result_content);
+
+            /** Capuche ? */
+            let vest_div = document.createElement('div');
+            vest_div.id = 'vest-field';
+            vest_div.style.display = 'none';
+            my_info_content.appendChild(vest_div);
+
+            let vest_label = document.createElement('label');
+            vest_label.htmlFor = 'vest';
+            vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
+            let vest = document.createElement('input');
+            vest.type = 'checkbox';
+            vest.id = 'vest';
+            vest.checked = conf.vest;
+            vest.addEventListener('change', ($event) => {
+                conf.vest = $event.srcElement.checked;
+                calculateCampingProbabilities(conf);
+            })
+            vest_div.appendChild(vest);
+            vest_div.appendChild(vest_label);
+
+            /** Campeur pro ? */
+            let pro_camper_div = document.createElement('div');
+            my_info_content.appendChild(pro_camper_div);
+
+            let pro_camper_label = document.createElement('label');
+            pro_camper_label.htmlFor = 'pro';
+            pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
+            let pro_camper = document.createElement('input');
+            pro_camper.type = 'checkbox';
+            pro_camper.id = 'pro';
+            pro_camper.checked = conf.pro;
+            pro_camper.addEventListener('change', ($event) => {
+                conf.pro = $event.srcElement.checked;
+                calculateCampingProbabilities(conf);
+            })
+            pro_camper_div.appendChild(pro_camper);
+            pro_camper_div.appendChild(pro_camper_label);
+
+            /** Tombe ? */
+            let tomb_div = document.createElement('div');
+            my_info_content.appendChild(tomb_div);
+
+            let tomb_label = document.createElement('label');
+            tomb_label.htmlFor = 'tomb';
+            tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
+            let tomb = document.createElement('input');
+            tomb.type = 'checkbox';
+            tomb.id = 'tomb';
+            tomb.checked = conf.tomb;
+            tomb.addEventListener('change', ($event) => {
+                conf.tomb = $event.srcElement.checked;
+                calculateCampingProbabilities(conf);
+            })
+            tomb_div.appendChild(tomb);
+            tomb_div.appendChild(tomb_label);
+
+            /** Nombre de nuits déjà campées */
+            let nb_campings_div = document.createElement('div');
+            my_info_content.appendChild(nb_campings_div);
+
+            let nb_campings_label = document.createElement('label');
+            nb_campings_label.htmlFor = 'nb-campings';
+            nb_campings_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
+            nb_campings_label.classList.add('spaced-label');
+            let nb_campings = document.createElement('input');
+            nb_campings.type = 'number';
+            nb_campings.id = 'nb-campings';
+            nb_campings.value = conf.campings;
+            nb_campings.classList.add('inline');
+            nb_campings.addEventListener('change', ($event) => {
+                conf.campings = +$event.srcElement.value;
+                calculateCampingProbabilities(conf);
+            })
+            nb_campings_div.appendChild(nb_campings_label);
+            nb_campings_div.appendChild(nb_campings);
+
+            /** Nombre de toiles de tente ou pelure de peau */
+            let objects_in_bag_div = document.createElement('div');
+            my_info_content.appendChild(objects_in_bag_div);
+
+            let objects_in_bag_label = document.createElement('label');
+            objects_in_bag_label.htmlFor = 'nb-objects';
+            objects_in_bag_label.innerText = getI18N(texts.objects_in_bag);
+            objects_in_bag_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
+            objects_in_bag_label.classList.add('spaced-label');
+            let objects_in_bag = document.createElement('input');
+            objects_in_bag.type = 'number';
+            objects_in_bag.id = 'nb-objects';
+            objects_in_bag.value = conf.objects;
+            objects_in_bag.classList.add('inline');
+            objects_in_bag.addEventListener('change', ($event) => {
+                conf.objects = +$event.srcElement.value;
+                calculateCampingProbabilities(conf);
+            })
+            objects_in_bag_div.appendChild(objects_in_bag_label);
+            objects_in_bag_div.appendChild(objects_in_bag);
+
+
+            /** Type de bâtiment */
+            let ruin_type_div = document.createElement('div');
+            cell_info_content.appendChild(ruin_type_div);
+
+            let select_ruin_label = document.createElement('label');
+            select_ruin_label.htmlFor = 'select-ruin';
+            select_ruin_label.innerText = getI18N(texts.ruin);
+            select_ruin_label.classList.add('spaced-label');
+            let select_ruin = document.createElement('select');
+            select_ruin.id = 'select-ruin';
+            select_ruin.value = conf.ruin;
+            select_ruin.classList.add('small');
+            all_ruins.forEach((ruin) => {
+                let ruin_option = document.createElement('option');
+                ruin_option.value = ruin.id;
+                ruin_option.label = getI18N(ruin.label);
+                select_ruin.appendChild(ruin_option);
+            });
+            select_ruin.addEventListener('change', ($event) => {
+                conf.ruin = $event.srcElement.value;
+                calculateCampingProbabilities(conf);
+            })
+            ruin_type_div.appendChild(select_ruin_label);
+            ruin_type_div.appendChild(select_ruin);
+
+            /** Nombre de zombies sur la case */
+            let zombies_div = document.createElement('div');
+            cell_info_content.appendChild(zombies_div);
+
+            let zombies_label = document.createElement('label');
+            zombies_label.htmlFor = 'nb-zombies';
+            zombies_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
+            zombies_label.classList.add('spaced-label');
+            let zombies = document.createElement('input');
+            zombies.type = 'number';
+            zombies.id = 'nb-zombies';
+            zombies.value = conf.zombies;
+            zombies.classList.add('inline');
+            zombies.addEventListener('change', ($event) => {
+                conf.zombies = +$event.srcElement.value;
+                calculateCampingProbabilities(conf);
+            })
+            zombies_div.appendChild(zombies_label);
+            zombies_div.appendChild(zombies);
+
+            /** Nombre d'améliorations simples sur la case */
+            let improve_div = document.createElement('div');
+            cell_info_content.appendChild(improve_div);
+
+            let improve_label = document.createElement('label');
+            improve_label.htmlFor = 'nb-improve';
+            improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
+            improve_label.classList.add('spaced-label');
+            let improve = document.createElement('input');
+            improve.type = 'number';
+            improve.id = 'nb-improve';
+            improve.value = conf.improve;
+            improve.classList.add('inline');
+            improve.addEventListener('change', ($event) => {
+                conf.improve = +$event.srcElement.value;
+                calculateCampingProbabilities(conf);
+            })
+            improve_div.appendChild(improve_label);
+            improve_div.appendChild(improve);
+
+            /** Nombre d'objets de campement installés sur la case */
+            let object_improve_div = document.createElement('div');
+            cell_info_content.appendChild(object_improve_div);
+
+            let object_improve_label = document.createElement('label');
+            object_improve_label.htmlFor = 'nb-object-improve';
+            object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
+            object_improve_label.classList.add('spaced-label');
+            let object_improve = document.createElement('input');
+            object_improve.type = 'number';
+            object_improve.id = 'nb-object-improve';
+            object_improve.value = conf.object_improve;
+            object_improve.classList.add('inline');
+            object_improve.addEventListener('change', ($event) => {
+                conf.object_improve = +$event.srcElement.value;
+                calculateCampingProbabilities(conf);
+            })
+            object_improve_div.appendChild(object_improve_label);
+            object_improve_div.appendChild(object_improve);
+
+            /** Nombre de personnes déjà cachées */
+            let hidden_campers_div = document.createElement('div');
+            cell_info_content.appendChild(hidden_campers_div);
+
+            let hidden_campers_label = document.createElement('label');
+            hidden_campers_label.htmlFor = 'hidden-campers';
+            hidden_campers_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
+            hidden_campers_label.classList.add('spaced-label');
+            let hidden_campers = document.createElement('input');
+            hidden_campers.type = 'number';
+            hidden_campers.id = 'hidden-campers';
+            hidden_campers.value = conf.hidden_campers;
+            hidden_campers.classList.add('inline');
+            hidden_campers.addEventListener('change', ($event) => {
+                conf.hidden_campers = +$event.srcElement.value;
+                calculateCampingProbabilities(conf);
+            })
+            hidden_campers_div.appendChild(hidden_campers_label);
+            hidden_campers_div.appendChild(hidden_campers);
+
+            /** Nuit ? */
+            let night_div = document.createElement('div');
+            town_info_content.appendChild(night_div);
+
+            let night_label = document.createElement('label');
+            night_label.htmlFor = 'night';
+            night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
+            let night = document.createElement('input');
+            night.type = 'checkbox';
+            night.id = 'night';
+            night.checked = conf.night;
+            night.addEventListener('change', ($event) => {
+                conf.night = $event.srcElement.checked;
+                calculateCampingProbabilities(conf);
+            })
+            night_div.appendChild(night);
+            night_div.appendChild(night_label);
+
+            /** Phare construit ? */
+            let phare_div = document.createElement('div');
+            town_info_content.appendChild(phare_div);
+
+            let phare_label = document.createElement('label');
+            phare_label.htmlFor = 'phare';
+            phare_label.innerText = getI18N(texts.phare);
+            phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
+            let phare = document.createElement('input');
+            phare.type = 'checkbox';
+            phare.id = 'phare';
+            phare.checked = conf.phare;
+            phare.addEventListener('change', ($event) => {
+                conf.phare = $event.srcElement.checked;
+                calculateCampingProbabilities(conf);
+            })
+            phare_div.appendChild(phare);
+            phare_div.appendChild(phare_label);
+
+
+            calculateCampingProbabilities(conf);
+        });
+
+    } else if (camping_predict_container) {
+        camping_predict_container.remove();
     }
 }
 
@@ -6614,12 +7063,7 @@ function updateExternalTools() {
 
     let data = {};
     let nb_dead_zombies = +document.querySelectorAll('.actor.splatter').length;
-    let tools_to_update = {
-        isBigBrothHordes: mho_parameters && mho_parameters.update_bbh ? 'api' : 'none',
-        isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
-        isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
-    };
-    data.tools = tools_to_update;
+
     data.townDetails = {
         townX: mh_user.townDetails.townX,
         townY: mh_user.townDetails.townY,
@@ -6627,8 +7071,15 @@ function updateExternalTools() {
         isDevaste: mh_user.townDetails.isDevaste,
     };
 
-    if (mho_parameters.update_gh_without_api) {
-        let objects = Array.from(document.querySelector('.inventory.desert').querySelectorAll('li.item')).map((desert_item) => {
+    data.map = {}
+    data.map.toolsToUpdate = {
+        isBigBrothHordes: mho_parameters && mho_parameters.update_bbh ? 'api' : 'none',
+        isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
+        isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
+    };
+
+    if (mho_parameters.update_gh_without_api && pageIsDesert()) {
+        let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item')).map((desert_item) => {
             let item = convertImgToItem(desert_item.querySelector('img'));
             return {id: item.id, isBroken: desert_item.classList.contains('broken')};
         });
@@ -6644,11 +7095,21 @@ function updateExternalTools() {
             objects: convertListOfSingleObjectsIntoListOfCountedObjects(objects)
         }
         if (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) {
-            data.cell = content;
+            data.map.cell = content;
         }
     }
 
-    if (mho_parameters.update_mho) {
+    if (mho_parameters.update_mho_bags) {
+
+        data.bags = {}
+        data.bags.contents = [];
+        data.bags.toolsToUpdate = {
+            isBigBrothHordes: false,
+            isFataMorgana: false,
+            isGestHordes: false,
+            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_bags
+        };
+
         let rucksacks = [];
         let my_rusksack = Array.from(document.querySelector('.pointer.rucksack').querySelectorAll('li.item:not(.locked)')).map((rucksack_item) => {
             let item = convertImgToItem(rucksack_item.querySelector('img'));
@@ -6676,7 +7137,104 @@ function updateExternalTools() {
             })
         }
 
-        data.bags = rucksacks;
+        data.bags.contents = rucksacks;
+    }
+
+    if (mho_parameters.update_mho_chest && pageIsHouse()) {
+
+        data.chest = {}
+        data.chest.contents = [];
+        data.chest.toolsToUpdate = {
+            isBigBrothHordes: false,
+            isFataMorgana: false,
+            isGestHordes: false,
+            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_chest
+        };
+
+        let chest_elements = Array.from(document.querySelector('.inventory.chest').querySelectorAll('li.item:not(.locked)')).map((chest_item) => {
+            let item = convertImgToItem(chest_item.querySelector('img'));
+            return {id: item.id, isBroken: chest_item.classList.contains('broken')};
+        });
+
+        data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
+    }
+
+
+    /** Récupération des pouvoirs héroïques */
+    if (mho_parameters.update_gh_ah || mho_parameters.update_mho_actions) {
+        data.heroicActions = {}
+        data.heroicActions.actions = [];
+        data.heroicActions.toolsToUpdate = {
+            isBigBrothHordes: false,
+            isFataMorgana: false,
+            isGestHordes: mho_parameters && mho_parameters.update_gh_ah,
+            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_actions
+        };
+        let heroics = Array.from(document.querySelector('.heroic_actions')?.querySelectorAll('.heroic_action:not(.help)'));
+        if (heroics && heroics.length > 0) {
+            for (let heroic of heroics) {
+                let action = {
+                    locale: lang,
+                    label: heroic.querySelector('.label').innerText,
+                    value: heroic.classList.contains('already') ? 0 : 1
+                }
+                data.heroicActions.actions.push(action);
+            }
+        }
+        let apag = document.querySelector('ul.actions [src*=item_photo]');
+        if (apag) {
+            let action = {
+                locale: lang,
+                label: apag.nextElementSibling.querySelector('b').innerText,
+                value: +apag.src.replace(/.*item_photo_(\d).*/, '$1')
+            }
+            data.heroicActions.actions.push(action);
+        }
+    }
+
+    /** Récupération des améliorations de maison */
+    if ((mho_parameters.update_gh_amelios || mho_parameters.update_mho_house) && pageIsHouse()) {
+        data.amelios = {}
+        data.amelios.values = {};
+        data.amelios.toolsToUpdate = {
+            isBigBrothHordes: false,
+            isFataMorgana: false,
+            isGestHordes: mho_parameters && mho_parameters.update_gh_amelios,
+            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_house
+        };
+        let amelios = Array.from(document.querySelectorAll('[x-tab-group="home-main"][x-tab-id="build"] .row-table .row:not(.header)'));
+        if (amelios && amelios.length > 0) {
+            amelios.forEach((amelio) => {
+                let amelio_img = amelio.querySelector('img');
+                let amelio_value = amelio_img.nextElementSibling.innerText.match(/\d+/);
+                data.amelios.values[amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1')] = amelio_value ? +amelio_value[0] : 0;
+            });
+        }
+        let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary').querySelector('.row-detail img').alt;
+        data.amelios.values.house = house_level;
+    }
+
+    /** Récupération des status */
+    if (mho_parameters.update_mho_status) {
+        data.status = {}
+        data.status.values = [];
+        data.status.toolsToUpdate = {
+            isBigBrothHordes: false,
+            isFataMorgana: false,
+            isGestHordes: false,
+            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_status
+        };
+        let statuses = Array.from(document.querySelectorAll('.rucksack_status_union li.status img'));
+        if (statuses && statuses.length > 0) {
+            statuses
+                .filter((status) => {
+                let status_name = status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1');
+                return status.src.indexOf('/status') > -1 && status_name !== 'ghoul' && status_name !== 'unknown';
+            })
+                .forEach((status) => {
+                data.status.values.push(status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1'));
+            });
+        }
     }
 
 
@@ -6692,15 +7250,20 @@ function updateExternalTools() {
         responseType: 'json',
         onload: function(response){
             if (response.status === 200) {
-                if (response.response.bigBrothHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_bbh_updated_key, true);
-                if (response.response.gestHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
-                if (response.response.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
+                if (response.response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_bbh_updated_key, true);
+                if (response.response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
+                if (response.response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
 
+                let tools_fail = [];
                 let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
-                let tools_success = response_items.filter((tool_response) => tool_response.value.toLowerCase() === 'ok');
-                let tools_fail = response_items.filter((tool_response) => tool_response.value.toLowerCase() !== 'ok' && tool_response.value.toLowerCase() !== 'not activated');
-                btn.innerHTML = tools_fail.length === 0 ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
-                : `<img src ="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_success.map((item) => item.key.replace('Status', ' : OK')).join('<br>')}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
+                response_items.forEach((response_item, index) => {
+                    let final = Object.keys(response_item.value).map((key) => {return {key: key, value: response_item.value[key]}});
+                    tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
+                    if (index >= response_items.length - 1) {
+                        btn.innerHTML = tools_fail.length === 0 ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
+                        : `<img src ="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
+                    }
+                });
             } else {
                 addError(response);
                 btn.innerHTML = `<img src="${repo_img_hordes_url}professions/death.gif">` + getI18N(texts.update_external_tools_fail_btn_label);
@@ -7102,6 +7665,7 @@ async function getCitizenHouseContent(link) {
                         displayNbDeadZombies();
                         displayTranslateTool();
                         displayMoreCitizensInformations();
+                        displayCampingPredict();
                         // blockUsersPosts();
                     }, 500);
 
