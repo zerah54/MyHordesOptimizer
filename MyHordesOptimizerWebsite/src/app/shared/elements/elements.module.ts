@@ -10,11 +10,12 @@ import { AccordionComponent } from './accordion/accordion.component';
 import { FilterFieldComponent } from './filter-field/filter-field.component';
 import { ItemComponent } from './item/item.component';
 import { LastUpdateComponent } from './last-update/last-update.component';
+import { ListElementAddRemoveComponent } from './list-elements-add-remove/list-element-add-remove.component';
 import { RecipeComponent } from './recipe/recipe.component';
 import { LabelPipe } from './select/label.pipe';
 import { SelectComponent } from './select/select.component';
 
-let components: any[] = [ItemComponent, SelectComponent, RecipeComponent, FilterFieldComponent, LastUpdateComponent, AccordionComponent];
+let components: any[] = [ItemComponent, SelectComponent, RecipeComponent, FilterFieldComponent, LastUpdateComponent, AccordionComponent, ListElementAddRemoveComponent];
 let local_components: any[] = [LabelPipe]
 let custom_modules: any[] = [MaterialModule]
 let angular_modules: any[] = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule]

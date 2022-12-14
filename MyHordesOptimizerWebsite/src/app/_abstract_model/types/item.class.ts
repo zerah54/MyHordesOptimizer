@@ -24,6 +24,7 @@ export class Item extends CommonModel<ItemDTO> {
     public wishlist_count!: number;
     public drop_rate_not_praf!: number;
     public drop_rate_praf!: number;
+    public is_broken!: boolean;
 
     constructor(dto?: ItemDTO) {
         super();

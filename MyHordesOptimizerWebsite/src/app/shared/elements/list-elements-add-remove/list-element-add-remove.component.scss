@@ -1,0 +1,51 @@
+@import "variables.scss";
+
+.editable-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5em;
+    border-radius: 0.5em;
+    padding: 0.5em;
+    background-color: $item_color;
+    margin-bottom: 0.25em;
+
+    .list {
+        margin: auto 0;
+        > img {
+            vertical-align: middle;
+        }
+    }
+
+    .bag {
+        display: flex;
+        gap: 0.25em;
+        align-items: center;
+    }
+
+    .add-remove {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        > img {
+            cursor: pointer;
+        }
+    }
+}
+
+.menu-add, .menu-remove {
+    .mat-menu-content {
+        padding: 8px;
+        .empty-bag {
+            display: flex;
+            align-items: center;
+        }
+        .items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25em;
+            > img {
+                cursor: pointer;
+            }
+        }
+    }
+}

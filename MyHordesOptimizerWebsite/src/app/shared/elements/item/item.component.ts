@@ -2,7 +2,6 @@ import { Component, HostBinding, Input } from '@angular/core';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from './../../../_abstract_model/const';
 import { ApiServices } from './../../../_abstract_model/services/api.services';
-import { BankItem } from './../../../_abstract_model/types/bank-item.class';
 import { Item } from './../../../_abstract_model/types/item.class';
 
 @Component({
@@ -13,8 +12,6 @@ import { Item } from './../../../_abstract_model/types/item.class';
 export class ItemComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    /** L'élément à afficher si c'est un objet de banque */
-    @Input() bankItem!: BankItem;
     /** L'élément à afficher si c'est un objet standard */
     @Input() item!: Item;
 
@@ -35,11 +32,7 @@ export class ItemComponent {
      */
     public addItemToWishlist(item: Item): void {
         this.api.addItemToWishlist(item).subscribe(() => {
-            if (this.bankItem) {
-                this.bankItem.wishlist_count = 1;
-            } else {
-                this.item.wishlist_count = 1;
-            }
+            this.item.wishlist_count = 1;
         })
     }
 

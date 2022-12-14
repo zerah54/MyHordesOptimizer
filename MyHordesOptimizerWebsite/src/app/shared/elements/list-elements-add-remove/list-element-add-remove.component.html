@@ -1,0 +1,47 @@
+<div class="editable-container">
+    <div class="list">
+        <ng-container *ngFor="let item of currentList">
+            <img [src]="HORDES_IMG_REPO + item.img" [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" style="cursor: pointer">
+        </ng-container>
+    </div>
+    <div class="add-remove">
+        <img [src]="HORDES_IMG_REPO + 'icons/small_more.gif'" [mat-menu-trigger-for]="menuAdd">
+        <img [src]="HORDES_IMG_REPO + 'icons/small_less.gif'" *ngIf="currentList.length > 0"
+            [mat-menu-trigger-for]="menuRemove">
+
+        <mat-menu #menuAdd="matMenu" class="menu-add">
+            <div class="search" (click)="$event.stopPropagation()">
+                <mat-form-field>
+                    <mat-label>{{addLabel}}</mat-label>
+                    <input matInput #searchItem>
+                </mat-form-field>
+            </div>
+            <div class="items">
+                <ng-container *ngFor="let item of completeList">
+                    <img *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1"
+                        [src]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id)" [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" >
+                </ng-container>
+            </div>
+        </mat-menu>
+        <mat-menu #menuRemove="matMenu" class="menu-remove">
+            <div class="search" (click)="$event.stopPropagation()">
+                <mat-form-field>
+                    <mat-label>{{removeLabel}}</mat-label>
+                    <input matInput #searchItem>
+                </mat-form-field>
+            </div>
+            <div class="items">
+                <ng-container *ngFor="let item of currentList">
+                    <ng-container
+                        *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1">
+                        <img [src]="HORDES_IMG_REPO + item.img" (click)="remove.next(item.id)"[title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" >
+                    </ng-container>
+                </ng-container>
+            </div>
+            <div mat-menu-item class="empty-bag" (click)="empty.next()">
+                <img [src]="HORDES_IMG_REPO + 'icons/b_close.png'" style="margin-right: 0.5em">
+                <span>{{emptyLabel}}</span>
+            </div>
+        </mat-menu>
+    </div>
+</div>

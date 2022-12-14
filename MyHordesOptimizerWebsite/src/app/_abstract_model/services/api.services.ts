@@ -9,9 +9,11 @@ import { ItemDTO } from '../dto/item.dto';
 import { MeDTO } from '../dto/me.dto';
 import { RecipeDTO } from '../dto/recipe.dto';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
+import { StatusEnum } from '../enum/status.enum';
 import { Citizen } from '../types/citizen.class';
 import { HeroSkill } from '../types/hero-skill.class';
-import { ItemCount } from '../types/item-count.class';
+import { HeroicActionsWithValue } from '../types/heroic-actions.class';
+import { HomeWithValue } from '../types/home.class';
 import { Me } from '../types/me.class';
 import { Recipe } from '../types/recipe.class';
 import { Ruin } from '../types/ruin.class';
@@ -250,7 +252,42 @@ export class ApiServices extends GlobalServices {
 
     public updateBag(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(API_URL + `/ExternalTools/Bag?townId=${getTown()?.town_id}&userId=${citizen.id}`, JSON.stringify(citizen.bag.items.map((item: ItemCount) => item.toShortItemCount())))
+            super.post<UpdateInfoDTO>(API_URL + `/ExternalTools/Bag?townId=${getTown()?.town_id}&userId=${citizen.id}`, JSON.stringify(citizen.bag.toShortItemCountList()))
+                .subscribe({
+                    next: (response: UpdateInfoDTO) => {
+                        sub.next(new UpdateInfo(response));
+                    }
+                })
+        })
+    }
+
+    public updateStatus(citizen: Citizen): Observable<UpdateInfo> {
+        return new Observable((sub: Subscriber<UpdateInfo>) => {
+            super.post<UpdateInfoDTO>(API_URL + `/ExternalTools/Status?townId=${getTown()?.town_id}&userId=${citizen.id}`, JSON.stringify(citizen.status.icons.map((icon: StatusEnum) => icon.key)))
+                .subscribe({
+                    next: (response: UpdateInfoDTO) => {
+                        sub.next(new UpdateInfo(response));
+                    }
+                })
+        })
+    }
+
+    public updateHome(citizen: Citizen): Observable<UpdateInfo> {
+        return new Observable((sub: Subscriber<UpdateInfo>) => {
+            const new_status: Dictionary<number> = citizen.home.content.reduce((accumulator, content: HomeWithValue) => { return {...accumulator, [content.element.key]: content.value}}, {})
+            super.post<UpdateInfoDTO>(API_URL + `/ExternalTools/home?townId=${getTown()?.town_id}&userId=${citizen.id}`, JSON.stringify(new_status))
+                .subscribe({
+                    next: (response: UpdateInfoDTO) => {
+                        sub.next(new UpdateInfo(response));
+                    }
+                })
+        })
+    }
+
+    public updateHeroicActions(citizen: Citizen): Observable<UpdateInfo> {
+        return new Observable((sub: Subscriber<UpdateInfo>) => {
+            const new_status: Dictionary<number> = citizen.heroic_actions.content.reduce((accumulator, content: HeroicActionsWithValue) => { return {...accumulator, [content.element.key]: content.value }}, {})
+            super.post<UpdateInfoDTO>(API_URL + `/ExternalTools/HeroicActions?townId=${getTown()?.town_id}&userId=${citizen.id}`, JSON.stringify(new_status))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));

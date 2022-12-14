@@ -1,5 +1,8 @@
 import { CitizenDTO } from '../dto/citizen.dto';
 import { Bag } from './bag.class';
+import { HeroicActions } from './heroic-actions.class';
+import { Home } from './home.class';
+import { Status } from './status.class';
 import { CommonModel } from './_common.class';
 
 export class Citizen extends CommonModel<CitizenDTO> {
@@ -13,6 +16,10 @@ export class Citizen extends CommonModel<CitizenDTO> {
     public x!: number;
     public y!: number;
     public bag!: Bag;
+    public chest!: Bag;
+    public status!: Status;
+    public home!: Home;
+    public heroic_actions!: HeroicActions;
 
     constructor(dto?: CitizenDTO) {
         super();
@@ -30,7 +37,11 @@ export class Citizen extends CommonModel<CitizenDTO> {
             x: this.x,
             y: this.y,
             name: this.name,
-            bag: this.bag.modelToDto()
+            bag: this.bag.modelToDto(),
+            chest: this.chest.modelToDto(),
+            status: this.status.modelToDto(),
+            home: this.home.modelToDto(),
+            actionsHeroic: this.heroic_actions.modelToDto()
         }
     };
 
@@ -46,6 +57,10 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.y = dto.y;
             this.name = dto.name;
             this.bag = new Bag(dto.bag);
+            this.chest = new Bag(dto.chest);
+            this.status = new Status(dto.status);
+            this.home = new Home(dto.home);
+            this.heroic_actions = new HeroicActions(dto.actionsHeroic);
         }
     };
 }

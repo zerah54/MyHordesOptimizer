@@ -85,7 +85,7 @@
                 <div>
                     <mat-form-field>
                         <mat-label i18n>Bâtiment</mat-label>
-                        <mho-select [formControlName]="'ruin'" [options]="ruins" [bindLabel]="'label.' + locale">
+                        <mho-select [formControlName]="'ruin'" [options]="ruins | filterRuinsByKm:townDistance.value" [bindLabel]="'label.' + locale">
                         </mho-select>
                     </mat-form-field>
 
@@ -93,7 +93,7 @@
                         <mat-label><img [src]="HORDES_IMG_REPO + 'emotes/explo.gif'">
                             <ng-container i18n>Distance de la ville (en km)</ng-container>
                         </mat-label>
-                        <input matInput type="number" [formControlName]="'distance'">
+                        <input matInput type="number" #townDistance [formControlName]="'distance'" min="1">
                     </mat-form-field>
 
                     <mat-form-field>

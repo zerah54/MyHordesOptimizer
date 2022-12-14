@@ -10,7 +10,7 @@ export abstract class CommonEnum {
      * @return {T} l'object correspondant.
      */
     public static getValue<T extends CommonEnum>(key: string): T | undefined {
-        if (!key) return undefined;
+        if (key === null || key === undefined) return undefined;
 
         const property_descriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(this, key);
         if (property_descriptor) {
@@ -30,8 +30,8 @@ export abstract class CommonEnum {
      *
      * @return {T[]} les objets correspondant.
      */
-    public static getValues<T extends CommonEnum>(keys: string[]): (T | undefined)[] {
-        return keys ? keys.map((value: string) => this.getValue(value)) : [];
+    public static getValues<T extends CommonEnum>(keys: string[]): T[] {
+        return keys ? <T[]>keys.filter((value: string) => this.getValue(value)).map((value: string) => this.getValue(value)) : [];
     }
 
     /**
@@ -73,7 +73,7 @@ export abstract class CommonEnum {
     }
 
     /** @return {T[]} retourne la liste des valeurs possibles */
-    public static getAllValues<T extends CommonEnum>(): (T | undefined)[] {
+    public static getAllValues<T extends CommonEnum>(): T[] {
         return this.getValues<T>(Object.keys(this)).filter((value: T | undefined) => value instanceof this);
     }
 

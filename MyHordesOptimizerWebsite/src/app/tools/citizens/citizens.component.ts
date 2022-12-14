@@ -4,8 +4,9 @@ import { MatTable, MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { getUser } from 'src/app/shared/utilities/localstorage.util';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
+import { StatusEnum } from 'src/app/_abstract_model/enum/status.enum';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
-import { ItemCount } from 'src/app/_abstract_model/types/item-count.class';
+import { HomeWithValue } from 'src/app/_abstract_model/types/home.class';
 import { Item } from 'src/app/_abstract_model/types/item.class';
 import { UpdateInfo } from 'src/app/_abstract_model/types/update-info.class';
 import { CitizenInfo } from './../../_abstract_model/types/citizen-info.class';
@@ -36,12 +37,16 @@ export class CitizensComponent {
     public readonly columns: CitizenColumn[] = [
         { id: 'avatar', header: $localize`Avatar` },
         { id: 'name', header: $localize`Nom du citoyen` },
+        { id: 'status', header: $localize`États` },
         { id: 'bag', header: $localize`Sac à dos` },
-        { id: 'home_message', header: $localize`Message` },
+        { id: 'heroic_actions', header: $localize`Actions héroïques` },
+        { id: 'home', header: $localize`Améliorations` },
+        // { id: 'chest', header: $localize`Coffre` },
     ];
+
+    public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: CitizenColumn) => column.id);
-    public moment = moment;
 
     constructor(private api: ApiServices) {
 
@@ -71,20 +76,11 @@ export class CitizensComponent {
     public addItem(citizen_id: number, item_id: number): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen) {
-            const item_in_datasource: ItemCount | undefined = citizen.bag.items.find((item_in_bag: ItemCount) => item_in_bag.item.id === item_id);
-            if (item_in_datasource) {
-                item_in_datasource.count += 1;
-            } else {
-                citizen.bag.items.push(new ItemCount({
-                    count: 1,
-                    isBroken: false,
-                    item: (<Item>this.all_items.find((item: Item) => item.id === item_id)).modelToDto()
-                }))
-            }
+            citizen.bag.items.push(<Item>this.all_items.find((item: Item) => item.id === item_id))
 
             this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.bag.username = getUser().username;
-                citizen.bag.update_time = update_info.update_time;
+                citizen.bag.update_info.username = getUser().username;
+                citizen.bag.update_info.update_time = update_info.update_time;
             });
         }
     }
@@ -99,22 +95,19 @@ export class CitizensComponent {
     public removeItem(citizen_id: number, item_id: number): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen) {
-            const item_in_datasource_index: number | undefined = citizen.bag.items.findIndex((item_in_bag: ItemCount) => item_in_bag.item.id === item_id);
+            const item_in_datasource_index: number | undefined = citizen.bag.items.findIndex((item_in_bag: Item) => item_in_bag.id === item_id);
             if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
-                citizen.bag.items[item_in_datasource_index].count -= 1;
-                if (citizen.bag.items[item_in_datasource_index].count <= 0) {
-                    citizen.bag.items.splice(item_in_datasource_index, 1);
-                }
+                citizen.bag.items.splice(item_in_datasource_index, 1);
             }
             this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.bag.username = getUser().username;
-                citizen.bag.update_time = update_info.update_time;
+                citizen.bag.update_info.username = getUser().username;
+                citizen.bag.update_info.update_time = update_info.update_time;
             });
         }
     }
 
     /**
-     * On vide complètement le dac
+     * On vide complètement le sac
      *
      * @param {number} citizen_id
      */
@@ -123,8 +116,92 @@ export class CitizensComponent {
         if (citizen) {
             citizen.bag.items = [];
             this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.bag.username = getUser().username;
-                citizen.bag.update_time = update_info.update_time;
+                citizen.bag.update_info.username = getUser().username;
+                citizen.bag.update_info.update_time = update_info.update_time;
+            });
+        }
+    }
+
+    /**
+     * On ajoute un état
+     *
+     * @param {number} citizen_id
+     * @param {number} status_key
+     */
+    public addStatus(citizen_id: number, status_key: string): void {
+        const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
+        if (citizen) {
+            citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status.key === status_key))
+
+            this.api.updateStatus(citizen).subscribe((update_info: UpdateInfo) => {
+                citizen.status.update_info.username = getUser().username;
+                citizen.status.update_info.update_time = update_info.update_time;
+            });
+        }
+    }
+
+    /**
+     * On retire un état
+     *
+     * @param {number} citizen_id
+     * @param {number} status_key
+     */
+    public removeStatus(citizen_id: number, status_key: string): void {
+        const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
+        if (citizen) {
+            const existing_status_index: number | undefined = citizen.status.icons.findIndex((status: StatusEnum) => status.key === status_key);
+            if (existing_status_index !== undefined && existing_status_index !== null && existing_status_index > -1) {
+                citizen.status.icons.splice(existing_status_index, 1);
+            }
+            this.api.updateStatus(citizen).subscribe((update_info: UpdateInfo) => {
+                citizen.status.update_info.username = getUser().username;
+                citizen.status.update_info.update_time = update_info.update_time;
+            });
+        }
+    }
+
+    /**
+     * On vide complètement les statuts
+     *
+     * @param {number} citizen_id
+     */
+    public emptyStatus(citizen_id: number): void {
+        const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
+        if (citizen) {
+            citizen.status.icons = [];
+            this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
+                citizen.status.update_info.username = getUser().username;
+                citizen.status.update_info.update_time = update_info.update_time;
+            });
+        }
+    }
+
+    /**
+     * On met à jour la liste des améliorations
+     *
+     * @param {number} citizen_id
+     */
+    public updateHome(citizen_id: number): void {
+        const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
+        if (citizen) {
+            this.api.updateHome(citizen).subscribe((update_info: UpdateInfo) => {
+                citizen.home.update_info.username = getUser().username;
+                citizen.home.update_info.update_time = update_info.update_time;
+            });
+        }
+    }
+
+    /**
+     * On met à jour la liste des actions héroiques
+     *
+     * @param {number} citizen_id
+     */
+    public updateActions(citizen_id: number): void {
+        const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
+        if (citizen) {
+            this.api.updateHeroicActions(citizen).subscribe((update_info: UpdateInfo) => {
+                citizen.heroic_actions.update_info.username = getUser().username;
+                citizen.heroic_actions.update_info.update_time = update_info.update_time;
             });
         }
     }
