@@ -656,7 +656,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 heroicActionDetail.ApagCharges = action.Value;
                                 break;
                             case ActionHeroicType.CheatDeath:
-                                heroicActionDetail.IsCheatingDeathActive = Convert.ToBoolean(action.Value);
+                                heroicActionDetail.HasCheatDeath = Convert.ToBoolean(action.Value);
                                 break;
                             case ActionHeroicType.HeroicReturn:
                                 heroicActionDetail.HasHeroicReturn = Convert.ToBoolean(action.Value);
