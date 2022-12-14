@@ -1,8 +1,8 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using System.Collections.Generic;
@@ -15,8 +15,8 @@ namespace MyHordesOptimizerApi.Services.Interfaces.ExternalTools
         public Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto);
         List<CaseGH> UpdateGHZoneRegen(UpdateZoneRegenDto requestDto);
         LastUpdateInfo UpdateCitizenBag(int townId, int userId, List<UpdateObjectDto> bag);
-        LastUpdateInfo UpdateCitizenHome(int townId, int userId, HomeUpgradeDetailsDto homeDetails);
+        LastUpdateInfo UpdateCitizenHome(int townId, int userId, CitizenHomeValue homeDetails);
         LastUpdateInfo UpdateCitizenStatus(int townId, int userId, List<string> status);
-        LastUpdateInfo UpdateCitizenHeroicActions(int townId, int userId, List<ActionHeroicDto> actionHeroics);
+        LastUpdateInfo UpdateCitizenHeroicActions(int townId, int userId, CitizenActionsHeroicValue actionHeroics);
     }
 }

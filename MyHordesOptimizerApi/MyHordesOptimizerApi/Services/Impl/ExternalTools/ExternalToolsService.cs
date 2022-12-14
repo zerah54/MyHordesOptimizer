@@ -512,7 +512,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         #endregion
 
-        public LastUpdateInfo UpdateCitizenHome(int townId, int userId, HomeUpgradeDetailsDto homeDetails)
+        public LastUpdateInfo UpdateCitizenHome(int townId, int userId, CitizenHomeValue homeDetails)
         {
             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
@@ -629,11 +629,11 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         #region CitizenHeroicAction
 
-        public LastUpdateInfo UpdateCitizenHeroicActions(int townId, int userId, List<ActionHeroicDto> actionHeroics)
+        public LastUpdateInfo UpdateCitizenHeroicActions(int townId, int userId, CitizenActionsHeroicValue actionHeroics)
         {
             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
-            var citizenDetail = GetHeroicActionCitizenDetail(actionHeroics);
+            var citizenDetail = Mapper.Map<TownCitizenDetailModel>(actionHeroics);
             citizenDetail.IdUser = userId;
             citizenDetail.IdTown = townId;
             citizenDetail.IdLastUpdateInfoHome = homeLastUpdateInfo;

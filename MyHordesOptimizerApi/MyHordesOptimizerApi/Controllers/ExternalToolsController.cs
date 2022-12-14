@@ -104,7 +104,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("HeroicActions")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenHeroicActions([FromQuery] int townId, [FromQuery] int userId, [FromBody] List<ActionHeroicDto> actionHeroics)
+        public ActionResult<LastUpdateInfo> UpdateCitizenHeroicActions([FromQuery] int townId, [FromQuery] int userId, [FromBody] CitizenActionsHeroicValue actionHeroics)
         {
             UserKeyProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenHeroicActions(townId, userId, actionHeroics);
@@ -113,7 +113,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Home")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenHome([FromQuery] int townId, [FromQuery] int userId, [FromBody] HomeUpgradeDetailsDto homeDetails)
+        public ActionResult<LastUpdateInfo> UpdateCitizenHome([FromQuery] int townId, [FromQuery] int userId, [FromBody] CitizenHomeValue homeDetails)
         {
             UserKeyProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenHome(townId, userId, homeDetails);
