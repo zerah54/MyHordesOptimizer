@@ -52,7 +52,13 @@ export class MenuComponent {
                 {
                     label: $localize`Script`, displayed: false, lvl: 1, authorized: () => true, expanded: false, children: [
                         { label: $localize`Installation`, path: 'tutorials/script/installation', displayed: false, lvl: 2, authorized: () => true },
+                        // { label: $localize`Mettre à jour les outils externes`, path: 'tutorials/script/update-external-tools', displayed: false, lvl: 2, authorized: () => true },
                         { label: $localize`Documentation`, path: 'tutorials/script/documentation', displayed: false, lvl: 2, authorized: () => true }
+                    ]
+                },
+                {
+                    label: $localize`Site`, displayed: false, lvl: 1, authorized: () => true, expanded: false, children: [
+                        { label: $localize`Première utilisation`, path: 'tutorials/site/first-use', displayed: false, lvl: 2, authorized: () => true },
                     ]
                 },
             ]

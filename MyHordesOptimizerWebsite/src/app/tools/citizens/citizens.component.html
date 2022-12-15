@@ -6,15 +6,19 @@
         <div class="mat-elevation-z8">
             <table mat-table [dataSource]="datasource" matSort>
 
-                <ng-container matColumnDef="filters">
-                    <td mat-header-cell *matHeaderCellDef colspan="6">
+                <ng-container matColumnDef="filters" sticky>
+                    <td mat-header-cell *matHeaderCellDef colspan="2">
                         <div class="table-filters">
                             <mho-filter (filterChange)="applyFilter($event)"></mho-filter>
                         </div>
                     </td>
                 </ng-container>
+                <ng-container matColumnDef="empty">
+                    <td mat-header-cell *matHeaderCellDef colspan="4"></td>
+                </ng-container>
 
-                <ng-container *ngFor="let column of columns" [matColumnDef]="column.id" [sticky]="column.id === 'name'">
+                <ng-container *ngFor="let column of columns" [matColumnDef]="column.id"
+                    [sticky]="column.id === 'name' || column.id === 'avatar'">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>{{column.header}}</th>
 
                     <td mat-cell *matCellDef="let row" [ngClass]="[column.id]">
@@ -25,76 +29,81 @@
                             <ng-container *ngSwitchCase="'name'">
                                 {{row.name}}
                             </ng-container>
-                            <ng-container *ngSwitchCase="'home_message'">
-                                {{row.home_message}}
+                            <ng-container *ngSwitchCase="'status'">
+                                <mho-list-element-add-remove [currentList]="row.status.icons"
+                                    [completeList]="all_status" addLabel="Ajouter aux statuts" i18n-addLabel
+                                    (add)="addStatus(row.id, $event + '')" removeLabel="Retirer des statuts"
+                                    i18n-removeLabel (remove)="removeStatus(row.id, $event + '')"
+                                    emptyLabel="Vider les statuts" i18n-emptyLabel (empty)="emptyStatus(row.id)">
+                                </mho-list-element-add-remove>
+                                <mho-last-update [lastUpdateInfo]="row.status.update_info"
+                                    [thresholds]="[30, 120, 120*2, 120*3]">
+                                </mho-last-update>
                             </ng-container>
                             <ng-container *ngSwitchCase="'bag'">
-                                <div class="bag-container">
-                                    <div class="bag">
-                                        <ng-container *ngFor="let item of row.bag.items">
-                                            <img *ngFor="let i of [].constructor(item.count)"
-                                                [src]="HORDES_IMG_REPO + item.item.img">
-                                        </ng-container>
-                                    </div>
-                                    <div class="add-remove">
-                                        <img [src]="HORDES_IMG_REPO + 'icons/small_more.gif'"
-                                            [mat-menu-trigger-for]="menuAdd">
-                                        <img [src]="HORDES_IMG_REPO + 'icons/small_less.gif'"
-                                            *ngIf="row.bag.items.length > 0" [mat-menu-trigger-for]="menuRemove">
-
-                                        <mat-menu #menuAdd="matMenu" class="menu-add">
-                                            <div class="search" (click)="$event.stopPropagation()">
-                                                <mat-form-field>
-                                                    <mat-label i18n>Ajouter au sac</mat-label>
-                                                    <input matInput #searchItem>
-                                                </mat-form-field>
-                                            </div>
-                                            <div class="items">
-                                                <ng-container *ngFor="let item of all_items">
-                                                    <img *ngIf="item.label[locale].startsWith(searchItem.value)"
-                                                        [src]="HORDES_IMG_REPO + item.img"
-                                                        (click)="addItem(row.id, item.id)">
-                                                </ng-container>
-                                            </div>
-                                        </mat-menu>
-                                        <mat-menu #menuRemove="matMenu" class="menu-remove">
-                                            <div class="search" (click)="$event.stopPropagation()">
-                                                <mat-form-field>
-                                                    <mat-label i18n>Retirer du sac</mat-label>
-                                                    <input matInput #searchItem>
-                                                </mat-form-field>
-                                            </div>
-                                            <div class="items">
-                                                <ng-container *ngFor="let item of row.bag.items">
-                                                    <img *ngFor="let i of [].constructor(item.count)"
-                                                        [src]="HORDES_IMG_REPO + item.item.img"
-                                                        (click)="removeItem(row.id, item.item.id)">
-                                                </ng-container>
-                                            </div>
-                                            <div mat-menu-item class="empty-bag" (click)="emptyBag(row.id)">
-                                                <img [src]="HORDES_IMG_REPO + 'icons/b_close.png'" style="margin-right: 0.5em">
-                                                <span i18n>Vider le sac</span>
-                                            </div>
-                                        </mat-menu>
-                                    </div>
-                                </div>
-                                <div>
-                                    <mho-last-update [lastUpdateInfo]="row.bag" [thresholds]="[30, 120, 120*2, 120*3]"></mho-last-update>
-                                </div>
+                                <mho-list-element-add-remove [currentList]="row.bag.items" [completeList]="all_items"
+                                    addLabel="Ajouter au sac" i18n-addLabel (add)="addItem(row.id, +$event)"
+                                    removeLabel="Retirer du sac" i18n-removeLabel (remove)="removeItem(row.id, +$event)"
+                                    emptyLabel="Vider le sac" i18n-emptyLabel (empty)="emptyBag(row.id)">
+                                </mho-list-element-add-remove>
+                                <mho-last-update [lastUpdateInfo]="row.bag.update_info"
+                                    [thresholds]="[30, 120, 120*2, 120*3]">
+                                </mho-last-update>
                             </ng-container>
-
+                            <ng-container *ngSwitchCase="'heroic_actions'">
+                                <div style="min-width: 400px">
+                                    <div class="lvl-element" *ngFor="let element of row.heroic_actions.content">
+                                        <mat-form-field *ngIf="element.element.value.max_lvl > 1"
+                                            [appearance]="'outline'">
+                                            <mat-label>{{element.element.value.label}}</mat-label>
+                                            <mat-select [(ngModel)]="element.value" (ngModelChange)="updateActions(row.id)">
+                                                <mat-option
+                                                    *ngFor="let el of [].constructor(element.element.value.max_lvl + 1); let i = index"
+                                                    [value]="i">{{i}}</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                        <mat-checkbox *ngIf="element.element.value.max_lvl === 1"
+                                            [checked]="element.value" (change)="element.value = $event.checked; updateActions(row.id)">
+                                            {{element.element.value.label}}
+                                        </mat-checkbox>
+                                    </div>
+                                </div>
+                                <mho-last-update [lastUpdateInfo]="row.heroic_actions.update_info"
+                                    [thresholds]="[30, 120, 120*2, 120*3]">
+                                </mho-last-update>
+                            </ng-container>
+                            <ng-container *ngSwitchCase="'home'">
+                                <div style="min-width: 400px">
+                                    <div class="lvl-element" *ngFor="let element of row.home.content">
+                                        <mat-form-field *ngIf="element.element.value.max_lvl > 1"
+                                            [appearance]="'outline'">
+                                            <mat-label>{{element.element.value.label}}</mat-label>
+                                            <mat-select [(ngModel)]="element.value" (ngModelChange)="updateHome(row.id)">
+                                                <mat-option
+                                                    *ngFor="let el of [].constructor(element.element.value.max_lvl + 1); let i = index"
+                                                    [value]="i">{{i}}</mat-option>
+                                            </mat-select>
+                                            <img matPrefix *ngIf="element.element.value.img" style="vertical-align: super; margin-right: 0.5em;"
+                                                [src]="HORDES_IMG_REPO + element.element.value.img">
+                                        </mat-form-field>
+                                        <mat-checkbox *ngIf="element.element.value.max_lvl === 1"
+                                            [checked]="element.value"
+                                            (change)="element.value = $event.checked; updateHome(row.id)">
+                                            <img *ngIf="element.element.value.img" style="vertical-align: middle; margin-right: 0.5em;"
+                                                [src]="HORDES_IMG_REPO + element.element.value.img">
+                                            {{element.element.value.label}}
+                                        </mat-checkbox>
+                                    </div>
+                                </div>
+                                <mho-last-update [lastUpdateInfo]="row.home.update_info"
+                                    [thresholds]="[30, 120, 120*2, 120*3]">
+                                </mho-last-update>
+                            </ng-container>
                         </ng-container>
                     </td>
                 </ng-container>
 
-                <!-- Footer -->
-                <!--                    <ng-container matColumnDef="save">
-                            <td mat-footer-cell *matFooterCellDef style="text-align: right;" colspan="6">
-                                <button mat-button [color]="'accent'" (click)="updateCitizens()" i18n>Enregistrer</button>
-                            </td>
-                        </ng-container> -->
-
-                <tr mat-header-row *matHeaderRowDef="['filters']; sticky: true"></tr>
+                <tr mat-header-row *matHeaderRowDef="['filters', 'empty']; sticky: true"></tr>
                 <tr mat-header-row *matHeaderRowDef="columns_ids; sticky: true"></tr>
                 <tr mat-row *matRowDef="let row; columns: columns_ids;"></tr>
                 <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->
@@ -104,7 +113,7 @@
                     <td class="mat-cell" colspan="6">
                         <ng-container
                             *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
-                            <ng-container *i18n> objet ne correspond au filtre
+                            <ng-container *i18n>Aucun objet ne correspond au filtre
                                 "{{filterInput.nativeElement.value}}"</ng-container>
                         </ng-container>
                         <ng-template #emptyTable>

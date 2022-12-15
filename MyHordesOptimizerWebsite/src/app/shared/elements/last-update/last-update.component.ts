@@ -15,8 +15,5 @@ export class LastUpdateComponent {
 
     public moment: typeof moment = moment;
 
-    public log(diff: unknown) {
-        console.log('diff', diff);
-    }
 }
 

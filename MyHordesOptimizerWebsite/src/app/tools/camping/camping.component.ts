@@ -125,11 +125,11 @@ export class CampingComponent implements OnInit {
     private readonly added_ruins: Ruin[] = dtoToModelArray(Ruin, [
         {
             id: 'none', camping: 0, label: { en: `None`, fr: 'Aucun', de: `Kein`, es: `TODO` }, chance: 0, description: { en: ``, fr: ``, de: ``, es: `` },
-            explorable: false, img: '', minDist: 0, maxDist: 0, drops: []
+            explorable: false, img: '', minDist: 1, maxDist: 1000, drops: []
         },
         {
             id: 'nondig', camping: 8, label: { en: `Buried building`, fr: 'Bâtiment non déterré', de: `Verschüttete Ruine`, es: `Sector inexplotable` },
-            chance: 0, description: { en: ``, fr: ``, de: ``, es: `` }, explorable: false, img: '', minDist: 0, maxDist: 0, drops: []
+            chance: 0, description: { en: ``, fr: ``, de: ``, es: `` }, explorable: false, img: '', minDist: 1, maxDist: 1000, drops: []
         }
     ]);
 

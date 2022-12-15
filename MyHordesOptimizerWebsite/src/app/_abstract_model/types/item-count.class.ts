@@ -21,14 +21,6 @@ export class ItemCount extends CommonModel<ItemCountDTO> {
         };
     }
 
-    public toShortItemCount(): ShortItemCountDTO {
-        return {
-            count: this.count,
-            isBroken: this.is_broken,
-            id: this.item.id
-        };
-    }
-
     protected dtoToModel(dto?: ItemCountDTO): void {
         if (dto) {
             this.count = dto.count;

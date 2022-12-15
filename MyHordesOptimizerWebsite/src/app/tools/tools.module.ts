@@ -6,13 +6,16 @@ import { CitizensComponent } from './citizens/citizens.component';
 import { EstimationComponent } from './estimation/estimation.component';
 import { ToolsRoutingModule } from './tools.routing.module';
 import { WishlistComponent } from './wishlist/wishlist.component';
+import { FilterRuinsByKmPipe } from './camping/filter-ruins-by-km.pipe';
 
 let components: any[] = [BankComponent, CitizensComponent, WishlistComponent, EstimationComponent, CampingComponent];
+let pipes: any[] = [FilterRuinsByKmPipe];
 
 @NgModule({
     imports: [SharedModule, ToolsRoutingModule],
     declarations: [
-        ...components
+        ...components,
+        ...pipes
     ],
     exports: [...components]
 })
