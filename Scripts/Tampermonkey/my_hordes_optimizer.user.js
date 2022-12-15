@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.14
+// @version      1.0.0-beta.15
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,7 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveautés] Possibilité d'enregistrer des informations complémentaires dans MHO. Pensez à cocher les options associées !`;
++ `[Correctif] Envoi des bonnes informations à GH`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -964,20 +964,20 @@ let params_categories = [
             {
                 id: `update_mho_actions`,
                 label: {
-                    en: `TODO`,
+                    en: `Heroic Actions`,
                     fr: `Actions héroïques`,
-                    de: `TODO`,
-                    es: `TODO`
+                    de: `Heldentaten`,
+                    es: `Acciones heroicas`
                 },
                 parent_id: `update_mho`
             },
             {
                 id: `update_mho_house`,
                 label: {
-                    en: `TODO`,
-                    fr: `Améliorations de maison`,
-                    de: `TODO`,
-                    es: `TODO`
+                    en: `Home upgrades`,
+                    fr: `Améliorations de la maison`,
+                    de: `Hausverbesserungen`,
+                    es: `Mejoras de la casa`
                 },
                 parent_id: `update_mho`
             },
@@ -1004,10 +1004,10 @@ let params_categories = [
             {
                 id: `update_mho_status`,
                 label: {
-                    en: `TODO`,
-                    fr: `Statuts`,
-                    de: `TODO`,
-                    es: `TODO`
+                    en: `Status`,
+                    fr: `États`,
+                    de: `Status`,
+                    es: `Estatus`
                 },
                 parent_id: `update_mho`
             },
@@ -1041,7 +1041,7 @@ let params_categories = [
                 },
                 help: {
                     en: `Killed zombies markers ; Update when the city is devastated`,
-                    fr: `Marqueurs zombies tués ; Mise à jour en ville dévastée.`,
+                    fr: `Marqueurs zombies tués ; Mise à jour en ville dévastée`,
                     de: `TODO`,
                     es: `TODO`
                 },
@@ -1050,20 +1050,20 @@ let params_categories = [
             // {
             //     id: `update_gh_ah`,
             //     label: {
-            //         en: `Heroic actions`,
-            //         fr: `Actions héroiques`,
-            //         de: `TODO`,
-            //         es: `TODO`
+            //        en: `Heroic Actions`,
+            //        fr: `Actions héroïques`,
+            //        de: `Heldentaten`,
+            //        es: `Acciones heroicas`
             //     },
             //     parent_id: `update_gh`
             // },
             // {
             //     id: `update_gh_amelios`,
             //     label: {
-            //         en: `House upgrades`,
-            //         fr: `Améliorations de maison`,
-            //         de: `TODO`,
-            //         es: `TODO`
+                    // en: `Home upgrades`,
+                    // fr: `Améliorations de la maison`,
+                    // de: `Hausverbesserungen`,
+                    // es: `Mejoras de la casa`
             //     },
             //     parent_id: `update_gh`
             // },
@@ -7050,7 +7050,7 @@ function updateExternalTools() {
     let convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
         let object_map = [];
         objects.forEach((object) => {
-            let object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id);
+            let object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id && _object_in_map.broken === object.isBroken);
             if (object_in_map) {
                 object_in_map.count += 1;
             } else {
