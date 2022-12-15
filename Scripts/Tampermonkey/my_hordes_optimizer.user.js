@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.17
+// @version      1.0.0-beta.18
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,7 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Il était impossible d'enregistrer le sac à dos dans MHO si vous aviez deux fois le même objet dedans (oups)`;
++ `[Correctif] L'état "Corps Sain" n'était jamais envoyé à GH`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1064,6 +1064,16 @@ let params_categories = [
                     fr: `Améliorations de la maison`,
                     de: `Hausverbesserungen`,
                     es: `Mejoras de la casa`
+                },
+                parent_id: `update_gh`
+            },
+            {
+                id: `update_gh_status`,
+                label: {
+                    en: `Status`,
+                    fr: `États`,
+                    de: `Status`,
+                    es: `Estatus`
                 },
                 parent_id: `update_gh`
             },
@@ -3412,7 +3422,7 @@ function createUpdateExternalToolsButton() {
     const chest = document.querySelector('.inventory.chest');
 
     /** Cette fonction ne doit s'exécuter que si on a un id d'app externe ET au moins l'une des options qui est cochée dans les paramètres ET qu'on est hors de la ville */
-    if (nb_tools_to_update > 0 && external_app_id && (zone_marker || chest) ) {
+    if (nb_tools_to_update > 0 && external_app_id && (zone_marker || (chest && pageIsHouse())) ) {
         if (update_external_tools_btn) return;
 
         let el = zone_marker?.parentElement.parentElement.parentElement || chest.parentElement;
@@ -7215,13 +7225,13 @@ function updateExternalTools() {
     }
 
     /** Récupération des status */
-    if (mho_parameters.update_mho_status) {
+    if (mho_parameters.update_mho_status || mho_parameters.update_gh_status) {
         data.status = {}
         data.status.values = [];
         data.status.toolsToUpdate = {
             isBigBrothHordes: false,
             isFataMorgana: false,
-            isGestHordes: false,
+            isGestHordes: mho_parameters && mho_parameters.update_gh_status,
             isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_status
         };
         let statuses = Array.from(document.querySelectorAll('.rucksack_status_union li.status img'));
