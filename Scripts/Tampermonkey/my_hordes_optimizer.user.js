@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.15
+// @version      1.0.0-beta.16
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,7 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Envoi des bonnes informations à GH`;
++ `[Nouveauté] Deux nouvelles options sont disponibles pour mettre à jour GH : la mise à jour automatique des pouvoirs héroïques et la mise à jour des améliorations de maison ! Pensez à les activer dans vos options !`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1047,26 +1047,26 @@ let params_categories = [
                 },
                 parent_id: `update_gh`
             },
-            // {
-            //     id: `update_gh_ah`,
-            //     label: {
-            //        en: `Heroic Actions`,
-            //        fr: `Actions héroïques`,
-            //        de: `Heldentaten`,
-            //        es: `Acciones heroicas`
-            //     },
-            //     parent_id: `update_gh`
-            // },
-            // {
-            //     id: `update_gh_amelios`,
-            //     label: {
-                    // en: `Home upgrades`,
-                    // fr: `Améliorations de la maison`,
-                    // de: `Hausverbesserungen`,
-                    // es: `Mejoras de la casa`
-            //     },
-            //     parent_id: `update_gh`
-            // },
+            {
+                id: `update_gh_ah`,
+                label: {
+                    en: `Heroic Actions`,
+                    fr: `Actions héroïques`,
+                    de: `Heldentaten`,
+                    es: `Acciones heroicas`
+                },
+                parent_id: `update_gh`
+            },
+            {
+                id: `update_gh_amelios`,
+                label: {
+                    en: `Home upgrades`,
+                    fr: `Améliorations de la maison`,
+                    de: `Hausverbesserungen`,
+                    es: `Mejoras de la casa`
+                },
+                parent_id: `update_gh`
+            },
             {
                 id: `update_fata`,
                 label: {
