@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.16
+// @version      1.0.0-beta.17
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,7 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Nouveauté] Deux nouvelles options sont disponibles pour mettre à jour GH : la mise à jour automatique des pouvoirs héroïques et la mise à jour des améliorations de maison ! Pensez à les activer dans vos options !`;
++ `[Correctif] Il était impossible d'enregistrer le sac à dos dans MHO si vous aviez deux fois le même objet dedans (oups)`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -7050,7 +7050,7 @@ function updateExternalTools() {
     let convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
         let object_map = [];
         objects.forEach((object) => {
-            let object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id && _object_in_map.broken === object.isBroken);
+            let object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id && _object_in_map.isBroken === object.isBroken);
             if (object_in_map) {
                 object_in_map.count += 1;
             } else {
@@ -7264,6 +7264,9 @@ function updateExternalTools() {
                         : `<img src ="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
                     }
                 });
+                if (tools_fail.length > 0) {
+                    console.error(`Erreur lors de la mise à jour de l'un des outils`, response.response);
+                }
             } else {
                 addError(response);
                 btn.innerHTML = `<img src="${repo_img_hordes_url}professions/death.gif">` + getI18N(texts.update_external_tools_fail_btn_label);
