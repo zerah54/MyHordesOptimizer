@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.19
+// @version      1.0.0-beta.20
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,7 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Le script plante si l'utilisateur n'a pas d'actions héroïques`;
++ `[Correctif] Divers correctifs pour anticiper des plantages`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -2572,7 +2572,7 @@ function displayEstimations() {
         let values = {};
 
         let today = Array.from(days_selector.querySelectorAll('input') || []).find((radio) => radio.checked).id === 'today_estimation';
-        let current_day_value = document.querySelector('#current-day').value;
+        let current_day_value = document.querySelector('#current-day')?.value;
         values_nodes.forEach((value, index) => {
             let value_details = Array.from(value.querySelectorAll('input') || []).map((input) => input.value);
             values[percents[index]] = value_details[0] && value_details[1] ? value_details.join(' - ') : ' ';
@@ -4722,8 +4722,8 @@ function displayOptimalPath(html, response) {
             next_path_div.style.marginTop = next_path_div.getAttribute('alignment') === 'bottom' ? '50%' : 'initial';
             next_path_div.style.marginBottom = next_path_div.getAttribute('alignment') === 'top' ? '50%' : 'initial';
 
-            path_cell.querySelector('.mho_opti_path').appendChild(path_div);
-            next_path_cell.querySelector('.mho_opti_path').appendChild(next_path_div);
+            path_cell.querySelector('.mho_opti_path')?.appendChild(path_div);
+            next_path_cell.querySelector('.mho_opti_path')?.appendChild(next_path_div);
         }
         console.log('cell', path_cell);
     });
@@ -5142,7 +5142,7 @@ function displayCampingPredict() {
             let conf = {
                 town: mh_user.townDetails.townType.toLowerCase(),
                 job: jobs.find((job) => mh_user.jobDetails.uid === job.img),
-                distance: document.querySelector('.zone-dist > div > b').innerText.replace('km', ''), // OK
+                distance: document.querySelector('.zone-dist > div > b')?.innerText.replace('km', ''), // OK
                 campings: 0,
                 pro: false,
                 hidden_campers: 0,
@@ -5557,7 +5557,7 @@ function createCopyButton(source, map, map_id, button_block_id) {
         copy_button.disabled = true;
         let map_to_convert = document.getElementById(map_id);
         if (source === 'fm') {
-            map = document.querySelector('#ruinmap-wrapper') && document.querySelector('#ruinmap-wrapper').offsetParent === null ? 'map' : 'ruin';
+            map = document.querySelector('#ruinmap-wrapper') && document.querySelector('#ruinmap-wrapper')?.offsetParent === null ? 'map' : 'ruin';
             map_to_convert = map === 'ruin' ? document.getElementById('ruinmap') : document.getElementById('map');
         }
         GM.getValue(mho_map_key).then((mho_map) => {
@@ -6277,7 +6277,7 @@ async function getGHRuin() {
                 map_html.innerHTML = mho_map.ruin;
 
                 let new_map = [];
-                let rows = Array.from(map_html.querySelector('#carteRuine').querySelector('tbody').children);
+                let rows = Array.from(map_html.querySelector('#carteRuine')?.querySelector('tbody')?.children);
                 let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
                 rows
                     .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('caseCarteRuine')))
@@ -6298,7 +6298,7 @@ async function getGHRuin() {
                                 zombies: cell.firstElementChild.getAttribute('data-z')
                             };
 
-                            let img_path = cell.querySelector('.ruineCarte').firstElementChild.href.baseVal.replace(/^(.*)#/, '');
+                            let img_path = cell.querySelector('.ruineCarte')?.firstElementChild.href.baseVal.replace(/^(.*)#/, '');
                             switch (img_path) {
                                 case 'ruineCarte_0':
                                     new_cell.borders = '0101';
@@ -6411,10 +6411,10 @@ async function getBBHMap() {
                                 let cells = [];
                                 let y;
                                 Array.from(row.children).forEach((cell, cell_index) => {
-                                    let cell_parts = Array.from(cell.querySelector('.divs').children);
+                                    let cell_parts = Array.from(cell.querySelector('.divs')?.children);
 
                                     let new_cell = {
-                                        horizontal: map.querySelector('.lgd_l').firstElementChild.children[row_index].firstElementChild.innerText,
+                                        horizontal: map.querySelector('.lgd_l')?.firstElementChild.children[row_index].firstElementChild.innerText,
                                         vertical: x_mapping[cell_index],
                                         town: cell.querySelector('.door'),
                                         bat: cell.querySelector('.bat'),
@@ -6592,7 +6592,7 @@ async function getFMMap() {
             map_html.innerHTML = mho_map.fm_block;
 
             let new_map = [];
-            let map = Array.from(map_html.querySelector('#map').children);
+            let map = Array.from(map_html.querySelector('#map')?.children);
             let x_mapping = Array.from(map[0].children).map((x) => x.innerText);
 
             map
@@ -6642,7 +6642,7 @@ async function getFMRuin() {
                 map_html.innerHTML = mho_map.ruin;
 
                 let new_map = [];
-                let rows = Array.from(map_html.querySelector('#ruinmap').children);
+                let rows = Array.from(map_html.querySelector('#ruinmap')?.children);
                 let x_mapping = Array.from(rows[0].children).map((x) => x.innerText);
                 rows
                     .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
@@ -7095,7 +7095,7 @@ function updateExternalTools() {
             return {id: item.id, isBroken: desert_item.classList.contains('broken')};
         });
 
-        let position = document.querySelector('.current-location').innerText.replace(/.*: ?/, '').split('/');
+        let position = document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/');
 
         let content = {
             x: +position[0],
@@ -7135,10 +7135,10 @@ function updateExternalTools() {
         if (pageIsDesert()) {
             let escorts = Array.from(document.querySelectorAll('.beyond-escort-on:not(.beyond-escort-on-all)') || []);
             escorts.forEach((escort) => {
-                let escort_id = +escort.querySelector('span.username').getAttribute('x-user-id');
-                let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort').querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
+                let escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
+                let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
                     let item = convertImgToItem(rucksack_item.querySelector('img'));
-                    return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
+                    return {id: item?.id, isBroken: rucksack_item.classList.contains('broken')};
                 });
 
                 rucksacks.push({
@@ -7162,7 +7162,7 @@ function updateExternalTools() {
             isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_chest
         };
 
-        let chest_elements = Array.from(document.querySelector('.inventory.chest').querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
+        let chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
             let item = convertImgToItem(chest_item.querySelector('img'));
             return {id: item.id, isBroken: chest_item.classList.contains('broken')};
         });
@@ -7186,7 +7186,7 @@ function updateExternalTools() {
             for (let heroic of heroics) {
                 let action = {
                     locale: lang,
-                    label: heroic.querySelector('.label').innerText,
+                    label: heroic.querySelector('.label')?.innerText,
                     value: heroic.classList.contains('already') ? 0 : 1
                 }
                 data.heroicActions.actions.push(action);
@@ -7196,7 +7196,7 @@ function updateExternalTools() {
         if (apag) {
             let action = {
                 locale: lang,
-                label: apag.nextElementSibling.querySelector('b').innerText,
+                label: apag.nextElementSibling.querySelector('b')?.innerText,
                 value: +apag.src.replace(/.*item_photo_(\d).*/, '$1')
             }
             data.heroicActions.actions.push(action);
@@ -7217,11 +7217,11 @@ function updateExternalTools() {
         if (amelios && amelios.length > 0) {
             amelios.forEach((amelio) => {
                 let amelio_img = amelio.querySelector('img');
-                let amelio_value = amelio_img.nextElementSibling.innerText.match(/\d+/);
+                let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
                 data.amelios.values[amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1')] = amelio_value ? +amelio_value[0] : 0;
             });
         }
-        let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary').querySelector('.row-detail img').alt;
+        let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt;
         data.amelios.values.house = house_level;
     }
 
@@ -7540,7 +7540,7 @@ async function getCitizenHouseContent(link) {
                     let more_info = {};
 
                     let citizen_home = temp_body.querySelector('.citizen-home');
-                    let lightbox = temp_body.querySelector('.lightbox').firstElementChild;
+                    let lightbox = temp_body.querySelector('.lightbox')?.firstElementChild;
                     let town_summary = temp_body.querySelector('.town-summary');
 
                     let gossips_div = document.createElement('div');
@@ -7557,7 +7557,7 @@ async function getCitizenHouseContent(link) {
                     more_info.gossips = gossips_div;
 
                     let plaintes = citizen_home.querySelector('.note');
-                    let nb_plaintes = plaintes ? plaintes.querySelector('b').innerText : '';
+                    let nb_plaintes = plaintes ? plaintes.querySelector('b')?.innerText : '';
                     more_info.plaintes = nb_plaintes;
 
 
