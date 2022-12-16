@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.18
+// @version      1.0.0-beta.19
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -33,7 +33,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] L'état "Corps Sain" n'était jamais envoyé à GH`;
++ `[Correctif] Le script plante si l'utilisateur n'a pas d'actions héroïques`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -2077,7 +2077,7 @@ function displayWishlist() {
             input.placeholder = getI18N(texts.searchObjectToAdd);
             input.addEventListener('keyup', (event) => {
                 if (event.key === 'Enter') {
-                    let wishlist_items = Array.from(wishlist_list.getElementsByTagName('li')).map((wishlist_item) => wishlist_item.getElementsByClassName('label')[0].textContent);
+                    let wishlist_items = Array.from(wishlist_list.getElementsByTagName('li') || []).map((wishlist_item) => wishlist_item.getElementsByClassName('label')[0].textContent);
                     options.childNodes.forEach((option) => {
                         let already_in_wishlist = wishlist_items.some((wishlist_item) => option.firstElementChild.textContent === wishlist_item);
 
@@ -2568,13 +2568,13 @@ function displayEstimations() {
     estimate_button.classList.add('inline');
     estimate_button.innerText = getI18N(texts.estimate);
     estimate_button.addEventListener('click', () => {
-        let values_nodes = Array.from(tab_content.querySelectorAll('.estimation'));
+        let values_nodes = Array.from(tab_content.querySelectorAll('.estimation') || []);
         let values = {};
 
-        let today = Array.from(days_selector.querySelectorAll('input')).find((radio) => radio.checked).id === 'today_estimation';
+        let today = Array.from(days_selector.querySelectorAll('input') || []).find((radio) => radio.checked).id === 'today_estimation';
         let current_day_value = document.querySelector('#current-day').value;
         values_nodes.forEach((value, index) => {
-            let value_details = Array.from(value.querySelectorAll('input')).map((input) => input.value);
+            let value_details = Array.from(value.querySelectorAll('input') || []).map((input) => input.value);
             values[percents[index]] = value_details[0] && value_details[1] ? value_details.join(' - ') : ' ';
         })
 
@@ -3493,7 +3493,7 @@ function displaySearchFieldOnBuildings() {
             search_field.classList.add('inline');
             search_field.setAttribute('style', 'min-width: 250px; margin-top: 1em; padding-left: 24px;');
 
-            let buildings = Array.from(document.querySelectorAll('.buildings'));
+            let buildings = Array.from(document.querySelectorAll('.buildings') || []);
             let building_rows = [];
             buildings.forEach((building) => {
                 building_rows.push(...Array.from(building.querySelectorAll('.row-flex')));
@@ -4592,7 +4592,7 @@ function createOptimizePathButton() {
 
 function mapToOptimize() {
     let map = document.querySelector('#optimizer-map-window-content');
-    let rows = Array.from(map.querySelectorAll('tr')).filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
+    let rows = Array.from(map.querySelectorAll('tr') || []).filter((row) => Array.from(row.querySelectorAll('td') || []).some((col) => {
         return !col.classList.contains('around-map') // Ligne d'index
     }));
     let final_rows = [];
@@ -4600,7 +4600,7 @@ function mapToOptimize() {
     let entrance = {};
 
     rows.forEach((row, row_index) => {
-        let cols = Array.from(row.querySelectorAll('td'));
+        let cols = Array.from(row.querySelectorAll('td') || []);
         let final_cols = cols
         .filter((col) => !col.classList.contains('around-map')) // Colonne d'index
         .map((col, col_index) => {
@@ -4630,12 +4630,12 @@ function mapToOptimize() {
 
 function displayOptimalPath(html, response) {
     console.log('display opti');
-    let rows = Array.from(html.querySelectorAll('tr'))
-    .filter((row) => Array.from(row.querySelectorAll('td')).some((col) => {
+    let rows = Array.from(html.querySelectorAll('tr') || [])
+    .filter((row) => Array.from(row.querySelectorAll('td') || []).some((col) => {
         return !col.classList.contains('bordCarteRuine') // Ligne d'index
     }))
     .map((row) => {
-        return Array.from(row.querySelectorAll('td')).filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
+        return Array.from(row.querySelectorAll('td') || []).filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
     });
 
     rows.forEach((row, row_index) => {
@@ -4959,7 +4959,7 @@ function displayTranslateTool() {
                                 display_all_img.src = `${repo_img_hordes_url}/icons/small_less.gif`;
                                 display_all_text.innerHTML = getI18N(texts.display_exact_search_result);
                             }
-                            let not_exact = Array.from(block_to_display.getElementsByClassName('not-exact'));
+                            let not_exact = Array.from(block_to_display.getElementsByClassName('not-exact') || []);
                             not_exact.forEach((not_exact_item) => {
                                 not_exact_item.classList.toggle('hidden');
                             })
@@ -5035,9 +5035,9 @@ function displayMoreCitizensInformations() {
 
             let citizens_list = document.querySelector('.citizens-list');
             if (citizens_list) {
-                let usernames = Array.from(citizens_list.querySelectorAll('.citizen-box-name, .citizen-box-name-me'));
-                let avatars = Array.from(citizens_list.querySelectorAll('.avatar'));
-                let citizens_houses = Array.from(citizens_list.querySelectorAll('.citizen-box.location')).map((div, index) => { return {username: usernames[index], avatar: avatars[index], link: div.getAttribute('x-ajax-href')}});
+                let usernames = Array.from(citizens_list.querySelectorAll('.citizen-box-name, .citizen-box-name-me') || []);
+                let avatars = Array.from(citizens_list.querySelectorAll('.avatar') || []);
+                let citizens_houses = Array.from(citizens_list.querySelectorAll('.citizen-box.location') || []).map((div, index) => { return {username: usernames[index], avatar: avatars[index], link: div.getAttribute('x-ajax-href')}});
 
                 mho_more_citizens_tab.addEventListener('click', () => {
                     let selected = document.querySelector('.tab.selected');
@@ -5481,7 +5481,7 @@ function blockUsersPosts() {
                                 if (!blacklisted_user.getAttribute('blacklisted')) {
                                     temp_blacklist.push(user_id);
                                     blacklisted_user.setAttribute('blacklisted', true);
-                                    let user_posts = Array.from(document.querySelectorAll(`.username[x-user-id="${user_id}"]`)).map((user_tag) => user_tag.parentElement.parentElement.querySelector('.original'));
+                                    let user_posts = Array.from(document.querySelectorAll(`.username[x-user-id="${user_id}"]`) || []).map((user_tag) => user_tag.parentElement.parentElement.querySelector('.original'));
                                     user_posts.forEach((user_post) => user_post.classList.remove('force-display'));
                                 } else {
                                     let index = temp_blacklist.findIndex((blacklisted_user_id) => blacklisted_user_id === user_id);
@@ -6217,7 +6217,7 @@ async function getGHMap() {
             onload: function(response){
                 if (response.status === 200) {
                     let new_map = [];
-                    let map = Array.from(response.response.body.querySelector('#zoneCarte').children);
+                    let map = Array.from(response.response.body.querySelector('#zoneCarte')?.children);
                     let x_mapping = Array.from(map[0].children).map((x) => x.innerText);
                     map
                         .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('caseCarte')))
@@ -6406,7 +6406,7 @@ async function getBBHMap() {
                         x_mapping.push('');
                         x_mapping.splice(0, 0, '');
                         if (map.querySelector('#cases')) {
-                            Array.from(map.querySelector('#cases').querySelectorAll('tr'))
+                            Array.from(map.querySelector('#cases')?.querySelectorAll('tr') || [])
                                 .forEach((row, row_index) => {
                                 let cells = [];
                                 let y;
@@ -7090,7 +7090,7 @@ function updateExternalTools() {
     };
 
     if (mho_parameters.update_gh_without_api && pageIsDesert()) {
-        let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item')).map((desert_item) => {
+        let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
             let item = convertImgToItem(desert_item.querySelector('img'));
             return {id: item.id, isBroken: desert_item.classList.contains('broken')};
         });
@@ -7122,7 +7122,7 @@ function updateExternalTools() {
         };
 
         let rucksacks = [];
-        let my_rusksack = Array.from(document.querySelector('.pointer.rucksack').querySelectorAll('li.item:not(.locked)')).map((rucksack_item) => {
+        let my_rusksack = Array.from(document.querySelector('.pointer.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
             let item = convertImgToItem(rucksack_item.querySelector('img'));
             return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
         });
@@ -7133,10 +7133,10 @@ function updateExternalTools() {
         });
 
         if (pageIsDesert()) {
-            let escorts = Array.from(document.querySelectorAll('.beyond-escort-on:not(.beyond-escort-on-all)'));
+            let escorts = Array.from(document.querySelectorAll('.beyond-escort-on:not(.beyond-escort-on-all)') || []);
             escorts.forEach((escort) => {
                 let escort_id = +escort.querySelector('span.username').getAttribute('x-user-id');
-                let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort').querySelectorAll('li.item:not(.locked):not(.plus)')).map((rucksack_item) => {
+                let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort').querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
                     let item = convertImgToItem(rucksack_item.querySelector('img'));
                     return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
                 });
@@ -7162,7 +7162,7 @@ function updateExternalTools() {
             isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_chest
         };
 
-        let chest_elements = Array.from(document.querySelector('.inventory.chest').querySelectorAll('li.item:not(.locked)')).map((chest_item) => {
+        let chest_elements = Array.from(document.querySelector('.inventory.chest').querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
             let item = convertImgToItem(chest_item.querySelector('img'));
             return {id: item.id, isBroken: chest_item.classList.contains('broken')};
         });
@@ -7181,7 +7181,7 @@ function updateExternalTools() {
             isGestHordes: mho_parameters && mho_parameters.update_gh_ah,
             isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_actions
         };
-        let heroics = Array.from(document.querySelector('.heroic_actions')?.querySelectorAll('.heroic_action:not(.help)'));
+        let heroics = Array.from(document.querySelector('.heroic_actions')?.querySelectorAll('.heroic_action:not(.help)') || []);
         if (heroics && heroics.length > 0) {
             for (let heroic of heroics) {
                 let action = {
@@ -7213,7 +7213,7 @@ function updateExternalTools() {
             isGestHordes: mho_parameters && mho_parameters.update_gh_amelios,
             isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_house
         };
-        let amelios = Array.from(document.querySelectorAll('[x-tab-group="home-main"][x-tab-id="build"] .row-table .row:not(.header)'));
+        let amelios = Array.from(document.querySelectorAll('[x-tab-group="home-main"][x-tab-id="build"] .row-table .row:not(.header)') || []);
         if (amelios && amelios.length > 0) {
             amelios.forEach((amelio) => {
                 let amelio_img = amelio.querySelector('img');
@@ -7235,7 +7235,7 @@ function updateExternalTools() {
             isGestHordes: mho_parameters && mho_parameters.update_gh_status,
             isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_status
         };
-        let statuses = Array.from(document.querySelectorAll('.rucksack_status_union li.status img'));
+        let statuses = Array.from(document.querySelectorAll('.rucksack_status_union li.status img') || []);
         if (statuses && statuses.length > 0) {
             statuses
                 .filter((status) => {
