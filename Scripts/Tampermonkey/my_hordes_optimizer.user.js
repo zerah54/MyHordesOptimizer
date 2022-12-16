@@ -5138,6 +5138,7 @@ function displayCampingPredict() {
 
             camping_predict_container.appendChild(updater_title);
 
+            console.log('mh_user', mh_user);
             let conf = {
                 town: mh_user.townDetails.townType.toLowerCase(),
                 job: jobs.find((job) => mh_user.jobDetails.uid === job.img),
