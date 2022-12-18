@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
@@ -15,5 +16,14 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 
         [JsonProperty("redSouls")]
         public int RedSouls { get; set; }
+
+        [JsonProperty("useDefaultOffsets")]
+        public bool UseDefaultOffsets { get; set; }
+
+        [JsonProperty("offsetsMin")]
+        public List<int> OffsetsMin { get; set; }
+
+        [JsonProperty("offsetsMax")]
+        public List<int> OffsetsMax { get; set; }
     }
 }
