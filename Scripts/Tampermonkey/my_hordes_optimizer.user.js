@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.20
+// @version      1.0.0-beta.21
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -20,6 +20,7 @@
 // @match        *://myhordes.eu/*
 // @match        *://myhord.es/*
 // @match        *://myhordes.localhost/*
+// @match        *://staging.myhordes.de/*
 //
 // @match        https://bbh.fred26.fr/*
 // @match        https://gest-hordes2.eragaming.fr/*
@@ -33,14 +34,16 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[Correctif] Divers correctifs pour anticiper des plantages`;
++ `Ajout du script sur le site de la bêta de MH - aucune nouveauté`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
+
+const is_mh_beta = document.URL.indexOf('staging') >= 0;
 
 const gm_bbh_updated_key = 'bbh_updated';
 const gm_gh_updated_key = 'gh_updated';
 const gm_fata_updated_key = 'fata_updated';
-const gm_mh_external_app_id_key = 'mh_external_app_id';
+const gm_mh_external_app_id_key = is_mh_beta ? 'mh_beta_external_app_id' : 'mh_external_app_id';
 const gm_parameters_key = 'mh_optimizer_parameters';
 const mh_user_key = 'mh_user';
 const mho_map_key = 'mho_map';
@@ -58,7 +61,6 @@ GM.getValue(gm_mh_external_app_id_key).then((app_id) => {external_app_id = app_i
 // L'URL de L'API //
 ////////////////////
 
-const api_url = 'https://api.myhordesoptimizer.fr';
 const api_url_2 = 'https://myhordesoptimizerapi.azurewebsites.net';
 
 ///////////////////////////////////////////
@@ -1369,8 +1371,8 @@ const table_ruins_headers = [
 ];
 
 const added_ruins = [
-    {id: '', camping: 0, label: {en: `None`, fr: 'Aucun', de: `Kein`, es: `Ninguna`}},
-    {id: 'nondig', camping: 8, label: {en: `Buried building`, fr: 'Bâtiment non déterré', de: `Verschüttete Ruine`, es: `Edificio no desenterrado`}}
+    {id: '', camping: 0, label: {en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna`}},
+    {id: 'nondig', camping: 8, label: {en: `Buried building`, fr: `Bâtiment non déterré`, de: `Verschüttete Ruine`, es: `Edificio no desenterrado`}}
 ];
 
 const town_type = [
@@ -5113,13 +5115,12 @@ function displayCampingPredict() {
                 camping_predict_container.style.display = camping_predict_container.style.display === 'none' ? 'block' : 'none'
             });
 
-            console.log('zone_camp_label', zone_camp_label);
             camping_predict_container = document.createElement('div');
             camping_predict_container.id = mho_camping_predict_id;
             camping_predict_container.style.border = '1px solid';
             camping_predict_container.style.padding = '0.5em';
             camping_predict_container.style.margin = '0.5em 0';
-            console.log(zone_camp_info)
+
             camping_predict_container.style.display = window.getComputedStyle(zone_camp_info).getPropertyValue('max-height') === '0px' ? 'none' : 'block';
             zone_camp.appendChild(camping_predict_container);
 
@@ -5139,6 +5140,10 @@ function displayCampingPredict() {
             camping_predict_container.appendChild(updater_title);
 
             console.log('mh_user', mh_user);
+            let zone_ruin = document.querySelector('.ruin-info b');
+            let ruin = '';
+            if (zone_ruin) {
+                ruin = all_ruins.find((one_ruin) => getI18N(one_ruin.label).toLowerCase() === zone_ruin.innerText.toLowerCase()).id;
             let conf = {
                 town: mh_user.townDetails.townType.toLowerCase(),
                 job: jobs.find((job) => mh_user.jobDetails.uid === job.img),
@@ -5149,13 +5154,13 @@ function displayCampingPredict() {
                 objects: 0,
                 vest: false,
                 tomb: false,
-                zombies: 0,
-                night: false,
+                zombies: document.querySelectorAll('.actor.zombie')?.length || 0,
+                night: !!document.querySelector('.time-19'),
                 devastated: mh_user.townDetails.isDevaste,
                 phare: false,
                 improve: 0,
                 object_improve: 0,
-                ruin: ''
+                ruin: ruin
             }
             console.log('conf', conf);
 
@@ -5314,6 +5319,9 @@ function displayCampingPredict() {
                 let ruin_option = document.createElement('option');
                 ruin_option.value = ruin.id;
                 ruin_option.label = getI18N(ruin.label);
+                if (ruin.id === conf.ruin) {
+                    ruin_option.setAttribute('selected', 'selected');
+                }
                 select_ruin.appendChild(ruin_option);
             });
             select_ruin.addEventListener('change', ($event) => {
