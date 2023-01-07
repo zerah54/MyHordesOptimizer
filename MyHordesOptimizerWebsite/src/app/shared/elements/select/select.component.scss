@@ -1,0 +1,42 @@
+.mho-select {
+    .mho-select-chip {
+        display: flex;
+        gap: 0.5em;
+        padding: 7px 12px !important;
+
+        button.mat-chip-remove {
+            margin-left: 0;
+        }
+
+        >span {
+            margin-right: 0;
+        }
+    }
+
+    .mat-select-trigger {
+        height: 100%;
+    }
+}
+
+.mat-select-panel {
+    height: 100%;
+
+    .options-container {
+        max-height: calc(100% - 42px);
+        overflow-y: auto;
+
+        .mat-option {
+            .mat-option-text {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            i {
+                margin-right: 0.5em;
+            }
+
+            .more-info {}
+        }
+    }
+}

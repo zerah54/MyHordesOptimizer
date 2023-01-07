@@ -85,7 +85,8 @@
                 <div>
                     <mat-form-field>
                         <mat-label i18n>Bâtiment</mat-label>
-                        <mho-select [formControlName]="'ruin'" [options]="ruins | filterRuinsByKm:townDistance.value" [bindLabel]="'label.' + locale">
+                        <mho-select [formControlName]="'ruin'" [options]="ruins | filterRuinsByKm:townDistance.value"
+                            [bindLabel]="'label.' + locale" [moreInfo]="getMoreRuinInfo">
                         </mho-select>
                     </mat-form-field>
 

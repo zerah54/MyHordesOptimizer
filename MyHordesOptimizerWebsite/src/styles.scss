@@ -5,6 +5,7 @@ html,
 body {
     height: 100%;
 }
+
 body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
@@ -30,4 +31,8 @@ body {
 .snackbar-information {
     background-color: cadetblue !important;
     color: black !important;
+}
+
+.mat-menu-content {
+    padding: 8px;
 }

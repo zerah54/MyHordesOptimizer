@@ -1,6 +1,7 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { Component, ElementRef, HostBinding, Input, OnDestroy, Optional, Output, Self, ViewChild, EventEmitter } from '@angular/core';
+import { Component, ElementRef, HostBinding, Input, OnDestroy, Optional, Output, Self, ViewChild, EventEmitter, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, UntypedFormControl, NgControl, ValidationErrors, Validator, Validators } from '@angular/forms';
+import { MatOption } from '@angular/material/core';
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSelect } from '@angular/material/select';
@@ -11,6 +12,7 @@ import { LabelPipe } from './label.pipe';
     selector: 'mho-select',
     templateUrl: './select.component.html',
     styleUrls: ['./select.component.scss'],
+    encapsulation: ViewEncapsulation.None,
     providers: [
         {
             provide: MatFormFieldControl,
@@ -33,6 +35,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     @Input() multiple: boolean = false;
     @Input() bindLabel!: string;
+    @Input() bindIcon!: string;
+    @Input() moreInfo!: (element: string | T) => string;
     @Input() emptyOption: boolean = false;
     //current form control input. helpful in validating and accessing form control
     @Input() form_control: AbstractControl = new UntypedFormControl();
@@ -116,6 +120,15 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
                 this.errors.push(this.form_control.errors[key]);
             }
         }
+    }
+
+
+    public remove(value: unknown): void {
+        Array.from(this.select.options)
+            .filter((option: MatOption<unknown>) => value === option.value)
+            .forEach((option: MatOption<unknown>) => option.deselect());
+        // this.updateValue(<TYPE>this.value);
+        this.select.options.notifyOnChanges();
     }
 
     public get errorState(): boolean {

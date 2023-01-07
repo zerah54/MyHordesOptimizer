@@ -1,9 +1,13 @@
 import { CitizenDTO } from '../dto/citizen.dto';
+import { ItemCountDTO } from '../dto/item-count.dto';
+import { ShortItemCountDTO } from '../dto/short-item-count.dto';
+import { StatusEnum } from '../enum/status.enum';
 import { Bag } from './bag.class';
-import { HeroicActions } from './heroic-actions.class';
-import { Home } from './home.class';
+import { HeroicActions, HeroicActionsWithValue } from './heroic-actions.class';
+import { Home, HomeWithValue } from './home.class';
 import { Status } from './status.class';
 import { CommonModel } from './_common.class';
+import { Dictionary } from './_types';
 
 export class Citizen extends CommonModel<CitizenDTO> {
     public avatar!: string;
@@ -44,6 +48,40 @@ export class Citizen extends CommonModel<CitizenDTO> {
             actionsHeroic: this.heroic_actions.modelToDto()
         }
     };
+
+    public toCitizenBagDto(): { userId: number, objects: ShortItemCountDTO[] } {
+        return {
+            userId: this.id,
+            objects: this.bag.modelToDto().items.map((item: ItemCountDTO) => {
+                return {
+                    count: item.count,
+                    id: item.item.id,
+                    isBroken: item.isBroken
+                }
+            }),
+        }
+    }
+
+    public toCitizenStatusDto(): { userId: number, status: string[] } {
+        return {
+            userId: this.id,
+            status: this.status.icons.map((icon: StatusEnum) => icon.key),
+        }
+    }
+
+    public toCitizenHeroicActionsDto(): { userId: number, heroicActions: Dictionary<number | boolean> } {
+        return {
+            userId: this.id,
+            heroicActions: this.heroic_actions.content.reduce((accumulator, content: HeroicActionsWithValue) => { return { ...accumulator, [content.element.key]: content.value } }, {})
+        }
+    }
+
+    public toCitizenHomeDto(): { userId: number, home: Dictionary<number | boolean> } {
+        return {
+            userId: this.id,
+            home: this.home.content.reduce((accumulator, content: HomeWithValue) => { return { ...accumulator, [content.element.key]: content.value } }, {})
+        }
+    }
 
     protected dtoToModel(dto?: CitizenDTO): void {
         if (dto) {

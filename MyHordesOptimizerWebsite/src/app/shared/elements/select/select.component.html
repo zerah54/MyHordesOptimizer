@@ -1,7 +1,42 @@
-<mat-select [multiple]="multiple" (valueChange)="writeValue($event);" [value]="value">
-    <input class="mat-option" matInput (input)="filter($event)">
-    <mat-option *ngIf="emptyOption" [value]="undefined">--</mat-option>
-    <mat-option *ngFor="let option of displayed_options" [value]="option" [title]="option | label:bindLabel">
-        {{option | label:bindLabel}}
-    </mat-option>
+<mat-select class="mho-select" [multiple]="multiple" [value]="value" (valueChange)="writeValue($event);">
+    <mat-select-trigger *ngIf="multiple">
+        <mat-chip-list>
+            <mat-chip *ngFor="let single_value of $any(value); let i = index" (removed)="remove(single_value)"
+                class="mho-select-chip">
+                <button type="cancel" matChipRemove>
+                    <mat-icon>cancel</mat-icon>
+                </button>
+                <ng-container *ngIf="single_value">
+                    <ng-container *ngTemplateOutlet="icons; context: {$implicit: single_value}"></ng-container>
+                    <span>{{ single_value | label:bindLabel }}</span>
+                </ng-container>
+            </mat-chip>
+        </mat-chip-list>
+    </mat-select-trigger>
+    <mat-select-trigger *ngIf="!multiple" style="display: flex; justify-content: space-between;">
+        <span *ngIf="value">
+            <ng-container *ngTemplateOutlet="icons; context: {$implicit: value}"></ng-container>
+            {{ value | label:bindLabel }}
+        </span>
+        <i matSuffix class="fal fa-close" *ngIf="value" style="margin-right: 0.5em; position: relative; bottom: 3px"
+            (click)="$event.stopPropagation(); value = undefined; writeValue(undefined)">
+        </i>
+    </mat-select-trigger>
+
+    <input matInput *ngIf="!options || options.length > 0" placeholder="Rechercher" class="mat-option mho-search"
+        (input)="filter($event)" (keydown.space)="$event.stopPropagation()" i18n-placeholder>
+    <mat-divider></mat-divider>
+    <div class="options-container">
+        <mat-option *ngIf="emptyOption" [value]="undefined">--</mat-option>
+        <mat-option *ngFor="let option of displayed_options" [value]="option" [title]="option | label:bindLabel">
+            {{option | label:bindLabel}}
+            <span *ngIf="moreInfo" [innerHTML]="moreInfo(option)" class="more-info"></span>
+        </mat-option>
+    </div>
 </mat-select>
+
+<ng-template #icons let-option>
+    <ng-container *ngIf="bindIcon && option">
+        <i [class]="option[bindIcon]" style="margin-right: 0.5em;"></i>
+    </ng-container>
+</ng-template>

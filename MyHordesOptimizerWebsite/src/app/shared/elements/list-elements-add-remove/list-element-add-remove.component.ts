@@ -16,6 +16,8 @@ export class ListElementAddRemoveComponent {
     @Input() currentList: (Item | StatusEnum)[] = [];
     @Input() completeList: (Item | StatusEnum)[] = [];
 
+    @Input() label!: string;
+
     @Input() displayAddFilter: boolean = true;
     @Input() addLabel!: string;
     @Output() add: EventEmitter<number | string> = new EventEmitter();

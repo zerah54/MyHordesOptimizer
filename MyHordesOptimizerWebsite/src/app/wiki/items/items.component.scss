@@ -3,6 +3,8 @@
         padding: 0;
         display: flex;
         flex-wrap: wrap;
+        gap: 0.25em;
+        margin-top: 0;
     }
 
     .filter {
@@ -10,10 +12,14 @@
         top: 0;
         z-index: 9999;
         background-color: white;
+        display: flex;
+        align-items: baseline;
+        gap: 0.5em;
+        flex-wrap: wrap;
 
         .properties-filter {
-            margin-left: 1em;
-            width: 350px;
+            flex: 1;
+            min-width: 350px;
         }
     }
 }

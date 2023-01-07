@@ -9,25 +9,85 @@
             >td {
                 padding: 0 0.5em;
 
-                &.avatar {
+                &.avatar_name {
                     >img {
                         width: 100px;
                         height: 100px;
                     }
+
+                    >div {
+                        text-align: center;
+                        margin: auto;
+                    }
                 }
 
-                &:not(.avatar) {
+                &.more_status {
+                    >div {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5em;
+
+                        >div {
+                            display: flex;
+                            flex-direction: row;
+                            align-items: center;
+
+                            .list-element-add-remove {
+                                flex: 1;
+
+                                .list {
+                                    white-space: nowrap;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                .heroic-actions {
+                    min-width: 300px;
+                }
+
+                .home {
+                    min-width: 400px;
+                }
+
+                .heroic-actions,
+                .home {
+                    .lvl-element {
+                        width: 50%;
+                        display: inline-block;
+
+                        .mat-form-field {
+
+                            .mat-form-field-infix {
+                                display: flex;
+                            }
+
+                            .mat-form-field-wrapper {
+                                padding-bottom: 0;
+                            }
+
+                        }
+                    }
+                }
+
+                .home {
+                    .lvl-element {
+                        .mat-form-field {
+                            .mat-form-field-infix {
+                                width: 125px;
+                            }
+                        }
+                    }
+                }
+            }
+
+            th,
+            td {
+                &:not(.avatar_name) {
                     padding: 0.5em;
                 }
 
-                .lvl-element {
-                    width: 50%;
-                    display: inline-block;
-
-                    .mat-form-field {
-                        width: 100%
-                    }
-                }
             }
         }
 

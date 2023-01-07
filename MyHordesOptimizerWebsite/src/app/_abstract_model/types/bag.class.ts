@@ -1,9 +1,8 @@
 import { BagDTO } from '../dto/bag.dto';
 import { ItemCountDTO } from '../dto/item-count.dto';
-import { ShortItemCountDTO } from '../dto/short-item-count.dto';
 import { Item } from './item.class';
 import { UpdateInfo } from './update-info.class';
-import { CommonModel, modelToDtoArray } from './_common.class';
+import { CommonModel } from './_common.class';
 
 export class Bag extends CommonModel<BagDTO> {
     public bag_id!: number;
@@ -19,23 +18,23 @@ export class Bag extends CommonModel<BagDTO> {
     public override modelToDto(): BagDTO {
         return {
             idBag: this.bag_id,
-            items: modelToDtoArray([]),
+            items: this.toShortItemCountList(),
             lastUpdateInfo: this.update_info.modelToDto()
         };
     }
 
-    public toShortItemCountList(): ShortItemCountDTO[] {
-        let short_items_count: ShortItemCountDTO[] = [];
+    public toShortItemCountList(): ItemCountDTO[] {
+        let short_items_count: ItemCountDTO[] = [];
         this.items.forEach((item: Item) => {
-            let item_in_existing_list: ShortItemCountDTO | undefined = short_items_count.find((short_item_count: ShortItemCountDTO) => {
-                return short_item_count.id === item.id && short_item_count.isBroken === item.is_broken
+            let item_in_existing_list: ItemCountDTO | undefined = short_items_count.find((short_item_count: ItemCountDTO) => {
+                return short_item_count.item.id === item.id && short_item_count.isBroken === item.is_broken
             });
             if (item_in_existing_list) {
                 item_in_existing_list.count += 1;
             } else {
                 short_items_count.push({
                     count: 1,
-                    id: item.id,
+                    item: item.modelToDto(),
                     isBroken: item.is_broken
                 })
             }

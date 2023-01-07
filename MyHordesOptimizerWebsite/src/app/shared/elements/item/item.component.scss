@@ -2,11 +2,9 @@
 
 .mho-item {
     list-style: none;
-    margin: 0.15em;
     &.simple {
-        max-width: calc(25% - (2 * 0.15em));
         min-width: 250px;
-        width: calc(25% - (2 * 0.15em));
+        flex: 1;
     }
     &.advanced {
         width: 100%;
