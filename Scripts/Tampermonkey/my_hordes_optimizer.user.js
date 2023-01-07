@@ -5144,6 +5144,7 @@ function displayCampingPredict() {
             let ruin = '';
             if (zone_ruin) {
                 ruin = all_ruins.find((one_ruin) => getI18N(one_ruin.label).toLowerCase() === zone_ruin.innerText.toLowerCase()).id;
+            }
             let conf = {
                 town: mh_user.townDetails.townType.toLowerCase(),
                 job: jobs.find((job) => mh_user.jobDetails.uid === job.img),
