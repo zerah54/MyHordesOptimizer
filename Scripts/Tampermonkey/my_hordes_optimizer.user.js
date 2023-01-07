@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.22
+// @version      1.0.0-beta.23
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -1301,7 +1301,7 @@ let informations = [
             de: `Webseite`,
             es: `Sitio web`
         },
-        src: `https://myhordes-optimizer.web.app/`,
+        src: is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`,
         action: () => {},
         img: `emotes/explo.gif`
     },
