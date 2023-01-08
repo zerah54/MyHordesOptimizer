@@ -11,8 +11,11 @@ export class HeaderWithSelectFilterComponent<T> {
     @Input() header!: string;
     @Input() textAlign?: string = 'left';
 
-    @Input() filterValue!: T | T[];
-    @Output() filterValueChange: EventEmitter<T | T[]> = new EventEmitter<T | T[]>();
+    @Input() options: T[] = [];
+    @Input() bindLabel: string = 'label';
+
+    @Input() filterValue!: T[];
+    @Output() filterValueChange: EventEmitter<T[]> = new EventEmitter<T[]>();
 
 
 }

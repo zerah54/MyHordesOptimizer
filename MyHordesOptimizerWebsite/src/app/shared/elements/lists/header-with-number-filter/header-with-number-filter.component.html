@@ -10,7 +10,7 @@
 
     </div>
     <ng-container *ngIf="filterValue !== '' && filterValue !== undefined && filterValue !== null">
-        <mat-form-field>
+        <mat-form-field (click)="$event.stopPropagation()">
             <input matInput [ngModel]="filterValue" (ngModelChange)="filterValueChange.next($event)">
         </mat-form-field>
     </ng-container>

@@ -1,10 +1,22 @@
-.open-menu-icon {
-    width: unset !important;
-    height: unset !important;
-    overflow: visible !important;
-    font-size: 16px !important;
+.mho-header-with-filter {
 
-    &.hidden {
-        display: none;
+    >div {
+        display: flex;
+        align-items: center;
+    }
+
+    .open-menu-icon {
+        width: unset !important;
+        height: unset !important;
+        overflow: visible !important;
+        font-size: 16px !important;
+
+        &.hidden {
+            display: none;
+        }
+    }
+
+    .mat-form-field {
+        width: 100%;
     }
 }

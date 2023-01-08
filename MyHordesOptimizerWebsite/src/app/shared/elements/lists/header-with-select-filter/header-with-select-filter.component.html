@@ -3,15 +3,17 @@
         {{header}}
 
         <mat-icon [matMenuTriggerFor]="labelFilter" #labelFilterTrigger="matMenuTrigger" class="open-menu-icon"
-            [class.hidden]="filterValue !== '' && filterValue !== undefined && filterValue !== null && !labelFilterTrigger.menuOpen"
+            [class.hidden]="filterValue.length > 0 && filterValue !== undefined && filterValue !== null && !labelFilterTrigger.menuOpen"
             (click)="$event.preventDefault(); $event.stopPropagation();">
             filter_alt
         </mat-icon>
 
     </div>
-    <ng-container *ngIf="filterValue !== '' && filterValue !== undefined && filterValue !== null">
-        <mat-form-field>
-            <input matInput [ngModel]="filterValue" (ngModelChange)="filterValueChange.next($event)">
+    <ng-container *ngIf="filterValue.length > 0 && filterValue !== undefined && filterValue !== null">
+        <mat-form-field (click)="$event.stopPropagation()">
+            <mho-select [multiple]="true" [options]="options" [bindLabel]="bindLabel" [ngModel]="filterValue"
+                (ngModelChange)="filterValueChange.next($event)">
+            </mho-select>
         </mat-form-field>
     </ng-container>
 
@@ -19,7 +21,9 @@
         <div (click)="$event.stopPropagation()">
             <mat-form-field>
                 <mat-label i18n>{{header}}</mat-label>
-                <input matInput [ngModel]="filterValue" (ngModelChange)="filterValueChange.next($event)">
+                <mho-select [multiple]="true" [options]="options" [bindLabel]="bindLabel" [ngModel]="filterValue"
+                    (ngModelChange)="filterValueChange.next($event)">
+                </mho-select>
             </mat-form-field>
         </div>
     </mat-menu>

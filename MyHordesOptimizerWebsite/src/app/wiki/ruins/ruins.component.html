@@ -39,9 +39,13 @@
                                 <ng-container *ngSwitchCase="'description'">
                                     {{column.header}}
                                 </ng-container>
-                                <ng-container *ngSwitchCase="'drops'">
+                                <mho-header-with-select-filter *ngSwitchCase="'drops'" [header]="column.header"
+                                    [(filterValue)]="ruins_filters.objects"
+                                    (filterValueChange)="ruins_filters_change.next()"
+                                    [options]="items"
+                                    [bindLabel]="'item.label.' + locale">
                                     {{column.header}}
-                                </ng-container>
+                                </mho-header-with-select-filter>
                             </ng-container>
                         </th>
                     </ng-container>

@@ -3,7 +3,9 @@ import { FormBuilder } from '@angular/forms';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
+import { getItemsWithExpirationDate } from 'src/app/shared/utilities/localstorage.util';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
+import { Item } from 'src/app/_abstract_model/types/item.class';
 import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
 import { HORDES_IMG_REPO } from './../../_abstract_model/const';
 import { RuinItem } from './../../_abstract_model/types/ruin-item.class';
@@ -23,6 +25,8 @@ export class RuinsComponent implements OnInit {
 
     /** La liste des bâtiments du jeu */
     public ruins!: Ruin[];
+    /** La liste des objets du jeu */
+    public items: RuinItem[] = [];
     /** La datasource pour le tableau */
     public datasource: MatTableDataSource<Ruin> = new MatTableDataSource();
     /** La liste des colonnes */
@@ -39,7 +43,7 @@ export class RuinsComponent implements OnInit {
         label: '',
         min_dist: '',
         max_dist: '',
-        object: []
+        objects: []
     };
 
     public ruins_filters_change: EventEmitter<void> = new EventEmitter();
@@ -56,6 +60,15 @@ export class RuinsComponent implements OnInit {
             this.ruins_filters_change.subscribe(() => {
                 this.datasource.filter = JSON.stringify(this.ruins_filters);
             });
+
+            this.items = [];
+            this.ruins.forEach((ruin: Ruin) => {
+                ruin.drops.forEach((ruin_item: RuinItem) => {
+                    if (!this.items.some((item: RuinItem) => item.item.id === ruin_item.item.id)) {
+                        this.items.push(ruin_item);
+                    }
+                })
+            })
 
             this.datasource = new MatTableDataSource(ruins);
             this.datasource.filterPredicate = this.customFilter;
@@ -81,13 +94,13 @@ export class RuinsComponent implements OnInit {
     private customFilter(data: Ruin, filter: string): boolean {
         let filter_object: RuinFilters = JSON.parse(filter.toLowerCase());
         let locale: string = moment.locale();
-        if (filter_object.label === '' && filter_object.min_dist === '' && filter_object.max_dist === '' && filter_object.object.length === 0) {
+        if (filter_object.label === '' && filter_object.min_dist === '' && filter_object.max_dist === '' && filter_object.objects.length === 0) {
             return true;
         }
         return (filter_object.label !== '' && filter_object.label !== undefined && data.label[locale].toLowerCase().indexOf(filter_object.label) > -1)
             || (filter_object.min_dist !== '' && filter_object.min_dist !== undefined && +data.min_dist >= +filter_object.min_dist)
             || (filter_object.max_dist !== '' && filter_object.max_dist !== undefined && +data.max_dist <= +filter_object.max_dist)
-            || (filter_object.object.length > 0 && data.drops.some((drop: RuinItem) => filter_object.object.some((object: RuinItem) => drop.item.label[locale].toLowerCase() === object.item.label[locale])));
+            || (filter_object.objects.length > 0 && data.drops.some((drop: RuinItem) => filter_object.objects.some((object: RuinItem) => drop.item.label[locale].toLowerCase() === object.item.label[locale])));
     }
 }
 
@@ -101,5 +114,5 @@ interface RuinFilters {
     label: string;
     min_dist: string | number;
     max_dist: string | number;
-    object: RuinItem[]
+    objects: RuinItem[]
 }
