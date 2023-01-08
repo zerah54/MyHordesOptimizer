@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.24
+// @version      1.0.0-beta.25
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -34,8 +34,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH-beta] désactivation des appels vers BBH & Fata. Ils seront réactivés en cas d'existance d'une version compatible beta. Les options restent toujours visibles mais n'auront pas d'effet`
-+ `[fix] Remise en place de l'URL d'appels API qui avait disparue (magic everywhere)`
++ `[MH-beta][fix] Correctif de l'envoi d'informations dans GH`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -7066,7 +7065,7 @@ function updateExternalTools() {
     startLoading();
 
     let convertImgToItem = (img) => {
-        return items.find((item) => img.src.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3').indexOf(item.img) > 0);
+        return items.find((item) => img.src.replace(/(.*)\/(\w+)\.(\w+)\.(\w+)/, '$1/$2.$4').indexOf(item.img) >= 0);
     }
 
     let convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
