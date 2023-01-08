@@ -9,6 +9,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -86,37 +87,37 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Bag")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenBag([FromQuery] int townId, [FromQuery] int userId, [FromBody] List<UpdateObjectDto> bag)
+        public ActionResult<LastUpdateInfo> UpdateCitizenBag([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleBagDto request)
         {
             UserKeyProvider.UserId = userId;
-            var lastUpdateInfo = ExternalToolsService.UpdateCitizenBag(townId, userId, bag);
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenBag(townId, request.UserId, request.Objects);
             return Ok(lastUpdateInfo);
         }
 
         [HttpPost]
         [Route("Status")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] List<string> status)
+        public ActionResult<LastUpdateInfo> UpdateCitizenStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleStatusDto request)
         {
             UserKeyProvider.UserId = userId;
-            var lastUpdateInfo = ExternalToolsService.UpdateCitizenStatus(townId, userId, status);
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenStatus(townId, request.UserId, request.Status);
             return Ok(lastUpdateInfo);
         }
 
         [HttpPost]
         [Route("HeroicActions")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenHeroicActions([FromQuery] int townId, [FromQuery] int userId, [FromBody] CitizenActionsHeroicValue actionHeroics)
+        public ActionResult<LastUpdateInfo> UpdateCitizenHeroicActions([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleHeroicActionsDto request)
         {
             UserKeyProvider.UserId = userId;
-            var lastUpdateInfo = ExternalToolsService.UpdateCitizenHeroicActions(townId, userId, actionHeroics);
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenHeroicActions(townId, request.UserId, request.HeroicActions);
             return Ok(lastUpdateInfo);
         }
 
         [HttpPost]
         [Route("Home")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenHome([FromQuery] int townId, [FromQuery] int userId, [FromBody] CitizenHomeValue homeDetails)
+        public ActionResult<LastUpdateInfo> UpdateCitizenHome([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleHomeDto request)
         {
             UserKeyProvider.UserId = userId;
-            var lastUpdateInfo = ExternalToolsService.UpdateCitizenHome(townId, userId, homeDetails);
+            var lastUpdateInfo = ExternalToolsService.UpdateCitizenHome(townId, request.UserId, request.Home);
             return Ok(lastUpdateInfo);
         }
     }
