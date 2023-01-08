@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.23
+// @version      1.0.0-beta.24
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -34,7 +34,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `Ajout du script sur le site de la bêta de MH - aucune nouveauté`;
++ `[MH-beta] désactivation des appels vers BBH & Fata. Ils seront réactivés en cas d'existance d'une version compatible beta. Les options restent toujours visibles mais n'auront pas d'effet`
++ `[fix] Remise en place de l'URL d'appels API qui avait disparue (magic everywhere)`
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -61,6 +62,7 @@ GM.getValue(gm_mh_external_app_id_key).then((app_id) => {external_app_id = app_i
 // L'URL de L'API //
 ////////////////////
 
+const api_url = 'https://api.myhordesoptimizer.fr' + (is_mh_beta ? '/beta' : '');
 const api_url_2 = 'https://myhordesoptimizerapi.azurewebsites.net';
 
 ///////////////////////////////////////////
@@ -3413,6 +3415,8 @@ function createUpdateExternalToolsButton() {
     let tools_to_update = {
         isBigBrothHordes: mho_parameters ? mho_parameters.update_bbh : false,
         isFataMorgana: mho_parameters ? mho_parameters.update_fata : false,
+        isBigBrothHordes: mho_parameters && !is_mh_beta ? mho_parameters.update_bbh : false,
+        isFataMorgana: mho_parameters && !is_mh_beta ? mho_parameters.update_fata : false,
         isGestHordes: mho_parameters ? mho_parameters.update_gh : false,
         isMyHordesOptimizer: mho_parameters ? mho_parameters.update_mho : false
     };
@@ -3456,7 +3460,7 @@ function createUpdateExternalToolsButton() {
         })
 
         updater_bloc.appendChild(btn);
-    } else if (update_external_tools_btn) {
+    } else if (update_external_tools_btn && (nb_tools_to_update ===0 || !external_app_id || !(zone_marker && pageIsHouse()))) {
         update_external_tools_btn.parentElement.remove();
     }
 }
