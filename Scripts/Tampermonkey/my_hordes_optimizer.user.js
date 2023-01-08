@@ -3413,8 +3413,6 @@ function saveParameters() {
 function createUpdateExternalToolsButton() {
 
     let tools_to_update = {
-        isBigBrothHordes: mho_parameters ? mho_parameters.update_bbh : false,
-        isFataMorgana: mho_parameters ? mho_parameters.update_fata : false,
         isBigBrothHordes: mho_parameters && !is_mh_beta ? mho_parameters.update_bbh : false,
         isFataMorgana: mho_parameters && !is_mh_beta ? mho_parameters.update_fata : false,
         isGestHordes: mho_parameters ? mho_parameters.update_gh : false,
