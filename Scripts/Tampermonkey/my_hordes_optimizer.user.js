@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.25
+// @version      1.0.0-beta.26
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
 // @author       Zerah
 //
@@ -34,7 +34,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH-beta][fix] Correctif de l'envoi d'informations dans GH`;
++ `[MH-beta][update] MHO supporte maintenant la mise à jour de FataMorgana en beta`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -3413,7 +3413,7 @@ function createUpdateExternalToolsButton() {
 
     let tools_to_update = {
         isBigBrothHordes: mho_parameters && !is_mh_beta ? mho_parameters.update_bbh : false,
-        isFataMorgana: mho_parameters && !is_mh_beta ? mho_parameters.update_fata : false,
+        isFataMorgana: mho_parameters ? mho_parameters.update_fata : false,
         isGestHordes: mho_parameters ? mho_parameters.update_gh : false,
         isMyHordesOptimizer: mho_parameters ? mho_parameters.update_mho : false
     };
@@ -3457,7 +3457,7 @@ function createUpdateExternalToolsButton() {
         })
 
         updater_bloc.appendChild(btn);
-    } else if (update_external_tools_btn && (nb_tools_to_update ===0 || !external_app_id || !(zone_marker && pageIsHouse()))) {
+    } else if (update_external_tools_btn && (nb_tools_to_update === 0 || !external_app_id || !(zone_marker && pageIsHouse()))) {
         update_external_tools_btn.parentElement.remove();
     }
 }
@@ -7094,7 +7094,7 @@ function updateExternalTools() {
 
     data.map = {}
     data.map.toolsToUpdate = {
-        isBigBrothHordes: mho_parameters && mho_parameters.update_bbh ? 'api' : 'none',
+        isBigBrothHordes: mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : 'none',
         isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
         isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
     };
