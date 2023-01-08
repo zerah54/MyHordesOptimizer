@@ -1,0 +1,26 @@
+<div class="mho-header-with-filter">
+    <div style="display: flex; align-items: center;" [style.text-align]="textAlign">
+        {{header}}
+
+        <mat-icon [matMenuTriggerFor]="labelFilter" #labelFilterTrigger="matMenuTrigger" class="open-menu-icon"
+            [class.hidden]="filterValue !== '' && filterValue !== undefined && filterValue !== null && !labelFilterTrigger.menuOpen"
+            (click)="$event.preventDefault(); $event.stopPropagation();">
+            filter_alt
+        </mat-icon>
+
+    </div>
+    <ng-container *ngIf="filterValue !== '' && filterValue !== undefined && filterValue !== null">
+        <mat-form-field>
+            <input matInput [ngModel]="filterValue" (ngModelChange)="filterValueChange.next($event)">
+        </mat-form-field>
+    </ng-container>
+
+    <mat-menu #labelFilter="matMenu">
+        <div (click)="$event.stopPropagation()">
+            <mat-form-field>
+                <mat-label>{{header}}</mat-label>
+                <input matInput [ngModel]="filterValue" (ngModelChange)="filterValueChange.next($event)">
+            </mat-form-field>
+        </div>
+    </mat-menu>
+</div>

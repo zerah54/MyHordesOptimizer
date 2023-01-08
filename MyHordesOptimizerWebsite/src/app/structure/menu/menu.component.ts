@@ -78,10 +78,14 @@ export class MenuComponent {
             this.themes.push({ label: $localize`Noël`, class: 'noel' });
             this.themes.splice(0, 1);
             if (this.selected_theme?.class === '') {
-                this.changeTheme(this.themes[this.themes.length - 1])
+                setTimeout(() => {
+                    this.changeTheme(this.themes[this.themes.length - 1])
+                })
             }
         } else if (this.selected_theme?.class === 'noel') {
-            this.changeTheme(this.themes[0])
+            setTimeout(() => {
+                this.changeTheme(this.themes[0])
+            })
         }
 
         this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'))
@@ -90,9 +94,12 @@ export class MenuComponent {
 
     public toggleDisplayChildren(route: SidenavLinks): void {
         if (route.children && route.children.length > 0) {
-            route.expanded = !route.expanded;
-            route.children?.forEach((child) => {
+            route.children?.forEach((child: SidenavLinks) => {
                 child.displayed = route.expanded || false;
+                if (!child.displayed) {
+                    child.expanded = child.displayed;
+                }
+                this.toggleDisplayChildren(child);
             });
             window.dispatchEvent(new Event('resize'));
         }

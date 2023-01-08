@@ -269,6 +269,14 @@ export class CampingComponent implements OnInit {
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
+    public getMoreRuinInfo(ruin: string | Ruin): string {
+        if (typeof ruin === 'string') {
+            return ruin
+        } else {
+            return `<small">Bonus : ${ruin.camping}</small>`;
+        }
+    }
+
     private calculateProbabilities(): void {
         let chances = 0;
         /** Type de ville */
@@ -276,7 +284,7 @@ export class CampingComponent implements OnInit {
         /** Tombe creusée */
         chances += this.configuration_form.get('tomb')?.value ? 1.6 * 100 : 0;
         /** Mode nuit */
-        chances += this.configuration_form.get('night')?.value ? 2 * 100: 0;
+        chances += this.configuration_form.get('night')?.value ? 2 * 100 : 0;
         /** Ville devastée */
         chances += this.configuration_form.get('devastated')?.value ? -10 * 100 : 0;
         /** Phare */

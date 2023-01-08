@@ -1,5 +1,4 @@
 import { HeroicActionsDTO } from '../dto/heroic-actions.dto';
-import { HomeDTO } from '../dto/home.dto';
 import { HeroicActionEnum } from '../enum/heroic-action.enum';
 import { HomeEnum } from '../enum/home.enum';
 import { UpdateInfo } from './update-info.class';
@@ -9,19 +8,19 @@ export class HeroicActions extends CommonModel<HeroicActionsDTO> {
     public content!: HeroicActionsWithValue[];
     public update_info!: UpdateInfo;
 
-    constructor(dto?: HomeDTO) {
+    constructor(dto?: HeroicActionsDTO) {
         super();
         this.dtoToModel(dto);
     }
 
-    public modelToDto(): HomeDTO {
+    public modelToDto(): HeroicActionsDTO {
         return {
             content: this.content.reduce((accumulator, key: HeroicActionsWithValue) => { return { ...accumulator, [key.element.getLabel()]: key.value } }, {}),
             lastUpdateInfo: this.update_info.modelToDto()
         };
     }
 
-    protected dtoToModel(dto?: HomeDTO): void {
+    protected dtoToModel(dto?: HeroicActionsDTO): void {
         if (dto) {
             this.content = Object.keys(dto.content)
                 .map((key: string) => {

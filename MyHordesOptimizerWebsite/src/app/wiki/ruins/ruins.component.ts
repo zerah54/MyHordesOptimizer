@@ -1,10 +1,12 @@
-import { RuinItem } from './../../_abstract_model/types/ruin-item.class';
-import { HORDES_IMG_REPO } from './../../_abstract_model/const';
+import { Component, EventEmitter, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Component, OnInit } from '@angular/core';
+import * as moment from 'moment';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
-import * as moment from 'moment';
+import { HORDES_IMG_REPO } from './../../_abstract_model/const';
+import { RuinItem } from './../../_abstract_model/types/ruin-item.class';
 
 @Component({
     selector: 'mho-ruins',
@@ -12,6 +14,7 @@ import * as moment from 'moment';
     styleUrls: ['./ruins.component.scss']
 })
 export class RuinsComponent implements OnInit {
+    @ViewChild(MatSort) sort!: MatSort;
 
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
@@ -24,24 +27,49 @@ export class RuinsComponent implements OnInit {
     public datasource: MatTableDataSource<Ruin> = new MatTableDataSource();
     /** La liste des colonnes */
     public readonly columns: RuinColumns[] = [
-        { id: 'img', header: `` },
-        { id: 'label', header: $localize`Nom de l'objet` },
-        { id: 'description', header: $localize`Description` },
-        { id: 'min_dist', header: $localize`Distance minimum` },
-        { id: 'max_dist', header: $localize`Distance maximum` },
-        { id: 'drops', header: $localize`Objets` }
+        { id: 'label', header: $localize`Nom du bâtiment`, sortable: true },
+        { id: 'description', header: $localize`Description`, sortable: false },
+        { id: 'min_dist', header: $localize`Distance minimum`, sortable: true },
+        { id: 'max_dist', header: $localize`Distance maximum`, sortable: true },
+        { id: 'camping', header: $localize`Bonus en camping`, sortable: true },
+        { id: 'drops', header: $localize`Objets`, sortable: false }
     ];
+
+    public ruins_filters: RuinFilters = {
+        label: '',
+        min_dist: '',
+        max_dist: '',
+        object: []
+    };
+
+    public ruins_filters_change: EventEmitter<void> = new EventEmitter();
+
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: RuinColumns) => column.id);
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiServices, private fb: FormBuilder) {
     }
 
     ngOnInit(): void {
         this.api.getRuins().subscribe((ruins: Ruin[]) => {
             this.ruins = ruins;
-            this.datasource.data = [...ruins];
+            this.ruins_filters_change.subscribe(() => {
+                this.datasource.filter = JSON.stringify(this.ruins_filters);
+            });
+
+            this.datasource = new MatTableDataSource(ruins);
             this.datasource.filterPredicate = this.customFilter;
+            this.datasource.sortingDataAccessor = (item: Ruin, property: string): any => {
+                switch (property) {
+                    case 'label':
+                        return item.label[this.locale];
+                    default:
+                        return item[property as keyof Ruin];
+                }
+            };
+            setTimeout(() => {
+                this.datasource.sort = this.sort;
+            });
         });
     }
 
@@ -51,14 +79,27 @@ export class RuinsComponent implements OnInit {
     }
 
     private customFilter(data: Ruin, filter: string): boolean {
+        let filter_object: RuinFilters = JSON.parse(filter.toLowerCase());
         let locale: string = moment.locale();
-        return data.drops.some((drop: RuinItem) => drop.item.label[locale].toLowerCase().indexOf(filter) > -1)
-        || data.label[locale].toLowerCase().indexOf(filter) > -1
-        || data.description[locale].toLowerCase().indexOf(filter) > -1;
+        if (filter_object.label === '' && filter_object.min_dist === '' && filter_object.max_dist === '' && filter_object.object.length === 0) {
+            return true;
+        }
+        return (filter_object.label !== '' && filter_object.label !== undefined && data.label[locale].toLowerCase().indexOf(filter_object.label) > -1)
+            || (filter_object.min_dist !== '' && filter_object.min_dist !== undefined && +data.min_dist >= +filter_object.min_dist)
+            || (filter_object.max_dist !== '' && filter_object.max_dist !== undefined && +data.max_dist <= +filter_object.max_dist)
+            || (filter_object.object.length > 0 && data.drops.some((drop: RuinItem) => filter_object.object.some((object: RuinItem) => drop.item.label[locale].toLowerCase() === object.item.label[locale])));
     }
 }
 
 interface RuinColumns {
     header: string;
     id: string;
+    sortable: boolean;
+}
+
+interface RuinFilters {
+    label: string;
+    min_dist: string | number;
+    max_dist: string | number;
+    object: RuinItem[]
 }

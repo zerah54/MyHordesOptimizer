@@ -2,11 +2,10 @@ import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/co
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
-import { getUser } from 'src/app/shared/utilities/localstorage.util';
+import { getItemsWithExpirationDate, getUser } from 'src/app/shared/utilities/localstorage.util';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 import { StatusEnum } from 'src/app/_abstract_model/enum/status.enum';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
-import { HomeWithValue } from 'src/app/_abstract_model/types/home.class';
 import { Item } from 'src/app/_abstract_model/types/item.class';
 import { UpdateInfo } from 'src/app/_abstract_model/types/update-info.class';
 import { CitizenInfo } from './../../_abstract_model/types/citizen-info.class';
@@ -35,12 +34,10 @@ export class CitizensComponent {
     public locale: string = moment.locale();
     /** La liste des colonnes */
     public readonly columns: CitizenColumn[] = [
-        { id: 'avatar', header: $localize`Avatar` },
-        { id: 'name', header: $localize`Nom du citoyen` },
-        { id: 'status', header: $localize`États` },
-        { id: 'bag', header: $localize`Sac à dos` },
-        { id: 'heroic_actions', header: $localize`Actions héroïques` },
-        { id: 'home', header: $localize`Améliorations` },
+        { id: 'avatar_name', header: $localize`Citoyen`, class: '' },
+        { id: 'more_status', header: $localize`États`, class: '' },
+        { id: 'heroic_actions', header: $localize`Actions héroïques`, class: '' },
+        { id: 'home', header: $localize`Améliorations`, class: '' },
         // { id: 'chest', header: $localize`Coffre` },
     ];
 
@@ -58,7 +55,10 @@ export class CitizensComponent {
         this.datasource.filterPredicate = (data: Citizen, filter: string) => this.customFilter(data, filter);
         this.getCitizens();
 
-        this.api.getItems().subscribe((items: Item[]) => this.all_items = items)
+        this.all_items = getItemsWithExpirationDate();
+        if (this.all_items.length === 0 || !this.all_items) {
+            this.api.getItems().subscribe((items: Item[]) => this.all_items = items)
+        }
     }
 
     /** Filtre la liste à afficher */
@@ -225,5 +225,6 @@ export class CitizensComponent {
 interface CitizenColumn {
     header: string;
     id: string;
+    class?: string;
 }
 

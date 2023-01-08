@@ -403,19 +403,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.ts</context>
-          <context context-type="linenumber">16</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.ts</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">20</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.ts</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.ts</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit id="673430564078029527" datatype="html">
@@ -446,18 +446,47 @@
           <context context-type="linenumber">28</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="7142468903278457154" datatype="html">
-        <source>Mis à jour par <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo.update_time.fromNow()}}"/></source>
+      <trans-unit id="4334429738783948937" datatype="html">
+        <source>Mis à jour par <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo.update_time.fromNow()}}"/> </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">26,28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3130710248919896495" datatype="html">
         <source>Jamais mis à jour</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3678164595352629699" datatype="html">
+        <source>Mis à jour par <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo.update_time.fromNow()}}"/> (<x id="INTERPOLATION_2" equiv-text="{{lastUpdateInfo.update_time.toDate() | date:&apos;medium&apos;}}"/>)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="187187500641108332" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{header}}"/></source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/elements/lists/header-with-select-filter/header-with-select-filter.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-installation/tuto-script-installation.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5829380065548494521" datatype="html">
+        <source>Rechercher</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/elements/select/select.component.html</context>
+          <context context-type="linenumber">26</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2974950606230121476" datatype="html">
@@ -632,7 +661,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">35</context>
         </context-group>
       </trans-unit>
       <trans-unit id="530325689928281558" datatype="html">
@@ -715,11 +744,25 @@
           <context context-type="linenumber">56</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="3793819955692174765" datatype="html">
+        <source>Site</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3556482685302387015" datatype="html">
+        <source>Première utilisation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">61</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="5737526992758767493" datatype="html">
         <source>Noël</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">78</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5344623683730509987" datatype="html">
@@ -870,67 +913,67 @@
         <source>Distance de la ville (en km)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">94</context>
+          <context context-type="linenumber">95</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2420553302076927639" datatype="html">
         <source>Nombre de zombies sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">101</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7014743875484323339" datatype="html">
         <source>Nombre de campeurs déjà cachés sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">109</context>
         </context-group>
       </trans-unit>
       <trans-unit id="165011294537677821" datatype="html">
         <source>Améliorations</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">115</context>
+          <context context-type="linenumber">116</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">40</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1759876158817324985" datatype="html">
         <source>Nombre d&apos;améliorations simples faites sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">120</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1569331568164081073" datatype="html">
         <source>Nombre d&apos;objets de défense installés sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">126</context>
+          <context context-type="linenumber">127</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1534155701917252037" datatype="html">
         <source>ou</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">131</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1176751937188269730" datatype="html">
         <source>Nombre total d&apos;améliotations sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2902261471051690112" datatype="html">
         <source>Résultat</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">144</context>
+          <context context-type="linenumber">145</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context>
@@ -1075,95 +1118,96 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.ts</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
+          <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="4943229469287567348" datatype="html">
-        <source>Ajouter aux statuts</source>
+      <trans-unit id="7945783910888141498" datatype="html">
+        <source>États</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
+          <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="1407981884166375542" datatype="html">
-        <source>Retirer des statuts</source>
+      <trans-unit id="4739884131356753082" datatype="html">
+        <source>Ajouter aux états</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6267376199968253376" datatype="html">
-        <source>Vider les statuts</source>
+      <trans-unit id="6864416921116271532" datatype="html">
+        <source>Retirer des états</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7332767872103966167" datatype="html">
+        <source>Vider les états</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7287080792595569200" datatype="html">
+        <source>Sac</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6019139638926667991" datatype="html">
         <source>Ajouter au sac</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">63</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6402922979065903259" datatype="html">
         <source>Retirer du sac</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context>
-          <context context-type="linenumber">46</context>
+          <context context-type="linenumber">64</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6195148584287059509" datatype="html">
         <source>Vider le sac</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">66</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8265078634979801865" datatype="html">
         <source>La liste est vide</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.html</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">146</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">110</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6525109356951792180" datatype="html">
-        <source>Avatar</source>
+      <trans-unit id="8297073205000664921" datatype="html">
+        <source>Citoyen</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
-          <context context-type="linenumber">38</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="6975093736711169035" datatype="html">
-        <source>Nom du citoyen</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
-          <context context-type="linenumber">39</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="7945783910888141498" datatype="html">
-        <source>États</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
-          <context context-type="linenumber">40</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="7213858055094818881" datatype="html">
-        <source>Sac à dos</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
       <trans-unit id="713605071826573828" datatype="html">
         <source>Actions héroïques</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/citizens/citizens.component.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
       <trans-unit id="626566591049088014" datatype="html">
@@ -1238,10 +1282,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context>
           <context context-type="linenumber">27</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
-          <context context-type="linenumber">28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4434386636143018239" datatype="html">
@@ -1622,6 +1662,10 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.html</context>
           <context context-type="linenumber">8,10</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.html</context>
+          <context context-type="linenumber">8,10</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="3885539050798710089" datatype="html">
         <source> Copier au format forum </source>
@@ -1633,12 +1677,9 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.html</context>
           <context context-type="linenumber">11,13</context>
         </context-group>
-      </trans-unit>
-      <trans-unit id="187187500641108332" datatype="html">
-        <source><x id="INTERPOLATION" equiv-text="{{ final_text }}"/></source>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-installation/tuto-script-installation.component.html</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.html</context>
+          <context context-type="linenumber">11,13</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7228219696199470616" datatype="html">
@@ -1735,35 +1776,67 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.ts</context>
-          <context context-type="linenumber">46</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3391342399314033567" datatype="html">
+        <source>Une des fonctionnalités du script est de permettre la mise à jour de différents outils externes depuis le site de MyHordes. Pour ce faire, il faut activer les options associées dans la liste des options de MyHordes Optimizer.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.ts</context>
+          <context context-type="linenumber">15</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9052701380908438701" datatype="html">
         <source>MyHordes Optimizer</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.ts</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">18</context>
         </context-group>
       </trans-unit>
       <trans-unit id="762928771016494268" datatype="html">
         <source>Gest&apos;Hordes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.ts</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">20</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4957168085124746094" datatype="html">
         <source>BigBroth&apos;Hordes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.ts</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">23</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7465509859706491373" datatype="html">
         <source>Fata Morgana</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-update-external-tools/tuto-script-update-external-tools.component.ts</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6781675583173132570" datatype="html">
+        <source>Première utilisation du site</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6125750195163105243" datatype="html">
+        <source>Lors de votre première utilisation du site, vous n&apos;aurez pas accès aux pages sous le menu &quot;Outils&quot;. En effet, il faut au préalable renseigner son identifiant externe pour les applications, en haut à droite de la page.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="720951074500366028" datatype="html">
+        <source>L&apos;identifiant externe pour les applications se trouve sur le site de MyHordes, dans la page de votre âme, onglet &quot;Avancé&quot;. Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
+          <context context-type="linenumber">15</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7031255060364978694" datatype="html">
@@ -1781,7 +1854,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">31</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6606510916077285969" datatype="html">
@@ -1879,18 +1952,32 @@
           <context context-type="linenumber">29</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="4280305830543989718" datatype="html">
+        <source>Nom du bâtiment</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="7533053521139949104" datatype="html">
         <source>Distance minimum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">32</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3656199934377633082" datatype="html">
         <source>Distance maximum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3182705520281939075" datatype="html">
+        <source>Bonus en camping</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
+          <context context-type="linenumber">34</context>
         </context-group>
       </trans-unit>
     </body>

@@ -51,8 +51,8 @@
 
 <ng-template #routeLink let-route>
     <a mat-list-item *ngIf="route.displayed && route.authorized()" routerLinkActive="link-selected"
-        [routerLinkActiveOptions]="{exact : true}" [routerLink]="route.path" (click)="toggleDisplayChildren(route)"
-        [ngClass]="['lvl-' + route.lvl]">
+        [routerLinkActiveOptions]="{exact : true}" [routerLink]="route.path"
+        (click)="route.expanded = !route.expanded; toggleDisplayChildren(route)" [ngClass]="['lvl-' + route.lvl]">
         <mat-icon *ngIf="route.children && route.children.length > 0">
             {{route.expanded ? 'expand_more' : 'chevron_right'}}</mat-icon>
         {{route.label}}

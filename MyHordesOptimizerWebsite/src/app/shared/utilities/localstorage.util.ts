@@ -1,7 +1,10 @@
+import * as moment from 'moment';
+import { ItemDTO } from 'src/app/_abstract_model/dto/item.dto';
+import { Item } from 'src/app/_abstract_model/types/item.class';
 import { Me } from 'src/app/_abstract_model/types/me.class';
 import { TownDetails } from 'src/app/_abstract_model/types/town-details.class';
-import { EXTERNAL_APP_ID_KEY, TOWN_KEY, USER_KEY } from '../../_abstract_model/const';
-
+import { EXTERNAL_APP_ID_KEY, ITEMS_KEY, TOWN_KEY, USER_KEY } from '../../_abstract_model/const';
+import { dtoToModelArray, modelToDtoArray } from '../../_abstract_model/types/_common.class';
 
 export function setUser(user: Me | null): void {
     localStorage.setItem(USER_KEY, user ? JSON.stringify(user) : '');
@@ -32,4 +35,27 @@ export function getTown(): TownDetails | null {
 
 export function setTown(town: TownDetails | null): void {
     localStorage.setItem(TOWN_KEY, town ? JSON.stringify(town) : '');
+}
+
+export function getItemsWithExpirationDate(): Item[] {
+    const local_storage: string | null = localStorage.getItem(ITEMS_KEY) || '';
+    const element_with_expiration: ElementWithExpiration<ItemDTO[]> = local_storage ? JSON.parse(local_storage) : undefined;
+    if (!element_with_expiration || moment(element_with_expiration.expire_at).isBefore(moment())) {
+        return [];
+    } else {
+        return dtoToModelArray(Item, element_with_expiration.element);
+    }
+}
+
+export function setItemsWithExpirationDate(items: Item[]): void {
+    let element_with_expiration: ElementWithExpiration<ItemDTO[] | null> = {
+        expire_at: moment().endOf('day'),
+        element: modelToDtoArray(items)
+    }
+    localStorage.setItem(ITEMS_KEY, JSON.stringify(element_with_expiration));
+}
+
+interface ElementWithExpiration<T> {
+    expire_at: moment.Moment;
+    element: T;
 }

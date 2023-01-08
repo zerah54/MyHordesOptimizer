@@ -12,6 +12,7 @@ export class LastUpdateComponent {
 
     @Input() lastUpdateInfo!: UpdateInfo;
     @Input() thresholds!: [number, number, number, number];
+    @Input() hideDetails: boolean = false;
 
     public moment: typeof moment = moment;
 

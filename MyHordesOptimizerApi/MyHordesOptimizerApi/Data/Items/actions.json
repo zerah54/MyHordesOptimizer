@@ -7,7 +7,7 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "not_role_ghoul",
-            "no_full_ap",
+            "not_thirsty",
             "drink_mesg",
             "drink_tl0a",
             "drink_tl0b"
@@ -376,7 +376,7 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "not_role_ghoul",
-            "no_full_ap",
+            "not_thirsty",
             "drink_mesg",
             "drink_tl0a",
             "drink_tl0b"
@@ -475,7 +475,7 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "not_role_ghoul",
-            "no_full_ap",
+            "not_thirsty",
             "drink_mesg",
             "drink_tl0a",
             "drink_tl0b"
@@ -574,7 +574,7 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "not_role_ghoul",
-            "no_full_ap",
+            "not_thirsty",
             "drink_mesg",
             "drink_tl0a",
             "drink_tl0b"

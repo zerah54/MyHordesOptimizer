@@ -11,22 +11,26 @@ import { FilterFieldComponent } from './filter-field/filter-field.component';
 import { ItemComponent } from './item/item.component';
 import { LastUpdateComponent } from './last-update/last-update.component';
 import { ListElementAddRemoveComponent } from './list-elements-add-remove/list-element-add-remove.component';
+import { HeaderWithNumberFilterComponent } from './lists/header-with-number-filter/header-with-number-filter.component';
+import { HeaderWithSelectFilterComponent } from './lists/header-with-select-filter/header-with-select-filter.component';
+import { HeaderWithStringFilterComponent } from './lists/header-with-string-filter/header-with-string-filter.component';
 import { RecipeComponent } from './recipe/recipe.component';
 import { LabelPipe } from './select/label.pipe';
 import { SelectComponent } from './select/select.component';
 
 let components: any[] = [ItemComponent, SelectComponent, RecipeComponent, FilterFieldComponent, LastUpdateComponent, AccordionComponent, ListElementAddRemoveComponent];
-let local_components: any[] = [LabelPipe]
-let custom_modules: any[] = [MaterialModule]
-let angular_modules: any[] = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule]
+let list_headers: any[] = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent];
+let local_components: any[] = [LabelPipe];
+let custom_modules: any[] = [MaterialModule];
+let angular_modules: any[] = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule];
 let pipes: any[] = [DecimalPipe];
 
 @NgModule({
     imports: [...custom_modules, ...angular_modules],
     declarations: [
-        ...components, ...local_components
+        ...components, ...local_components, ...list_headers
     ],
-    exports: [...components],
+    exports: [...components, ...list_headers],
     providers: [...pipes]
 })
 

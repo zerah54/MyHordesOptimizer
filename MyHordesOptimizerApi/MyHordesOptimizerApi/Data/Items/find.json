@@ -141,11 +141,11 @@
     },
     "christmas_dig": {
         "christmas_suit_1_#00": 8,
-        "christmas_suit_2_#00": 8,
-        "christmas_suit_3_#00": 8,
-        "sand_ball_#00": 2,
+        "christmas_suit_2_#00": 7,
+        "christmas_suit_3_#00": 6,
+        "sand_ball_#00": 10,
         "renne_#00": 10,
-        "food_xmas_#00": 6
+        "food_xmas_#00": 5
     },
     "christmas_dig_post": {
         "postal_box_#01": 3,
