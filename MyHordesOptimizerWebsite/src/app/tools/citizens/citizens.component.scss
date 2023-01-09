@@ -9,6 +9,10 @@
             >td {
                 padding: 0 0.5em;
 
+                &.center {
+                    text-align: center;
+                }
+
                 &.avatar_name {
                     >img {
                         width: 100px;

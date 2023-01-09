@@ -30,8 +30,7 @@ export class TutoScriptInstallationComponent {
                 <li>Ouvrir l’application "UserScripts" ;</li>
                 <li>Appuyer sur "Set Userscripts Directory" ;</li>
                 <li>Sélectionner le dossier précédemment créé et valider ;</li>
-                <li>Cliquer sur le ${this.download_link} ;</li>
-                <li>Enregistrer le fichier ;</li>
+                <li>Enregistrer le fichier disponible sur le ${this.download_link} (ou via un appui long sur le lien, peut être);</li>
                 <li>Déplacer le fichier dans le dossier créé ;</li>
                 <li>Aller sur Safari ;</li>
                 <li>Appuyer sur le "Aa" dans la barre de recherche ;</li>

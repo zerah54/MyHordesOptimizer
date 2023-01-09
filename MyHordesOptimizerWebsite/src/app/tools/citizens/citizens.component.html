@@ -6,24 +6,15 @@
         <div class="mat-elevation-z8">
             <table mat-table [dataSource]="datasource" matSort>
 
-                <ng-container matColumnDef="filters" sticky>
-                    <td mat-header-cell *matHeaderCellDef colspan="2">
-                        <div class="table-filters">
-                            <mho-filter (filterChange)="applyFilter($event)"></mho-filter>
-                        </div>
-                    </td>
-                </ng-container>
-                <ng-container matColumnDef="empty">
-                    <td mat-header-cell *matHeaderCellDef colspan="4"></td>
-                </ng-container>
-
                 <ng-container *ngFor="let column of columns" [matColumnDef]="column.id"
                     [sticky]="column.id === 'name' || column.id === 'avatar'">
                     <th mat-header-cell *matHeaderCellDef [ngClass]="[column.id, column.class]">
                         <ng-container [ngSwitch]="column.id">
-                            <ng-container *ngSwitchCase="'avatar_name'">
-                                {{column.header}}
-                            </ng-container>
+                            <mho-header-with-select-filter *ngSwitchCase="'avatar_name'" [header]="column.header"
+                                [(filterValue)]="citizen_filters"
+                                (filterValueChange)="citizen_filter_change.next()" [options]="citizen_info.citizens"
+                                [bindLabel]="'name'">
+                            </mho-header-with-select-filter>
                             <ng-container *ngSwitchCase="'more_status'">
                                 {{column.header}}
                             </ng-container>
@@ -45,23 +36,21 @@
                             <ng-container *ngSwitchCase="'more_status'">
                                 <div>
                                     <div class="status">
-                                        <mho-list-element-add-remove [currentList]="row.status.icons"
-                                            label="États" i18n-label
-                                            [completeList]="all_status" addLabel="Ajouter aux états" i18n-addLabel
-                                            (add)="addStatus(row.id, $event + '')" removeLabel="Retirer des états"
-                                            i18n-removeLabel (remove)="removeStatus(row.id, $event + '')"
-                                            emptyLabel="Vider les états" i18n-emptyLabel
-                                            (empty)="emptyStatus(row.id)">
+                                        <mho-list-element-add-remove [currentList]="row.status.icons" label="États"
+                                            i18n-label [completeList]="all_status" addLabel="Ajouter aux états"
+                                            i18n-addLabel (add)="addStatus(row.id, $event + '')"
+                                            removeLabel="Retirer des états" i18n-removeLabel
+                                            (remove)="removeStatus(row.id, $event + '')" emptyLabel="Vider les états"
+                                            i18n-emptyLabel (empty)="emptyStatus(row.id)">
                                         </mho-list-element-add-remove>
                                         <mho-last-update [lastUpdateInfo]="row.status.update_info"
                                             [thresholds]="[30, 120, 120*2, 120*3]" [hideDetails]="true">
                                         </mho-last-update>
                                     </div>
                                     <div class="bag">
-                                        <mho-list-element-add-remove [currentList]="row.bag.items"
-                                            label="Sac" i18n-label
-                                            [completeList]="all_items" addLabel="Ajouter au sac" i18n-addLabel
-                                            (add)="addItem(row.id, +$event)" removeLabel="Retirer du sac"
+                                        <mho-list-element-add-remove [currentList]="row.bag.items" label="Sac"
+                                            i18n-label [completeList]="all_items" addLabel="Ajouter au sac"
+                                            i18n-addLabel (add)="addItem(row.id, +$event)" removeLabel="Retirer du sac"
                                             i18n-removeLabel (remove)="removeItem(row.id, +$event)"
                                             emptyLabel="Vider le sac" i18n-emptyLabel (empty)="emptyBag(row.id)">
                                         </mho-list-element-add-remove>
@@ -129,7 +118,6 @@
                     </td>
                 </ng-container>
 
-                <tr mat-header-row *matHeaderRowDef="['filters', 'empty']; sticky: true"></tr>
                 <tr mat-header-row *matHeaderRowDef="columns_ids; sticky: true"></tr>
                 <tr mat-row *matRowDef="let row; columns: columns_ids;"></tr>
                 <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->

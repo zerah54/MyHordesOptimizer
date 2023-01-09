@@ -13,7 +13,7 @@ export class TutoScriptAlertsComponent {
 
     public readonly tuto_script_items: AccordionItem[] = [
         {
-            title: $localize`Avertissement en cas de fermeture de la page`, content: $localize`Dans l'interface, vous pouvez cocher l'option' "Demander confirmation avant de quitter en l'absence d'escorte automatique", ce qui activera la fonctionnalité.
+            title: $localize`Avertissement en cas de fermeture de la page`, content: $localize`Dans l'interface, vous pouvez cocher l'option "Demander confirmation avant de quitter en l'absence d'escorte automatique", ce qui activera la fonctionnalité.
                 Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, alors au moment de fermer la fenêtre ou l'onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.`
         },
         {

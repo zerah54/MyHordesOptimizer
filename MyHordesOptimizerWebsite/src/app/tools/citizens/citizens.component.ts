@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
@@ -32,9 +32,13 @@ export class CitizensComponent {
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public locale: string = moment.locale();
+    /** Les filtres de la liste des citoyens */
+    public citizen_filters: Citizen[] = [];
+    /** La liste des citoyens a été mise à jour */
+    public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: CitizenColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: '' },
+        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center' },
         { id: 'more_status', header: $localize`États`, class: '' },
         { id: 'heroic_actions', header: $localize`Actions héroïques`, class: '' },
         { id: 'home', header: $localize`Améliorations`, class: '' },
@@ -52,6 +56,11 @@ export class CitizensComponent {
     ngOnInit(): void {
         this.datasource = new MatTableDataSource();
         this.datasource.sort = this.sort;
+
+        this.citizen_filter_change.subscribe(() => {
+            this.datasource.filter = JSON.stringify(this.citizen_filters);
+        });
+
         this.datasource.filterPredicate = (data: Citizen, filter: string) => this.customFilter(data, filter);
         this.getCitizens();
 
@@ -209,7 +218,10 @@ export class CitizensComponent {
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: Citizen, filter: string): boolean {
-        if (data.name.toLowerCase().indexOf(filter.toLowerCase()) > -1) return true;
+
+        let filter_object: Citizen[] = JSON.parse(filter.toLowerCase());
+        if (filter_object.length === 0) return true;
+        if (filter_object.some((citizen: Citizen) => citizen.id === data.id)) return true;
         return false;
     }
 
