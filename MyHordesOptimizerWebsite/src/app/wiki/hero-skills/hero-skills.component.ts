@@ -39,20 +39,7 @@ export class HeroSkillsComponent implements OnInit {
         this.api.getHeroSkill().subscribe((hero_skill: HeroSkill[]) => {
             this.hero_skills = hero_skill;
             this.datasource.data = [...hero_skill];
-            this.datasource.filterPredicate = this.customFilter;
         });
-    }
-
-    /** Filtre la liste à afficher */
-    public applyFilter(value: string): void {
-        this.datasource.filter = value.trim().toLowerCase();
-
-    }
-
-    private customFilter(data: HeroSkill, filter: string): boolean {
-        let locale: string = moment.locale();
-        return data.label[locale].toLowerCase().indexOf(filter) > -1
-        || data.description[locale].toLowerCase().indexOf(filter) > -1;
     }
 }
 

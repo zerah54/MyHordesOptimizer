@@ -6,7 +6,6 @@ import { ClipboardService } from 'src/app/shared/services/clipboard.service';
     selector: 'mho-tuto-script-installation',
     templateUrl: './tuto-script-installation.component.html',
     styleUrls: ['./tuto-script-installation.component.scss'],
-    encapsulation: ViewEncapsulation.None
 })
 export class TutoScriptInstallationComponent {
 
@@ -57,10 +56,10 @@ export class TutoScriptInstallationComponent {
     public shareForum(): void {
         let text: string = '';
 
-        text += `[b][big]${this.title}[/big][/b]`
-        text += `\n\n`
+        text += `[b][big]${this.title}[/big][/b]`;
+        text += `\n\n`;
         this.tuto_script_items.forEach((item: AccordionItem) => {
-            text += `[collapse=${item.title}]${item.content.replace(/<ul>/g, '').replace(/<\/ul>/g, '').replace(/<li>/g, '[0]').replace(/<\/li>/g, '').replace(/<a .* href="(.*)" .*>(.*)<\/a>/g, '[link=$1]$2[/link]')}[/collapse]\n\n`
+            text += `[collapse=${item.title}]${item.content.replace(/<ul>/g, '').replace(/<\/ul>/g, '').replace(/<li>/g, '[0]').replace(/<\/li>/g, '').replace(/<a .* href="(.*)" .*>(.*)<\/a>/g, '[link=$1]$2[/link]')}[/collapse]\n\n`;
         })
 
         text += this.final_text;

@@ -1,11 +1,17 @@
 import { NgModule } from '@angular/core';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { ScriptDocumentationComponent } from './doc/doc.component';
+import { TutoScriptAlertsComponent } from './tuto-script-alerts/tuto-script-alerts.component';
+import { TutoScriptDisplayComponent } from './tuto-script-display/tuto-script-display.component';
+import { TutoScriptExternalToolsComponent } from './tuto-script-external-tools/tuto-script-external-tools.component';
 import { TutoScriptInstallationComponent } from './tuto-script-installation/tuto-script-installation.component';
-import { TutoScriptUpdateExternalToolsComponent } from './tuto-script-update-external-tools/tuto-script-update-external-tools.component';
+import { TutoScriptToolsComponent } from './tuto-script-tools/tuto-script-tools.component';
+import { TutoScriptWikiComponent } from './tuto-script-wiki/tuto-script-wiki.component';
 
 
-const components: any[] = [TutoScriptInstallationComponent, ScriptDocumentationComponent, TutoScriptUpdateExternalToolsComponent];
+const components: any[] = [
+    TutoScriptInstallationComponent, TutoScriptExternalToolsComponent, TutoScriptToolsComponent,
+    TutoScriptWikiComponent, TutoScriptAlertsComponent, TutoScriptDisplayComponent
+];
 
 
 @NgModule({

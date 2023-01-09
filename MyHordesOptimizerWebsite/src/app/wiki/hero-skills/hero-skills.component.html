@@ -5,17 +5,8 @@
     <ng-container *ngIf="hero_skills">
         <div class="mat-elevation-z8">
             <table mat-table [dataSource]="datasource" matSort>
-
-                <ng-container matColumnDef="filters">
-                    <td mat-header-cell *matHeaderCellDef colspan="6">
-                        <div class="table-filters">
-                            <mho-filter (filterChange)="applyFilter($event)"></mho-filter>
-                        </div>
-                    </td>
-                </ng-container>
-
                 <ng-container *ngFor="let column of columns" [matColumnDef]="column.id" [sticky]="column.id === 'name'">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>{{column.header}}</th>
+                    <th mat-header-cell *matHeaderCellDef>{{column.header}}</th>
 
                     <td mat-cell *matCellDef="let row">
                         <ng-container [ngSwitch]="column.id">
@@ -35,9 +26,6 @@
                     </td>
                 </ng-container>
 
-                <!-- Footer -->
-
-                <tr mat-header-row *matHeaderRowDef="['filters']; sticky: true"></tr>
                 <tr mat-header-row *matHeaderRowDef="columns_ids; sticky: true"></tr>
                 <tr mat-row *matRowDef="let row; columns: columns_ids;"></tr>
             </table>

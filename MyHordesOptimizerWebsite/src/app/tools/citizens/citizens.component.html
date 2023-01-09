@@ -19,7 +19,7 @@
 
                 <ng-container *ngFor="let column of columns" [matColumnDef]="column.id"
                     [sticky]="column.id === 'name' || column.id === 'avatar'">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header [ngClass]="[column.id, column.class]">
+                    <th mat-header-cell *matHeaderCellDef [ngClass]="[column.id, column.class]">
                         <ng-container [ngSwitch]="column.id">
                             <ng-container *ngSwitchCase="'avatar_name'">
                                 {{column.header}}

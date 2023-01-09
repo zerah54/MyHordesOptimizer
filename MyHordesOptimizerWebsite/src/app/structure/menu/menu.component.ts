@@ -1,4 +1,4 @@
-import { Component, Inject, LOCALE_ID } from '@angular/core';
+import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
 import * as moment from 'moment';
 
 @Component({
@@ -6,7 +6,7 @@ import * as moment from 'moment';
     templateUrl: './menu.component.html',
     styleUrls: ['./menu.component.scss']
 })
-export class MenuComponent {
+export class MenuComponent implements OnInit {
 
     public themes: Theme[] = [
         { label: $localize`Par défaut`, class: '' },
@@ -52,8 +52,11 @@ export class MenuComponent {
                 {
                     label: $localize`Script`, displayed: false, lvl: 1, authorized: () => true, expanded: false, children: [
                         { label: $localize`Installation`, path: 'tutorials/script/installation', displayed: false, lvl: 2, authorized: () => true },
-                        // { label: $localize`Mettre à jour les outils externes`, path: 'tutorials/script/update-external-tools', displayed: false, lvl: 2, authorized: () => true },
-                        { label: $localize`Documentation`, path: 'tutorials/script/documentation', displayed: false, lvl: 2, authorized: () => true }
+                        { label: $localize`Outils`, path: 'tutorials/script/tools', displayed: false, lvl: 2, authorized: () => true },
+                        { label: $localize`Wiki`, path: 'tutorials/script/wiki', displayed: false, lvl: 2, authorized: () => true },
+                        { label: $localize`Outils Externes`, path: 'tutorials/script/external-tools', displayed: false, lvl: 2, authorized: () => true },
+                        { label: $localize`Affichage`, path: 'tutorials/script/display', displayed: false, lvl: 2, authorized: () => true },
+                        { label: $localize`Notifications`, path: 'tutorials/script/alerts', displayed: false, lvl: 2, authorized: () => true },
                     ]
                 },
                 {
@@ -66,6 +69,10 @@ export class MenuComponent {
     ];
 
     constructor(@Inject(LOCALE_ID) private locale_id: string,) {
+
+    }
+
+    public ngOnInit(): void {
         /** Si il y a une langue enregistrée, on l'utilise, sinon on utilise le français */
         let used_locale: string = this.locale_id;
         /** Si dans la liste des langues supportées on trouve la langue ci-dessus, on l'utilise, sinon on utilise le français */
@@ -77,19 +84,19 @@ export class MenuComponent {
             && moment().isSameOrBefore(moment(`25-12-${moment().year()} 23:59:59`, 'DD-MM-YYYY HH:mm:ss'))) {
             this.themes.push({ label: $localize`Noël`, class: 'noel' });
             this.themes.splice(0, 1);
-            if (this.selected_theme?.class === '') {
+            if (this.selected_theme?.class === '' || !this.selected_theme) {
                 setTimeout(() => {
                     this.changeTheme(this.themes[this.themes.length - 1])
                 })
             }
-        } else if (this.selected_theme?.class === 'noel') {
+        } else if (this.selected_theme?.class === 'noel' || !this.selected_theme) {
             setTimeout(() => {
                 this.changeTheme(this.themes[0])
             })
         }
 
         this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'))
-            || this.themes.find((theme: Theme) => theme.class === '')
+            || this.themes.find((theme: Theme) => theme.class === '');
     }
 
     public toggleDisplayChildren(route: SidenavLinks): void {
