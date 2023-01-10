@@ -1,4 +1,4 @@
-<mat-select class="mho-select" [multiple]="multiple" [value]="value" (valueChange)="writeValue($event);">
+<mat-select class="mho-select" [multiple]="multiple" [value]="value" (valueChange)="writeValue($event);" (closed)="closed.next()">
     <mat-select-trigger *ngIf="multiple">
         <mat-chip-list>
             <mat-chip *ngFor="let single_value of $any(value); let i = index" (removed)="remove(single_value)"

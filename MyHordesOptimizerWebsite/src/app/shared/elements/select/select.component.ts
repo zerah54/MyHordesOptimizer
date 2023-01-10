@@ -60,6 +60,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     @Input() get disabled(): boolean { return this._disabled; }
 
     @Output() filterChange: EventEmitter<T | string | T[] | string[] | undefined> = new EventEmitter<T | string | T[] | string[] | undefined>();
+    @Output() closed: EventEmitter<void> = new EventEmitter<void>();
 
     set required(req) {
         this._required = coerceBooleanProperty(req);
@@ -122,7 +123,6 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         }
     }
 
-
     public remove(value: unknown): void {
         Array.from(this.select.options)
             .filter((option: MatOption<unknown>) => value === option.value)
@@ -171,6 +171,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     //From ControlValueAccessor interface
     public writeValue(value: T | string | undefined) {
+        // console.log('value', value)
         this.innerValue = value;
         this.onChange(value);
         this.filterChange.next(value);

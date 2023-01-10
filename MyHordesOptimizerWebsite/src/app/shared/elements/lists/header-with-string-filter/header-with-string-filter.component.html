@@ -2,25 +2,16 @@
     <div [style.text-align]="textAlign">
         {{header}}
 
-        <mat-icon [matMenuTriggerFor]="labelFilter" #labelFilterTrigger="matMenuTrigger" class="open-menu-icon"
-            [class.hidden]="filterValue !== '' && filterValue !== undefined && filterValue !== null && !labelFilterTrigger.menuOpen"
-            (click)="$event.preventDefault(); $event.stopPropagation();">
+        <mat-icon class="open-menu-icon" *ngIf="!visible"
+            (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter();">
             filter_alt
         </mat-icon>
 
     </div>
-    <ng-container *ngIf="filterValue !== '' && filterValue !== undefined && filterValue !== null">
-        <mat-form-field (click)="$event.stopPropagation()">
-            <input matInput [ngModel]="filterValue" (ngModelChange)="filterValueChange.next($event)">
+    <ng-container *ngIf="visible">
+        <mat-form-field (click)="$event.stopPropagation();">
+            <input #filter matInput [ngModel]="filterValue" (ngModelChange)="filterValueChange.next($event);"
+                (focusout)="checkVisibility()">
         </mat-form-field>
     </ng-container>
-
-    <mat-menu #labelFilter="matMenu">
-        <div (click)="$event.stopPropagation()">
-            <mat-form-field>
-                <mat-label>{{header}}</mat-label>
-                <input matInput [ngModel]="filterValue" (ngModelChange)="filterValueChange.next($event)">
-            </mat-form-field>
-        </div>
-    </mat-menu>
 </div>

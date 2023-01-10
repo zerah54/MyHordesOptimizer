@@ -1,30 +1,18 @@
 <div class="mho-header-with-filter">
-    <div style="display: flex; align-items: center;" [style.text-align]="textAlign">
+    <div [style.text-align]="textAlign">
         {{header}}
 
-        <mat-icon [matMenuTriggerFor]="labelFilter" #labelFilterTrigger="matMenuTrigger" class="open-menu-icon"
-            [class.hidden]="filterValue.length > 0 && filterValue !== undefined && filterValue !== null && !labelFilterTrigger.menuOpen"
-            (click)="$event.preventDefault(); $event.stopPropagation();">
+        <mat-icon class="open-menu-icon" *ngIf="!visible"
+            (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter()">
             filter_alt
         </mat-icon>
 
     </div>
-    <ng-container *ngIf="filterValue.length > 0 && filterValue !== undefined && filterValue !== null">
+    <ng-container *ngIf="visible">
         <mat-form-field (click)="$event.stopPropagation()">
-            <mho-select [multiple]="true" [options]="options" [bindLabel]="bindLabel" [ngModel]="filterValue"
-                (ngModelChange)="filterValueChange.next($event)">
+            <mho-select #filter [multiple]="true" [options]="options" [bindLabel]="bindLabel" [ngModel]="filterValue"
+                (ngModelChange)="filterValueChange.next($event); checkVisibility()" (closed)="checkVisibility();">
             </mho-select>
         </mat-form-field>
     </ng-container>
-
-    <mat-menu #labelFilter="matMenu">
-        <div (click)="$event.stopPropagation()">
-            <mat-form-field>
-                <mat-label i18n>{{header}}</mat-label>
-                <mho-select [multiple]="true" [options]="options" [bindLabel]="bindLabel" [ngModel]="filterValue"
-                    (ngModelChange)="filterValueChange.next($event)">
-                </mho-select>
-            </mat-form-field>
-        </div>
-    </mat-menu>
 </div>
