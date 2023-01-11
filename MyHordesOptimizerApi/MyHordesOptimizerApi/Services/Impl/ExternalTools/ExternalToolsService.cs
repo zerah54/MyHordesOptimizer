@@ -7,7 +7,6 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
 using MyHordesOptimizerApi.Extensions;
@@ -190,7 +189,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
                 var patchHeroicActionMho = false;
                 var patchHeroicActionGh = false;
-                if(updateRequestDto.HeroicActions != null)
+                if (updateRequestDto.HeroicActions != null)
                 {
                     var heroicActionDetail = GetHeroicActionCitizenDetail(updateRequestDto.HeroicActions.Actions);
                     if (updateRequestDto.HeroicActions.ToolsToUpdate.IsMyHordesOptimizer)
@@ -205,10 +204,10 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         patchHeroicActionGh = true;
                     }
                 }
-            
+
                 var patchStatusMho = false;
                 var patchStatusGh = false;
-                if(updateRequestDto.Status != null)
+                if (updateRequestDto.Status != null)
                 {
                     var statusDetail = GetTownCitizenStatusDetail(updateRequestDto.Status.Values);
                     if (updateRequestDto.Status.ToolsToUpdate.IsMyHordesOptimizer)
@@ -223,7 +222,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         patchStatusGh = true;
                     }
                 }
-              
+
                 if (patchHomeMho || patchStatusMho || patchHeroicActionMho)
                 {
                     var mHOCitizenDetailTask = Task.Run(() =>
@@ -592,7 +591,31 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         private TownCitizenDetailModel GetTownCitizenStatusDetail(List<string> statusValues)
         {
-            var statusDetail = new TownCitizenDetailModel();
+            var statusDetail = new TownCitizenDetailModel()
+            {
+                IsAddict = false,
+                IsArmWounded = false,
+                IsCamper = false,
+                IsCheatingDeathActive = false,
+                IsCleanBody = false,
+                IsConvalescent = false,
+                IsDesy = false,
+                IsDrugged = false,
+                IsDrunk = false,
+                IsEyeWounded = false,
+                IsFootWounded = false,
+                IsHandWounded = false,
+                IsHungOver = false,
+                IsHeadWounded = false,
+                IsImmune = false,
+                IsInfected = false,
+                IsLegWounded = false,
+                IsQuenched = false,
+                IsSated = false,
+                IsTerrorised = false,
+                IsThirsty = false,
+                IsTired = false,
+            };
             foreach (var status in statusValues)
             {
                 foreach (StatusValue statusValue in Enum.GetValues(typeof(StatusValue)))
@@ -634,9 +657,6 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             case StatusValue.FootWounded:
                                 statusDetail.IsFootWounded = true;
                                 break;
-                            case StatusValue.Ghoul:
-                                statusDetail.IsGhoul = true;
-                                break;
                             case StatusValue.HandWounded:
                                 statusDetail.IsHandWounded = true;
                                 break;
@@ -677,6 +697,19 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             return statusDetail;
         }
 
+        public LastUpdateInfo UpdateGhoulStatus(int townId, int userId, UpdateGhoulStatusDto request)
+        {
+            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            var ghoulStatusLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            var citizenDetail = new TownCitizenDetailModel();
+            citizenDetail.IdUser = userId;
+            citizenDetail.IdTown = townId;
+            citizenDetail.IdLastUpdateInfoGhoulStatus = ghoulStatusLastUpdateInfo;
+            citizenDetail.IsGhoul = request.IsGhoul;
+            citizenDetail.GhoulVoracity = request.Voracity;
+            MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
+            return lastUpdateInfo;
+        }
         #endregion
 
         #region CitizenHeroicAction

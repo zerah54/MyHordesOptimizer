@@ -407,7 +407,11 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<TownCitizenBagItemCompletModel, CitizenStatus>()
                 .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src))
                 .ForMember(dest => dest.LastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.StatusLastUpdateDateUpdate.Value, UserName = src.StatusLastUpdateInfoUserName }); opt.PreCondition(src => src.StatusLastUpdateDateUpdate.HasValue); })
-                .ForMember(dest => dest.Icons, opt => opt.MapFrom(src => GetStatusIcons(src)));
+                .ForMember(dest => dest.Icons, opt => opt.MapFrom(src => GetStatusIcons(src)))
+                .ForMember(dest => dest.GhoulStatusLastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.GhoulStatusLastUpdateDateUpdate.Value, UserName = src.GhoulStatusLastUpdateInfoUserName }); opt.PreCondition(src => src.GhoulStatusLastUpdateDateUpdate.HasValue); })
+                .ForMember(dest => dest.IsGhoul, opt => opt.MapFrom(src => src.IsGhoul))
+                .ForMember(dest => dest.GhoulVoracity, opt => opt.MapFrom(src => src.GhoulVoracity));
+
             CreateMap<TownCitizenBagItemCompletModel, CitizenActionsHeroic>()
                 .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src))
                 .ForMember(dest => dest.LastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.HeroicActionLastUpdateDateUpdate.Value, UserName = src.HeroicActionLastUpdateInfoUserName }); opt.PreCondition(src => src.HeroicActionLastUpdateDateUpdate.HasValue); });

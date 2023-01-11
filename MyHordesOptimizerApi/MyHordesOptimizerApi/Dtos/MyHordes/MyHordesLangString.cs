@@ -15,5 +15,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
 
         [JsonProperty("de")]
         public string De;
+
+        public override string ToString()
+        {
+            return Fr;
+        }
     }
 }

@@ -42,7 +42,7 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
         public int LastUpdateInfoId { get; set; }
         public int LastUpdateInfoUserId { get; set; }
         public DateTime LastUpdateDateUpdate { get; set; }
-        public string LastUpdateInfoUserName { get; set; } 
+        public string LastUpdateInfoUserName { get; set; }
         public DateTime? BagLastUpdateDateUpdate { get; set; }
         public string BagLastUpdateUserName { get; set; }
         public int ItemCount { get; set; }
@@ -77,7 +77,6 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
         public bool IsAddict { get; set; }
         public bool IsDrugged { get; set; }
         public bool IsDrunk { get; set; }
-        public bool IsGhoul { get; set; }
         public bool IsQuenched { get; set; }
         public bool IsConvalescent { get; set; }
         public bool IsSated { get; set; }
@@ -97,5 +96,11 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
         public bool IsFootWounded { get; set; }
         public DateTime? StatusLastUpdateDateUpdate { get; set; }
         public string? StatusLastUpdateInfoUserName { get; set; }
+
+
+        public bool IsGhoul { get; set; }
+        public int GhoulVoracity { get; set; }
+        public DateTime? GhoulStatusLastUpdateDateUpdate { get; set; }
+        public string? GhoulStatusLastUpdateInfoUserName { get; set; }
     }
 }

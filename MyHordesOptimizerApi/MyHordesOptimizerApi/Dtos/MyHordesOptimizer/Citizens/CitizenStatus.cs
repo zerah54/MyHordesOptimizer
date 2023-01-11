@@ -1,5 +1,4 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
-using System;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
@@ -9,6 +8,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public CitizenStatusValue Content { get; set; }
         public LastUpdateInfo? LastUpdateInfo { get; set; }
         public List<string> Icons { get; set; }
+
+        public LastUpdateInfo? GhoulStatusLastUpdateInfo { get; set; }
+        public bool IsGhoul { get; set; }
+        public int GhoulVoracity { get; set; }
         public CitizenStatus()
         {
             Content = new CitizenStatusValue();

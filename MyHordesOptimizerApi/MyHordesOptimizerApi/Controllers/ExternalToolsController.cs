@@ -120,5 +120,14 @@ namespace MyHordesOptimizerApi.Controllers
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenHome(townId, request.UserId, request.Home);
             return Ok(lastUpdateInfo);
         }
+
+        [HttpPost]
+        [Route("Ghoul")]
+        public ActionResult<LastUpdateInfo> UpdateGhoulStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateGhoulStatusDto request)
+        {
+            UserKeyProvider.UserId = userId;
+            var lastUpdateInfo = ExternalToolsService.UpdateGhoulStatus(townId, userId, request);
+            return Ok(lastUpdateInfo);
+        }
     }
 }

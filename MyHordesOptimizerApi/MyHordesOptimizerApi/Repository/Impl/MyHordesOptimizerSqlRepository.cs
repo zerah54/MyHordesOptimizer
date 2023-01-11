@@ -588,7 +588,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                   ,tc.isAddict
                                   ,tc.isDrugged
                                   ,tc.isDrunk
-                                  ,tc.isGhoul
                                   ,tc.isQuenched
                                   ,tc.isConvalescent
                                   ,tc.isSated
@@ -647,6 +646,10 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                   ,statusLuiUser.name AS StatusLastUpdateInfoUserName
                                   ,statusLui.dateUpdate AS StatusLastUpdateDateUpdate
                                   ,tc.idBag AS BagId
+                                  ,tc.isGhoul
+                                  ,tc.ghoulVoracity
+                                  ,ghoulLuiUser.name AS GhoulStatusLastUpdateInfoUserName
+                                  ,ghoulLui.dateUpdate AS GhoulStatusLastUpdateDateUpdate
                               FROM TownCitizen tc
                               INNER JOIN Users citizen ON citizen.idUser = tc.idUser
                               INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = tc.idLastUpdateInfo 
@@ -662,6 +665,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
                               LEFT JOIN Users homeLuiUser ON homeLuiUser.idUser = homeLui.idUser
                               LEFT JOIN LastUpdateInfo statusLui ON statusLui.idLastUpdateInfo = tc.idLastUpdateInfoStatus 
                               LEFT JOIN Users statusLuiUser ON statusLuiUser.idUser = statusLui.idUser
+                              LEFT JOIN LastUpdateInfo ghoulLui ON ghoulLui.idLastUpdateInfo = tc.idLastUpdateInfoGhoulStatus 
+                              LEFT JOIN Users ghoulLuiUser ON ghoulLuiUser.idUser = ghoulLui.idUser
                               WHERE tc.idTown = @idTown";
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             var citizens = connection.Query<TownCitizenBagItemCompletModel>(query, new { idTown = townId });
