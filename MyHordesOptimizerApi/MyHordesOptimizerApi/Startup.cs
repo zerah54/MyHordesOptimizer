@@ -92,6 +92,7 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IWishListService, WishListService>();
             services.AddSingleton<ITranslationService, TranslationService>();
             services.AddSingleton<IMyHordesRuineService, MyHordesRuineService>();
+            services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimizerParametersService>();
 
             services.AddApplicationInsightsTelemetry();
         }

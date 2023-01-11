@@ -54,5 +54,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         IDictionary<int,int> GetCitizenBagsId(int townId, IEnumerable<int> userIds);
         int GetCitizenBagId(int townId, int userId);
         int CreateLastUpdateInfo(LastUpdateInfo lastUpdateInfo);
+
+        IEnumerable<ParametersModel> GetParameters();
     }
 }

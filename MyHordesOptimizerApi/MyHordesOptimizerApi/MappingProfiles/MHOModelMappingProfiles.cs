@@ -416,6 +416,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<TownCitizenBagItemCompletModel, CitizenHomeValue>();
             CreateMap<TownCitizenBagItemCompletModel, CitizenStatusValue>();
             CreateMap<TownCitizenBagItemCompletModel, CitizenActionsHeroicValue>();
+
+            CreateMap<ParametersModel, ParametersDto>();
         }
 
         private List<string> GetStatusIcons(TownCitizenBagItemCompletModel src)

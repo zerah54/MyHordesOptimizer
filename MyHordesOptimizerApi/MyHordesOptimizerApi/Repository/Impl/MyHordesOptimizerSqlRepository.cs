@@ -1100,6 +1100,19 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #endregion
 
+        #region Parameters
+
+        public IEnumerable<ParametersModel> GetParameters()
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var parameters = connection.Query<ParametersModel>("SELECT name, value FROM Parameters");
+            connection.Close();
+            return parameters;
+        }
+
+        #endregion
+
         public int CreateLastUpdateInfo(LastUpdateInfo lastUpdateInfo)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
