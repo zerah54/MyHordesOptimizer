@@ -9,5 +9,6 @@
         public bool HasLuckyFind { get; set; }
         public bool HasCheatDeath { get; set; }
         public bool HasHeroicReturn { get; set; }
+        public bool HasBreakThrough { get; set; }
     }
 }

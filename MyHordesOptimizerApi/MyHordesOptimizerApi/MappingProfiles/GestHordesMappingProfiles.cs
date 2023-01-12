@@ -31,7 +31,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Apag, opt => opt.MapFrom(src => src.ApagCharges))
                 .ForMember(dest => dest.CorpsSain, opt => opt.MapFrom(src => src.IsCleanBody))
                 .ForMember(dest => dest.DonJH, opt => opt.Ignore())
-                .ForMember(dest => dest.Pef, opt => opt.Ignore())
+                .ForMember(dest => dest.Pef, opt => opt.MapFrom(src => src.HasBreakThrough))
                 .ForMember(dest => dest.Rdh, opt => opt.MapFrom(src => src.HasHeroicReturn))
                 .ForMember(dest => dest.Sauvetage, opt => opt.MapFrom(src => src.HasRescue))
                 .ForMember(dest => dest.SecondSouffle, opt => opt.MapFrom(src => src.HasSecondWind))

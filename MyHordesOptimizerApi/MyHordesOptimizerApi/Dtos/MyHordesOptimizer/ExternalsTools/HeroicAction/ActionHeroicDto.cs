@@ -33,7 +33,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
         [Fr("Retour du Héros"), En("Heroic Return"), De("Die Rückkehr des Helden"), Es("El retorno del Héroe")]
         HeroicReturn,
         [Fr("Appareil photo d'avant-guerre"), En("Pre-war camera"), De("Kamera aus Vorkriegs-Tagen"), Es("Cámara fotográfica de post-guerra")]
-        Apag
+        Apag,
+        [Fr("Passage en Force"), En("Break Through"), De("Durchgang in Kraft"), Es("Pasaje en vigor")]
+        BreakThrough
     }
 
     internal class LocaleAttribute : Attribute

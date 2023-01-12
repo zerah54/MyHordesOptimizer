@@ -758,6 +758,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             case ActionHeroicType.Uppercut:
                                 heroicActionDetail.HasUppercut = Convert.ToBoolean(action.Value);
                                 break;
+                            case ActionHeroicType.BreakThrough:
+                                heroicActionDetail.HasBreakThrough = Convert.ToBoolean(action.Value);
+                                break;
                         }
                     }
                 }
