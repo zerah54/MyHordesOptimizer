@@ -3,4 +3,4 @@
 	value NVARCHAR(255) NOT NULL
 );
 
-INSERT INTO Parameters (name, value) VALUES ('ScriptVersion','1.0.0-beta.26');
+INSERT INTO Parameters (name, value) VALUES ('ScriptVersion','1.0.0-beta.27');

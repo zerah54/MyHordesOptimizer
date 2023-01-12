@@ -784,6 +784,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 case ActionHeroicType.BreakThrough:
                                     heroicActionDetail.HasBreakThrough = Convert.ToBoolean(action.Value);
                                     break;
+                                case ActionHeroicType.BrotherInArms:
+                                    heroicActionDetail.HasBrotherInArms = Convert.ToBoolean(action.Value);
+                                    break;
                             }
                         }
                     }

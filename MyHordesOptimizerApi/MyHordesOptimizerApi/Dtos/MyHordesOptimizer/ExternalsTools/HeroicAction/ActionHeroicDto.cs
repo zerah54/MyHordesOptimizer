@@ -37,7 +37,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
         [Fr("Passage en Force"), En("Break Through"), De("Durchgang in Kraft"), Es("Pasaje en vigor")]
         BreakThrough,
         [Fr("Camaraderie"), En("Brothers in Arms"), De("Freundschaft"), Es("Camaradería")]
-        HasBrotherInArms
+        BrotherInArms
     }
 
     public enum ActionHeroicZone
