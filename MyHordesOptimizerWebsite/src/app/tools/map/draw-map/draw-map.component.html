@@ -1,0 +1,8 @@
+<div *ngFor="let row of test; let row_index = index" style="text-align: center; white-space: nowrap">
+  <ng-container *ngFor="let cell of row; let cell_index = index">
+    <mho-map-border *ngIf="cell_index === 0 || cell_index === row.length - 1 || row_index === 0  || row_index === test.length - 1; else mapCell"
+      [vertical]="cell_index === 0 || cell_index === row.length - 1" [horizontal]="row_index === 0  || row_index === test.length - 1" [index]="cell">
+    </mho-map-border>
+    <ng-template #mapCell><mho-map-cell></mho-map-cell></ng-template>
+  </ng-container>
+</div>

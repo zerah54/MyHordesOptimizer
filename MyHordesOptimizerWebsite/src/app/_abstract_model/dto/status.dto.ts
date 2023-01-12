@@ -5,4 +5,7 @@ export interface StatusDTO {
     content: Dictionary<boolean>;
     icons: string[];
     lastUpdateInfo: UpdateInfoDTO;
+    isGhoul: boolean;
+    ghoulVoracity: number;
+    ghoulStatusLastUpdateInfo: UpdateInfoDTO;
 }

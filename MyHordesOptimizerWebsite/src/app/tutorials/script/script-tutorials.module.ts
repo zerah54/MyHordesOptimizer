@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { Components } from 'src/app/_abstract_model/types/_types';
 import { TutoScriptAlertsComponent } from './tuto-script-alerts/tuto-script-alerts.component';
 import { TutoScriptDisplayComponent } from './tuto-script-display/tuto-script-display.component';
 import { TutoScriptExternalToolsComponent } from './tuto-script-external-tools/tuto-script-external-tools.component';
@@ -8,7 +9,7 @@ import { TutoScriptToolsComponent } from './tuto-script-tools/tuto-script-tools.
 import { TutoScriptWikiComponent } from './tuto-script-wiki/tuto-script-wiki.component';
 
 
-const components: any[] = [
+const components: Components = [
     TutoScriptInstallationComponent, TutoScriptExternalToolsComponent, TutoScriptToolsComponent,
     TutoScriptWikiComponent, TutoScriptAlertsComponent, TutoScriptDisplayComponent
 ];

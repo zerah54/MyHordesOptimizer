@@ -1,3 +1,9 @@
+import { ComponentType } from "@angular/cdk/portal";
+import { ModuleWithProviders, Type } from "@angular/core";
+
+export type Modules = Type<unknown>[] | ModuleWithProviders<unknown>[];
+export type Components = ComponentType<unknown>[] | Type<unknown>[];
+
 export interface ToolsToUpdate {
     isBigBrothHordes: 'none' | 'cell' | 'api';
     isFataMorgana: 'none' | 'cell' | 'api';

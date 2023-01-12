@@ -1,0 +1,24 @@
+@import "variables.scss";
+
+$small: 20px;
+$large: 32px;
+
+.border-cell {
+
+  background-color: $sidenav_bg_color;
+
+  &.horizontal:not(.vertical) {
+    width: $large;
+    height: $small;
+  }
+
+  &.vertical:not(.horizontal) {
+    width: $small;
+    height: $large;
+  }
+
+  &.horizontal.vertical {
+    height: $small;
+    width: $small;
+  }
+}

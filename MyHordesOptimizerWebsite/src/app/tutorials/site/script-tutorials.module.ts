@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { Components } from 'src/app/_abstract_model/types/_types';
 import { TutoSiteFirstUseComponent } from './tuto-site-first-use/tuto-site-first-use.component';
 
 
-const components: any[] = [TutoSiteFirstUseComponent];
+const components: Components = [TutoSiteFirstUseComponent];
 
 
 @NgModule({

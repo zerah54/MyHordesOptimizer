@@ -1,0 +1,7 @@
+@import "variables.scss";
+
+.map-cell {
+  height: 30px;
+  width: 30px;
+  border: 1px solid $item_color;
+}

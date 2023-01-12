@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { SharedModule } from '../shared/shared.module';
+import { Components } from '../_abstract_model/types/_types';
 import { HeroSkillsComponent } from './hero-skills/hero-skills.component';
 import { ItemsComponent } from './items/items.component';
 import { MiscellaneousInfoComponent } from './miscellaneous-info/miscellaneous-info.component';
@@ -8,8 +9,8 @@ import { RecipesComponent } from './recipes/recipes.component';
 import { RuinsComponent } from './ruins/ruins.component';
 import { WikiRoutingModule } from './wiki.routing.module';
 
-let components: any[] = [HeroSkillsComponent, ItemsComponent, RecipesComponent, RuinsComponent, MiscellaneousInfoComponent];
-let local_components: any[] = [DespairDeathsPipe];
+let components: Components = [HeroSkillsComponent, ItemsComponent, RecipesComponent, RuinsComponent, MiscellaneousInfoComponent];
+let local_components: Components = [DespairDeathsPipe];
 
 @NgModule({
     imports: [SharedModule, WikiRoutingModule],
