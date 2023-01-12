@@ -321,6 +321,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.HasSecondWind, opt => opt.MapFrom(src => src.HasSecondWind))
                 .ForMember(dest => dest.HasUppercut, opt => opt.MapFrom(src => src.HasUppercut))
                 .ForMember(dest => dest.HasBreakThrough, opt => opt.MapFrom(src => src.HasBreakThrough))
+                .ForMember(dest => dest.HasBrotherInArms, opt => opt.MapFrom(src => src.HasBrotherInArms))
                 .ForMember(dest => dest.ChestLevel, opt => opt.Ignore())
                 .ForMember(dest => dest.HasAlarm, opt => opt.Ignore())
                 .ForMember(dest => dest.HasCurtain, opt => opt.Ignore())

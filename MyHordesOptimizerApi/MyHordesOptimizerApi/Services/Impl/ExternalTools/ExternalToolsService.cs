@@ -731,36 +731,60 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             var heroicActionDetail = new TownCitizenDetailModel();
             foreach (var action in heroicActions)
             {
-                foreach (ActionHeroicType heroicType in Enum.GetValues(typeof(ActionHeroicType)))
+                if (action.Label == "Empty")
                 {
-                    if (heroicType.IsEquivalentToLabel(action.Locale, action.Label))
+                    if(action.Value == (int)ActionHeroicZone.Outside)
                     {
-                        switch (heroicType)
+                        heroicActionDetail.HasLuckyFind = false;
+                        heroicActionDetail.HasHeroicReturn = false;
+                        heroicActionDetail.HasUppercut = false;
+                        heroicActionDetail.HasSecondWind = false;
+                        heroicActionDetail.HasCheatDeath = false;
+                        heroicActionDetail.HasBrotherInArms = false;
+                    }
+                    if (action.Value == (int)ActionHeroicZone.Inside)
+                    {
+                        heroicActionDetail.HasLuckyFind = false;
+                        heroicActionDetail.HasRescue = false;
+                        heroicActionDetail.HasSecondWind = false;
+                        heroicActionDetail.HasCheatDeath = false;
+                        heroicActionDetail.HasBrotherInArms = false;
+                    }
+                    return heroicActionDetail;
+                }
+                else
+                {
+                    foreach (ActionHeroicType heroicType in Enum.GetValues(typeof(ActionHeroicType)))
+                    {
+                        if (heroicType.IsEquivalentToLabel(action.Locale, action.Label))
                         {
-                            case ActionHeroicType.Apag:
-                                heroicActionDetail.ApagCharges = action.Value;
-                                break;
-                            case ActionHeroicType.CheatDeath:
-                                heroicActionDetail.HasCheatDeath = Convert.ToBoolean(action.Value);
-                                break;
-                            case ActionHeroicType.HeroicReturn:
-                                heroicActionDetail.HasHeroicReturn = Convert.ToBoolean(action.Value);
-                                break;
-                            case ActionHeroicType.LuckyFind:
-                                heroicActionDetail.HasLuckyFind = Convert.ToBoolean(action.Value);
-                                break;
-                            case ActionHeroicType.Rescue:
-                                heroicActionDetail.HasRescue = Convert.ToBoolean(action.Value);
-                                break;
-                            case ActionHeroicType.SecondWind:
-                                heroicActionDetail.HasSecondWind = Convert.ToBoolean(action.Value);
-                                break;
-                            case ActionHeroicType.Uppercut:
-                                heroicActionDetail.HasUppercut = Convert.ToBoolean(action.Value);
-                                break;
-                            case ActionHeroicType.BreakThrough:
-                                heroicActionDetail.HasBreakThrough = Convert.ToBoolean(action.Value);
-                                break;
+                            switch (heroicType)
+                            {
+                                case ActionHeroicType.Apag:
+                                    heroicActionDetail.ApagCharges = action.Value;
+                                    break;
+                                case ActionHeroicType.CheatDeath:
+                                    heroicActionDetail.HasCheatDeath = Convert.ToBoolean(action.Value);
+                                    break;
+                                case ActionHeroicType.HeroicReturn:
+                                    heroicActionDetail.HasHeroicReturn = Convert.ToBoolean(action.Value);
+                                    break;
+                                case ActionHeroicType.LuckyFind:
+                                    heroicActionDetail.HasLuckyFind = Convert.ToBoolean(action.Value);
+                                    break;
+                                case ActionHeroicType.Rescue:
+                                    heroicActionDetail.HasRescue = Convert.ToBoolean(action.Value);
+                                    break;
+                                case ActionHeroicType.SecondWind:
+                                    heroicActionDetail.HasSecondWind = Convert.ToBoolean(action.Value);
+                                    break;
+                                case ActionHeroicType.Uppercut:
+                                    heroicActionDetail.HasUppercut = Convert.ToBoolean(action.Value);
+                                    break;
+                                case ActionHeroicType.BreakThrough:
+                                    heroicActionDetail.HasBreakThrough = Convert.ToBoolean(action.Value);
+                                    break;
+                            }
                         }
                     }
                 }

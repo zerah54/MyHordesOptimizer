@@ -35,7 +35,15 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
         [Fr("Appareil photo d'avant-guerre"), En("Pre-war camera"), De("Kamera aus Vorkriegs-Tagen"), Es("Cámara fotográfica de post-guerra")]
         Apag,
         [Fr("Passage en Force"), En("Break Through"), De("Durchgang in Kraft"), Es("Pasaje en vigor")]
-        BreakThrough
+        BreakThrough,
+        [Fr("Camaraderie"), En("Brothers in Arms"), De("Freundschaft"), Es("Camaradería")]
+        HasBrotherInArms
+    }
+
+    public enum ActionHeroicZone
+    {
+        Outside,
+        Inside
     }
 
     internal class LocaleAttribute : Attribute

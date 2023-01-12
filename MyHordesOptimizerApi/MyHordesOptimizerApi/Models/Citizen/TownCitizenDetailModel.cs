@@ -28,6 +28,7 @@ namespace MyHordesOptimizerApi.Models.Citizen
         public bool? HasCheatDeath { get; set; }
         public bool? HasHeroicReturn { get; set; }
         public bool? HasBreakThrough { get; set; }
+        public bool? HasBrotherInArms { get; set; }
         public int? IdLastUpdateInfoHeroicAction { get; set; }
 
         public int HouseLevel { get; set; }
@@ -95,6 +96,7 @@ namespace MyHordesOptimizerApi.Models.Citizen
             HasCheatDeath = heroicDetailDetail.HasCheatDeath;
             HasHeroicReturn = heroicDetailDetail.HasHeroicReturn;
             HasBreakThrough = heroicDetailDetail.HasBreakThrough;
+            HasBrotherInArms = heroicDetailDetail.HasBrotherInArms;
         }
 
         internal void ImportStatusDetail(TownCitizenDetailModel statusDetail)

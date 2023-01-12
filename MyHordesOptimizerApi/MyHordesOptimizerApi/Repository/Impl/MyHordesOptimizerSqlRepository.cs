@@ -574,6 +574,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                   ,tc.hasCheatDeath
                                   ,tc.hasHeroicReturn
                                   ,tc.hasBreakThrough
+                                  ,tc.hasBrotherInArms
                                   ,tc.houseLevel
                                   ,tc.hasAlarm
                                   ,tc.chestLevel

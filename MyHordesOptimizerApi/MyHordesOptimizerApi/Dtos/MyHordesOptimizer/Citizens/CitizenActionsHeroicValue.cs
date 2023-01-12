@@ -10,5 +10,6 @@
         public bool HasCheatDeath { get; set; }
         public bool HasHeroicReturn { get; set; }
         public bool HasBreakThrough { get; set; }
+        public bool HasBrotherInArms { get; set; }
     }
 }

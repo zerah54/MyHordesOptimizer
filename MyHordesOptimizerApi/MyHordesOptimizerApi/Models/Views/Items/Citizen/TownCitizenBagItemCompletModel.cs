@@ -57,6 +57,7 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
         public bool HasCheatDeath { get; set; }
         public bool HasHeroicReturn { get; set; }
         public bool HasBreakThrough { get; set; }
+        public bool HasBrotherInArms { get; set; }
         public DateTime? HeroicActionLastUpdateDateUpdate { get; set; }
         public string? HeroicActionLastUpdateInfoUserName { get; set; }
 
