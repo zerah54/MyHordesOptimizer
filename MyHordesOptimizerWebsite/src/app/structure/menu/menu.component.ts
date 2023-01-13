@@ -36,6 +36,7 @@ export class MenuComponent implements OnInit {
                 { label: $localize`Liste de courses`, path: 'tools/wishlist', displayed: false, lvl: 1, authorized: () => true },
                 { label: $localize`Citoyens`, path: 'tools/citizens', displayed: false, lvl: 1, authorized: () => true },
                 { label: $localize`Camping`, path: 'tools/camping', displayed: false, lvl: 1, authorized: () => true },
+                // { label: $localize`Carte des fouilles`, path: 'tools/map', displayed: false, lvl: 1, authorized: () => true },
             ]
         },
         {

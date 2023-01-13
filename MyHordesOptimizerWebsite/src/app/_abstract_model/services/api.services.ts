@@ -9,11 +9,8 @@ import { ItemDTO } from '../dto/item.dto';
 import { MeDTO } from '../dto/me.dto';
 import { RecipeDTO } from '../dto/recipe.dto';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
-import { StatusEnum } from '../enum/status.enum';
 import { Citizen } from '../types/citizen.class';
 import { HeroSkill } from '../types/hero-skill.class';
-import { HeroicActionsWithValue } from '../types/heroic-actions.class';
-import { HomeWithValue } from '../types/home.class';
 import { Me } from '../types/me.class';
 import { Recipe } from '../types/recipe.class';
 import { Ruin } from '../types/ruin.class';
@@ -289,6 +286,17 @@ export class ApiServices extends GlobalServices {
             super.post<UpdateInfoDTO>(API_URL + `/ExternalTools/HeroicActions?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenHeroicActionsDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
+                        sub.next(new UpdateInfo(response));
+                    }
+                })
+        })
+    }
+
+    public getTown(): Observable<any> {
+        return new Observable((sub: Subscriber<any>) => {
+            super.post<any>(API_URL + ``)
+                .subscribe({
+                    next: (response: any) => {
                         sub.next(new UpdateInfo(response));
                     }
                 })

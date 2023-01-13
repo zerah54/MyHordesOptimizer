@@ -1,8 +1,9 @@
 import { SharedModule } from '../../shared/shared.module';
 import { NgModule } from '@angular/core';
 import { MenuComponent } from './menu.component';
+import { Components } from '../../_abstract_model/types/_types';
 
-let components: any[] = [MenuComponent];
+let components: Components = [MenuComponent];
 
 @NgModule({
     imports: [SharedModule],

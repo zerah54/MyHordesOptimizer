@@ -4,6 +4,7 @@ import { BankComponent } from './bank/bank.component';
 import { CampingComponent } from './camping/camping.component';
 import { CitizensComponent } from './citizens/citizens.component';
 import { EstimationComponent } from './estimation/estimation.component';
+import { MapComponent } from './map/map.component';
 import { WishlistComponent } from './wishlist/wishlist.component';
 
 let routes: Routes = [
@@ -15,6 +16,7 @@ let routes: Routes = [
             {path: 'camping', component: CampingComponent},
             {path: 'citizens', component: CitizensComponent},
             {path: 'estimation', component: EstimationComponent},
+            {path: 'map', component: MapComponent},
             {path: 'wishlist', component: WishlistComponent},
         ]
     }

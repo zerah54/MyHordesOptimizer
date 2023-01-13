@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
+import { Components, Modules } from 'src/app/_abstract_model/types/_types';
 import { MaterialModule } from './../material-modules.module';
 import { AccordionComponent } from './accordion/accordion.component';
 import { FilterFieldComponent } from './filter-field/filter-field.component';
@@ -18,12 +19,12 @@ import { RecipeComponent } from './recipe/recipe.component';
 import { LabelPipe } from './select/label.pipe';
 import { SelectComponent } from './select/select.component';
 
-let components: any[] = [ItemComponent, SelectComponent, RecipeComponent, FilterFieldComponent, LastUpdateComponent, AccordionComponent, ListElementAddRemoveComponent];
-let list_headers: any[] = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent];
-let local_components: any[] = [LabelPipe];
-let custom_modules: any[] = [MaterialModule];
-let angular_modules: any[] = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule];
-let pipes: any[] = [DecimalPipe];
+let components: Components = [ItemComponent, SelectComponent, RecipeComponent, FilterFieldComponent, LastUpdateComponent, AccordionComponent, ListElementAddRemoveComponent];
+let list_headers: Components = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent];
+let local_components: Components = [LabelPipe];
+let custom_modules: Modules = [MaterialModule];
+let angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule];
+let pipes: Components = [DecimalPipe];
 
 @NgModule({
     imports: [...custom_modules, ...angular_modules],

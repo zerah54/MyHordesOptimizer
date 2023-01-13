@@ -10,11 +10,11 @@ let routes: Routes = [
     { path: 'wiki', redirectTo: 'wiki/items' },
     {
         path: 'wiki', children: [
-            { path: 'miscellaneous-info', component: MiscellaneousInfoComponent },
-            { path: 'hero-skills', component: HeroSkillsComponent },
-            { path: 'items', component: ItemsComponent },
-            { path: 'recipes', component: RecipesComponent },
-            { path: 'ruins', component: RuinsComponent },
+            { path: 'miscellaneous-info', component: MiscellaneousInfoComponent, title: $localize`Informations diverses` },
+            { path: 'hero-skills', component: HeroSkillsComponent, title: $localize`Pouvoirs` },
+            { path: 'items', component: ItemsComponent, title: $localize`Objets` },
+            { path: 'recipes', component: RecipesComponent, title: $localize`Recettes` },
+            { path: 'ruins', component: RuinsComponent, title: $localize`Bâtiments` },
         ]
     }
 ]

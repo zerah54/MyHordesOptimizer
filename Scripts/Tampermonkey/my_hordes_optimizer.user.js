@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.26
-// @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/script
+// @version      1.0.0-beta.27
+// @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
 // @icon         https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/logo/logo_mho_16x16.png
@@ -33,8 +33,12 @@
 //
 // ==/UserScript==
 
+
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH-beta][update] MHO supporte maintenant la mise à jour de FataMorgana en beta`;
++ `[MH-beta][fix] Réparation de la liste des objets : le Serpent Agonisant n'existait pas dedans, ce qui provoquait des erreurs en cas de mise à jour avec un serpent agonisant\n\n`
++ `[MH][fix]La carte intégrée de GH est réparée (mais non, elle n'intègre toujours pas les expéditions)\n\n`
++ `[MH][update] La liste des citoyens améliorée, en ville, est désormais mieux organisée, et toujours rangée par ordre alphabétique. Contrepartie : elle est légèrement plus longue à charger\n\n`
++ `[MH][update] Le Passage en Force fait désormais partie des AH enregistrées`
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -609,6 +613,18 @@ const api_texts = {
         de: `Fehler aufgetreten. (Fehler : $error$)`,
         es: `Ha ocurrido un error. (Error: $error$)`
     },
+    error_version: {
+        en: `Your script is not up to date (your version: $your_version$ / most recent version: $recent_version$). Update the script, then try again.`,
+        fr: `Votre script n'est pas à jour (votre version : $your_version$ / version la plus récente : $recent_version$). Mettez le script à jour, puis réessayez.`,
+        de: `Ihr Skript ist nicht aktuell (Ihre Version: $your_version$ / neueste Version: $recent_version$). Aktualisieren Sie das Skript und versuchen Sie es erneut.`,
+        es: `Tu script no está actualizado (tu versión: $your_version$ / versión más reciente: $recent_version$). Actualice el script y vuelva a intentarlo.`
+    },
+    error_discord: {
+        en: `If the error persists, please let us know on <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.`,
+        fr: `Si l'erreur persiste, n'hésitez pas à nous la signaler sur <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.`,
+        de: `Wenn der Fehler weiterhin besteht, teilen Sie uns dies bitte auf <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a> mit.`,
+        es: `Si el error persiste, infórmanos en <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.`
+    },
     update_wishlist_success: {
         en: `Shopping list updated.`,
         fr: `La liste de courses a bien été mise à jour.`,
@@ -768,48 +784,68 @@ const wishlist_headers = [
 
 const more_citizen_info_headers = [
     {
-        id: 'avatar',
-        label: {
-            en: `TODO`,
-            fr: `Citoyens`,
-            de: `TODO`,
-            es: `TODO`
-        },
-        header_class: ['padded', 'cell', 'rw-6', 'left'],
-        content_class: [] // récupéré automatiquement
-    },
-    {
         id: 'username',
         label: {
             en: ``,
-            fr: ``,
+            fr: `Citoyen`,
             de: ``,
             es: ``
         },
-        header_class: [],
+        header_class: ['padded', 'cell', 'rw-4', 'left', 'factor-1'],
         content_class: [] // récupéré automatiquement
     },
     {
-        id: 'plaintes',
+        id: 'clock',
         label: {
-            en: `TODO`,
-            fr: `Plaintes`,
-            de: `TODO`,
-            es: `TODO`
+            en: ``,
+            fr: `Dernière connexion`,
+            de: ``,
+            es: ``
         },
-        header_class: ['padded', 'cell', 'rw-1'],
-        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box']
+        header_class: ['padded', 'cell', 'rw-5'],
+        content_class: ['padded', 'cell', 'rw-5', 'small', 'citizen-box', 'content-center-vertical']
     },
     {
-        id: 'gossips',
-        label: {
-            en: `TODO`,
-            fr: `Rumeurs`,
-            de: `TODO`,
-            es: `TODO`
-        },
-        header_class: ['padded', 'cell', 'rw-8'],
-        content_class: ['padded', 'cell', 'rw-8', 'small', 'citizen-box']
+        id: 'plaintes',
+        icon: 'emotes/warning.gif',
+        header_class: ['padded', 'cell', 'rw-1', 'center'],
+        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+    },
+    {
+        id: 'rations',
+        icon: 'icons/small_well.gif',
+        header_class: ['padded', 'cell', 'rw-1', 'center'],
+        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+    },
+    {
+        id: 'injured',
+        icon: 'status/status_wound1.gif',
+        header_class: ['padded', 'cell', 'rw-1', 'center'],
+        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+    },
+    {
+        id: 'infection',
+        icon: 'status/status_infection.gif',
+        header_class: ['padded', 'cell', 'rw-1', 'center'],
+        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+    },
+    {
+        id: 'thirsty',
+        icon: 'status/status_thirst2.gif',
+        header_class: ['padded', 'cell', 'rw-1', 'center'],
+        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+    },
+    {
+        id: 'addict',
+        icon: 'status/status_addict.gif',
+        header_class: ['padded', 'cell', 'rw-1', 'center'],
+        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+    },
+    {
+        id: 'terror',
+        icon: 'status/status_terror.gif',
+        header_class: ['padded', 'cell', 'rw-1', 'center'],
+        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
     },
     {
         id: 'travaux',
@@ -1393,7 +1429,8 @@ let ruins;
 let recipes;
 let citizens;
 let hero_skills;
-let wishlist;
+let wishlist;;
+let parameters;
 
 let is_refresh_wishlist;
 let dragged = {item: undefined, element: undefined};
@@ -1511,17 +1548,23 @@ function addError(error) {
     let notifications = document.getElementById('notifications');
     let notification = document.createElement('div');
     notification.classList.add('error', 'show');
-    notification.innerText = `${GM_info.script.name} : ${getI18N(api_texts.error).replace('$error$', error.status)}`;
-    if (error.status === 0) {
-        notification.innerText += '\n' + error.error;
+    notification.innerHTML = `
+    <div style="vertical_align: middle"><img src="${mh_optimizer_icon}" style="width: 24px; margin-right: 0.5em;">${GM_info.script.name} :</div>
+    <br />
+    <div>${getI18N(api_texts.error).replace('$error$', error.status)}</div>
+    <br />`
+    if (parameters?.find((param) => param.name === 'ScriptVersion')?.value !== GM_info.script.version) {
+        notification.innerHTML += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', GM_info.script.version).replace('$recent_version$', parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small><div>`
     }
+    notification.innerHTML += `<div><small>${getI18N(api_texts.error_discord)}</small><div>`;
+
     notifications.appendChild(notification);
     notification.addEventListener('click', () => {
         notification.remove();
     });
     setTimeout(() => {
         notification.remove();
-    }, 5000);
+    }, 10000);
     console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
 }
 
@@ -1633,8 +1676,17 @@ function createOptimizerButtonContent() {
         /////////////////////
         // SECTION BOUTONS //
         /////////////////////
+
+        let btn_content = document.createElement('div');
+        btn_content.style.display = 'flex';
+        btn_content.style.gap = '0.5em';
+        btn_content.style.alignItems = 'center';
+        content.appendChild(btn_content);
+
         let wiki_btn = document.createElement('a');
         wiki_btn.classList.add('button');
+        wiki_btn.style.marginTop = 0;
+        wiki_btn.style.textAlign = 'center';
         wiki_btn.innerHTML = 'Wiki';
         wiki_btn.id = wiki_btn_id;
 
@@ -1642,16 +1694,18 @@ function createOptimizerButtonContent() {
             displayWindow('wiki');
         });
 
-        content.appendChild(wiki_btn);
+        btn_content.appendChild(wiki_btn);
 
         let tools_btn = document.createElement('a');
         tools_btn.classList.add('button');
+        tools_btn.style.marginTop = 0;
+        tools_btn.style.textAlign = 'center';
         tools_btn.innerHTML = getI18N(texts.tools_btn_label);
         tools_btn.addEventListener('click', () => {
             displayWindow('tools');
         });
 
-        content.appendChild(tools_btn);
+        btn_content.appendChild(tools_btn);
 
         ////////////////////////
         // SECTION PARAMETRES //
@@ -1663,7 +1717,7 @@ function createOptimizerButtonContent() {
         // SECTION INFORMATIONS //
         //////////////////////////
 
-        let informations_title = document.createElement('h1');
+        let informations_title = document.createElement('h5');
         informations_title.innerText = getI18N(texts.informations_section_label);
 
         let informations_list = document.createElement('ul');
@@ -1705,7 +1759,7 @@ function createOptimizerButtonContent() {
 }
 
 function createParams() {
-    let params_title = document.createElement('h1');
+    let params_title = document.createElement('h5');
     params_title.innerText = getI18N(texts.parameters_section_label);
 
     let categories_list = document.createElement('ul');
@@ -1718,7 +1772,7 @@ function createParams() {
 
     params_categories.forEach((category) => {
         let category_container = document.createElement('li');
-        let category_title = document.createElement('h5');
+        let category_title = document.createElement('h1');
         category_title.innerText = getI18N(category.label);
         categories_list.appendChild(category_container);
         let category_content = document.createElement('ul');
@@ -5021,7 +5075,6 @@ function displayTranslateTool() {
     }
 }
 
-
 function displayMoreCitizensInformations() {
     if (mho_parameters.more_citizens_info && pageIsCitizens()) {
         let mho_more_citizens_tab = document.querySelector(`li#${mho_more_citizens_info_id}`);
@@ -5039,8 +5092,7 @@ function displayMoreCitizensInformations() {
             let citizens_list = document.querySelector('.citizens-list');
             if (citizens_list) {
                 let usernames = Array.from(citizens_list.querySelectorAll('.citizen-box-name, .citizen-box-name-me') || []);
-                let avatars = Array.from(citizens_list.querySelectorAll('.avatar') || []);
-                let citizens_houses = Array.from(citizens_list.querySelectorAll('.citizen-box.location') || []).map((div, index) => { return {username: usernames[index], avatar: avatars[index], link: div.getAttribute('x-ajax-href')}});
+                let citizens_houses = Array.from(citizens_list.querySelectorAll('.citizen-box.location') || []).map((div, index) => { return {username: usernames[index], link: div.getAttribute('x-ajax-href')}});
 
                 mho_more_citizens_tab.addEventListener('click', () => {
                     let selected = document.querySelector('.tab.selected');
@@ -5052,10 +5104,13 @@ function displayMoreCitizensInformations() {
 
                     let new_table_header = document.createElement('div');
                     new_table_header.classList.add('row-flex','header');
+                    new_table_header.style.position = 'sticky';
+                    new_table_header.style.top = '0';
+                    new_table_header.style.backgroundColor = '#7e4d2a';
 
                     more_citizen_info_headers.forEach((header) => {
                         let header_div = document.createElement('div');
-                        header_div.innerText = getI18N(header.label);
+                        header_div.innerHTML = getI18N(header.label) || (header.icon ? `<img src="${repo_img_hordes_url + header.icon}" >` : '');
                         header_div.classList.add(...header.header_class);
 
                         new_table_header.appendChild(header_div);
@@ -5063,39 +5118,110 @@ function displayMoreCitizensInformations() {
 
                     citizens_list.appendChild(new_table_header);
 
-                    for (let citizen_house of citizens_houses) {
-                        getCitizenHouseContent(citizen_house.link).then((more_info) => {
-                            citizen_house.gossips = more_info.gossips;
-                            citizen_house.plaintes = more_info.plaintes;
-                            citizen_house.travaux = more_info.travaux;
+                    let citizen_gossip_mapping = {
+                        clock: {
+                            label: {
+                                de: `zuletzt`,
+                                en: `was seen last`,
+                                es: `última vez`,
+                                fr: `pour la dernière fois`
+                            }
+                        },
+                        rations: {
+                            label: {
+                                de: `Brunnen`,
+                                en: `well`,
+                                es: `pozo`,
+                                fr: `puits`
+                            }
+                        },
+                        injured: {
+                            label: {
+                                de: `verletzt`,
+                                en: `wounded`,
+                                es: `herido`,
+                                fr: `blessé`
+                            }
+                        },
+                        infection: {
+                            label: {
+                                de: `Infektion`,
+                                en: `infection`,
+                                es: `Infección`,
+                                fr: `infection`
+                            }
+                        },
+                        thirsty: {
+                            label: {
+                                de: `durstig`,
+                                en: `Thirsty`,
+                                es: `pueblo`,
+                                fr: `soif`
+                            }
+                        },
+                        addict: {
+                            label: {
+                                de: `süchtig`,
+                                en: `dependant`,
+                                es: `dependencia`,
+                                fr: `dépendance`
+                            }
+                        },
+                        terror: {
+                            label: {
+                                de: `schlafen`,
+                                en: `sleep`,
+                                es: `dormir`,
+                                fr: `dormir`
+                            }
+                        },
+                    }
 
-                            let new_table_row = document.createElement('div');
-                            new_table_row.classList.add('row-flex', 'stretch', 'pointer');
 
-                            more_citizen_info_headers.forEach((cell) => {
-                                if (cell.id === 'username' || cell.id === 'avatar') {
-                                    new_table_row.appendChild(citizen_house[cell.id] || document.createElement('div'));
-                                } else {
-                                    let cell_div = document.createElement('div');
-                                    cell_div.classList.add(...cell.content_class);
-                                    if (typeof citizen_house[cell.id] === 'string' || !citizen_house[cell.id]) {
-                                        cell_div.innerText = citizen_house[cell.id] || '';
+                    let for_loop = async _ => {
+                        for (let i = 0; i < citizens_houses.length; i++) {
+                            let citizen_house = citizens_houses[i];
+                            await getCitizenHouseContent(citizen_house.link).then((more_info) => {
+                                citizen_house.plaintes = more_info.plaintes;
+                                citizen_house.travaux = more_info.travaux;
+                                citizen_house.clock = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.clock.label[lang].toLowerCase()) > -1)?.querySelector('strong')?.innerText || '';
+                                citizen_house.rations = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.rations.label[lang].toLowerCase()) > -1)?.innerText.replace(/.*(\d+).*/, '$1') || '';
+                                citizen_house.injured = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.injured.label[lang].toLowerCase()) > -1) ? `<img src="${repo_img_hordes_url}/icons/tickOn.gif" >` : '';
+                                citizen_house.infection = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.infection.label[lang].toLowerCase()) > -1) ? `<img src="${repo_img_hordes_url}/icons/tickOn.gif" >` : '';
+                                citizen_house.thirsty = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.thirsty.label[lang].toLowerCase()) > -1) ? `<img src="${repo_img_hordes_url}/icons/tickOn.gif" >` : '';
+                                citizen_house.addict = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.addict.label[lang].toLowerCase()) > -1) ? `<img src="${repo_img_hordes_url}/icons/tickOn.gif" >` : '';
+                                citizen_house.terror = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.terror.label[lang].toLowerCase()) > -1) ? `<img src="${repo_img_hordes_url}/icons/tickOn.gif" >` : '';
+
+                                let new_table_row = document.createElement('div');
+                                new_table_row.classList.add('row-flex', 'stretch');
+
+                                more_citizen_info_headers.forEach((cell) => {
+                                    if (cell.id === 'username') {
+                                        new_table_row.appendChild(citizen_house[cell.id] || document.createElement('div'));
                                     } else {
-                                        cell_div.appendChild(citizen_house[cell.id] || document.createElement('div'));
+                                        let cell_div = document.createElement('div');
+                                        cell_div.classList.add(...cell.content_class);
+                                        if (typeof citizen_house[cell.id] === 'string' || !citizen_house[cell.id]) {
+                                            cell_div.innerHTML = citizen_house[cell.id] || '';
+                                        } else {
+                                            cell_div.appendChild(citizen_house[cell.id] || document.createElement('div'));
+                                        }
+                                        new_table_row.appendChild(cell_div);
                                     }
-                                    new_table_row.appendChild(cell_div);
-                                }
+                                });
+
+                                citizens_list.appendChild(new_table_row);
                             });
-                            citizens_list.appendChild(new_table_row);
-                        });
+                        };
                     };
+
+                    for_loop();
                 });
 
                 // a faire en dernier
                 tabs.appendChild(mho_more_citizens_tab);
             }
         }
-
     }
 }
 
@@ -5157,7 +5283,7 @@ function displayCampingPredict() {
                 vest: false,
                 tomb: false,
                 zombies: document.querySelectorAll('.actor.zombie')?.length || 0,
-                night: !!document.querySelector('.time-19'),
+                night: !!document.querySelector('.map.night'),
                 devastated: mh_user.townDetails.isDevaste,
                 phare: false,
                 improve: 0,
@@ -5574,8 +5700,8 @@ function createCopyButton(source, map, map_id, button_block_id) {
             GM.setValue(mho_map_key, {
                 source: source,
                 map: map,
-                fm_block: source === 'fm' && map === 'map' ? map_to_convert.outerHTML : (mho_map ? mho_map.fm_block : undefined),
-                ruin: map === 'ruin' ? map_to_convert.outerHTML : (mho_map ? mho_map.ruin : undefined)
+                block: (source === 'fm' || source === 'gh') && map === 'map' ? map_to_convert.outerHTML : undefined,
+                ruin: map === 'ruin' ? map_to_convert.outerHTML : undefined
             });
         });
 
@@ -6073,6 +6199,7 @@ function createStyles() {
     + 'bottom: 0;'
     + 'margin: auto;'
     + '}';
+
     let empty_bat_after = '.empty-bat:after {'
     + '-webkit-transform: rotate(45deg);'
     + 'transform: rotate(45deg);'
@@ -6081,6 +6208,10 @@ function createStyles() {
     let camping_spaced_label = '.spaced-label:after {'
     + `content: '\\00a0:\\00a0'`
     + '}';
+
+    let citizen_list_more_info_content = '.content-center-vertical.center {'
+    + `justify-content: center;`
+    + `}`;
 
 
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
@@ -6093,7 +6224,7 @@ function createStyles() {
     + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + item_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
     + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
     + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
-    + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label;
+    + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content;
 
     let style = document.createElement('style');
 
@@ -6220,58 +6351,46 @@ async function getGHMap() {
                     return {direction: 'none', type: 'point', source: 'middle', length: 'none', position: 'middle'};
             }
         }
-        GM.xmlHttpRequest({
-            method: 'GET',
-            url: 'https://gest-hordes2.eragaming.fr/carte',
-            responseType: 'document',
-            onload: function(response){
-                if (response.status === 200) {
-                    let new_map = [];
-                    let map = Array.from(response.response.body.querySelector('#zoneCarte')?.children);
-                    let x_mapping = Array.from(map[0].children).map((x) => x.innerText);
-                    map
-                        .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('caseCarte')))
-                        .forEach((row) => {
-                        let cells = [];
-                        let y;
-                        Array.from(row.children).forEach((cell, index) => {
-                            if (cell.classList.contains('fondNoir')) {
-                                y = cell.innerText;
-                            } else {
-                                let cell_parts = Array.from(cell.children);
+        GM.getValue(mho_map_key).then((mho_map) => {
+            let map_html = document.createElement('div');
+            map_html.innerHTML = mho_map.block;
 
-                                let new_cell = {
-                                    horizontal: y,
-                                    vertical: x_mapping[index],
-                                    town: cell.querySelector('.caseVille'),
-                                    bat: cell.querySelector('.bat'),
-                                    my_pos: cell.querySelector('.posJoueur'),
-                                    expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& Array.from(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
-                                    expedition_arrows: [],/*Array.from(cell_parts.find((cell_part) => cell_part.classList.contains('expeditionVille')).children).map((arrow) => getArrow(arrow)), */
-                                    not_yet_visited: cell.querySelector('.zone-NonExplo'),
-                                    not_visited_today: !cell.querySelector('.danger') && !cell.querySelector('.caseVille'),
-                                    zombies: cell.querySelector('.danger') ? Array.from(cell.querySelector('.danger').classList).filter((class_name) => class_name.startsWith('zone-danger')).map((class_name) => class_name.replace('zone-danger', ''))[0] : undefined,
-                                    empty: cell.querySelector('.epuise'),
-                                    empty_bat: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-e',
-                                    ruin: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-r',
-                                };
-                                cells.push(new_cell);
-                            }
-                        });
-                        new_map.push(cells);
-                    });
-                    resolve({map: new_map, vertical_mapping: x_mapping});
-                } else {
-                    addError(response);
-                    reject(response);
-                }
-                endLoading();
-            },
-            onerror: function(error){
-                endLoading();
-                addError(error);
-                addError(error);
-            }
+            let new_map = [];
+            let map = Array.from(map_html.querySelectorAll('.ligneCarte'));
+            let x_mapping = Array.from(map[0].children).map((x) => x.innerText);
+            map
+                .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('caseCarte')))
+                .forEach((row) => {
+                let cells = [];
+                let y;
+                Array.from(row.children).forEach((cell, index) => {
+                    if (cell.classList.contains('fondNoir')) {
+                        y = cell.innerText;
+                    } else {
+                        let cell_parts = Array.from(cell.children);
+
+                        let new_cell = {
+                            horizontal: y,
+                            vertical: x_mapping[index],
+                            town: cell.querySelector('.caseVille'),
+                            bat: cell.querySelector('.bat'),
+                            my_pos: cell.querySelector('.posJoueur'),
+                            expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& Array.from(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
+                            expedition_arrows: [],/*Array.from(cell_parts.find((cell_part) => cell_part.classList.contains('expeditionVille')).children).map((arrow) => getArrow(arrow)), */
+                            not_yet_visited: cell.querySelector('.zone-NonExplo'),
+                            not_visited_today: !cell.querySelector('.danger') && !cell.querySelector('.caseVille'),
+                            zombies: cell.querySelector('.danger') ? Array.from(cell.querySelector('.danger').classList).filter((class_name) => class_name.startsWith('zone-danger')).map((class_name) => class_name.replace('zone-danger', ''))[0] : undefined,
+                            empty: cell.querySelector('.epuise'),
+                            empty_bat: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-e',
+                            ruin: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-r',
+                        };
+                        cells.push(new_cell);
+                    }
+                });
+                new_map.push(cells);
+            });
+            resolve({map: new_map, vertical_mapping: x_mapping});
+            endLoading();
         });
     });
 }
@@ -6599,7 +6718,7 @@ async function getFMMap() {
         let map_html = document.createElement('div');
 
         GM.getValue(mho_map_key).then((mho_map) => {
-            map_html.innerHTML = mho_map.fm_block;
+            map_html.innerHTML = mho_map.block;
 
             let new_map = [];
             let map = Array.from(map_html.querySelector('#map')?.children);
@@ -6773,7 +6892,7 @@ async function getItems() {
                             return -1;
                         }
                     })
-                    .filter((item) => +item.id !== 302);
+                    .filter((item) => is_mh_beta ? true : +item.id !== 302);
                     let wiki_btn = document.getElementById(wiki_btn_id);
                     if (wiki_btn) {
                         wiki_btn.setAttribute('style', 'display: inherit');
@@ -6845,13 +6964,15 @@ async function getMe() {
                         }
                         GM.setValue(mh_user_key, mh_user);
                         console.log('MHO - I am...', mh_user);
-                        getItems().then(() => {
-                            resolve();
-                        });
+                        getParameters().then(() => {
+                            getItems().then(() => {
+                                resolve();
+                            });
 
-                        if (mh_user !== '' && mh_user.townDetails.townId) {
-                            getWishlist().then();
-                        }
+                            if (mh_user !== '' && mh_user.townDetails.townId) {
+                                getWishlist().then();
+                            }
+                        });
                     } else {
                         addError(response);
                         reject(response);
@@ -7096,7 +7217,7 @@ function updateExternalTools() {
     data.map.toolsToUpdate = {
         isBigBrothHordes: mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : 'none',
         isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
-        isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
+        isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && pageIsDesert() && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
     };
 
     if (mho_parameters.update_gh_without_api && pageIsDesert()) {
@@ -7183,6 +7304,9 @@ function updateExternalTools() {
 
     /** Récupération des pouvoirs héroïques */
     if (mho_parameters.update_gh_ah || mho_parameters.update_mho_actions) {
+
+        let no_interaction = document.querySelector('.no-interaction');
+
         data.heroicActions = {}
         data.heroicActions.actions = [];
         data.heroicActions.toolsToUpdate = {
@@ -7201,15 +7325,42 @@ function updateExternalTools() {
                 }
                 data.heroicActions.actions.push(action);
             }
+        } else if (!no_interaction) {
+            let action = {
+                locale: null,
+                label: 'Empty',
+                value: pageIsDesert() ? 0 /* 'desert' */ : 1 /* 'town' */
+            }
+            data.heroicActions.actions.push(action);
         }
-        let apag = document.querySelector('ul.actions [src*=item_photo]');
+
+        let apag = document.querySelector('.pointer.rucksack [src*=item_photo]');
         if (apag) {
             let action = {
                 locale: lang,
-                label: apag.nextElementSibling.querySelector('b')?.innerText,
+                label: apag.parentElement.nextElementSibling.querySelector('h1')?.innerText.replace('  ', ''),
                 value: +apag.src.replace(/.*item_photo_(\d).*/, '$1')
             }
             data.heroicActions.actions.push(action);
+        }
+
+        if (pageIsDesert()) {
+            let pef = document.querySelector('ul.special_actions [src*=armag]');
+            if (pef) {
+                let action = {
+                    locale: lang,
+                    label: 'PEF',
+                    value: 1
+                }
+                data.heroicActions.actions.push(action);
+            } else if (!no_interaction) {
+                let action = {
+                    locale: lang,
+                    label: 'PEF',
+                    value: 0
+                }
+                data.heroicActions.actions.push(action);
+            }
         }
     }
 
@@ -7414,6 +7565,34 @@ async function getRecipes() {
     });
 }
 
+/** Récupère la liste complète des paramètres en base */
+async function getParameters() {
+    return new Promise((resolve, reject) => {
+        startLoading();
+        GM.xmlHttpRequest({
+            method: 'GET',
+            url: api_url + '/parameters/parameters',
+            responseType: 'json',
+            onload: function(response){
+                if (response.status === 200) {
+                    console.log('response', response.response);
+                    parameters = response.response
+                    resolve();
+                } else {
+                    addError(response);
+                    reject(recipes);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
+                reject(error);
+            }
+        });
+    });
+}
+
 /** Récupère la liste complète des recettes */
 async function getTodayEstimation(day, estimations, today) {
     return new Promise((resolve, reject) => {
@@ -7573,7 +7752,7 @@ async function getCitizenHouseContent(link) {
 
                     let travaux_row = lightbox ? lightbox.querySelectorAll('.row')[3] : undefined;
                     let travaux = travaux_row ? travaux_row.lastElementChild : town_summary.querySelectorAll('.row-detail')[1];
-                    more_info.travaux = travaux ? travaux.innerHTML.replaceAll('<b>', '').replaceAll('</b>', '').replaceAll(' , ', '') : '';
+                    more_info.travaux = travaux ? travaux.innerHTML.replace(/\<b\>/g, '').replace(/\<\/b\>/g, '').replace(/ , /g, '').replace(/^\n/g, '') : '';
                     resolve(more_info);
                 } else {
                     reject(response);
@@ -7691,7 +7870,7 @@ async function getCitizenHouseContent(link) {
                         displayMoreCitizensInformations();
                         displayCampingPredict();
                         // blockUsersPosts();
-                    }, 500);
+                    }, 200);
 
                     setInterval(() => {
                         displayAdvancedTooltips();
