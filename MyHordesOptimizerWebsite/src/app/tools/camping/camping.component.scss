@@ -1,3 +1,5 @@
+@import "variables.scss";
+
 .mho-camping {
     .camping-params {
         display: flex;
@@ -26,12 +28,31 @@
 
                 img {
                     margin-right: 0.5em;
+                    vertical-align: sub;
                 }
             }
 
             .or {
                 text-align: center;
+
+                .mat-button-toggle-group {
+                    border-color: $primary;
+
+                    .mat-button-toggle {
+                        border-color: $primary;
+                    }
+
+                    .mat-button-toggle-label-content {
+                        line-height: 42px !important;
+                    }
+
+                    .mat-button-toggle-checked {
+                        background-color: $item_color;
+                    }
+                }
             }
+
+
         }
     }
 }

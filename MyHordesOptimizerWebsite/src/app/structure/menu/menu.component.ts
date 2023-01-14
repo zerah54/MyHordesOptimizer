@@ -31,21 +31,21 @@ export class MenuComponent implements OnInit {
 
     public routes: SidenavLinks[] = [
         {
-            label: $localize`Outils`, lvl: 0, displayed: true, authorized: () => true, expanded: false, children: [
-                { label: $localize`Banque`, path: 'tools/bank', displayed: false, lvl: 1, authorized: () => true },
-                { label: $localize`Liste de courses`, path: 'tools/wishlist', displayed: false, lvl: 1, authorized: () => true },
-                { label: $localize`Citoyens`, path: 'tools/citizens', displayed: false, lvl: 1, authorized: () => true },
-                { label: $localize`Camping`, path: 'tools/camping', displayed: false, lvl: 1, authorized: () => true },
+            label: $localize`Outils`, lvl: 0, displayed: true, authorized: () => true, expanded: true, children: [
+                { label: $localize`Banque`, path: 'tools/bank', displayed: true, lvl: 1, authorized: () => true },
+                { label: $localize`Liste de courses`, path: 'tools/wishlist', displayed: true, lvl: 1, authorized: () => true },
+                { label: $localize`Citoyens`, path: 'tools/citizens', displayed: true, lvl: 1, authorized: () => true },
+                { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: () => true },
                 // { label: $localize`Carte des fouilles`, path: 'tools/map', displayed: false, lvl: 1, authorized: () => true },
             ]
         },
         {
-            label: $localize`Wiki`, lvl: 0, displayed: true, authorized: () => true, expanded: false, children: [
-                { label: $localize`Objets`, path: 'wiki/items', displayed: false, lvl: 1, authorized: () => true },
-                { label: $localize`Recettes`, path: 'wiki/recipes', displayed: false, lvl: 1, authorized: () => true },
-                { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: false, lvl: 1, authorized: () => true },
-                { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: false, lvl: 1, authorized: () => true },
-                { label: $localize`Informations diverses`, path: 'wiki/miscellaneous-info', displayed: false, lvl: 1, authorized: () => true }
+            label: $localize`Wiki`, lvl: 0, displayed: true, authorized: () => true, expanded: true, children: [
+                { label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: () => true },
+                { label: $localize`Recettes`, path: 'wiki/recipes', displayed: true, lvl: 1, authorized: () => true },
+                { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: true, lvl: 1, authorized: () => true },
+                { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: () => true },
+                { label: $localize`Informations diverses`, path: 'wiki/miscellaneous-info', displayed: true, lvl: 1, authorized: () => true }
             ]
         },
         {

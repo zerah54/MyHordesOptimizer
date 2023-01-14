@@ -1,6 +1,5 @@
-import { Clipboard } from '@angular/cdk/clipboard';
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
@@ -14,11 +13,13 @@ import { Dictionary } from './../../_abstract_model/types/_types';
 @Component({
     selector: 'mho-camping',
     templateUrl: './camping.component.html',
-    styleUrls: ['./camping.component.scss']
+    styleUrls: ['./camping.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 export class CampingComponent implements OnInit {
 
     public ruins: Ruin[] = [];
+    public and_amelio: boolean = true;
 
     public town_types: TownType[] = [
         { id: 'rne', label: $localize`Petite carte` },
@@ -34,6 +35,8 @@ export class CampingComponent implements OnInit {
     /** Le dossier dans lequel sont stockées les images */
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
+    public readonly help_ruins: string = $localize`La liste est impactée par la distance choisie`;
+    public readonly help_amelio: string = $localize`Il faut en soustraire 3 après chaque attaque`;
 
     public readonly camping_results: any[] = [
         {
@@ -307,14 +310,14 @@ export class CampingComponent implements OnInit {
         /** Nombre d'objets de protection dans l'inventaire */
         chances += +this.configuration_form.get('objects')?.value * 100;
 
-        if (+this.configuration_form.get('complete_improve')?.value > 0) {
+        if (this.and_amelio) {
             /** Nombre total d'améliorations sur la case */
             chances += +this.configuration_form.get('complete_improve')?.value * 100;
-        } else {
+
             /**
-              * Nombre d'améliorations simples sur la case
-              * @see ActionDataService.php : 'improve'
-              */
+             * Nombre d'améliorations simples sur la case
+             * @see ActionDataService.php : 'improve'
+             */
             chances += +this.configuration_form.get('improve')?.value * 100;
 
             /**
@@ -322,8 +325,24 @@ export class CampingComponent implements OnInit {
               * @see ActionDataService.php : 'cm_campsite_improve'
               */
             chances += +this.configuration_form.get('object_improve')?.value * 1.8 * 100;
-        }
+        } else {
+            if (+this.configuration_form.get('complete_improve')?.value > 0) {
+                /** Nombre total d'améliorations sur la case */
+                chances += +this.configuration_form.get('complete_improve')?.value * 100;
+            } else {
+                /**
+                  * Nombre d'améliorations simples sur la case
+                  * @see ActionDataService.php : 'improve'
+                  */
+                chances += +this.configuration_form.get('improve')?.value * 100;
 
+                /**
+                  * Nombre d'objets de défense installés sur la case
+                  * @see ActionDataService.php : 'cm_campsite_improve'
+                  */
+                chances += +this.configuration_form.get('object_improve')?.value * 1.8 * 100;
+            }
+        }
         /**
           * Bonus liés au bâtiment
           * @see RuinDataService.php

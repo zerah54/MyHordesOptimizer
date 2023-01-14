@@ -64,15 +64,16 @@
                         <mho-select [formControlName]="'town'" [options]="town_types" [bindLabel]="'label'">
                         </mho-select>
                     </mat-form-field>
-                    <mat-checkbox [formControlName]="'night'"><img [src]="HORDES_IMG_REPO +  'pictos/r_doutsd.gif'">
+                    <mat-checkbox [formControlName]="'night'">
+                        <img [src]="HORDES_IMG_REPO +  'pictos/r_doutsd.gif'">
                         <ng-container i18n>Nuit</ng-container>
                     </mat-checkbox>
-                    <mat-checkbox [formControlName]="'devastated'"><img
-                            [src]="HORDES_IMG_REPO + 'item/item_out_def_broken.gif'">
+                    <mat-checkbox [formControlName]="'devastated'">
+                        <img [src]="HORDES_IMG_REPO + 'item/item_out_def_broken.gif'">
                         <ng-container i18n>Ville dévastée</ng-container>
                     </mat-checkbox>
-                    <mat-checkbox [formControlName]="'phare'"><img
-                            [src]="HORDES_IMG_REPO + 'building/small_lighthouse.gif'">
+                    <mat-checkbox [formControlName]="'phare'">
+                        <img [src]="HORDES_IMG_REPO + 'building/small_lighthouse.gif'">
                         <ng-container i18n>Phare</ng-container>
                     </mat-checkbox>
                 </div>
@@ -84,17 +85,19 @@
                 <h3 i18n>Le bâtiment</h3>
                 <div>
                     <mat-form-field>
-                        <mat-label i18n>Bâtiment</mat-label>
-                        <mho-select [formControlName]="'ruin'" [options]="ruins | filterRuinsByKm:townDistance.value"
-                            [bindLabel]="'label.' + locale" [moreInfo]="getMoreRuinInfo">
-                        </mho-select>
-                    </mat-form-field>
-
-                    <mat-form-field>
                         <mat-label><img [src]="HORDES_IMG_REPO + 'emotes/explo.gif'">
                             <ng-container i18n>Distance de la ville (en km)</ng-container>
                         </mat-label>
                         <input matInput type="number" #townDistance [formControlName]="'distance'" min="1">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label i18n>Bâtiment</mat-label>
+                        <mho-select [formControlName]="'ruin'" [options]="ruins | filterRuinsByKm:townDistance.value"
+                            [bindLabel]="'label.' + locale" [moreInfo]="getMoreRuinInfo">
+                        </mho-select>
+                        <mat-icon matSuffix [matTooltip]="help_ruins" style="vertical-align: middle"
+                            [color]="'primary'">help_outline</mat-icon>
                     </mat-form-field>
 
                     <mat-form-field>
@@ -113,25 +116,34 @@
 
                     <mat-divider style="margin: 0.5em 0"></mat-divider>
 
-                    <h3 i18n>Améliorations</h3>
-                    <h5>Il faut en soustraire 3 après chaque attaque</h5>
+                    <h3>
+                        <ng-container i18n>Améliorations</ng-container>
+                        <mat-icon matSuffix [matTooltip]="help_amelio"
+                            style="vertical-align: middle; margin-left: 0.25em;"
+                            [color]="'primary'">help_outline</mat-icon>
+                    </h3>
                     <mat-form-field>
-                        <mat-label><img [src]="HORDES_IMG_REPO + 'icons/home_recycled.gif'">
+                        <mat-label><img [src]="HORDES_IMG_REPO + 'icons/small_refine.gif'">
                             <ng-container i18n>Nombre d'améliorations simples faites sur la case</ng-container>
                         </mat-label>
                         <input matInput type="number" [formControlName]="'improve'">
                     </mat-form-field>
 
                     <mat-form-field>
-                        <mat-label><img [src]="HORDES_IMG_REPO + 'icons/home.gif'">
+                        <mat-label><img [src]="HORDES_IMG_REPO + 'item/cat_def.gif'">
                             <ng-container i18n>Nombre d'objets de défense installés sur la case</ng-container>
                         </mat-label>
                         <input matInput type="number" [formControlName]="'object_improve'">
                     </mat-form-field>
-                    <div i18n class="or">ou</div>
+                    <div class="or">
+                        <mat-button-toggle-group [(ngModel)]="and_amelio">
+                            <mat-button-toggle [value]="true" i18n [checked]="and_amelio">Et</mat-button-toggle>
+                            <mat-button-toggle [value]="false" i18n [checked]="!and_amelio">Ou</mat-button-toggle>
+                        </mat-button-toggle-group>
+                    </div>
                     <mat-form-field>
-                        <mat-label><img [src]="HORDES_IMG_REPO + 'icons/home_recycled.gif'"> + <img
-                                [src]="HORDES_IMG_REPO + 'icons/home.gif'">
+                        <mat-label><img [src]="HORDES_IMG_REPO + 'icons/small_refine.gif'"> + <img
+                                [src]="HORDES_IMG_REPO + 'item/cat_def.gif'">
                             <ng-container i18n>Nombre total d'améliotations sur la case</ng-container>
                         </mat-label>
                         <input matInput type="number" [formControlName]="'complete_improve'">

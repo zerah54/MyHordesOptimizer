@@ -2,6 +2,7 @@
     <mat-list>
         <ng-container *ngFor="let route of routes">
             <ng-container *ngTemplateOutlet="routeTemplate; context: {$implicit: route}"></ng-container>
+            <mat-divider></mat-divider>
         </ng-container>
 
     </mat-list>

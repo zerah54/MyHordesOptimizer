@@ -1,3 +1,4 @@
+import { I18nLabels } from "../types/_types";
 import { CommonEnum, CommonEnumData } from "./_common.enum";
 
 const HOUSE_LEVEL_KEY: string = 'houseLevel';
@@ -11,7 +12,64 @@ const REST_LEVEL_KEY: string = 'restLevel';
 const HAS_LOCK_KEY: string = 'hasLock';
 const HAS_FENCE_KEY: string = 'hasFence';
 
-const HOUSE_LEVEL_DATA: HomeEnumData = { label: $localize`Niveau de l'habitation`, img: '', max_lvl: 8 };
+const HOUSE_LABELS: I18nLabels[] = [
+    {
+        de: 'Feldbett',
+        en: 'Camp Bed',
+        es: 'Camastro',
+        fr: 'Lit de camp'
+    },
+    {
+        de: 'Zelt',
+        en: 'Tent',
+        es: 'Tienda',
+        fr: 'Tente'
+    },
+    {
+        de: 'Baracke',
+        en: 'Hovel',
+        es: 'Cuchitril',
+        fr: 'Taudis'
+    },
+    {
+        de: 'Hütte',
+        en: 'Shack',
+        es: 'Barraca',
+        fr: 'Baraque'
+    },
+    {
+        de: 'Haus',
+        en: 'House',
+        es: 'Casa',
+        fr: 'Maison'
+    },
+    {
+        de: 'Umzäuntes Haus',
+        en: 'Safehouse',
+        es: 'Casa enrejada',
+        fr: 'Maison clôturée'
+    },
+    {
+        de: 'Befestigte Unterkunft',
+        en: 'Stronghold',
+        es: 'Fuerte',
+        fr: 'Abri fortifié'
+    },
+    {
+        de: 'Bunker',
+        en: 'Nuclear Bunker',
+        es: 'Bunker nuclear',
+        fr: 'Bunker'
+    },
+    {
+        de: '',
+        en: 'Palace',
+        es: 'Castillo',
+        fr: 'Château'
+    }
+]
+
+const HOUSE_LEVEL_DATA: HomeEnumData = { label: $localize`Niveau de l'habitation`, img: '', max_lvl: 8, options: HOUSE_LABELS };
 const HAS_ALARM_DATA: HomeEnumData = { label: $localize`Alarme rudimentaire `, img: '/home/alarm.gif', max_lvl: 1 };
 const CHEST_LEVEL_DATA: HomeEnumData = { label: $localize`Rangements`, img: '/home/chest.gif', max_lvl: 13 };
 const HAS_CURTAIN_DATA: HomeEnumData = { label: $localize`Gros rideau `, img: '/home/curtain.gif', max_lvl: 1 };
@@ -56,4 +114,5 @@ interface HomeEnumData extends CommonEnumData {
     label: string;
     max_lvl: number;
     img: string;
+    options?: I18nLabels[];
 }

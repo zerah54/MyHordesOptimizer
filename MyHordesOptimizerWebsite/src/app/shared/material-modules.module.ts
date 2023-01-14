@@ -4,6 +4,7 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
 import { NgModule } from '@angular/core';
 
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
@@ -26,7 +27,7 @@ import { Modules } from '../_abstract_model/types/_types';
 
 
 let material_modules: Modules = [
-    MatButtonModule, MatCardModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatProgressSpinnerModule, MatSelectModule,
+    MatButtonModule, MatButtonToggleModule, MatCardModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatProgressSpinnerModule, MatSelectModule,
     MatSidenavModule, MatSnackBarModule, MatTableModule, MatToolbarModule, MatRadioModule, MatCheckboxModule, ClipboardModule, CdkAccordionModule, MatChipsModule, MatTooltipModule,
     MatSortModule
 ];

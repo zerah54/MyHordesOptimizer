@@ -22,19 +22,12 @@
                 color: $primary !important;
             }
 
-            &.lvl-1 {
-                padding-left: 1em;
-                width: calc(100% - 1em);
-            }
-
-            &.lvl-2 {
-                padding-left: 2em;
-                width: calc(100% - 2em);
-            }
-
-            &.lvl-3 {
-                padding-left: 3em;
-                width: calc(100% - 3em);
+            @for $i from 1 through 10 {
+                &.lvl-#{$i} {
+                    $padding: $i * 2 + em;
+                    padding-left: $padding;
+                    width: calc(100% - $padding);
+                }
             }
         }
 

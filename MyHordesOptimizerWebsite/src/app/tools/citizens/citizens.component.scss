@@ -47,10 +47,31 @@
 
                 .heroic-actions {
                     min-width: 300px;
+                    max-width: 400px;
+
+                    .lvl-element {
+
+                        &.full-width {
+                            width: 100%;
+                        }
+                    }
                 }
 
                 .home {
-                    min-width: 400px;
+                    min-width: 450px;
+
+                    .lvl-element {
+                        .mat-form-field {
+                            .mat-form-field-infix {
+                                width: 125px;
+                            }
+
+                        }
+
+                        &.third-width {
+                            width: calc(100% / 3);
+                        }
+                    }
                 }
 
                 .heroic-actions,
@@ -60,6 +81,8 @@
                         display: inline-block;
 
                         .mat-form-field {
+                            width: 100%;
+                            max-width: 100%;
 
                             .mat-form-field-infix {
                                 display: flex;
@@ -69,16 +92,6 @@
                                 padding-bottom: 0;
                             }
 
-                        }
-                    }
-                }
-
-                .home {
-                    .lvl-element {
-                        .mat-form-field {
-                            .mat-form-field-infix {
-                                width: 125px;
-                            }
                         }
                     }
                 }

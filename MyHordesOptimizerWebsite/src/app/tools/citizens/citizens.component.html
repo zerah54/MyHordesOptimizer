@@ -7,13 +7,12 @@
             <table mat-table [dataSource]="datasource" matSort>
 
                 <ng-container *ngFor="let column of columns" [matColumnDef]="column.id"
-                    [sticky]="column.id === 'name' || column.id === 'avatar'">
+                    [sticky]="column.id === 'avatar_name'">
                     <th mat-header-cell *matHeaderCellDef [ngClass]="[column.id, column.class]">
                         <ng-container [ngSwitch]="column.id">
                             <mho-header-with-select-filter *ngSwitchCase="'avatar_name'" [header]="column.header"
-                                [(filterValue)]="citizen_filters"
-                                (filterValueChange)="citizen_filter_change.next()" [options]="citizen_info.citizens"
-                                [bindLabel]="'name'">
+                                [(filterValue)]="citizen_filters" (filterValueChange)="citizen_filter_change.next()"
+                                [options]="citizen_info.citizens" [bindLabel]="'name'">
                             </mho-header-with-select-filter>
                             <ng-container *ngSwitchCase="'more_status'">
                                 {{column.header}}
@@ -62,7 +61,8 @@
                             </ng-container>
                             <ng-container *ngSwitchCase="'heroic_actions'">
                                 <div class="heroic-actions">
-                                    <div class="lvl-element" *ngFor="let element of row.heroic_actions.content">
+                                    <div class="lvl-element" *ngFor="let element of row.heroic_actions.content"
+                                        [class.full-width]="element.element.value.max_lvl > 1">
                                         <mat-form-field *ngIf="element.element.value.max_lvl > 1"
                                             [appearance]="'outline'">
                                             <mat-label>{{element.element.value.label}}</mat-label>
@@ -74,7 +74,8 @@
                                             </mat-select>
                                         </mat-form-field>
                                         <mat-checkbox *ngIf="element.element.value.max_lvl === 1"
-                                            [checked]="element.value"
+                                            [checked]="element.value === true"
+                                            [indeterminate]="element.value === null || element.value === undefined"
                                             (change)="element.value = $event.checked; updateActions(row.id)">
                                             {{element.element.value.label}}
                                         </mat-checkbox>
@@ -86,22 +87,32 @@
                             </ng-container>
                             <ng-container *ngSwitchCase="'home'">
                                 <div class="home" style="min-width: 400px">
-                                    <div class="lvl-element" *ngFor="let element of row.home.content">
+                                    <div class="lvl-element" *ngFor="let element of row.home.content"
+                                        [class.third-width]="element.element.value.max_lvl > 1">
                                         <mat-form-field *ngIf="element.element.value.max_lvl > 1"
                                             [appearance]="'outline'">
                                             <mat-label>{{element.element.value.label}}</mat-label>
-                                            <img *ngIf="element.element.value.img"
+                                            <img *ngIf="element.element.value.img && element.element.value.img !== ''"
                                                 style="vertical-align: super; margin-right: 0.5em;"
                                                 [src]="HORDES_IMG_REPO + element.element.value.img">
+                                            <img *ngIf="element.element.value.options"
+                                                style="vertical-align: super; margin-right: 0.5em;"
+                                                [src]="HORDES_IMG_REPO + 'home/home_lv' + element.value + '.gif'">
                                             <mat-select [(ngModel)]="element.value"
                                                 (ngModelChange)="updateHome(row.id)">
                                                 <mat-option
-                                                    *ngFor="let el of [].constructor(element.element.value.max_lvl + 1); let i = index"
-                                                    [value]="i">{{i}}</mat-option>
+                                                    *ngFor="let option of (element.element.value.options || [].constructor(element.element.value.max_lvl + 1)); let i = index"
+                                                    [value]="i">
+                                                    <ng-container *ngIf="!element.element.value.options">{{i}}</ng-container>
+                                                    <ng-container *ngIf="element.element.value.options">
+                                                        <img [src]="HORDES_IMG_REPO + 'home/home_lv' + i + '.gif'" style="margin-right: 0.5em">{{option[locale]}}
+                                                    </ng-container>
+                                                </mat-option>
                                             </mat-select>
                                         </mat-form-field>
                                         <mat-checkbox *ngIf="element.element.value.max_lvl === 1"
-                                            [checked]="element.value"
+                                            [checked]="element.value === true"
+                                            [indeterminate]="element.value === null || element.value === undefined"
                                             (change)="element.value = $event.checked; updateHome(row.id)">
                                             <img *ngIf="element.element.value.img"
                                                 style="vertical-align: middle; margin-right: 0.5em;"
