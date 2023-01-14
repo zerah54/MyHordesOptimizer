@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System;
@@ -122,5 +123,16 @@ namespace MyHordesOptimizerApi.Controllers
             return ruins;
         }
 
+        [HttpGet]
+        [Route("Map")]
+        public ActionResult<IEnumerable<MyHordesOptimizerCell>> GetRuins(int? townId)
+        {
+            if (!townId.HasValue)
+            {
+                return BadRequest($"{nameof(townId)} cannot be empty");
+            }
+            var cells = _myHordesFetcherService.GetCells(townId.Value).ToList();
+            return cells;
+        }
     }
 }

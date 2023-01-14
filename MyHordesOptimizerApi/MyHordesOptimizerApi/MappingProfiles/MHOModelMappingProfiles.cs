@@ -10,6 +10,7 @@ using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.MappingProfiles.Converters;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
+using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Items.Bank;
 using MyHordesOptimizerApi.Models.Views.Items.Citizen;
@@ -418,6 +419,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src))
                 .ForMember(dest => dest.LastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.HeroicActionLastUpdateDateUpdate.Value, UserName = src.HeroicActionLastUpdateInfoUserName }); opt.PreCondition(src => src.HeroicActionLastUpdateDateUpdate.HasValue); });
 
+
+            CreateMap<MapCellCompletModel, MyHordesOptimizerCell>();
 
             CreateMap<TownCitizenBagItemCompletModel, CitizenHomeValue>();
             CreateMap<TownCitizenBagItemCompletModel, CitizenStatusValue>();

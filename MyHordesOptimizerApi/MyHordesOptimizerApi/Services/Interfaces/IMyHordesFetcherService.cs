@@ -14,5 +14,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         BankWrapper GetBank();
         CitizensWrapper GetCitizens(int townId);
         IEnumerable<MyHordesOptimizerRuin> GetRuins();
+        IEnumerable<MyHordesOptimizerCell> GetCells(int townId);
     }
 }

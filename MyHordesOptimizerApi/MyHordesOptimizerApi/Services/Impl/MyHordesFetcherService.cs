@@ -161,5 +161,12 @@ namespace MyHordesOptimizerApi.Services.Impl
             var ruins = MyHordesOptimizerRepository.GetRuins();
             return ruins;
         }
+
+        public IEnumerable<MyHordesOptimizerCell> GetCells(int townId)
+        {
+            var models = MyHordesOptimizerRepository.GetCells(townId);
+            var dtos = Mapper.Map<IEnumerable<MyHordesOptimizerCell>>(models);
+            return dtos;
+        }
     }
 }

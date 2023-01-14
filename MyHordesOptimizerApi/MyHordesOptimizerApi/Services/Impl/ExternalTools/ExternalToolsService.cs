@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.Citizen;
+using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
@@ -12,6 +13,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models.Citizen;
 using MyHordesOptimizerApi.Models.ExternalTools.GestHordes;
+using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
@@ -30,6 +32,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         protected IBigBrothHordesRepository BigBrothHordesRepository { get; private set; }
         protected IFataMorganaRepository FataMorganaRepository { get; private set; }
         protected IGestHordesRepository GestHordesRepository { get; private set; }
+        protected IMyHordesApiRepository MyHordesApiRepository { get; private set; }
         protected IMapper Mapper { get; private set; }
         protected IUserInfoProvider UserInfoProvider { get; private set; }
         protected IMyHordesOptimizerRepository MyHordesOptimizerRepository { get; private set; }
@@ -40,7 +43,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             IGestHordesRepository gestHordesRepository,
             IMapper mapper,
             IUserInfoProvider userInfoProvider,
-            IMyHordesOptimizerRepository myHordesOptimizerRepository)
+            IMyHordesOptimizerRepository myHordesOptimizerRepository,
+            IMyHordesApiRepository myHordesApiRepository)
         {
             BigBrothHordesRepository = bigBrothHordesRepository;
             FataMorganaRepository = fataMorganaRepository;
@@ -48,6 +52,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             Mapper = mapper;
             UserInfoProvider = userInfoProvider;
             MyHordesOptimizerRepository = myHordesOptimizerRepository;
+            MyHordesApiRepository = myHordesApiRepository;
         }
 
         public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto)
@@ -60,6 +65,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             var bbh = updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes;
             var gh = updateRequestDto.Map.ToolsToUpdate.IsGestHordes;
             var fata = updateRequestDto.Map.ToolsToUpdate.IsFataMorgana;
+            var mho = updateRequestDto.Map.ToolsToUpdate.IsMyHordesOptimizer;
             if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(bbh))
             {
                 var bbhTask = Task.Run(() =>
@@ -90,6 +96,93 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                 });
                 tasks.Add(fataTask);
+            }
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(mho))
+            {
+                var mhoTask = Task.Run(() =>
+                {
+                    try
+                    {
+                        var me = MyHordesApiRepository.GetMe();
+                        var zones = me.Map.Zones;
+                        var listCells = new List<MapCellModel>();
+                        var listCellItems = new List<MapCellItemModel>();
+
+                        var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+                        var idLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+
+                        var townId = me.Map.Id;
+                        var zoneItemX = -1;
+                        var zoneItemY = -1;
+                        foreach (var zone in zones)
+                        {
+                            int? nbHero = null;
+                            int? nbZombie = null;
+
+                            var details = zone.Details;
+                            if (details.GetType() != typeof(JArray))
+                            {
+                                var jObject = details as JObject;
+                                var detail = jObject.ToObject<MyHordesDetails>();
+                                nbHero = detail.H;
+                                nbZombie = detail.Z;
+                            }
+
+                            int? type = zone.Building?.Type;
+                            if (type.HasValue && type.Value == -1)
+                            {
+                                type = null;
+                            }
+                            var cell = new MapCellModel()
+                            {
+                                IdTown = townId,
+                                IdLastUpdateInfo = idLastUpdateInfo,
+                                X = zone.X,
+                                Y = zone.Y,
+                                IsVisitedToday = Convert.ToBoolean(zone.Nvt),
+                                IdRuin = type,
+                                NbZombie = nbZombie,
+                                NbZombieKilled = null,
+                                NbHero = nbHero,
+                                IsRuinCamped = zone.Building?.Camped,
+                                IsRuinDryed = zone.Building?.Dried,
+                                NbRuinDig = zone.Building?.Dig,
+                                TodayNbDigSucces = null,
+                                PreviousDayTotalNbDigSucces = null,
+                                AveragePotentialRemainingDig = null,
+                                MaxPotentialRemainingDig = null
+                            };
+                            if (zone.Items != null)
+                            {
+                                zoneItemX = zone.X;
+                                zoneItemY = zone.Y;
+                                foreach (var item in zone.Items)
+                                {
+                                    var cellItem = new MapCellItemModel()
+                                    {
+                                        Count = item.Count,
+                                        IdItem = item.Id,
+                                        IsBroken = item.Broken
+                                    };
+                                    listCellItems.Add(cellItem);
+                                }
+                            }
+                            listCells.Add(cell);
+                        }
+                        MyHordesOptimizerRepository.PatchMapCell(townId, listCells);
+                        if (zoneItemX != -1 && zoneItemY != -1)
+                        {
+                            var cellWithItemId = MyHordesOptimizerRepository.GetCell(townId, zoneItemX: zoneItemX, zoneItemY: zoneItemY);
+                            listCellItems.ForEach(cellItem => cellItem.IdCell = cellWithItemId.IdCell);
+                            MyHordesOptimizerRepository.PatchMapCellItem(townId, listCellItems);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        response.MapResponseDto.MhoApiStatus = e.Message;
+                    }
+                });
+                tasks.Add(mhoTask);
             }
             var ghTask = Task.Run(() =>
             {
@@ -733,7 +826,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             {
                 if (action.Label == "Empty")
                 {
-                    if(action.Value == (int)ActionHeroicZone.Outside)
+                    if (action.Value == (int)ActionHeroicZone.Outside)
                     {
                         heroicActionDetail.HasLuckyFind = false;
                         heroicActionDetail.HasHeroicReturn = false;

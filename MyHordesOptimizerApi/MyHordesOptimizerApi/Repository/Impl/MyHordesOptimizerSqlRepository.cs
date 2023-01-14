@@ -7,6 +7,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
+using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Items.Bank;
@@ -539,7 +540,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 citizenToUpdate.IdBag = existings.Single(existing => existing.idUser == citizenToUpdate.IdUser).idBag;
                 connection.Execute(@"UPDATE TownCitizen 
                                      SET HomeMessage = @HomeMessage, JobName = @JobName, JobUID = @JobUID, Avatar = @Avatar, PositionX = @PositionX, PositionY = @PositionY, IsGhost = @IsGhost, IdLastUpdateInfo = @IdLastUpdateInfo 
-                                     WHERE IdTown = @IdTown AND IdUser = @IdUser", new { HomeMessage = citizenToUpdate.HomeMessage, JobName = citizenToUpdate.JobName, JobUID = citizenToUpdate.JobUID, Avatar = citizenToUpdate.Avatar, PositionX = citizenToUpdate.PositionX, PositionY = citizenToUpdate.PositionY, IsGhost = citizenToUpdate.IsGhost, IdLastUpdateInfo = citizenToUpdate.IdLastUpdateInfo, IdTown = townId, IdUser = citizenToUpdate.IdUser});
+                                     WHERE IdTown = @IdTown AND IdUser = @IdUser", new { HomeMessage = citizenToUpdate.HomeMessage, JobName = citizenToUpdate.JobName, JobUID = citizenToUpdate.JobUID, Avatar = citizenToUpdate.Avatar, PositionX = citizenToUpdate.PositionX, PositionY = citizenToUpdate.PositionY, IsGhost = citizenToUpdate.IsGhost, IdLastUpdateInfo = citizenToUpdate.IdLastUpdateInfo, IdTown = townId, IdUser = citizenToUpdate.IdUser });
             }
             connection.Close();
         }
@@ -700,14 +701,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 if (!citizenItems.Any()) // Si y'a pas d'item dans le sac, il faut aller chercher l'info du last update dans la liste sans le distinct !
                 {
                     var c = citizens.First(x => x.CitizenId == citizen.Id);
-                    if(c.BagLastUpdateDateUpdate.HasValue)
+                    if (c.BagLastUpdateDateUpdate.HasValue)
                     {
                         citizen.Bag.LastUpdateInfo = new LastUpdateInfo()
                         {
                             UpdateTime = c.BagLastUpdateDateUpdate.Value,
                             UserName = c.BagLastUpdateUserName
                         };
-                    }        
+                    }
                     citizen.Bag.IdBag = c.BagId;
                 }
             });
@@ -1120,6 +1121,58 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #endregion
 
+        #region MapCells
+
+        public void PatchMapCell(int townId, List<MapCellModel> listCells)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var dico = new Dictionary<string, Func<MapCellModel, object>>() { { "idCell", x => x.IdCell }, { "idTown", x => x.IdTown }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo }, { "x", x => x.X }, { "y", x => x.Y },
+            { "isVisitedToday", x => x.IsVisitedToday }, { "dangerLevel", x => x.DangerLevel }, { "idRuin", x => x.IdRuin }, { "isDryed", x => x.IsDryed }, { "nbZombie", x => x.NbZombie },
+            { "nbZombieKilled", x => x.NbZombieKilled }, { "nbHero", x => x.NbHero }, { "isRuinCamped", x => x.IsRuinCamped }, { "isRuinDryed", x => x.IsRuinDryed }, { "nbRuinDig", x => x.NbRuinDig },
+            { "todayNbDigSucces", x => x.TodayNbDigSucces }, { "previousDayTotalNbDigSucces", x => x.PreviousDayTotalNbDigSucces }, { "averagePotentialRemainingDig", x => x.AveragePotentialRemainingDig }, { "maxPotentialRemainingDig", x => x.MaxPotentialRemainingDig }};
+            connection.BulkInsert("MapCell", dico, listCells);
+            connection.Close();
+        }
+
+        public MapCellCompletModel GetCell(int townId, int zoneItemX, int zoneItemY)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCell mc
+                                                         INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mc.idLastUpdateInfo
+                                                         WHERE idTown = @idtown AND x = @x AND y = @y", new { idTown = townId, x = zoneItemX, y = zoneItemY });
+            connection.Close();
+            var mostRecent = cells.Max(x => x.DateUpdate);
+            cells = cells.Where(x => x.DateUpdate == mostRecent);
+            var cell = cells.Single();
+            return cell;
+        }
+
+        public IEnumerable<MapCellCompletModel> GetCells(int townId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCell mc
+                                                         INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mc.idLastUpdateInfo
+                                                         WHERE idTown = @idtown", new { idTown = townId });
+            connection.Close();
+            var mostRecent = cells.Max(x => x.DateUpdate);
+            cells = cells.Where(x => x.DateUpdate == mostRecent);
+            return cells;
+        }
+
+        public void PatchMapCellItem(int townId, List<MapCellItemModel> listCellItems)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var dico = new Dictionary<string, Func<MapCellItemModel, object>>() { { "idCell", x => x.IdCell }, { "idItem", x => x.IdItem }, { "count", x => x.Count }, { "IsBroken", x => x.IsBroken } };
+            connection.BulkInsert("MapCellItem", dico, listCellItems);
+            connection.Close();
+        }
+
+        #endregion
+
         public int CreateLastUpdateInfo(LastUpdateInfo lastUpdateInfo)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
@@ -1129,6 +1182,5 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
             return idLastUpdateInfo;
         }
-
     }
 }

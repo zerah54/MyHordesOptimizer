@@ -2,6 +2,7 @@
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
+using MyHordesOptimizerApi.Models.Map;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
@@ -56,5 +57,10 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         int CreateLastUpdateInfo(LastUpdateInfo lastUpdateInfo);
 
         IEnumerable<ParametersModel> GetParameters();
+
+        void PatchMapCell(int townId, List<MapCellModel> listCells);
+        MapCellCompletModel GetCell(int townId, int zoneItemX, int zoneItemY);
+        IEnumerable<MapCellCompletModel> GetCells(int townId);
+        void PatchMapCellItem(int townId, List<MapCellItemModel> listCellItems);
     }
 }

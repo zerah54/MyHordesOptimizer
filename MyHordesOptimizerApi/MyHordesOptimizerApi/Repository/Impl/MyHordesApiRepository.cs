@@ -35,12 +35,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
         public MyHordesMeResponseDto GetMe()
         {
             var url = GenerateUrl(EndpointMe);
-            url = AddParameterToQuery(url, _parameterFields, "id,name,map.fields(id, city.fields(bank, chantiers, buildings, name, water, x, y, door, chaos, hard, devast), citizens.fields(id,name,isGhost,homeMessage,avatar,x,y,job.fields(uid,name,id,desc)), wid, hei, consiparcy, cadavers), rewards,job.fields(uid,name,id,desc)");
+            url = AddParameterToQuery(url, _parameterFields, "id,name,isGhost,locale,twinId,mapId,map.fields(id,date,wid,hei,conspiracy,bonusPts,days,custom,zones.fields(x,y,nvt,tag,danger,details.fields(z,h,dried),items.fields(uid,id,count,broken),building.fields(type,dig,camped,dried)),citizens.fields(id,name,isGhost,twinId,mapId,homeMessage,avatar,hero,job.fields(uid,name,id,desc),dead,out,baseDef,ban,x,y),city.fields(name,water,x,y,door,chaos,hard,devast,chantiers.fields(id,icon,name,pa,maxLife,votes,breakable,def,resources.fields(amount,rsc.fields(id,name)),actions,hasLevels),buildings.fields(id,name,life,maxLife,breakable,def,hasUpgrade,rarity,temporary,parent,actions,hasLevels),news.fields(z,def,content,regenDir,water),defense.fields(total,base,buildings,upgrades,items,itemsMul,citizenHomes,citizenGuardians,watchmen,souls,temp,cadavers,guardiansInfos.fields(gardians,def),bonus),upgrades.fields(total,list.fields(name,level,update,buildingId)),estimations.fields(days,min,max,maxed),estimationsNext.fields(days,min,max,maxed),bank.fields(uid,id,count,broken)),cadavers.fields(id,name,avatar,survival,origin,score,dtype,msg,cleanup.fields(user,type)),expeditions.fields(name,author.fields(id),length,points.fields(x,y)),season,shaman,guide),homeMessage,avatar,hero,job.fields(uid,name,id,desc),dead,out,baseDef,ban,x,y,rewards.fields(id,number)");
             var response = base.Get<MyHordesMeResponseDto>(url);
             UserKeyProvider.UserId = response.Id;
             UserKeyProvider.UserName = response.Name;
             return response;
-        }
+        }  
 
         public Dictionary<string, MyHordesApiRuinDto> GetRuins()
         {

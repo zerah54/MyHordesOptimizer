@@ -13,7 +13,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map
         [JsonProperty("IsBigBrothHordes")]
         public string IsBigBrothHordes { get; set; }
         [JsonProperty("IsGestHordes")]
-        public string IsGestHordes { get; set; }
+        public string IsGestHordes { get; set; }  
+        [JsonProperty("IsMyHordesOptimizer")]
+        public string IsMyHordesOptimizer { get; set; }
 
 
         public static bool IsApi(string param)

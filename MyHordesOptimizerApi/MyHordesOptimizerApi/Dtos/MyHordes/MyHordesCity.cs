@@ -29,13 +29,28 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         [JsonProperty("devast")]
         public bool Devast { get; set; }
 
-        [JsonProperty("bank")]
-        public List<MyHordesBank> Bank { get; set; }
-
         [JsonProperty("chantiers")]
         public List<MyHordesChantier> Chantiers { get; set; }
 
         [JsonProperty("buildings")]
         public List<MyHordesBuilding> Buildings { get; set; }
+
+        [JsonProperty("news")]
+        public MyHordesNews News { get; set; }
+
+        [JsonProperty("defense")]
+        public MyHordesDefense Defense { get; set; }
+
+        [JsonProperty("upgrades")]
+        public MyHordesUpgradesRoot Upgrades { get; set; }
+
+        [JsonProperty("estimations")]
+        public dynamic Estimations { get; set; }
+
+        [JsonProperty("estimationsNext")]
+        public List<object> EstimationsNext { get; set; }
+
+        [JsonProperty("bank")]
+        public List<MyHordesBank> Bank { get; set; }
     }
 }
