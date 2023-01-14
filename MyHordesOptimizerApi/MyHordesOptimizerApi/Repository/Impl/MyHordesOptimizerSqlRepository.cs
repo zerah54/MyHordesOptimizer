@@ -1127,11 +1127,20 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
+            var existings = connection.Query<MapCellModel>("SELECT * FROM MapCell WHERE idTown = @IdTown", new { IdTown = townId });
+            foreach(var cell in listCells)
+            {
+                var existingCell = existings.SingleOrDefault(existing => existing.X == cell.X && existing.Y == cell.Y);
+                if (existingCell != null)
+                {
+                    cell.IdCell = existingCell.IdCell;
+                }
+            }
             var dico = new Dictionary<string, Func<MapCellModel, object>>() { { "idCell", x => x.IdCell }, { "idTown", x => x.IdTown }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo }, { "x", x => x.X }, { "y", x => x.Y },
             { "isVisitedToday", x => x.IsVisitedToday }, { "dangerLevel", x => x.DangerLevel }, { "idRuin", x => x.IdRuin }, { "isDryed", x => x.IsDryed }, { "nbZombie", x => x.NbZombie },
             { "nbZombieKilled", x => x.NbZombieKilled }, { "nbHero", x => x.NbHero }, { "isRuinCamped", x => x.IsRuinCamped }, { "isRuinDryed", x => x.IsRuinDryed }, { "nbRuinDig", x => x.NbRuinDig },
             { "todayNbDigSucces", x => x.TodayNbDigSucces }, { "previousDayTotalNbDigSucces", x => x.PreviousDayTotalNbDigSucces }, { "averagePotentialRemainingDig", x => x.AveragePotentialRemainingDig }, { "maxPotentialRemainingDig", x => x.MaxPotentialRemainingDig }};
-            connection.BulkInsert("MapCell", dico, listCells);
+            connection.BulkInsertOrUpdate("MapCell", dico, listCells, ignoreNullOnUpdate: true);
             connection.Close();
         }
 
@@ -1167,7 +1176,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var dico = new Dictionary<string, Func<MapCellItemModel, object>>() { { "idCell", x => x.IdCell }, { "idItem", x => x.IdItem }, { "count", x => x.Count }, { "IsBroken", x => x.IsBroken } };
-            connection.BulkInsert("MapCellItem", dico, listCellItems);
+            connection.BulkInsertOrUpdate("MapCellItem", dico, listCellItems);
             connection.Close();
         }
 

@@ -33,3 +33,13 @@ CREATE TABLE MapCellItem(
 	FOREIGN KEY(idItem) REFERENCES Item(idItem),
 	FOREIGN KEY(idCell) REFERENCES MapCell(idCell)
 );
+
+CREATE TABLE MapCellDig(
+	idCell INT,
+	idUser INT,
+	dateUpdate datetime NOT NULL,
+	nbSucces INT,
+	PRIMARY KEY (idCell, idUser, dateUpdate),
+	FOREIGN KEY(idUser) REFERENCES Users(idUser),
+	FOREIGN KEY(idCell) REFERENCES MapCell(idCell)
+);

@@ -38,6 +38,42 @@ namespace MyHordesOptimizerApi.Extensions
             }
         }
 
+        public static void BulkInsertOrUpdate<TModel>(this MySqlConnection connection, 
+            string tableName,
+            Dictionary<string, Func<TModel, object>> dico, 
+            List<TModel> models, 
+            bool ignoreNullOnUpdate = false)
+        {
+            if (models.Any())
+            {
+                var sb = new StringBuilder($"INSERT INTO {tableName}({string.Join(",", dico.Keys)}) VALUES ");
+                var param = new DynamicParameters();
+                var count = 1;
+                var listValues = new List<string>();
+                var listUpdates = new HashSet<string>();
+                foreach (var model in models)
+                {
+                    var list = new List<string>();
+                    foreach (var kvp in dico)
+                    {
+                        list.Add($"@{count}");
+                        var value = kvp.Value.Invoke(model);
+                        param.Add($"@{count}", value);
+                        count++;
+                        if(value != null)
+                        {
+                            listUpdates.Add($"{kvp.Key} = values({kvp.Key})");
+                        }
+                    }
+                    listValues.Add($"({string.Join(",", list)})");
+                }
+                sb.Append($"{string.Join(",", listValues)}");
+                sb.Append($" ON DUPLICATE KEY UPDATE {string.Join(",", listUpdates)}");
+                var query = sb.ToString();
+                connection.Execute(query, param);
+            }
+        }
+
         public static void Update<TModel>(this MySqlConnection connection, TModel model, Dictionary<string, Func<TModel, object>> keys = null, bool ignoreNull = false)
         {
             var type = model.GetType();
@@ -99,46 +135,7 @@ namespace MyHordesOptimizerApi.Extensions
                 connection.Execute(query, param);
             }
         }
-        /*
-                public static void BulkUpdate<TModel>(this MySqlConnection connection, List<TModel> models)
-                {
-                    var type = typeof(TModel);
-                    var tableAttribute = Attribute.GetCustomAttributes(type).FirstOrDefault(attr => attr.GetType() == typeof(TableAttribute)) as TableAttribute;
-                    var tableName = tableAttribute == null ? type.Name : tableAttribute.Name;
-                    var values = new List<string>();
-                    var param = new DynamicParameters();
-                    var setClauses = new List<string>();
-                    var keyName = string.Empty;
-                    foreach (var prop in type.GetProperties())
-                    {
-                        var keyAttr = prop.GetCustomAttributes().FirstOrDefault(attr => attr.GetType() == typeof(KeyAttribute)) as KeyAttribute;
-                        var columnAttr = prop.GetCustomAttributes().FirstOrDefault(attr => attr.GetType() == typeof(ColumnAttribute)) as ColumnAttribute;
-                        var name = string.Empty;
-                        if (columnAttr == null)
-                        {
-                            name = prop.Name;
-                        }
-                        else
-                        {
-                            name = columnAttr.Name;
-                        }
-                        if (keyAttr != null)
-                        {
-                            keyName = name;
-                        }
-                        else
-                        {
-                            values.Add($"@{name}");
-                            setClauses.Add($"{name} = CASE WHEN {keyName} = @{keyName} THEN @{name}");
-                            param.Add(name, prop.GetValue(model, null));
-                        }
-                        param.Add(name, prop.GetValue(model, null));
-                    }
-                    var sb = new StringBuilder($"UPDATE {tableName} SET {string.Join(",", setClauses)} WHERE {keyName} IN @{keyValues}");
-                    var query = sb.ToString();
-                    connection.Execute(query, param);
-                }
-                */
+       
         public static void Insert<TModel>(this MySqlConnection connection, TModel model)
         {
             var type = model.GetType();
