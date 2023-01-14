@@ -9,6 +9,7 @@ namespace MyHordesOptimizerApi.Models.Map
         public int IdLastUpdateInfo { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public bool IsTown { get; set; }
         public bool IsVisitedToday { get; set; }
         public int DangerLevel { get; set; }
         public int? IdRuin { get; set; }
@@ -26,5 +27,14 @@ namespace MyHordesOptimizerApi.Models.Map
         public DateTime LastUpdateDateUpdate { get; set; }
         public string LastUpdateInfoUserName { get; set; }
         public int LastUpdateInfoUserId { get; set; }
+        public int TownX { get; set; }
+        public int TownY { get; set; }
+        public int MapHeight { get; set; }
+        public int MapWidth { get; set; }
+        public bool IsChaos { get; set; }
+        public bool IsDevasted { get; set; }
+        public bool IsDoorOpen { get; set; }
+        public int WaterWell { get; set; }
+        public int Day { get; set; }
     }
 }

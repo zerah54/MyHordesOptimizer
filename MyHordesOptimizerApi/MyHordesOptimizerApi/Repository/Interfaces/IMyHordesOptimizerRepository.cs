@@ -9,7 +9,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
 {
     public interface IMyHordesOptimizerRepository
     {
-        void PatchTown(Town town);
+        void PatchTown(TownModel town);
         Town GetTown(int townId);
 
         void PatchHeroSkill(List<HeroSkillsModel> heroSkills);

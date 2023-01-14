@@ -1,5 +1,6 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Services.Interfaces
@@ -14,6 +15,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         BankWrapper GetBank();
         CitizensWrapper GetCitizens(int townId);
         IEnumerable<MyHordesOptimizerRuin> GetRuins();
-        IEnumerable<MyHordesOptimizerCellDto> GetCells(int townId);
+        MyHordesOptimizerMapDto GetMap(int townId);
     }
 }

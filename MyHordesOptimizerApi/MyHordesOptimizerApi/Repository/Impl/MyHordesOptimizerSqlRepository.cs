@@ -42,28 +42,11 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #region Town
 
-        public void PatchTown(Town town)
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-            InsertTown(town.Id);
-            Logger.LogTrace($"Insertion de la ville : {sw.ElapsedMilliseconds}");
-            PatchCitizen(town.Id, town.Citizens);
-            Logger.LogTrace($"PatchCitizen : {sw.ElapsedMilliseconds}");
-            PutBank(town.Id, town.Bank);
-            Logger.LogTrace($"PutBank : {sw.ElapsedMilliseconds}");
-            sw.Stop();
-        }
-
-        private void InsertTown(int townId)
+        public void PatchTown(TownModel town)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var exist = connection.ExecuteScalar<int?>("SELECT idTown FROM Town WHERE idTown = @TownId", new { TownId = townId });
-            if (!exist.HasValue)
-            {
-                connection.Execute("INSERT INTO Town(idTown) VALUES(@TownId)", new { TownId = townId });
-            }
+            connection.InsertOrUpdate("Town", town, ignoreNullOnUpdate: true);
             connection.Close();
         }
 
@@ -313,7 +296,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             var sw = new Stopwatch();
             sw.Start();
-            InsertTown(townId);
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
 
@@ -407,7 +389,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void AddItemToWishlist(int townId, int itemId, int userId)
         {
-            InsertTown(townId);
             var query = @"CALL AddItemToWishList(@TownId, @UserId, @ItemId, @DateUpdate)";
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
@@ -417,7 +398,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PutWishList(int townId, int userId, List<TownWishlistItemModel> items)
         {
-            InsertTown(townId);
             items.ForEach(x => x.IdTown = townId);
             var updateTownQuery = @"UPDATE Town SET idUserWishListUpdater = @UserId, wishlistDateUpdate = @DateUpdate WHERE idTown = @TownId;";
             var cleanWishListQuery = @"DELETE FROM TownWishListItem WHERE idTown = @TownId;";
@@ -498,7 +478,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public void PatchCitizen(int townId, CitizensWrapper wrapper)
         {
-            InsertTown(townId);
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var userIds = wrapper.Citizens.Select(x => x.Id).ToList();

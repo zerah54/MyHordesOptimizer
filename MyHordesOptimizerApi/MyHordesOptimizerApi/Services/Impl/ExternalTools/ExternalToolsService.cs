@@ -139,6 +139,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 IdLastUpdateInfo = idLastUpdateInfo,
                                 X = zone.X,
                                 Y = zone.Y,
+                                IsTown = zone.X == me.Map.City.X && zone.Y == me.Map.City.Y,
                                 IsVisitedToday = Convert.ToBoolean(zone.Nvt),
                                 IdRuin = type,
                                 NbZombie = nbZombie,

@@ -7,6 +7,7 @@
         public int IdLastUpdateInfo { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public bool IsTown { get; set; }
         public bool IsVisitedToday { get; set; }
         public int DangerLevel { get; set; }
         public int? IdRuin { get; set; }

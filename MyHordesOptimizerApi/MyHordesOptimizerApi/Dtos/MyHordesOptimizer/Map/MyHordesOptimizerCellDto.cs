@@ -1,13 +1,13 @@
 ﻿using System;
 
-namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
+namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
 {
     public class MyHordesOptimizerCellDto
     {
-        public int IdCell { get; set; }
-        public int IdTown { get; set; }
+        public int CellId { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public bool IsTown { get; set; }
         public bool IsVisitedToday { get; set; }
         public int DangerLevel { get; set; }
         public int? IdRuin { get; set; }

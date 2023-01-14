@@ -39,9 +39,9 @@ namespace MyHordesOptimizerApi.Extensions
             }
         }
 
-        public static void BulkInsertOrUpdate<TModel>(this MySqlConnection connection, 
+        public static void BulkInsertOrUpdate<TModel>(this MySqlConnection connection,
             string tableName,
-            List<TModel> models, 
+            List<TModel> models,
             bool ignoreNullOnUpdate = false)
         {
             if (models.Any())
@@ -61,7 +61,7 @@ namespace MyHordesOptimizerApi.Extensions
                         var value = kvp.Value.Invoke(model);
                         param.Add($"@{count}", value);
                         count++;
-                        if(value != null)
+                        if (value != null)
                         {
                             listUpdates.Add($"{kvp.Key} = values({kvp.Key})");
                         }
@@ -73,6 +73,36 @@ namespace MyHordesOptimizerApi.Extensions
                 var query = sb.ToString();
                 connection.Execute(query, param);
             }
+        }
+
+        public static void InsertOrUpdate<TModel>(this MySqlConnection connection,
+            string tableName,
+            TModel model,
+            bool ignoreNullOnUpdate = false)
+        {
+            var dico = typeof(TModel).GetPropertiesInvoker<TModel>();
+            var sb = new StringBuilder($"INSERT INTO {tableName}({string.Join(",", dico.Keys)}) VALUES ");
+            var param = new DynamicParameters();
+            var count = 1;
+            var listValues = new List<string>();
+            var listUpdates = new HashSet<string>();
+            var list = new List<string>();
+            foreach (var kvp in dico)
+            {
+                list.Add($"@{count}");
+                var value = kvp.Value.Invoke(model);
+                param.Add($"@{count}", value);
+                count++;
+                if (value != null)
+                {
+                    listUpdates.Add($"{kvp.Key} = values({kvp.Key})");
+                }
+            }
+            listValues.Add($"({string.Join(",", list)})");
+            sb.Append($"{string.Join(",", listValues)}");
+            sb.Append($" ON DUPLICATE KEY UPDATE {string.Join(",", listUpdates)}");
+            var query = sb.ToString();
+            connection.Execute(query, param);
         }
 
         public static void Update<TModel>(this MySqlConnection connection, TModel model, Dictionary<string, Func<TModel, object>> keys = null, bool ignoreNull = false)
@@ -136,7 +166,7 @@ namespace MyHordesOptimizerApi.Extensions
                 connection.Execute(query, param);
             }
         }
-       
+
         public static void Insert<TModel>(this MySqlConnection connection, TModel model)
         {
             var type = model.GetType();

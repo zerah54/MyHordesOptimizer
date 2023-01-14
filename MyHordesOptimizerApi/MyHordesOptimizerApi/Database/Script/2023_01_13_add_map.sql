@@ -24,6 +24,9 @@
 	FOREIGN KEY(idRuin) REFERENCES Ruin(idRuin)
 );
 
+ALTER TABLE MapCell
+ADD COLUMN isTown BIT NULL DEFAULT 0 AFTER y;
+
 CREATE TABLE MapCellItem(
 	idCell INT,
 	idItem INT,
@@ -34,9 +37,21 @@ CREATE TABLE MapCellItem(
 	FOREIGN KEY(idCell) REFERENCES MapCell(idCell)
 );
 
+ALTER TABLE Town ADD COLUMN x INT NOT NULL;
+ALTER TABLE Town ADD COLUMN y INT NOT NULL;
+ALTER TABLE Town ADD COLUMN width INT NOT NULL;
+ALTER TABLE Town ADD COLUMN height INT NOT NULL;
+ALTER TABLE Town ADD COLUMN day INT NOT NULL;
+ALTER TABLE Town ADD COLUMN waterWell INT NOT NULL;
+ALTER TABLE Town ADD COLUMN isDoorOpen BIT NOT NULL;
+ALTER TABLE Town ADD COLUMN isChaos BIT NOT NULL;
+ALTER TABLE Town ADD COLUMN isDevasted BIT NOT NULL;
+
+ALTER TABLE TownCitizen ADD COLUMN houseDefense INT NULL DEFAULT NULL AFTER idLastUpdateInfoHeroicAction;
+
 CREATE VIEW MapCellComplet AS 
 SELECT mc.idCell
-	   ,mc.idTown
+	   ,t.idTown
        ,mc.idLastUpdateInfo
        ,mc.x
        ,mc.y
@@ -54,12 +69,23 @@ SELECT mc.idCell
        ,mc.previousDayTotalNbDigSucces
        ,mc.averagePotentialRemainingDig
        ,mc.maxPotentialRemainingDig
+	   ,mc.isTown
        ,lui.dateUpdate AS LastUpdateDateUpdate
        ,u.idUser AS LastUpdateInfoUserId
        ,u.name AS LastUpdateInfoUserName
-FROM MapCell mc
-INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mc.idLastUpdateInfo
-INNER JOIN Users u ON u.idUser = lui.idUser;
+       ,t.x AS TownX
+       ,t.y AS TownY
+       ,t.height AS MapHeight
+       ,t.width AS MapWidth
+       ,t.isChaos
+       ,t.isDevasted
+       ,t.isDoorOpen
+       ,t.waterWell
+       ,t.day
+FROM Town t
+LEFT JOIN MapCell mc ON t.idTown = mc.idTown
+LEFT JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mc.idLastUpdateInfo
+LEFT JOIN Users u ON u.idUser = lui.idUser;
 
 
 CREATE TABLE MapCellDig(

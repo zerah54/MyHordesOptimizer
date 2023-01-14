@@ -43,7 +43,7 @@ namespace MyHordesOptimizerApi.Models
 		public bool IsConvalescent { get; set; }
 		public bool IsSated { get; set; }
 		public bool IsCheatingDeathActive { get; set; }
-		public bool IsHangOver { get; set; }
+		public bool IsHungOver { get; set; }
 		public bool IsImmune { get; set; }
 		public bool IsInfected { get; set; }
 		public bool IsTerrorised { get; set; }

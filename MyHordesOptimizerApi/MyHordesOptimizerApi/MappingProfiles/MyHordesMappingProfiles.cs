@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.MappingProfiles.Resolvers;
+using MyHordesOptimizerApi.Models;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.MappingProfiles
@@ -18,6 +19,20 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.MyHordesMap, opt => opt.MapFrom(src => src))
                 .ForMember(dest => dest.Citizens, opt => opt.MapFrom<TownCitizensResolver>())
                 .ForMember(dest => dest.Bank, opt => opt.MapFrom<TownBankResolver>());
+
+            CreateMap<MyHordesMeResponseDto, TownModel>()
+                .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => src.MapId))
+                .ForMember(dest => dest.WishlistDateUpdate, opt => opt.Ignore())
+                .ForMember(dest => dest.IdUserWishListUpdater, opt => opt.Ignore())
+                .ForMember(dest => dest.Day, opt => opt.MapFrom(src => src.Map.Days))
+                .ForMember(dest => dest.Height, opt => opt.MapFrom(src => src.Map.Hei))
+                .ForMember(dest => dest.Width, opt => opt.MapFrom(src => src.Map.Wid))
+                .ForMember(dest => dest.IsChaos, opt => opt.MapFrom(src => src.Map.City.Chaos))
+                .ForMember(dest => dest.IsDevasted, opt => opt.MapFrom(src => src.Map.City.Devast))
+                .ForMember(dest => dest.IsDoorOpen, opt => opt.MapFrom(src => src.Map.City.Door))
+                .ForMember(dest => dest.WaterWell, opt => opt.MapFrom(src => src.Map.City.Water))
+                .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.Map.City.X))
+                .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.Map.City.Y));
 
             CreateMap<MyHordesCitizen, Citizen>()
                 .ForMember(dest => dest.NombreJourHero, opt => opt.Ignore());

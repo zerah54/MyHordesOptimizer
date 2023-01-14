@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.MappingProfiles.Converters;
@@ -420,7 +421,21 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.LastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.HeroicActionLastUpdateDateUpdate.Value, UserName = src.HeroicActionLastUpdateInfoUserName }); opt.PreCondition(src => src.HeroicActionLastUpdateDateUpdate.HasValue); });
 
 
+            CreateMap<IEnumerable<MapCellCompletModel>, MyHordesOptimizerMapDto>()
+                .ForMember(dest => dest.Day, opt => opt.MapFrom(src => src.First().Day))
+                .ForMember(dest => dest.IsChaos, opt => opt.MapFrom(src => src.First().IsChaos))
+                .ForMember(dest => dest.IsDevasted, opt => opt.MapFrom(src => src.First().IsDevasted))
+                .ForMember(dest => dest.IsDoorOpen, opt => opt.MapFrom(src => src.First().IsDoorOpen))
+                .ForMember(dest => dest.WaterWell, opt => opt.MapFrom(src => src.First().WaterWell))
+                .ForMember(dest => dest.TownX, opt => opt.MapFrom(src => src.First().TownX))
+                .ForMember(dest => dest.TownY, opt => opt.MapFrom(src => src.First().TownY))
+                .ForMember(dest => dest.MapHeight, opt => opt.MapFrom(src => src.First().MapHeight))
+                .ForMember(dest => dest.MapWidth, opt => opt.MapFrom(src => src.First().MapWidth))
+                .ForMember(dest => dest.TownId, opt => opt.MapFrom(src => src.First().IdTown))
+                .ForMember(dest => dest.Cells, opt => { opt.MapFrom(src => src); opt.PreCondition(src => src.First().IdCell != 0); });
+
             CreateMap<MapCellCompletModel, MyHordesOptimizerCellDto>()
+                .ForMember(dest => dest.CellId, opt => opt.MapFrom(src => src.IdCell))
                 .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.LastUpdateDateUpdate, UserName = src.LastUpdateInfoUserName, UserId = src.LastUpdateInfoUserId } ));
 
             CreateMap<TownCitizenBagItemCompletModel, CitizenHomeValue>();

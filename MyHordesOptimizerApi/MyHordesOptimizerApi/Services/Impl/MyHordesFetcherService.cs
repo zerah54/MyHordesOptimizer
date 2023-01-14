@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions.Models;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -87,7 +89,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             var town = Mapper.Map<Town>(myHordeMeResponse.Map);
 
             // Enregistrer en base
-            MyHordesOptimizerRepository.PatchTown(town);
+            var townModel = Mapper.Map<TownModel>(myHordeMeResponse);
+            MyHordesOptimizerRepository.PatchTown(townModel);
+            MyHordesOptimizerRepository.PatchCitizen(town.Id, town.Citizens);
+            MyHordesOptimizerRepository.PutBank(town.Id, town.Bank);
             town = MyHordesOptimizerRepository.GetTown(town.Id);
 
             return town;
@@ -100,8 +105,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 myHordeMeResponse.Map.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
                 var town = Mapper.Map<Town>(myHordeMeResponse.Map);
-
-                MyHordesOptimizerRepository.PatchTown(town);
+                var townModel = Mapper.Map<TownModel>(myHordeMeResponse);
+                MyHordesOptimizerRepository.PatchTown(townModel);
+                MyHordesOptimizerRepository.PatchCitizen(town.Id, town.Citizens);
+                MyHordesOptimizerRepository.PutBank(town.Id, town.Bank);
             }
             var simpleMe = Mapper.Map<SimpleMe>(myHordeMeResponse);
 
@@ -162,11 +169,11 @@ namespace MyHordesOptimizerApi.Services.Impl
             return ruins;
         }
 
-        public IEnumerable<MyHordesOptimizerCellDto> GetCells(int townId)
+        public MyHordesOptimizerMapDto GetMap(int townId)
         {
             var models = MyHordesOptimizerRepository.GetCells(townId);
-            var dtos = Mapper.Map<IEnumerable<MyHordesOptimizerCellDto>>(models);
-            return dtos;
+            var map = Mapper.Map<MyHordesOptimizerMapDto>(models);
+            return map;
         }
     }
 }
