@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
 {
@@ -24,5 +24,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         public int? MaxPotentialRemainingDig { get; set; }
 
         public LastUpdateInfo? LastUpdateInfo { get; set; }
+
+        public List<CellItemDto> Items { get; set; }
+
+        public MyHordesOptimizerCellDto()
+        {
+            Items = new List<CellItemDto>();
+        }
     }
 }

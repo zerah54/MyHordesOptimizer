@@ -436,7 +436,13 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             CreateMap<MapCellCompletModel, MyHordesOptimizerCellDto>()
                 .ForMember(dest => dest.CellId, opt => opt.MapFrom(src => src.IdCell))
+                .ForMember(dest => dest.Items, opt => opt.Ignore())
                 .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.LastUpdateDateUpdate, UserName = src.LastUpdateInfoUserName, UserId = src.LastUpdateInfoUserId } ));
+
+            CreateMap<MapCellCompletModel, CellItemDto>()
+                .ForMember(dest => dest.ItemId, opt => opt.MapFrom(src => src.ItemId))
+                .ForMember(dest => dest.ItemCount, opt => opt.MapFrom(src => src.ItemCount))
+                .ForMember(dest => dest.IsItemBroken, opt => opt.MapFrom(src => src.IsItemBroken));
 
             CreateMap<TownCitizenBagItemCompletModel, CitizenHomeValue>();
             CreateMap<TownCitizenBagItemCompletModel, CitizenStatusValue>();

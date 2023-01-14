@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -172,7 +173,15 @@ namespace MyHordesOptimizerApi.Services.Impl
         public MyHordesOptimizerMapDto GetMap(int townId)
         {
             var models = MyHordesOptimizerRepository.GetCells(townId);
-            var map = Mapper.Map<MyHordesOptimizerMapDto>(models);
+            var distinct = models.Distinct(new CellIdComparer());
+            var map = Mapper.Map<MyHordesOptimizerMapDto>(distinct);
+
+            var items = models.Where(x => x.ItemId.HasValue);
+            foreach (var item in items)
+            {
+                var cellItem = Mapper.Map<CellItemDto>(item);
+                map.Cells.Single(cell => cell.CellId == item.IdCell).Items.Add(cellItem);
+            }
             return map;
         }
     }

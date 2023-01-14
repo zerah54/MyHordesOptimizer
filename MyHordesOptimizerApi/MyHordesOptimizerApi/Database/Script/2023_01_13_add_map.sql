@@ -32,7 +32,7 @@ CREATE TABLE MapCellItem(
 	idItem INT,
 	count INT,
 	isBroken BIT NOT NULL DEFAULT 0,
-	PRIMARY KEY (idCell, idItem),
+	PRIMARY KEY (idCell, idItem, isBroken),
 	FOREIGN KEY(idItem) REFERENCES Item(idItem),
 	FOREIGN KEY(idCell) REFERENCES MapCell(idCell)
 );
@@ -82,8 +82,12 @@ SELECT mc.idCell
        ,t.isDoorOpen
        ,t.waterWell
        ,t.day
+       ,mci.idItem AS ItemId
+       ,mci.count AS ItemCount
+       ,mci.isBroken AS IsItemBroken
 FROM Town t
 LEFT JOIN MapCell mc ON t.idTown = mc.idTown
+LEFT JOIN MapCellItem mci ON mci.idCell = mc.idCell
 LEFT JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mc.idLastUpdateInfo
 LEFT JOIN Users u ON u.idUser = lui.idUser;
 

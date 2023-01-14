@@ -36,5 +36,8 @@ namespace MyHordesOptimizerApi.Models.Map
         public bool IsDoorOpen { get; set; }
         public int WaterWell { get; set; }
         public int Day { get; set; }
+        public int? ItemId { get; set; }
+        public int? ItemCount { get; set; }
+        public bool? IsItemBroken { get; set; }
     }
 }
