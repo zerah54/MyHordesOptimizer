@@ -50,6 +50,10 @@
                     max-width: 400px;
 
                     .lvl-element {
+                        .mat-form-field {
+                            width: 100%;
+                            max-width: 100%;
+                        }
 
                         &.full-width {
                             width: 100%;
@@ -62,6 +66,8 @@
 
                     .lvl-element {
                         .mat-form-field {
+                            width: 95%;
+                            max-width: 95%;
                             .mat-form-field-infix {
                                 width: 125px;
                             }
@@ -81,8 +87,6 @@
                         display: inline-block;
 
                         .mat-form-field {
-                            width: 100%;
-                            max-width: 100%;
 
                             .mat-form-field-infix {
                                 display: flex;

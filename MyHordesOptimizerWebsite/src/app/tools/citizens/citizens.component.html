@@ -86,7 +86,7 @@
                                 </mho-last-update>
                             </ng-container>
                             <ng-container *ngSwitchCase="'home'">
-                                <div class="home" style="min-width: 400px">
+                                <div class="home">
                                     <div class="lvl-element" *ngFor="let element of row.home.content"
                                         [class.third-width]="element.element.value.max_lvl > 1">
                                         <mat-form-field *ngIf="element.element.value.max_lvl > 1"
