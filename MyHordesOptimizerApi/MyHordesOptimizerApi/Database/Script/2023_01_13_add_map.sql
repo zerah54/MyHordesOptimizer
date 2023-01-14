@@ -34,6 +34,34 @@ CREATE TABLE MapCellItem(
 	FOREIGN KEY(idCell) REFERENCES MapCell(idCell)
 );
 
+CREATE VIEW MapCellComplet AS 
+SELECT mc.idCell
+	   ,mc.idTown
+       ,mc.idLastUpdateInfo
+       ,mc.x
+       ,mc.y
+       ,mc.isVisitedToday
+       ,mc.dangerLevel
+       ,mc.idRuin
+       ,mc.isDryed
+       ,mc.nbZombie
+       ,mc.nbZombieKilled
+       ,mc.nbHero
+       ,mc.isRuinCamped
+       ,mc.isRuinDryed
+       ,mc.nbRuinDig
+       ,mc.todayNbDigSucces
+       ,mc.previousDayTotalNbDigSucces
+       ,mc.averagePotentialRemainingDig
+       ,mc.maxPotentialRemainingDig
+       ,lui.dateUpdate AS LastUpdateDateUpdate
+       ,u.idUser AS LastUpdateInfoUserId
+       ,u.name AS LastUpdateInfoUserName
+FROM MapCell mc
+INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mc.idLastUpdateInfo
+INNER JOIN Users u ON u.idUser = lui.idUser;
+
+
 CREATE TABLE MapCellDig(
 	idCell INT,
 	idUser INT,

@@ -125,7 +125,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Map")]
-        public ActionResult<IEnumerable<MyHordesOptimizerCell>> GetRuins(int? townId)
+        public ActionResult<IEnumerable<MyHordesOptimizerCellDto>> GetRuins(int? townId)
         {
             if (!townId.HasValue)
             {

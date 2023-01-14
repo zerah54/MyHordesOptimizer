@@ -162,10 +162,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             return ruins;
         }
 
-        public IEnumerable<MyHordesOptimizerCell> GetCells(int townId)
+        public IEnumerable<MyHordesOptimizerCellDto> GetCells(int townId)
         {
             var models = MyHordesOptimizerRepository.GetCells(townId);
-            var dtos = Mapper.Map<IEnumerable<MyHordesOptimizerCell>>(models);
+            var dtos = Mapper.Map<IEnumerable<MyHordesOptimizerCellDto>>(models);
             return dtos;
         }
     }

@@ -23,7 +23,8 @@ namespace MyHordesOptimizerApi.Models.Map
         public int? PreviousDayTotalNbDigSucces { get; set; }
         public double? AveragePotentialRemainingDig { get; set; }
         public int? MaxPotentialRemainingDig { get; set; }
-        public DateTime DateUpdate { get; set; }
-        public string Name { get; set; }
+        public DateTime LastUpdateDateUpdate { get; set; }
+        public string LastUpdateInfoUserName { get; set; }
+        public int LastUpdateInfoUserId { get; set; }
     }
 }

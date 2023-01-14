@@ -2,11 +2,10 @@
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
-    public class MyHordesOptimizerCell
+    public class MyHordesOptimizerCellDto
     {
         public int IdCell { get; set; }
         public int IdTown { get; set; }
-        public int IdLastUpdateInfo { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
         public bool IsVisitedToday { get; set; }
@@ -23,7 +22,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public int? PreviousDayTotalNbDigSucces { get; set; }
         public double? AveragePotentialRemainingDig { get; set; }
         public int? MaxPotentialRemainingDig { get; set; }
-        public DateTime DateUpdate { get; set; }
-        public string Name { get; set; }
+
+        public LastUpdateInfo? LastUpdateInfo { get; set; }
     }
 }

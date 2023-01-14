@@ -1139,12 +1139,11 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCell mc
-                                                         INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mc.idLastUpdateInfo
-                                                         WHERE idTown = @idtown AND x = @x AND y = @y", new { idTown = townId, x = zoneItemX, y = zoneItemY });
+            var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCellComplet
+                                                                WHERE idTown = @idtown AND x = @x AND y = @y", new { idTown = townId, x = zoneItemX, y = zoneItemY });
             connection.Close();
-            var mostRecent = cells.Max(x => x.DateUpdate);
-            cells = cells.Where(x => x.DateUpdate == mostRecent);
+            var mostRecent = cells.Max(x => x.LastUpdateDateUpdate);
+            cells = cells.Where(x => x.LastUpdateDateUpdate == mostRecent);
             var cell = cells.Single();
             return cell;
         }
@@ -1153,12 +1152,11 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCell mc
-                                                         INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mc.idLastUpdateInfo
-                                                         WHERE idTown = @idtown", new { idTown = townId });
+            var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCellComplet 
+                                                                WHERE idTown = @idtown", new { idTown = townId });
             connection.Close();
-            var mostRecent = cells.Max(x => x.DateUpdate);
-            cells = cells.Where(x => x.DateUpdate == mostRecent);
+            var mostRecent = cells.Max(x => x.LastUpdateDateUpdate);
+            cells = cells.Where(x => x.LastUpdateDateUpdate == mostRecent);
             return cells;
         }
 

@@ -420,7 +420,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.LastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.HeroicActionLastUpdateDateUpdate.Value, UserName = src.HeroicActionLastUpdateInfoUserName }); opt.PreCondition(src => src.HeroicActionLastUpdateDateUpdate.HasValue); });
 
 
-            CreateMap<MapCellCompletModel, MyHordesOptimizerCell>();
+            CreateMap<MapCellCompletModel, MyHordesOptimizerCellDto>()
+                .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.LastUpdateDateUpdate, UserName = src.LastUpdateInfoUserName, UserId = src.LastUpdateInfoUserId } ));
 
             CreateMap<TownCitizenBagItemCompletModel, CitizenHomeValue>();
             CreateMap<TownCitizenBagItemCompletModel, CitizenStatusValue>();
