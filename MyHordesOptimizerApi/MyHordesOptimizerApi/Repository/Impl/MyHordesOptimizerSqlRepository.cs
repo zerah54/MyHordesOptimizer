@@ -325,8 +325,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var townBankItemModels = Mapper.Map<List<TownBankItemModel>>(bank.Bank);
             townBankItemModels.ForEach(x => { x.IdTown = townId; x.IdLastUpdateInfo = idLastUpdateInfo; });
             Logger.LogTrace($"[PutBank] Automapper TownBankItemModel : {sw.ElapsedMilliseconds}");
-            var dico = new Dictionary<string, Func<TownBankItemModel, object>>() { { "idTown", x => x.IdTown }, { "idItem", x => x.IdItem }, { "count", x => x.Count }, { "isBroken", x => x.IsBroken }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo } };
-            connection.BulkInsert("TownBankItem", dico, townBankItemModels);
+            connection.BulkInsert("TownBankItem", townBankItemModels);
             connection.ExecuteScalar("DELETE FROM TownBankItem WHERE idTown = @IdTown AND idLastUpdateInfo != @IdLastUpdateInfo", new { IdTown = townId, IdLastUpdateInfo = idLastUpdateInfo });
             connection.Close();
             Logger.LogTrace($"[PutBank] Insert TownBankItem : {sw.ElapsedMilliseconds}");
@@ -422,12 +421,11 @@ namespace MyHordesOptimizerApi.Repository.Impl
             items.ForEach(x => x.IdTown = townId);
             var updateTownQuery = @"UPDATE Town SET idUserWishListUpdater = @UserId, wishlistDateUpdate = @DateUpdate WHERE idTown = @TownId;";
             var cleanWishListQuery = @"DELETE FROM TownWishListItem WHERE idTown = @TownId;";
-            var dico = new Dictionary<string, Func<TownWishlistItemModel, object>>() { { "idTown", x => x.IdTown }, { "idItem", x => x.IdItem }, { "count", x => x.Count }, { "priority", x => x.Priority }, { "depot", x => x.Depot } };
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             connection.Execute(updateTownQuery, new { UserId = userId, DateUpdate = DateTime.UtcNow, TownId = townId });
             connection.Execute(cleanWishListQuery, new { TownId = townId });
-            connection.BulkInsert(tableName: "TownWishListItem", dico: dico, models: items);
+            connection.BulkInsert(tableName: "TownWishListItem", models: items);
             connection.Close();
         }
 
@@ -527,12 +525,10 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var townCitizenModels = Mapper.Map<List<TownCitizenModel>>(wrapper.Citizens);
             townCitizenModels.ForEach(x => { x.IdTown = townId; x.IdLastUpdateInfo = idLastUpdateInfo; });
 
-            var dico = new Dictionary<string, Func<TownCitizenModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser }, { "homeMessage", x => x.HomeMessage }, { "jobName", x => x.JobName }, { "jobUID", x => x.JobUID }, { "positionX", x => x.PositionX }, { "positionY", x => x.PositionY }, { "isGhost", x => x.IsGhost }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo }, { "avatar", x => x.Avatar } };
-
             var existings = connection.Query("SELECT idUser, idBag FROM TownCitizen WHERE idTown = @IdTown", new { IdTown = townId });
 
             var townCitizenModelsToInsert = townCitizenModels.Where(x => !existings.Any(existing => existing.idUser == x.IdUser)).ToList();
-            connection.BulkInsert("TownCitizen", dico, townCitizenModelsToInsert);
+            connection.BulkInsert("TownCitizen", townCitizenModelsToInsert);
 
             var townCitizenModelsToUpdate = townCitizenModels.Where(x => existings.Any(existing => existing.idUser == x.IdUser)).ToList();
             foreach (var citizenToUpdate in townCitizenModelsToUpdate)
@@ -1020,7 +1016,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
             StringBuilder inBuilder = GenerateInQuery(citizens.Select(x => x.Bag.IdBag), param);
             connection.ExecuteScalar($"DELETE FROM BagItem WHERE idBag {inBuilder}", param);
 
-            var dico = new Dictionary<string, Func<BagItem, object>>() { { "idBag", x => x.IdBag }, { "idItem", x => x.IdItem }, { "count", x => x.Count }, { "isBroken", x => x.IsBroken } };
             var modeles = new List<BagItem>();
             foreach (var citizen in citizens)
             {
@@ -1037,7 +1032,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             }
             if (modeles.Any())
             {
-                connection.BulkInsert("BagItem", dico, modeles);
+                connection.BulkInsert("BagItem", modeles);
             }
 
             param = new DynamicParameters();
@@ -1136,11 +1131,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                     cell.IdCell = existingCell.IdCell;
                 }
             }
-            var dico = new Dictionary<string, Func<MapCellModel, object>>() { { "idCell", x => x.IdCell }, { "idTown", x => x.IdTown }, { "idLastUpdateInfo", x => x.IdLastUpdateInfo }, { "x", x => x.X }, { "y", x => x.Y },
-            { "isVisitedToday", x => x.IsVisitedToday }, { "dangerLevel", x => x.DangerLevel }, { "idRuin", x => x.IdRuin }, { "isDryed", x => x.IsDryed }, { "nbZombie", x => x.NbZombie },
-            { "nbZombieKilled", x => x.NbZombieKilled }, { "nbHero", x => x.NbHero }, { "isRuinCamped", x => x.IsRuinCamped }, { "isRuinDryed", x => x.IsRuinDryed }, { "nbRuinDig", x => x.NbRuinDig },
-            { "todayNbDigSucces", x => x.TodayNbDigSucces }, { "previousDayTotalNbDigSucces", x => x.PreviousDayTotalNbDigSucces }, { "averagePotentialRemainingDig", x => x.AveragePotentialRemainingDig }, { "maxPotentialRemainingDig", x => x.MaxPotentialRemainingDig }};
-            connection.BulkInsertOrUpdate("MapCell", dico, listCells, ignoreNullOnUpdate: true);
+            connection.BulkInsertOrUpdate("MapCell", listCells, ignoreNullOnUpdate: true);
             connection.Close();
         }
 
@@ -1175,8 +1166,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var dico = new Dictionary<string, Func<MapCellItemModel, object>>() { { "idCell", x => x.IdCell }, { "idItem", x => x.IdItem }, { "count", x => x.Count }, { "IsBroken", x => x.IsBroken } };
-            connection.BulkInsertOrUpdate("MapCellItem", dico, listCellItems);
+            connection.BulkInsertOrUpdate("MapCellItem", listCellItems);
             connection.Close();
         }
 

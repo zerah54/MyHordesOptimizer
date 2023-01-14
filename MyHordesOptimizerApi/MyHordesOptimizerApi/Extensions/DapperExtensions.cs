@@ -12,10 +12,11 @@ namespace MyHordesOptimizerApi.Extensions
 {
     public static class DapperExtensions
     {
-        public static void BulkInsert<TModel>(this MySqlConnection connection, string tableName, Dictionary<string, Func<TModel, object>> dico, List<TModel> models)
+        public static void BulkInsert<TModel>(this MySqlConnection connection, string tableName, List<TModel> models)
         {
             if (models.Any())
             {
+                var dico = typeof(TModel).GetPropertiesInvoker<TModel>();
                 var sb = new StringBuilder($"INSERT INTO {tableName}({string.Join(",", dico.Keys)}) VALUES ");
                 var param = new DynamicParameters();
                 var count = 1;
@@ -40,12 +41,12 @@ namespace MyHordesOptimizerApi.Extensions
 
         public static void BulkInsertOrUpdate<TModel>(this MySqlConnection connection, 
             string tableName,
-            Dictionary<string, Func<TModel, object>> dico, 
             List<TModel> models, 
             bool ignoreNullOnUpdate = false)
         {
             if (models.Any())
             {
+                var dico = typeof(TModel).GetPropertiesInvoker<TModel>();
                 var sb = new StringBuilder($"INSERT INTO {tableName}({string.Join(",", dico.Keys)}) VALUES ");
                 var param = new DynamicParameters();
                 var count = 1;
