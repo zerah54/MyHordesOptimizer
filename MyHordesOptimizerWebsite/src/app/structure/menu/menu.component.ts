@@ -98,6 +98,10 @@ export class MenuComponent implements OnInit {
 
         this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'))
             || this.themes.find((theme: Theme) => theme.class === '');
+
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        })
     }
 
     public toggleDisplayChildren(route: SidenavLinks): void {
