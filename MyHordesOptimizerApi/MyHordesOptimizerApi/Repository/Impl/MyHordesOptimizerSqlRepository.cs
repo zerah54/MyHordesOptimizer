@@ -690,6 +690,25 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return citizenWrapper;
         }
 
+        public void UpdateCitizenLocation(int townId, int x, int y, List<int> citizenId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var param = new DynamicParameters();
+            param.Add($"@PositionX", x);
+            param.Add($"@PositionY", y);
+            param.Add($"@IdTown", townId);
+            var inParamList = new List<string>();
+            foreach(var id in citizenId)
+            {
+                inParamList.Add($"@{id}");
+                param.Add($"@{id}", id);
+            }
+            var query = $"UPDATE TownCitizen SET positionX = @positionX, positionY = @positionY WHERE idUser IN ({string.Join(",", inParamList)}) AND idTown = @idTown";
+            connection.Query(query, param);
+            connection.Close();
+        }
+
         #endregion
 
         #region Ruins

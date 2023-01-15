@@ -97,7 +97,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 });
                 tasks.Add(fataTask);
             }
-            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(mho))
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(mho) || UpdateRequestMapToolsToUpdateDetailsDto.IsCell(mho))
             {
                 var mhoTask = Task.Run(() =>
                 {
@@ -173,6 +173,28 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 }
                             }
                             listCells.Add(cell);
+                        }
+                        if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(mho))
+                        {
+                            UpdateCellInfoDto updateCellDto = updateRequestDto.Map.Cell;
+                            var realX = updateRequestDto.TownDetails.TownX + updateCellDto.X;
+                            var realY = updateRequestDto.TownDetails.TownY - updateCellDto.Y;
+
+                            var cellToUpdate = listCells.Single(cell => cell.X == realX && cell.Y == realY);
+
+                            cellToUpdate.NbZombie = updateCellDto.Zombies;
+                            cellToUpdate.NbZombieKilled = updateCellDto.DeadZombies;
+                            cellToUpdate.IsDryed = updateCellDto.ZoneEmpty;
+
+                            listCellItems.Clear();
+                            var items = Mapper.Map<List<MapCellItemModel>>(updateCellDto.Objects);
+                            items.ForEach(item => item.IdCell = cellToUpdate.IdCell);
+                            listCellItems.AddRange(items);
+
+                            if(updateCellDto.CitizenId.Any())
+                            {
+                                MyHordesOptimizerRepository.UpdateCitizenLocation(updateRequestDto.TownDetails.TownId, realX, realY, updateCellDto.CitizenId);
+                            }
                         }
                         MyHordesOptimizerRepository.PatchMapCell(townId, listCells);
                         if (zoneItemX != -1 && zoneItemY != -1)

@@ -3,7 +3,9 @@ using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
@@ -455,6 +457,12 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             CreateMap<ParametersModel, ParametersDto>()
                 .ReverseMap();
+
+            CreateMap<UpdateObjectDto, MapCellItemModel>()
+                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
+                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
+                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.IdCell, opt => opt.Ignore());
         }
 
         private List<string> GetStatusIcons(TownCitizenBagItemCompletModel src)
