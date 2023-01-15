@@ -11,6 +11,7 @@ namespace MyHordesOptimizerApi.Models.Map
         public int Y { get; set; }
         public bool IsTown { get; set; }
         public bool IsVisitedToday { get; set; }
+        public bool IsNeverVisited { get; set; }
         public int DangerLevel { get; set; }
         public int? IdRuin { get; set; }
         public bool IsDryed { get; set; }

@@ -50,6 +50,15 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
         }
 
+        public TownModel GetTownModel(int townId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var town = connection.QuerySingleOrDefault<TownModel>("SELECT * FROM Town WHERE idTown = @idTown",new {idTown = townId});
+            connection.Close();
+            return town;
+        }
+
         public Town GetTown(int townId)
         {
             var town = new Town()

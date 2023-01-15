@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
@@ -14,6 +15,7 @@ using MyHordesOptimizerApi.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Services.Impl
 {
@@ -113,96 +115,155 @@ namespace MyHordesOptimizerApi.Services.Impl
                 myHordeMeResponse.Map.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
                 var town = Mapper.Map<Town>(myHordeMeResponse.Map);
                 var townModel = Mapper.Map<TownModel>(myHordeMeResponse);
+
+                var existingTownModel = MyHordesOptimizerRepository.GetTownModel(town.Id);
+
                 MyHordesOptimizerRepository.PatchTown(townModel);
                 MyHordesOptimizerRepository.PatchCitizen(town.Id, town.Citizens);
                 MyHordesOptimizerRepository.PutBank(town.Id, town.Bank);
 
-                // Update des fouilles, si c'est pas déjà fait
-                try
+                if (existingTownModel == null) // Si la ville est null, il faut créer toutes les cells
                 {
-                    var update = MyHordesOptimizerRepository.GetMapCellDigUpdate(town.Id, myHordeMeResponse.Map.Days);
-                    if (update == null)
+                    var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+                    var idLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+                    double averageStartingItem = Math.Round((float)MyHordesScrutateurConfiguration.StartItemMin + (((float)MyHordesScrutateurConfiguration.StartItemMax - (float)MyHordesScrutateurConfiguration.StartItemMin) / 2), 3);
+                    var cells = new List<MapCellModel>();
+                    for (var x = 0; x < myHordeMeResponse.Map.Wid; x++)
                     {
-                        var scrutLevel = 0;
-                        var scrut = myHordeMeResponse.Map.City.Buildings.SingleOrDefault(building => building.Id == MyHordesScrutateurConfiguration.Id);
-                        if (scrut != null && scrut.HasLevels.HasValue)
+                        for (var y = 0; y < myHordeMeResponse.Map.Hei; y++)
                         {
-                            scrutLevel = scrut.HasLevels.Value;
-                        }
-                        var regenChance = MyHordesScrutateurConfiguration.Level0;
-                        switch (scrutLevel)
-                        {
-                            case 0:
-                                regenChance = MyHordesScrutateurConfiguration.Level0;
-                                break;
-                            case 1:
-                                regenChance = MyHordesScrutateurConfiguration.Level1;
-                                break;
-                            case 2:
-                                regenChance = MyHordesScrutateurConfiguration.Level2;
-                                break;
-                            case 3:
-                                regenChance = MyHordesScrutateurConfiguration.Level3;
-                                break;
-                            case 4:
-                                regenChance = MyHordesScrutateurConfiguration.Level4;
-                                break;
-                            case 5:
-                                regenChance = MyHordesScrutateurConfiguration.Level5;
-                                break;
-                        }
-                        var cellsComplet = MyHordesOptimizerRepository.GetCells(town.Id);
-                        var cells = Mapper.Map<IEnumerable<MapCellModel>>(cellsComplet);
-                        var regenDirLabel = myHordeMeResponse.Map.City.News.RegenDir.De;
-                        var regen = regenDirLabel.GetEnumFromDescription<RegenDirectionEnum>();
-                        float averageNbOfItemAdded = ((float)MyHordesScrutateurConfiguration.MinItemAdd + ((float)MyHordesScrutateurConfiguration.MaxItemAdd - (float)MyHordesScrutateurConfiguration.MinItemAdd) / (float)2);
-                        var xVille = myHordeMeResponse.Map.City.X;
-                        var yVille = myHordeMeResponse.Map.City.Y;
-                        foreach (var cell in cells)
-                        {
-                            var xFromTown = cell.X - xVille;
-                            var yFromTown = yVille - cell.Y;
-                            if (xFromTown != 0 && yFromTown != 0)
+                            bool isTown = x == myHordeMeResponse.Map.City.X && y == myHordeMeResponse.Map.City.Y;
+                            double? averageStartingItemValue = averageStartingItem;
+                            int? maxPotentialStartingItemValue = MyHordesScrutateurConfiguration.StartItemMax;
+                            if(isTown)
                             {
-                                var cellZone = GetCellZone(xFromTown, yFromTown);
-                                if (cellZone == regen)
-                                {
-                                    var max = cell.MaxPotentialRemainingDig ?? 0;
-                                    var average = cell.AveragePotentialRemainingDig ?? 0;
-                                    if (max < MyHordesScrutateurConfiguration.MaxItemPerCell)
-                                    {
-                                        if (max >= MyHordesScrutateurConfiguration.DigThrottle)
-                                        {
-                                            max = Convert.ToInt32(Math.Ceiling((float)max - 1.0 / 2.0));
-                                        }
-                                        cell.MaxPotentialRemainingDig = max + MyHordesScrutateurConfiguration.MaxItemAdd;
-                                    }
-
-                                    double averageItemAdd = ((float)regenChance / (float)100) * averageNbOfItemAdded;
-                                    if (average < MyHordesScrutateurConfiguration.MaxItemPerCell)
-                                    {
-                                        if (average >= MyHordesScrutateurConfiguration.DigThrottle)
-                                        {
-                                            averageItemAdd = ((float)regenChance / (float)100) * Math.Ceiling(averageNbOfItemAdded - 1.0 / 2.0);
-                                        }
-                                        averageItemAdd = Math.Round(averageItemAdd, 3);
-                                        cell.AveragePotentialRemainingDig = average + averageItemAdd;
-                                    }
-                                }
+                                averageStartingItemValue = null;
+                                maxPotentialStartingItemValue = null;
                             }
+                            var cell = new MapCellModel()
+                            {
+                                IdTown = town.Id,
+                                IdLastUpdateInfo = idLastUpdateInfo,
+                                X = x,
+                                Y = y,
+                                IsTown = isTown,
+                                IsVisitedToday = false,
+                                IsNeverVisited = true,
+                                DangerLevel = null,
+                                IsDryed = false,
+                                IdRuin = null,
+                                NbZombie = null,
+                                NbZombieKilled = null,
+                                NbHero = null,
+                                IsRuinCamped = null,
+                                IsRuinDryed = null,
+                                NbRuinDig = null,
+                                TodayNbDigSucces = null,
+                                PreviousDayTotalNbDigSucces = null,
+                                AveragePotentialRemainingDig = averageStartingItemValue,
+                                MaxPotentialRemainingDig = maxPotentialStartingItemValue
+                            };
+                            cells.Add(cell);
                         }
-                        MyHordesOptimizerRepository.InsertMapCellDigUpdate(new MapCellDigUpdate() { Day = myHordeMeResponse.Map.Days, IdTown = town.Id });
-                        MyHordesOptimizerRepository.PatchMapCell(town.Id, cells);
                     }
+                    MyHordesOptimizerRepository.PatchMapCell(town.Id, cells);
                 }
-                catch (Exception e)
-                {
-                    Logger.LogWarning($"Erreur lors de la maj des fouilles restantes : {e.ToString()}");
-                }
+
+                _ = Task.Run(() => CheckAndUpdateCellDigs(myHordeMeResponse, town.Id));
             }
             var simpleMe = Mapper.Map<SimpleMe>(myHordeMeResponse);
 
             return simpleMe;
+        }
+
+        private void CheckAndUpdateCellDigs(MyHordesMeResponseDto myHordeMeResponse, int townId)
+        {
+            try
+            {
+                // Update des fouilles, si c'est pas déjà fait
+                var update = MyHordesOptimizerRepository.GetMapCellDigUpdate(townId, myHordeMeResponse.Map.Days);
+                if (update == null)
+                {
+                    var scrutLevel = 0;
+                    var scrut = myHordeMeResponse.Map.City.Buildings.SingleOrDefault(building => building.Id == MyHordesScrutateurConfiguration.Id);
+                    if (scrut != null && scrut.HasLevels.HasValue)
+                    {
+                        scrutLevel = scrut.HasLevels.Value;
+                    }
+                    var regenChance = MyHordesScrutateurConfiguration.Level0;
+                    switch (scrutLevel)
+                    {
+                        case 0:
+                            regenChance = MyHordesScrutateurConfiguration.Level0;
+                            break;
+                        case 1:
+                            regenChance = MyHordesScrutateurConfiguration.Level1;
+                            break;
+                        case 2:
+                            regenChance = MyHordesScrutateurConfiguration.Level2;
+                            break;
+                        case 3:
+                            regenChance = MyHordesScrutateurConfiguration.Level3;
+                            break;
+                        case 4:
+                            regenChance = MyHordesScrutateurConfiguration.Level4;
+                            break;
+                        case 5:
+                            regenChance = MyHordesScrutateurConfiguration.Level5;
+                            break;
+                    }
+                    var cellsComplet = MyHordesOptimizerRepository.GetCells(townId);
+                    var cells = Mapper.Map<IEnumerable<MapCellModel>>(cellsComplet);
+                    RegenDirectionEnum regen = RegenDirectionEnum.All;
+                    if (myHordeMeResponse.Map.City.News.RegenDir != null)
+                    {
+                        var regenDirLabel = myHordeMeResponse.Map.City.News.RegenDir.De;
+                        regen = regenDirLabel.GetEnumFromDescription<RegenDirectionEnum>();
+                    }
+                    float averageNbOfItemAdded = ((float)MyHordesScrutateurConfiguration.MinItemAdd + ((float)MyHordesScrutateurConfiguration.MaxItemAdd - (float)MyHordesScrutateurConfiguration.MinItemAdd) / (float)2);
+                    var xVille = myHordeMeResponse.Map.City.X;
+                    var yVille = myHordeMeResponse.Map.City.Y;
+                    foreach (var cell in cells)
+                    {
+                        var xFromTown = cell.X - xVille;
+                        var yFromTown = yVille - cell.Y;
+                        if (!(xFromTown == 0 && yFromTown == 0))
+                        {
+                            var cellZone = GetCellZone(xFromTown, yFromTown);
+                            if (cellZone == regen || regen == RegenDirectionEnum.All)
+                            {
+                                var max = cell.MaxPotentialRemainingDig ?? 0;
+                                var average = cell.AveragePotentialRemainingDig ?? 0;
+                                if (max < MyHordesScrutateurConfiguration.MaxItemPerCell)
+                                {
+                                    if (max >= MyHordesScrutateurConfiguration.DigThrottle)
+                                    {
+                                        max = Convert.ToInt32(Math.Ceiling((float)max - 1.0 / 2.0));
+                                    }
+                                    cell.MaxPotentialRemainingDig = max + MyHordesScrutateurConfiguration.MaxItemAdd;
+                                }
+
+                                double averageItemAdd = ((float)regenChance / (float)100) * averageNbOfItemAdded;
+                                if (average < MyHordesScrutateurConfiguration.MaxItemPerCell)
+                                {
+                                    if (average >= MyHordesScrutateurConfiguration.DigThrottle)
+                                    {
+                                        averageItemAdd = ((float)regenChance / (float)100) * Math.Ceiling(averageNbOfItemAdded - 1.0 / 2.0);
+                                    }
+                                    averageItemAdd = Math.Round(averageItemAdd, 3);
+                                    cell.AveragePotentialRemainingDig = average + averageItemAdd;
+                                }
+                            }
+                        }
+                    }
+                    MyHordesOptimizerRepository.InsertMapCellDigUpdate(new MapCellDigUpdate() { Day = myHordeMeResponse.Map.Days, IdTown = townId });
+                    MyHordesOptimizerRepository.PatchMapCell(townId, cells);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.LogWarning($"Erreur lors de la maj des fouilles restantes : {e.ToString()}");
+            }
         }
 
         private RegenDirectionEnum GetCellZone(int x, int y)

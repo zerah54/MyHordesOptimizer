@@ -19,6 +19,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         [Description("Südosten")]
         SouthEst,
         [Description("Südwesten")]
-        SouthWest
+        SouthWest,
+        All
     }
 }

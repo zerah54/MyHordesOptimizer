@@ -11,6 +11,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
     {
         void PatchTown(TownModel town);
         Town GetTown(int townId);
+        TownModel GetTownModel(int townId);
 
         void PatchHeroSkill(IEnumerable<HeroSkillsModel> heroSkills);
         IEnumerable<HeroSkill> GetHeroSkills();

@@ -5,6 +5,7 @@
 	x INT NOT NULL,
 	y INT NOT NULL,
 	isVisitedToday BIT DEFAULT 0,
+	isNeverVisited BIT DEFAULT 1,
 	dangerLevel INT,
 	idRuin INT,
 	isDryed BIT DEFAULT 0,
@@ -16,7 +17,7 @@
 	nbRuinDig INT,
 	todayNbDigSucces INT,
 	previousDayTotalNbDigSucces INT DEFAULT 0,
-	averagePotentialRemainingDig INT,
+	averagePotentialRemainingDig FLOAT(3),
 	maxPotentialRemainingDig INT,
 	PRIMARY KEY (idCell),
 	FOREIGN KEY(idTown) REFERENCES Town(idTown),
@@ -56,6 +57,7 @@ SELECT mc.idCell
        ,mc.x
        ,mc.y
        ,mc.isVisitedToday
+	   ,mc.isNeverVisited
        ,mc.dangerLevel
        ,mc.idRuin
        ,mc.isDryed

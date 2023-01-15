@@ -143,6 +143,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 Y = zone.Y,
                                 IsTown = zone.X == me.Map.City.X && zone.Y == me.Map.City.Y,
                                 IsVisitedToday = !Convert.ToBoolean(zone.Nvt),
+                                IsNeverVisited = false,
                                 DangerLevel = zone.Danger,
                                 IsDryed = isDried,
                                 IdRuin = type,
