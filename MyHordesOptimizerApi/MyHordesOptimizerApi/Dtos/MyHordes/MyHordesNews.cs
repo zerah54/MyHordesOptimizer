@@ -15,5 +15,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
 
         [JsonProperty("water")]
         public int Water { get; set; }
+
+        [JsonProperty("regenDir")]
+        public MyHordesLangString RegenDir { get; set; }
+
     }
 }

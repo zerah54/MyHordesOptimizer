@@ -27,5 +27,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
 
         [JsonProperty("temporary")]
         public bool Temporary { get; set; }
+        [JsonProperty("hasLevels")]
+        public int? HasLevels { get; set; }
     }
 }

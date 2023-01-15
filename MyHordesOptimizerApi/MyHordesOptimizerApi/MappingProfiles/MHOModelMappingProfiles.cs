@@ -447,6 +447,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CitizenId))
                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CitizenName));
 
+            CreateMap<MapCellCompletModel, MapCellModel>();
+
             CreateMap<TownCitizenBagItemCompletModel, CitizenHomeValue>();
             CreateMap<TownCitizenBagItemCompletModel, CitizenStatusValue>();
             CreateMap<TownCitizenBagItemCompletModel, CitizenActionsHeroicValue>();

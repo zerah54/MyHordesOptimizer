@@ -107,3 +107,10 @@ CREATE TABLE MapCellDig(
 	FOREIGN KEY(idCell) REFERENCES MapCell(idCell),
 	FOREIGN KEY(idLastUpdateInfo) REFERENCES LastUpdateInfo(idLastUpdateInfo)
 );
+
+CREATE TABLE MapCellDigUpdate(
+	idTown INT,
+	day INT,
+	PRIMARY KEY (idTown, day),
+	FOREIGN KEY(idTown) REFERENCES Town(idTown)
+)

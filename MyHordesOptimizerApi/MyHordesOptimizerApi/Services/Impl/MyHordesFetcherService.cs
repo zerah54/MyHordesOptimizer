@@ -1,14 +1,17 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,6 +23,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IMyHordesApiRepository MyHordesJsonApiRepository { get; set; }
         protected IMyHordesOptimizerRepository MyHordesOptimizerRepository { get; set; }
         protected IMyHordesCodeRepository MyHordesCodeRepository { get; set; }
+        protected IMyHordesScrutateurConfiguration MyHordesScrutateurConfiguration { get; set; }
         protected readonly IMapper Mapper;
         protected IUserInfoProvider UserInfoProvider { get; set; }
 
@@ -29,7 +33,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             IMyHordesOptimizerRepository firebaseRepository,
             IMyHordesCodeRepository myHordesCodeRepository,
             IMapper mapper,
-            IUserInfoProvider userInfoProvider)
+            IUserInfoProvider userInfoProvider,
+            IMyHordesScrutateurConfiguration myHordesScrutateurConfiguration)
         {
             Logger = logger;
             MyHordesJsonApiRepository = myHordesJsonApiRepository;
@@ -37,6 +42,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             MyHordesCodeRepository = myHordesCodeRepository;
             Mapper = mapper;
             UserInfoProvider = userInfoProvider;
+            MyHordesScrutateurConfiguration = myHordesScrutateurConfiguration;
         }
 
         public IEnumerable<Item> GetItems(int? townId)
@@ -102,7 +108,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         public SimpleMe GetSimpleMe()
         {
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
-            if(myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
+            if (myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
             {
                 myHordeMeResponse.Map.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
                 var town = Mapper.Map<Town>(myHordeMeResponse.Map);
@@ -110,10 +116,136 @@ namespace MyHordesOptimizerApi.Services.Impl
                 MyHordesOptimizerRepository.PatchTown(townModel);
                 MyHordesOptimizerRepository.PatchCitizen(town.Id, town.Citizens);
                 MyHordesOptimizerRepository.PutBank(town.Id, town.Bank);
+
+                // Update des fouilles, si c'est pas déjà fait
+                try
+                {
+                    var update = MyHordesOptimizerRepository.GetMapCellDigUpdate(town.Id, myHordeMeResponse.Map.Days);
+                    if (update == null)
+                    {
+                        var scrutLevel = 0;
+                        var scrut = myHordeMeResponse.Map.City.Buildings.SingleOrDefault(building => building.Id == MyHordesScrutateurConfiguration.Id);
+                        if (scrut != null && scrut.HasLevels.HasValue)
+                        {
+                            scrutLevel = scrut.HasLevels.Value;
+                        }
+                        var regenChance = MyHordesScrutateurConfiguration.Level0;
+                        switch (scrutLevel)
+                        {
+                            case 0:
+                                regenChance = MyHordesScrutateurConfiguration.Level0;
+                                break;
+                            case 1:
+                                regenChance = MyHordesScrutateurConfiguration.Level1;
+                                break;
+                            case 2:
+                                regenChance = MyHordesScrutateurConfiguration.Level2;
+                                break;
+                            case 3:
+                                regenChance = MyHordesScrutateurConfiguration.Level3;
+                                break;
+                            case 4:
+                                regenChance = MyHordesScrutateurConfiguration.Level4;
+                                break;
+                            case 5:
+                                regenChance = MyHordesScrutateurConfiguration.Level5;
+                                break;
+                        }
+                        var cellsComplet = MyHordesOptimizerRepository.GetCells(town.Id);
+                        var cells = Mapper.Map<IEnumerable<MapCellModel>>(cellsComplet);
+                        var regenDirLabel = myHordeMeResponse.Map.City.News.RegenDir.De;
+                        var regen = regenDirLabel.GetEnumFromDescription<RegenDirectionEnum>();
+                        float averageNbOfItemAdded = ((float)MyHordesScrutateurConfiguration.MinItemAdd + ((float)MyHordesScrutateurConfiguration.MaxItemAdd - (float)MyHordesScrutateurConfiguration.MinItemAdd) / (float)2);
+                        var xVille = myHordeMeResponse.Map.City.X;
+                        var yVille = myHordeMeResponse.Map.City.Y;
+                        foreach (var cell in cells)
+                        {
+                            var xFromTown = cell.X - xVille;
+                            var yFromTown = yVille - cell.Y;
+                            if (xFromTown != 0 && yFromTown != 0)
+                            {
+                                var cellZone = GetCellZone(xFromTown, yFromTown);
+                                if (cellZone == regen)
+                                {
+                                    var max = cell.MaxPotentialRemainingDig ?? 0;
+                                    var average = cell.AveragePotentialRemainingDig ?? 0;
+                                    if (max < MyHordesScrutateurConfiguration.MaxItemPerCell)
+                                    {
+                                        if (max >= MyHordesScrutateurConfiguration.DigThrottle)
+                                        {
+                                            max = Convert.ToInt32(Math.Ceiling((float)max - 1.0 / 2.0));
+                                        }
+                                        cell.MaxPotentialRemainingDig = max + MyHordesScrutateurConfiguration.MaxItemAdd;
+                                    }
+
+                                    double averageItemAdd = ((float)regenChance / (float)100) * averageNbOfItemAdded;
+                                    if (average < MyHordesScrutateurConfiguration.MaxItemPerCell)
+                                    {
+                                        if (average >= MyHordesScrutateurConfiguration.DigThrottle)
+                                        {
+                                            averageItemAdd = ((float)regenChance / (float)100) * Math.Ceiling(averageNbOfItemAdded - 1.0 / 2.0);
+                                        }
+                                        averageItemAdd = Math.Round(averageItemAdd, 3);
+                                        cell.AveragePotentialRemainingDig = average + averageItemAdd;
+                                    }
+                                }
+                            }
+                        }
+                        MyHordesOptimizerRepository.InsertMapCellDigUpdate(new MapCellDigUpdate() { Day = myHordeMeResponse.Map.Days, IdTown = town.Id });
+                        MyHordesOptimizerRepository.PatchMapCell(town.Id, cells);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.LogWarning($"Erreur lors de la maj des fouilles restantes : {e.ToString()}");
+                }
             }
             var simpleMe = Mapper.Map<SimpleMe>(myHordeMeResponse);
 
             return simpleMe;
+        }
+
+        private RegenDirectionEnum GetCellZone(int x, int y)
+        {
+            if (Math.Abs(Math.Abs(x) - Math.Abs(y)) < Math.Min(Math.Abs(x), Math.Abs(y)))
+            {
+                if (x < 0 && y < 0)
+                {
+                    return RegenDirectionEnum.SouthWest;
+                }
+                if (x < 0 && y > 0)
+                {
+                    return RegenDirectionEnum.NorthWest;
+                }
+                if (x > 0 && y < 0)
+                {
+                    return RegenDirectionEnum.SouthEst;
+                }
+                if (x > 0 && y > 0)
+                {
+                    return RegenDirectionEnum.NorthEst;
+                }
+            }
+            else
+            {
+                if (x < 0 && Math.Abs(x) > Math.Abs(y))
+                {
+                    return RegenDirectionEnum.West;
+                }
+                if (x > 0 && Math.Abs(x) > Math.Abs(y))
+                {
+                    return RegenDirectionEnum.Est;
+                }
+                if (y < 0 && Math.Abs(x) < Math.Abs(y))
+                {
+                    return RegenDirectionEnum.South;
+                }
+                if (y > 0 && Math.Abs(x) < Math.Abs(y))
+                {
+                    return RegenDirectionEnum.North;
+                }
+            }
+            throw new Exception();
         }
 
         public IEnumerable<HeroSkill> GetHeroSkills()
@@ -136,7 +268,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             // Enregistrer en base
             MyHordesOptimizerRepository.PutBank(town.Id, town.Bank);
             town = MyHordesOptimizerRepository.GetTown(town.Id);
-            var recipes = MyHordesOptimizerRepository.GetRecipes();
+            var recipes = MyHordesOptimizerRepository.GetRecipes().ToList();
             var bankWrapper = town.Bank;
 
             if (town.WishList != null && town.WishList.WishList != null)
@@ -184,7 +316,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
 
             var citizens = models.Where(x => x.CitizenId.HasValue);
-            foreach(var citizen in citizens)
+            foreach (var citizen in citizens)
             {
                 var cellCitizen = Mapper.Map<CellCitizenDto>(citizen);
                 map.Cells.Single(cell => cell.CellId == citizen.IdCell).Citizens.Add(cellCitizen);

@@ -41,7 +41,7 @@ namespace MyHordesOptimizerApi.Extensions
 
         public static void BulkInsertOrUpdate<TModel>(this MySqlConnection connection,
             string tableName,
-            List<TModel> models,
+            IEnumerable<TModel> models,
             bool ignoreNullOnUpdate = false)
         {
             if (models.Any())
