@@ -135,5 +135,17 @@ namespace MyHordesOptimizerApi.Controllers
             var map = _myHordesFetcherService.GetMap(townId.Value);
             return map;
         }
+
+        [HttpGet]
+        [Route("MapDigs")]
+        public ActionResult<IEnumerable<MyHordesOptimizerMapDigDto>> GetMapDigs(int? townId)
+        {
+            if (!townId.HasValue)
+            {
+                return BadRequest($"{nameof(townId)} cannot be empty");
+            }
+            var digs = _myHordesFetcherService.GetMapDigs(townId.Value).ToList();
+            return digs;
+        }
     }
 }

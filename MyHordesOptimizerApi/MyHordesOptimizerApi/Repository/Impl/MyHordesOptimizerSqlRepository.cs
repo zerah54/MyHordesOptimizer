@@ -1141,12 +1141,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
         }
 
-        public MapCellCompletModel GetCell(int townId, int zoneItemX, int zoneItemY)
+        public MapCellCompletModel GetCell(int townId, int x, int y)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCellComplet
-                                                                WHERE idTown = @idtown AND x = @x AND y = @y", new { idTown = townId, x = zoneItemX, y = zoneItemY });
+                                                                WHERE idTown = @idtown AND x = @x AND y = @y", new { idTown = townId, x = x, y = y });
             connection.Close();
             var mostRecent = cells.Max(x => x.LastUpdateDateUpdate);
             cells = cells.Where(x => x.LastUpdateDateUpdate == mostRecent);
@@ -1172,6 +1172,38 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Open();
             connection.BulkInsertOrUpdate("MapCellItem", listCellItems);
             connection.Close();
+        }
+
+        public void PatchCellDig(int townId, List<MapCellDigModel> cellDigsToUpdate)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.BulkInsertOrUpdate("MapCellDig", cellDigsToUpdate);
+            connection.Close();
+        }
+
+        public IEnumerable<MapCellDigCompletModel> GetCellsDigs(int townId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var digs = connection.Query<MapCellDigCompletModel>(@"SELECT mcd.idCell AS CellId
+	                                                              ,mcd.idUser AS DiggerId
+                                                                  ,mcd.day 
+                                                                  ,mcd.nbSucces
+                                                                  ,mcd.nbTotalDig
+                                                                  ,mc.x
+                                                                  ,mc.y
+                                                                  ,digger.name AS DiggerName
+                                                                  ,lui.dateUpdate AS LastUpdateDateUpdate
+                                                                  ,luiUser.name AS LastUpdateInfoUserName
+                                                                  ,luiUser.idUser AS LastUpdateInfoUserId
+                                                            FROM MapCellDig mcd
+                                                            INNER JOIN MapCell mc ON mc.idCell = mcd.idCell
+                                                            INNER JOIN Users digger on digger.idUser = mcd.idUser
+                                                            INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mcd.idLastUpdateInfo
+                                                            INNER JOIN Users luiUser ON luiUser.idUser = lui.idUser", new { idTown = townId });
+            connection.Close();
+            return digs;
         }
 
         #endregion

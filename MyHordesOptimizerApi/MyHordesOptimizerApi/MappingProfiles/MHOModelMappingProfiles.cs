@@ -5,7 +5,6 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
@@ -190,7 +189,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore());
 
             CreateMap<TownCitizenBagItemCompletModel, LastUpdateInfo>()
-               .ForMember(dest => dest.UserKey, opt => opt.Ignore())
                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
                .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
@@ -227,7 +225,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.ItemImg));
 
             CreateMap<BankItemCompletModel, LastUpdateInfo>()
-                 .ForMember(dest => dest.UserKey, opt => opt.Ignore())
                  .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
                  .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
                  .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
@@ -267,7 +264,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.ItemImg));
 
             CreateMap<TownWishlistItemCompletModel, LastUpdateInfo>()
-                 .ForMember(dest => dest.UserKey, opt => opt.Ignore())
                  .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
                  .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
                  .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
@@ -440,7 +436,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.CellId, opt => opt.MapFrom(src => src.IdCell))
                 .ForMember(dest => dest.Items, opt => opt.Ignore())
                 .ForMember(dest => dest.Citizens, opt => opt.Ignore())
-                .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.LastUpdateDateUpdate, UserName = src.LastUpdateInfoUserName, UserId = src.LastUpdateInfoUserId } ));
+                .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.LastUpdateDateUpdate, UserName = src.LastUpdateInfoUserName, UserId = src.LastUpdateInfoUserId }));
 
             CreateMap<MapCellCompletModel, CellItemDto>()
                 .ForMember(dest => dest.ItemId, opt => opt.MapFrom(src => src.ItemId))
@@ -463,6 +459,9 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
                 .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.IdCell, opt => opt.Ignore());
+
+            CreateMap<MapCellDigCompletModel, MyHordesOptimizerMapDigDto>()
+                .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.LastUpdateDateUpdate, UserName = src.LastUpdateInfoUserName, UserId = src.LastUpdateInfoUserId }));
         }
 
         private List<string> GetStatusIcons(TownCitizenBagItemCompletModel src)

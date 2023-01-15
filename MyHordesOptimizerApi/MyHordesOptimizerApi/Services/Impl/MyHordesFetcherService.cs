@@ -191,5 +191,12 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
             return map;
         }
+
+        public IEnumerable<MyHordesOptimizerMapDigDto> GetMapDigs(int townId)
+        {
+            var models = MyHordesOptimizerRepository.GetCellsDigs(townId);
+            var dtos = Mapper.Map<IEnumerable<MyHordesOptimizerMapDigDto>>(models);
+            return dtos;
+        }
     }
 }

@@ -101,7 +101,9 @@ CREATE TABLE MapCellDig(
 	day INT,
 	nbSucces INT,
 	nbTotalDig INT,
+	idLastUpdateInfo INT,
 	PRIMARY KEY (idCell, idUser, day),
 	FOREIGN KEY(idUser) REFERENCES Users(idUser),
-	FOREIGN KEY(idCell) REFERENCES MapCell(idCell)
+	FOREIGN KEY(idCell) REFERENCES MapCell(idCell),
+	FOREIGN KEY(idLastUpdateInfo) REFERENCES LastUpdateInfo(idLastUpdateInfo)
 );

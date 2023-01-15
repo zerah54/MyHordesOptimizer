@@ -199,7 +199,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         MyHordesOptimizerRepository.PatchMapCell(townId, listCells);
                         if (zoneItemX != -1 && zoneItemY != -1)
                         {
-                            var cellWithItemId = MyHordesOptimizerRepository.GetCell(townId, zoneItemX: zoneItemX, zoneItemY: zoneItemY);
+                            var cellWithItemId = MyHordesOptimizerRepository.GetCell(townId, x: zoneItemX, y: zoneItemY);
                             listCellItems.ForEach(cellItem => cellItem.IdCell = cellWithItemId.IdCell);
                             MyHordesOptimizerRepository.PatchMapCellItem(townId, listCellItems);
                         }
@@ -284,6 +284,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 tasks.Add(mHOBagTask);
             }
             #endregion
+
+            #region Citizen
 
             try
             {
@@ -403,6 +405,38 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 response.HomeResponseDto.MhoStatus = e.Message;
                 response.HomeResponseDto.GestHordesStatus = e.Message;
             }
+
+            #endregion
+
+            #region SuccesDig
+
+            var successedDig = updateRequestDto.SuccessedDig;
+            if (successedDig != null)
+            {
+                var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+                var idLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+
+                var cellDigsToUpdate = new List<MapCellDigModel>();
+                var realX = updateRequestDto.TownDetails.TownX + successedDig.Cell.X;
+                var realY = updateRequestDto.TownDetails.TownY - successedDig.Cell.Y;
+                int townId = updateRequestDto.TownDetails.TownId;
+                var cell = MyHordesOptimizerRepository.GetCell(townId, x: realX, y: realY);
+                foreach (var dig in successedDig.Values)
+                {
+                    cellDigsToUpdate.Add(new MapCellDigModel()
+                    {
+                        Day = successedDig.Cell.Day,
+                        IdCell = cell.IdCell,
+                        IdUser = dig.CitizenId,
+                        NbSucces = dig.SuccessDigs,
+                        NbTotalDig = dig.TotalDigs,
+                        IdLastUpdateInfo = idLastUpdateInfo
+                    });
+                }
+                MyHordesOptimizerRepository.PatchCellDig(townId, cellDigsToUpdate);
+            }
+
+            #endregion
 
             await Task.WhenAll(tasks);
             return response;

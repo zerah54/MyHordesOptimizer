@@ -16,5 +16,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         CitizensWrapper GetCitizens(int townId);
         IEnumerable<MyHordesOptimizerRuin> GetRuins();
         MyHordesOptimizerMapDto GetMap(int townId);
+        IEnumerable<MyHordesOptimizerMapDigDto> GetMapDigs(int townId);
     }
 }
