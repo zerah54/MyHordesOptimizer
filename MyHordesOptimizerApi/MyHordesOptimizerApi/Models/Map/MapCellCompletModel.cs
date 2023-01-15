@@ -39,5 +39,7 @@ namespace MyHordesOptimizerApi.Models.Map
         public int? ItemId { get; set; }
         public int? ItemCount { get; set; }
         public bool? IsItemBroken { get; set; }
+        public string CitizenName { get; set; }
+        public int? CitizenId { get; set; }
     }
 }

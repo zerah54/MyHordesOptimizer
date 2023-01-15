@@ -182,6 +182,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var cellItem = Mapper.Map<CellItemDto>(item);
                 map.Cells.Single(cell => cell.CellId == item.IdCell).Items.Add(cellItem);
             }
+
+            var citizens = models.Where(x => x.CitizenId.HasValue);
+            foreach(var citizen in citizens)
+            {
+                var cellCitizen = Mapper.Map<CellCitizenDto>(citizen);
+                map.Cells.Single(cell => cell.CellId == citizen.IdCell).Citizens.Add(cellCitizen);
+            }
             return map;
         }
     }

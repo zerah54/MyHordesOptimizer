@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MyHordesOptimizerApi.Models.Map;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
 {
@@ -26,10 +27,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         public LastUpdateInfo? LastUpdateInfo { get; set; }
 
         public List<CellItemDto> Items { get; set; }
+        public List<CellCitizenDto> Citizens { get; set; }
 
         public MyHordesOptimizerCellDto()
         {
             Items = new List<CellItemDto>();
+            Citizens = new List<CellCitizenDto>();
         }
     }
 }

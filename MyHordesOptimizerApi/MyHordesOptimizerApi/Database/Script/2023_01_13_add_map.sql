@@ -82,15 +82,18 @@ SELECT mc.idCell
        ,t.isDoorOpen
        ,t.waterWell
        ,t.day
+       ,citizen.name AS CitizenName
+       ,citizen.idUser AS CitizenId
        ,mci.idItem AS ItemId
        ,mci.count AS ItemCount
        ,mci.isBroken AS IsItemBroken
 FROM Town t
 LEFT JOIN MapCell mc ON t.idTown = mc.idTown
 LEFT JOIN MapCellItem mci ON mci.idCell = mc.idCell
+LEFT JOIN TownCitizen tc ON tc.idTown = t.idTown AND tc.positionX = mc.x AND tc.positionY = mc.y
+LEFT JOIN Users citizen ON citizen.idUser = tc.idUser
 LEFT JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mc.idLastUpdateInfo
 LEFT JOIN Users u ON u.idUser = lui.idUser;
-
 
 CREATE TABLE MapCellDig(
 	idCell INT,
