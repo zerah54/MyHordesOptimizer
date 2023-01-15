@@ -57,6 +57,8 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         int CreateLastUpdateInfo(LastUpdateInfo lastUpdateInfo);
 
         IEnumerable<ParametersModel> GetParameters();
+        void PatchParameter(ParametersModel model);
+
 
         void PatchMapCell(int townId, List<MapCellModel> listCells);
         MapCellCompletModel GetCell(int townId, int zoneItemX, int zoneItemY);

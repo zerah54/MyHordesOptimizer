@@ -1093,6 +1093,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return parameters;
         }
 
+        public void PatchParameter(ParametersModel model)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.InsertOrUpdate("Parameters", model);
+            connection.Close();
+        }
+
         #endregion
 
         #region MapCells

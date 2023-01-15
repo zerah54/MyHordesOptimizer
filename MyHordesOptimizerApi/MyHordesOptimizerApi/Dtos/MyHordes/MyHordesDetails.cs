@@ -9,5 +9,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
 
         [JsonProperty("z")]
         public int? Z { get; set; }
+
+        [JsonProperty("dried")]
+        public bool? Dried { get; set; }
     }
 }

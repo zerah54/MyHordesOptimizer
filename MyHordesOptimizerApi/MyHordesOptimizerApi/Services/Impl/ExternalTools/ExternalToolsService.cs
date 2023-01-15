@@ -118,6 +118,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         {
                             int? nbHero = null;
                             int? nbZombie = null;
+                            bool? isDried = null;
 
                             var details = zone.Details;
                             if (details.GetType() != typeof(JArray))
@@ -126,6 +127,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 var detail = jObject.ToObject<MyHordesDetails>();
                                 nbHero = detail.H;
                                 nbZombie = detail.Z;
+                                isDried = detail.Dried;
                             }
 
                             int? type = zone.Building?.Type;
@@ -141,6 +143,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 Y = zone.Y,
                                 IsTown = zone.X == me.Map.City.X && zone.Y == me.Map.City.Y,
                                 IsVisitedToday = Convert.ToBoolean(zone.Nvt),
+                                DangerLevel = zone.Danger,
+                                IsDryed = isDried,
                                 IdRuin = type,
                                 NbZombie = nbZombie,
                                 NbZombieKilled = null,

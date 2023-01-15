@@ -5,7 +5,7 @@
 	x INT NOT NULL,
 	y INT NOT NULL,
 	isVisitedToday BIT DEFAULT 0,
-	dangerLevel INT NOT NULL,
+	dangerLevel INT,
 	idRuin INT,
 	isDryed BIT DEFAULT 0,
 	nbZombie INT,
