@@ -98,9 +98,10 @@ LEFT JOIN Users u ON u.idUser = lui.idUser;
 CREATE TABLE MapCellDig(
 	idCell INT,
 	idUser INT,
-	dateUpdate datetime NOT NULL,
+	day INT,
 	nbSucces INT,
-	PRIMARY KEY (idCell, idUser, dateUpdate),
+	nbTotalDig INT,
+	PRIMARY KEY (idCell, idUser, day),
 	FOREIGN KEY(idUser) REFERENCES Users(idUser),
 	FOREIGN KEY(idCell) REFERENCES MapCell(idCell)
 );

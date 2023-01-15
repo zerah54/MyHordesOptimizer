@@ -25,6 +25,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public int TownMaxY { get; set; }
         public bool IsDevaste { get; set; }
         public string TownType { get; set; }
+        public int Day { get; set; }
     }
 
     public class SimpleMeJobDetailDto
