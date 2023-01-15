@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.27
+// @version      1.0.0-beta.28
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,10 +35,7 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH-beta][fix] Réparation de la liste des objets : le Serpent Agonisant n'existait pas dedans, ce qui provoquait des erreurs en cas de mise à jour avec un serpent agonisant\n\n`
-+ `[MH][fix]La carte intégrée de GH est réparée (mais non, elle n'intègre toujours pas les expéditions)\n\n`
-+ `[MH][update] La liste des citoyens améliorée, en ville, est désormais mieux organisée, et toujours rangée par ordre alphabétique. Contrepartie : elle est légèrement plus longue à charger\n\n`
-+ `[MH][update] Le Passage en Force fait désormais partie des AH enregistrées`
++ `[MH][fix] Correction de la mise à jour des outils externes si 0 charges d'APAG \n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -7220,13 +7217,13 @@ function updateExternalTools() {
         isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && pageIsDesert() && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
     };
 
+    let position = document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/');
+
     if (mho_parameters.update_gh_without_api && pageIsDesert()) {
         let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
             let item = convertImgToItem(desert_item.querySelector('img'));
             return {id: item.id, isBroken: desert_item.classList.contains('broken')};
         });
-
-        let position = document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/');
 
         let content = {
             x: +position[0],
@@ -7339,7 +7336,7 @@ function updateExternalTools() {
             let action = {
                 locale: lang,
                 label: apag.parentElement.nextElementSibling.querySelector('h1')?.innerText.replace('  ', ''),
-                value: +apag.src.replace(/.*item_photo_(\d).*/, '$1')
+                value: +apag.src.replace(/.*item_photo_(\d).*/, '$1') || 0
             }
             data.heroicActions.actions.push(action);
         }
@@ -7752,7 +7749,7 @@ async function getCitizenHouseContent(link) {
 
                     let travaux_row = lightbox ? lightbox.querySelectorAll('.row')[3] : undefined;
                     let travaux = travaux_row ? travaux_row.lastElementChild : town_summary.querySelectorAll('.row-detail')[1];
-                    more_info.travaux = travaux ? travaux.innerHTML.replace(/\<b\>/g, '').replace(/\<\/b\>/g, '').replace(/ , /g, '').replace(/^\n/g, '') : '';
+                    more_info.travaux = travaux ? travaux.innerHTML.replace(/\<b\>/g, '').replace(/\<\/b\>/g, '').replace(/ , /g, '').replace(/\n/g, '').replace(/(\d+)/g, '$1<br />') : '';
                     resolve(more_info);
                 } else {
                     reject(response);
