@@ -1171,8 +1171,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCellComplet 
                                                                 WHERE idTown = @idtown", new { idTown = townId });
             connection.Close();
-            var mostRecent = cells.Max(x => x.LastUpdateDateUpdate);
-            cells = cells.Where(x => x.LastUpdateDateUpdate == mostRecent);
             return cells;
         }
 
