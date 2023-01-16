@@ -364,6 +364,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         public MyHordesOptimizerMapDto GetMap(int townId)
         {
             var models = MyHordesOptimizerRepository.GetCells(townId);
+
             var distinct = models.Distinct(new CellIdComparer());
             var map = Mapper.Map<MyHordesOptimizerMapDto>(distinct);
 

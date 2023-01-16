@@ -20,6 +20,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         public bool? IsRuinCamped { get; set; }
         public bool? IsRuinDryed { get; set; }
         public int? NbRuinDig { get; set; }
+        public int? TotalSucces { get; set; }
         public double? AveragePotentialRemainingDig { get; set; }
         public int? MaxPotentialRemainingDig { get; set; }
 
