@@ -153,8 +153,6 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 IsRuinCamped = zone.Building?.Camped,
                                 IsRuinDryed = zone.Building?.Dried,
                                 NbRuinDig = zone.Building?.Dig,
-                                TodayNbDigSucces = null,
-                                PreviousDayTotalNbDigSucces = null,
                                 AveragePotentialRemainingDig = null,
                                 MaxPotentialRemainingDig = null
                             };

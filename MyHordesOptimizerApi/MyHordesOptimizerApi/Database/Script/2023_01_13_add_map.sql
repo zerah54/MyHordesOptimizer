@@ -28,6 +28,9 @@
 ALTER TABLE MapCell
 ADD COLUMN isTown BIT NULL DEFAULT 0 AFTER y;
 
+ALTER TABLE MapCell DROP COLUMN todayNbDigSucces;
+ALTER TABLE MapCell DROP COLUMN previousDayTotalNbDigSucces;
+
 CREATE TABLE MapCellItem(
 	idCell INT,
 	idItem INT,
@@ -67,8 +70,6 @@ SELECT mc.idCell
        ,mc.isRuinCamped
        ,mc.isRuinDryed
        ,mc.nbRuinDig
-       ,mc.todayNbDigSucces
-       ,mc.previousDayTotalNbDigSucces
        ,mc.averagePotentialRemainingDig
        ,mc.maxPotentialRemainingDig
 	   ,mc.isTown

@@ -19,8 +19,6 @@
         public bool? IsRuinCamped { get; set; }
         public bool? IsRuinDryed { get; set; }
         public int? NbRuinDig { get; set; }
-        public int? TodayNbDigSucces { get; set; }
-        public int? PreviousDayTotalNbDigSucces { get; set; }
         public double? AveragePotentialRemainingDig { get; set; }
         public int? MaxPotentialRemainingDig { get; set; }
     }

@@ -158,8 +158,6 @@ namespace MyHordesOptimizerApi.Services.Impl
                                 IsRuinCamped = null,
                                 IsRuinDryed = null,
                                 NbRuinDig = null,
-                                TodayNbDigSucces = null,
-                                PreviousDayTotalNbDigSucces = null,
                                 AveragePotentialRemainingDig = averageStartingItemValue,
                                 MaxPotentialRemainingDig = maxPotentialStartingItemValue
                             };
