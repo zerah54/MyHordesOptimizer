@@ -135,5 +135,43 @@ namespace MyHordesOptimizerApi.Controllers
             var digs = _myHordesFetcherService.GetMapDigs(townId.Value).ToList();
             return digs;
         }
+
+
+        [HttpPost]
+        [Route("MapDigs")]
+        public ActionResult<MyHordesOptimizerMapDigDto> CreaterOrUpdateMapDig([FromQuery] int? townId, [FromQuery] int? userId, [FromBody] MyHordesOptimizerMapDigDto request)
+        {
+            if (!userId.HasValue)
+            {
+                return BadRequest($"{nameof(userId)} cannot be empty");
+            }
+            if (request.CellId == 0 && !townId.HasValue)
+            {
+                return BadRequest($"{nameof(townId)} cannot be empty when no cellId is provided");
+            }
+            UserKeyProvider.UserId = userId.Value;
+            var dto = _myHordesFetcherService.CreateOrUpdateMapDigs(townId, userId.Value, request);
+            return Ok(dto);
+        }
+
+        [HttpDelete]
+        [Route("MapDigs")]
+        public ActionResult<LastUpdateInfo> CreaterOrUpdateMapDig([FromQuery] int? idCell, [FromQuery] int? diggerId, [FromQuery] int? day)
+        {
+            if (!idCell.HasValue)
+            {
+                return BadRequest($"{nameof(idCell)} cannot be empty");
+            }
+            if (!diggerId.HasValue)
+            {
+                return BadRequest($"{nameof(diggerId)} cannot be empty");
+            }
+            if (!day.HasValue)
+            {
+                return BadRequest($"{nameof(day)} cannot be empty");
+            }
+            _myHordesFetcherService.DeleteMapDigs(idCell.Value, diggerId.Value, day.Value);
+            return Ok();
+        }
     }
 }

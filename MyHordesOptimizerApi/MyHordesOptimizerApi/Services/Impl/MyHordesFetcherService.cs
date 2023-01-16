@@ -135,7 +135,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                             bool isTown = x == myHordeMeResponse.Map.City.X && y == myHordeMeResponse.Map.City.Y;
                             double? averageStartingItemValue = averageStartingItem;
                             int? maxPotentialStartingItemValue = MyHordesScrutateurConfiguration.StartItemMax;
-                            if(isTown)
+                            if (isTown)
                             {
                                 averageStartingItemValue = null;
                                 maxPotentialStartingItemValue = null;
@@ -390,6 +390,28 @@ namespace MyHordesOptimizerApi.Services.Impl
             var models = MyHordesOptimizerRepository.GetCellsDigs(townId);
             var dtos = Mapper.Map<IEnumerable<MyHordesOptimizerMapDigDto>>(models);
             return dtos;
+        }
+
+        public MyHordesOptimizerMapDigDto CreateOrUpdateMapDigs(int? townId, int userId, MyHordesOptimizerMapDigDto request)
+        {
+            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
+            var idLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            var model = Mapper.Map<MapCellDigModel>(request);
+            model.IdLastUpdateInfo = idLastUpdateInfo;
+            if(model.IdCell == 0)
+            {
+                var existingCell = MyHordesOptimizerRepository.GetCell(townId.Value, request.X, request.Y);
+                model.IdCell = existingCell.IdCell;
+            }
+            MyHordesOptimizerRepository.PatchMapCellDig(model);
+            var result = MyHordesOptimizerRepository.GetCellDigs(model.IdCell, model.IdUser, model.Day);
+            var dto = Mapper.Map<MyHordesOptimizerMapDigDto>(result);
+            return dto;
+        }
+
+        public void DeleteMapDigs(int idCell, int diggerId, int day)
+        {
+            MyHordesOptimizerRepository.DeleteMapCellDig(idCell, diggerId, day);
         }
     }
 }

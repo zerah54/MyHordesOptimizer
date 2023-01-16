@@ -1209,9 +1209,35 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                                             INNER JOIN MapCell mc ON mc.idCell = mcd.idCell
                                                             INNER JOIN Users digger on digger.idUser = mcd.idUser
                                                             INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mcd.idLastUpdateInfo
-                                                            INNER JOIN Users luiUser ON luiUser.idUser = lui.idUser", new { idTown = townId });
+                                                            INNER JOIN Users luiUser ON luiUser.idUser = lui.idUser
+                                                            WHERE mc.idTown = @idTown", new { idTown = townId });
             connection.Close();
             return digs;
+        }
+
+        public MapCellDigCompletModel GetCellDigs(int idCell, int idUser, int day)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var dig = connection.QuerySingleOrDefault<MapCellDigCompletModel>(@"SELECT mcd.idCell AS CellId
+	                                                              ,mcd.idUser AS DiggerId
+                                                                  ,mcd.day 
+                                                                  ,mcd.nbSucces
+                                                                  ,mcd.nbTotalDig
+                                                                  ,mc.x
+                                                                  ,mc.y
+                                                                  ,digger.name AS DiggerName
+                                                                  ,lui.dateUpdate AS LastUpdateDateUpdate
+                                                                  ,luiUser.name AS LastUpdateInfoUserName
+                                                                  ,luiUser.idUser AS LastUpdateInfoUserId
+                                                            FROM MapCellDig mcd
+                                                            INNER JOIN MapCell mc ON mc.idCell = mcd.idCell
+                                                            INNER JOIN Users digger on digger.idUser = mcd.idUser
+                                                            INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mcd.idLastUpdateInfo
+                                                            INNER JOIN Users luiUser ON luiUser.idUser = lui.idUser
+                                                            WHERE mcd.idCell = @idCell AND mcd.idUser = @idUser AND mcd.day", new { idCell = idCell, idUser = idUser, day = day });
+            connection.Close();
+            return dig;
         }
 
         public MapCellDigUpdate GetMapCellDigUpdate(int townId, int day)
@@ -1228,6 +1254,22 @@ namespace MyHordesOptimizerApi.Repository.Impl
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             connection.Insert(mapCellDigUpdate);
+            connection.Close();
+        }
+
+        public void PatchMapCellDig(MapCellDigModel model)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.InsertOrUpdate("MapCellDig", model);
+            connection.Close();
+        }
+
+        public void DeleteMapCellDig(int idCell, int diggerId, int day)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Query("DELETE FROM MapCellDig WHERE idCell = @idCell AND idUser = @idUser AND day = @day", new { idCell = idCell, idUser = diggerId, day = day });
             connection.Close();
         }
 
