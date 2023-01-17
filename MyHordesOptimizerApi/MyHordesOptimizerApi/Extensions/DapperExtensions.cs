@@ -41,8 +41,7 @@ namespace MyHordesOptimizerApi.Extensions
 
         public static void BulkInsertOrUpdate<TModel>(this MySqlConnection connection,
             string tableName,
-            IEnumerable<TModel> models,
-            bool ignoreNullOnUpdate = false)
+            IEnumerable<TModel> models)
         {
             if (models.Any())
             {
@@ -61,10 +60,7 @@ namespace MyHordesOptimizerApi.Extensions
                         var value = kvp.Value.Invoke(model);
                         param.Add($"@{count}", value);
                         count++;
-                        if (value != null)
-                        {
-                            listUpdates.Add($"{kvp.Key} = values({kvp.Key})");
-                        }
+                        listUpdates.Add($"{kvp.Key} = values({kvp.Key})");   
                     }
                     listValues.Add($"({string.Join(",", list)})");
                 }
@@ -93,7 +89,7 @@ namespace MyHordesOptimizerApi.Extensions
                 var value = kvp.Value.Invoke(model);
                 param.Add($"@{count}", value);
                 count++;
-                if (value != null)
+                if (!ignoreNullOnUpdate || (ignoreNullOnUpdate && value != null))
                 {
                     listUpdates.Add($"{kvp.Key} = values({kvp.Key})");
                 }

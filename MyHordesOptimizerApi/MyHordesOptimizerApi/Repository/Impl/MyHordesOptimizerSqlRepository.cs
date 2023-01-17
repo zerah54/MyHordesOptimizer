@@ -1145,9 +1145,16 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 if (existingCell != null)
                 {
                     cell.IdCell = existingCell.IdCell;
+                    foreach(var prop in cell.GetType().GetProperties())
+                    {
+                        if(prop.GetValue(cell) == null)
+                        {
+                            prop.SetValue(cell, prop.GetValue(existingCell));
+                        }
+                    }
                 }
             }
-            connection.BulkInsertOrUpdate("MapCell", listCells, ignoreNullOnUpdate: true);
+            connection.BulkInsertOrUpdate("MapCell", listCells);
             connection.Close();
         }
 
@@ -1268,6 +1275,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             connection.Query("DELETE FROM MapCellDig WHERE idCell = @idCell AND idUser = @idUser AND day = @day", new { idCell = idCell, idUser = diggerId, day = day });
+            connection.Close();
+        }
+
+        public void ClearCellDig(IEnumerable<int> cellId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Query("DELETE FROM MapCellDig WHERE idCell IN @cellIds", new { cellIds = cellId});
             connection.Close();
         }
 

@@ -107,6 +107,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         var zones = me.Map.Zones;
                         var listCells = new List<MapCellModel>();
                         var listCellItems = new List<MapCellItemModel>();
+                        var driedCell = new List<MapCellModel>();
 
                         var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
                         var idLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
@@ -130,6 +131,13 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 isDried = detail.Dried;
                             }
 
+                            int? averagePotentialRemainingDig = null;
+                            int? maxPotentialRemainingDig = null;
+                            if(isDried.HasValue && isDried.Value)
+                            {
+                                averagePotentialRemainingDig = 0;
+                                maxPotentialRemainingDig = 0;
+                            }
                             int? type = zone.Building?.Type;
                             if (type.HasValue && type.Value == -1)
                             {
@@ -153,8 +161,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 IsRuinCamped = zone.Building?.Camped,
                                 IsRuinDryed = zone.Building?.Dried,
                                 NbRuinDig = zone.Building?.Dig,
-                                AveragePotentialRemainingDig = null,
-                                MaxPotentialRemainingDig = null
+                                AveragePotentialRemainingDig = averagePotentialRemainingDig,
+                                MaxPotentialRemainingDig = maxPotentialRemainingDig
                             };
                             if (zone.Items != null)
                             {
@@ -194,8 +202,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             {
                                 MyHordesOptimizerRepository.UpdateCitizenLocation(updateRequestDto.TownDetails.TownId, realX, realY, updateCellDto.CitizenId);
                             }
+                            if(updateCellDto.ZoneEmpty)
+                            {
+                                cellToUpdate.AveragePotentialRemainingDig = 0;
+                                cellToUpdate.MaxPotentialRemainingDig = 0;
+                            }
                         }
                         MyHordesOptimizerRepository.PatchMapCell(townId, listCells);
+                        MyHordesOptimizerRepository.ClearCellDig(listCells.Where(cell => cell.IsDryed.HasValue && cell.IsDryed.Value).Select(cell => cell.IdCell));
                         if (zoneItemX != -1 && zoneItemY != -1)
                         {
                             var cellWithItemId = MyHordesOptimizerRepository.GetCell(townId, x: zoneItemX, y: zoneItemY);
