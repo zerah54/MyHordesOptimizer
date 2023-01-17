@@ -41,5 +41,8 @@ namespace MyHordesOptimizerApi.Models.Map
         public bool? IsItemBroken { get; set; }
         public string CitizenName { get; set; }
         public int? CitizenId { get; set; }
+        public int? NbKm { get; set; }
+        public int? NbPa { get; set; }
+        public int? ZoneRegen { get; set; }
     }
 }

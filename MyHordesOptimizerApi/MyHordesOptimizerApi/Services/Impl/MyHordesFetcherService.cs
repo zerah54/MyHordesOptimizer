@@ -128,10 +128,14 @@ namespace MyHordesOptimizerApi.Services.Impl
                     var idLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
                     double averageStartingItem = Math.Round((float)MyHordesScrutateurConfiguration.StartItemMin + (((float)MyHordesScrutateurConfiguration.StartItemMax - (float)MyHordesScrutateurConfiguration.StartItemMin) / 2), 3);
                     var cells = new List<MapCellModel>();
+                    var xVille = myHordeMeResponse.Map.City.X;
+                    var yVille = myHordeMeResponse.Map.City.Y;
                     for (var x = 0; x < myHordeMeResponse.Map.Wid; x++)
                     {
                         for (var y = 0; y < myHordeMeResponse.Map.Hei; y++)
                         {
+                            var xFromTown = x - xVille;
+                            var yFromTown = yVille - y;
                             bool isTown = x == myHordeMeResponse.Map.City.X && y == myHordeMeResponse.Map.City.Y;
                             double? averageStartingItemValue = averageStartingItem;
                             int? maxPotentialStartingItemValue = MyHordesScrutateurConfiguration.StartItemMax;
@@ -159,7 +163,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                                 IsRuinDryed = null,
                                 NbRuinDig = null,
                                 AveragePotentialRemainingDig = averageStartingItemValue,
-                                MaxPotentialRemainingDig = maxPotentialStartingItemValue
+                                MaxPotentialRemainingDig = maxPotentialStartingItemValue,
+                                NbKm = GetCellDistanceInKm(xFromTown, yFromTown),
+                                NbPa = GetCellDistanceInActionPoint(xFromTown, yFromTown),
+                                ZoneRegen = (int)GetCellZone(xFromTown, yFromTown)
                             };
                             cells.Add(cell);
                         }
@@ -227,7 +234,24 @@ namespace MyHordesOptimizerApi.Services.Impl
                         var yFromTown = yVille - cell.Y;
                         if (!(xFromTown == 0 && yFromTown == 0))
                         {
-                            var cellZone = GetCellZone(xFromTown, yFromTown);
+                            if(!cell.NbKm.HasValue)
+                            {
+                                cell.NbKm = GetCellDistanceInKm(xFromTown, yFromTown);
+                            }
+                            if(!cell.NbPa.HasValue)
+                            {
+                                cell.NbPa = GetCellDistanceInActionPoint(xFromTown,yFromTown);
+                            }
+                            RegenDirectionEnum cellZone;
+                            if (cell.ZoneRegen.HasValue)
+                            {
+                                cellZone = (RegenDirectionEnum)cell.ZoneRegen.Value;
+                            }
+                            else
+                            {
+                                cellZone = GetCellZone(xFromTown, yFromTown);
+                                cell.ZoneRegen = (int)cellZone;
+                            }
                             if (cellZone == regen || regen == RegenDirectionEnum.All)
                             {
                                 var max = cell.MaxPotentialRemainingDig ?? 0;
@@ -306,6 +330,17 @@ namespace MyHordesOptimizerApi.Services.Impl
                 }
             }
             throw new Exception();
+        }
+
+        private int GetCellDistanceInKm(int xRelativeToTown, int yRelativetoTown)
+        {
+            return (int)Math.Round(Math.Sqrt(Math.Pow(xRelativeToTown, 2) + Math.Pow(yRelativetoTown, 2)));
+
+
+        }
+        private int GetCellDistanceInActionPoint(int xRelativeToTown, int yRelativetoTown)
+        {
+            return xRelativeToTown + yRelativetoTown;
         }
 
         public IEnumerable<HeroSkill> GetHeroSkills()
@@ -398,7 +433,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var idLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
             var model = Mapper.Map<MapCellDigModel>(request);
             model.IdLastUpdateInfo = idLastUpdateInfo;
-            if(model.IdCell == 0)
+            if (model.IdCell == 0)
             {
                 var existingCell = MyHordesOptimizerRepository.GetCell(townId.Value, request.X, request.Y);
                 model.IdCell = existingCell.IdCell;

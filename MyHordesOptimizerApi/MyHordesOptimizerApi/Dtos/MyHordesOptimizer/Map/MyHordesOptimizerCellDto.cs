@@ -1,4 +1,5 @@
 ﻿using MyHordesOptimizerApi.Models.Map;
+using System;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
@@ -23,6 +24,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         public int? TotalSucces { get; set; }
         public double? AveragePotentialRemainingDig { get; set; }
         public int? MaxPotentialRemainingDig { get; set; }
+        public int NbKm { get; set; }
+        public int NbPa { get; set; }
+        public string ZoneRegen { get; set; }
 
         public LastUpdateInfo? LastUpdateInfo { get; set; }
 
@@ -34,5 +38,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
             Items = new List<CellItemDto>();
             Citizens = new List<CellCitizenDto>();
         }
+
     }
 }

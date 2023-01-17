@@ -21,5 +21,8 @@
         public int? NbRuinDig { get; set; }
         public double? AveragePotentialRemainingDig { get; set; }
         public int? MaxPotentialRemainingDig { get; set; }
+        public int? NbKm { get; set; }
+        public int? NbPa { get; set; }
+        public int? ZoneRegen { get; set; }
     }
 }

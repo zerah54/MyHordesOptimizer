@@ -31,6 +31,12 @@ ADD COLUMN isTown BIT NULL DEFAULT 0 AFTER y;
 ALTER TABLE MapCell DROP COLUMN todayNbDigSucces;
 ALTER TABLE MapCell DROP COLUMN previousDayTotalNbDigSucces;
 
+ALTER TABLE MapCell ADD COLUMN nbKm INT AFTER y;
+ALTER TABLE MapCell ADD COLUMN nbPa INT AFTER nbKm;
+ALTER TABLE MapCell ADD COLUMN zoneRegen INT AFTER nbPa;
+
+
+
 CREATE TABLE MapCellItem(
 	idCell INT,
 	idItem INT,
@@ -54,6 +60,7 @@ ALTER TABLE Town ADD COLUMN isDevasted BIT NOT NULL;
 ALTER TABLE TownCitizen ADD COLUMN houseDefense INT NULL DEFAULT NULL AFTER idLastUpdateInfoHeroicAction;
 
 CREATE VIEW MapCellComplet AS
+CREATE VIEW MapCellComplet AS 
 SELECT mc.idCell
 	   ,t.idTown
        ,mc.idLastUpdateInfo
@@ -91,6 +98,9 @@ SELECT mc.idCell
        ,mci.count AS ItemCount
        ,mci.isBroken AS IsItemBroken
        ,mcd.totalSucces
+       ,mc.nbKm
+       ,mc.nbPa
+       ,mc.zoneRegen
 FROM Town t
 LEFT JOIN MapCell mc ON t.idTown = mc.idTown
 LEFT JOIN MapCellItem mci ON mci.idCell = mc.idCell
@@ -99,6 +109,7 @@ LEFT JOIN Users citizen ON citizen.idUser = tc.idUser
 LEFT JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mc.idLastUpdateInfo
 LEFT JOIN Users u ON u.idUser = lui.idUser
 LEFT JOIN (SELECT idCell, SUM(nbSucces) AS totalSucces FROM MapCellDig GROUP BY idCell) mcd ON mcd.idCell = mc.idCell;
+
 
 CREATE TABLE MapCellDig(
 	idCell INT,
