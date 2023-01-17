@@ -340,7 +340,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         }
         private int GetCellDistanceInActionPoint(int xRelativeToTown, int yRelativetoTown)
         {
-            return xRelativeToTown + yRelativetoTown;
+            return Math.Abs(xRelativeToTown) + Math.Abs(yRelativetoTown);
         }
 
         public IEnumerable<HeroSkill> GetHeroSkills()
