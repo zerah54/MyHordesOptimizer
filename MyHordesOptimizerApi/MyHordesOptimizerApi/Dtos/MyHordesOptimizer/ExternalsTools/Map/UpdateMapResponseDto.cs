@@ -6,6 +6,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map
     {
         public string FataMorganaStatus { get; set; }
         public string BigBrothHordesStatus { get; set; }
+        public string MhoApiStatus { get; set; }
         public string GestHordesApiStatus { get; set; }
         public string GestHordesCellsStatus { get; set; }
 
@@ -14,6 +15,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map
         {
             FataMorganaStatus = !UpdateRequestMapToolsToUpdateDetailsDto.IsNone(updateRequestDto.Map.ToolsToUpdate.IsFataMorgana) ? ExternalToolsUpdateResponseType.Ok.GetDescription() : ExternalToolsUpdateResponseType.NotActivated.GetDescription();
             BigBrothHordesStatus = !UpdateRequestMapToolsToUpdateDetailsDto.IsNone(updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes) ? ExternalToolsUpdateResponseType.Ok.GetDescription() : ExternalToolsUpdateResponseType.NotActivated.GetDescription();
+            MhoApiStatus = !UpdateRequestMapToolsToUpdateDetailsDto.IsNone(updateRequestDto.Map.ToolsToUpdate.IsMyHordesOptimizer) ? ExternalToolsUpdateResponseType.Ok.GetDescription() : ExternalToolsUpdateResponseType.NotActivated.GetDescription();
 
             if(UpdateRequestMapToolsToUpdateDetailsDto.IsNone(updateRequestDto.Map.ToolsToUpdate.IsGestHordes))
             {

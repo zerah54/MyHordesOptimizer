@@ -21,8 +21,7 @@ namespace MyHordesOptimizerApi.Providers.Impl
             {
                 UserId = UserId,
                 UserName = UserName,
-                UpdateTime = DateTime.UtcNow,
-                UserKey = UserKey
+                UpdateTime = DateTime.UtcNow
             };
         }
     }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
@@ -22,6 +23,12 @@ namespace MyHordesOptimizerApi.Services.Impl
             var models = MyHordesOptimizerRepository.GetParameters();
             var dtos = Mapper.Map<IEnumerable<ParametersDto>>(models);
             return dtos;
+        }
+
+        public void UpdateParameter(ParametersDto parameter)
+        {
+            var model = Mapper.Map<ParametersModel>(parameter);
+            MyHordesOptimizerRepository.PatchParameter(model);
         }
     }
 }

@@ -3,13 +3,16 @@ using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.MappingProfiles.Converters;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
+using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Items.Bank;
 using MyHordesOptimizerApi.Models.Views.Items.Citizen;
@@ -186,7 +189,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore());
 
             CreateMap<TownCitizenBagItemCompletModel, LastUpdateInfo>()
-               .ForMember(dest => dest.UserKey, opt => opt.Ignore())
                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
                .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
@@ -223,7 +225,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.ItemImg));
 
             CreateMap<BankItemCompletModel, LastUpdateInfo>()
-                 .ForMember(dest => dest.UserKey, opt => opt.Ignore())
                  .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
                  .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
                  .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
@@ -263,7 +264,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.ItemImg));
 
             CreateMap<TownWishlistItemCompletModel, LastUpdateInfo>()
-                 .ForMember(dest => dest.UserKey, opt => opt.Ignore())
                  .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
                  .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
                  .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
@@ -419,11 +419,56 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.LastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.HeroicActionLastUpdateDateUpdate.Value, UserName = src.HeroicActionLastUpdateInfoUserName }); opt.PreCondition(src => src.HeroicActionLastUpdateDateUpdate.HasValue); });
 
 
+            CreateMap<IEnumerable<MapCellCompletModel>, MyHordesOptimizerMapDto>()
+                .ForMember(dest => dest.Day, opt => opt.MapFrom(src => src.First().Day))
+                .ForMember(dest => dest.IsChaos, opt => opt.MapFrom(src => src.First().IsChaos))
+                .ForMember(dest => dest.IsDevasted, opt => opt.MapFrom(src => src.First().IsDevasted))
+                .ForMember(dest => dest.IsDoorOpen, opt => opt.MapFrom(src => src.First().IsDoorOpen))
+                .ForMember(dest => dest.WaterWell, opt => opt.MapFrom(src => src.First().WaterWell))
+                .ForMember(dest => dest.TownX, opt => opt.MapFrom(src => src.First().TownX))
+                .ForMember(dest => dest.TownY, opt => opt.MapFrom(src => src.First().TownY))
+                .ForMember(dest => dest.MapHeight, opt => opt.MapFrom(src => src.First().MapHeight))
+                .ForMember(dest => dest.MapWidth, opt => opt.MapFrom(src => src.First().MapWidth))
+                .ForMember(dest => dest.TownId, opt => opt.MapFrom(src => src.First().IdTown))
+                .ForMember(dest => dest.Cells, opt => { opt.MapFrom(src => src); opt.PreCondition(src => src.First().IdCell != 0); });
+
+            CreateMap<MapCellCompletModel, MyHordesOptimizerCellDto>()
+                .ForMember(dest => dest.CellId, opt => opt.MapFrom(src => src.IdCell))
+                .ForMember(dest => dest.ZoneRegen, opt => { opt.MapFrom(src => ((RegenDirectionEnum)src.ZoneRegen.Value).GetDescription()); opt.PreCondition(src => src.ZoneRegen.HasValue); })
+                .ForMember(dest => dest.Items, opt => opt.Ignore())
+                .ForMember(dest => dest.Citizens, opt => opt.Ignore())
+                .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.LastUpdateDateUpdate, UserName = src.LastUpdateInfoUserName, UserId = src.LastUpdateInfoUserId }));
+
+            CreateMap<MapCellCompletModel, CellItemDto>()
+                .ForMember(dest => dest.ItemId, opt => opt.MapFrom(src => src.ItemId))
+                .ForMember(dest => dest.ItemCount, opt => opt.MapFrom(src => src.ItemCount))
+                .ForMember(dest => dest.IsItemBroken, opt => opt.MapFrom(src => src.IsItemBroken));
+
+            CreateMap<MapCellCompletModel, CellCitizenDto>()
+               .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CitizenId))
+               .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CitizenName));
+
+            CreateMap<MapCellCompletModel, MapCellModel>();
+
             CreateMap<TownCitizenBagItemCompletModel, CitizenHomeValue>();
             CreateMap<TownCitizenBagItemCompletModel, CitizenStatusValue>();
             CreateMap<TownCitizenBagItemCompletModel, CitizenActionsHeroicValue>();
 
-            CreateMap<ParametersModel, ParametersDto>();
+            CreateMap<ParametersModel, ParametersDto>()
+                .ReverseMap();
+
+            CreateMap<UpdateObjectDto, MapCellItemModel>()
+                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
+                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
+                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.IdCell, opt => opt.Ignore());
+
+            CreateMap<MapCellDigCompletModel, MyHordesOptimizerMapDigDto>()
+                .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.LastUpdateDateUpdate, UserName = src.LastUpdateInfoUserName, UserId = src.LastUpdateInfoUserId }));
+            CreateMap<MyHordesOptimizerMapDigDto, MapCellDigModel>()
+                .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
+                .ForMember(dest => dest.IdCell, opt => opt.MapFrom(src => src.CellId))
+                .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.DiggerId));
         }
 
         private List<string> GetStatusIcons(TownCitizenBagItemCompletModel src)

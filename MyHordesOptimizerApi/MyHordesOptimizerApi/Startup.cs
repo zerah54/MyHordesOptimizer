@@ -70,6 +70,7 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<IFataMorganaConfiguration, FataMorganaConfiguration>();
             services.AddSingleton<IMyHordesTranslationsConfiguration, MyHordesTranslationsConfiguration>();
             services.AddSingleton<IMyHordesOptimizerSqlConfiguration, MyHordesOptimizerSqlConfiguration>();
+            services.AddSingleton<IMyHordesScrutateurConfiguration, MyHordesScrutateurConfiguration>();
 
             services.AddSingleton<IMyHordesOptimizerFirebaseConfiguration, MyHordesOptimizerFirebaseConfiguration>();
 

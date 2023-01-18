@@ -6,5 +6,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces
     public interface IMyHordesOptimizerParametersService
     {
         IEnumerable<ParametersDto> GetParameters();
+        void UpdateParameter(ParametersDto parameter);
     }
 }

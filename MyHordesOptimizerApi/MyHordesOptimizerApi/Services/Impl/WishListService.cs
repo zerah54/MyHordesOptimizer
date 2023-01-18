@@ -41,7 +41,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             sw.Start();
             var wishList = MyHordesOptimizerRepository.GetWishList(townId);
             Logger.LogInformation($"[GetWishList] GetWishList : {sw.ElapsedMilliseconds}");
-            var recipes = MyHordesOptimizerRepository.GetRecipes();
+            var recipes = MyHordesOptimizerRepository.GetRecipes().ToList();
             Logger.LogInformation($"[GetWishList] GetRecipes : {sw.ElapsedMilliseconds}");
             var bank = MyHordesOptimizerRepository.GetBank(townId);
             Logger.LogInformation($"[GetWishList] GetBank : {sw.ElapsedMilliseconds}");

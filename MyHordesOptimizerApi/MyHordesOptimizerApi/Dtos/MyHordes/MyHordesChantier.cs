@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordes
 {
@@ -19,6 +20,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         [JsonProperty("pa")]
         public int Pa { get; set; }
 
+        [JsonProperty("maxLife")]
+        public int MaxLife { get; set; }
+
+        [JsonProperty("votes")]
+        public int Votes { get; set; }
+
         [JsonProperty("breakable")]
         public bool Breakable { get; set; }
 
@@ -27,5 +34,14 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
 
         [JsonProperty("temporary")]
         public bool Temporary { get; set; }
+
+        [JsonProperty("resources")]
+        public List<MyHordesResourceRoot> Resources { get; set; }
+
+        [JsonProperty("actions")]
+        public int Actions { get; set; }
+
+        [JsonProperty("hasLevels")]
+        public int HasLevels { get; set; }
     }
 }

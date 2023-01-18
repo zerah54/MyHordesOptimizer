@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.Attributes;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -25,6 +26,15 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var parameters = ParametersService.GetParameters();
             return parameters.ToList();
+        }
+
+        [HttpPost]
+        [BasicAuthentication]
+        [Route("Parameters")]
+        public ActionResult PostParameters([FromBody] ParametersDto parameter)
+        {
+            ParametersService.UpdateParameter(parameter);
+            return Ok();
         }
     }
 }
