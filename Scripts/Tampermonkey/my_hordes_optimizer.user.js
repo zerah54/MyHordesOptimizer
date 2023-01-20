@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.28
+// @version      1.0.0-beta.29
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,7 +35,9 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH][fix] Correction de la mise à jour des outils externes si 0 charges d'APAG \n\n`;
++ `[MH][update] Replacement du bouton de suppression de l'id externe pour les apps par un bouton de modification \n\n`
++ `[MH][update] Correctifs visuels sur la page d'informations complémentaires sur les citoyens \n\n`
++ `[MH][new] Ajout d'une option pour remonter à MHO le résultat de vos fouilles. Des outils de lectures et de modification sont à votre disposition sur le site`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -437,6 +439,12 @@ const texts = {
         fr: `Votre identifiant n'a pas pu être récupéré automatiquement. Vous pouvez le saisir manuellement ici.`,
         de: `TODO`,
         es: `TODO`,
+    },
+    edit_add_app_id_key: {
+        en: `TODO`,
+        fr: `Saisissez votre identifiant externe pour les applications ici.\Vous pouvez vider le champ pour le supprimer.`,
+        de: `TODO`,
+        es: `TODO`,
     }
 };
 
@@ -799,50 +807,50 @@ const more_citizen_info_headers = [
             de: ``,
             es: ``
         },
-        header_class: ['padded', 'cell', 'rw-5'],
+        header_class: ['padded', 'cell', 'rw-5', 'header-center-vertical'],
         content_class: ['padded', 'cell', 'rw-5', 'small', 'citizen-box', 'content-center-vertical']
     },
     {
         id: 'plaintes',
         icon: 'emotes/warning.gif',
-        header_class: ['padded', 'cell', 'rw-1', 'center'],
-        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
+        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
     },
     {
         id: 'rations',
         icon: 'icons/small_well.gif',
-        header_class: ['padded', 'cell', 'rw-1', 'center'],
-        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
+        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
     },
     {
         id: 'injured',
         icon: 'status/status_wound1.gif',
-        header_class: ['padded', 'cell', 'rw-1', 'center'],
-        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
+        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
     },
     {
         id: 'infection',
         icon: 'status/status_infection.gif',
-        header_class: ['padded', 'cell', 'rw-1', 'center'],
-        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
+        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
     },
     {
         id: 'thirsty',
         icon: 'status/status_thirst2.gif',
-        header_class: ['padded', 'cell', 'rw-1', 'center'],
-        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
+        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
     },
     {
         id: 'addict',
         icon: 'status/status_addict.gif',
-        header_class: ['padded', 'cell', 'rw-1', 'center'],
-        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
+        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
     },
     {
         id: 'terror',
         icon: 'status/status_terror.gif',
-        header_class: ['padded', 'cell', 'rw-1', 'center'],
-        content_class: ['padded', 'cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
+        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
+        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
     },
     {
         id: 'travaux',
@@ -1044,6 +1052,16 @@ let params_categories = [
                     fr: `États`,
                     de: `Status`,
                     es: `Estatus`
+                },
+                parent_id: `update_mho`
+            },
+            {
+                id: `update_mho_digs`,
+                label: {
+                    en: `Record successful digs`,
+                    fr: `Enregistrer les fouilles réussies`,
+                    de: `Zeichnen Sie erfolgreiche Ausgrabungen auf`,
+                    es: `Grabar excavaciones exitosas`
                 },
                 parent_id: `update_mho`
             },
@@ -1364,17 +1382,24 @@ let informations = [
         img: `${repo_img_url}discord.ico`
     },
     {
-        id: `clean-app-id`,
+        id: `edit-app-id`,
         label: {
             en: `TODO`,
-            fr: `Réinitialiser mon ID d'app externe`,
+            fr: `Modifier mon ID externe pour les apps`,
             de: `TODO`,
             es: `TODO`
         },
         src: undefined,
         action: () => {
-            GM.setValue(gm_mh_external_app_id_key, undefined);
-            external_app_id = undefined;
+            let manual_app_id_key = prompt(getI18N(texts.edit_add_app_id_key), external_app_id);
+
+            if (manual_app_id_key !== null && manual_app_id_key !== undefined && manual_app_id_key !== '') {
+                external_app_id = manual_app_id_key;
+                GM.setValue(gm_mh_external_app_id_key, external_app_id);
+            } else if (manual_app_id_key === '') {
+                external_app_id = undefined;
+                GM.setValue(gm_mh_external_app_id_key, undefined);
+            }
         },
         img: `icons/small_remove.gif`
     }
@@ -1464,7 +1489,7 @@ function pageIsHouse() {
 
 /** @return {boolean}    true si la page de l'utilisateur est la liste des citoyens */
 function pageIsCitizens() {
-    return document.URL.endsWith('citizens');
+    return document.URL.indexOf('citizens') > -1;
 }
 
 /** @return {boolean}    true si la page de l'utilisateur est la page des chantiers */
@@ -3504,7 +3529,7 @@ function createUpdateExternalToolsButton() {
         btn.addEventListener('click', () => {
             /** Au clic sur le bouton, on appelle la fonction de mise à jour */
             btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/middot.gif">' + getI18N(texts.update_external_tools_pending_btn_label);
-            updateExternalTools();
+            updateExternalTools().then();
         })
 
         updater_bloc.appendChild(btn);
@@ -5082,16 +5107,16 @@ function displayMoreCitizensInformations() {
             mho_more_citizens_tab.classList.add('tab');
 
             let mho_more_citizens_tab_title = document.createElement('div');
-            mho_more_citizens_tab_title.innerHTML = `<img src="${mh_optimizer_icon}" style="height: 16px; margin-right: 0.5em">${getI18N(texts.more_citizens_info)}`;
+            mho_more_citizens_tab_title.innerHTML = `<img src="${mh_optimizer_icon}" style="height: 16px;"><span class="hide-sm hide-md hide-lg" style="margin-left: 0.5em">${getI18N(texts.more_citizens_info)}</span>`;
             mho_more_citizens_tab_title.classList.add('tab-link');
             mho_more_citizens_tab.appendChild(mho_more_citizens_tab_title);
 
             let citizens_list = document.querySelector('.citizens-list');
             if (citizens_list) {
-                let usernames = Array.from(citizens_list.querySelectorAll('.citizen-box-name, .citizen-box-name-me') || []);
-                let citizens_houses = Array.from(citizens_list.querySelectorAll('.citizen-box.location') || []).map((div, index) => { return {username: usernames[index], link: div.getAttribute('x-ajax-href')}});
-
                 mho_more_citizens_tab.addEventListener('click', () => {
+                    let usernames = Array.from(citizens_list.querySelectorAll('.citizen-box-name, .citizen-box-name-me') || []);
+                    let citizens_houses = Array.from(citizens_list.querySelectorAll('.row-flex.stretch') || []).map((row) => row.querySelector('[x-ajax-href]')).map((div, index) => { return {username: usernames[index], link: div.getAttribute('x-ajax-href')}});
+
                     let selected = document.querySelector('.tab.selected');
                     selected.classList.remove('selected');
 
@@ -6208,6 +6233,13 @@ function createStyles() {
 
     let citizen_list_more_info_content = '.content-center-vertical.center {'
     + `justify-content: center;`
+    + `min-width: 18px;`
+    + `}`;
+
+    let citizen_list_more_info_header_content = '.header-center-vertical {'
+    + `text-align: center;`
+    + `padding-bottom: 4px;`
+    + `min-width: 18px;`
     + `}`;
 
 
@@ -6221,7 +6253,8 @@ function createStyles() {
     + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + item_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
     + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
     + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
-    + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content;
+    + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
+    + citizen_list_more_info_header_content;
 
     let style = document.createElement('style');
 
@@ -6239,7 +6272,7 @@ function createStyles() {
 ////////////////////////////
 
 /** Récupère la carte de GH */
-async function getGHMap() {
+function getGHMap() {
     return new Promise((resolve, reject) => {
         startLoading();
 
@@ -6394,7 +6427,7 @@ async function getGHMap() {
 
 
 /** Récupère la carte de Gest'Hordes */
-async function getGHRuin() {
+function getGHRuin() {
     return new Promise((resolve, reject) => {
         startLoading();
         GM.getValue(mho_map_key).then((mho_map) => {
@@ -6515,7 +6548,7 @@ async function getGHRuin() {
 
 
 /** Récupère la carte de GH */
-async function getBBHMap() {
+function getBBHMap() {
     return new Promise((resolve, reject) => {
         startLoading();
 
@@ -6579,7 +6612,7 @@ async function getBBHMap() {
 
 
 /** Récupère la carte de BBH */
-async function getBBHRuin() {
+function getBBHRuin() {
     return new Promise((resolve, reject) => {
         startLoading();
         GM.getValue(mho_map_key).then((mho_map) => {
@@ -6708,7 +6741,7 @@ async function getBBHRuin() {
 }
 
 /** Récupère la carte de FataMorgana */
-async function getFMMap() {
+function getFMMap() {
     return new Promise((resolve, reject) => {
         startLoading();
 
@@ -6759,7 +6792,7 @@ async function getFMMap() {
 }
 
 /** Récupère la carte de FataMorgana */
-async function getFMRuin() {
+function getFMRuin() {
     return new Promise((resolve, reject) => {
         startLoading();
         GM.getValue(mho_map_key).then((mho_map) => {
@@ -6871,7 +6904,7 @@ async function getFMRuin() {
 // Appels API //
 ////////////////
 
-async function getItems() {
+function getItems() {
     return new Promise((resolve, reject) => {
         GM.xmlHttpRequest({
             method: 'GET',
@@ -6909,7 +6942,7 @@ async function getItems() {
     });
 }
 
-async function getRuins() {
+function getRuins() {
     return new Promise((resolve, reject) => {
         if (!ruins) {
             startLoading();
@@ -6946,7 +6979,7 @@ async function getRuins() {
 }
 
 /** Récupère les informations de la ville */
-async function getMe() {
+function getMe() {
     return new Promise((resolve, reject) => {
         if (external_app_id) {
             GM.xmlHttpRequest({
@@ -6987,32 +7020,7 @@ async function getMe() {
 }
 
 /** Récupère les informations de la ville */
-async function getTown() {
-    return new Promise((resolve, reject) => {
-        GM.xmlHttpRequest({
-            method: 'GET',
-            url: api_url + '/myhordesfetcher/town?userKey=' + external_app_id,
-            responseType: 'json',
-            onload: function(response){
-                if (response.status === 200) {
-                    resolve(response.response);
-                } else {
-                    addError(response);
-                    reject(response);
-                }
-                endLoading();
-            },
-            onerror: function(error){
-                addError(error);
-                reject(error);
-            }
-        });
-    });
-}
-
-
-/** Récupère les informations de la ville */
-async function getCitizens() {
+function getCitizens() {
     return new Promise((resolve, reject) => {
         getHeroSkills().then((hero_skills) => {
             startLoading();
@@ -7042,7 +7050,7 @@ async function getCitizens() {
 }
 
 /** Récupère les informations de la banque */
-async function getBank() {
+function getBank() {
     return new Promise((resolve, reject) => {
         startLoading();
         GM.xmlHttpRequest({
@@ -7082,7 +7090,7 @@ async function getBank() {
 }
 
 /** Récupère les informations de liste de course */
-async function getWishlist() {
+function getWishlist() {
     return new Promise((resolve, reject) => {
         GM.xmlHttpRequest({
             method: 'GET',
@@ -7116,7 +7124,7 @@ async function getWishlist() {
   * Ajoute un élément à la wishlist
   * @param item l'élément à ajouter à la wishlist
   */
-async function addItemToWishlist(item) {
+function addItemToWishlist(item) {
     return new Promise((resolve, reject) => {
         startLoading();
         GM.xmlHttpRequest({
@@ -7180,277 +7188,373 @@ function updateWishlist() {
 
 /** Met à jour les outils externes (BBH, GH et Fata) en fonction des paramètres sélectionnés */
 function updateExternalTools() {
-    startLoading();
+    return new Promise(async (resolve, reject) => {
+        startLoading();
 
-    let convertImgToItem = (img) => {
-        return items.find((item) => img.src.replace(/(.*)\/(\w+)\.(\w+)\.(\w+)/, '$1/$2.$4').indexOf(item.img) >= 0);
-    }
-
-    let convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
-        let object_map = [];
-        objects.forEach((object) => {
-            let object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id && _object_in_map.isBroken === object.isBroken);
-            if (object_in_map) {
-                object_in_map.count += 1;
-            } else {
-                object.count = 1;
-                object_map.push(object);
-            }
-        });
-        return object_map;
-    }
-
-    let data = {};
-    let nb_dead_zombies = +document.querySelectorAll('.actor.splatter').length;
-
-    data.townDetails = {
-        townX: mh_user.townDetails.townX,
-        townY: mh_user.townDetails.townY,
-        townid: mh_user.townDetails.townId,
-        isDevaste: mh_user.townDetails.isDevaste,
-    };
-
-    data.map = {}
-    data.map.toolsToUpdate = {
-        isBigBrothHordes: mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : 'none',
-        isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
-        isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && pageIsDesert() && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
-    };
-
-    let position = document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/');
-
-    if (mho_parameters.update_gh_without_api && pageIsDesert()) {
-        let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
-            let item = convertImgToItem(desert_item.querySelector('img'));
-            return {id: item.id, isBroken: desert_item.classList.contains('broken')};
-        });
-
-        let content = {
-            x: +position[0],
-            y: +position[1],
-            zombies: +document.querySelectorAll('.actor.zombie').length,
-            deadZombies: nb_dead_zombies,
-            zoneEmpty: !!document.querySelector('#mgd-empty-zone-note'),
-            objects: convertListOfSingleObjectsIntoListOfCountedObjects(objects)
-        }
-        if (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) {
-            data.map.cell = content;
-        }
-    }
-
-    if (mho_parameters.update_mho_bags) {
-
-        data.bags = {}
-        data.bags.contents = [];
-        data.bags.toolsToUpdate = {
-            isBigBrothHordes: false,
-            isFataMorgana: false,
-            isGestHordes: false,
-            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_bags
-        };
-
-        let rucksacks = [];
-        let my_rusksack = Array.from(document.querySelector('.pointer.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
-            let item = convertImgToItem(rucksack_item.querySelector('img'));
-            return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
-        });
-
-        rucksacks.push({
-            userId: mh_user.id,
-            objects: convertListOfSingleObjectsIntoListOfCountedObjects(my_rusksack),
-        });
-
-        if (pageIsDesert()) {
-            let escorts = Array.from(document.querySelectorAll('.beyond-escort-on:not(.beyond-escort-on-all)') || []);
-            escorts.forEach((escort) => {
-                let escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
-                let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
-                    let item = convertImgToItem(rucksack_item.querySelector('img'));
-                    return {id: item?.id, isBroken: rucksack_item.classList.contains('broken')};
-                });
-
-                rucksacks.push({
-                    userId: escort_id,
-                    objects: convertListOfSingleObjectsIntoListOfCountedObjects(escort_rucksack),
-                });
-            })
+        let convertImgToItem = (img) => {
+            return items.find((item) => img.src.replace(/(.*)\/(\w+)\.(\w+)\.(\w+)/, '$1/$2.$4').indexOf(item.img) >= 0);
         }
 
-        data.bags.contents = rucksacks;
-    }
-
-    if (mho_parameters.update_mho_chest && pageIsHouse()) {
-
-        data.chest = {}
-        data.chest.contents = [];
-        data.chest.toolsToUpdate = {
-            isBigBrothHordes: false,
-            isFataMorgana: false,
-            isGestHordes: false,
-            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_chest
-        };
-
-        let chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
-            let item = convertImgToItem(chest_item.querySelector('img'));
-            return {id: item.id, isBroken: chest_item.classList.contains('broken')};
-        });
-
-        data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
-    }
-
-
-    /** Récupération des pouvoirs héroïques */
-    if (mho_parameters.update_gh_ah || mho_parameters.update_mho_actions) {
-
-        let no_interaction = document.querySelector('.no-interaction');
-
-        data.heroicActions = {}
-        data.heroicActions.actions = [];
-        data.heroicActions.toolsToUpdate = {
-            isBigBrothHordes: false,
-            isFataMorgana: false,
-            isGestHordes: mho_parameters && mho_parameters.update_gh_ah,
-            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_actions
-        };
-        let heroics = Array.from(document.querySelector('.heroic_actions')?.querySelectorAll('.heroic_action:not(.help)') || []);
-        if (heroics && heroics.length > 0) {
-            for (let heroic of heroics) {
-                let action = {
-                    locale: lang,
-                    label: heroic.querySelector('.label')?.innerText,
-                    value: heroic.classList.contains('already') ? 0 : 1
+        let convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
+            let object_map = [];
+            objects.forEach((object) => {
+                let object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id && _object_in_map.isBroken === object.isBroken);
+                if (object_in_map) {
+                    object_in_map.count += 1;
+                } else {
+                    object.count = 1;
+                    object_map.push(object);
                 }
-                data.heroicActions.actions.push(action);
-            }
-        } else if (!no_interaction) {
-            let action = {
-                locale: null,
-                label: 'Empty',
-                value: pageIsDesert() ? 0 /* 'desert' */ : 1 /* 'town' */
-            }
-            data.heroicActions.actions.push(action);
+            });
+            return object_map;
         }
 
-        let apag = document.querySelector('.pointer.rucksack [src*=item_photo]');
-        if (apag) {
-            let action = {
-                locale: lang,
-                label: apag.parentElement.nextElementSibling.querySelector('h1')?.innerText.replace('  ', ''),
-                value: +apag.src.replace(/.*item_photo_(\d).*/, '$1') || 0
+        let data = {};
+        let nb_dead_zombies = +document.querySelectorAll('.actor.splatter').length;
+
+        data.townDetails = {
+            townX: mh_user.townDetails.townX,
+            townY: mh_user.townDetails.townY,
+            townid: mh_user.townDetails.townId,
+            isDevaste: mh_user.townDetails.isDevaste,
+        };
+
+        data.map = {}
+        data.map.toolsToUpdate = {
+            isBigBrothHordes: mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : 'none',
+            isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
+            isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && pageIsDesert() && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none',
+            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? (pageIsDesert() && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
+        };
+
+        let position = document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/');
+        let citizen_list = Array.from(document.querySelectorAll('.citizen-box .username[x-user-id]') || [])?.map((citizen_box) => {
+            return { id: +citizen_box.getAttribute('x-user-id'), userName: citizen_box.innerText, job: citizen_box.parentElement.parentElement.querySelector('img[src*=professions').src.replace(/.*professions\/(\w+).*/, '$1'), row: citizen_box }
+        }) || [ { id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid } ]
+
+        if ((mho_parameters.update_gh_without_api || mho_parameters.update_mho) && pageIsDesert()) {
+            let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
+                let item = convertImgToItem(desert_item.querySelector('img'));
+                return {id: item.id, isBroken: desert_item.classList.contains('broken')};
+            });
+
+            let content = {
+                x: +position[0],
+                y: +position[1],
+                zombies: +document.querySelectorAll('.actor.zombie').length,
+                deadZombies: nb_dead_zombies,
+                zoneEmpty: !!document.querySelector('#mgd-empty-zone-note'),
+                objects: convertListOfSingleObjectsIntoListOfCountedObjects(objects),
+                citizenId: citizen_list.map((citizen) => citizen.id)
             }
-            data.heroicActions.actions.push(action);
+            if (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) {
+                data.map.cell = content;
+            }
         }
 
-        if (pageIsDesert()) {
-            let pef = document.querySelector('ul.special_actions [src*=armag]');
-            if (pef) {
-                let action = {
-                    locale: lang,
-                    label: 'PEF',
-                    value: 1
+        if (mho_parameters.update_mho && mho_parameters.update_mho_bags) {
+
+            data.bags = {}
+            data.bags.contents = [];
+            data.bags.toolsToUpdate = {
+                isBigBrothHordes: false,
+                isFataMorgana: false,
+                isGestHordes: false,
+                isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_bags
+            };
+
+            let rucksacks = [];
+            let my_rusksack = Array.from(document.querySelector('.pointer.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
+                let item = convertImgToItem(rucksack_item.querySelector('img'));
+                return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
+            });
+
+            rucksacks.push({
+                userId: mh_user.id,
+                objects: convertListOfSingleObjectsIntoListOfCountedObjects(my_rusksack),
+            });
+
+            if (pageIsDesert()) {
+                let escorts = Array.from(document.querySelectorAll('.beyond-escort-on:not(.beyond-escort-on-all)') || []);
+                escorts.forEach((escort) => {
+                    let escort_id = +escort.querySelector('span.username')?.getAttribute('x-user-id');
+                    let escort_rucksack = Array.from(escort.querySelector('.inventory.rucksack-escort')?.querySelectorAll('li.item:not(.locked):not(.plus)') || []).map((rucksack_item) => {
+                        let item = convertImgToItem(rucksack_item.querySelector('img'));
+                        return {id: item?.id, isBroken: rucksack_item.classList.contains('broken')};
+                    });
+
+                    rucksacks.push({
+                        userId: escort_id,
+                        objects: convertListOfSingleObjectsIntoListOfCountedObjects(escort_rucksack),
+                    });
+                })
+            }
+
+            data.bags.contents = rucksacks;
+        }
+
+        if (mho_parameters.update_mho && mho_parameters.update_mho_chest && pageIsHouse()) {
+
+            data.chest = {}
+            data.chest.contents = [];
+            data.chest.toolsToUpdate = {
+                isBigBrothHordes: false,
+                isFataMorgana: false,
+                isGestHordes: false,
+                isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_chest
+            };
+
+            let chest_elements = Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked)') || []).map((chest_item) => {
+                let item = convertImgToItem(chest_item.querySelector('img'));
+                return {id: item.id, isBroken: chest_item.classList.contains('broken')};
+            });
+
+            data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
+        }
+
+
+        /** Récupération des pouvoirs héroïques */
+        if ((mho_parameters.update_gh && mho_parameters.update_gh_ah) || (mho_parameters.update_mho &&mho_parameters.update_mho_actions)) {
+
+            let no_interaction = document.querySelector('.no-interaction');
+
+            data.heroicActions = {}
+            data.heroicActions.actions = [];
+            data.heroicActions.toolsToUpdate = {
+                isBigBrothHordes: false,
+                isFataMorgana: false,
+                isGestHordes: mho_parameters && mho_parameters.update_gh_ah,
+                isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_actions
+            };
+            let heroics = Array.from(document.querySelector('.heroic_actions')?.querySelectorAll('.heroic_action:not(.help)') || []);
+            if (heroics && heroics.length > 0) {
+                for (let heroic of heroics) {
+                    let action = {
+                        locale: lang,
+                        label: heroic.querySelector('.label')?.innerText,
+                        value: heroic.classList.contains('already') ? 0 : 1
+                    }
+                    data.heroicActions.actions.push(action);
                 }
-                data.heroicActions.actions.push(action);
             } else if (!no_interaction) {
                 let action = {
-                    locale: lang,
-                    label: 'PEF',
-                    value: 0
+                    locale: null,
+                    label: 'Empty',
+                    value: pageIsDesert() ? 0 /* 'desert' */ : 1 /* 'town' */
                 }
                 data.heroicActions.actions.push(action);
             }
-        }
-    }
 
-    /** Récupération des améliorations de maison */
-    if ((mho_parameters.update_gh_amelios || mho_parameters.update_mho_house) && pageIsHouse()) {
-        data.amelios = {}
-        data.amelios.values = {};
-        data.amelios.toolsToUpdate = {
-            isBigBrothHordes: false,
-            isFataMorgana: false,
-            isGestHordes: mho_parameters && mho_parameters.update_gh_amelios,
-            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_house
-        };
-        let amelios = Array.from(document.querySelectorAll('[x-tab-group="home-main"][x-tab-id="build"] .row-table .row:not(.header)') || []);
-        if (amelios && amelios.length > 0) {
-            amelios.forEach((amelio) => {
-                let amelio_img = amelio.querySelector('img');
-                let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
-                data.amelios.values[amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1')] = amelio_value ? +amelio_value[0] : 0;
-            });
-        }
-        let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt;
-        data.amelios.values.house = house_level;
-    }
-
-    /** Récupération des status */
-    if (mho_parameters.update_mho_status || mho_parameters.update_gh_status) {
-        data.status = {}
-        data.status.values = [];
-        data.status.toolsToUpdate = {
-            isBigBrothHordes: false,
-            isFataMorgana: false,
-            isGestHordes: mho_parameters && mho_parameters.update_gh_status,
-            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_status
-        };
-        let statuses = Array.from(document.querySelectorAll('.rucksack_status_union li.status img') || []);
-        if (statuses && statuses.length > 0) {
-            statuses
-                .filter((status) => {
-                let status_name = status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1');
-                return status.src.indexOf('/status') > -1 && status_name !== 'ghoul' && status_name !== 'unknown';
-            })
-                .forEach((status) => {
-                data.status.values.push(status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1'));
-            });
-        }
-    }
-
-
-    console.log('Voici ce que j\'envoie :', data);
-    let btn = document.getElementById(mh_update_external_tools_id);
-    GM.xmlHttpRequest({
-        method: 'POST',
-        url: api_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id,
-        data: JSON.stringify(data),
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        responseType: 'json',
-        onload: function(response){
-            if (response.status === 200) {
-                if (response.response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_bbh_updated_key, true);
-                if (response.response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
-                if (response.response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
-
-                let tools_fail = [];
-                let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
-                response_items.forEach((response_item, index) => {
-                    let final = Object.keys(response_item.value).map((key) => {return {key: key, value: response_item.value[key]}});
-                    tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
-                    if (index >= response_items.length - 1) {
-                        btn.innerHTML = tools_fail.length === 0 ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
-                        : `<img src ="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
-                    }
-                });
-                if (tools_fail.length > 0) {
-                    console.error(`Erreur lors de la mise à jour de l'un des outils`, response.response);
+            let apag = document.querySelector('.pointer.rucksack [src*=item_photo]');
+            if (apag) {
+                let action = {
+                    locale: lang,
+                    label: apag.parentElement.nextElementSibling.querySelector('h1')?.innerText.replace('  ', ''),
+                    value: +apag.src.replace(/.*item_photo_(\d).*/, '$1') || 0
                 }
-            } else {
-                addError(response);
-                btn.innerHTML = `<img src="${repo_img_hordes_url}professions/death.gif">` + getI18N(texts.update_external_tools_fail_btn_label);
+                data.heroicActions.actions.push(action);
             }
-            endLoading();
-        },
-        onerror: function(error){
-            endLoading();
-            addError(error);
+
+            if (pageIsDesert()) {
+                let pef = document.querySelector('ul.special_actions [src*=armag]');
+                if (pef) {
+                    let action = {
+                        locale: lang,
+                        label: 'PEF',
+                        value: 1
+                    }
+                    data.heroicActions.actions.push(action);
+                } else if (!no_interaction) {
+                    let action = {
+                        locale: lang,
+                        label: 'PEF',
+                        value: 0
+                    }
+                    data.heroicActions.actions.push(action);
+                }
+            }
         }
+
+        /** Récupération des améliorations de maison */
+        if (((mho_parameters.update_gh && mho_parameters.update_gh_amelios) || (mho_parameters.update_mho && mho_parameters.update_mho_house)) && pageIsHouse()) {
+            data.amelios = {}
+            data.amelios.values = {};
+            data.amelios.toolsToUpdate = {
+                isBigBrothHordes: false,
+                isFataMorgana: false,
+                isGestHordes: mho_parameters && mho_parameters.update_gh_amelios,
+                isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_house
+            };
+            let amelios = Array.from(document.querySelectorAll('[x-tab-group="home-main"][x-tab-id="build"] .row-table .row:not(.header)') || []);
+            if (amelios && amelios.length > 0) {
+                amelios.forEach((amelio) => {
+                    let amelio_img = amelio.querySelector('img');
+                    let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
+                    data.amelios.values[amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1')] = amelio_value ? +amelio_value[0] : 0;
+                });
+            }
+            let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt;
+            data.amelios.values.house = house_level;
+        }
+
+        /** Récupération des status */
+        if ((mho_parameters.update_mho && mho_parameters.update_mho_status) || (mho_parameters.update_gh && mho_parameters.update_gh_status)) {
+            data.status = {}
+            data.status.values = [];
+            data.status.toolsToUpdate = {
+                isBigBrothHordes: false,
+                isFataMorgana: false,
+                isGestHordes: mho_parameters && mho_parameters.update_gh_status,
+                isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_status
+            };
+            let statuses = Array.from(document.querySelectorAll('.rucksack_status_union li.status img') || []);
+            if (statuses && statuses.length > 0) {
+                statuses
+                    .filter((status) => {
+                    let status_name = status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1');
+                    return status.src.indexOf('/status') > -1 && status_name !== 'ghoul' && status_name !== 'unknown';
+                })
+                    .forEach((status) => {
+                    data.status.values.push(status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1'));
+                });
+            }
+        }
+
+        /** Récupération des fouilles réussies */
+        if (pageIsDesert() && (mho_parameters.update_mho && mho_parameters.update_mho_digs)) {
+            data.successedDig = {};
+            data.successedDig.cell = {
+                day: mh_user.townDetails.day,
+                x: +position[0],
+                y: +position[1]
+            }
+            data.successedDig.values = [];
+            data.successedDig.toolsToUpdate = {
+                isBigBrothHordes: false,
+                isFataMorgana: false,
+                isGestHordes: false,
+                isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_digs
+            };
+
+            let logs = await getDesertLogs();
+            let arrivals_texts = {
+                de: `angekommen`,
+                en: `has arrived from the`,
+                es: `ha llegado desde el`,
+                fr: `est arrivé depuis`
+            }
+
+            let arrivals = logs.filter((log) => log.innerText.toLowerCase().indexOf(getI18N(arrivals_texts).toLowerCase()) > -1).map((log) => {
+                return {
+                    time: log.querySelector('.log-part-time')?.innerText,
+                    citizen: log.querySelector('.log-part-content span')?.innerText
+                };
+            });
+
+            let citizen_digs = []
+
+            let now = document.querySelector('.clock [x-current-time]').innerText;
+
+            citizen_list
+                .filter((citizen) => { // On ne garde que les citoyens actuellement en train de fouiller
+                let is_digging = false;
+                if (citizen.id === mh_user.id) { // Il s'agit de l'utilisateur qui a cliqué sur le bouton
+                    is_digging = document.querySelector('#mgd-digging-note [x-countdown]') ? true : false
+                } else { // Les autres
+                    is_digging = citizen.row.parentElement.parentElement.parentElement.querySelector('li.status img[src*=small_gather]') ? true : false;
+                }
+                return is_digging;
+            })
+                .forEach((citizen) => {
+
+                let failed_texts = {
+                    de: `durch Graben nichts gefunden...`,
+                    en: `found nothing during their last search...`,
+                    es: `no encontró nada...`,
+                    fr: `rien trouvé...`
+                };
+                let failed_digs = Array.from(logs.filter((log) => log.innerText.toLowerCase().indexOf(getI18N(failed_texts).toLowerCase()) > -1) || []).filter((log) =>log.innerText.indexOf(citizen.userName) > -1) || [];
+                let nb_failed_digs = failed_digs.length;
+
+                let nb_minutes_for_dig = citizen.job === 'dig' ? 90 : 120; // Une fouille = 2h = 120 minutes pour un tous les métiers, ou 1h30 = 90 minutes pour une pelle
+
+                let citizen_arrivals = arrivals.filter((arrival) => arrival.citizen === citizen.userName); // Les heures d'arrivées du citoyen sur la case
+
+                let citizen_last_arrival = citizen_arrivals[0]?.time;
+                let start_date;
+
+                if (citizen_last_arrival) { // Si le citoyen a une heure d'arrivée alors on se base sur cette heure comme heure de début de fouilles
+                    start_date = citizen_last_arrival;
+                } else { // Sinon, on se base sur le cooldown
+                    start_date = nb_failed_digs === 0 ? null : failed_digs[failed_digs.length - 1].querySelector('.log-part-time').innerText;
+                }
+
+                let nb_digs;
+                if (start_date) {
+                    let now_minutes = (+now.split(':')[0]*60) + (+now.split(':')[1]);
+                    let start_date_minutes = (+start_date.split(':')[0]*60) + (+start_date.split(':')[1]);
+
+                    let nb_minutes_digging = now_minutes - start_date_minutes; // Le nombre total de minutes passées à fouiller
+                    nb_digs = Math.floor(nb_minutes_digging / nb_minutes_for_dig) + 1;
+
+                } else {
+                    nb_digs = 1;
+                }
+                data.successedDig.values.push({
+                    citizenId: citizen.id,
+                    successDigs: nb_digs - nb_failed_digs,
+                    totalDigs: nb_digs
+                })
+            });
+        }
+
+
+
+        console.log('Voici ce que j\'envoie :', data);
+        let btn = document.getElementById(mh_update_external_tools_id);
+        GM.xmlHttpRequest({
+            method: 'POST',
+            url: api_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id,
+            data: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            responseType: 'json',
+            onload: function(response){
+                if (response.status === 200) {
+                    if (response.response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_bbh_updated_key, true);
+                    if (response.response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
+                    if (response.response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
+
+                    let tools_fail = [];
+                    let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
+                    response_items.forEach((response_item, index) => {
+                        let final = Object.keys(response_item.value).map((key) => {return {key: key, value: response_item.value[key]}});
+                        tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
+                        if (index >= response_items.length - 1) {
+                            btn.innerHTML = tools_fail.length === 0 ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
+                            : `<img src ="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
+                        }
+                    });
+                    if (tools_fail.length > 0) {
+                        console.error(`Erreur lors de la mise à jour de l'un des outils`, response.response);
+                    }
+                } else {
+                    addError(response);
+                    btn.innerHTML = `<img src="${repo_img_hordes_url}professions/death.gif">` + getI18N(texts.update_external_tools_fail_btn_label);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                endLoading();
+                addError(error);
+            }
+        });
     });
 }
 
 /** Récupère la liste complète des pouvoirs héros */
-async function getHeroSkills() {
+function getHeroSkills() {
     return new Promise((resolve, reject) => {
         if (!hero_skills) {
             startLoading();
@@ -7490,7 +7594,7 @@ async function getHeroSkills() {
 
 
 /** Récupère les traductions de la chaine de caractères */
-async function getTranslation(string_to_translate, source_language) {
+function getTranslation(string_to_translate, source_language) {
     return new Promise((resolve, reject) => {
         if (string_to_translate && string_to_translate !== '') {
             let locale = 'locale=' + source_language;
@@ -7520,7 +7624,7 @@ async function getTranslation(string_to_translate, source_language) {
 }
 
 /** Récupère la liste complète des recettes */
-async function getRecipes() {
+function getRecipes() {
     return new Promise((resolve, reject) => {
         if (!recipes) {
             startLoading();
@@ -7563,7 +7667,7 @@ async function getRecipes() {
 }
 
 /** Récupère la liste complète des paramètres en base */
-async function getParameters() {
+function getParameters() {
     return new Promise((resolve, reject) => {
         startLoading();
         GM.xmlHttpRequest({
@@ -7572,7 +7676,6 @@ async function getParameters() {
             responseType: 'json',
             onload: function(response){
                 if (response.status === 200) {
-                    console.log('response', response.response);
                     parameters = response.response
                     resolve();
                 } else {
@@ -7591,7 +7694,7 @@ async function getParameters() {
 }
 
 /** Récupère la liste complète des recettes */
-async function getTodayEstimation(day, estimations, today) {
+function getTodayEstimation(day, estimations, today) {
     return new Promise((resolve, reject) => {
         startLoading();
         GM.xmlHttpRequest({
@@ -7618,7 +7721,7 @@ async function getTodayEstimation(day, estimations, today) {
 }
 
 /** Récupère le chemin optimal à partir d'une carte */
-async function getOptimalPath(map, html, button) {
+function getOptimalPath(map, html, button) {
     return new Promise((resolve, reject) => {
         map.doors = map.doors.slice(2);
         console.log('map before send', map);
@@ -7649,7 +7752,7 @@ async function getOptimalPath(map, html, button) {
     });
 }
 
-async function getApiKey() {
+function getApiKey() {
     return new Promise((resolve, reject) => {
         if (!external_app_id || external_app_id === '') {
             GM.xmlHttpRequest({
@@ -7706,7 +7809,7 @@ async function getApiKey() {
 }
 
 /** Récupère le contenu de la maison d'un citoyen pour tout afficher dans la nouvelle page de l'onglet citoyens */
-async function getCitizenHouseContent(link) {
+function getCitizenHouseContent(link) {
     return new Promise((resolve, reject) => {
         GM.xmlHttpRequest({
             method: 'POST',
@@ -7751,6 +7854,41 @@ async function getCitizenHouseContent(link) {
                     let travaux = travaux_row ? travaux_row.lastElementChild : town_summary.querySelectorAll('.row-detail')[1];
                     more_info.travaux = travaux ? travaux.innerHTML.replace(/\<b\>/g, '').replace(/\<\/b\>/g, '').replace(/ , /g, '').replace(/\n/g, '').replace(/(\d+)/g, '$1<br />') : '';
                     resolve(more_info);
+                } else {
+                    reject(response);
+                }
+                endLoading();
+            },
+            onerror: function(error){
+                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
+                endLoading();
+                reject(error);
+            }
+        });
+    });
+}
+
+function getDesertLogs() {
+    return new Promise((resolve, reject) => {
+        GM.xmlHttpRequest({
+            method: 'POST',
+            url: location.origin + '/api/beyond/desert/log',
+            responseType: 'document',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Request-Intent': 'WebNavigation',
+                'X-Render-Target': 'content'
+            },
+            data: JSON.stringify({
+                day: -1,
+                town: mh_user.townDetails.townId
+            }),
+            onload: function(response){
+                if (response.status === 200) {
+                    let temp_body = document.createElement('body');
+                    temp_body.innerHTML = response.response.body.innerHTML;
+                    resolve(Array.from(temp_body.querySelectorAll('div.log-entry')));
                 } else {
                     reject(response);
                 }
