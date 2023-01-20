@@ -1,0 +1,148 @@
+<div class="mat-elevation-z8 mho-citizens-digs" *ngIf="citizen_info">
+    <table mat-table [dataSource]="datasource" matSort>
+
+        <ng-container *ngFor="let column of columns" [matColumnDef]="column.id" [sticky]="column.id === 'avatar_name'">
+            <th mat-header-cell *matHeaderCellDef [ngClass]="[column.id, column.class]">
+                <ng-container [ngSwitch]="column.id">
+                    <mho-header-with-select-filter *ngSwitchCase="'avatar_name'" [header]="column.header"
+                        [(filterValue)]="citizen_filters" (filterValueChange)="citizen_filter_change.next()"
+                        [options]="citizen_info.citizens" [bindLabel]="'name'">
+                    </mho-header-with-select-filter>
+                    <mho-header-with-number-previous-next-filter class="previous-next" *ngSwitchCase="'today_digs'" [header]="column.header"
+                        [(filterValue)]="filters.selected_day" (filterValueChange)="citizen_filter_change.next()"
+                        [min]="1" [max]="current_day">
+                    </mho-header-with-number-previous-next-filter>
+                </ng-container>
+            </th>
+
+            <td mat-cell *matCellDef="let row" [ngClass]="[column.id, column.class]">
+                <ng-container [ngSwitch]="column.id">
+                    <ng-container *ngSwitchCase="'avatar_name'">
+                        <img *ngIf="row.citizen.avatar" [src]="row.citizen.avatar" />
+                        <div>{{row.citizen.name}}</div>
+                    </ng-container>
+                    <ng-container *ngSwitchCase="'today_digs'">
+                        <div class="digs">
+                            <div class="dig create-dig">
+                                <ng-container
+                                    *ngIf="dig_to_update && !dig_to_update.cell_id && dig_to_update.digger_id === row.citizen.id && dig_to_update.day === filters.selected_day; else noCreate">
+                                    <div class="positions">
+                                        <img [src]="HORDES_IMG_REPO + 'emotes/explo.gif'">
+                                        <ng-container i18n>Position</ng-container>&nbsp;:&nbsp;
+                                        <input [(ngModel)]="dig_to_update.x">/<input [(ngModel)]="dig_to_update.y">
+                                    </div>
+                                    <div class="values">
+                                        <span class="success">
+                                            <img [src]="HORDES_IMG_REPO + 'icons/done.png'"><input
+                                                [(ngModel)]="dig_to_update.nb_success">
+                                        </span>
+                                        &nbsp;/&nbsp;
+                                        <span class="total">
+                                            <input [(ngModel)]="dig_to_update.nb_total_dig"><img
+                                                [src]="HORDES_IMG_REPO + '/icons/small_gather.gif'">
+                                        </span>
+                                    </div>
+                                    <mat-divider></mat-divider>
+                                    <div class="actions">
+                                        <ng-container>
+                                            <button mat-icon-button (click)="updateDig()">
+                                                <img [src]="HORDES_IMG_REPO + 'icons/done.png'" title="Enregistrer"
+                                                    i18n-title>
+                                            </button>
+                                            <button mat-icon-button (click)="dig_to_update = undefined">
+                                                <img [src]="HORDES_IMG_REPO + 'icons/small_remove.gif'" title="Annuler"
+                                                    i18n-title>
+                                            </button>
+                                        </ng-container>
+                                    </div>
+                                </ng-container>
+                                <ng-template #noCreate>
+                                    <button mat-icon-button (click)="changeDigToUpdate(row.citizen)">
+                                        <img [src]="HORDES_IMG_REPO + 'icons/small_more2.gif'" title="Ajouter"
+                                            i18n-title>
+                                    </button>
+                                </ng-template>
+                            </div>
+                            <div class="dig" *ngFor="let dig of row.digs">
+                                <div class="positions">
+                                    <img [src]="HORDES_IMG_REPO + 'emotes/explo.gif'">
+                                    <ng-container i18n>Position</ng-container>&nbsp;:&nbsp;{{dig.x}}/{{dig.y}}
+                                </div>
+                                <ng-container
+                                    *ngIf="dig_to_update && dig_to_update.cell_id === dig.cell_id && dig_to_update.digger_id === dig.digger_id && dig_to_update.day === dig.day; else noUpdate">
+                                    <div class="values">
+                                        <span class="success">
+                                            <img [src]="HORDES_IMG_REPO + 'icons/done.png'">
+                                            <input [(ngModel)]="dig_to_update.nb_success">
+                                        </span>
+                                        &nbsp;/&nbsp;
+                                        <span class="total">
+                                            <input [(ngModel)]="dig_to_update.nb_total_dig">
+                                            <img [src]="HORDES_IMG_REPO + '/icons/small_gather.gif'">
+                                        </span>
+                                    </div>
+                                    <mat-divider></mat-divider>
+                                    <div class="actions">
+                                        <ng-container>
+                                            <button mat-icon-button (click)="updateDig()">
+                                                <img [src]="HORDES_IMG_REPO + 'icons/done.png'" title="Enregistrer"
+                                                    i18n-title>
+                                            </button>
+                                            <button mat-icon-button (click)="dig_to_update = undefined">
+                                                <img [src]="HORDES_IMG_REPO + 'icons/small_remove.gif'" title="Annuler"
+                                                    i18n-title>
+                                            </button>
+                                        </ng-container>
+                                    </div>
+                                </ng-container>
+                                <ng-template #noUpdate>
+                                    <div class="values">
+                                        <span class="success">
+                                            <img [src]="HORDES_IMG_REPO + 'icons/done.png'">{{dig.nb_success}}
+                                        </span>
+                                        &nbsp;/&nbsp;
+                                        <span class="total">
+                                            {{dig.nb_total_dig}}<img
+                                                [src]="HORDES_IMG_REPO + '/icons/small_gather.gif'">
+                                        </span>
+                                    </div>
+                                    <mat-divider></mat-divider>
+                                    <div class="actions">
+                                        <ng-container>
+                                            <button mat-icon-button (click)="changeDigToUpdate(row.citizen, dig)">
+                                                <img [src]="HORDES_IMG_REPO + 'forum/edit.png'" title="Modifier"
+                                                    i18n-title>
+                                            </button>
+                                            <button mat-icon-button (click)="deleteDig(dig)">
+                                                <img [src]="HORDES_IMG_REPO + 'emotes/trash.gif'" title="Supprimer"
+                                                    i18n-title>
+                                            </button>
+                                        </ng-container>
+                                    </div>
+                                </ng-template>
+                            </div>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns_ids; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns_ids;"></tr>
+        <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->
+
+        <!-- Row shown when there is no matching data. -->
+        <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" colspan="6">
+                <ng-container
+                    *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
+                    <ng-container *i18n>Aucun objet ne correspond au filtre
+                        "{{filterInput.nativeElement.value}}"</ng-container>
+                </ng-container>
+                <ng-template #emptyTable>
+                    <ng-container i18n>La liste est vide</ng-container>
+                </ng-template>
+            </td>
+        </tr>
+    </table>
+</div>

@@ -69,7 +69,7 @@ export class WishlistComponent {
         this.datasource.sort = this.sort;
         this.datasource.filterPredicate = (data: WishlistItem, filter: string) => this.customFilter(data, filter);
         this.getWishlist();
-        this.api.getItems().subscribe((items: Item[]) => {
+        this.api.getItems(true).subscribe((items: Item[]) => {
             this.items = items;
         });
     }

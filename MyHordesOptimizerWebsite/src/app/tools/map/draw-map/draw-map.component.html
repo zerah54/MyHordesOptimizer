@@ -1,8 +1,26 @@
-<div *ngFor="let row of test; let row_index = index" style="text-align: center; white-space: nowrap">
-  <ng-container *ngFor="let cell of row; let cell_index = index">
-    <mho-map-border *ngIf="cell_index === 0 || cell_index === row.length - 1 || row_index === 0  || row_index === test.length - 1; else mapCell"
-      [vertical]="cell_index === 0 || cell_index === row.length - 1" [horizontal]="row_index === 0  || row_index === test.length - 1" [index]="cell">
-    </mho-map-border>
-    <ng-template #mapCell><mho-map-cell></mho-map-cell></ng-template>
-  </ng-container>
-</div>
+<table *ngIf="complete_map">
+    <thead>
+        <ng-container *ngTemplateOutlet="firstLastRow; context: {$implicit: true}"></ng-container>
+    </thead>
+    <tbody>
+        <tr *ngFor="let row of drawed_map; let row_index = index">
+            <mho-map-border [vertical]="true" [horizontal]="false"
+                [index]="+complete_map.town_y - row_index"></mho-map-border>
+            <mho-map-cell *ngFor="let cell of row" [cell]="cell" [allItems]="allItems"
+                [allRuins]="allRuins" [options]="options" [drawedMap]="drawed_map"></mho-map-cell>
+            <mho-map-border [vertical]="true" [horizontal]="false"
+                [index]="+complete_map.town_y - row_index"></mho-map-border>
+        </tr>
+    </tbody>
+    <tfoot>
+        <ng-container *ngTemplateOutlet="firstLastRow; context: {$implicit: false}"></ng-container>
+    </tfoot>
+
+    <ng-template #firstLastRow let-first>
+        <tr [class.first]="first" [class.last]="!first">
+            <mho-map-border [vertical]="true" [horizontal]="true"></mho-map-border>
+            <mho-map-border [vertical]="false" [horizontal]="true" *ngFor="let x of x_row" [index]="x"></mho-map-border>
+            <mho-map-border [vertical]="true" [horizontal]="true"></mho-map-border>
+        </tr>
+    </ng-template>
+</table>

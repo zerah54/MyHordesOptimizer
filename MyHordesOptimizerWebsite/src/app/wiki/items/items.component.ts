@@ -35,7 +35,7 @@ export class ItemsComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.api.getItems().subscribe((items: Item[]) => {
+        this.api.getItems(true).subscribe((items: Item[]) => {
             this.items = items;
             if (this.items) {
                 this.items = this.items.sort((item_a: Item, item_b: Item) => {

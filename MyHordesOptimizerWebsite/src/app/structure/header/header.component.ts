@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MediaObserver } from '@angular/flex-layout';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Title } from '@angular/platform-browser';
@@ -11,6 +11,8 @@ import { ApiServices } from '../../_abstract_model/services/api.services';
     styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
+    @HostBinding('style.display') display: string = 'contents';
+
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
 
     @Output() changeSidenavStatus: EventEmitter<void> = new EventEmitter();

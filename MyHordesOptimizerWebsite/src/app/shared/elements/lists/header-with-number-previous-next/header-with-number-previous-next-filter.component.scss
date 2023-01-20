@@ -1,0 +1,23 @@
+.mho-header-with-filter {
+
+    >div {
+        display: flex;
+        align-items: center;
+    }
+
+    .open-menu-icon {
+        width: unset !important;
+        height: unset !important;
+        overflow: visible !important;
+        font-size: 16px !important;
+        cursor: pointer;
+
+        &.hidden {
+            display: none;
+        }
+    }
+
+    .mat-form-field {
+        width: 100%;
+    }
+}

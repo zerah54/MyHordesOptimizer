@@ -1,17 +1,36 @@
 {
-    "hosting": {
-        "site": "myhordes-optimizer",
-        "public": "dist/my-hordes-optimizer-website",
-        "ignore": [
-            "firebase.json",
-            "**/.*",
-            "**/node_modules/**"
-        ],
-        "rewrites": [
-            {
-                "source": "**",
-                "destination": "/index.html"
-            }
-        ]
-    }
+    "hosting": [
+        {
+            "target": "prod",
+            "site": "myhordes-optimizer",
+            "public": "dist/my-hordes-optimizer-website",
+            "ignore": [
+                "firebase.json",
+                "**/.*",
+                "**/node_modules/**"
+            ],
+            "rewrites": [
+                {
+                    "source": "**",
+                    "destination": "/index.html"
+                }
+            ]
+        },
+        {
+            "target": "dev",
+            "site": "myhordes-optimizer-dev",
+            "public": "dist/my-hordes-optimizer-website",
+            "ignore": [
+                "firebase.json",
+                "**/.*",
+                "**/node_modules/**"
+            ],
+            "rewrites": [
+                {
+                    "source": "**",
+                    "destination": "/index.html"
+                }
+            ]
+        }
+    ]
 }

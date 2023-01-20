@@ -39,11 +39,6 @@ export class AppComponent implements OnInit {
         this.api.getMe();
     }
 
-    /** Mise à jour des outils externes */
-    public updateExternalTools() {
-        this.api.updateExternalTools();
-    }
-
     private loaderOnRouting(): void {
         this.router.events
             .pipe(filter((event: Event) => event instanceof NavigationStart || event instanceof NavigationEnd))

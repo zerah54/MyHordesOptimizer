@@ -136,7 +136,7 @@
                         <input matInput type="number" [formControlName]="'object_improve'">
                     </mat-form-field>
                     <div class="or">
-                        <mat-button-toggle-group [(ngModel)]="and_amelio">
+                        <mat-button-toggle-group [(ngModel)]="and_amelio" [ngModelOptions]="{standalone: true}">
                             <mat-button-toggle [value]="true" i18n [checked]="and_amelio">Et</mat-button-toggle>
                             <mat-button-toggle [value]="false" i18n [checked]="!and_amelio">Ou</mat-button-toggle>
                         </mat-button-toggle-group>

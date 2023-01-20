@@ -1,5 +1,23 @@
 {
-    "projects": {
-        "default": "myhordes-optimizer"
+  "projects": {
+    "default": "myhordes-optimizer",
+    "dev": "myhordes-optimizer-dev",
+    "prod": "myhordes-optimizer"
+  },
+  "targets": {
+    "myhordes-optimizer": {
+      "hosting": {
+        "prod": [
+          "myhordes-optimizer"
+        ]
+      }
+    },
+    "myhordes-optimizer-dev": {
+      "hosting": {
+        "dev": [
+          "myhordes-optimizer-dev"
+        ]
+      }
     }
+  }
 }

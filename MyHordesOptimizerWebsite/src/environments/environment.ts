@@ -4,14 +4,15 @@
 
 export const environment = {
     production: false,
+    // api_url: 'https://api.myhordesoptimizer.fr',
+    api_url: 'https://myhordesoptimizerapi.azurewebsites.net',
     firebase_config: {
-        apiKey: "AIzaSyCnRCJ-FfBIeeYk4NkQ9SSz9oMOYt_VIqE",
-        authDomain: "myhordes-optimizer.firebaseapp.com",
-        projectId: "myhordes-optimizer",
-        storageBucket: "myhordes-optimizer.appspot.com",
-        messagingSenderId: "452593583285",
-        appId: "1:452593583285:web:c519bc58c71132429beafc",
-        measurementId: "G-8TJ97WXDZR"
+        apiKey: "AIzaSyB3H--KamQP_FZfFgFgrGXHpaa9msDqp50",
+        authDomain: "myhordes-optimizer-dev.firebaseapp.com",
+        projectId: "myhordes-optimizer-dev",
+        storageBucket: "myhordes-optimizer-dev.appspot.com",
+        messagingSenderId: "711281495109",
+        appId: "1:711281495109:web:eb6a5d2e2b110a2b12672c"
     }
 };
 
