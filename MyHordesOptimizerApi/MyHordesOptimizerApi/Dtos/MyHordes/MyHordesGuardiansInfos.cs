@@ -5,7 +5,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
     public class MyHordesGuardiansInfos
     {
         [JsonProperty("gardians")]
-        public int Gardians { get; set; }
+        public double Gardians { get; set; }
 
         [JsonProperty("def")]
         public int Def { get; set; }
