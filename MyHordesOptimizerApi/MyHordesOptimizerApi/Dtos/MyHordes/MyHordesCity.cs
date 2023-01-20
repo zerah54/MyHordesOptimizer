@@ -49,7 +49,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         public dynamic Estimations { get; set; }
 
         [JsonProperty("estimationsNext")]
-        public List<object> EstimationsNext { get; set; }
+        public dynamic EstimationsNext { get; set; }
 
         [JsonProperty("bank")]
         public List<MyHordesBank> Bank { get; set; }
