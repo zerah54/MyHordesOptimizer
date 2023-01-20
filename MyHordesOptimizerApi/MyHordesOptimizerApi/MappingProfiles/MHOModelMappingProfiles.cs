@@ -474,95 +474,95 @@ namespace MyHordesOptimizerApi.MappingProfiles
         private List<string> GetStatusIcons(TownCitizenBagItemCompletModel src)
         {
             var result = new List<string>();
-            if (src.IsCleanBody)
+            if (src.IsCleanBody.HasValue && src.IsCleanBody.Value)
             {
                 result.Add(StatusValue.CleanBody.GetDescription());
             }
-            if (src.IsCamper)
+            if (src.IsCamper.HasValue && src.IsCamper.Value)
             {
                 result.Add(StatusValue.Camper.GetDescription());
             }
-            if (src.IsAddict)
+            if (src.IsAddict.HasValue && src.IsAddict.Value)
             {
                 result.Add(StatusValue.Addict.GetDescription());
             }
-            if (src.IsDrugged)
+            if (src.IsDrugged.HasValue && src.IsDrugged.Value)
             {
                 result.Add(StatusValue.Drugged.GetDescription());
             }
-            if (src.IsDrunk)
+            if (src.IsDrunk.HasValue && src.IsDrunk.Value)
             {
                 result.Add(StatusValue.Drunk.GetDescription());
             }
-            if (src.IsGhoul)
+            if (src.IsGhoul.HasValue && src.IsGhoul.Value)
             {
                 result.Add(StatusValue.Ghoul.GetDescription());
             }
-            if (src.IsQuenched)
+            if (src.IsQuenched.HasValue && src.IsQuenched.Value)
             {
                 result.Add(StatusValue.Quenched.GetDescription());
             }
-            if (src.IsConvalescent)
+            if (src.IsConvalescent.HasValue && src.IsConvalescent.Value)
             {
                 result.Add(StatusValue.Convalescent.GetDescription());
             }
-            if (src.IsSated)
+            if (src.IsSated.HasValue && src.IsSated.Value)
             {
                 result.Add(StatusValue.Sated.GetDescription());
             }
-            if (src.IsCheatingDeathActive)
+            if (src.IsCheatingDeathActive.HasValue && src.IsCheatingDeathActive.Value)
             {
                 result.Add(StatusValue.CheatingDeathActive.GetDescription());
             }
-            if (src.IsHangOver)
+            if (src.IsHangOver.HasValue && src.IsHangOver.Value)
             {
                 result.Add(StatusValue.HangOver.GetDescription());
             }
-            if (src.IsImmune)
+            if (src.IsImmune.HasValue && src.IsImmune.Value)
             {
                 result.Add(StatusValue.Immune.GetDescription());
             }
-            if (src.IsInfected)
+            if (src.IsInfected.HasValue && src.IsInfected.Value)
             {
                 result.Add(StatusValue.Infected.GetDescription());
             }
-            if (src.IsTerrorised)
+            if (src.IsTerrorised.HasValue && src.IsTerrorised.Value)
             {
                 result.Add(StatusValue.Terrorised.GetDescription());
             }
-            if (src.IsThirsty)
+            if (src.IsThirsty.HasValue && src.IsThirsty.Value)
             {
                 result.Add(StatusValue.Thirsty.GetDescription());
             }
-            if (src.IsDesy)
+            if (src.IsDesy.HasValue && src.IsDesy.Value)
             {
                 result.Add(StatusValue.Desy.GetDescription());
             }
-            if (src.IsTired)
+            if (src.IsTired.HasValue && src.IsTired.Value)
             {
                 result.Add(StatusValue.Tired.GetDescription());
             }
-            if (src.IsHeadWounded)
+            if (src.IsHeadWounded.HasValue && src.IsHeadWounded.Value)
             {
                 result.Add(StatusValue.HeadWounded.GetDescription());
             }
-            if (src.IsHandWounded)
+            if (src.IsHandWounded.HasValue && src.IsHandWounded.Value)
             {
                 result.Add(StatusValue.HandWounded.GetDescription());
             }
-            if (src.IsArmWounded)
+            if (src.IsArmWounded.HasValue && src.IsArmWounded.Value)
             {
                 result.Add(StatusValue.ArmWounded.GetDescription());
             }
-            if (src.IsLegWounded)
+            if (src.IsLegWounded.HasValue && src.IsLegWounded.Value)
             {
                 result.Add(StatusValue.LegWounded.GetDescription());
             }
-            if (src.IsEyeWounded)
+            if (src.IsEyeWounded.HasValue && src.IsEyeWounded.Value)
             {
                 result.Add(StatusValue.EyeWounded.GetDescription());
             }
-            if (src.IsFootWounded)
+            if (src.IsFootWounded.HasValue && src.IsFootWounded.Value)
             {
                 result.Add(StatusValue.FootWounded.GetDescription());
             }
