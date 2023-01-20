@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordes
@@ -36,13 +37,13 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         public List<MyHordesBuilding> Buildings { get; set; }
 
         [JsonProperty("news")]
-        public MyHordesNews News { get; set; }
+        public dynamic News { get; set; }
 
         [JsonProperty("defense")]
         public MyHordesDefense Defense { get; set; }
 
         [JsonProperty("upgrades")]
-        public MyHordesUpgradesRoot Upgrades { get; set; }
+        public dynamic Upgrades { get; set; }
 
         [JsonProperty("estimations")]
         public dynamic Estimations { get; set; }

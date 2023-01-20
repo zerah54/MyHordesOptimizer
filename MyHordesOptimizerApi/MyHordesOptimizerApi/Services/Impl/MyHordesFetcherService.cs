@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
@@ -12,6 +13,7 @@ using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -144,6 +146,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                                 averageStartingItemValue = null;
                                 maxPotentialStartingItemValue = null;
                             }
+                            int? zoneRegen = null;
+                            if (xFromTown != 0 && yFromTown != 0)
+                            {
+                                zoneRegen = (int)GetCellZone(xFromTown, yFromTown);
+                            }
                             var cell = new MapCellModel()
                             {
                                 IdTown = town.Id,
@@ -166,7 +173,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                                 MaxPotentialRemainingDig = maxPotentialStartingItemValue,
                                 NbKm = GetCellDistanceInKm(xFromTown, yFromTown),
                                 NbPa = GetCellDistanceInActionPoint(xFromTown, yFromTown),
-                                ZoneRegen = (int)GetCellZone(xFromTown, yFromTown)
+                                ZoneRegen = zoneRegen
                             };
                             cells.Add(cell);
                         }
@@ -220,9 +227,20 @@ namespace MyHordesOptimizerApi.Services.Impl
                     var cellsComplet = MyHordesOptimizerRepository.GetCells(townId);
                     var cells = Mapper.Map<IEnumerable<MapCellModel>>(cellsComplet);
                     RegenDirectionEnum regen = RegenDirectionEnum.All;
-                    if (myHordeMeResponse.Map.City.News.RegenDir != null)
+
+                    var dynamicNews = myHordeMeResponse.Map.City.News;
+                    MyHordesNews news = null;
+                    if (dynamicNews.GetType() != typeof(JObject))
                     {
-                        var regenDirLabel = myHordeMeResponse.Map.City.News.RegenDir.De;
+                        var jObject = dynamicNews as JObject;
+                        if(jObject != null)
+                        {
+                            news = jObject.ToObject<MyHordesNews>();
+                        }
+                    }
+                    if (news != null && news.RegenDir != null)
+                    {
+                        var regenDirLabel = news.RegenDir.De;
                         regen = regenDirLabel.GetEnumFromDescription<RegenDirectionEnum>();
                     }
                     float averageNbOfItemAdded = ((float)MyHordesScrutateurConfiguration.MinItemAdd + ((float)MyHordesScrutateurConfiguration.MaxItemAdd - (float)MyHordesScrutateurConfiguration.MinItemAdd) / (float)2);
@@ -234,13 +252,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                         var yFromTown = yVille - cell.Y;
                         if (!(xFromTown == 0 && yFromTown == 0))
                         {
-                            if(!cell.NbKm.HasValue)
+                            if (!cell.NbKm.HasValue)
                             {
                                 cell.NbKm = GetCellDistanceInKm(xFromTown, yFromTown);
                             }
-                            if(!cell.NbPa.HasValue)
+                            if (!cell.NbPa.HasValue)
                             {
-                                cell.NbPa = GetCellDistanceInActionPoint(xFromTown,yFromTown);
+                                cell.NbPa = GetCellDistanceInActionPoint(xFromTown, yFromTown);
                             }
                             RegenDirectionEnum cellZone;
                             if (cell.ZoneRegen.HasValue)

@@ -181,7 +181,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             }
                             listCells.Add(cell);
                         }
-                        if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(mho))
+                        if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(mho) && updateRequestDto.Map.Cell != null)
                         {
                             UpdateCellInfoDto updateCellDto = updateRequestDto.Map.Cell;
                             var realX = updateRequestDto.TownDetails.TownX + updateCellDto.X;
