@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.29
+// @version      1.0.0-beta.30
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,9 +35,7 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH][update] Replacement du bouton de suppression de l'id externe pour les apps par un bouton de modification \n\n`
-+ `[MH][update] Correctifs visuels sur la page d'informations complémentaires sur les citoyens \n\n`
-+ `[MH][new] Ajout d'une option pour remonter à MHO le résultat de vos fouilles. Des outils de lectures et de modification sont à votre disposition sur le site`;
++ `[MH][fix] La liste des citoyens présents sur la case envoyée à MHO était vide si il n'y avait qu'une personne sur la case \n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -7230,7 +7228,11 @@ function updateExternalTools() {
         let position = document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/');
         let citizen_list = Array.from(document.querySelectorAll('.citizen-box .username[x-user-id]') || [])?.map((citizen_box) => {
             return { id: +citizen_box.getAttribute('x-user-id'), userName: citizen_box.innerText, job: citizen_box.parentElement.parentElement.querySelector('img[src*=professions').src.replace(/.*professions\/(\w+).*/, '$1'), row: citizen_box }
-        }) || [ { id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid } ]
+        });
+
+        if (!citizen_list || citizen_list.length === 0) {
+            citizen_list = [ { id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid } ];
+        }
 
         if ((mho_parameters.update_gh_without_api || mho_parameters.update_mho) && pageIsDesert()) {
             let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
@@ -7450,8 +7452,6 @@ function updateExternalTools() {
                     citizen: log.querySelector('.log-part-content span')?.innerText
                 };
             });
-
-            let citizen_digs = []
 
             let now = document.querySelector('.clock [x-current-time]').innerText;
 
