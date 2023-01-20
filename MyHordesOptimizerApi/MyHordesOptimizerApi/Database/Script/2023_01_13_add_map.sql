@@ -59,7 +59,26 @@ ALTER TABLE Town ADD COLUMN isDevasted BIT NOT NULL;
 
 ALTER TABLE TownCitizen ADD COLUMN houseDefense INT NULL DEFAULT NULL AFTER idLastUpdateInfoHeroicAction;
 
-CREATE VIEW MapCellComplet AS
+CREATE TABLE MapCellDig(
+	idCell INT,
+	idUser INT,
+	day INT,
+	nbSucces INT,
+	nbTotalDig INT,
+	idLastUpdateInfo INT,
+	PRIMARY KEY (idCell, idUser, day),
+	FOREIGN KEY(idUser) REFERENCES Users(idUser),
+	FOREIGN KEY(idCell) REFERENCES MapCell(idCell),
+	FOREIGN KEY(idLastUpdateInfo) REFERENCES LastUpdateInfo(idLastUpdateInfo)
+);
+
+CREATE TABLE MapCellDigUpdate(
+	idTown INT,
+	day INT,
+	PRIMARY KEY (idTown, day),
+	FOREIGN KEY(idTown) REFERENCES Town(idTown)
+);
+
 CREATE VIEW MapCellComplet AS 
 SELECT mc.idCell
 	   ,t.idTown
@@ -109,24 +128,3 @@ LEFT JOIN Users citizen ON citizen.idUser = tc.idUser
 LEFT JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mc.idLastUpdateInfo
 LEFT JOIN Users u ON u.idUser = lui.idUser
 LEFT JOIN (SELECT idCell, SUM(nbSucces) AS totalSucces FROM MapCellDig GROUP BY idCell) mcd ON mcd.idCell = mc.idCell;
-
-
-CREATE TABLE MapCellDig(
-	idCell INT,
-	idUser INT,
-	day INT,
-	nbSucces INT,
-	nbTotalDig INT,
-	idLastUpdateInfo INT,
-	PRIMARY KEY (idCell, idUser, day),
-	FOREIGN KEY(idUser) REFERENCES Users(idUser),
-	FOREIGN KEY(idCell) REFERENCES MapCell(idCell),
-	FOREIGN KEY(idLastUpdateInfo) REFERENCES LastUpdateInfo(idLastUpdateInfo)
-);
-
-CREATE TABLE MapCellDigUpdate(
-	idTown INT,
-	day INT,
-	PRIMARY KEY (idTown, day),
-	FOREIGN KEY(idTown) REFERENCES Town(idTown)
-)
