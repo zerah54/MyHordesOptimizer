@@ -1,5 +1,8 @@
-import { Component, Inject, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, HostBinding, Inject, LOCALE_ID, OnInit } from '@angular/core';
 import * as moment from 'moment';
+import { getExternalAppId, getTown } from 'src/app/shared/utilities/localstorage.util';
+import { TownDetails } from 'src/app/_abstract_model/types/town-details.class';
+import { Town } from 'src/app/_abstract_model/types/town.class';
 
 @Component({
     selector: 'mho-menu',
@@ -7,6 +10,7 @@ import * as moment from 'moment';
     styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent implements OnInit {
+    @HostBinding('style.display') display: string = 'contents';
 
     public themes: Theme[] = [
         { label: $localize`Par défaut`, class: '' },
@@ -32,11 +36,11 @@ export class MenuComponent implements OnInit {
     public routes: SidenavLinks[] = [
         {
             label: $localize`Outils`, lvl: 0, displayed: true, authorized: () => true, expanded: true, children: [
-                { label: $localize`Banque`, path: 'tools/bank', displayed: true, lvl: 1, authorized: () => true },
-                { label: $localize`Liste de courses`, path: 'tools/wishlist', displayed: true, lvl: 1, authorized: () => true },
-                { label: $localize`Citoyens`, path: 'tools/citizens', displayed: true, lvl: 1, authorized: () => true },
+                { label: $localize`Banque`, path: 'tools/bank', displayed: true, lvl: 1, authorized: () => this.isInTown() },
+                { label: $localize`Liste de courses`, path: 'tools/wishlist', displayed: true, lvl: 1, authorized: () => this.isInTown() },
+                { label: $localize`Citoyens`, path: 'tools/citizens', displayed: true, lvl: 1, authorized: () => this.isInTown() },
                 { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: () => true },
-                // { label: $localize`Carte des fouilles`, path: 'tools/map', displayed: false, lvl: 1, authorized: () => true },
+                { label: $localize`Carte des fouilles`, path: 'tools/map', displayed: true, lvl: 1, authorized: () => this.isInTown() },
             ]
         },
         {
@@ -136,6 +140,12 @@ export class MenuComponent implements OnInit {
         setTimeout(() => {
             location.reload();
         })
+    }
+
+    private isInTown(): boolean {
+        const town: TownDetails | null = getTown();
+        if (!town) return false;
+        return town.town_id !== null && town.town_id !== undefined && town.town_id !== 0;
     }
 }
 

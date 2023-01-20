@@ -2,4 +2,29 @@
     display: inline-block;
     vertical-align: middle;
     text-align: center;
-  }
+}
+
+table {
+
+    border-spacing: 0;
+    margin: auto;
+
+    tr {
+
+        white-space: nowrap;
+
+        &.first,
+        &.last {
+            position: sticky;
+            z-index: 10;
+        }
+
+        &.first {
+            top: 0;
+        }
+
+        &.last {
+            bottom: 0;
+        }
+    }
+}

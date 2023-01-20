@@ -1,1 +1,32 @@
-<div class="cell map-cell"><span></span></div>
+<td class="cell map-cell" [class.town]="cell.is_town" [class.visited-today]="cell.is_visited_today"
+    [class.never-visited]="cell.is_never_visited"
+    [ngClass]="[options.map_type === 'danger' ? 'danger-' + cell.danger_level : '', 'dig-' + (cell|digLevel:options.dig_mode), cell.zone_regen ? cell.zone_regen.value.class : '']"
+    [class.alert]="options.map_type === 'danger'" [class.digs]="options.map_type === 'digs'"
+    [class.border-left]="cell|borderLeft:options:drawedMap" [class.border-top]="cell|borderTop:options:drawedMap"
+    [class.border-right]="cell|borderRight:options:drawedMap" [class.border-bottom]="cell|borderBottom:options:drawedMap">
+
+    <div *ngIf="cell.ruin_id" [class]="'ruin'">
+        <span [class.empty-ruin]="cell.is_ruin_dryed">
+            <ng-container *ngIf="cell | isRuin:allRuins">R</ng-container>
+        </span>
+    </div>
+
+    <div *ngIf="cell.is_dryed" [class]="'dried'">
+    </div>
+
+    <div class="content" *ngIf="!cell.is_town">
+        <span class="corner-top-left">
+            <ng-container *ngIf="options.display_pa">{{cell.nb_pa}}</ng-container>
+        </span>
+        <span class="corner-top-right">
+            <ng-container *ngIf="options.display_km">{{cell.nb_km}}</ng-container>
+        </span>
+        <span class="corner-bottom-left"></span>
+        <span class="corner-bottom-right">
+            <ng-container *ngIf="options.map_type === 'digs'">
+                {{((options.dig_mode === 'max' ? cell.max_potential_remaining_dig :
+                cell.average_potential_remaining_dig) - cell.total_success) | number:'1.0-0':locale}}
+            </ng-container>
+        </span>
+    </div>
+</td>

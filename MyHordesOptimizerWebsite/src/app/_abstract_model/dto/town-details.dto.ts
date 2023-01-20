@@ -6,4 +6,5 @@ export interface TownDetailsDTO {
     townMaxX: number;
     townMaxY: number;
     isDevaste: boolean;
+    day: number;
 }

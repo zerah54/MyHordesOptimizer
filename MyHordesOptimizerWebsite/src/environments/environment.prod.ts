@@ -1,5 +1,6 @@
 export const environment = {
     production: true,
+    api_url: 'https://api.myhordesoptimizer.fr',
     firebase_config: {
         apiKey: "AIzaSyCnRCJ-FfBIeeYk4NkQ9SSz9oMOYt_VIqE",
         authDomain: "myhordes-optimizer.firebaseapp.com",

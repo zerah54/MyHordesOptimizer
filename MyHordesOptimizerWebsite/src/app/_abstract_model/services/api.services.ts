@@ -2,19 +2,24 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
-import { getExternalAppId, getTown, getUserId, setItemsWithExpirationDate, setTown, setUser } from 'src/app/shared/utilities/localstorage.util';
+import { getExternalAppId, getItemsWithExpirationDate, getRuinsWithExpirationDate, getTown, getUserId, setItemsWithExpirationDate, setRuinsWithExpirationDate, setTown, setUser } from 'src/app/shared/utilities/localstorage.util';
 import { Dictionary } from 'src/app/_abstract_model/types/_types';
+import { environment } from 'src/environments/environment';
+import { DigDTO } from '../dto/dig.dto';
 import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { ItemDTO } from '../dto/item.dto';
 import { MeDTO } from '../dto/me.dto';
 import { RecipeDTO } from '../dto/recipe.dto';
+import { TownDTO } from '../dto/town.dto';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
 import { Citizen } from '../types/citizen.class';
+import { Dig } from '../types/dig.class';
 import { HeroSkill } from '../types/hero-skill.class';
 import { Me } from '../types/me.class';
 import { Recipe } from '../types/recipe.class';
 import { Ruin } from '../types/ruin.class';
 import { TownDetails } from '../types/town-details.class';
+import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
 import { dtoToModelArray } from '../types/_common.class';
 import { ToolsToUpdate } from '../types/_types';
@@ -30,8 +35,7 @@ import { WishlistInfo } from './../types/wishlist-info.class';
 import { WishlistItem } from './../types/wishlist-item.class';
 import { GlobalServices } from './global.services';
 
-const API_URL: string = 'https://api.myhordesoptimizer.fr';
-const API_URL_2: string = 'https://myhordesoptimizerapi.azurewebsites.net';
+const API_URL: string = environment.api_url;
 
 @Injectable()
 export class ApiServices extends GlobalServices {
@@ -48,16 +52,21 @@ export class ApiServices extends GlobalServices {
      *
      * @returns {Observable<Item[]>}
      */
-    public getItems(): Observable<Item[]> {
+    public getItems(force?: boolean): Observable<Item[]> {
         return new Observable((sub: Subscriber<Item[]>) => {
-            super.get<ItemDTO[]>(API_URL + '/myhordesfetcher/items?townId=' + getUserId())
-                .subscribe({
-                    next: (response: HttpResponse<ItemDTO[]>) => {
-                        const items: Item[] = dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302);
-                        setItemsWithExpirationDate(items)
-                        sub.next(items);
-                    }
-                });
+            const saved_items: Item[] = getItemsWithExpirationDate();
+            if (saved_items && saved_items.length > 0 && !force) {
+                sub.next(saved_items);
+            } else {
+                super.get<ItemDTO[]>(API_URL + '/myhordesfetcher/items?townId=' + getTown()?.town_id)
+                    .subscribe({
+                        next: (response: HttpResponse<ItemDTO[]>) => {
+                            const items: Item[] = dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302);
+                            setItemsWithExpirationDate(items)
+                            sub.next(items);
+                        }
+                    });
+            }
         });
     }
 
@@ -91,7 +100,8 @@ export class ApiServices extends GlobalServices {
         let tools_to_update: ToolsToUpdate = {
             isBigBrothHordes: 'api',
             isFataMorgana: 'api',
-            isGestHordes: 'api'
+            isGestHordes: 'api',
+            isMyHordesOptimizer: 'api'
         };
 
         super.post<any>(API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`, JSON.stringify({ tools: tools_to_update }))
@@ -179,19 +189,26 @@ export class ApiServices extends GlobalServices {
      *
      * @returns {Observable<Ruin[]>}
      */
-    public getRuins(): Observable<Ruin[]> {
+    public getRuins(force?: boolean): Observable<Ruin[]> {
         return new Observable((sub: Subscriber<Ruin[]>) => {
-            super.get<RuinDTO[]>(API_URL + '/myhordesfetcher/ruins')
-                .subscribe({
-                    next: (response: HttpResponse<RuinDTO[]>) => {
-                        let ruins: Ruin[] = dtoToModelArray(Ruin, response.body).sort((a: Ruin, b: Ruin) => {
-                            if (a.label[this.locale].localeCompare(b.label[this.locale]) < 0) { return -1; }
-                            if (a.label[this.locale].localeCompare(b.label[this.locale]) > 0) { return 1; }
-                            return 0;
-                        });
-                        sub.next(ruins);
-                    }
-                })
+            const saved_ruins: Ruin[] = getRuinsWithExpirationDate();
+            if (saved_ruins && saved_ruins.length > 0 && !force) {
+                sub.next(saved_ruins);
+            } else {
+                super.get<RuinDTO[]>(API_URL + '/myhordesfetcher/ruins')
+                    .subscribe({
+                        next: (response: HttpResponse<RuinDTO[]>) => {
+                            let ruins: Ruin[] = dtoToModelArray(Ruin, response.body).sort((a: Ruin, b: Ruin) => {
+                                if (a.label[this.locale].localeCompare(b.label[this.locale]) < 0) { return -1; }
+                                if (a.label[this.locale].localeCompare(b.label[this.locale]) > 0) { return 1; }
+                                return 0;
+                            });
+                            setRuinsWithExpirationDate(ruins)
+
+                            sub.next(ruins);
+                        }
+                    })
+            }
         })
     }
 
@@ -292,12 +309,45 @@ export class ApiServices extends GlobalServices {
         })
     }
 
-    public getTown(): Observable<any> {
-        return new Observable((sub: Subscriber<any>) => {
-            super.post<any>(API_URL + ``)
+    public getMap(): Observable<Town> {
+        return new Observable((sub: Subscriber<Town>) => {
+            super.get<TownDTO>(API_URL + `/myhordesfetcher/map?townId=${getTown()?.town_id}`)
                 .subscribe({
-                    next: (response: any) => {
-                        sub.next(new UpdateInfo(response));
+                    next: (response: HttpResponse<TownDTO>) => {
+                        sub.next(new Town(response.body));
+                    }
+                })
+        })
+    }
+
+    public getDigs(): Observable<Dig[]> {
+        return new Observable((sub: Subscriber<Dig[]>) => {
+            super.get<DigDTO[]>(API_URL + `/myhordesfetcher/MapDigs?townId=${getTown()?.town_id}`)
+                .subscribe({
+                    next: (response: HttpResponse<DigDTO[]>) => {
+                        sub.next(dtoToModelArray(Dig, response.body));
+                    }
+                })
+        })
+    }
+
+    public deleteDig(dig: Dig): Observable<void> {
+        return new Observable((sub: Subscriber<void>) => {
+            super.delete<void>(API_URL + `/myhordesfetcher/MapDigs?idCell=${dig.cell_id}&diggerId=${dig.digger_id}&day=${dig.day}`)
+                .subscribe({
+                    next: () => {
+                        sub.next();
+                    }
+                })
+        })
+    }
+
+    public updateDig(dig: Dig): Observable<Dig> {
+        return new Observable((sub: Subscriber<Dig>) => {
+            super.post<DigDTO>(API_URL + `/myhordesfetcher/MapDigs?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(dig.modelToDto()))
+                .subscribe({
+                    next: (response: DigDTO) => {
+                        sub.next(new Dig(response));
                     }
                 })
         })

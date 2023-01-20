@@ -1,7 +1,208 @@
 @import "variables.scss";
 
-.map-cell {
-  height: 30px;
-  width: 30px;
-  border: 1px solid $item_color;
+$green: #80c27e;
+$yellow: khaki;
+$orange: sandybrown;
+$red: lightcoral;
+
+td.map-cell {
+    height: 30px;
+    width: 30px;
+    border: 1px solid $item_color;
+    padding: 0;
+    position: relative;
+    z-index: 0;
+
+    &.border-left {
+        border-left: 1px solid $primary;
+    }
+
+    &.border-right {
+        border-right: 1px solid $primary;
+    }
+
+    &.border-top {
+        border-top: 1px solid $primary;
+    }
+
+    &.border-bottom {
+        border-bottom: 1px solid $primary;
+    }
+
+    >div {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    &:not(.town) {
+
+        &.alert {
+
+            &.never-visited {
+                background-color: darkslategray;
+            }
+
+            &:not(.never-visited) {
+                &.visited-today {
+                    &.danger-0 {
+                        background-color: $green;
+                    }
+
+                    &.danger-1 {
+                        background-color: $yellow;
+                    }
+
+                    &.danger-2 {
+                        background-color: $orange;
+                    }
+
+                    &.danger-3 {
+                        background-color: $red;
+                    }
+                }
+
+                &:not(.visited-today) {
+                    background-color: gray;
+                }
+            }
+        }
+
+        &.digs {
+            &.dig-0 {
+                background-color: $red;
+            }
+
+            &.dig-1 {
+                background-color: $orange;
+            }
+
+            &.dig-2 {
+                background-color: $yellow;
+            }
+
+            &.dig-3 {
+                background-color: $green;
+            }
+        }
+
+        .content {
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+
+            >span {
+                position: absolute;
+                line-height: 10px;
+                font-size: 10px;
+
+                &.corner-top-left {
+                    top: 0;
+                    left: 0;
+                }
+
+                &.corner-top-right {
+                    top: 0;
+                    right: 0;
+                }
+
+                &.corner-bottom-left {
+                    bottom: 0;
+                    left: 0;
+                }
+
+                &.corner-bottom-right {
+                    bottom: 0;
+                    right: 0;
+                }
+            }
+        }
+    }
+
+    &.town {
+        background-color: $primary;
+    }
+
+    .dried {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+
+        background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%),
+            -moz-linear-gradient(-45deg, #444 25%, transparent 25%),
+            -moz-linear-gradient(45deg, transparent 75%, #444 75%),
+            -moz-linear-gradient(-45deg, transparent 75%, #444 75%);
+        background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, #444), color-stop(.25, transparent)),
+            -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, #444), color-stop(.25, transparent)),
+            -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, #444)),
+            -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, #444));
+        background-image: -webkit-linear-gradient(45deg, #444 25%, transparent 25%),
+            -webkit-linear-gradient(-45deg, #444 25%, transparent 25%),
+            -webkit-linear-gradient(45deg, transparent 75%, #444 75%),
+            -webkit-linear-gradient(-45deg, transparent 75%, #444 75%);
+        background-image: -o-linear-gradient(45deg, #444 25%, transparent 25%),
+            -o-linear-gradient(-45deg, #444 25%, transparent 25%),
+            -o-linear-gradient(45deg, transparent 75%, #444 75%),
+            -o-linear-gradient(-45deg, transparent 75%, #444 75%);
+        background-image: linear-gradient(45deg, #444 25%, transparent 25%),
+            linear-gradient(-45deg, #444 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, #444 75%),
+            linear-gradient(-45deg, transparent 75%, #444 75%);
+        -moz-background-size: 2px 2px;
+        background-size: 2px 2px;
+        /* override value for webkit */
+        -webkit-background-size: 2px 2px;
+        background-position: 0 0, 2px 1px, 1px -1px, 0 0;
+    }
+
+    .ruin {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+
+        >span {
+            width: 65%;
+            height: 65%;
+            background-color: $primary;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            &.empty-ruin {
+
+                &::before,
+                &::after {
+                    position: absolute;
+                    content: "";
+                    background: white;
+                    display: block;
+                    width: 1px;
+                    height: 26px;
+                    left: 0;
+                    right: 0;
+                    top: 0;
+                    bottom: 0;
+                    margin: auto;
+                }
+
+                &::before {
+                    -webkit-transform: rotate(-45deg);
+                    transform: rotate(-45deg);
+                }
+
+                &::after {
+                    -webkit-transform: rotate(45deg);
+                    transform: rotate(45deg);
+                }
+            }
+
+        }
+    }
 }

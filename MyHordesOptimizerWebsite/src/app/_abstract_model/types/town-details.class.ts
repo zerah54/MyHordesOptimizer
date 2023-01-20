@@ -1,7 +1,5 @@
-import { MeDTO } from '../dto/me.dto';
 import { TownDetailsDTO } from '../dto/town-details.dto';
 import { CommonModel } from "./_common.class";
-import { I18nLabels } from "./_types";
 
 export class TownDetails extends CommonModel<TownDetailsDTO> {
     public town_id!: number;
@@ -10,6 +8,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
     public town_max_x!: number;
     public town_max_y!: number;
     public is_devaste!: boolean;
+    public day!: number;
 
     constructor(dto?: TownDetailsDTO) {
         super();
@@ -23,7 +22,8 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
             townY: this.town_y,
             townMaxX: this.town_max_x,
             townMaxY: this.town_max_y,
-            isDevaste: this.is_devaste
+            isDevaste: this.is_devaste,
+            day: this.day
         };
     };
 
@@ -35,6 +35,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
             this.town_max_x = dto.townMaxX;
             this.town_max_y = dto.townMaxY;
             this.is_devaste = dto.isDevaste;
+            this.day = dto.day;
         }
     };
 }

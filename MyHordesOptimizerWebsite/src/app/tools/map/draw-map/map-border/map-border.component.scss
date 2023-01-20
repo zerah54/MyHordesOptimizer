@@ -1,24 +1,40 @@
 @import "variables.scss";
 
 $small: 20px;
-$large: 32px;
+$large: 30px;
 
-.border-cell {
+th.border-cell {
 
-  background-color: $sidenav_bg_color;
+    background-color: $sidenav_bg_color;
+    border: 1px solid $sidenav_bg_color;
+    font-weight: normal;
+    padding: 0;
+    position: sticky;
+    z-index: 2;
 
-  &.horizontal:not(.vertical) {
-    width: $large;
-    height: $small;
-  }
+    &.horizontal:not(.vertical) {
+        width: $large;
+        height: $small;
+    }
 
-  &.vertical:not(.horizontal) {
-    width: $small;
-    height: $large;
-  }
+    &.vertical:not(.horizontal) {
+        width: $small;
+        height: $large;
 
-  &.horizontal.vertical {
-    height: $small;
-    width: $small;
-  }
+        left: 0;
+        right: 0;
+    }
+
+    &.horizontal.vertical {
+        height: $small;
+        width: $small;
+    }
+
+    > div {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }

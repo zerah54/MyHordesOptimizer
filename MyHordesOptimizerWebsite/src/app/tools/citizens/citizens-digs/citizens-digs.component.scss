@@ -1,0 +1,106 @@
+@import 'variables.scss';
+
+.mho-citizens-digs {
+    table {
+        width: 100%;
+
+        tr {
+
+            >td {
+                padding: 0 0.5em;
+
+                &.center {
+                    text-align: center;
+                }
+
+                &.avatar_name {
+                    >img {
+                        width: 100px;
+                        height: 100px;
+                    }
+
+                    >div {
+                        text-align: center;
+                        margin: auto;
+                    }
+                }
+
+                .digs {
+                    display: flex;
+                    gap: 0.5em;
+                    flex-wrap: wrap;
+
+                    .dig {
+                        background-color: $item_color;
+                        max-width: 150px;
+                        border-radius: 0.5em;
+                        padding: 0.5em;
+
+                        .actions {
+                            display: flex;
+                            flex-wrap: nowrap;
+                            gap: 0.5em;
+                            align-items: center;
+                        }
+
+                        div img {
+                            vertical-align: middle;
+
+                        }
+
+                        .positions {
+                            margin-bottom: 0.5em;
+
+                            >img {
+                                margin-right: 0.5em;
+                            }
+                        }
+
+                        .values {
+                            margin-bottom: 0.5em;
+
+                            .success>img {
+                                margin-right: 0.5em;
+                            }
+
+                            .total>img {
+                                margin-left: 0.5em;
+                            }
+                        }
+
+                        .positions, .values {
+                            input {
+                                width: 1.5em;
+                            }
+                        }
+                    }
+                }
+            }
+
+            th,
+            td {
+                &:not(.avatar_name) {
+                    padding: 0.5em;
+                }
+
+            }
+        }
+
+        .table-filters {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .previous-next {
+            .mho-header-with-filter {
+                display: flex;
+                gap: 0.5em;
+                white-space: nowrap;
+                >div {
+                    flex-wrap: nowrap;
+                }
+            }
+        }
+
+    }
+}

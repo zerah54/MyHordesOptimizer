@@ -8,6 +8,7 @@ export interface ToolsToUpdate {
     isBigBrothHordes: 'none' | 'cell' | 'api';
     isFataMorgana: 'none' | 'cell' | 'api';
     isGestHordes: 'none' | 'cell' | 'api';
+    isMyHordesOptimizer: 'none' | 'cell' | 'api';
 };
 
 export type I18nLabels = Dictionary<string>;

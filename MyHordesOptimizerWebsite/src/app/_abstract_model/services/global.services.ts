@@ -42,6 +42,16 @@ export class GlobalServices {
             );
     }
 
+    protected delete<T>(url: string): Observable<HttpResponse<T>> {
+        return this._http.delete<T>(url, {
+            responseType: 'json',
+            observe: 'response'
+        }).pipe(
+            retry(3),
+            catchError(this.handleError)
+        );
+    }
+
     /**
      * Gère les erreurs suite aux appels
      *

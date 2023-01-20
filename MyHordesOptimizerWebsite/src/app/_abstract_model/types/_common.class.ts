@@ -9,7 +9,7 @@ export type ICommonModel<DTO, MODEL> = {
     new(dto?: DTO, ...params: unknown[]): MODEL;
 }
 
-export function dtoToModelArray<DTO, MODEL>(model_class: ICommonModel<DTO, MODEL>, dto_array: DTO[] | null, ...params: unknown[]): MODEL[] | [] {
+export function dtoToModelArray<DTO, MODEL>(model_class: ICommonModel<DTO, MODEL>, dto_array: DTO[] | null | undefined, ...params: unknown[]): MODEL[] | [] {
     return dto_array ? dto_array.map((dto: DTO) => new model_class(dto, ...params)) : [];
 }
 

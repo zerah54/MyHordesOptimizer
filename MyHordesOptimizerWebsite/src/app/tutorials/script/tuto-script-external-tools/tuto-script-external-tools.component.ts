@@ -18,12 +18,14 @@ export class TutoScriptExternalToolsComponent {
     public readonly tuto_script_items: AccordionItem[] = [
         {
             title: $localize`MyHordes Optimizer`, content: $localize`
-            L'option "Mettre à jour MyHordes Optimizer" n'est pas utile seule, mais uniquement si vous cochez une ou plusieurs de ses sous-options.
+            En cochant l'option "Mettre à jour MyHordesOptimizer", quand vous cliquerez sur le boutton "Mettre à jour les outils externes", la mise à jour de MyHordes Optimizer se fera automatiquement.
+            Vous rendez également accessibles d'autres options de mise à jour avancées.
             <ul>
                 <li><strong>Actions héroïques :</strong> Enregistre les actions héroïques disponibles / utilisées</li>
                 <li><strong>Améliorations de la maison :</strong> Enregistre les informations concernant votre maison</li>
                 <li><strong>Détail de mon sac et de ceux de mon escorte :</strong> Enregistre le contenu de votre sac ainsi que ceux de vos escortés</li>
                 <li><strong>États :</strong> Enregistre vos différents états (rassasié, soif, etc... Attention : n'enregistre pas l'état goule)</li>
+                <li><strong>Entregistrer les fouilles réussies :</strong> Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte dédiée</li>
             </ul>
         ` },
         {

@@ -9,7 +9,8 @@
     "test": "ng test",
     "xlftojson": "node src/i18n/scripts/xlf_to_json.js",
     "extract-i18n": "ng extract-i18n MyHordesOptimizerWebsite --format xlf --output-path src/i18n && xliffmerge --profile xliffmerge-options.json",
-    "build-deploy": "node src/i18n/scripts/xlf_to_json.js && ng build && firebase deploy"
+    "build-deploy": "node src/i18n/scripts/xlf_to_json.js && ng build && firebase use prod && firebase deploy --only hosting:prod",
+    "build-deploy:dev": "node src/i18n/scripts/xlf_to_json.js && ng build --configuration development && firebase use dev && firebase deploy --only hosting:dev"
   },
   "private": true,
   "dependencies": {

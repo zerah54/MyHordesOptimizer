@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Title } from '@angular/platform-browser';
@@ -11,6 +11,8 @@ import { ThanksComponent } from '../../thanks/thanks.component';
     encapsulation: ViewEncapsulation.None
 })
 export class FooterComponent {
+    @HostBinding('style.display') display: string = 'contents';
+
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
 
     public title: string = '';
