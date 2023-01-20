@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.30
+// @version      1.0.0-beta.31
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,7 +35,8 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH][fix] La liste des citoyens présents sur la case envoyée à MHO était vide si il n'y avait qu'une personne sur la case \n\n`;
++ `[MH][fix] Digs => searches \n\n`
++ `[MH][update] Prise en compte de la quantité d'objets dans les sacs dans la liste de courses`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -754,12 +755,21 @@ const wishlist_headers = [
     },
     {
         label: {
-            en: `Stock in bank`,
-            fr: `Stock en banque`,
-            de: `Bestand in der Bank`,
-            es: `Cantidad en el almacén`
+            en: `In bank`,
+            fr: `En banque`,
+            de: `In der Bank`,
+            es: `En el almacén`
         },
         id: `bank_count`
+    },
+    {
+        label: {
+            en: `In bags`,
+            fr: `En sacs`,
+            de: `TODO`,
+            es: `TODO`
+        },
+        id: `bag_count`
     },
     {
         label: {
@@ -1056,7 +1066,7 @@ let params_categories = [
             {
                 id: `update_mho_digs`,
                 label: {
-                    en: `Record successful digs`,
+                    en: `Record successful searches`,
                     fr: `Enregistrer les fouilles réussies`,
                     de: `Zeichnen Sie erfolgreiche Ausgrabungen auf`,
                     es: `Grabar excavaciones exitosas`
@@ -2329,6 +2339,11 @@ function createWishlistItemElement(item) {
     item_bank_count.classList.add('bank_count');
     item_element.appendChild(item_bank_count);
 
+    let item_bag_count = document.createElement('div');
+    item_bag_count.innerText = item.bagCount;
+    item_bag_count.classList.add('bag_count');
+    item_element.appendChild(item_bag_count);
+
     let item_bank_needed = document.createElement('div');
     item_bank_needed.classList.add('bank_needed');
     item_element.appendChild(item_bank_needed);
@@ -2339,7 +2354,7 @@ function createWishlistItemElement(item) {
     item_bank_needed_input.addEventListener('change', (event) => {
         item_bank_needed_input.value = +event.target.value;
         item.count = +event.target.value;
-        item_diff_input.value = item.count - item.bankCount;
+        item_diff_input.value = item.count - item.bankCount - item.bagCount;
     });
     item_bank_needed.appendChild(item_bank_needed_input);
 
@@ -2349,10 +2364,10 @@ function createWishlistItemElement(item) {
 
     let item_diff_input = document.createElement('input');
     item_diff_input.type = 'number';
-    item_diff_input.value = item.count - item.bankCount;
+    item_diff_input.value = item.count - item.bankCount - item.bagCount;
     item_diff_input.addEventListener('change', (event) => {
         item_diff_input.value = +event.target.value;
-        item.count = +item.bankCount + +item_diff_input.value;
+        item.count = +item.bankCount + +item.bagCount + +item_diff_input.value;
         item_bank_needed_input.value = item.count;
     });
     item_diff.appendChild(item_diff_input);
@@ -3746,6 +3761,11 @@ function displayWishlistInApp() {
                 bank_count.innerHTML = `<span class="small">${item.bankCount}</span>`;
                 list_item.appendChild(bank_count);
 
+                let bag_count = document.createElement('span');
+                bag_count.classList.add('padded', 'cell', 'rw-2');
+                bag_count.innerHTML = `<span class="small">${item.bagCount}</span>`;
+                list_item.appendChild(bag_count);
+
                 let bank_need = document.createElement('span');
                 bank_need.classList.add('padded', 'cell', 'rw-2');
                 bank_need.innerHTML = `<span class="small">${item.count}</span>`;
@@ -3753,7 +3773,7 @@ function displayWishlistInApp() {
 
                 let needed = document.createElement('span');
                 needed.classList.add('padded', 'cell', 'rw-2');
-                needed.innerHTML = `<span class="small">${item.count - item.bankCount}</span>`;
+                needed.innerHTML = `<span class="small">${item.count - item.bankCount - item.bagCount}</span>`;
                 list_item.appendChild(needed);
             });
 
@@ -6069,7 +6089,7 @@ function createStyles() {
     + '}'
 
     const wishlist_label = '#wishlist .label {'
-    + 'width: calc(100% - 650px);'
+    + 'width: calc(100% - 775px);'
     + 'min-width: 200px;'
     + 'padding: 0 4px;'
     + '}';
@@ -6079,7 +6099,7 @@ function createStyles() {
     + 'font-variant: small-caps;'
     + '}';
 
-    const wishlist_cols = '#wishlist .priority, #wishlist .depot, #wishlist .bank_count, #wishlist .bank_needed, #wishlist .diff {'
+    const wishlist_cols = '#wishlist .priority, #wishlist .depot, #wishlist .bank_count, #wishlist .bag_count, #wishlist .bank_needed, #wishlist .diff {'
     + 'width: 125px;'
     + 'padding: 0 4px;'
     + '}';
