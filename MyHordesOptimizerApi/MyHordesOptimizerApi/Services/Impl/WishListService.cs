@@ -45,6 +45,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             Logger.LogInformation($"[GetWishList] GetRecipes : {sw.ElapsedMilliseconds}");
             var bank = MyHordesOptimizerRepository.GetBank(townId);
             Logger.LogInformation($"[GetWishList] GetBank : {sw.ElapsedMilliseconds}");
+            var allBagsItem = MyHordesOptimizerRepository.GetAllBagItems(townId);
             foreach (var wishlistItem in wishList.WishList)
             {
                 var bankItem = bank.Bank.FirstOrDefault(x => x.Item.Id == wishlistItem.Item.Id);
@@ -55,6 +56,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                 else
                 {
                     wishlistItem.BankCount = 0;
+                }
+                var bagItem = allBagsItem.SingleOrDefault(x => x.IdItem == wishlistItem.Item.Id);
+                if(bagItem != null)
+                {
+                    wishlistItem.BagCount = bagItem.Count;
                 }
                 wishlistItem.IsWorkshop = recipes.Any(x => x.Type.StartsWith("WORKSHOP")
                                                              && (x.Components.Any(component => component.Id == wishlistItem.Item.Id) || x.Result.Any(result => result.Item.Id == wishlistItem.Item.Id)));

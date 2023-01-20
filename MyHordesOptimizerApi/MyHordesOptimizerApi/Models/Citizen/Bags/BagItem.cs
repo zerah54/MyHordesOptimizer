@@ -1,4 +1,4 @@
-﻿namespace MyHordesOptimizerApi.Models
+﻿namespace MyHordesOptimizerApi.Models.Citizen.Bags
 {
     public class BagItem
     {

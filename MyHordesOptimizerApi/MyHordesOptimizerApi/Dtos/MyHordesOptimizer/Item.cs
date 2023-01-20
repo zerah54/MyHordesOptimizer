@@ -1,5 +1,4 @@
-﻿using MyHordesOptimizerApi.Attributes.Firebase;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using System;
 using System.Collections.Generic;
 
@@ -19,11 +18,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
 
         public IEnumerable<string> Properties { get; set; }
         public IEnumerable<string> Actions { get; set; }
-        [FirebaseSerializeIgnore]
         public List<ItemRecipe> Recipes { get; set; }
-        [FirebaseSerializeIgnore]
         public int WishListCount { get; set; }
-        [FirebaseSerializeIgnore]
         public int BankCount { get; set; }
 
         public double DropRatePraf { get; set; }

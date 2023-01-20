@@ -7,6 +7,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
+using MyHordesOptimizerApi.Models.Citizen.Bags;
 using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
@@ -54,7 +55,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var town = connection.QuerySingleOrDefault<TownModel>("SELECT * FROM Town WHERE idTown = @idTown",new {idTown = townId});
+            var town = connection.QuerySingleOrDefault<TownModel>("SELECT * FROM Town WHERE idTown = @idTown", new { idTown = townId });
             connection.Close();
             return town;
         }
@@ -709,7 +710,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             param.Add($"@PositionY", y);
             param.Add($"@IdTown", townId);
             var inParamList = new List<string>();
-            foreach(var id in citizenId)
+            foreach (var id in citizenId)
             {
                 inParamList.Add($"@{id}");
                 param.Add($"@{id}", id);
@@ -1109,6 +1110,21 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return bagId.Value;
         }
 
+        public IEnumerable<BagItem> GetAllBagItems(int townId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var bagsItems = connection.Query<BagItem>(@"SELECT bi.idItem
+                                                               ,SUM(bi.count) AS Count
+				                                               ,bi.isBroken
+                                                              FROM BagItem bi
+                                                              LEFT JOIN TownCitizen tc ON tc.idBag = bi.idBag
+                                                              WHERE tc.idTown = 2154
+                                                              GROUP BY  bi.idItem", new { IdTown = townId });
+            connection.Close();
+            return bagsItems;
+        }
+
         #endregion
 
         #region Parameters
@@ -1139,15 +1155,15 @@ namespace MyHordesOptimizerApi.Repository.Impl
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var existings = connection.Query<MapCellModel>("SELECT * FROM MapCell WHERE idTown = @IdTown", new { IdTown = townId });
-            foreach(var cell in listCells)
+            foreach (var cell in listCells)
             {
                 var existingCell = existings.SingleOrDefault(existing => existing.X == cell.X && existing.Y == cell.Y);
                 if (existingCell != null)
                 {
                     cell.IdCell = existingCell.IdCell;
-                    foreach(var prop in cell.GetType().GetProperties())
+                    foreach (var prop in cell.GetType().GetProperties())
                     {
-                        if(prop.GetValue(cell) == null)
+                        if (prop.GetValue(cell) == null)
                         {
                             prop.SetValue(cell, prop.GetValue(existingCell));
                         }
@@ -1282,7 +1298,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            connection.Query("DELETE FROM MapCellDig WHERE idCell IN @cellIds", new { cellIds = cellId});
+            connection.Query("DELETE FROM MapCellDig WHERE idCell IN @cellIds", new { cellIds = cellId });
             connection.Close();
         }
 

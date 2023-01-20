@@ -2,6 +2,7 @@
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
+using MyHordesOptimizerApi.Models.Citizen.Bags;
 using MyHordesOptimizerApi.Models.Map;
 using System.Collections.Generic;
 
@@ -56,6 +57,9 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PatchCitizenBags(int townId, LastUpdateInfo lastUpdateInfo, IEnumerable<Citizen> citizens);
         IDictionary<int,int> GetCitizenBagsId(int townId, IEnumerable<int> userIds);
         int GetCitizenBagId(int townId, int userId);
+        IEnumerable<BagItem> GetAllBagItems(int townId);
+
+
         int CreateLastUpdateInfo(LastUpdateInfo lastUpdateInfo);
 
         IEnumerable<ParametersModel> GetParameters();
