@@ -221,6 +221,10 @@ export class CitizensListComponent {
         }
     }
 
+    public trackByColumnId(index: number, column: CitizenColumn): string {
+        return column.id;
+    }
+
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: Citizen, filter: string): boolean {

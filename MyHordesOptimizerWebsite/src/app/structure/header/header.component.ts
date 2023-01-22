@@ -1,8 +1,9 @@
-import { Component, EventEmitter, HostBinding, Output, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MediaObserver } from '@angular/flex-layout';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Component, EventEmitter, HostBinding, Output, ViewChild, HostListener } from '@angular/core';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Title } from '@angular/platform-browser';
 import { getExternalAppId, setExternalAppId } from 'src/app/shared/utilities/localstorage.util';
+import { BREAKPOINTS } from 'src/app/_abstract_model/const';
 import { ApiServices } from '../../_abstract_model/services/api.services';
 
 @Component({
@@ -12,6 +13,11 @@ import { ApiServices } from '../../_abstract_model/services/api.services';
 })
 export class HeaderComponent {
     @HostBinding('style.display') display: string = 'contents';
+
+    @HostListener('window:resize', ['$event'])
+    onResize() {
+        this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    }
 
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
 
@@ -25,7 +31,9 @@ export class HeaderComponent {
     /** L'idendifiant d'app externe si il existe */
     public saved_external_app_id: string | null = getExternalAppId();
 
-    public constructor(public media: MediaObserver, private title_service: Title, private api: ApiServices) {
+    public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+
+    public constructor(private breakpoint_observer: BreakpointObserver, private title_service: Title, private api: ApiServices) {
         this.title = this.title_service.getTitle();
     }
 

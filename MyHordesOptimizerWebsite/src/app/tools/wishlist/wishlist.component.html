@@ -61,6 +61,10 @@
                                 {{row.bank_count}}
                             </ng-container>
 
+                            <ng-container *ngSwitchCase="'bag_count'">
+                                {{row.bag_count}}
+                            </ng-container>
+
                             <ng-container *ngSwitchCase="'count'">
                                 <mat-form-field>
                                     <input matInput type="number" [(ngModel)]="row.count">
@@ -69,8 +73,8 @@
 
                             <ng-container *ngSwitchCase="'needed'">
                                 <mat-form-field>
-                                    <input matInput type="number" [ngModel]="row.count - row.bank_count"
-                                        (ngModelChange)="row.count = row.bank_count + $event">
+                                    <input matInput type="number" [ngModel]="row.count - row.bank_count - row.bag_count"
+                                        (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
                                 </mat-form-field>
                             </ng-container>
 

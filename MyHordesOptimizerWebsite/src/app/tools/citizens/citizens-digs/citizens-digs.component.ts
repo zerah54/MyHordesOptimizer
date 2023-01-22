@@ -70,9 +70,12 @@ export class CitizensDigsComponent {
         this.datasource = new MatTableDataSource();
         this.datasource.sort = this.sort;
 
+        this.createDigsByCitizenAndDay();
         this.citizen_filter_change.subscribe(() => {
+            console.log('9');
             this.datasource.filter = JSON.stringify(this.citizen_filters);
             this.createDigsByCitizenAndDay();
+            console.log('10');
         });
 
         this.datasource.filterPredicate = (data: DigsByCitizen, filter: string) => this.customFilter(data, filter);
@@ -84,7 +87,7 @@ export class CitizensDigsComponent {
         this.datasource.filter = value.trim().toLowerCase();
     }
 
-    public deleteDig(dig_to_delete: Dig) {
+    public deleteDig(dig_to_delete: Dig): void {
         this.api.deleteDig(dig_to_delete).subscribe(() => {
             let delete_dig: number = this.digs.findIndex((dig: Dig) => {
                 return dig.cell_id === dig_to_delete?.cell_id
@@ -97,7 +100,7 @@ export class CitizensDigsComponent {
         });
     }
 
-    public updateDig() {
+    public updateDig(): void {
         if (this.dig_to_update) {
             this.api.updateDig(this.dig_to_update).subscribe((new_dig: Dig) => {
                 let replace_dig: number = this.digs.findIndex((dig: Dig) => {
@@ -118,7 +121,7 @@ export class CitizensDigsComponent {
         }
     }
 
-    public changeDigToUpdate(citizen: Citizen, dig?: Dig) {
+    public changeDigToUpdate(citizen: Citizen, dig?: Dig): void {
         this.dig_to_update = undefined;
         if (dig) {
             this.dig_to_update = new Dig(dig.modelToDto())
@@ -136,9 +139,15 @@ export class CitizensDigsComponent {
         }
     }
 
-    public changeDay() {
+    public changeDay(): void {
         this.createDigsByCitizenAndDay();
     }
+
+    
+    public trackByColumnId(index: number, column: CitizenColumn): string {
+        return column.id;
+    }
+
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: DigsByCitizen, filter: string): boolean {
@@ -149,13 +158,15 @@ export class CitizensDigsComponent {
     }
 
     private getDigs(): void {
+        console.log('1');
         this.api.getDigs().subscribe((digs: Dig[]) => {
+            console.log('3')
             this.digs = digs;
             this.createDigsByCitizenAndDay();
         });
     }
 
-    private createDigsByCitizenAndDay() {
+    private createDigsByCitizenAndDay(): void {
         if (this.digs && this.citizen_info) {
 
             this.datasource.data = [...this.citizen_info.citizens.map((citizen: Citizen) => {

@@ -16,13 +16,14 @@ export class LoadingOverlayService {
 
     /** Change l'état de chargement */
     public setLoading(is_loading: boolean): void {
+        const previous_counter: number = +this.loading_counter;
         if (is_loading) {
             this.loading_counter++;
         } else {
             this.loading_counter--;
         }
-        setTimeout(() => {
+        if ((previous_counter > 0) !== (this.loading_counter > 0)) {
             this.is_loading.next(this.loading_counter > 0);
-        })
+        }
     }
 }

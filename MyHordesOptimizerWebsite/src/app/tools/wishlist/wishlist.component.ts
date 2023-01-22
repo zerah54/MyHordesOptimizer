@@ -35,6 +35,7 @@ export class WishlistComponent {
         { id: 'priority', header: $localize`Priorité` },
         { id: 'depot', header: $localize`Dépôt` },
         { id: 'bank_count', header: $localize`Stock en banque` },
+        { id: 'bag_count', header: $localize`Stock en sacs` },
         { id: 'count', header: $localize`Stock souhaité` },
         { id: 'needed', header: $localize`Quantité manquante` },
         { id: 'delete', header: `` },

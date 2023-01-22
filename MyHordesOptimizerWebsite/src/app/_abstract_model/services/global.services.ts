@@ -13,7 +13,7 @@ export class GlobalServices {
             responseType: 'json',
             observe: 'response'
         }).pipe(
-            retry(3),
+            // retry(3),
             catchError(this.handleError)
         );
     }
@@ -21,7 +21,7 @@ export class GlobalServices {
     protected post<T>(url: string, params?: string): Observable<T> {
         const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
         return this._http.post<T>(url, params, {responseType: 'json', headers: headers}).pipe(
-            retry(3),
+            // retry(3),
             catchError(this.handleError)
         );
     }
@@ -37,7 +37,7 @@ export class GlobalServices {
                 },
                 observe: 'response'
             }).pipe(
-                retry(3),
+                // retry(3),
                 catchError(this.handleError)
             );
     }
@@ -47,7 +47,7 @@ export class GlobalServices {
             responseType: 'json',
             observe: 'response'
         }).pipe(
-            retry(3),
+            // retry(3),
             catchError(this.handleError)
         );
     }

@@ -21,7 +21,7 @@ let guards: Components = [IsInTownGuard];
 @NgModule({
     imports: [
         ...angular_modules,
-        ...custom_modules
+        ...custom_modules,
     ],
     exports: [
         ...angular_modules,
@@ -29,7 +29,7 @@ let guards: Components = [IsInTownGuard];
     ],
     providers: [
         ...services,
-        ...guards
+        ...guards,
     ]
 })
 

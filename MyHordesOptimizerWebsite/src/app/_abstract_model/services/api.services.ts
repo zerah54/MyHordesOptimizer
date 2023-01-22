@@ -325,6 +325,7 @@ export class ApiServices extends GlobalServices {
             super.get<DigDTO[]>(API_URL + `/myhordesfetcher/MapDigs?townId=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<DigDTO[]>) => {
+                        console.log('2');
                         sub.next(dtoToModelArray(Dig, response.body));
                     }
                 })

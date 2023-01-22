@@ -6,7 +6,7 @@
     </ul>
 
     <mat-sidenav-container class="mho-container">
-        <mat-sidenav #sidenav [mode]="media.isActive('gt-xs') ? 'side' : 'over'" [opened]="media.isActive('gt-xs')">
+        <mat-sidenav #sidenav [mode]="is_gt_xs ? 'side' : 'over'" [opened]="is_gt_xs">
             <mho-menu></mho-menu>
         </mat-sidenav>
         <mat-sidenav-content class="mho-content">
@@ -17,7 +17,7 @@
     </mat-sidenav-container>
 
     <mho-footer #footer></mho-footer>
-    <ng-container *ngIf="loading_service.is_loading_obs | async">
+    <ng-container *ngIf="is_loading">
         <div class="mho-loading">
             <mat-spinner [color]="'accent'"></mat-spinner>
         </div>
