@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.Citizen;
 using MyHordesOptimizerApi.Dtos.MyHordes;
@@ -29,6 +30,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 {
     public class ExternalToolsService : IExternalToolsService
     {
+        protected ILogger Logger { get; private set; }
         protected IBigBrothHordesRepository BigBrothHordesRepository { get; private set; }
         protected IFataMorganaRepository FataMorganaRepository { get; private set; }
         protected IGestHordesRepository GestHordesRepository { get; private set; }
@@ -38,7 +40,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         protected IMyHordesOptimizerRepository MyHordesOptimizerRepository { get; private set; }
 
 
-        public ExternalToolsService(IBigBrothHordesRepository bigBrothHordesRepository,
+        public ExternalToolsService(ILogger logger,
+            IBigBrothHordesRepository bigBrothHordesRepository,
             IFataMorganaRepository fataMorganaRepository,
             IGestHordesRepository gestHordesRepository,
             IMapper mapper,
@@ -46,6 +49,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             IMyHordesOptimizerRepository myHordesOptimizerRepository,
             IMyHordesApiRepository myHordesApiRepository)
         {
+            Logger = logger;
             BigBrothHordesRepository = bigBrothHordesRepository;
             FataMorganaRepository = fataMorganaRepository;
             GestHordesRepository = gestHordesRepository;
@@ -76,6 +80,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
+                        Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.BigBrothHordesStatus = e.Message;
                     }
                 });
@@ -92,6 +97,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
+                        Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.FataMorganaStatus = e.Message;
                     }
                 });
@@ -219,6 +225,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
+                        Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.MhoApiStatus = e.Message;
                     }
                 });
@@ -234,6 +241,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
+                        Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.GestHordesApiStatus = e.Message;
                     }
                 }
@@ -272,6 +280,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
+                        Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.GestHordesCellsStatus = e.Message;
                     }
                 }
@@ -291,6 +300,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
+                        Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
                         response.BagsResponseDto.MhoStatus = e.Message;
                     }
                 });
@@ -384,6 +394,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         }
                         catch (Exception e)
                         {
+                            Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
                             response.HeroicActionsResponseDto.MhoStatus = e.Message;
                             response.StatusResponseDto.MhoStatus = e.Message;
                             response.HomeResponseDto.MhoStatus = e.Message;
@@ -402,6 +413,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         }
                         catch (Exception e)
                         {
+                            Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
                             response.HeroicActionsResponseDto.GestHordesStatus = e.Message;
                             response.StatusResponseDto.GestHordesStatus = e.Message;
                             response.HomeResponseDto.GestHordesStatus = e.Message;
@@ -412,6 +424,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             }
             catch (Exception e)
             {
+                Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
                 response.HeroicActionsResponseDto.MhoStatus = e.Message;
                 response.HeroicActionsResponseDto.GestHordesStatus = e.Message;
                 response.StatusResponseDto.MhoStatus = e.Message;
