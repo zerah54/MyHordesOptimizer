@@ -38,7 +38,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
         {
             var majHeaders = new Dictionary<string, string>()
             {
-                {"Cookie", $"PHPSESSID={sessid}" }
+                {"Cookie", $"gh_session_id={sessid}" }
             };
             majHeaders.Add("X-Requested-With", "XMLHttpRequest");
             foreach(var cell in cellToUpdate)
@@ -89,15 +89,15 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
                 {
                     var result = httpClient.PostAsync(uri, loginRequestDto.ToFormUrlEncodedContent()).Result;
                     var cookie = cookieContainer.GetCookies(uri);
-                    sessid = cookie.FirstOrDefault(x => x.Name == "PHPSESSID")?.Value;
-                    rememberMe = cookie.FirstOrDefault(x => x.Name == "REMEMBERME")?.Value;
+                    sessid = cookie.FirstOrDefault(x => x.Name == "gh_session_id")?.Value;
+                    rememberMe = cookie.FirstOrDefault(x => x.Name == "gh_remember_me")?.Value;
                 };
             }
 
             var majUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}";
             var majHeaders = new Dictionary<string, string>()
             {
-                {"Cookie", $"PHPSESSID={sessid};REMEMBERME={rememberMe}" }
+                {"Cookie", $"gh_session_id={sessid};gh_remember_me={rememberMe}" }
             };
             return majHeaders;
         }

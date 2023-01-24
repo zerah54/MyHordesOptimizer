@@ -30,7 +30,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 {
     public class ExternalToolsService : IExternalToolsService
     {
-        protected ILogger Logger { get; private set; }
+        protected ILogger<ExternalToolsService> Logger { get; private set; }
         protected IBigBrothHordesRepository BigBrothHordesRepository { get; private set; }
         protected IFataMorganaRepository FataMorganaRepository { get; private set; }
         protected IGestHordesRepository GestHordesRepository { get; private set; }
@@ -40,7 +40,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         protected IMyHordesOptimizerRepository MyHordesOptimizerRepository { get; private set; }
 
 
-        public ExternalToolsService(ILogger logger,
+        public ExternalToolsService(ILogger<ExternalToolsService> logger,
             IBigBrothHordesRepository bigBrothHordesRepository,
             IFataMorganaRepository fataMorganaRepository,
             IGestHordesRepository gestHordesRepository,

@@ -128,3 +128,6 @@ LEFT JOIN Users citizen ON citizen.idUser = tc.idUser
 LEFT JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mc.idLastUpdateInfo
 LEFT JOIN Users u ON u.idUser = lui.idUser
 LEFT JOIN (SELECT idCell, SUM(nbSucces) AS totalSucces FROM MapCellDig GROUP BY idCell) mcd ON mcd.idCell = mc.idCell;
+
+
+ALTER TABLE MapCell ADD UNIQUE (`idTown`,`x`,`y`);
