@@ -11,7 +11,7 @@
             <mho-draw-map [map]="map" [allItems]="all_items" [allRuins]="all_ruins" [options]="options"></mho-draw-map>
         </mat-sidenav-content>
         <mat-sidenav #sidenav class="map-settings" [position]="'end'"
-            [mode]="media.isActive('gt-xs') ? 'side' : 'over'">
+            [mode]="is_gt_xs ? 'side' : 'over'">
             <h1 i18n>Paramètres</h1>
         <!--    <div>
                 <h2 i18n>Type de carte</h2>

@@ -3,7 +3,7 @@
         <mat-icon>menu</mat-icon>
     </button>
     <img [src]="'assets/img/logo/logo_mho_64x64.png'" height="48px" width="48px">
-    <div class="title">{{media.isActive('gt-sm') ? 'MyHordes Optimizer' : 'MHO'}}</div>
+    <div class="title">{{is_gt_xs ? 'MyHordes Optimizer' : 'MHO'}}</div>
     <!-- <span *ngIf="!external_app_id_field_value"> -->
     <span class="spacer"></span>
     <mat-form-field *ngIf="!saved_external_app_id" class="external-app-id-input">

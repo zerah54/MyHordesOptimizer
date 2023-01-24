@@ -26,7 +26,7 @@ export class Home extends CommonModel<HomeDTO> {
                     const element: HomeEnum = <HomeEnum>HomeEnum.getByKey(key);
                     return <HomeWithValue>{
                         element: element,
-                        value: dto.content[key]
+                        value: dto.content[key] || 0
                     }
                 })
                 .filter((content: HomeWithValue) => content.element)

@@ -1,14 +1,14 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, HostListener } from '@angular/core';
 import { Analytics } from '@angular/fire/analytics';
-import { MediaObserver } from '@angular/flex-layout';
 import { Event, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { getAnalytics } from 'firebase/analytics';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { filter } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { LoadingOverlayService } from './shared/services/loading-overlay.service';
+import { BREAKPOINTS } from './_abstract_model/const';
 import { ApiServices } from './_abstract_model/services/api.services';
 
 // Initialize Firebase
@@ -23,11 +23,18 @@ const analytics: Analytics | undefined = app ? getAnalytics(app) : undefined;
     encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit {
+    @HostListener('window:resize', ['$event'])
+    onResize() {
+        this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    }
+
+    public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    public is_loading: boolean = false;
 
     public readonly theme: string | null = localStorage.getItem('theme');
 
-    constructor(public media: MediaObserver, public loading_service: LoadingOverlayService, private api: ApiServices, private router: Router,
-        private overlay_container: OverlayContainer, public breakpoint_observer: BreakpointObserver) {
+    constructor(public loading_service: LoadingOverlayService, private api: ApiServices, private router: Router,
+        private overlay_container: OverlayContainer, private breakpoint_observer: BreakpointObserver) {
     }
 
     public ngOnInit(): void {
@@ -37,6 +44,10 @@ export class AppComponent implements OnInit {
         }
         this.loaderOnRouting();
         this.api.getMe();
+
+        this.loading_service.is_loading_obs.subscribe((is_loading: boolean) => {
+            this.is_loading = is_loading;
+        })
     }
 
     private loaderOnRouting(): void {

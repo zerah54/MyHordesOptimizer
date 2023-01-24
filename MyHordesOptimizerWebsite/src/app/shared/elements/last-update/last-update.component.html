@@ -1,6 +1,6 @@
 <div class="mho-last-update">
     <small *ngIf="lastUpdateInfo.update_time; else neverUpdated">
-        <ng-container *ngFor="let diff of [moment().diff(lastUpdateInfo.update_time, 'minutes')]">
+        <ng-container *ngFor="let diff of [moment.diff(lastUpdateInfo.update_time, 'minutes')]">
             <ng-container *ngIf="diff <= thresholds[0]; else threshold2">
                 <ng-container *ngTemplateOutlet="img; context: {$implicit: 1}"></ng-container>
             </ng-container>

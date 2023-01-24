@@ -1,5 +1,6 @@
-import { Component, HostBinding, OnInit, ViewEncapsulation } from '@angular/core';
-import { MediaObserver } from '@angular/flex-layout';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { BREAKPOINTS } from 'src/app/_abstract_model/const';
 import { ZoneRegen } from 'src/app/_abstract_model/enum/zone-regen.enum';
 import { Item } from 'src/app/_abstract_model/types/item.class';
 import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
@@ -16,6 +17,11 @@ import { ApiServices } from '../../_abstract_model/services/api.services';
 export class MapComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
+    @HostListener('window:resize', ['$event'])
+    onResize() {
+        this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    }
+
     /** La carte de la ville */
     public map!: Town;
     public all_ruins!: Ruin[];
@@ -25,6 +31,8 @@ export class MapComponent implements OnInit {
 
     public scrut_list: ZoneRegen[] = ZoneRegen.getAllValues();
 
+    public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+
     private readonly default_options: MapOptions = {
         map_type: 'digs',
         dig_mode: 'average',
@@ -33,7 +41,7 @@ export class MapComponent implements OnInit {
         displayed_scrut_zone: {}
     }
 
-    constructor(public media: MediaObserver, private api: ApiServices) {
+    constructor(private breakpoint_observer: BreakpointObserver, private api: ApiServices) {
 
     }
 
@@ -53,7 +61,7 @@ export class MapComponent implements OnInit {
     }
 
     public changeScrutZone(zone: ZoneRegen, changed_scrut_zone: boolean) {
-        let selected_scrut: Dictionary<boolean> = {...this.options.displayed_scrut_zone};
+        let selected_scrut: Dictionary<boolean> = { ...this.options.displayed_scrut_zone };
 
         selected_scrut[zone.key] = changed_scrut_zone;
         this.changeOptions('displayed_scrut_zone', selected_scrut);
@@ -62,7 +70,7 @@ export class MapComponent implements OnInit {
     public changeOptions<T>(key: string, value: T): void {
         this.options[key] = value;
         setTimeout(() => {
-            this.options = {...this.options};
+            this.options = { ...this.options };
             localStorage.setItem('MAP_OPTIONS', JSON.stringify(this.options));
         })
     }

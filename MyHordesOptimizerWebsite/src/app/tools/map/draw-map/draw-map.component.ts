@@ -47,4 +47,8 @@ export class DrawMapComponent {
 
     public complete_map!: Town;
     public drawed_map: Cell[][] = [];
+
+    public trackByCellId(index: number, column: Cell): number {
+        return column.cell_id;
+    }
 }
