@@ -10,6 +10,7 @@ using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Map;
+using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -430,7 +431,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
 
             var citizens = models.Where(x => x.CitizenId.HasValue);
-            foreach (var citizen in citizens)
+            var distinctCitizens = citizens.Distinct(new CitizenIdComparer());
+            foreach (var citizen in distinctCitizens)
             {
                 var cellCitizen = Mapper.Map<CellCitizenDto>(citizen);
                 map.Cells.Single(cell => cell.CellId == citizen.IdCell).Citizens.Add(cellCitizen);

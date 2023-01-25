@@ -131,3 +131,4 @@ LEFT JOIN (SELECT idCell, SUM(nbSucces) AS totalSucces FROM MapCellDig GROUP BY 
 
 
 ALTER TABLE MapCell ADD UNIQUE (`idTown`,`x`,`y`);
+ALTER TABLE TownCitizen ADD UNIQUE (`idTown`,`idUser`);
