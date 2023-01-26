@@ -51,7 +51,8 @@
 
 .menu-add,
 .menu-remove {
-    .mat-menu-content {
+    padding: 8px;
+    .mat-mdc-menu-content {
 
         .empty-bag {
             display: flex;

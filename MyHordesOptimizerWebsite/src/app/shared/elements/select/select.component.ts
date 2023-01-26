@@ -22,9 +22,8 @@ import { LabelPipe } from './label.pipe';
     ],
 })
 export class SelectComponent<T> implements ControlValueAccessor, Validator, MatFormFieldControl<T | string | T[] | string[] | undefined>, OnDestroy {
-
+    @HostBinding('style.display') display: string = 'contents';
     @HostBinding() id = `mho-select-${SelectComponent.nextId++}`;
-
     @HostBinding('class.floating') get shouldLabelFloat() {
         return this.focused || !this.empty;
     }

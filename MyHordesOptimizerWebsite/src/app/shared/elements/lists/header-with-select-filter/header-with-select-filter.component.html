@@ -9,7 +9,7 @@
 
     </div>
     <ng-container *ngIf="visible">
-        <mat-form-field (click)="$event.stopPropagation()">
+        <mat-form-field (click)="$event.stopPropagation()" class="short-bottom">
             <mho-select #filter [multiple]="true" [options]="options" [bindLabel]="bindLabel" [ngModel]="filterValue"
                 (ngModelChange)="filterValueChange.next($event); checkVisibility()" (closed)="checkVisibility();">
             </mho-select>

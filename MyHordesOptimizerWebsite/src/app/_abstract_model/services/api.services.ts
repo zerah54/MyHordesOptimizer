@@ -10,6 +10,7 @@ import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { ItemDTO } from '../dto/item.dto';
 import { MeDTO } from '../dto/me.dto';
 import { RecipeDTO } from '../dto/recipe.dto';
+import { RegenDTO } from '../dto/regen.dto';
 import { TownDTO } from '../dto/town.dto';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
 import { Citizen } from '../types/citizen.class';
@@ -17,6 +18,7 @@ import { Dig } from '../types/dig.class';
 import { HeroSkill } from '../types/hero-skill.class';
 import { Me } from '../types/me.class';
 import { Recipe } from '../types/recipe.class';
+import { Regen } from '../types/regen.class';
 import { Ruin } from '../types/ruin.class';
 import { TownDetails } from '../types/town-details.class';
 import { Town } from '../types/town.class';
@@ -41,7 +43,7 @@ const API_URL: string = environment.api_url;
 export class ApiServices extends GlobalServices {
 
     /** La locale */
-    private locale: string = moment.locale();
+    private readonly locale: string = moment.locale();
 
     constructor(private http: HttpClient, private snackbar: SnackbarService) {
         super(http, snackbar);
@@ -349,6 +351,17 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: DigDTO) => {
                         sub.next(new Dig(response));
+                    }
+                })
+        })
+    }
+
+    public getScrutList(): Observable<Regen[]> {
+        return new Observable((sub: Subscriber<Regen[]>) => {
+            super.get<RegenDTO[]>(API_URL + `/myhordesfetcher/MapUpdates?townid=${getTown()?.town_id}`)
+                .subscribe({
+                    next: (response: HttpResponse<RegenDTO[]>) => {
+                        sub.next(dtoToModelArray(Regen, response.body));
                     }
                 })
         })

@@ -2,6 +2,8 @@
 
     .mat-elevation-z8 {
         overflow: auto;
+        height: initial;
+        width: initial;
         &:not(:first-child) {
             margin-top: 1em;
         }

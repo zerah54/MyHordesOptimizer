@@ -18,7 +18,7 @@ $snow-3: url('/assets/img/noel/s3.png');
     z-index: 9999;
     display: flex;
 
-    .mat-spinner {
+    .mat-mdc-progress-spinner {
         margin: auto;
     }
 }
@@ -43,19 +43,18 @@ $snow-3: url('/assets/img/noel/s3.png');
         .mho-content {
             overflow: hidden;
 
-            .mat-card {
+            .mdc-card {
                 overflow: hidden;
                 margin: 0.5em;
-                height: calc(100% - 32px - 1em);
+                height: calc(100% - 1em);
 
-                .mat-card-header {
+                .mat-mdc-card-header {
                     height: 40px;
                     align-items: center;
                 }
 
-                .mat-card-content {
+                .mat-mdc-card-content {
                     overflow: auto;
-                    height: calc(100% - 40px);
                 }
             }
         }

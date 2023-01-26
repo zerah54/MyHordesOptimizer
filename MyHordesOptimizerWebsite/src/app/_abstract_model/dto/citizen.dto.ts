@@ -9,6 +9,7 @@ export interface CitizenDTO {
     id: number;
     isGhost: boolean;
     jobName: string;
+    jobUid: string;
     name: string;
     nombreJourHero: number;
     x: number;

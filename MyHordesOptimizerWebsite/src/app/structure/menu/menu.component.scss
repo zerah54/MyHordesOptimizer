@@ -6,16 +6,17 @@
     flex-direction: column;
     justify-content: space-between;
     min-width: 200px;
+    overflow: hidden;
 
-
-    .mat-list {
+    .mdc-list {
         overflow-y: auto;
-        .mat-list-item:hover {
+
+        .mat-mdc-list-item:hover {
             background-color: rgba(0, 0, 0, 0.2);
             cursor: pointer;
         }
 
-        .mat-list-item {
+        .mat-mdc-list-item {
             text-decoration: none;
 
             &.link-selected {
@@ -24,10 +25,18 @@
 
             @for $i from 1 through 10 {
                 &.lvl-#{$i} {
-                    $padding: $i * 2 + em;
+                    $padding: $i * 2+em;
                     padding-left: $padding;
-                    width: calc(100% - $padding);
+                    // width: calc(100% - $padding);
                 }
+            }
+
+            .mat-mdc-list-item-unscoped-content {
+                vertical-align: middle;
+            }
+
+            .mat-icon {
+                vertical-align: middle;
             }
         }
 
@@ -39,6 +48,8 @@
 
         button {
             text-align: left;
+            justify-content: left;
+            align-items: center;
         }
     }
 

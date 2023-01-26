@@ -1,3 +1,4 @@
+import { CitizenDTO } from './citizen.dto';
 import { ItemCountShortDTO } from './item-count-short.dto';
 import { UpdateInfoDTO } from './update-info.dto';
 
@@ -22,6 +23,7 @@ export interface CellDTO {
     maxPotentialRemainingDig: number;
     lastUpdateInfo: UpdateInfoDTO;
     items: ItemCountShortDTO[];
+    citizens: CitizenDTO[];
     nbKm: number;
     nbPa: number;
     zoneRegen?: string;

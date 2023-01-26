@@ -1,4 +1,5 @@
 @import "variables.scss";
+@import "tables.scss";
 
 
 html,
@@ -33,15 +34,27 @@ body {
     color: black !important;
 }
 
-.mat-menu-content {
-    padding: 8px;
+.mat-mdc-card-title {
+    display: flex !important;
+    align-items: center;
 }
 
-.mat-sidenav-container {
-    background-color: transparent !important;
+.mat-mdc-form-field {
+    &.no-bottom {
+        .mat-mdc-form-field-bottom-align {
+            display: none;
+        }
+    }
+
+    &.short-bottom {
+        .mat-mdc-form-field-bottom-align {
+            height: 1em;
+        }
+    }
 }
 
-.mat-card-title {
-    margin-top: auto !important;
-    margin-bottom: auto !important;
+.mat-mdc-icon-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

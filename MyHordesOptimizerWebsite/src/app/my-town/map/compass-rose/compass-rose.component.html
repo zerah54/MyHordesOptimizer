@@ -1,0 +1,27 @@
+<div class="mho-compass-rose">
+    <div class="compass">
+        <div class="compass-main">
+            <span class="north-label" i18n>N</span>
+            <span class="east-label" i18n>E</span>
+            <span class="west-label" i18n>O</span>
+            <span class="south-label" i18n>S</span>
+
+            <div class="compass-rose">
+                <div class="cardial-points">
+                    <div class="north-pointer pointer main" [class.selected]="selectedScrutZone | isScrutDirectionSelected:'Norden'" (click)="addToSelection('Norden')"></div>
+                    <div class="south-pointer pointer main" [class.selected]="selectedScrutZone | isScrutDirectionSelected:'Süden'" (click)="addToSelection('Süden')"></div>
+                    <div class="east-pointer pointer main" [class.selected]="selectedScrutZone | isScrutDirectionSelected:'Osten'" (click)="addToSelection('Osten')"></div>
+                    <div class="west-pointer pointer main" [class.selected]="selectedScrutZone | isScrutDirectionSelected:'Westen'" (click)="addToSelection('Westen')"></div>
+                </div>
+                <div class="ordinal-points">
+                    <div class="northeast-pointer pointer sub" [class.selected]="selectedScrutZone | isScrutDirectionSelected:'Nordosten'" (click)="addToSelection('Nordosten')"></div>
+                    <div class="northwest-pointer pointer sub" [class.selected]="selectedScrutZone | isScrutDirectionSelected:'Nordwesten'" (click)="addToSelection('Nordwesten')"></div>
+                    <div class="southeast-pointer pointer sub" [class.selected]="selectedScrutZone | isScrutDirectionSelected:'Südosten'" (click)="addToSelection('Südosten')"></div>
+                    <div class="southwest-pointer pointer sub" [class.selected]="selectedScrutZone | isScrutDirectionSelected:'Südwesten'" (click)="addToSelection('Südwesten')"></div>
+                </div>
+            </div>
+
+            <div class="bt-center" [class.all-selected]="selectedScrutZone | areAllScrutDirectionsSelected" (click)="addAllToSelection()"></div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,5 @@
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostBinding, OnInit } from '@angular/core';
 import { Recipe } from 'src/app/_abstract_model/types/recipe.class';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
@@ -13,6 +13,7 @@ import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
     styleUrls: ['./recipes.component.scss']
 })
 export class RecipesComponent implements OnInit {
+    @HostBinding('style.display') display: string = 'contents';
 
     public recipes: Recipe[] = [];
     /** La datasource pour le tableau */
@@ -21,7 +22,7 @@ export class RecipesComponent implements OnInit {
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
-    public locale: string = moment.locale();
+    public readonly locale: string = moment.locale();
 
     /** La liste des colonnes */
     public readonly columns: RecipeColumns[] = [

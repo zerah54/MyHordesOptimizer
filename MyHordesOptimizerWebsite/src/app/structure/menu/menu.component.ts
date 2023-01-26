@@ -1,13 +1,13 @@
-import { Component, HostBinding, Inject, LOCALE_ID, OnInit } from '@angular/core';
+import { Component, HostBinding, Inject, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
 import * as moment from 'moment';
-import { getExternalAppId, getTown } from 'src/app/shared/utilities/localstorage.util';
+import { getTown } from 'src/app/shared/utilities/localstorage.util';
 import { TownDetails } from 'src/app/_abstract_model/types/town-details.class';
-import { Town } from 'src/app/_abstract_model/types/town.class';
 
 @Component({
     selector: 'mho-menu',
     templateUrl: './menu.component.html',
-    styleUrls: ['./menu.component.scss']
+    styleUrls: ['./menu.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 export class MenuComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -35,12 +35,17 @@ export class MenuComponent implements OnInit {
 
     public routes: SidenavLinks[] = [
         {
+            label: $localize`Ma ville`, lvl: 0, displayed: true, authorized: () => this.isInTown(), expanded: true, children: [
+                { label: $localize`Banque`, path: 'my-town/bank', displayed: true, lvl: 1, authorized: () => this.isInTown() },
+                { label: $localize`Liste de courses`, path: 'my-town/wishlist', displayed: true, lvl: 1, authorized: () => this.isInTown() },
+                { label: $localize`Citoyens`, path: 'my-town/citizens', displayed: true, lvl: 1, authorized: () => this.isInTown() },
+                { label: $localize`Carte des fouilles`, path: 'my-town/map', displayed: true, lvl: 1, authorized: () => this.isInTown() },
+                { label: $localize`Statistiques`, path: 'my-town/stats', displayed: true, lvl: 1, authorized: () => this.isInTown() },
+            ]
+        },
+        {
             label: $localize`Outils`, lvl: 0, displayed: true, authorized: () => true, expanded: true, children: [
-                { label: $localize`Banque`, path: 'tools/bank', displayed: true, lvl: 1, authorized: () => this.isInTown() },
-                { label: $localize`Liste de courses`, path: 'tools/wishlist', displayed: true, lvl: 1, authorized: () => this.isInTown() },
-                { label: $localize`Citoyens`, path: 'tools/citizens', displayed: true, lvl: 1, authorized: () => this.isInTown() },
                 { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: () => true },
-                { label: $localize`Carte des fouilles`, path: 'tools/map', displayed: true, lvl: 1, authorized: () => this.isInTown() },
             ]
         },
         {

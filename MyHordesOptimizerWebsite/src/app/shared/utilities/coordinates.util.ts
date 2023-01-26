@@ -1,12 +1,17 @@
+import { getTown } from "./localstorage.util";
+
 export function getArrayXFromDisplayedX(displayed_x: number): number {
-    return 0;
+    return displayed_x + (getTown()?.town_x || 0);
 }
+
 export function getArrayYFromDisplayedY(displayed_y: number): number {
-    return 0;
+    return (getTown()?.town_y || 0) - displayed_y;
 }
-export function getDisplayedXFromArrayX(displayed_x: number, array_x: number): number {
-    return 0;
+
+export function getDisplayedXFromArrayX(array_x: number): number {
+    return array_x - (getTown()?.town_x || 0);
 }
-export function getDisplayedXFromArrayX(displayed_x: number, array_x: number): number {
-    return 0;
+
+export function getDisplayedYFromArrayY(array_y: number): number {
+    return (getTown()?.town_y || 0) - array_y;
 }

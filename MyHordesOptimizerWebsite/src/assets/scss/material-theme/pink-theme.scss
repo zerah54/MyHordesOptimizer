@@ -1,6 +1,15 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 
+// TODO(v15): As of v15 mat.core no longer includes default typography styles.
+//  The following line adds:
+//    1. Default typography styles for all components
+//    2. Styles for typography hierarchy classes (e.g. .mat-headline-1)
+//  If you specify typography styles for the components you use elsewhere, you should delete this line.
+//  If you don't need the default component typographies but still want the hierarchy styles,
+//  you can delete this line and instead use:
+//    `@include mat.typography-hierarchy(mat.define-typography-config());`
+@include mat.all-component-typographies();
 @include mat.core();
 
 $theme-primary: mat.define-palette(mat.$pink-palette, 800);
@@ -14,6 +23,7 @@ $pink-theme: mat.define-light-theme(
             accent: $theme-accent,
             warn: $theme-warn,
         ),
+        density: -2
     )
 );
 
@@ -26,6 +36,7 @@ $pink-theme: mat.define-light-theme(
     $footer-color: mat.get-color-from-palette(map.get($color-config, "primary"), "darker");
     $sidenav-bg-color: mat.get-color-from-palette(map.get($color-config, "primary"), "lighter");
     $item-color: rgba($primary, 0.25);
+    $map-details-color: mat.get-color-from-palette(map.get($color-config, "primary"), 50);
 
     --primary: #{$primary};
     --accent: #{$accent};
@@ -33,4 +44,5 @@ $pink-theme: mat.define-light-theme(
     --footer-color: #{$footer-color};
     --sidenav-bg-color: #{$sidenav-bg-color};
     --item-color: #{$item-color};
+    --map-details-color: #{$map-details-color};
 }

@@ -1,27 +1,29 @@
 <div class="mho-last-update">
     <small *ngIf="lastUpdateInfo.update_time; else neverUpdated">
-        <ng-container *ngFor="let diff of [moment.diff(lastUpdateInfo.update_time, 'minutes')]">
-            <ng-container *ngIf="diff <= thresholds[0]; else threshold2">
-                <ng-container *ngTemplateOutlet="img; context: {$implicit: 1}"></ng-container>
-            </ng-container>
-            <ng-template #threshold2>
-                <ng-container *ngIf="diff <= thresholds[1]; else threshold3">
-                    <ng-container *ngTemplateOutlet="img; context: {$implicit: 2}"></ng-container>
+        <ng-container *ngIf="thresholds">
+            <ng-container *ngFor="let diff of [moment.diff(lastUpdateInfo.update_time, 'minutes')]">
+                <ng-container *ngIf="diff <= thresholds[0]; else threshold2">
+                    <ng-container *ngTemplateOutlet="img; context: {$implicit: 1}"></ng-container>
                 </ng-container>
-                <ng-template #threshold3>
-                    <ng-container *ngIf="diff <= thresholds[2]; else threshold4">
-                        <ng-container *ngTemplateOutlet="img; context: {$implicit: 3}"></ng-container>
+                <ng-template #threshold2>
+                    <ng-container *ngIf="diff <= thresholds[1]; else threshold3">
+                        <ng-container *ngTemplateOutlet="img; context: {$implicit: 2}"></ng-container>
                     </ng-container>
-                    <ng-template #threshold4>
-                        <ng-container *ngIf="diff <= thresholds[3]; else more">
-                            <ng-container *ngTemplateOutlet="img; context: {$implicit: 4}"></ng-container>
+                    <ng-template #threshold3>
+                        <ng-container *ngIf="diff <= thresholds[2]; else threshold4">
+                            <ng-container *ngTemplateOutlet="img; context: {$implicit: 3}"></ng-container>
                         </ng-container>
-                        <ng-template #more>
-                            <ng-container *ngTemplateOutlet="img; context: {$implicit: 5}"></ng-container>
+                        <ng-template #threshold4>
+                            <ng-container *ngIf="diff <= thresholds[3]; else more">
+                                <ng-container *ngTemplateOutlet="img; context: {$implicit: 4}"></ng-container>
+                            </ng-container>
+                            <ng-template #more>
+                                <ng-container *ngTemplateOutlet="img; context: {$implicit: 5}"></ng-container>
+                            </ng-template>
                         </ng-template>
                     </ng-template>
                 </ng-template>
-            </ng-template>
+            </ng-container>
         </ng-container>
         <span i18n *ngIf="!hideDetails">Mis à jour par {{lastUpdateInfo.username}}
             {{lastUpdateInfo.update_time.fromNow()}}

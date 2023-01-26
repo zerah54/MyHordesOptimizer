@@ -17,13 +17,14 @@ import localeEN from '@angular/common/locales/en';
 import localeES from '@angular/common/locales/es';
 import localeFR from '@angular/common/locales/fr';
 import { Modules } from './_abstract_model/types/_types';
+import { MyTownModule } from './my-town/my-town.module';
 
 registerLocaleData(localeDE);
 registerLocaleData(localeEN);
 registerLocaleData(localeES);
 registerLocaleData(localeFR);
 
-let app_modules: Modules = [StructureModule, WikiModule, ThanksModule, ToolsModule, TutorialsModule];
+let app_modules: Modules = [StructureModule, WikiModule, ThanksModule, ToolsModule, TutorialsModule, MyTownModule];
 @NgModule({
     declarations: [AppComponent],
     imports: [

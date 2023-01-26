@@ -1,4 +1,3 @@
-import { NumberValueAccessor } from '@angular/forms';
 import { Action } from '../enum/action.enum';
 import { Property } from '../enum/property.enum';
 import { ItemDTO } from './../dto/item.dto';

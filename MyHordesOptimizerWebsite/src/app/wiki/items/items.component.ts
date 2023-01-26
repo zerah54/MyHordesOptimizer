@@ -1,7 +1,7 @@
 import { Item } from './../../_abstract_model/types/item.class';
 import { ApiServices } from './../../_abstract_model/services/api.services';
 import { Dictionary } from './../../_abstract_model/types/_types';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostBinding, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { Property } from 'src/app/_abstract_model/enum/property.enum';
 import { Action } from 'src/app/_abstract_model/enum/action.enum';
@@ -12,6 +12,7 @@ import { Action } from 'src/app/_abstract_model/enum/action.enum';
     styleUrls: ['./items.component.scss']
 })
 export class ItemsComponent implements OnInit {
+    @HostBinding('style.display') display: string = 'contents';
 
     /** La liste des objets du jeu */
     public items!: Item[];
@@ -20,7 +21,7 @@ export class ItemsComponent implements OnInit {
 
     public displayed_items!: Item[];
 
-    private locale: string = moment.locale();
+    private readonly locale: string = moment.locale();
 
     /** Le champ de filtre sur les objets */
     public filter_value: string = '';

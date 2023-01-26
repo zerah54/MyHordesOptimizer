@@ -13,7 +13,7 @@ export class LoadingInterceptor implements HttpInterceptor {
         this.loading_service.setLoading(true);
         return next.handle(request).pipe(
             finalize(() => {
-                console.log('finalize', request);
+                // console.log('finalize', request);
                 this.loading_service.setLoading(false);
             })
         );

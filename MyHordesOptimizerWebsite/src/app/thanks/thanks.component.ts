@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 
 @Component({
     selector: 'mho-thanks',
@@ -6,5 +6,6 @@ import { Component } from '@angular/core';
     styleUrls: ['./thanks.component.scss']
 })
 export class ThanksComponent {
+    @HostBinding('style.display') display: string = 'contents';
 
 }

@@ -1,0 +1,153 @@
+@import "variables.scss";
+
+
+.mho-compass-rose {
+
+    .compass {
+        width: 200px;
+        height: 200px;
+        position: relative;
+        margin: 0 auto;
+    }
+
+    .compass-main {
+        width: 94%;
+        height: 94%;
+    }
+
+    .compass-rose {
+        width: 70%;
+        height: 70%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -35%;
+        margin-left: -35%;
+    }
+
+    .pointer {
+        cursor: pointer;
+        width: 0;
+        height: 0;
+        position: absolute;
+        border: 80px solid;
+        border-left: 14px solid;
+        border-right: 14px solid;
+
+
+        &.main {
+            z-index: 1;
+
+            &.selected {
+                border-color: $compass-selected-cardinals-color transparent transparent transparent !important;
+            }
+
+        }
+
+        &.sub {
+            z-index: 0;
+
+            &.selected {
+                border-color: $compass-selected-ordinals-color transparent transparent transparent !important;
+            }
+
+        }
+    }
+
+    .cardial-points .pointer {
+        border-color: $compass-cardinals-color transparent transparent transparent;
+    }
+
+    .ordinal-points .pointer {
+        border-color: $compass-ordinals-color transparent transparent transparent;
+    }
+
+    .north-pointer {
+        top: -94px;
+        left: calc(50% - 14px);
+        -webkit-transform: rotate(180deg);
+    }
+
+    .northeast-pointer {
+        top: -71px;
+        left: 112px;
+        -webkit-transform: rotate(225deg);
+    }
+
+    .east-pointer {
+        top: -14px;
+        right: -23px;
+        -webkit-transform: rotate(-90deg);
+    }
+
+    .southeast-pointer {
+        bottom: -62px;
+        left: 112px;
+        -webkit-transform: rotate(315deg);
+    }
+
+    .south-pointer {
+        bottom: -85px;
+        left: calc(50% - 14px);
+    }
+
+    .southwest-pointer {
+        bottom: -62px;
+        right: 112px;
+        -webkit-transform: rotate(45deg);
+    }
+
+    .west-pointer {
+        top: -14px;
+        left: -23px;
+        -webkit-transform: rotate(90deg);
+    }
+
+    .northwest-pointer {
+        top: -71px;
+        right: 112px;
+        -webkit-transform: rotate(135deg);
+    }
+
+    .bt-center {
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+        position: absolute;
+        z-index: 3;
+        top: calc(50% - 12px);
+        left: calc(50% - 8px);
+        display: block;
+        background: $compass-center-color;
+        border-radius: 50%;
+
+        &.all-selected {
+            background: $compass-selected-center-color;
+        }
+    }
+
+    .north-label {
+        position: absolute;
+        top: -4px;
+        left: calc(50% - 5px);
+    }
+
+    .east-label {
+        position: absolute;
+        top: calc(50% - 14px);
+        right: 0;
+    }
+
+    .south-label {
+        position: absolute;
+        bottom: 4px;
+        left: calc(50% - 4px);
+    }
+
+    .west-label {
+        position: absolute;
+        top: calc(50% - 14px);
+        left: 0;
+    }
+
+}
