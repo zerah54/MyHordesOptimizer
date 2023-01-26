@@ -469,6 +469,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
                 .ForMember(dest => dest.IdCell, opt => opt.MapFrom(src => src.CellId))
                 .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.DiggerId));
+
+            CreateMap<MapCellDigUpdateModel, MyHordesOptimizerMapUpdateDto>();
         }
 
         private List<string> GetStatusIcons(TownCitizenBagItemCompletModel src)

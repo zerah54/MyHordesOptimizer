@@ -173,5 +173,17 @@ namespace MyHordesOptimizerApi.Controllers
             _myHordesFetcherService.DeleteMapDigs(idCell.Value, diggerId.Value, day.Value);
             return Ok();
         }
+
+        [HttpGet]
+        [Route("MapUpdates")]
+        public ActionResult<IEnumerable<MyHordesOptimizerMapUpdateDto>> GetMapUpdates(int? townId)
+        {
+            if (!townId.HasValue)
+            {
+                return BadRequest($"{nameof(townId)} cannot be empty");
+            }
+            var updates = _myHordesFetcherService.GetMapUpdates(townId.Value).ToList();
+            return updates;
+        }
     }
 }

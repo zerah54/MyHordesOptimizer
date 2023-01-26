@@ -1261,16 +1261,25 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return dig;
         }
 
-        public MapCellDigUpdate GetMapCellDigUpdate(int townId, int day)
+        public MapCellDigUpdateModel GetMapCellDigUpdate(int townId, int day)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var update = connection.QuerySingleOrDefault<MapCellDigUpdate>("SELECT * FROM MapCellDigUpdate WHERE idTown = @idTown AND day = @day", new { idTown = townId, day = day });
+            var update = connection.QuerySingleOrDefault<MapCellDigUpdateModel>("SELECT * FROM MapCellDigUpdate WHERE idTown = @idTown AND day = @day", new { idTown = townId, day = day });
             connection.Close();
             return update;
         }
 
-        public void InsertMapCellDigUpdate(MapCellDigUpdate mapCellDigUpdate)
+        public IEnumerable<MapCellDigUpdateModel> GetMapUpdates(int townId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var updates = connection.Query<MapCellDigUpdateModel>("SELECT * FROM MapCellDigUpdate WHERE idTown = @idTown", new { idTown = townId });
+            connection.Close();
+            return updates;
+        }
+
+        public void InsertMapCellDigUpdate(MapCellDigUpdateModel mapCellDigUpdate)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();

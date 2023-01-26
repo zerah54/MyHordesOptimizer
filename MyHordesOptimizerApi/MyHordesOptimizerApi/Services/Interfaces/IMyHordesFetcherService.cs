@@ -19,5 +19,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         IEnumerable<MyHordesOptimizerMapDigDto> GetMapDigs(int townId);
         MyHordesOptimizerMapDigDto CreateOrUpdateMapDigs(int? townId, int userId, MyHordesOptimizerMapDigDto request);
         void DeleteMapDigs(int idCell, int diggerId, int day);
+        IEnumerable<MyHordesOptimizerMapUpdateDto> GetMapUpdates(int townId);
     }
 }

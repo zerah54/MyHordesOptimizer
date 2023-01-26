@@ -231,7 +231,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
                     var dynamicNews = myHordeMeResponse.Map.City.News;
                     MyHordesNews news = null;
-                    if (dynamicNews.GetType() != typeof(JObject))
+                    if (dynamicNews.GetType() == typeof(JObject))
                     {
                         var jObject = dynamicNews as JObject;
                         if(jObject != null)
@@ -292,13 +292,24 @@ namespace MyHordesOptimizerApi.Services.Impl
                                     {
                                         averageItemAdd = ((float)regenChance / (float)100) * Math.Ceiling((averageNbOfItemAdded - 1.0) / 2.0);
                                     }
+                                    if(regen == RegenDirectionEnum.All)
+                                    {
+                                        averageItemAdd = averageItemAdd / (float)8;
+                                    }
                                     averageItemAdd = Math.Round(averageItemAdd, 3);
                                     cell.AveragePotentialRemainingDig = average + averageItemAdd;
                                 }
                             }
                         }
                     }
-                    MyHordesOptimizerRepository.InsertMapCellDigUpdate(new MapCellDigUpdate() { Day = myHordeMeResponse.Map.Days, IdTown = townId });
+                    MyHordesOptimizerRepository.InsertMapCellDigUpdate(new MapCellDigUpdateModel()
+                    {
+                        Day = myHordeMeResponse.Map.Days,
+                        IdTown = townId,
+                        DirectionRegen = (int)regen,
+                        LevelRegen = scrutLevel,
+                        TauxRegen = regenChance
+                    });
                     MyHordesOptimizerRepository.PatchMapCell(townId, cells);
                 }
             }
@@ -467,6 +478,13 @@ namespace MyHordesOptimizerApi.Services.Impl
         public void DeleteMapDigs(int idCell, int diggerId, int day)
         {
             MyHordesOptimizerRepository.DeleteMapCellDig(idCell, diggerId, day);
+        }
+
+        public IEnumerable<MyHordesOptimizerMapUpdateDto> GetMapUpdates(int townId)
+        {
+            var models = MyHordesOptimizerRepository.GetMapUpdates(townId);
+            var dtos = Mapper.Map<IEnumerable<MyHordesOptimizerMapUpdateDto>>(models);
+            return dtos;
         }
     }
 }
