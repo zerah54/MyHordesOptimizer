@@ -1,0 +1,42 @@
+<td #cellHtml class="cell map-cell" [class.town]="cell.is_town" [class.visited-today]="cell.is_visited_today"
+    [class.never-visited]="cell.is_never_visited"
+    [ngClass]="[options.map_type === 'danger' ? 'danger-' + cell.danger_level : '', 'dig-' + (cell|digLevel:options.dig_mode), cell.zone_regen ? cell.zone_regen.value.class : '']"
+    [class.alert]="options.map_type === 'danger'" [class.digs]="options.map_type === 'digs'"
+    [class.border-left]="cell|borderLeft:options:drawedMap" [class.border-top]="cell|borderTop:options:drawedMap"
+    [class.border-right]="cell|borderRight:options:drawedMap"
+    [class.border-bottom]="cell|borderBottom:options:drawedMap" [class.my-cell]="cell|myCell" (click)="log(cell)">
+    <!-- (mouseenter)="current_cell = cell" (mouseleave)="current_cell = undefined" -->
+
+    <div *ngIf="cell.ruin_id" [class]="'ruin'">
+        <span [class.empty-ruin]="cell.is_ruin_dryed">
+            <ng-container *ngIf="cell | isRuin:allRuins">R</ng-container>
+        </span>
+    </div>
+
+    <div *ngIf="cell.is_dryed" [class]="'dried'">
+    </div>
+
+    <div class="content" *ngIf="!cell.is_town">
+        <span class="corner-top-left corner">
+        </span>
+        <span class="corner-top-right corner">
+            <ng-container *ngIf="options.map_type === 'digs'">
+                {{((options.dig_mode === 'max' ? cell.max_potential_remaining_dig :
+                cell.average_potential_remaining_dig) - cell.total_success) | number:'1.0-0':locale}}
+            </ng-container>
+        </span>
+        <span class="corner-bottom-left corner">
+            <div *ngIf="options.map_type === 'danger'" [matBadge]="cell.nb_zombie_killed ? cell.nb_zombie_killed : 0" [matBadgeSize]="'small'" [matBadgePosition]="'after'">
+                <img [src]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'">
+            </div>
+        </span>
+        <span class="corner-bottom-right corner">
+            <div *ngIf="options.map_type === 'danger'" [matBadge]="cell.nb_zombie ? cell.nb_zombie : 0" [matBadgeSize]="'small'" [matBadgePosition]="'before'">
+                <img [src]="HORDES_IMG_REPO + 'icons/small_zombie.gif'">
+            </div>
+        </span>
+    </div>
+</td>
+
+<mho-map-cell-details *ngIf="current_cell" [cell]="current_cell" [allItems]="allItems" [allRuins]="allRuins" [cellHtml]="cellHtml" [allCitizens]="allCitizens">
+</mho-map-cell-details>

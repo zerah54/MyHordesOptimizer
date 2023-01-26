@@ -1,0 +1,57 @@
+<div *ngIf="cell && cellHtml" class="mho-map-cell-detail" [style.top]="cellHtml|cellDetailsTop"
+    [style.bottom]="cellHtml|cellDetailsBottom" [style.left]="cellHtml|cellDetailsLeft"
+    [style.right]="cellHtml|cellDetailsRight">
+
+    <div class="details-header">
+        <div class="title">
+            <h1>
+                <ng-container
+                    *ngIf="cell|ruinInCell:allRuins as ruin; else noRuin">{{ruin.label[locale]}}</ng-container>
+                <ng-template #noRuin>
+                    <ng-container *ngIf="cell.is_town; else noTown">
+                        <ng-container i18n>Ville</ng-container>
+                    </ng-container>
+                </ng-template>
+                <ng-template #noTown>
+                    <ng-container i18n>Désert</ng-container>
+                </ng-template>
+            </h1>
+        </div>
+        <div class="coords-distance">
+            <span class="cords">[{{cell.displayed_x}}&nbsp;;&nbsp;{{cell.displayed_y}}]</span>
+            <span class="distance-pa">{{cell.nb_pa}}<img
+                    [src]="HORDES_IMG_REPO + 'icons/ap_small_' + locale + '.gif'"></span>
+            <span class="distance-km">{{cell.nb_km}}km</span>
+        </div>
+        <mat-divider></mat-divider>
+    </div>
+    <div class="content">
+        <div class="zombies">
+            <div class="zombies-here">
+                <img [src]="HORDES_IMG_REPO + 'icons/small_zombie.gif'">
+                {{cell.nb_zombie || 0}}
+            </div>
+            <div class="killed-zombies">
+                {{cell.nb_zombie_killed || 0}}
+                <img [src]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'">
+            </div>
+        </div>
+        <div class="citizen" *ngIf="cell.citizens.length > 0">
+            <img [src]="HORDES_IMG_REPO + 'emotes/human.gif'">
+            <div>
+                <div *ngFor="let citizen of (cell.citizens | citizenNames:allCitizens)">
+                    <img [src]="HORDES_IMG_REPO + 'professions/' + citizen.job.value.img + '.gif'">
+                    <span>{{citizen.name}}</span>
+                </div>
+            </div>
+        </div>
+        <mat-divider></mat-divider>
+    </div>
+    <div class="items" *ngIf="cell.items && cell.items.length > 0">
+        <ng-container *ngFor=" let item of cell.items">
+            <img *ngIf="(item | itemDetails:allItems) as complete_item" [src]="HORDES_IMG_REPO + complete_item.img">
+        </ng-container>
+        <mat-divider></mat-divider>
+    </div>
+    <div class="last-update"><mho-last-update [lastUpdateInfo]="cell.update_info"></mho-last-update></div>
+</div>

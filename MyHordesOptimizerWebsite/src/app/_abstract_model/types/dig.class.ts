@@ -1,4 +1,4 @@
-import { getTown } from 'src/app/shared/utilities/localstorage.util';
+import { getArrayXFromDisplayedX, getArrayYFromDisplayedY, getDisplayedXFromArrayX, getDisplayedYFromArrayY } from 'src/app/shared/utilities/coordinates.util';
 import { DigDTO } from '../dto/dig.dto';
 import { UpdateInfo } from './update-info.class';
 import { CommonModel } from './_common.class';
@@ -24,8 +24,8 @@ export class Dig extends CommonModel<DigDTO> {
             cellId: this.cell_id,
             diggerId: +this.digger_id,
             diggerName: this.digger_name,
-            x: +this.x + (getTown()?.town_x || 0),
-            y: (getTown()?.town_y || 0) - +this.y,
+            x: getArrayXFromDisplayedX(+this.x),
+            y: getArrayYFromDisplayedY(+this.y),
             day: +this.day,
             nbSucces: +this.nb_success,
             nbTotalDig: +this.nb_total_dig,
@@ -35,9 +35,8 @@ export class Dig extends CommonModel<DigDTO> {
     protected override dtoToModel(dto?: DigDTO): void {
         if (dto) {
             this.cell_id = dto.cellId;
-
-            this.x = dto.x - (getTown()?.town_x || 0);
-            this.y = (getTown()?.town_y || 0) - dto.y;
+            this.x = getDisplayedXFromArrayX(dto.x);
+            this.y = getDisplayedYFromArrayY(dto.y);
             this.digger_id = dto.diggerId;
             this.digger_name = dto.diggerName;
             this.day = dto.day;

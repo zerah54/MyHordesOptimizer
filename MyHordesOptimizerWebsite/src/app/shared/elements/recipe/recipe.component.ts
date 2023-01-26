@@ -18,7 +18,7 @@ export class RecipeComponent {
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
-    public locale: string = moment.locale();
+    public readonly locale: string = moment.locale();
 
 }
 

@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
 import { AccordionItem } from 'src/app/shared/elements/accordion/accordion.component';
 import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 
@@ -8,6 +8,7 @@ import { ClipboardService } from 'src/app/shared/services/clipboard.service';
     styleUrls: ['./tuto-script-wiki.component.scss'],
 })
 export class TutoScriptWikiComponent {
+    @HostBinding('style.display') display: string = 'contents';
 
     public readonly title: string = $localize`Wiki`;
     public readonly tuto_script_items: AccordionItem[] = [

@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
 import { AccordionItem } from 'src/app/shared/elements/accordion/accordion.component';
 import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 
@@ -8,6 +8,7 @@ import { ClipboardService } from 'src/app/shared/services/clipboard.service';
     styleUrls: ['./tuto-script-installation.component.scss'],
 })
 export class TutoScriptInstallationComponent {
+    @HostBinding('style.display') display: string = 'contents';
 
     public readonly title: string = $localize`Installation du script`;
     public readonly download_link: string = $localize`<a color="accent" href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js" target="_blank">lien de téléchargement du script</a>`;

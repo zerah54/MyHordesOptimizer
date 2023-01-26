@@ -1,9 +1,10 @@
 import { Location } from '@angular/common';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, OnInit, ViewEncapsulation } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { ClipboardService } from 'src/app/shared/services/clipboard.service';
+import { JobEnum } from 'src/app/_abstract_model/enum/job.enum';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { dtoToModelArray } from 'src/app/_abstract_model/types/_common.class';
 import { HORDES_IMG_REPO } from './../../_abstract_model/const';
@@ -17,6 +18,7 @@ import { Dictionary } from './../../_abstract_model/types/_types';
     encapsulation: ViewEncapsulation.None
 })
 export class CampingComponent implements OnInit {
+    @HostBinding('style.display') display: string = 'contents';
 
     public ruins: Ruin[] = [];
     public and_amelio: boolean = true;
@@ -80,50 +82,7 @@ export class CampingComponent implements OnInit {
             label: $localize`Vous estimez que vos chances de survie ici sont optimales : personne ne vous verrait même en vous pointant du doigt.`,
         },
     ];
-    public readonly jobs: Job[] = [
-        {
-            id: 'citizen',
-            img: 'basic',
-            label: $localize`Habitant`,
-            camping_factor: 0.9
-        },
-        {
-            id: 'scavenger',
-            img: 'dig',
-            label: $localize`Fouineur`,
-            camping_factor: 0.9
-        },
-        {
-            id: 'scout',
-            img: 'vest',
-            label: $localize`Éclaireur`,
-            camping_factor: 0.9
-        },
-        {
-            id: 'guardian',
-            img: 'shield',
-            label: $localize`Gardien`,
-            camping_factor: 0.9
-        },
-        {
-            id: 'survivalist',
-            img: 'book',
-            label: $localize`Ermite`,
-            camping_factor: 1
-        },
-        {
-            id: 'tamer',
-            img: 'tamer',
-            label: $localize`Apprivoiseur`,
-            camping_factor: 0.9
-        },
-        {
-            id: 'technician',
-            img: 'tech',
-            label: $localize`Technicien`,
-            camping_factor: 0.9
-        },
-    ];
+    public readonly jobs: JobEnum[] = JobEnum.getAllValues();
 
     private readonly added_ruins: Ruin[] = dtoToModelArray(Ruin, [
         {
@@ -240,7 +199,7 @@ export class CampingComponent implements OnInit {
 
                 this.configuration_form = this.fb.group(init_form ? init_form : {
                     town: [<TownType>this.town_types.find((town_type: TownType) => town_type.id === 'rne')],
-                    job: [<Job>this.jobs.find((job: Job) => job.id === 'citizen')],
+                    job: [<JobEnum>this.jobs.find((job: JobEnum) => job.value.id === 'citizen')],
                     distance: [1],
                     campings: [0],
                     pro: [false],
@@ -349,7 +308,7 @@ export class CampingComponent implements OnInit {
           */
         chances += (<Ruin>this.configuration_form.get('ruin')?.value)?.camping * 100 || 0;
 
-        this.camping_result.probability = Math.min(Math.max((100 - (Math.abs(Math.min(0, chances)) * 5 / 100)) / 100, 0.1), ((<Job>this.configuration_form.get('job')?.value)?.camping_factor));
+        this.camping_result.probability = Math.min(Math.max((100 - (Math.abs(Math.min(0, chances)) * 5 / 100)) / 100, 0.1), ((<JobEnum>this.configuration_form.get('job')?.value)?.value.camping_factor));
         this.camping_result.label = this.camping_results.find((camping_result) => camping_result.strict ? <number>this.camping_result.probability < camping_result.probability : <number>this.camping_result.probability <= camping_result.probability)?.label;
     };
 
@@ -386,7 +345,7 @@ export class CampingComponent implements OnInit {
                         init_form[key] = [this.ruins.find((ruin: Ruin) => ruin.id.toString() === params[key].toString())];
                         break;
                     case "job":
-                        init_form[key] = [this.jobs.find((job: Job) => job.id.toString() === params[key].toString())];
+                        init_form[key] = [this.jobs.find((job: JobEnum) => job.value.id.toString() === params[key].toString())];
                         break;
                     default:
                         if (params[key] === "false") {
@@ -413,11 +372,4 @@ interface CampingResult {
     label: string;
     probability: number;
     strict?: boolean;
-}
-
-interface Job {
-    id: string,
-    img: string,
-    label: string,
-    camping_factor: number
 }

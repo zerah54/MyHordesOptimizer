@@ -1,11 +1,9 @@
-import { Component, EventEmitter, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostBinding, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
-import { getItemsWithExpirationDate } from 'src/app/shared/utilities/localstorage.util';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
-import { Item } from 'src/app/_abstract_model/types/item.class';
 import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
 import { HORDES_IMG_REPO } from './../../_abstract_model/const';
 import { RuinItem } from './../../_abstract_model/types/ruin-item.class';
@@ -16,12 +14,14 @@ import { RuinItem } from './../../_abstract_model/types/ruin-item.class';
     styleUrls: ['./ruins.component.scss']
 })
 export class RuinsComponent implements OnInit {
+    @HostBinding('style.display') display: string = 'contents';
+
     @ViewChild(MatSort) sort!: MatSort;
 
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
-    public locale: string = moment.locale();
+    public readonly locale: string = moment.locale();
 
     /** La liste des bâtiments du jeu */
     public ruins!: Ruin[];

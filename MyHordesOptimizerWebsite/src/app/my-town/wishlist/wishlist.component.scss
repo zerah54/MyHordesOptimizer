@@ -1,0 +1,16 @@
+.mho-wishlist {
+    .hidden {
+        display: none;
+    }
+
+    table {
+        width: 100%;
+        tr {
+            > td {
+                > img {
+                    margin-right: 0.5em;
+                }
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
 import { AccordionItem } from 'src/app/shared/elements/accordion/accordion.component';
 import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 
@@ -9,6 +9,7 @@ import { ClipboardService } from 'src/app/shared/services/clipboard.service';
     encapsulation: ViewEncapsulation.None
 })
 export class TutoScriptExternalToolsComponent {
+    @HostBinding('style.display') display: string = 'contents';
 
     public readonly title: string = $localize`Outils externes`;
 

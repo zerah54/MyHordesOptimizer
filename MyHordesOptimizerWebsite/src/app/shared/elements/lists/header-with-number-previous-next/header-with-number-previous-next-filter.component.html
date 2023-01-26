@@ -9,7 +9,7 @@
 
     </div>
     <ng-container *ngIf="visible">
-        <mat-form-field (click)="$event.stopPropagation();">
+        <mat-form-field (click)="$event.stopPropagation();" class="short-bottom">
             <button mat-icon-button matPrefix [disabled]="filterValue === min"
                 (click)="filterValueChange.next(min)"><mat-icon>first_page</mat-icon></button>
             <button mat-icon-button matPrefix [disabled]="filterValue === min"

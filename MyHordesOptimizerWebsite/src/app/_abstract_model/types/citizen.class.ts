@@ -1,6 +1,7 @@
 import { CitizenDTO } from '../dto/citizen.dto';
 import { ItemCountDTO } from '../dto/item-count.dto';
 import { ShortItemCountDTO } from '../dto/short-item-count.dto';
+import { JobEnum } from '../enum/job.enum';
 import { StatusEnum } from '../enum/status.enum';
 import { Bag } from './bag.class';
 import { HeroicActions, HeroicActionsWithValue } from './heroic-actions.class';
@@ -14,7 +15,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
     public home_message!: string;
     public id!: number;
     public is_ghost: boolean = false;
-    public job_name!: string;
+    public job!: JobEnum;
     public name!: string;
     public nombre_jour_hero!: number;
     public x!: number;
@@ -36,7 +37,8 @@ export class Citizen extends CommonModel<CitizenDTO> {
             homeMessage: this.home_message,
             id: this.id,
             isGhost: this.is_ghost,
-            jobName: this.job_name,
+            jobName: '',
+            jobUid: this.job.key,
             nombreJourHero: this.nombre_jour_hero,
             x: this.x,
             y: this.y,
@@ -89,7 +91,10 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.home_message = dto.homeMessage;
             this.id = dto.id;
             this.is_ghost = dto.isGhost;
-            this.job_name = dto.jobName;
+            this.job = <JobEnum>JobEnum.getByKey(dto.jobUid);
+            if (!this.job) {
+                console.log('dto.uid', dto.jobUid);
+            }
             this.nombre_jour_hero = dto.nombreJourHero;
             this.x = dto.x;
             this.y = dto.y;

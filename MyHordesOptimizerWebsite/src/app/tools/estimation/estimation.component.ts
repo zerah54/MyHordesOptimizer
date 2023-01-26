@@ -1,6 +1,6 @@
 import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { ApiServices } from './../../_abstract_model/services/api.services';
-import { Component } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 
 @Component({
     selector: 'mho-estimation',
@@ -8,6 +8,8 @@ import { Component } from '@angular/core';
     styleUrls: ['./estimation.component.scss']
 })
 export class EstimationComponent {
+    @HostBinding('style.display') display: string = 'contents';
+    
     /** Le jour auquel est fait l'estimation */
     public current_day!: number;
     /** Est-ce qu'on fait l'attaque d'aujourd'hui (true) ou de demain (false) */

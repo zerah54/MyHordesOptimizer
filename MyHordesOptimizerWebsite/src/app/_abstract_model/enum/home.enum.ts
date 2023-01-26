@@ -69,7 +69,7 @@ const HOUSE_LABELS: I18nLabels[] = [
     }
 ]
 
-const HOUSE_LEVEL_DATA: HomeEnumData = { label: $localize`Niveau de l'habitation`, img: '', max_lvl: 8, options: HOUSE_LABELS };
+const HOUSE_LEVEL_DATA: HomeEnumData = { label: $localize`Habitation`, img: '', max_lvl: 8, options: HOUSE_LABELS };
 const HAS_ALARM_DATA: HomeEnumData = { label: $localize`Alarme rudimentaire `, img: '/home/alarm.gif', max_lvl: 1 };
 const CHEST_LEVEL_DATA: HomeEnumData = { label: $localize`Rangements`, img: '/home/chest.gif', max_lvl: 13 };
 const HAS_CURTAIN_DATA: HomeEnumData = { label: $localize`Gros rideau `, img: '/home/curtain.gif', max_lvl: 1 };

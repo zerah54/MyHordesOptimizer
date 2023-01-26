@@ -1,5 +1,7 @@
+import { getDisplayedXFromArrayX, getDisplayedYFromArrayY } from 'src/app/shared/utilities/coordinates.util';
 import { CellDTO } from '../dto/cell.dto';
 import { ZoneRegen } from '../enum/zone-regen.enum';
+import { Citizen } from './citizen.class';
 import { ItemCountShort } from './item-count-short.class';
 import { UpdateInfo } from './update-info.class';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
@@ -25,9 +27,12 @@ export class Cell extends CommonModel<CellDTO> {
     public max_potential_remaining_dig!: number;
     public update_info!: UpdateInfo;
     public items!: ItemCountShort[];
+    public citizens!: Citizen[];
     public nb_pa!: number;
     public nb_km!: number;
     public zone_regen!: ZoneRegen | undefined;
+    public displayed_x!: number;
+    public displayed_y!: number;
 
     constructor(dto?: CellDTO) {
         super();
@@ -58,7 +63,8 @@ export class Cell extends CommonModel<CellDTO> {
             items: modelToDtoArray(this.items),
             nbKm: this.nb_km,
             nbPa: this.nb_pa,
-            zoneRegen: this.zone_regen?.key
+            zoneRegen: this.zone_regen?.key,
+            citizens: modelToDtoArray(this.citizens)
         };
     }
 
@@ -84,9 +90,12 @@ export class Cell extends CommonModel<CellDTO> {
             this.max_potential_remaining_dig = dto.maxPotentialRemainingDig;
             this.update_info = new UpdateInfo(dto.lastUpdateInfo);
             this.items = dtoToModelArray(ItemCountShort, dto.items);
+            this.citizens = dtoToModelArray(Citizen, dto.citizens);
             this.nb_pa = dto.nbPa;
             this.nb_km = dto.nbKm;
             this.zone_regen = dto.zoneRegen ? <ZoneRegen>ZoneRegen.getByKey(dto.zoneRegen) : undefined;
+            this.displayed_x = getDisplayedXFromArrayX(dto.x);
+            this.displayed_y = getDisplayedYFromArrayY(dto.y);
         }
     };
 

@@ -15,20 +15,19 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "~15.1.1",
-    "@angular/cdk": "~14.2.7",
+    "@angular/cdk": "~15.1.1",
     "@angular/common": "~15.1.1",
     "@angular/compiler": "~15.1.1",
     "@angular/core": "~15.1.1",
     "@angular/fire": "^7.5.0",
     "@angular/forms": "~15.1.1",
-    "@angular/material": "~14.2.7",
+    "@angular/material": "~15.1.1",
     "@angular/platform-browser": "~15.1.1",
     "@angular/platform-browser-dynamic": "~15.1.1",
     "@angular/router": "~15.1.1",
     "moment": "^2.29.1",
-    "rxjs": "~7.5.7",
-    "tslib": "^2.3.1",
-    "zone.js": "~0.11.8"
+    "rxjs": "~7.8.0",
+    "zone.js": "~0.12.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~15.1.2",
@@ -38,14 +37,15 @@
     "@types/jasmine": "~4.3.1",
     "@types/node": "^18.11.15",
     "firebase": "^9.15.0",
-    "jasmine-core": "~4.1.1",
+    "jasmine-core": "~4.5.0",
     "karma": "~6.4.1",
     "karma-chrome-launcher": "~3.1.1",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
     "ngx-i18nsupport": "^0.17.1",
-    "typescript": "~4.8.4",
+    "tslib": "^2.4.1",
+    "typescript": "~4.9.4",
     "xliff": "^6.0.3"
   }
 }

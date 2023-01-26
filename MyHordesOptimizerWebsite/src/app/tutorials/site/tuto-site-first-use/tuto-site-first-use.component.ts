@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
 import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 
 @Component({
@@ -8,6 +8,7 @@ import { ClipboardService } from 'src/app/shared/services/clipboard.service';
     encapsulation: ViewEncapsulation.None
 })
 export class TutoSiteFirstUseComponent {
+    @HostBinding('style.display') display: string = 'contents';
 
     public readonly title: string = $localize`Première utilisation du site`;
 
