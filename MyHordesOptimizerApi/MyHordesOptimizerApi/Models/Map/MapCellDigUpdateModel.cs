@@ -1,5 +1,8 @@
-﻿namespace MyHordesOptimizerApi.Models.Map
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace MyHordesOptimizerApi.Models.Map
 {
+    [Table("MapCellDigUpdate")]
     public class MapCellDigUpdateModel
     {
         public int IdTown { get; set; }
