@@ -11,6 +11,7 @@ using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Models.Views.Citizens;
+using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -434,7 +435,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var distinct = models.Distinct(new CellIdComparer());
             var map = Mapper.Map<MyHordesOptimizerMapDto>(distinct);
 
-            var items = models.Where(x => x.ItemId.HasValue);
+            var items = models.Where(x => x.ItemId.HasValue).Distinct(new ItemIdComparer()); ;
             foreach (var item in items)
             {
                 var cellItem = Mapper.Map<CellItemDto>(item);
