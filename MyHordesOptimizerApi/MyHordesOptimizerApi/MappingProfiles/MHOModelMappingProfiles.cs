@@ -162,7 +162,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.HomeMessage, opt => opt.MapFrom(src => src.HomeMessage))
                 .ForMember(dest => dest.PositionY, opt => opt.MapFrom(src => src.Y))
                 .ForMember(dest => dest.PositionX, opt => opt.MapFrom(src => src.X))
-                .ForMember(dest => dest.JobUID, opt => opt.MapFrom(src => src.JobName))
+                .ForMember(dest => dest.JobUID, opt => opt.MapFrom(src => src.JobUid))
                 .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.JobName))
                 .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.IsGhost))
                 .ForMember(dest => dest.IdBag, opt => opt.Ignore());
@@ -175,6 +175,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CitizenId))
                 .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.CitizenIsGhost))
                 .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.CitizenJobName))
+                .ForMember(dest => dest.JobUid, opt => opt.MapFrom(src => src.CitizenJobUID))
                 .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.CitizenPositionX))
                 .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.CitizenPositionY))
                 .ForMember(dest => dest.Home, opt => opt.MapFrom(src => src))
