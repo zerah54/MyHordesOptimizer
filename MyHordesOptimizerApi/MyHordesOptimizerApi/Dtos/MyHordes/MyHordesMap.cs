@@ -34,7 +34,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         public List<MyHordesZone> Zones { get; set; }
 
         [JsonProperty("citizens")]
-        public List<Citizen> Citizens { get; set; }
+        public List<MyHordesCitizen> Citizens { get; set; }
 
         [JsonProperty("city")]
         public MyHordesCity City { get; set; }
