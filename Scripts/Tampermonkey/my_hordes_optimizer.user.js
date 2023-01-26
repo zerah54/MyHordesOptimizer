@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.31
+// @version      1.0.0-beta.32
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,8 +35,8 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH][fix] Digs => searches \n\n`
-+ `[MH][update] Prise en compte de la quantité d'objets dans les sacs dans la liste de courses`;
++ `[MH][fix] Correction des styles qui écrasaient les puces de MH dans les forums (désolée :( ) \n\n`
++ `[MH][update] Ajout de traductions (anglaises et allemandes) - merci Xochi, Crazy Unicorn, Nekomine ! `;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -205,9 +205,9 @@ const texts = {
         es: `Número de zombis que han muerto aquí el día de hoy`
     },
     nb_despair_deaths: {
-        en: `TODO`,
+        en: `Amount of zombies that will die from despair`,
         fr: `Nombre de zombies qui vont mourir de désespoir`,
-        de: `TODO`,
+        de: `Anzahl von Zombies, die abwandern werden`,
         es: `TODO`
     },
     copy_map: {
@@ -424,25 +424,25 @@ const texts = {
     broken: {
         en: `Broken`,
         fr: `Cassé`,
-        de: `TODO`,
-        es: `TODO`,
+        de: `Kaputt`,
+        es: `Roto/a`,
     },
     more_citizens_info: {
-        en: `TODO`,
+        en: `Additional information`,
         fr: `Informations complémentaires`,
-        de: `TODO`,
+        de: `Zusätzliche Informationen`,
         es: `TODO`,
     },
     manually_add_app_id_key: {
-        en: `TODO`,
+        en: `Your external ID could not be retrieved automatically. You can enter it manually here.`,
         fr: `Votre identifiant n'a pas pu être récupéré automatiquement. Vous pouvez le saisir manuellement ici.`,
-        de: `TODO`,
+        de: `Ihr externe ID konnte nicht automatisch abgerufen werden. Sie können ihn hier manuell eingeben.`,
         es: `TODO`,
     },
     edit_add_app_id_key: {
-        en: `TODO`,
-        fr: `Saisissez votre identifiant externe pour les applications ici.\Vous pouvez vider le champ pour le supprimer.`,
-        de: `TODO`,
+        en: `Enter your external ID here.\nYou can also clear the form field to remove it.`,
+        fr: `Saisissez votre identifiant externe pour les applications ici.\nVous pouvez vider le champ pour le supprimer.`,
+        de: `Bitte hier Deine externe ID eintragen oder den Inhalt des Felds entfernen, um sie zu löschen.`,
         es: `TODO`,
     }
 };
@@ -646,7 +646,7 @@ const api_texts = {
 const action_types = [
     {id: `Recipe::ManualAnywhere`, label: {en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante`}, ordering: 1},
     {id: `Recipe::WorkshopType`, label: {en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller`}, ordering: 0},
-    {id: `Recipe::WorkshopTypeShamanSpecific`, label: {en: `TODO`, fr: `Atelier - Chaman`, de: `TODO`, es: `TODO`}, ordering: 2},
+    {id: `Recipe::WorkshopTypeShamanSpecific`, label: {en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán`}, ordering: 2},
 ];
 
 const wishlist_priorities = [
@@ -721,7 +721,7 @@ const wishlist_depot = [
         label: {
             en: `Teleport area`,
             fr: `Zone de rapatriement`,
-            de: `TODO`,
+            de: `Rettungs-Bereich`,
             es: `Zona de volver`
         }
     }
@@ -764,7 +764,7 @@ const wishlist_headers = [
     },
     {
         label: {
-            en: `In bags`,
+            en: `In rucksack`,
             fr: `En sacs`,
             de: `TODO`,
             es: `TODO`
@@ -863,10 +863,10 @@ const more_citizen_info_headers = [
     {
         id: 'travaux',
         label: {
-            en: `TODO`,
+            en: `Building upgrades`,
             fr: `Travaux`,
-            de: `TODO`,
-            es: `TODO`
+            de: `Bauarbeiten`,
+            es: `Obras`
         },
         header_class: ['padded', 'cell', 'rw-4'],
         content_class: ['padded', 'cell', 'rw-4', 'small', 'citizen-box']
@@ -1038,7 +1038,7 @@ let params_categories = [
                 label: {
                     en: `TODO`,
                     fr: `Détail de mon sac et de ceux de mon escorte`,
-                    de: `TODO`,
+                    de: `Details meines Inventars und des Inventars meiner Eskorte`,
                     es: `TODO`
                 },
                 parent_id: `update_mho`
@@ -1046,9 +1046,9 @@ let params_categories = [
             // {
             //     id: `update_mho_chest`,
             //     label: {
-            //         en: `TODO`,
+            //         en: `Items in my chest`,
             //         fr: `Contenu de mon coffre`,
-            //         de: `TODO`,
+            //         de: `Gegenstände in meiner Truhe`,
             //         es: `TODO`
             //     },
             //     parent_id: `update_mho`
@@ -1098,13 +1098,13 @@ let params_categories = [
                 label: {
                     en: `Additional information on the map`,
                     fr: `Informations complémentaires sur la carte`,
-                    de: `TODO`,
+                    de: `Zusätzliche Informationen auf der Karte`,
                     es: `TODO`
                 },
                 help: {
-                    en: `Killed zombies markers ; Update when the city is devastated`,
+                    en: `Amount of zombies killed in a zone; Zone update even after the town has been devastated`,
                     fr: `Marqueurs zombies tués ; Mise à jour en ville dévastée`,
-                    de: `TODO`,
+                    de: `Anzahl getöteter Zombies; Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
                     es: `TODO`
                 },
                 parent_id: `update_gh`
@@ -1269,7 +1269,7 @@ let params_categories = [
                 help: {
                     en: `In Pandemonium (Hardcore towns), the construction sites are damaged during the attack. The damages can amount to 70% max of the construction's life points (rounded up to the nearest whole number). This option displays over the constructions the number of AP needed to keep them safe.`,
                     fr: `En Pandémonium, les bâtiments prennent des dégâts lors de l'attaque. Ces dégâts équivalent à un maximum de 70% des points de vie du bâtiment (arrondi à l'entier supérieur). Cette option affiche sur les bâtiments les PA à investir pour que le bâtiment soit en sécurité.`,
-                    de: `TODO`,
+                    de: `In Pandämonium-Städten nehmen Gebäude während des nächtlichen Angriffs Schaden. Diese Schäden können bis zu 70% eines Gebäudes ausmachen (aufgerundet zur nächsten ganzen Zahl). Diese Einstellung zeigt oberhalb der Bau-AP an, wieviele AP benötigt werden, um das Gebäude für die Nacht zu schützen.`,
                     es: `En Pandemonio, las construcciones sufren daños durante el ataque. Estos daños equivalen a un máximo de 70% de los puntos de vida de la construcción (redondeados al entero superior). Esta opción muestra sobre las construcciones la cantidad de PA a invertir para evitar que puedan ser destruidas.`
                 },
                 parent_id: null
@@ -1279,7 +1279,7 @@ let params_categories = [
                 label: {
                     en: `Display a tab with additional information on the citizens page in town`,
                     fr: `Afficher un onglet contenant des informations supplémentaires sur la page des citoyens`,
-                    de: `TODO`,
+                    de: `Ein Tab mit zusätzlichen Informationen auf der Bürgerliste  in der Stadt anzeigen`,
                     es: `TODO`
                 },
                 parent_id: null
@@ -1394,7 +1394,7 @@ let informations = [
         label: {
             en: `TODO`,
             fr: `Modifier mon ID externe pour les apps`,
-            de: `TODO`,
+            de: `Meine externe ID für externe Programme ändern`,
             es: `TODO`
         },
         src: undefined,
@@ -1423,9 +1423,9 @@ const table_hero_skills_headers = [
 
 const table_skills_headers = [
     {id: 'icon', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
-    {id: 'label', label: {en: `Skill`, fr: `Capacité`, de: `TODO`, es: `Poder`}, type: 'th'},
-    {id: 'daysNeeded', label: {en: `Hero days needed`, fr: `Jours héros nécessaires`, de: `TODO`, es: `Días de héroe necesarios`}, type: 'td'},
-    {id: 'description', label: {en: `Description`, fr: `Description`, de: `TODO`, es: `Descripción`}, type: 'td'}
+    {id: 'label', label: {en: `Skill`, fr: `Capacité`, de: `Fähigkeit`, es: `Poder`}, type: 'th'},
+    {id: 'daysNeeded', label: {en: `Hero days needed`, fr: `Jours héros nécessaires`, de: `Benötigte Heldentage`, es: `Días de héroe necesarios`}, type: 'td'},
+    {id: 'description', label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción`}, type: 'td'}
 ];
 
 const table_ruins_headers = [
@@ -6011,7 +6011,7 @@ function createStyles() {
     + 'color: #f0d79e;'
     + '}';
 
-    const li_style = 'ul > li {'
+    const li_style = '#categories > ul > li, ul.parameters > li, #tab-content ul > li {'
     + 'list-style: none;'
     + '}';
 
