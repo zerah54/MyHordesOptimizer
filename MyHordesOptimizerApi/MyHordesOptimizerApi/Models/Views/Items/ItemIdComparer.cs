@@ -1,5 +1,6 @@
 ﻿using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Models.Views.Items.Citizen;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -19,7 +20,7 @@ namespace MyHordesOptimizerApi.Models.Views.Items
 
         public bool Equals([AllowNull] MapCellCompletModel x, [AllowNull] MapCellCompletModel y)
         {
-            return x.ItemId == y.ItemId;
+            return x.ItemId == y.ItemId && x.IdCell == y.IdCell;
         }
 
         public int GetHashCode([DisallowNull] ItemCompletModel obj)
@@ -34,7 +35,7 @@ namespace MyHordesOptimizerApi.Models.Views.Items
 
         public int GetHashCode([DisallowNull] MapCellCompletModel obj)
         {
-            return obj.ItemId.GetHashCode();
+            return HashCode.Combine(obj.ItemId, obj.IdCell);
         }
     }
 }

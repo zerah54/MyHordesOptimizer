@@ -435,7 +435,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var distinct = models.Distinct(new CellIdComparer());
             var map = Mapper.Map<MyHordesOptimizerMapDto>(distinct);
 
-            var items = models.Where(x => x.ItemId.HasValue).Distinct(new ItemIdComparer()); ;
+            var items = models.Where(x => x.ItemId.HasValue).Distinct(new ItemIdComparer());
             foreach (var item in items)
             {
                 var cellItem = Mapper.Map<CellItemDto>(item);
@@ -449,6 +449,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var cellCitizen = Mapper.Map<CellCitizenDto>(citizen);
                 map.Cells.Single(cell => cell.CellId == citizen.IdCell).Citizens.Add(cellCitizen);
             }
+
             return map;
         }
 

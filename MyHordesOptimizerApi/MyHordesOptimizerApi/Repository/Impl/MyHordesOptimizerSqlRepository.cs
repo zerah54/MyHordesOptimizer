@@ -1311,6 +1311,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
         }
 
+        public void ClearCellItem(int idCell)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Query("DELETE FROM MapCellItem WHERE idCell = @idCell", new { idCell = idCell });
+            connection.Close();
+        }
+
         #endregion
 
         public int CreateLastUpdateInfo(LastUpdateInfo lastUpdateInfo)
