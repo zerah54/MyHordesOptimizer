@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.32
+// @version      1.0.0-beta.33
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -9,7 +9,7 @@
 //
 // @downloadURL  https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
 // @updateURL    https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
-// @homepageURL  https://myhordes-optimizer.web.app/script
+// @homepageURL  https://myhordes-optimizer.web.app/tutorials/script/installation
 // @supportURL   lenoune38@gmail.com
 //
 // @connect      https://myhordesoptimizerapi.azurewebsites.net/
@@ -35,8 +35,8 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH][fix] Correction des styles qui écrasaient les puces de MH dans les forums (désolée :( ) \n\n`
-+ `[MH][update] Ajout de traductions (anglaises et allemandes) - merci Xochi, Crazy Unicorn, Nekomine ! `;
++ `[MH][update] Déplacement du lien du site tout en haut de la liste des options (j'espère que cette fois tout le monde sera au courant qu'il existe 😊) \n\n`
++ `[MH][fix] Correction du lien vers la doc utilisé dans tampermonkey`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -96,6 +96,12 @@ const mho_display_translate_input_id = 'mho-display-translate-input';
 const mho_more_citizens_info_id = 'mho-more-citizens-info';
 
 const texts = {
+    website: {
+        en: `Website`,
+        fr: `Site web`,
+        de: `Webseite`,
+        es: `Sitio web`
+    },
     save_external_app_id: {
         en: `Save your external ID for apps`,
         fr: `Enregistrez votre ID d'app externe`,
@@ -1354,18 +1360,6 @@ let params_categories = [
 
 let informations = [
     {
-        id: `website`,
-        label: {
-            en: `Website`,
-            fr: `Site web`,
-            de: `Webseite`,
-            es: `Sitio web`
-        },
-        src: is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`,
-        action: () => {},
-        img: `emotes/explo.gif`
-    },
-    {
         id: `version`,
         label: {
             en: `Changelog ${GM_info.script.version}`,
@@ -1676,8 +1670,23 @@ function createOptimizerBtn() {
         title_hidden.innerHTML = mho_title;
 
         let title = document.createElement('h1');
-        title.appendChild(img);
-        title.appendChild(title_hidden);
+
+        let title_first_part = document.createElement('div');
+        title.appendChild(title_first_part);
+
+        let title_second_part = document.createElement('div');
+        title.appendChild(title_second_part);
+
+        let website = document.createElement('a');
+        website.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
+        website.href = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
+        website.target = '_blank';
+        website.style.cursor = 'pointer';
+
+        title_second_part.appendChild(website);
+
+        title_first_part.appendChild(img);
+        title_first_part.appendChild(title_hidden);
 
         let optimizer_btn = document.createElement('div');
         optimizer_btn.appendChild(title);
@@ -5761,7 +5770,7 @@ function createCopyButton(source, map, map_id, button_block_id) {
 
 /** Add styles to this page */
 function createStyles() {
-    const btn_style = '#' + btn_id + ' {'
+    const btn_style = `#${btn_id} {`
     + 'background-color: #5c2b20;'
     + 'border: 1px solid #f0d79e;'
     + 'outline: 1px solid #000;'
@@ -5770,15 +5779,15 @@ function createStyles() {
     + 'z-index: 30;'
     + '}';
 
-    const btn_hover_h1_span_style = '#' + btn_id + ':hover h1 span {'
+    const btn_hover_h1_span_style = `#${btn_id}:hover h1 span, #${btn_id}:hover h1 a {`
     + 'display: inline;'
     + '}';
 
-    const btn_hover_div_style = '#' + btn_id + ':hover div {'
+    const btn_hover_div_style = `#${btn_id}:hover div {`
     + 'display: block;'
     + '}';
 
-    const btn_h1_style = '#' + btn_id + ' h1 {'
+    const btn_h1_style = `#${btn_id} h1 {`
     + 'height: auto;'
     + 'font-size: 8pt;'
     + 'text-transform: none;'
@@ -5789,18 +5798,21 @@ function createStyles() {
     + 'padding: 0;'
     + 'line-height: 17px;'
     + 'color: #f0d79e;'
+    + 'display: flex;'
+    + 'justify-content: space-between;'
+    + 'align-items: center;'
     + '}';
 
-    const btn_h1_img_style = '#' + btn_id + ' h1 img {'
+    const btn_h1_img_style = `#${btn_id} h1 > div > img {`
     + 'vertical-align: -9%;'
     + '}';
 
-    const btn_h1_hover_style = '#' + btn_id + ':hover h1 {'
+    const btn_h1_hover_style = `#${btn_id}:hover h1 {`
     + 'border-bottom: 1px solid #b37c4a;'
     + 'margin-bottom: 5px;'
     + '}'
 
-    const btn_h1_span_style = '#' + btn_id + ' h1 span {'
+    const btn_h1_span_style = `#${btn_id} h1 span, #${btn_id} h1 a {`
     + 'color: #f0d79e;'
     + 'cursor: help;'
     + 'font-family: Trebuchet MS,Arial,Verdana,sans-serif;'
@@ -7871,7 +7883,7 @@ function getCitizenHouseContent(link) {
 
 
                     let travaux_row = lightbox ? lightbox.querySelectorAll('.row')[3] : undefined;
-                    let travaux = travaux_row ? travaux_row.lastElementChild : town_summary.querySelectorAll('.row-detail')[1];
+                    let travaux = travaux_row ? travaux_row.lastElementChild : (town_summary.querySelectorAll('.row-detail') ? town_summary.querySelectorAll('.row-detail')[1] : undefined);
                     more_info.travaux = travaux ? travaux.innerHTML.replace(/\<b\>/g, '').replace(/\<\/b\>/g, '').replace(/ , /g, '').replace(/\n/g, '').replace(/(\d+)/g, '$1<br />') : '';
                     resolve(more_info);
                 } else {
