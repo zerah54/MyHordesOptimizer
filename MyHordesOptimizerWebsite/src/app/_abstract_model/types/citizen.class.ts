@@ -92,9 +92,6 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.id = dto.id;
             this.is_ghost = dto.isGhost;
             this.job = <JobEnum>JobEnum.getByKey(dto.jobUid);
-            if (!this.job) {
-                console.log('dto.uid', dto.jobUid);
-            }
             this.nombre_jour_hero = dto.nombreJourHero;
             this.x = dto.x;
             this.y = dto.y;

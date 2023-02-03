@@ -5,6 +5,8 @@ $yellow: khaki;
 $orange: sandybrown;
 $red: lightcoral;
 
+$empty-color: gray;
+
 td.map-cell {
     height: 30px;
     width: 30px;
@@ -12,25 +14,42 @@ td.map-cell {
     padding: 0;
     position: relative;
     z-index: 0;
+    cursor: pointer;
 
-    &.border-left {
+    &.scrut-border-left {
         border-left: 1px solid $primary;
     }
 
-    &.border-right {
+    &.scrut-border-right {
         border-right: 1px solid $primary;
     }
 
-    &.border-top {
+    &.scrut-border-top {
         border-top: 1px solid $primary;
     }
 
-    &.border-bottom {
+    &.scrut-border-bottom {
         border-bottom: 1px solid $primary;
     }
 
-    &.my-cell {
-        box-shadow: inset 0 0 0.5em 2px white;
+    >.dist-border-left {
+        border-left: 2px solid white;
+    }
+
+    >.dist-border-right {
+        border-right: 2px solid white;
+    }
+
+    >.dist-border-top {
+        border-top: 2px solid white;
+    }
+
+    >.dist-border-bottom {
+        border-bottom: 2px solid white;
+    }
+
+    >.my-cell {
+        box-shadow: inset 0 0 0.25em 2px white;
     }
 
     >div {
@@ -161,26 +180,26 @@ td.map-cell {
         height: 100%;
         z-index: 0;
 
-        background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%),
-            -moz-linear-gradient(-45deg, #444 25%, transparent 25%),
-            -moz-linear-gradient(45deg, transparent 75%, #444 75%),
-            -moz-linear-gradient(-45deg, transparent 75%, #444 75%);
-        background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, #444), color-stop(.25, transparent)),
-            -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, #444), color-stop(.25, transparent)),
-            -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, #444)),
-            -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, #444));
-        background-image: -webkit-linear-gradient(45deg, #444 25%, transparent 25%),
-            -webkit-linear-gradient(-45deg, #444 25%, transparent 25%),
-            -webkit-linear-gradient(45deg, transparent 75%, #444 75%),
-            -webkit-linear-gradient(-45deg, transparent 75%, #444 75%);
-        background-image: -o-linear-gradient(45deg, #444 25%, transparent 25%),
-            -o-linear-gradient(-45deg, #444 25%, transparent 25%),
-            -o-linear-gradient(45deg, transparent 75%, #444 75%),
-            -o-linear-gradient(-45deg, transparent 75%, #444 75%);
-        background-image: linear-gradient(45deg, #444 25%, transparent 25%),
-            linear-gradient(-45deg, #444 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, #444 75%),
-            linear-gradient(-45deg, transparent 75%, #444 75%);
+        background-image: -moz-linear-gradient(45deg, $empty-color 25%, transparent 25%),
+            -moz-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
+            -moz-linear-gradient(45deg, transparent 75%, $empty-color 75%),
+            -moz-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
+        background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, $empty-color), color-stop(.25, transparent)),
+            -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, $empty-color), color-stop(.25, transparent)),
+            -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, $empty-color)),
+            -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, $empty-color));
+        background-image: -webkit-linear-gradient(45deg, $empty-color 25%, transparent 25%),
+            -webkit-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
+            -webkit-linear-gradient(45deg, transparent 75%, $empty-color 75%),
+            -webkit-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
+        background-image: -o-linear-gradient(45deg, $empty-color 25%, transparent 25%),
+            -o-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
+            -o-linear-gradient(45deg, transparent 75%, $empty-color 75%),
+            -o-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
+        background-image: linear-gradient(45deg, $empty-color 25%, transparent 25%),
+            linear-gradient(-45deg, $empty-color 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, $empty-color 75%),
+            linear-gradient(-45deg, transparent 75%, $empty-color 75%);
         -moz-background-size: 2px 2px;
         background-size: 2px 2px;
         /* override value for webkit */

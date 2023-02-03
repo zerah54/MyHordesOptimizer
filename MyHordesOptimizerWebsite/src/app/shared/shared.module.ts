@@ -9,6 +9,9 @@ import { ApiServices } from './../_abstract_model/services/api.services';
 import { ElementsModule } from './elements/elements.module';
 import { IsInTownGuard } from './guards/has-app-key.guard';
 import { MaterialModule } from './material-modules.module';
+import { ArrayItemDetailsPipe } from './pipes/array-item-details.pipe';
+import { CitizensFromShortPipe } from './pipes/citizens-from-short.pipe';
+import { ItemDetailsPipe } from './pipes/item-details.pipe';
 import { ClipboardService } from './services/clipboard.service';
 import { LoadingOverlayService } from './services/loading-overlay.service';
 import { SnackbarService } from './services/snackbar.service';
@@ -17,8 +20,10 @@ let custom_modules: Modules = [MaterialModule, ElementsModule];
 let angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule]
 let services: Components = [ApiServices, LoadingOverlayService, SnackbarService, ClipboardService]
 let guards: Components = [IsInTownGuard];
+let pipes: Components = [ArrayItemDetailsPipe, CitizensFromShortPipe, ItemDetailsPipe];
 
 @NgModule({
+    declarations: [...pipes],
     imports: [
         ...angular_modules,
         ...custom_modules,
@@ -26,10 +31,12 @@ let guards: Components = [IsInTownGuard];
     exports: [
         ...angular_modules,
         ...custom_modules,
+        ...pipes
     ],
     providers: [
         ...services,
         ...guards,
+        ...pipes
     ]
 })
 

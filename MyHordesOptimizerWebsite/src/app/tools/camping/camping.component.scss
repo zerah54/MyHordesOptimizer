@@ -4,27 +4,18 @@
     .camping-params {
         display: flex;
         flex-wrap: wrap;
+        column-gap: 1em;
 
         >div {
             flex: 1;
             min-width: 300px;
 
-            &:not(:first-child) {
-                padding-left: 0.25em;
-            }
-
-            &:not(:last-child) {
-                padding-right: 0.25em;
-            }
-
             h3 {
                 margin-bottom: 0.5em;
             }
 
-            .mat-mdc-form-field,
             .mat-mdc-checkbox {
                 display: block;
-                margin-right: 0.5em;
 
                 img {
                     margin-right: 0.5em;
@@ -32,8 +23,20 @@
                 }
             }
 
+
+            .mat-mdc-form-field {
+                display: block;
+
+                .mdc-floating-label {
+                    span {
+                        padding: 0 0.5em;
+                    }
+                }
+            }
+
             .or {
                 text-align: center;
+                margin-bottom: 1em;
 
                 .mat-button-toggle-group {
                     border-color: $primary;

@@ -32,11 +32,9 @@
                         [sticky]="column.id === 'name'">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>
                             <ng-container [ngSwitch]="column.id">
-                                <mho-header-with-select-filter *ngSwitchCase="'name'" [header]="column.header"
-                                    [(filterValue)]="wishlist_filters.items"
-                                    (filterValueChange)="wishlist_filters_change.next()"
-                                    [options]="wishlist_info.wishlist_items" [bindLabel]="'item.label.' + locale">
-                                </mho-header-with-select-filter>
+                                <mho-header-with-string-filter *ngSwitchCase="'name'" [header]="column.header"
+                                    [(filterValue)]="wishlist_filters.items" (filterValueChange)="wishlist_filters_change.next()">
+                                </mho-header-with-string-filter>
                                 <ng-container *ngSwitchCase="'priority'">
                                     {{column.header}}
                                 </ng-container>

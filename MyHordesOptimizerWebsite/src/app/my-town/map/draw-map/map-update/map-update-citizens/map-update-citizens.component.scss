@@ -1,0 +1,22 @@
+.mho-map-update-citizens {
+    table {
+        th, td {
+            padding: 0.25em 0.5em;
+
+            &.name {
+                text-align: left;
+                >img {
+                    margin-right: 0.5em;
+                    vertical-align: middle;
+                }
+            }
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            background-color: white;
+        }
+    }
+}
+

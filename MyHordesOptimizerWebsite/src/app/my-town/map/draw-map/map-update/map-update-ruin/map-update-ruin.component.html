@@ -1,0 +1,17 @@
+<div class="mho-map-update-ruin" *ngIf="ruin">
+    <ng-container>
+        <div [innerHTML]="ruin.description[locale]"></div>
+        <br />
+        <div><ng-container i18n>Bonus en camping</ng-container>&nbsp;:&nbsp;{{ruin.camping}}</div>
+    </ng-container>
+    <ng-container *ngIf="ruin.drops && ruin.drops.length > 0">
+        <mat-divider></mat-divider>
+        <div class="drops">
+            <div *ngFor="let drop of ruin.drops">
+                <img [src]="HORDES_IMG_REPO + drop.item.img">
+                {{drop.item.label[locale]}}
+                <small>&nbsp;({{drop.probability * 100 | number:'1.0-2':locale}}%)</small>
+            </div>
+        </div>
+    </ng-container>
+</div>

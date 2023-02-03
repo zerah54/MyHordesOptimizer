@@ -38,37 +38,59 @@
             display: flex;
             justify-content: center;
             align-items: center;
+
+            .distance-pa {
+                > img {
+                    vertical-align: middle;
+                }
+            }
         }
     }
 
     .content {
         .zombies {
             display: flex;
+            gap: 0.5em;
             justify-content: space-between;
             align-items: center;
         }
 
-        .citizen {
-            display: flex;
-            align-items: baseline;
+        .pdc {}
+    }
 
-            >img::after {
-                content: ' : ';
-            }
+    .citizens {
 
-            >div {
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                white-space: pre-wrap;
-                > :not(:last-child)::after {
-                    content: ', ';
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        white-space: pre-wrap;
+
+        >div:not(:last-child)::after {
+            content: ', ';
+        }
+
+        >div>img {
+            margin-right: 0.25em;
+        }
+    }
+
+    .items {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        flex-wrap: wrap;
+
+        .broken {
+            .item_img {
+                img {
+                    border: 1px dashed red;
                 }
-
-                > div > img {
-                    margin-right: 0.25em;
-                }
             }
+        }
+
+        .item-quantity {
+            font-size: 0.75em;
+            vertical-align: baseline;
         }
     }
 }
