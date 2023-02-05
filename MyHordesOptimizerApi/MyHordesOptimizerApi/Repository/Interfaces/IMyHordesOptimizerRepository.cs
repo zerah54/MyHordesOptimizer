@@ -79,6 +79,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void DeleteMapCellDig(int idCell, int diggerId, int day);
         MapCellDigCompletModel GetCellDigs(int idCell, int idUser, int day);
         void ClearCellDig(IEnumerable<int> cellId);
-        void ClearCellItem(int idCell);
+        void ClearCellItem(int idCell, int idLastUpdateInfo);
     }
 }

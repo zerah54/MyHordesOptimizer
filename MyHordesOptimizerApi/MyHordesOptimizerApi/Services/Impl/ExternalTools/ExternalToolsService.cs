@@ -220,7 +220,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         {
                             var cellWithItemId = MyHordesOptimizerRepository.GetCell(townId, x: zoneItemX, y: zoneItemY);
                             listCellItems.ForEach(cellItem => cellItem.IdCell = cellWithItemId.IdCell);
-                            MyHordesOptimizerRepository.ClearCellItem(cellWithItemId.IdCell);
+                            MyHordesOptimizerRepository.ClearCellItem(cellWithItemId.IdCell, idLastUpdateInfo);
                             MyHordesOptimizerRepository.PatchMapCellItem(townId, listCellItems);
                         }
                     }

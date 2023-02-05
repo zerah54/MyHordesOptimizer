@@ -1170,7 +1170,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
                     }
                 }
             }
-            connection.BulkInsertOrUpdate("MapCell", listCells);
+            var toUpdate = listCells.Except(existings, new CellModelComparer());
+            connection.BulkInsertOrUpdate("MapCell", toUpdate);
             connection.Close();
         }
 
@@ -1311,11 +1312,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
         }
 
-        public void ClearCellItem(int idCell)
+        public void ClearCellItem(int idCell, int idLastUpdateInfo)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             connection.Query("DELETE FROM MapCellItem WHERE idCell = @idCell", new { idCell = idCell });
+            connection.Execute(@"UPDATE MapCell SET idLastUpdateInfo = @idLastUpdateInfo WHERE idCell = @idCell", new { idLastUpdateInfo = idLastUpdateInfo, idCell = idCell });
             connection.Close();
         }
 
