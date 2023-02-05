@@ -3,6 +3,7 @@ using Common.Core.Repository.Impl;
 using Common.Core.Repository.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,7 +11,6 @@ using MyHordesOptimizerApi.Configuration.Impl;
 using MyHordesOptimizerApi.Configuration.Impl.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
-using MyHordesOptimizerApi.DapperMapping;
 using MyHordesOptimizerApi.MappingProfiles;
 using MyHordesOptimizerApi.Providers.Impl;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -95,6 +95,10 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<IMyHordesRuineService, MyHordesRuineService>();
             services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimizerParametersService>();
 
+            services.AddHttpLogging(logging =>
+            {
+                logging.LoggingFields = HttpLoggingFields.All;
+            });
             services.AddApplicationInsightsTelemetry();
         }
 
@@ -125,6 +129,8 @@ namespace MyHordesOptimizerApi
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseHttpLogging();
 
             app.UseEndpoints(endpoints =>
             {
