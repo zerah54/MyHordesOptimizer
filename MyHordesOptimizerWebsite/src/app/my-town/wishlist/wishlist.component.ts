@@ -48,7 +48,9 @@ export class WishlistComponent {
     public items: Item[] = [];
     /** Les filtres de la liste de courses */
     public wishlist_filters: WishlistFilters = {
-        items: []
+        items: '',
+        priority: [],
+        depot: []
     };
 
     public wishlist_filters_change: EventEmitter<void> = new EventEmitter();
@@ -76,7 +78,13 @@ export class WishlistComponent {
     ngOnInit(): void {
         this.datasource = new MatTableDataSource();
         this.datasource.sort = this.sort;
+
+        this.wishlist_filters_change.subscribe(() => {
+            this.datasource.filter = JSON.stringify(this.wishlist_filters);
+        });
+
         this.datasource.filterPredicate = (data: WishlistItem, filter: string) => this.customFilter(data, filter);
+
         this.getWishlist();
         this.api.getItems(true).subscribe((items: Item[]) => {
             this.items = items;
@@ -125,7 +133,9 @@ export class WishlistComponent {
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: WishlistItem, filter: string): boolean {
-        if (data.item.label[this.locale].toLowerCase().indexOf(filter.toLowerCase()) > -1) return true;
+        let filter_object: WishlistFilters = JSON.parse(filter.toLowerCase());
+        if (!filter_object || ((!filter_object.items || filter_object.items === '') && !filter_object.depot && !filter_object.priority)) return true;
+        if (data.item.label[this.locale].toLocaleLowerCase().indexOf(filter_object.items.toLocaleLowerCase()) > -1) return true;
         return false;
     }
 
@@ -148,5 +158,7 @@ interface WishlistColumns {
 }
 
 interface WishlistFilters {
-    items: WishlistItem[];
+    items: string;
+    priority: PriorityOrDepot[];
+    depot: PriorityOrDepot[];
 }

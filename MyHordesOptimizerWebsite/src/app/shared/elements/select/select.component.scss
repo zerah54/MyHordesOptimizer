@@ -18,25 +18,27 @@
     }
 }
 
-.mat-select-panel {
+.mat-mdc-select-panel {
     height: 100%;
 
-    .options-container {
-        max-height: calc(100% - 42px);
-        overflow-y: auto;
+    .mho-search {
+        width: calc(100% - 2em);
+    }
 
-        .mat-option {
-            .mat-option-text {
+    .options-container {
+        max-height: calc(100% - 48px);
+
+        .mho-option {
+
+            > span {
                 display: flex;
-                flex-direction: row;
                 justify-content: space-between;
+                width: 100%;
             }
 
             i {
                 margin-right: 0.5em;
             }
-
-            .more-info {}
         }
     }
 }

@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
 import { ExtraOptions, RouterModule, Routes } from '@angular/router';
 
-const routes: Routes = [];
+const routes: Routes = [
+    { path: '**', redirectTo: 'wiki/items' },
+];
 const extra_options: ExtraOptions = {
     useHash: false, anchorScrolling: 'enabled', onSameUrlNavigation: 'reload', scrollPositionRestoration: 'enabled'
 }

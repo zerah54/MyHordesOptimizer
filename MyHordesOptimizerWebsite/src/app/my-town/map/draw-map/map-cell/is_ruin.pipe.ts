@@ -9,6 +9,7 @@ import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
 })
 export class IsRuinPipe implements PipeTransform {
     transform(cell: Cell, ruins: Ruin[]): boolean {
+        if (!ruins) return false;
         return ruins.find((ruin: Ruin) => ruin.id === cell.ruin_id)?.explorable || false;
     }
 }

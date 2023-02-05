@@ -20,7 +20,12 @@
             margin-bottom: 0.5em;
         }
 
-        .scrut_zones {
+        .scrut-zones {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .dist-zones {
             display: flex;
             flex-direction: column;
         }

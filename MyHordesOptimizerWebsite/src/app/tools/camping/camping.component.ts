@@ -7,7 +7,7 @@ import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 import { JobEnum } from 'src/app/_abstract_model/enum/job.enum';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { dtoToModelArray } from 'src/app/_abstract_model/types/_common.class';
-import { HORDES_IMG_REPO } from './../../_abstract_model/const';
+import { HORDES_IMG_REPO, NONDIG_RUIN, NO_RUIN } from './../../_abstract_model/const';
 import { Ruin } from './../../_abstract_model/types/ruin.class';
 import { Dictionary } from './../../_abstract_model/types/_types';
 
@@ -84,16 +84,7 @@ export class CampingComponent implements OnInit {
     ];
     public readonly jobs: JobEnum[] = JobEnum.getAllValues();
 
-    private readonly added_ruins: Ruin[] = dtoToModelArray(Ruin, [
-        {
-            id: 'none', camping: 0, label: { en: `None`, fr: 'Aucun', de: `Kein`, es: `TODO` }, chance: 0, description: { en: ``, fr: ``, de: ``, es: `` },
-            explorable: false, img: '', minDist: 1, maxDist: 1000, drops: []
-        },
-        {
-            id: 'nondig', camping: 8, label: { en: `Buried building`, fr: 'Bâtiment non déterré', de: `Verschüttete Ruine`, es: `Sector inexplotable` },
-            chance: 0, description: { en: ``, fr: ``, de: ``, es: `` }, explorable: false, img: '', minDist: 1, maxDist: 1000, drops: []
-        }
-    ]);
+    private readonly added_ruins: Ruin[] = dtoToModelArray(Ruin, [NO_RUIN, NONDIG_RUIN]);
 
     /** @see CitizenHandler > getCampingValues > $distance_map */
     private readonly distance_map: Dictionary<number> = {

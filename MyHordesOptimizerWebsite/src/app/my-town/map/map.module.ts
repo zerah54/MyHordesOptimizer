@@ -6,22 +6,31 @@ import { AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe } from 
 import { DrawMapComponent } from './draw-map/draw-map.component';
 import { MapBorderComponent } from './draw-map/map-border/map-border.component';
 import { CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe } from './draw-map/map-cell-details/cell-details-position.pipe';
-import { CitizenNamesPipe } from './draw-map/map-cell-details/citizen_name.pipe';
-import { ItemDetailsPipe } from './draw-map/map-cell-details/item-details.pipe';
 import { MapCellDetailsComponent } from './draw-map/map-cell-details/map-cell-details.component';
 import { RuinInCell } from './draw-map/map-cell-details/ruin-in-cell.pipe';
-import { BorderBottom, BorderLeft, BorderRight, BorderTop } from './draw-map/map-cell/borders.pipe';
+import { ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop } from './draw-map/map-cell/scrut-borders.pipe';
 import { DigLevelPipe } from './draw-map/map-cell/dig-level.pipe';
 import { IsRuinPipe } from './draw-map/map-cell/is_ruin.pipe';
 import { MapCellComponent } from './draw-map/map-cell/map-cell.component';
 import { MyCellPipe } from './draw-map/map-cell/my-cell.pipe';
+import { ItemsInBagsPipe } from './draw-map/map-update/map-update-cell/items-in-bags.pipe';
+import { MapUpdateCellComponent } from './draw-map/map-update/map-update-cell/map-update-cell.component';
+import { HasStillHeroicPipe } from './draw-map/map-update/map-update-citizens/has-still-heroic.pipe';
+import { MapUpdateCitizensComponent } from './draw-map/map-update/map-update-citizens/map-update-citizens.component';
+import { MapUpdateRuinComponent } from './draw-map/map-update/map-update-ruin/map-update-ruin.component';
+import { MapUpdateComponent } from './draw-map/map-update/map-update.component';
 import { MapComponent } from './map.component';
+import { DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop } from './draw-map/map-cell/dist-borders.pipe';
 
 let components: Components = [MapComponent];
-let map_components: Components = [DrawMapComponent, MapCellComponent, MapBorderComponent, CompassRoseComponent, MapCellDetailsComponent]
+let map_components: Components = [
+    DrawMapComponent, MapCellComponent, MapBorderComponent, CompassRoseComponent, MapCellDetailsComponent, MapUpdateComponent, MapUpdateCellComponent,
+    MapUpdateRuinComponent, MapUpdateCitizensComponent
+];
 let pipes: Components = [
-    IsRuinPipe, DigLevelPipe, BorderLeft, BorderRight, BorderTop, BorderBottom, MyCellPipe, AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe,
-    CellDetailsLeftPipe, CellDetailsBottomPipe, CellDetailsRightPipe, CellDetailsTopPipe, CitizenNamesPipe, ItemDetailsPipe, RuinInCell
+    IsRuinPipe, DigLevelPipe, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop, ScrutBorderBottom, MyCellPipe, AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe,
+    CellDetailsLeftPipe, CellDetailsBottomPipe, CellDetailsRightPipe, CellDetailsTopPipe, RuinInCell, HasStillHeroicPipe, ItemsInBagsPipe, DistBorderBottom, DistBorderLeft,
+    DistBorderRight, DistBorderTop
 ];
 
 @NgModule({

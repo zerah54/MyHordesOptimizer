@@ -1,3 +1,4 @@
+import { RuinDTO } from "./dto/ruin.dto";
 import { Dictionary } from "./types/_types";
 
 export const EXTERNAL_APP_ID_KEY: string = 'external_app_id';
@@ -23,3 +24,14 @@ export const BREAKPOINTS: Dictionary<string> = {
     'gt-md': 'screen and (min-width: 1280px)',
     'gt-lg': 'screen and (min-width: 1920px)',
 }
+
+
+export const NO_RUIN: RuinDTO = {
+    id: 'none', camping: 0, label: { en: `None`, fr: 'Aucun', de: `Kein`, es: `TODO` }, chance: 0, description: { en: ``, fr: ``, de: ``, es: `` },
+    explorable: false, img: '', minDist: 1, maxDist: 1000, drops: []
+};
+export const NONDIG_RUIN: RuinDTO = {
+    id: 'nondig', camping: 8, label: { en: `Buried building`, fr: 'Bâtiment non déterré', de: `Verschüttete Ruine`, es: `Sector inexplotable` },
+    chance: 0, description: { en: ``, fr: ``, de: ``, es: `` }, explorable: false, img: 'burried', minDist: 1, maxDist: 1000, drops: []
+};
+

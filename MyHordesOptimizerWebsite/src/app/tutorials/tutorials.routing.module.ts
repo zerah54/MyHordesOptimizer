@@ -12,6 +12,7 @@ let routes: Routes = [
     { path: 'tutorials', redirectTo: 'tutorials/script/installation' },
     {
         path: 'tutorials', children: [
+            { path: 'script', redirectTo: 'script/installation' },
             {
                 path: 'script', children: [
                     { path: 'alerts', component: TutoScriptAlertsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Notifications` },
@@ -22,6 +23,7 @@ let routes: Routes = [
                     { path: 'wiki', component: TutoScriptWikiComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Wiki` },
                 ]
             },
+            { path: 'site', redirectTo: 'site/first-use' },
             {
                 path: 'site', children: [
                     { path: 'first-use', component: TutoSiteFirstUseComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Site` + ' - ' + $localize` diverses` },

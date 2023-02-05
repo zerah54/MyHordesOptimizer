@@ -2,19 +2,29 @@
     [class.never-visited]="cell.is_never_visited"
     [ngClass]="[options.map_type === 'danger' ? 'danger-' + cell.danger_level : '', 'dig-' + (cell|digLevel:options.dig_mode), cell.zone_regen ? cell.zone_regen.value.class : '']"
     [class.alert]="options.map_type === 'danger'" [class.digs]="options.map_type === 'digs'"
-    [class.border-left]="cell|borderLeft:options:drawedMap" [class.border-top]="cell|borderTop:options:drawedMap"
-    [class.border-right]="cell|borderRight:options:drawedMap"
-    [class.border-bottom]="cell|borderBottom:options:drawedMap" [class.my-cell]="cell|myCell" (click)="log(cell)">
-    <!-- (mouseenter)="current_cell = cell" (mouseleave)="current_cell = undefined" -->
+    [class.scrut-border-left]="cell|scrutBorderLeft:options:drawedMap"
+    [class.scrut-border-top]="cell|scrutBorderTop:options:drawedMap"
+    [class.scrut-border-right]="cell|scrutBorderRight:options:drawedMap"
+    [class.scrut-border-bottom]="cell|scrutBorderBottom:options:drawedMap">
+    <!-- (click)="openCellUpdate(cell)" (mouseenter)="current_cell = cell" (mouseleave)="current_cell = undefined"> -->
 
     <div *ngIf="cell.ruin_id" [class]="'ruin'">
         <span [class.empty-ruin]="cell.is_ruin_dryed">
             <ng-container *ngIf="cell | isRuin:allRuins">R</ng-container>
+            <ng-container *ngIf="cell.nb_ruin_dig">{{cell.nb_ruin_dig}} digs</ng-container>
         </span>
     </div>
 
     <div *ngIf="cell.is_dryed" [class]="'dried'">
     </div>
+
+    <div *ngIf="cell|myCell" [class]="'my-cell'">
+    </div>
+
+    <div [class.dist-border-left]="cell|distBorderLeft:options:drawedMap"
+    [class.dist-border-top]="cell|distBorderTop:options:drawedMap"
+    [class.dist-border-right]="cell|distBorderRight:options:drawedMap"
+    [class.dist-border-bottom]="cell|distBorderBottom:options:drawedMap"></div>
 
     <div class="content" *ngIf="!cell.is_town">
         <span class="corner-top-left corner">
@@ -26,17 +36,20 @@
             </ng-container>
         </span>
         <span class="corner-bottom-left corner">
-            <div *ngIf="options.map_type === 'danger'" [matBadge]="cell.nb_zombie_killed ? cell.nb_zombie_killed : 0" [matBadgeSize]="'small'" [matBadgePosition]="'after'">
+            <div *ngIf="options.map_type === 'danger'" [matBadge]="cell.nb_zombie_killed ? cell.nb_zombie_killed : 0"
+                [matBadgeSize]="'small'" [matBadgePosition]="'after'">
                 <img [src]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'">
             </div>
         </span>
         <span class="corner-bottom-right corner">
-            <div *ngIf="options.map_type === 'danger'" [matBadge]="cell.nb_zombie ? cell.nb_zombie : 0" [matBadgeSize]="'small'" [matBadgePosition]="'before'">
+            <div *ngIf="options.map_type === 'danger'" [matBadge]="cell.nb_zombie ? cell.nb_zombie : 0"
+                [matBadgeSize]="'small'" [matBadgePosition]="'before'">
                 <img [src]="HORDES_IMG_REPO + 'icons/small_zombie.gif'">
             </div>
         </span>
     </div>
 </td>
 
-<mho-map-cell-details *ngIf="current_cell" [cell]="current_cell" [allItems]="allItems" [allRuins]="allRuins" [cellHtml]="cellHtml" [allCitizens]="allCitizens">
+<mho-map-cell-details *ngIf="current_cell" [cell]="current_cell" [allItems]="allItems" [allRuins]="allRuins"
+    [cellHtml]="cellHtml" [allCitizens]="allCitizens">
 </mho-map-cell-details>

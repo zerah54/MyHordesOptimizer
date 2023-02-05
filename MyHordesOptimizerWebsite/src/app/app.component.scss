@@ -36,7 +36,7 @@ $snow-3: url('/assets/img/noel/s3.png');
 
         > .mat-sidenav,
         > .mho-content {
-            background-color: $sidenav_bg_color;
+            background-color: $sidenav_bg_color !important;
             border-width: 0;
         }
 

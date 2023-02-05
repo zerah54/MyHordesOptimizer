@@ -32,12 +32,18 @@ export class MapComponent implements OnInit {
 
     public options!: MapOptions;
 
+    public new_distance_option: Distance = {
+        value: 1,
+        unit: 'km'
+    }
+
     public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
 
     private readonly default_options: MapOptions = {
         map_type: 'digs',
         dig_mode: 'average',
-        displayed_scrut_zone: {}
+        displayed_scrut_zone: {},
+        distances: []
     }
 
     constructor(private breakpoint_observer: BreakpointObserver, private api: ApiServices) {
@@ -60,6 +66,51 @@ export class MapComponent implements OnInit {
 
         this.options = JSON.parse(localStorage.getItem('MAP_OPTIONS') || JSON.stringify(this.default_options));
         this.checkIfAllOptionsExist();
+    }
+
+    public addDistanceToList(): void {
+
+        this.new_distance_option.value = +this.new_distance_option.value;
+        /** On nettoie les options impossibles */
+        if (this.new_distance_option.unit === 'km') {
+            this.new_distance_option.round_trip = undefined;
+        }
+
+        let current_distances: Distance[] = [...this.options.distances];
+
+        const already_exists: boolean = [...current_distances].some((distance: Distance) => {
+            return distance.unit === this.new_distance_option.unit
+            && +distance.value === +this.new_distance_option.value
+            && distance.round_trip === this.new_distance_option.round_trip
+        })
+
+        /** Si il existe une option absolument identique, alors on n'ajoute rien */
+        if (already_exists && current_distances.length > 0) return;
+
+        /** Sinon, on ajoute à la liste */
+        current_distances.push({...this.new_distance_option});
+
+        this.changeOptions('distances', [...current_distances]);
+    }
+
+
+    public removeDistanceFromList(distance_to_remove: Distance): void {
+
+        let current_distances: Distance[] = [...this.options.distances];
+
+        const index: number = current_distances.findIndex((distance: Distance) => {
+            return distance.unit === distance_to_remove.unit
+            && +distance.value === +distance_to_remove.value
+            && distance.round_trip === distance_to_remove.round_trip
+        })
+
+        /** Si il n'existe pas d'option absolument identique, alors on ne retire rien */
+        if (index < 0) return;
+
+        /** Sinon, on retire de la liste */
+        current_distances.splice(index, 1);
+
+        this.changeOptions('distances', current_distances);
     }
 
     public changeOptions<T>(key: string, value: T): void {
@@ -87,4 +138,11 @@ export interface MapOptions {
     map_type: 'digs' | 'danger';
     dig_mode: 'max' | 'average';
     displayed_scrut_zone: Dictionary<boolean>;
+    distances: Distance[];
+}
+
+export interface Distance {
+    value: number;
+    unit: 'km' | 'pa';
+    round_trip?: boolean;
 }

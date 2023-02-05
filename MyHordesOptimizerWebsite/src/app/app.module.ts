@@ -29,8 +29,8 @@ let app_modules: Modules = [StructureModule, WikiModule, ThanksModule, ToolsModu
     declarations: [AppComponent],
     imports: [
         SharedModule,
-        AppRoutingModule,
         ...app_modules,
+        AppRoutingModule,
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },

@@ -8,11 +8,12 @@
     <mat-sidenav-container class="mho-map-sidenav-container">
 
         <mat-sidenav-content class="map-container">
-            <mho-draw-map [map]="map" [allItems]="all_items" [allRuins]="all_ruins" [options]="options" [allCitizens]="all_citizens"></mho-draw-map>
+            <mho-draw-map [map]="map" [allItems]="all_items" [allRuins]="all_ruins" [options]="options"
+                [allCitizens]="all_citizens"></mho-draw-map>
         </mat-sidenav-content>
         <mat-sidenav #sidenav class="map-settings" [position]="'end'" [mode]="is_gt_xs ? 'side' : 'over'">
             <h1 i18n>Paramètres</h1>
-<!--            <div>
+            <!--            <div>
                 <h2 i18n>Type de carte</h2>
                 <mat-chip-listbox>
                     <mat-chip (click)="changeOptions('map_type', 'danger')"
@@ -40,8 +41,49 @@
             </div>
             <div>
                 <h2 i18n>Afficher les zones du scrutateur</h2>
-                <div class="scrut_zones">
-                    <mho-compass-rose [selectedScrutZone]="options.displayed_scrut_zone" (selectedScrutZoneChange)="changeOptions('displayed_scrut_zone', $event)"></mho-compass-rose>
+                <div class="scrut-zones">
+                    <mho-compass-rose [selectedScrutZone]="options.displayed_scrut_zone"
+                        (selectedScrutZoneChange)="changeOptions('displayed_scrut_zone', $event)"></mho-compass-rose>
+                </div>
+            </div>
+            <div>
+                <h2 i18n>Afficher les zones en distance</h2>
+                <div class="dist-zones">
+                    <button mat-button [matMenuTriggerFor]="addZone">
+                        <mat-icon>add</mat-icon>
+                        <ng-container i18n>Ajouter une zone</ng-container>
+                    </button>
+                    <mat-menu #addZone="matMenu">
+                        <div (click)="$event.stopPropagation()" style="padding: 0.5em">
+                            <div style="display: flex; align-items: center">
+                                <mat-form-field style="width: calc(100% - 100px)">
+                                    <input matInput [(ngModel)]="new_distance_option.value" placeholder="Distance" i18n-placeholder>
+                                </mat-form-field>
+                                <mat-form-field style="width: 100px">
+                                    <mat-select [(ngModel)]="new_distance_option.unit" placeholder="Unité" i18n-placeholder>
+                                        <mat-option [value]="'km'" i18n>km</mat-option>
+                                        <mat-option [value]="'pa'" i18n>pa</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <ng-container *ngIf="new_distance_option.unit === 'pa'">
+                                <mat-checkbox [(ngModel)]="new_distance_option.round_trip" i18n>Aller / Retour</mat-checkbox>
+                            </ng-container>
+                            <button mat-button i18n (click)="addDistanceToList(); addZone.closed.next()">Ajouter</button>
+                        </div>
+                    </mat-menu>
+                    <mat-list>
+                        <mat-list-item *ngFor="let option of options.distances">
+                            <button mat-icon-button matListItemIcon (click)="removeDistanceFromList(option)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                            <div matListItemTitle>{{option.value}}&nbsp;{{option.unit}}</div>
+                            <div matListItemLine *ngIf="option.unit === 'pa'">
+                                <ng-container *ngIf="option.round_trip" i18n>Aller / Retour</ng-container>
+                                <ng-container *ngIf="!option.round_trip" i18n>Aller simple</ng-container>
+                            </div>
+                        </mat-list-item>
+                    </mat-list>
                 </div>
             </div>
         </mat-sidenav>
