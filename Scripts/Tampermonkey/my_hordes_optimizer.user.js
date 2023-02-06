@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.33
+// @version      1.0.0-beta.34
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,8 +35,8 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH][update] Déplacement du lien du site tout en haut de la liste des options (j'espère que cette fois tout le monde sera au courant qu'il existe 😊) \n\n`
-+ `[MH][fix] Correction du lien vers la doc utilisé dans tampermonkey`;
++ `[MH][new] Ajout d'une option pour recevoir des notifications navigateur en cas de changement dans le nombre de notifications MH\n\n`;
++ `[MH][fix] Correction d'un libellé dans les tooltips améliorés`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -94,6 +94,31 @@ const mho_display_map_id = 'mho-display-map';
 const mho_search_building_field_id = 'mho-search-building-field';
 const mho_display_translate_input_id = 'mho-display-translate-input';
 const mho_more_citizens_info_id = 'mho-more-citizens-info';
+
+//////////////////////////////////////
+// Les éléments récupérés via l'API //
+//////////////////////////////////////
+
+let items;
+let ruins;
+let recipes;
+let citizens;
+let hero_skills;
+let wishlist;;
+let parameters;
+
+///////////////////
+// Les variables //
+///////////////////
+
+let loading_count = 0;
+let is_refresh_wishlist;
+let dragged = {item: undefined, element: undefined};
+let count_pending_notifications;
+
+////////////////
+// Les textes //
+////////////////
 
 const texts = {
     website: {
@@ -204,6 +229,12 @@ const texts = {
         de: `Grabungsaktion fertig`,
         es: `La búsqueda ha finalizado`
     },
+    new_message: {
+        en: `You have %VAR% new message(s)`,
+        fr: `Vous avez %VAR% nouveau(x) message(s)`,
+        de: `Sie haben %VAR% neue Nachricht(en)`,
+        es: `Tienes %VAR% mensaje(s) nuevo(s)`
+    },
     nb_dead_zombies: {
         en: `Number of zombies that died here today`,
         fr: `Nombre de zombies morts sur cette case aujourd'hui`,
@@ -257,43 +288,6 @@ const texts = {
         fr: `Afficher uniquement les résultats exacts`,
         de: `Nur exakte Ergebnisse anzeigen`,
         es: `Mostrar sólo los resultados exactos`
-    },
-    prevention_estimation: {
-        en: `The attack estimation through this method was approved by certain members of the developer team.
-        Nonetheless, they have been warned about our methods, and they will correct the calculation mode.
-        This means that after the next update this feature won't be reliable`,
-        fr: `Attention : L'estimation de l'attaque par cette méthode a été approuvée par certains membres de l'équipe de développement.
-        Toutefois, ils ont été prévenus de notre méthode, et prévoient déjà de corriger le mode de calcul en fonction.
-        Par conséquent, il est probable que cette fonctionnalité ne soit plus fiable dès la prochaine mise à jour`,
-        de: `Achtung: Die Abschätzungsmethode wurde vom Entwicklungsteam zwar abgesegnet, wir wurden allerdings gewarnt dass eine Korretkur der Berechnung in Planung ist.
-        Es ist wahrscheinlich, dass diese Funktion ab dem nächsten Update nicht mehr zuverlässig funktioniert.`,
-        es: `¡Cuidado!: La estimación del ataque por este método fue aprobada por ciertos desarrolladores del juego.
-        Sin embargo, previnieron al equipo sobre nuestro método y preveen corregir el modo de cálculo.
-        En consecuencia, es probable que esta función no sea fiable a partir de la próxima actualización.`
-    },
-    estimate: {
-        en: `Estimate the attack`,
-        fr: `Estimer l'attaque`,
-        de: `Angriffsabschätzung`,
-        es: `Estimar el ataque`
-    },
-    current_day: {
-        en: `Current day`,
-        fr: `Jour actuel`,
-        de: `Aktueller Tag`,
-        es: `Día actual`
-    },
-    today_estimation: {
-        en: `Estimation for tonight's attack`,
-        fr: `Estimation pour l'attaque du soir`,
-        de: `Schätzung für den nächtlichen Angriff`,
-        es: `Estimación del ataque de hoy`
-    },
-    tomorrow_estimation: {
-        en: `Estimation for tomorrow's 's attack`,
-        fr: `Estimation pour l'attaque du lendemain`,
-        de: `Schätzung für den morgigen Angriff`,
-        es: `Estimación del ataque de mañana`
     },
     missing_ap_explanation: {
         en: `(including %VAR% for the building to stay overnight)`,
@@ -967,20 +961,8 @@ let tabs_list = {
         //     icon: repo_img_hordes_url + `icons/small_human.gif`,
         //     needs_town: true,
         // },
-        // {
-        //     ordering: 3,
-        //     id: `estimations`,
-        //     label: {
-        //         en: `Estimations`,
-        //         fr: `Estimations`,
-        //         de: `Schätzen`,
-        //         es: `Estimación`
-        //     },
-        //     icon: repo_img_hordes_url + `item/item_scope.gif`,
-        //     needs_town: true,
-        // }
         {
-            ordering: 4,
+            ordering: 3,
             id: `camping`,
             label: {
                 en: `Camping`,
@@ -1341,7 +1323,7 @@ let params_categories = [
             {
                 id: `notify_on_search_end`,
                 label: {
-                    en: `Notify me at the end of a search `,
+                    en: `Notify me at the end of a search`,
                     fr: `Me notifier à la fin de la fouille`,
                     de: `Mich Benachrichtigen am Ende einer Grabungsaktion`,
                     es: `Notificarme al final de la búsquedas`
@@ -1351,6 +1333,22 @@ let params_categories = [
                     fr: `Permet de recevoir une notification lorsque la fouille est terminée si la page n'a pas été quittée entre temps`,
                     de: `Ermöglicht den Erhalt einer Benachrichtigung wann eine Grabungsaktion endet wenn die Seite in der Zwischenzeit nicht geschlossen wurde`,
                     es: `Permite recibir una notificación al terminar una búsqueda si la página no ha sido cerrada entre tanto`
+                },
+                parent_id: null
+            },
+            {
+                id: `notify_on_new_msg`,
+                label: {
+                    en: `Notify me if I receive a new message`,
+                    fr: `Me notifier si je reçois un nouveau message`,
+                    de: `Benachrichtigen Sie mich, wenn ich eine neue Nachricht erhalte`,
+                    es: `Notificarme si recibo un mensaje nuevo`
+                },
+                help: {
+                    en: `Allows to receive a notification in case of reception of a new notification changing the count of notifications of the game`,
+                    fr: `Permet de recevoir une notification en cas de réception d'une nouvelle notification faisant changer le compteur de notifications du jeu`,
+                    de: `Ermöglicht den Erhalt einer Benachrichtigung im Falle des Empfangs einer neuen Benachrichtigung, die die Anzahl der Benachrichtigungen des Spiels ändert`,
+                    es: `Permite recibir una notificación en caso de recibir una nueva notificación cambiando el conteo de notificaciones del juego`
                 },
                 parent_id: null
             }
@@ -1441,23 +1439,6 @@ const town_type = [
     {id: 're', label: {de: 'Entfernte Regionen', en: 'Distant Region', es: 'Leyenda', fr: 'Région éloignée'}},
     {id: 'pande', label: {de: 'Pandämonium', en: 'Pandemonium', es: 'Pandemonio', fr: 'Pandémonium'}}
 ];
-
-//////////////////////////////////////
-// Les éléments récupérés via l'API //
-//////////////////////////////////////
-
-let loading_count = 0;
-
-let items;
-let ruins;
-let recipes;
-let citizens;
-let hero_skills;
-let wishlist;;
-let parameters;
-
-let is_refresh_wishlist;
-let dragged = {item: undefined, element: undefined};
 
 /////////////////////////////////////////
 // Fonctions utiles / Useful functions //
@@ -1601,6 +1582,8 @@ function calculateDespairDeaths(nb_killed_zombies) {
 function initOptions() {
     preventFromLeaving();
     createDisplayMapButton();
+
+    count_pending_notifications = document.querySelector('#postbox-new-msg-counter')?.innerText;
 }
 
 /**
@@ -2112,9 +2095,6 @@ function dispatchContent(window_type, tab) {
         case 'wishlist':
             displayWishlist();
             break;
-        case 'estimations':
-            displayEstimations();
-            break;
         case 'camping':
             displayCamping();
             break;
@@ -2578,116 +2558,6 @@ function displayCitizens() {
             }
         }
     });
-}
-
-/** Affiche le formulaire d'estimation de l'attaque */
-function displayEstimations() {
-    let tab_content = document.getElementById('tab-content');
-    let percents = [33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100];
-    let prevention = document.createElement('div');
-    prevention.innerText = getI18N(texts.prevention_estimation);
-    tab_content.appendChild(prevention);
-
-    let current_day_label = document.createElement('label');
-    current_day_label.style.marginTop = '1em';
-    current_day_label.style.marginRight = '1em';
-    current_day_label.innerText = getI18N(texts.current_day);
-    let current_day = document.createElement('input');
-    current_day.style.marginTop = '1em';
-    current_day.id = 'current-day';
-
-    tab_content.appendChild(current_day_label);
-    tab_content.appendChild(current_day);
-
-    let days = ['today_estimation', 'tomorrow_estimation']
-    let days_selector = document.createElement('div');
-    tab_content.appendChild(days_selector);
-    let radio = document.createElement('input');
-    days.forEach((day, index) => {
-        let div = document.createElement('div');
-        days_selector.appendChild(div);
-        let input = document.createElement('input');
-        div.appendChild(input);
-        input.checked = index === 0;
-        input.type = 'radio';
-        input.id = day;
-        input.name = 'today'
-        input.value = day;
-        let label = document.createElement('label');
-        div.appendChild(label);
-        label.htmlFor = day;
-        label.innerText = getI18N(texts[day]);
-    })
-
-
-    let ul = document.createElement('ul');
-    ul.style.display = 'block';
-    tab_content.appendChild(ul);
-    ul.innerHTML = `<li><span style="display: inline-block; width: 50px;"></span><span style="display: inline-block; width: 150px">Min</span><span style="display: inline-block; width: 150px">Max</span></li>`;
-    percents.forEach((percent) => {
-        let li = document.createElement('li');
-        li.classList.add('estimation');
-        ul.appendChild(li);
-        let percent_text = document.createElement('span');
-        percent_text.style.width = '50px';
-        percent_text.style.display = 'inline-block';
-        percent_text.innerText = percent + '%';
-        li.appendChild(percent_text);
-        let input_min = document.createElement('input');
-        input_min.style.width = '150px';
-        li.appendChild(input_min);
-        let input_max = document.createElement('input');
-        input_max.style.width = '150px';
-        li.appendChild(input_max);
-
-        input_min.addEventListener('paste', (event) => {
-            setTimeout(() => {
-                let paste_value = input_min.value;
-                if (paste_value.indexOf('-') > -1) {
-                    let values = paste_value.split('-');
-                    input_min.value = values[0];
-                    input_max.value = values[1];
-                }
-            });
-        })
-
-        input_max.addEventListener('paste', (event) => {
-            setTimeout(() => {
-                let paste_value = input_max.value;
-                if (paste_value.indexOf('-') > -1) {
-                    let values = paste_value.split('-');
-                    input_min.value = values[0];
-                    input_max.value = values[1];
-                }
-            });
-        })
-    })
-
-    let estimate_button = document.createElement('button');
-    ul.appendChild(estimate_button);
-    estimate_button.setAttribute('style', 'width: 350px; margin-left: 0.5em;');
-    estimate_button.classList.add('inline');
-    estimate_button.innerText = getI18N(texts.estimate);
-    estimate_button.addEventListener('click', () => {
-        let values_nodes = Array.from(tab_content.querySelectorAll('.estimation') || []);
-        let values = {};
-
-        let today = Array.from(days_selector.querySelectorAll('input') || []).find((radio) => radio.checked).id === 'today_estimation';
-        let current_day_value = document.querySelector('#current-day')?.value;
-        values_nodes.forEach((value, index) => {
-            let value_details = Array.from(value.querySelectorAll('input') || []).map((input) => input.value);
-            values[percents[index]] = value_details[0] && value_details[1] ? value_details.join(' - ') : ' ';
-        })
-
-        getTodayEstimation(current_day_value, values, today).then((response) => {
-            let bloc = document.querySelector('#mho-estimation-response');
-            bloc.innerText = response;
-        });
-    });
-
-    let response = document.createElement('p');
-    response.id = 'mho-estimation-response';
-    tab_content.appendChild(response);
 }
 
 /** Affiche le calcul des probabilités en camping */
@@ -3936,15 +3806,16 @@ function createAdvancedProperties(content, item, tooltip) {
     if (tooltip) {
         let stock_div = document.createElement('div');
         content.appendChild(stock_div);
-        let bank_div = document.createElement('div');
-        stock_div.appendChild(bank_div);
         stock_div.style.borderBottom = '1px solid white';
+
+        let bank_div = document.createElement('div');
         bank_div.innerText = getI18N(wishlist_headers[3].label) + ' : ' + item.bankCount;
+        stock_div.appendChild(bank_div);
 
         if (item.wishListCount && item.wishListCount > 0) {
             let wishlist_wanted_div = document.createElement('div');
             stock_div.appendChild(wishlist_wanted_div);
-            wishlist_wanted_div.innerText = getI18N(wishlist_headers[4].label) + ' : ' + item.wishListCount;
+            wishlist_wanted_div.innerText = getI18N(wishlist_headers[5].label) + ' : ' + item.wishListCount;
         }
     }
     if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0) return;
@@ -4930,6 +4801,21 @@ function notifyOnSearchEnd() {
             notifyOnSearchEnd();
         }
     }, 250);
+}
+
+function notifyOnNewMessage() {
+    if (mho_parameters.notify_on_new_msg) {
+        let counter = document.querySelector('#postbox-new-msg-counter');
+        if (counter && counter.innerText !== count_pending_notifications && counter.innerText !== '0') {
+            count_pending_notifications = counter.innerText;
+            GM_notification({
+                text: getI18N(texts.new_message).replace('%VAR%', count_pending_notifications),
+                title: GM_info.script.name,
+                highlight: true,
+                timeout: 0
+            });
+        }
+    }
 }
 
 /** Affiche le nombre de zombies morts aujourd'hui */
@@ -7725,33 +7611,6 @@ function getParameters() {
     });
 }
 
-/** Récupère la liste complète des recettes */
-function getTodayEstimation(day, estimations, today) {
-    return new Promise((resolve, reject) => {
-        startLoading();
-        GM.xmlHttpRequest({
-            method: 'POST',
-            url: api_url + `:8080/${today ? 'attaque' : 'planif'}.php?day=${day}&id=${mh_user.townDetails.townId}&type=normal&debug=false`,
-            data: JSON.stringify(estimations),
-            responseType: 'text',
-            onload: function(response){
-                if (response.status === 200) {
-                    resolve(response.response);
-                } else {
-                    addError(response);
-                    reject(response);
-                }
-                endLoading();
-            },
-            onerror: function(error){
-                endLoading();
-                addError(error);
-                reject(error);
-            }
-        });
-    });
-}
-
 /** Récupère le chemin optimal à partir d'une carte */
 function getOptimalPath(map, html, button) {
     return new Promise((resolve, reject) => {
@@ -8035,9 +7894,13 @@ function getDesertLogs() {
                         displayNbDeadZombies();
                         displayTranslateTool();
                         displayMoreCitizensInformations();
-                        displayCampingPredict();
+                        notifyOnNewMessage();
                         // blockUsersPosts();
                     }, 200);
+
+                    setInterval(() => {
+                        displayCampingPredict();
+                    }, 500)
 
                     setInterval(() => {
                         displayAdvancedTooltips();
