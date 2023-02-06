@@ -1,0 +1,10 @@
+import { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'fr.mho.companion',
+  appName: 'MyHordesOptimizerCompanion',
+  webDir: 'dist',
+  bundledWebRuntime: false
+};
+
+export default config;

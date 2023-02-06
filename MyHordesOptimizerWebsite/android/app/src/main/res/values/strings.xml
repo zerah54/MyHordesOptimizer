@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MyHordesOptimizerCompanion</string>
+    <string name="title_activity_main">MyHordesOptimizerCompanion</string>
+    <string name="package_name">fr.mho.companion</string>
+    <string name="custom_url_scheme">fr.mho.companion</string>
+</resources>
