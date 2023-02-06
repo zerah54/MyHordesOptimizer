@@ -51,13 +51,11 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
 
         public void Update()
         {
-            Dictionary<string, string> majHeaders = GetGHHeaders();
-
             var majBody = new GestHordesMajRequest()
             {
                 Key = UserKeyProvider.UserKey
             };
-            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}", body: majBody, customHeader: majHeaders, mediaTypeIn : "application/x-www-form-urlencoded");
+            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}", body: majBody, mediaTypeIn : "application/x-www-form-urlencoded");
         }
 
 
