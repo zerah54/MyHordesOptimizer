@@ -70,15 +70,15 @@ const HOUSE_LABELS: I18nLabels[] = [
 ]
 
 const HOUSE_LEVEL_DATA: HomeEnumData = { label: $localize`Habitation`, img: '', max_lvl: 8, options: HOUSE_LABELS };
-const HAS_ALARM_DATA: HomeEnumData = { label: $localize`Alarme rudimentaire `, img: '/home/alarm.gif', max_lvl: 1 };
-const CHEST_LEVEL_DATA: HomeEnumData = { label: $localize`Rangements`, img: '/home/chest.gif', max_lvl: 13 };
-const HAS_CURTAIN_DATA: HomeEnumData = { label: $localize`Gros rideau `, img: '/home/curtain.gif', max_lvl: 1 };
-const HOUSE_DEFENSE_DATA: HomeEnumData = { label: $localize`Renforts`, img: '/home/defense.gif', max_lvl: 10 };
-const KITCHEN_LEVEL_DATA: HomeEnumData = { label: $localize`Cuisine`, img: '/home/kitchen.gif', max_lvl: 4 };
-const LAB_LEVEL_DATA: HomeEnumData = { label: $localize`Cave laboratoire `, img: '/home/lab.gif', max_lvl: 4 };
-const REST_LEVEL_DATA: HomeEnumData = { label: $localize`Coin sieste `, img: '/home/rest.gif', max_lvl: 3 };
-const HAS_LOCK_DATA: HomeEnumData = { label: $localize`Verrou`, img: '/home/lock.gif', max_lvl: 1 };
-const HAS_FENCE_DATA: HomeEnumData = { label: $localize`Clôture`, img: '/home/fence.gif', max_lvl: 1 };
+const HAS_ALARM_DATA: HomeEnumData = { label: $localize`Alarme rudimentaire `, img: 'home/alarm.gif', max_lvl: 1 };
+const CHEST_LEVEL_DATA: HomeEnumData = { label: $localize`Rangements`, img: 'home/chest.gif', max_lvl: 13 };
+const HAS_CURTAIN_DATA: HomeEnumData = { label: $localize`Gros rideau `, img: 'home/curtain.gif', max_lvl: 1 };
+const HOUSE_DEFENSE_DATA: HomeEnumData = { label: $localize`Renforts`, img: 'home/defense.gif', max_lvl: 10 };
+const KITCHEN_LEVEL_DATA: HomeEnumData = { label: $localize`Cuisine`, img: 'home/kitchen.gif', max_lvl: 4 };
+const LAB_LEVEL_DATA: HomeEnumData = { label: $localize`Cave laboratoire `, img: 'home/lab.gif', max_lvl: 4 };
+const REST_LEVEL_DATA: HomeEnumData = { label: $localize`Coin sieste `, img: 'home/rest.gif', max_lvl: 3 };
+const HAS_LOCK_DATA: HomeEnumData = { label: $localize`Verrou`, img: 'home/lock.gif', max_lvl: 1 };
+const HAS_FENCE_DATA: HomeEnumData = { label: $localize`Clôture`, img: 'home/fence.gif', max_lvl: 1 };
 
 
 /** Type de champs de propriétés existants */
