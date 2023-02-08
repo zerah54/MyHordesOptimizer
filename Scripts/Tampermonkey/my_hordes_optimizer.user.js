@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.34
+// @version      1.0.0-beta.35
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,8 +35,7 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH][new] Ajout d'une option pour recevoir des notifications navigateur en cas de changement dans le nombre de notifications MH\n\n`;
-+ `[MH][fix] Correction d'un libellé dans les tooltips améliorés`;
++ `[MH][new] Ajout d'une option pour filtrer les destinataires des messages`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -92,6 +91,7 @@ const mho_copy_map_id = 'mho-copy-map';
 const mho_opti_map_id = 'mho-opti-map';
 const mho_display_map_id = 'mho-display-map';
 const mho_search_building_field_id = 'mho-search-building-field';
+const mho_search_recipient_field_id = 'mho-search-recipient-field';
 const mho_display_translate_input_id = 'mho-display-translate-input';
 const mho_more_citizens_info_id = 'mho-more-citizens-info';
 
@@ -270,6 +270,12 @@ const texts = {
         fr: `Rechercher un chantier`,
         de: `Baustelle suchen`,
         es: `Buscar una construcción`
+    },
+    search_recipient: {
+        en: `Find a recipient`,
+        fr: `Rechercher un destinataire`,
+        de: `Finden Sie einen Empfänger`,
+        es: `Encuentra un destinatario`
     },
     translation_file_context: {
         en: `Context (translation file)`,
@@ -1191,6 +1197,16 @@ let params_categories = [
                     fr: `Afficher un champ de recherche pour les chantiers`,
                     de: `Ein Suchfeld für Baustellen anzeigen`,
                     es: `Mostrar la barra buscadora para construcciones`
+                },
+                parent_id: null
+            },
+            {
+                id: `display_search_field_on_recipient_list`,
+                label: {
+                    en: `Display a search box for message recipients`,
+                    fr: `Afficher un champ de recherche pour les destinataires de messages`,
+                    de: `Zeigen Sie ein Suchfeld für Nachrichtenempfänger an`,
+                    es: `Mostrar un cuadro de búsqueda para los destinatarios del mensaje`
                 },
                 parent_id: null
             },
@@ -3496,6 +3512,51 @@ function displaySearchFieldOnBuildings() {
             header_mho_img.style.left = '-250px';
             search_field_container.appendChild(header_mho_img);
             tabs_block.insertBefore(search_field_container, tabs);
+        }
+    } else if (search_field) {
+        search_field.parentElement.remove();
+    }
+}
+
+/** Si l'option associée est activée, affiche un champ de recherche sur la liste des destinataires d'un message */
+function displaySearchFieldOnRecipientList() {
+    let search_field = document.getElementById(mho_search_recipient_field_id);
+    if (mho_parameters.display_search_field_on_recipient_list && pageIsHouse()) {
+        if (search_field) return;
+
+        let recipients = document.querySelector('#recipient_list');
+        if (recipients) {
+            let search_field_container = document.createElement('div');
+
+            search_field = document.createElement('input');
+            search_field.type = 'text';
+            search_field.id = mho_search_recipient_field_id;
+            search_field.placeholder = getI18N(texts.search_recipient);
+            search_field.classList.add('inline');
+            search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
+
+            let recipients_list = Array.from(document.querySelectorAll('.recipient.link') || []);
+
+            search_field.addEventListener('keyup', (event) => {
+                recipients_list.forEach((recipient) => {
+                    if (recipient.innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {
+                        recipient.classList.remove('hidden');
+                    } else {
+                        recipient.classList.add('hidden');
+                    }
+                });
+            });
+
+            search_field_container.appendChild(search_field);
+
+            let header_mho_img = document.createElement('img');
+            header_mho_img.src = mh_optimizer_icon;
+            header_mho_img.style.height = '24px';
+            header_mho_img.style.position = 'absolute';
+            header_mho_img.style.left = '4px';
+
+            search_field_container.appendChild(header_mho_img);
+            recipients.insertBefore(search_field_container, recipients.firstElementChild);
         }
     } else if (search_field) {
         search_field.parentElement.remove();
@@ -7888,6 +7949,7 @@ function getDesertLogs() {
                         createUpdateExternalToolsButton();
                         clickOnVotedToRedirect();
                         displaySearchFieldOnBuildings();
+                        displaySearchFieldOnRecipientList();
                         displayMinApOnBuildings();
                         displayWishlistInApp();
                         displayPriorityOnItems();
