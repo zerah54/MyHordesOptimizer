@@ -808,12 +808,15 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 var dropComplet = matchingComplet.Select(r => new { r.IdItem, r.DropWeight, r.DropProbability });
                 foreach (var drop in dropComplet)
                 {
-                    ruin.Drops.Add(new ItemResult()
+                    if(drop.IdItem != 0)
                     {
-                        Item = items.First(i => i.Id == drop.IdItem),
-                        Probability = drop.DropProbability,
-                        Weight = drop.DropWeight
-                    });
+                        ruin.Drops.Add(new ItemResult()
+                        {
+                            Item = items.First(i => i.Id == drop.IdItem),
+                            Probability = drop.DropProbability,
+                            Weight = drop.DropWeight
+                        });
+                    }             
                 }
             }
             return ruins;
