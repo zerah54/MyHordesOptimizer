@@ -22,7 +22,7 @@
                 (cellChange)="cell = $event"></mho-map-update-cell>
         </mat-tab>
         <mat-tab label="Bâtiment" i18n-label *ngIf="data.ruin">
-            <mho-map-update-ruin [ruin]="data.ruin"></mho-map-update-ruin>
+            <mho-map-update-ruin [ruin]="data.ruin" [allRuins]="data.all_ruins" [cell]="cell"></mho-map-update-ruin>
         </mat-tab>
         <mat-tab label="Citoyens" i18n-label *ngIf="cell.citizens && cell.citizens.length > 0">
             <mho-map-update-citizens [citizens]="cell.citizens | citizensFromShort:data.all_citizens"

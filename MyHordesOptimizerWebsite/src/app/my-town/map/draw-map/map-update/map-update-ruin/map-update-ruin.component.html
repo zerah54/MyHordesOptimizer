@@ -14,4 +14,18 @@
             </div>
         </div>
     </ng-container>
+    <ng-container *ngIf="ruin.id === -1">
+        <mat-divider></mat-divider>
+        <h4 i18n>Liste des bâtiments possibles</h4>
+        <mat-list>
+            <ng-container *ngFor="let ruin of (allRuins | filterRuinsByKm:cell.nb_km)">
+                <mat-list-item *ngIf="ruin.id > -1">
+                    <span matListItemTitle>{{ruin.label[locale]}}</span>
+                    <span matListItemLine>
+                        <ng-container i18n>Bonus en camping</ng-container>
+                        &nbsp;:&nbsp;{{ruin.camping}}</span>
+                </mat-list-item>
+            </ng-container>
+        </mat-list>
+    </ng-container>
 </div>

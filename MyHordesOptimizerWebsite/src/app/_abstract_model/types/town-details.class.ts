@@ -9,6 +9,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
     public town_max_y!: number;
     public is_devaste!: boolean;
     public day!: number;
+    public town_type!: "RE" | "RNE" | "PANDE";
 
     constructor(dto?: TownDetailsDTO) {
         super();
@@ -23,7 +24,8 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
             townMaxX: this.town_max_x,
             townMaxY: this.town_max_y,
             isDevaste: this.is_devaste,
-            day: this.day
+            day: this.day,
+            townType: this.town_type
         };
     };
 
@@ -36,6 +38,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
             this.town_max_y = dto.townMaxY;
             this.is_devaste = dto.isDevaste;
             this.day = dto.day;
+            this.town_type = dto.townType;
         }
     };
 }

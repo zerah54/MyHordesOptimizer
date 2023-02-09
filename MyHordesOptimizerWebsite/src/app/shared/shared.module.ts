@@ -17,12 +17,13 @@ import { LoadingOverlayService } from './services/loading-overlay.service';
 import { SnackbarService } from './services/snackbar.service';
 import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { DigsServices } from '../_abstract_model/services/digs.service';
+import { FilterRuinsByKmPipe } from './pipes/filter-ruins-by-km.pipe';
 
 let custom_modules: Modules = [MaterialModule, ElementsModule];
 let angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule]
 let services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService]
 let guards: Components = [IsInTownGuard];
-let pipes: Components = [ArrayItemDetailsPipe, CitizensFromShortPipe, ItemDetailsPipe];
+let pipes: Components = [ArrayItemDetailsPipe, CitizensFromShortPipe, ItemDetailsPipe, FilterRuinsByKmPipe];
 let external_modules: Modules = [TableVirtualScrollModule];
 
 @NgModule({
