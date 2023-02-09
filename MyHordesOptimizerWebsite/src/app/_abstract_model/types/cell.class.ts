@@ -1,5 +1,5 @@
 import { getDisplayedXFromArrayX, getDisplayedYFromArrayY } from 'src/app/shared/utilities/coordinates.util';
-import { CellDTO } from '../dto/cell.dto';
+import { CellDTO, SaveCellDTO } from '../dto/cell.dto';
 import { ZoneRegen } from '../enum/zone-regen.enum';
 import { Citizen } from './citizen.class';
 import { ItemCountShort } from './item-count-short.class';
@@ -64,6 +64,18 @@ export class Cell extends CommonModel<CellDTO> {
             nbKm: this.nb_km,
             nbPa: this.nb_pa,
             zoneRegen: this.zone_regen?.key,
+            citizens: modelToDtoArray(this.citizens)
+        };
+    }
+
+    public saveCellDTO(): SaveCellDTO {
+        return {
+            cellId: this.cell_id,
+            isDryed: this.is_dryed,
+            nbZombie: this.nb_hero,
+            nbZombieKilled: this.nb_zombie_killed,
+            isRuinCamped: this.is_ruin_camped,
+            items: modelToDtoArray(this.items),
             citizens: modelToDtoArray(this.citizens)
         };
     }

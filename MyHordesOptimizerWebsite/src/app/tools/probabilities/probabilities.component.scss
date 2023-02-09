@@ -1,0 +1,25 @@
+@import "variables.scss";
+
+.mho-probabilities {
+    .header, .chances {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        flex-wrap: wrap;
+    }
+
+    .header {
+        justify-content: space-between;
+    }
+
+    .chances {
+        min-width: 100px;
+        justify-content: left;
+        flex: 1;
+    }
+
+    .content {
+        display: flex;
+        gap: 0.5em;
+    }
+}

@@ -25,4 +25,12 @@
     .mho-tab-group {
         max-height: calc(65vh - 70px);
     }
+
+    .mho-cell-note {
+        min-width: 350px;
+
+        textarea {
+            min-height: 300px;
+        }
+    }
 }

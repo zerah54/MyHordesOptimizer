@@ -1,5 +1,5 @@
 export interface UpdateInfoDTO {
-    updateTime: string;
+    updateTime: Date;
     userId: string;
     userName: string;
     userKey: string;

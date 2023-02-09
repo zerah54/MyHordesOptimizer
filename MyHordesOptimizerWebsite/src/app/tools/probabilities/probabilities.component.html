@@ -1,0 +1,36 @@
+<mat-card-header>
+    <mat-card-title>
+        <ng-container i18n>Probabilités</ng-container>
+    </mat-card-title>
+</mat-card-header>
+<mat-card-content class="mho-probabilities">
+    <div class="header">
+        <mat-form-field>
+            <mat-label i18n>Nombre de personnes</mat-label>
+            <input matInput [(ngModel)]="nb_people" (ngModelChange)="calculateProbabilities()" [min]="1" [max]="40" type="number" placeholder="Nombre de personnes" i18n-placeholder>
+        </mat-form-field>
+    </div>
+    <div class="content">
+        <div class="chances">
+            <mat-form-field *ngFor="let people of [].constructor(nb_people)" appearance="outline">
+                <mat-label i18n>Chances de survie</mat-label>
+                <input matInput (change)="calculateProbabilities()" [value]="0" #chances [min]="0" [max]="100" type="number">
+                <span matSuffix style="margin-right: 0.5em;">%</span>
+            </mat-form-field>
+        </div>
+        <div class="results">
+            <table>
+                <thead>
+                    <th i18n>Nombre de morts</th>
+                    <th i18n>Probabilité</th>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let nb of [].constructor(nb_people + 1); let index = index">
+                        <th>{{index}}</th>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</mat-card-content>

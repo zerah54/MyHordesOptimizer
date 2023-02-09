@@ -15,22 +15,27 @@ import { ItemDetailsPipe } from './pipes/item-details.pipe';
 import { ClipboardService } from './services/clipboard.service';
 import { LoadingOverlayService } from './services/loading-overlay.service';
 import { SnackbarService } from './services/snackbar.service';
+import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
+import { DigsServices } from '../_abstract_model/services/digs.service';
 
 let custom_modules: Modules = [MaterialModule, ElementsModule];
 let angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule]
-let services: Components = [ApiServices, LoadingOverlayService, SnackbarService, ClipboardService]
+let services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService]
 let guards: Components = [IsInTownGuard];
 let pipes: Components = [ArrayItemDetailsPipe, CitizensFromShortPipe, ItemDetailsPipe];
+let external_modules: Modules = [TableVirtualScrollModule];
 
 @NgModule({
     declarations: [...pipes],
     imports: [
         ...angular_modules,
         ...custom_modules,
+        ...external_modules,
     ],
     exports: [
         ...angular_modules,
         ...custom_modules,
+        ...external_modules,
         ...pipes
     ],
     providers: [

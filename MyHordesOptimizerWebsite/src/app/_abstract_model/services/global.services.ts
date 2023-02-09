@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from "@angular/common/http";
-import { catchError, Observable, retry, throwError } from "rxjs";
+import { catchError, Observable, throwError } from "rxjs";
 import { SnackbarService } from './../../shared/services/snackbar.service';
 
 export class GlobalServices {

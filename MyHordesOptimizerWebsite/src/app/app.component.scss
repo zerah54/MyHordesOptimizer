@@ -55,6 +55,15 @@ $snow-3: url('/assets/img/noel/s3.png');
 
                 .mat-mdc-card-content {
                     overflow: auto;
+                    height: 100%;
+
+                    .mat-mdc-tab-group {
+                        height: 100%;
+
+                        .mat-mdc-tab-body-wrapper {
+                            height: 100%;
+                        }
+                    }
                 }
             }
         }

@@ -4,7 +4,7 @@ import { MatTable, MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { getTown } from 'src/app/shared/utilities/localstorage.util';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
-import { ApiServices } from 'src/app/_abstract_model/services/api.services';
+import { DigsServices } from 'src/app/_abstract_model/services/digs.service';
 import { CitizenInfo } from 'src/app/_abstract_model/types/citizen-info.class';
 import { Citizen } from 'src/app/_abstract_model/types/citizen.class';
 import { Dig } from 'src/app/_abstract_model/types/dig.class';
@@ -62,7 +62,7 @@ export class CitizensDigsComponent {
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: CitizenColumn) => column.id);
 
-    constructor(private api: ApiServices) {
+    constructor(private digs_api: DigsServices) {
 
     }
 
@@ -88,7 +88,7 @@ export class CitizensDigsComponent {
     }
 
     public deleteDig(dig_to_delete: Dig): void {
-        this.api.deleteDig(dig_to_delete).subscribe(() => {
+        this.digs_api.deleteDig(dig_to_delete).subscribe(() => {
             let delete_dig: number = this.digs.findIndex((dig: Dig) => {
                 return dig.cell_id === dig_to_delete?.cell_id
                     && dig.digger_id === dig_to_delete?.digger_id
@@ -102,7 +102,7 @@ export class CitizensDigsComponent {
 
     public updateDig(): void {
         if (this.dig_to_update) {
-            this.api.updateDig(this.dig_to_update).subscribe((new_dig: Dig) => {
+            this.digs_api.updateDig(this.dig_to_update).subscribe((new_dig: Dig) => {
                 let replace_dig: number = this.digs.findIndex((dig: Dig) => {
                     return dig.cell_id === new_dig?.cell_id
                         && dig.digger_id === new_dig?.digger_id
@@ -158,9 +158,7 @@ export class CitizensDigsComponent {
     }
 
     private getDigs(): void {
-        console.log('1');
-        this.api.getDigs().subscribe((digs: Dig[]) => {
-            console.log('3')
+        this.digs_api.getDigs().subscribe((digs: Dig[]) => {
             this.digs = digs;
             this.createDigsByCitizenAndDay();
         });

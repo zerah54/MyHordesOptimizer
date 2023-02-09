@@ -4,8 +4,9 @@
 
         <div class="add-remove">
             <img [src]="HORDES_IMG_REPO + 'icons/small_less.gif'" *ngIf="currentList.length > 0"
-                [mat-menu-trigger-for]="menuRemove">
-            <img [src]="HORDES_IMG_REPO + 'icons/small_more.gif'" [mat-menu-trigger-for]="menuAdd">
+                [matMenuTriggerFor]="remove_menu" [matMenuTriggerData]="{menuLabel: removeLabel, list: currentList, emptyLabel: emptyLabel}">
+            <img [src]="HORDES_IMG_REPO + 'icons/small_more.gif'" [matMenuTriggerFor]="add_menu"
+                [matMenuTriggerData]="{menuLabel: addLabel, list: completeList}">
         </div>
     </div>
     <div class="editable-container">
@@ -17,14 +18,15 @@
             </ng-container>
         </div>
         <div class="add-remove" *ngIf="!label">
-            <img [src]="HORDES_IMG_REPO + 'icons/small_more.gif'" [mat-menu-trigger-for]="menuAdd">
+            <img [src]="HORDES_IMG_REPO + 'icons/small_more.gif'" [matMenuTriggerFor]="add_menu"
+                [matMenuTriggerData]="{menuLabel: addLabel, list: completeList}">
             <img [src]="HORDES_IMG_REPO + 'icons/small_less.gif'" *ngIf="currentList.length > 0"
-                [mat-menu-trigger-for]="menuRemove">
+                [matMenuTriggerFor]="remove_menu" [matMenuTriggerData]="{menuLabel: removeLabel, list: currentList, emptyLabel: emptyLabel}">
         </div>
     </div>
 </div>
 
-<mat-menu #menuAdd="matMenu" class="menu-add">
+<!--<mat-menu #menuAdd="matMenu" class="menu-add">
     <div class="search" (click)="$event.stopPropagation()">
         <mat-form-field>
             <mat-label>{{addLabel}}</mat-label>
@@ -60,3 +62,4 @@
         <span>{{emptyLabel}}</span>
     </div>
 </mat-menu>
+-->

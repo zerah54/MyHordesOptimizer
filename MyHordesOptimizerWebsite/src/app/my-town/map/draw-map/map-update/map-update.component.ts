@@ -1,6 +1,7 @@
 import { Component, HostBinding, Inject, ViewEncapsulation } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import * as moment from 'moment';
+import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { Cell } from 'src/app/_abstract_model/types/cell.class';
 import { Citizen } from 'src/app/_abstract_model/types/citizen.class';
 import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
@@ -14,17 +15,22 @@ import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
 export class MapUpdateComponent {
     @HostBinding('style.display') display: string = 'contents';
 
+    /** La cellule potentiellement modifiée */
     public cell: Cell;
 
     public readonly locale: string = moment.locale();
 
-    constructor(@Inject(MAT_DIALOG_DATA) public data: MapUpdateData) {
-        this.cell = this.data.cell;
+    constructor(@Inject(MAT_DIALOG_DATA) public data: MapUpdateData, private api: ApiServices) {
+        this.cell = new Cell({ ...this.data.cell.modelToDto() });
+    }
+
+    saveCell(): void {
+        this.api.saveCell(this.cell);
     }
 }
 
-interface MapUpdateData {
+export interface MapUpdateData {
     cell: Cell;
     ruin?: Ruin;
-    citizens: Citizen[]
+    all_citizens: Citizen[];
 }

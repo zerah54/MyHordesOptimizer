@@ -1,4 +1,5 @@
-import { Component, HostBinding, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
@@ -19,18 +20,37 @@ export class MapUpdateCellComponent implements OnInit {
     @Input() cell!: Cell;
     @Input() citizens!: Citizen[];
 
+    @Output() cellChange: EventEmitter<Cell> = new EventEmitter()
+
     public all_items: Item[] = [];
+
+    public cell_form!: FormGroup;
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiServices, private fb: FormBuilder) {
 
     }
 
     public ngOnInit(): void {
         this.api.getItems().subscribe((all_items: Item[]) => {
             this.all_items = all_items;
+        })
+
+        this.cell_form = this.fb.group({
+            nb_zombies: [this.cell.nb_zombie],
+            nb_killed_zombies: [this.cell.nb_zombie_killed],
+            is_dryed: [this.cell.is_dryed],
+            items: [this.cell.items]
+        })
+
+        this.cell_form.valueChanges.subscribe((values: CellInfoUpdate) => {
+            this.cell.is_dryed = values.is_dryed;
+            this.cell.nb_zombie = +values.nb_zombies;
+            this.cell.nb_zombie_killed = +values.nb_killed_zombies;
+            this.cell.items = [...values.items];
+            this.cellChange.next(this.cell);
         })
     }
 
@@ -57,6 +77,8 @@ export class MapUpdateCellComponent implements OnInit {
                 cell.items.push(short_item);
                 cell.items = [...cell.items];
             }
+
+            this.cell_form.get('items')?.setValue([...cell.items]);
         }
     }
 
@@ -77,6 +99,8 @@ export class MapUpdateCellComponent implements OnInit {
                 cell.items[item_in_list_index].count--;
             }
             cell.items = [...cell.items];
+
+            this.cell_form.get('items')?.setValue([...cell.items]);
         }
     }
 
@@ -88,8 +112,17 @@ export class MapUpdateCellComponent implements OnInit {
     public emptyItems(cell: Cell): void {
         if (cell) {
             cell.items = [];
+
+            this.cell_form.get('items')?.setValue([...cell.items]);
         }
     }
 
 }
 
+
+interface CellInfoUpdate {
+    nb_zombies: number;
+    nb_killed_zombies: number,
+    is_dryed: boolean,
+    items: ItemCountShort[]
+}

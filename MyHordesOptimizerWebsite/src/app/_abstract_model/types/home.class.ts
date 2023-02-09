@@ -14,14 +14,14 @@ export class Home extends CommonModel<HomeDTO> {
 
     public modelToDto(): HomeDTO {
         return {
-            content: this.content.reduce((accumulator, key: HomeWithValue) => { return { ...accumulator, [key.element.getLabel()]: key.value } }, {}),
-            lastUpdateInfo: this.update_info.modelToDto()
+            content: this.content?.reduce((accumulator, key: HomeWithValue) => { return { ...accumulator, [key.element.getLabel()]: key.value } }, {}),
+            lastUpdateInfo: this.update_info?.modelToDto()
         };
     }
 
     protected dtoToModel(dto?: HomeDTO): void {
         if (dto) {
-            this.content = Object.keys(dto.content)
+            this.content = dto.content ? Object.keys(dto.content)
                 .map((key: string) => {
                     const element: HomeEnum = <HomeEnum>HomeEnum.getByKey(key);
                     return <HomeWithValue>{
@@ -37,7 +37,7 @@ export class Home extends CommonModel<HomeDTO> {
                         return 1;
                     }
                     return 0;
-                });
+                }) : [];
             this.update_info = new UpdateInfo(dto.lastUpdateInfo);
         }
     };

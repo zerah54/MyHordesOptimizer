@@ -5,6 +5,7 @@ import { Observable, Subscriber } from 'rxjs';
 import { getExternalAppId, getItemsWithExpirationDate, getRuinsWithExpirationDate, getTown, getUserId, setItemsWithExpirationDate, setRuinsWithExpirationDate, setTown, setUser } from 'src/app/shared/utilities/localstorage.util';
 import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { environment } from 'src/environments/environment';
+import { CellDTO } from '../dto/cell.dto';
 import { DigDTO } from '../dto/dig.dto';
 import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { ItemDTO } from '../dto/item.dto';
@@ -13,6 +14,7 @@ import { RecipeDTO } from '../dto/recipe.dto';
 import { RegenDTO } from '../dto/regen.dto';
 import { TownDTO } from '../dto/town.dto';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
+import { Cell } from '../types/cell.class';
 import { Citizen } from '../types/citizen.class';
 import { Dig } from '../types/dig.class';
 import { HeroSkill } from '../types/hero-skill.class';
@@ -106,10 +108,22 @@ export class ApiServices extends GlobalServices {
             isMyHordesOptimizer: 'api'
         };
 
-        super.post<any>(API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`, JSON.stringify({ tools: tools_to_update }))
+        let town_details: {
+            townX: number,
+            townY: number,
+            isDevaste: boolean,
+            townId: number
+        } = {
+            townX: getTown()?.town_x || 0,
+            townY: getTown()?.town_y || 0,
+            isDevaste: getTown()?.is_devaste || false,
+            townId: getTown()?.town_id || 0
+        };
+
+        super.post<any>(API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`, JSON.stringify({ map: {toolsToUpdate: tools_to_update}, townDetails: town_details }))
             .subscribe({
                 next: () => {
-                    this.snackbar.successSnackbar(`Les outils externes ont bien été mis à jour`);
+                    this.snackbar.successSnackbar($localize`Les outils externes ont bien été mis à jour`);
                 }
             });
     }
@@ -148,7 +162,7 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         sub.next(new WishlistInfo(response.body));
-                        this.snackbar.successSnackbar(`La liste de courses a bien été enregistrée`);
+                        this.snackbar.successSnackbar($localize`La liste de courses a bien été enregistrée`);
                     }
                 })
         })
@@ -164,7 +178,7 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: () => {
                         sub.next();
-                        this.snackbar.successSnackbar(`L'objet ${item.label[this.locale]} a bien été ajouté à la liste de courses`);
+                        this.snackbar.successSnackbar($localize`L'objet ${item.label[this.locale]} a bien été ajouté à la liste de courses`);
                     }
                 })
         })
@@ -322,46 +336,24 @@ export class ApiServices extends GlobalServices {
         })
     }
 
-    public getDigs(): Observable<Dig[]> {
-        return new Observable((sub: Subscriber<Dig[]>) => {
-            super.get<DigDTO[]>(API_URL + `/myhordesfetcher/MapDigs?townId=${getTown()?.town_id}`)
-                .subscribe({
-                    next: (response: HttpResponse<DigDTO[]>) => {
-                        console.log('2');
-                        sub.next(dtoToModelArray(Dig, response.body));
-                    }
-                })
-        })
-    }
-
-    public deleteDig(dig: Dig): Observable<void> {
-        return new Observable((sub: Subscriber<void>) => {
-            super.delete<void>(API_URL + `/myhordesfetcher/MapDigs?idCell=${dig.cell_id}&diggerId=${dig.digger_id}&day=${dig.day}`)
-                .subscribe({
-                    next: () => {
-                        sub.next();
-                    }
-                })
-        })
-    }
-
-    public updateDig(dig: Dig): Observable<Dig> {
-        return new Observable((sub: Subscriber<Dig>) => {
-            super.post<DigDTO>(API_URL + `/myhordesfetcher/MapDigs?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(dig.modelToDto()))
-                .subscribe({
-                    next: (response: DigDTO) => {
-                        sub.next(new Dig(response));
-                    }
-                })
-        })
-    }
-
     public getScrutList(): Observable<Regen[]> {
         return new Observable((sub: Subscriber<Regen[]>) => {
             super.get<RegenDTO[]>(API_URL + `/myhordesfetcher/MapUpdates?townid=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<RegenDTO[]>) => {
                         sub.next(dtoToModelArray(Regen, response.body));
+                    }
+                })
+        })
+    }
+
+    public saveCell(cell: Cell): Observable<Cell> {
+        console.log('cell', cell.saveCellDTO());
+        return new Observable((sub: Subscriber<Cell>) => {
+            super.post<CellDTO>(API_URL + `/myhordesfetcher/cell?townid=${getTown()?.town_id}`, JSON.stringify(cell.modelToDto()))
+                .subscribe({
+                    next: (response: CellDTO) => {
+                        sub.next(new Cell(response));
                     }
                 })
         })

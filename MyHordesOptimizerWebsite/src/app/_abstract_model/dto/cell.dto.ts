@@ -28,3 +28,13 @@ export interface CellDTO {
     nbPa: number;
     zoneRegen?: string;
 }
+
+export interface SaveCellDTO {
+    cellId: number;
+    isDryed: boolean;
+    nbZombie: number;
+    nbZombieKilled: number;
+    isRuinCamped: boolean;
+    items: ItemCountShortDTO[];
+    citizens: CitizenDTO[];
+}

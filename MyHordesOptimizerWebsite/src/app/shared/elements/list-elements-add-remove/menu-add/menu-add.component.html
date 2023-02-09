@@ -1,0 +1,17 @@
+<mat-menu #menuAdd="matMenu" class="mho-menu-add">
+    <ng-template matMenuContent let-menuLabel="menuLabel" let-list="list">
+        <div class="search" (click)="$event.stopPropagation()">
+            <mat-form-field>
+                <mat-label>{{menuLabel}}</mat-label>
+                <input matInput #searchItem>
+            </mat-form-field>
+        </div>
+        <div class="items">
+            <ng-container *ngFor="let item of list">
+                <img *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1"
+                    [src]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id); test()"
+                    [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+            </ng-container>
+        </div>
+    </ng-template>
+</mat-menu>

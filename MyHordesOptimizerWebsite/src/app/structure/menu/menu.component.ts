@@ -46,6 +46,7 @@ export class MenuComponent implements OnInit {
         {
             label: $localize`Outils`, lvl: 0, displayed: true, authorized: () => true, expanded: true, children: [
                 { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: () => true },
+                // { label: $localize`Probabilités`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: () => true },
             ]
         },
         {

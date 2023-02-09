@@ -20,9 +20,9 @@ export class Status extends CommonModel<StatusDTO> {
     public modelToDto(): StatusDTO {
         return {
             content: this.content,
-            icons: this.icons.map((status: StatusEnum) => status.key),
-            lastUpdateInfo: this.update_info.modelToDto(),
-            ghoulStatusLastUpdateInfo: this.ghoul_status_update_info.modelToDto(),
+            icons: this.icons?.map((status: StatusEnum) => status.key),
+            lastUpdateInfo: this.update_info?.modelToDto(),
+            ghoulStatusLastUpdateInfo: this.ghoul_status_update_info?.modelToDto(),
             isGhoul: this.is_ghoul,
             ghoulVoracity: this.ghoul_voracity,
         };

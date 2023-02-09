@@ -1,7 +1,10 @@
-import { Component, ElementRef, EventEmitter, HostBinding, ViewChild, ViewEncapsulation, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
+import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
+import { MenuAddComponent } from 'src/app/shared/elements/list-elements-add-remove/menu-add/menu-add.component';
+import { MenuRemoveComponent } from 'src/app/shared/elements/list-elements-add-remove/menu-remove/menu-remove.component';
 import { getUser } from 'src/app/shared/utilities/localstorage.util';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 import { StatusEnum } from 'src/app/_abstract_model/enum/status.enum';
@@ -20,6 +23,9 @@ import { UpdateInfo } from 'src/app/_abstract_model/types/update-info.class';
 export class CitizensListComponent {
     @HostBinding('style.display') display: string = 'contents';
 
+    @ViewChild(MenuAddComponent) menuAdd!: MenuAddComponent;
+    @ViewChild(MenuRemoveComponent) menuRemove!: MenuRemoveComponent;
+
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
     @ViewChild('filterInput') filterInput!: ElementRef;
@@ -36,6 +42,7 @@ export class CitizensListComponent {
     /** La liste des citoyens */
     public citizen_info!: CitizenInfo;
     /** La datasource pour le tableau */
+    // public datasource: TableVirtualScrollDataSource<Citizen> = new TableVirtualScrollDataSource();
     public datasource: MatTableDataSource<Citizen> = new MatTableDataSource();
     /** La liste complète des items */
     public all_items: Item[] = [];
@@ -90,12 +97,14 @@ export class CitizensListComponent {
      */
     public addItem(citizen_id: number, item_id: number): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
-        if (citizen) {
+        if (citizen && citizen.bag) {
             citizen.bag.items.push(<Item>this.all_items.find((item: Item) => item.id === item_id))
 
             this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.bag.update_info.username = getUser().username;
-                citizen.bag.update_info.update_time = update_info.update_time;
+                if (citizen.bag) {
+                    citizen.bag.update_info.username = getUser().username;
+                    citizen.bag.update_info.update_time = update_info.update_time;
+                }
             });
         }
     }
@@ -109,14 +118,16 @@ export class CitizensListComponent {
      */
     public removeItem(citizen_id: number, item_id: number): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
-        if (citizen) {
+        if (citizen && citizen.bag) {
             const item_in_datasource_index: number | undefined = citizen.bag.items.findIndex((item_in_bag: Item) => item_in_bag.id === item_id);
             if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
                 citizen.bag.items.splice(item_in_datasource_index, 1);
             }
             this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.bag.update_info.username = getUser().username;
-                citizen.bag.update_info.update_time = update_info.update_time;
+                if (citizen.bag) {
+                    citizen.bag.update_info.username = getUser().username;
+                    citizen.bag.update_info.update_time = update_info.update_time;
+                }
             });
         }
     }
@@ -128,11 +139,13 @@ export class CitizensListComponent {
      */
     public emptyBag(citizen_id: number): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
-        if (citizen) {
+        if (citizen && citizen.bag) {
             citizen.bag.items = [];
             this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.bag.update_info.username = getUser().username;
-                citizen.bag.update_info.update_time = update_info.update_time;
+                if (citizen.bag) {
+                    citizen.bag.update_info.username = getUser().username;
+                    citizen.bag.update_info.update_time = update_info.update_time;
+                }
             });
         }
     }
@@ -145,12 +158,14 @@ export class CitizensListComponent {
      */
     public addStatus(citizen_id: number, status_key: string): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
-        if (citizen) {
+        if (citizen && citizen.status) {
             citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status.key === status_key))
 
             this.api.updateStatus(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.status.update_info.username = getUser().username;
-                citizen.status.update_info.update_time = update_info.update_time;
+                if (citizen.status) {
+                    citizen.status.update_info.username = getUser().username;
+                    citizen.status.update_info.update_time = update_info.update_time;
+                }
             });
         }
     }
@@ -163,14 +178,16 @@ export class CitizensListComponent {
      */
     public removeStatus(citizen_id: number, status_key: string): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
-        if (citizen) {
+        if (citizen && citizen.status) {
             const existing_status_index: number | undefined = citizen.status.icons.findIndex((status: StatusEnum) => status.key === status_key);
             if (existing_status_index !== undefined && existing_status_index !== null && existing_status_index > -1) {
                 citizen.status.icons.splice(existing_status_index, 1);
             }
             this.api.updateStatus(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.status.update_info.username = getUser().username;
-                citizen.status.update_info.update_time = update_info.update_time;
+                if (citizen.status) {
+                    citizen.status.update_info.username = getUser().username;
+                    citizen.status.update_info.update_time = update_info.update_time;
+                }
             });
         }
     }
@@ -182,11 +199,13 @@ export class CitizensListComponent {
      */
     public emptyStatus(citizen_id: number): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
-        if (citizen) {
+        if (citizen && citizen.status) {
             citizen.status.icons = [];
             this.api.updateBag(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.status.update_info.username = getUser().username;
-                citizen.status.update_info.update_time = update_info.update_time;
+                if (citizen.status) {
+                    citizen.status.update_info.username = getUser().username;
+                    citizen.status.update_info.update_time = update_info.update_time;
+                }
             });
         }
     }
@@ -198,10 +217,12 @@ export class CitizensListComponent {
      */
     public updateHome(citizen_id: number): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
-        if (citizen) {
+        if (citizen && citizen.home !== undefined) {
             this.api.updateHome(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.home.update_info.username = getUser().username;
-                citizen.home.update_info.update_time = update_info.update_time;
+                if (citizen.home) {
+                    citizen.home.update_info.username = getUser().username;
+                    citizen.home.update_info.update_time = update_info.update_time;
+                }
             });
         }
     }
@@ -213,10 +234,12 @@ export class CitizensListComponent {
      */
     public updateActions(citizen_id: number): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
-        if (citizen) {
+        if (citizen && citizen.heroic_actions) {
             this.api.updateHeroicActions(citizen).subscribe((update_info: UpdateInfo) => {
-                citizen.heroic_actions.update_info.username = getUser().username;
-                citizen.heroic_actions.update_info.update_time = update_info.update_time;
+                if (citizen.heroic_actions) {
+                    citizen.heroic_actions.update_info.username = getUser().username;
+                    citizen.heroic_actions.update_info.update_time = update_info.update_time;
+                }
             });
         }
     }

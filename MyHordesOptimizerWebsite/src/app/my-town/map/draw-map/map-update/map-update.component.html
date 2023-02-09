@@ -2,7 +2,7 @@
     <h1>
         <ng-container *ngIf="data.ruin; else noRuin">{{data.ruin.label[locale]}}</ng-container>
         <ng-template #noRuin>
-            <ng-container *ngIf="data.cell.is_town; else noTown">
+            <ng-container *ngIf="cell.is_town; else noTown">
                 <ng-container i18n>Ville</ng-container>
             </ng-container>
         </ng-template>
@@ -16,15 +16,27 @@
 
 <div mat-dialog-content class="mho-map-update">
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="mho-tab-group">
-        <mat-tab label="Cellule" i18n-label *ngIf="!data.cell.is_town">
-            <mho-map-update-cell [cell]="data.cell" [citizens]="data.citizens"></mho-map-update-cell>
+        <mat-tab label="Cellule" i18n-label *ngIf="!cell.is_town">
+            <mho-map-update-cell [cell]="cell"
+                [citizens]="cell.citizens | citizensFromShort:data.all_citizens"
+                (cellChange)="cell = $event"></mho-map-update-cell>
         </mat-tab>
         <mat-tab label="Bâtiment" i18n-label *ngIf="data.ruin">
             <mho-map-update-ruin [ruin]="data.ruin"></mho-map-update-ruin>
         </mat-tab>
-        <mat-tab label="Citoyens" i18n-label *ngIf="data.cell.citizens && data.cell.citizens.length > 0">
-            <mho-map-update-citizens [citizens]="data.citizens"></mho-map-update-citizens>
+        <mat-tab label="Citoyens" i18n-label *ngIf="cell.citizens && cell.citizens.length > 0">
+            <mho-map-update-citizens [citizens]="cell.citizens | citizensFromShort:data.all_citizens"
+                (citizensChange)="cell.citizens = $event" [allCitizens]="data.all_citizens"></mho-map-update-citizens>
+        </mat-tab>
+        <mat-tab label="Notes" i18n-label *ngIf="!cell.is_town">
+            <mat-form-field class="mho-cell-note">
+                <textarea matInput></textarea>
+            </mat-form-field>
         </mat-tab>
     </mat-tab-group>
 </div>
 
+<div mat-dialog-actions [align]="'end'">
+    <button mat-button color="accent" mat-dialog-close>Annuler</button>
+    <button mat-raised-button color="accent" (click)="saveCell()">Enregistrer</button>
+</div>

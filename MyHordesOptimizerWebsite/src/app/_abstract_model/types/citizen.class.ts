@@ -11,20 +11,20 @@ import { CommonModel } from './_common.class';
 import { Dictionary } from './_types';
 
 export class Citizen extends CommonModel<CitizenDTO> {
-    public avatar!: string;
-    public home_message!: string;
+    public avatar?: string;
+    public home_message?: string;
     public id!: number;
-    public is_ghost: boolean = false;
-    public job!: JobEnum;
+    public is_ghost?: boolean;
+    public job?: JobEnum;
     public name!: string;
-    public nombre_jour_hero!: number;
-    public x!: number;
-    public y!: number;
-    public bag!: Bag;
-    public chest!: Bag;
-    public status!: Status;
-    public home!: Home;
-    public heroic_actions!: HeroicActions;
+    public nombre_jour_hero?: number;
+    public x?: number;
+    public y?: number;
+    public bag?: Bag;
+    public chest?: Bag;
+    public status?: Status;
+    public home?: Home;
+    public heroic_actions?: HeroicActions;
 
     constructor(dto?: CitizenDTO) {
         super();
@@ -38,50 +38,50 @@ export class Citizen extends CommonModel<CitizenDTO> {
             id: this.id,
             isGhost: this.is_ghost,
             jobName: '',
-            jobUid: this.job.key,
+            jobUid: this.job?.key,
             nombreJourHero: this.nombre_jour_hero,
             x: this.x,
             y: this.y,
             name: this.name,
-            bag: this.bag.modelToDto(),
-            chest: this.chest.modelToDto(),
-            status: this.status.modelToDto(),
-            home: this.home.modelToDto(),
-            actionsHeroic: this.heroic_actions.modelToDto()
+            bag: this.bag?.modelToDto(),
+            chest: this.chest?.modelToDto(),
+            status: this.status?.modelToDto(),
+            home: this.home?.modelToDto(),
+            actionsHeroic: this.heroic_actions?.modelToDto()
         }
     };
 
     public toCitizenBagDto(): { userId: number, objects: ShortItemCountDTO[] } {
         return {
             userId: this.id,
-            objects: this.bag.modelToDto().items.map((item: ItemCountDTO) => {
+            objects: this.bag?.modelToDto().items.map((item: ItemCountDTO) => {
                 return {
                     count: item.count,
                     id: item.item.id,
                     isBroken: item.isBroken
                 }
-            }),
+            }) || [],
         }
     }
 
     public toCitizenStatusDto(): { userId: number, status: string[] } {
         return {
             userId: this.id,
-            status: this.status.icons.map((icon: StatusEnum) => icon.key),
+            status: this.status?.icons.map((icon: StatusEnum) => icon.key) || [],
         }
     }
 
     public toCitizenHeroicActionsDto(): { userId: number, heroicActions: Dictionary<number | boolean> } {
         return {
             userId: this.id,
-            heroicActions: this.heroic_actions.content.reduce((accumulator, content: HeroicActionsWithValue) => { return { ...accumulator, [content.element.key]: content.value } }, {})
+            heroicActions: this.heroic_actions?.content.reduce((accumulator, content: HeroicActionsWithValue) => { return { ...accumulator, [content.element.key]: content.value } }, {}) || []
         }
     }
 
     public toCitizenHomeDto(): { userId: number, home: Dictionary<number | boolean> } {
         return {
             userId: this.id,
-            home: this.home.content.reduce((accumulator, content: HomeWithValue) => { return { ...accumulator, [content.element.key]: content.value } }, {})
+            home: this.home?.content.reduce((accumulator, content: HomeWithValue) => { return { ...accumulator, [content.element.key]: content.value } }, {}) || []
         }
     }
 
@@ -91,7 +91,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.home_message = dto.homeMessage;
             this.id = dto.id;
             this.is_ghost = dto.isGhost;
-            this.job = <JobEnum>JobEnum.getByKey(dto.jobUid);
+            this.job = dto.jobUid ? <JobEnum>JobEnum.getByKey(dto.jobUid) : undefined;
             this.nombre_jour_hero = dto.nombreJourHero;
             this.x = dto.x;
             this.y = dto.y;

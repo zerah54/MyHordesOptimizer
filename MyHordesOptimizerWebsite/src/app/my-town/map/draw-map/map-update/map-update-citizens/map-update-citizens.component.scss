@@ -10,6 +10,10 @@
                     vertical-align: middle;
                 }
             }
+
+            &.remove-citizen {
+                cursor: pointer;
+            }
         }
 
         thead {
@@ -18,5 +22,17 @@
             background-color: white;
         }
     }
+
 }
 
+
+.mho-add-citizen-list {
+    max-height: 300px;
+    > * {
+        cursor: pointer;
+
+        img {
+            margin-right: 0.5em;
+        }
+    }
+}

@@ -1,0 +1,22 @@
+@import "variables.scss";
+
+.mho-menu-remove {
+    padding: 8px !important;
+    .mat-mdc-menu-content {
+
+        .empty-bag {
+            display: flex;
+            align-items: center;
+        }
+
+        .items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25em;
+
+            >img {
+                cursor: pointer;
+            }
+        }
+    }
+}

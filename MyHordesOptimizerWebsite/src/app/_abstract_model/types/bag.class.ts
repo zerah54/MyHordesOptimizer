@@ -19,13 +19,13 @@ export class Bag extends CommonModel<BagDTO> {
         return {
             idBag: this.bag_id,
             items: this.toShortItemCountList(),
-            lastUpdateInfo: this.update_info.modelToDto()
+            lastUpdateInfo: this.update_info?.modelToDto()
         };
     }
 
     public toShortItemCountList(): ItemCountDTO[] {
         let short_items_count: ItemCountDTO[] = [];
-        this.items.forEach((item: Item) => {
+        this.items?.forEach((item: Item) => {
             let item_in_existing_list: ItemCountDTO | undefined = short_items_count.find((short_item_count: ItemCountDTO) => {
                 return short_item_count.item.id === item.id && short_item_count.isBroken === item.is_broken
             });

@@ -17,7 +17,7 @@ export class BankInfo extends CommonModel<BankInfoDTO> {
     public modelToDto(): BankInfoDTO {
         return {
             bank: modelArrayToDictionnary([], 'item.id'),
-            lastUpdateInfo: this.update_info.modelToDto()
+            lastUpdateInfo: this.update_info?.modelToDto()
         }
     };
 

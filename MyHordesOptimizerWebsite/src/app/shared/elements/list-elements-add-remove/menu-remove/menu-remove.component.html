@@ -1,0 +1,23 @@
+<mat-menu #menuRemove="matMenu" class="mho-menu-remove">
+    <ng-template matMenuContent let-menuLabel="menuLabel" let-list="list" let-emptyLabel="emptyLabel">
+        <div class="search" (click)="$event.stopPropagation()">
+            <mat-form-field>
+                <mat-label>{{menuLabel}}</mat-label>
+                <input matInput #searchItem>
+            </mat-form-field>
+        </div>
+        <div class="items">
+            <ng-container *ngFor="let item of list">
+                <ng-container
+                    *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1">
+                    <img [src]="HORDES_IMG_REPO + item.img" (click)="remove.next(item.id)"
+                        [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+                </ng-container>
+            </ng-container>
+        </div>
+        <div mat-menu-item class="empty-bag" (click)="empty.next()">
+            <img [src]="HORDES_IMG_REPO + 'icons/b_close.png'" style="margin-right: 0.5em">
+            <span>{{emptyLabel}}</span>
+        </div>
+    </ng-template>
+</mat-menu>
