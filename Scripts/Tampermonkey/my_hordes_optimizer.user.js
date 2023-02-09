@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.35
+// @version      1.0.0-beta.36
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,7 +35,7 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH][new] Ajout d'une option pour filtrer les destinataires des messages`;
++ `[MH][update] Ajout des chances de réussite du manuel dans le tooltip associé`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -4022,13 +4022,21 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             // ne pas afficher
             item_action.classList.remove('item-tag');
             break;
+        case 'hero_surv_1':
+            var days = mh_user.townDetails.day;
+            var success = Math.round((+days <= 3 ? 1 : Math.max(0.1, 1 - (+days * 0.025))) * 10000) / 100;
+            item_action.innerHTML = `${success}% de chances de réussir son manuel`;
+            break;
+        case 'hero_surv_2':
+            // ne pas afficher
+            item_action.classList.remove('item-tag');
+            break;
         case 'box_opener':
         case 'can_opener':
         case 'parcel_opener':
         case 'impoundable':
         case 'nw_ikea':
         case 'nw_armory':
-        case 'hero_surv_1':
         case 'food':
         case 'weapon':
         case 'drug':
@@ -4270,7 +4278,6 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'hero_tamer_1b':
         case 'hero_tamer_2':
         case 'hero_tamer_2b':
-        case 'hero_surv_2':
         case 'alarm_clock':
             item_action.classList.remove('item-tag');
             break;
