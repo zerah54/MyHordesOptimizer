@@ -110,7 +110,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             }
             mhoItems.ForEach(item =>
             {
-                if(listOfPrafDrops.TryGetValue(item.Uid, out var dropWeight))
+                if (listOfPrafDrops.TryGetValue(item.Uid, out var dropWeight))
                 {
                     item.DropRatePraf = dropWeight / totalWeightPraf;
                 }
@@ -270,6 +270,23 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             }
 
             // Enregistrer dans firebase
+            jsonRuins.Add(new MyHordesOptimizerRuin()
+            {
+                Id = -1,
+                Camping = 8,
+                Label = new Dictionary<string, string>()
+                {
+                      { "fr", "Bâtiment non déterré" },
+                      { "en", "Buried building" },
+                      { "de", "Verschüttete Ruine" },
+                      { "es", "Sector inexplotable" }
+                },
+                Chance = 0,
+                Explorable = false,
+                Img = "burried",
+                MinDist = 1,
+                MaxDist = 1000
+            });
             MyHordesOptimizerRepository.PatchRuins(jsonRuins);
         }
 

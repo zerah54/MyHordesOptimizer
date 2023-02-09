@@ -145,10 +145,6 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 maxPotentialRemainingDig = 0;
                             }
                             int? type = zone.Building?.Type;
-                            if (type.HasValue && type.Value == -1)
-                            {
-                                type = null;
-                            }
                             var cell = new MapCellModel()
                             {
                                 IdTown = townId,
