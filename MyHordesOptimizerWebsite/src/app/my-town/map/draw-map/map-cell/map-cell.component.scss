@@ -122,18 +122,17 @@ td.map-cell {
                 font-size: 10px;
 
                 &.corner {
-                    .mat-badge-content {
-                        height: 8px;
-                        width: 8px;
-                        font-size: 7px;
-                        line-height: 8px;
-                        font-weight: normal;
-                        background-color: white;
-                        color: black;
-                    }
-
                     img {
                         width: 12px;
+                    }
+
+                    .detail-value {
+                        color: white;
+                        position: absolute;
+                        bottom: -1px;
+                        text-shadow: #000000 1px 1px, #000000 -1px 1px, #000000 -1px -1px, #000000 1px -1px;
+                        font-size: 8px;
+                        right: 6px;
                     }
                 }
 
@@ -150,21 +149,11 @@ td.map-cell {
                 &.corner-bottom-left {
                     bottom: 0;
                     left: 0;
-
-                    .mat-badge-content {
-                        top: 2px;
-                        right: -2px;
-                    }
                 }
 
                 &.corner-bottom-right {
                     bottom: 0;
                     right: 0;
-
-                    .mat-badge-content {
-                        top: 5px;
-                        left: -3px;
-                    }
                 }
             }
         }
@@ -252,6 +241,13 @@ td.map-cell {
                 }
             }
 
+            .nb-digs {
+                position: absolute;
+                bottom: 0;
+                right: 6px;
+                text-shadow: #000000 1px 1px, #000000 -1px 1px, #000000 -1px -1px, #000000 1px -1px;
+                font-size: 10px;
+            }
         }
     }
 }

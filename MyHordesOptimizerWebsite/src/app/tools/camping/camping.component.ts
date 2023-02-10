@@ -7,7 +7,7 @@ import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 import { JobEnum } from 'src/app/_abstract_model/enum/job.enum';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { dtoToModelArray } from 'src/app/_abstract_model/types/_common.class';
-import { HORDES_IMG_REPO, NONDIG_RUIN, NO_RUIN } from './../../_abstract_model/const';
+import { HORDES_IMG_REPO, NO_RUIN } from './../../_abstract_model/const';
 import { Ruin } from './../../_abstract_model/types/ruin.class';
 import { Dictionary } from './../../_abstract_model/types/_types';
 
@@ -84,7 +84,7 @@ export class CampingComponent implements OnInit {
     ];
     public readonly jobs: JobEnum[] = JobEnum.getAllValues();
 
-    private readonly added_ruins: Ruin[] = dtoToModelArray(Ruin, [NO_RUIN, NONDIG_RUIN]);
+    private readonly added_ruins: Ruin[] = dtoToModelArray(Ruin, [NO_RUIN]);
 
     /** @see CitizenHandler > getCampingValues > $distance_map */
     private readonly distance_map: Dictionary<number> = {

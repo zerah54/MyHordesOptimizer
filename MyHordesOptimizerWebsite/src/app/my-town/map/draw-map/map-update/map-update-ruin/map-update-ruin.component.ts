@@ -1,6 +1,7 @@
 import { Component, HostBinding, Input } from '@angular/core';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
+import { Cell } from 'src/app/_abstract_model/types/cell.class';
 import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
 
 @Component({
@@ -12,6 +13,8 @@ export class MapUpdateRuinComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input() ruin!: Ruin;
+    @Input() allRuins!: Ruin[];
+    @Input() cell!: Cell;
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();

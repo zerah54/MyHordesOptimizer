@@ -5,7 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
-import { HORDES_IMG_REPO, NONDIG_RUIN } from './../../_abstract_model/const';
+import { HORDES_IMG_REPO } from './../../_abstract_model/const';
 import { RuinItem } from './../../_abstract_model/types/ruin-item.class';
 
 @Component({
@@ -56,7 +56,7 @@ export class RuinsComponent implements OnInit {
 
     ngOnInit(): void {
         this.api.getRuins().subscribe((ruins: Ruin[]) => {
-            this.ruins = ruins.concat(new Ruin(NONDIG_RUIN));
+            this.ruins = ruins;
             this.ruins_filters_change.subscribe(() => {
                 this.datasource.filter = JSON.stringify(this.ruins_filters);
             });

@@ -33,4 +33,5 @@ export interface MapUpdateData {
     cell: Cell;
     ruin?: Ruin;
     all_citizens: Citizen[];
+    all_ruins: Ruin[];
 }

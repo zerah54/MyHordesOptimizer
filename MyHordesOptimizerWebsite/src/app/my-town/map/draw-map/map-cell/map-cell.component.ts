@@ -37,11 +37,13 @@ export class MapCellComponent {
     }
 
     public openCellUpdate(cell: Cell): void {
+        console.log('cell', cell);
         if (!environment.production) {
             this.dialog.open(MapUpdateComponent, {
                 data: <MapUpdateData>{
                     cell: cell,
                     ruin: cell.ruin_id ? this.allRuins.find((ruin: Ruin) => ruin.id === cell.ruin_id) : undefined,
+                    all_ruins: this.allRuins,
                     all_citizens: this.allCitizens
                 }
             });
