@@ -32,8 +32,9 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
 
         void PatchCitizen(int townId, CitizensWrapper citizens);
         void PatchCitizenDetail(TownCitizenDetailModel citizenDetail);
+
         CitizensWrapper GetCitizens(int townId);
-        void UpdateCitizenLocation(int townId, int x, int y, IEnumerable<int> citizenId);
+        void UpdateCitizenLocation(int townId, int x, int y, IEnumerable<int> citizenId, int lastUpdateInfoId);
 
 
         void AddItemToWishlist(int townId, int itemId, int userId);
@@ -66,7 +67,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PatchParameter(ParametersModel model);
 
 
-        void PatchMapCell(int townId, IEnumerable<MapCellModel> listCells);
+        void PatchMapCell(int townId, IEnumerable<MapCellModel> listCells, bool forceUpdate);
         MapCellCompletModel GetCell(int townId, int x, int y);
         IEnumerable<MapCellCompletModel> GetCells(int townId);
         void PatchMapCellItem(int townId, IEnumerable<MapCellItemModel> listCellItems);

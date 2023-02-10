@@ -94,6 +94,7 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<ITranslationService, TranslationService>();
             services.AddSingleton<IMyHordesRuineService, MyHordesRuineService>();
             services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimizerParametersService>();
+            services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
 
             services.AddHttpLogging(logging =>
             {

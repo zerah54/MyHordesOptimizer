@@ -659,8 +659,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
                               WHERE tc.idTown = @idTown";
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             var citizens = connection.Query<TownCitizenBagItemCompletModel>(query, new { idTown = townId });
-            var mostRecent = citizens.Max(x => x.LastUpdateDateUpdate);
-            citizens = citizens.Where(x => x.LastUpdateDateUpdate == mostRecent);
             connection.Close();
 
 
@@ -701,7 +699,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return citizenWrapper;
         }
 
-        public void UpdateCitizenLocation(int townId, int x, int y, IEnumerable<int> citizenId)
+        public void UpdateCitizenLocation(int townId, int x, int y, IEnumerable<int> citizenId, int lastUpdateInfoId)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
@@ -709,13 +707,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             param.Add($"@PositionX", x);
             param.Add($"@PositionY", y);
             param.Add($"@IdTown", townId);
+            param.Add($"@lastUpdateInfoId", lastUpdateInfoId);
             var inParamList = new List<string>();
             foreach (var id in citizenId)
             {
                 inParamList.Add($"@{id}");
                 param.Add($"@{id}", id);
             }
-            var query = $"UPDATE TownCitizen SET positionX = @positionX, positionY = @positionY WHERE idUser IN ({string.Join(",", inParamList)}) AND idTown = @idTown";
+            var query = $"UPDATE TownCitizen SET positionX = @positionX, positionY = @positionY, idLastUpdateInfo = @lastUpdateInfoId WHERE idUser IN ({string.Join(",", inParamList)}) AND idTown = @idTown";
             connection.Query(query, param);
             connection.Close();
         }
@@ -808,7 +807,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 var dropComplet = matchingComplet.Select(r => new { r.IdItem, r.DropWeight, r.DropProbability });
                 foreach (var drop in dropComplet)
                 {
-                    if(drop.IdItem != 0)
+                    if (drop.IdItem != 0)
                     {
                         ruin.Drops.Add(new ItemResult()
                         {
@@ -816,7 +815,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                             Probability = drop.DropProbability,
                             Weight = drop.DropWeight
                         });
-                    }             
+                    }
                 }
             }
             return ruins;
@@ -1153,7 +1152,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #region MapCells
 
-        public void PatchMapCell(int townId, IEnumerable<MapCellModel> listCells)
+        public void PatchMapCell(int townId, IEnumerable<MapCellModel> listCells, bool forceUpdate)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
@@ -1171,9 +1170,26 @@ namespace MyHordesOptimizerApi.Repository.Impl
                             prop.SetValue(cell, prop.GetValue(existingCell));
                         }
                     }
+                    if (cell.AveragePotentialRemainingDig < 1 && (cell.IsDryed.HasValue && !cell.IsDryed.Value))
+                    {
+                        cell.AveragePotentialRemainingDig = 1;
+                    }
+                    if (cell.MaxPotentialRemainingDig < 1 && (cell.IsDryed.HasValue && !cell.IsDryed.Value))
+                    {
+                        cell.MaxPotentialRemainingDig = 1;
+                    }
+                    if (cell.IsDryed.HasValue && cell.IsDryed.Value)
+                    {
+                        cell.AveragePotentialRemainingDig = 0;
+                        cell.MaxPotentialRemainingDig = 0;
+                    }
                 }
             }
-            var toUpdate = listCells.Except(existings, new CellModelComparer());
+            var toUpdate = listCells;
+            if(!forceUpdate)
+            {
+                toUpdate = listCells.Except(existings, new CellModelComparer());
+            }
             connection.BulkInsertOrUpdate("MapCell", toUpdate);
             connection.Close();
         }
