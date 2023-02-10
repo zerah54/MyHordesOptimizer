@@ -283,6 +283,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                                     {
                                         itemToAdd = Convert.ToInt32(Math.Ceiling(((float)itemToAdd - 1.0) / 2.0));
                                     }
+                                    if(regen == RegenDirectionEnum.All)
+                                    {
+                                        itemToAdd = itemToAdd / 8;
+                                    }
                                     cell.MaxPotentialRemainingDig = max + itemToAdd;
                                 }
 

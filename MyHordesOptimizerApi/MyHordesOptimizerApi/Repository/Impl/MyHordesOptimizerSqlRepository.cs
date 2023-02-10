@@ -1174,6 +1174,17 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 }
             }
             var toUpdate = listCells.Except(existings, new CellModelComparer());
+            foreach(var cell in toUpdate)
+            {
+                if(cell.AveragePotentialRemainingDig < 1 && (cell.IsDryed.HasValue && !cell.IsDryed.Value))
+                {
+                    cell.AveragePotentialRemainingDig = 1;
+                }
+                if (cell.MaxPotentialRemainingDig < 1 && (cell.IsDryed.HasValue && !cell.IsDryed.Value))
+                {
+                    cell.MaxPotentialRemainingDig = 1;
+                }
+            }
             connection.BulkInsertOrUpdate("MapCell", toUpdate);
             connection.Close();
         }
