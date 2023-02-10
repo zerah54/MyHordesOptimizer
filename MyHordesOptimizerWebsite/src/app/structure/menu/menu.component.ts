@@ -36,17 +36,17 @@ export class MenuComponent implements OnInit {
     public routes: SidenavLinks[] = [
         {
             label: $localize`Ma ville`, lvl: 0, displayed: true, authorized: () => this.isInTown(), expanded: true, children: [
-                { label: $localize`Banque`, path: 'my-town/bank', displayed: true, lvl: 1, authorized: () => this.isInTown() },
-                { label: $localize`Liste de courses`, path: 'my-town/wishlist', displayed: true, lvl: 1, authorized: () => this.isInTown() },
                 { label: $localize`Citoyens`, path: 'my-town/citizens', displayed: true, lvl: 1, authorized: () => this.isInTown() },
                 { label: $localize`Carte des fouilles`, path: 'my-town/map', displayed: true, lvl: 1, authorized: () => this.isInTown() },
+                { label: $localize`Banque`, path: 'my-town/bank', displayed: true, lvl: 1, authorized: () => this.isInTown() },
+                { label: $localize`Liste de courses`, path: 'my-town/wishlist', displayed: true, lvl: 1, authorized: () => this.isInTown() },
                 { label: $localize`Statistiques`, path: 'my-town/stats', displayed: true, lvl: 1, authorized: () => this.isInTown() },
             ]
         },
         {
             label: $localize`Outils`, lvl: 0, displayed: true, authorized: () => true, expanded: true, children: [
                 { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: () => true },
-                // { label: $localize`Probabilités`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: () => true },
+                { label: $localize`Probabilités`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: () => true },
             ]
         },
         {

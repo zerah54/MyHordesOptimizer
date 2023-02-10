@@ -7,9 +7,8 @@ import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 import { JobEnum } from 'src/app/_abstract_model/enum/job.enum';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { dtoToModelArray } from 'src/app/_abstract_model/types/_common.class';
-import { HORDES_IMG_REPO, NO_RUIN } from './../../_abstract_model/const';
+import { CAMPINGS_MAP, DISTANCE_MAP, HIDDEN_CAMPERS_MAP, HORDES_IMG_REPO, NO_RUIN } from './../../_abstract_model/const';
 import { Ruin } from './../../_abstract_model/types/ruin.class';
-import { Dictionary } from './../../_abstract_model/types/_types';
 
 @Component({
     selector: 'mho-camping',
@@ -86,94 +85,6 @@ export class CampingComponent implements OnInit {
 
     private readonly added_ruins: Ruin[] = dtoToModelArray(Ruin, [NO_RUIN]);
 
-    /** @see CitizenHandler > getCampingValues > $distance_map */
-    private readonly distance_map: Dictionary<number> = {
-        1: -24,
-        2: -19,
-        3: -14,
-        4: -11,
-        5: -9,
-        6: -9,
-        7: -9,
-        8: -9,
-        9: -9,
-        10: -9,
-        11: -9,
-        12: -8,
-        13: -7.6,
-        14: -7,
-        15: -6,
-        16: -5 // 16 et +
-    }
-
-
-    /** @see CitizenHandler > getCampingValues > $campings_map */
-    private readonly campings_map: Dictionary<Dictionary<Dictionary<number>>> = {
-        normal: {
-            nonpro: {
-                0: 0,
-                1: -4,
-                2: -9,
-                3: -13,
-                4: -16,
-                5: -26,
-                6: -36,
-                7: -50, // Totally arbitrary
-                8: -65, // Totally arbitrary
-                9: -80 // Totally arbitrary // 9 et +
-            },
-            pro: {
-                0: 0,
-                1: -2,
-                2: -4,
-                3: -8,
-                4: -10,
-                5: -12,
-                6: -16,
-                7: -26,
-                8: -36,
-                9: -60 // Totally arbitrary // 9 et +
-            }
-        },
-        pande: {
-            nonpro: {
-                0: 0,
-                1: -4,
-                2: -6,
-                3: -8,
-                4: -10,
-                5: -20,
-                6: -36,
-                7: -50,
-                8: -65,
-                9: -80 // 9 et +
-            },
-            pro: {
-                0: 0,
-                1: -1,
-                2: -2,
-                3: -4,
-                4: -6,
-                5: -8,
-                6: -10,
-                7: -20,
-                8: -36,
-                9: -60 // 9 et +
-            }
-        },
-    };
-
-    /** @see CitizenHandler > getCampingValues > $campers_map */
-    private readonly hidden_campers_map: Dictionary<number> = {
-        0: 0,
-        1: 0,
-        2: -2,
-        3: -6,
-        4: -10,
-        5: -14,
-        6: -20,
-        7: -26
-    };
 
 
     constructor(private api: ApiServices, private fb: UntypedFormBuilder, private route: ActivatedRoute, private clipboard: ClipboardService, private router: Router,
@@ -247,15 +158,15 @@ export class CampingComponent implements OnInit {
         chances += zombies_factor * 100 * this.configuration_form.get('zombies')?.value;
 
         /** Nombre de campings */
-        let nb_camping_town_type_mapping = (<TownType>this.configuration_form.get('town')?.value)?.id === 'pande' ? this.campings_map['pande'] : this.campings_map['normal'];
+        let nb_camping_town_type_mapping = (<TownType>this.configuration_form.get('town')?.value)?.id === 'pande' ? CAMPINGS_MAP['pande'] : CAMPINGS_MAP['normal'];
         let nb_camping_mapping = this.configuration_form.get('pro')?.value ? nb_camping_town_type_mapping['pro'] : nb_camping_town_type_mapping['nonpro'];
         chances += (this.configuration_form.get('campings')?.value > 9 ? nb_camping_mapping[9] : nb_camping_mapping[this.configuration_form.get('campings')?.value]) * 100;
 
         /** Distance de la ville */
-        chances += (this.configuration_form.get('distance')?.value > 16 ? this.distance_map[16] : this.distance_map[this.configuration_form.get('distance')?.value]) * 100;
+        chances += (this.configuration_form.get('distance')?.value > 16 ? DISTANCE_MAP[16] : DISTANCE_MAP[this.configuration_form.get('distance')?.value]) * 100;
 
         /** Nombre de personnes déjà cachées */
-        chances += (this.configuration_form.get('hidden_campers')?.value > 7 ? this.hidden_campers_map[7] : this.hidden_campers_map[this.configuration_form.get('hidden_campers')?.value]) * 100;
+        chances += (this.configuration_form.get('hidden_campers')?.value > 7 ? HIDDEN_CAMPERS_MAP[7] : HIDDEN_CAMPERS_MAP[this.configuration_form.get('hidden_campers')?.value]) * 100;
 
         /** Nombre d'objets de protection dans l'inventaire */
         chances += +this.configuration_form.get('objects')?.value * 100;

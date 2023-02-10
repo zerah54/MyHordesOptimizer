@@ -27,14 +27,19 @@ export interface CellDTO {
     nbKm: number;
     nbPa: number;
     zoneRegen?: string;
+    note: string;
 }
 
 export interface SaveCellDTO {
-    cellId: number;
+    x: number;
+    y: number;
     isDryed: boolean;
     nbZombie: number;
     nbZombieKilled: number;
     isRuinCamped: boolean;
     items: ItemCountShortDTO[];
-    citizens: CitizenDTO[];
+    citizens: number[];
+    note: string;
+    nbRuinDig: number;
+    isRuinDryed: boolean;
 }

@@ -30,7 +30,7 @@
         </mat-tab>
         <mat-tab label="Notes" i18n-label *ngIf="!cell.is_town">
             <mat-form-field class="mho-cell-note">
-                <textarea matInput></textarea>
+                <textarea matInput [(ngModel)]="cell.note"></textarea>
             </mat-form-field>
         </mat-tab>
     </mat-tab-group>
