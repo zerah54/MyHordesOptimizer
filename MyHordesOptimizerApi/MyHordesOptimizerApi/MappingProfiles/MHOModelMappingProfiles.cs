@@ -436,6 +436,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<MapCellCompletModel, MyHordesOptimizerCellDto>()
                 .ForMember(dest => dest.CellId, opt => opt.MapFrom(src => src.IdCell))
                 .ForMember(dest => dest.ZoneRegen, opt => { opt.MapFrom(src => ((RegenDirectionEnum)src.ZoneRegen.Value).GetDescription()); opt.PreCondition(src => src.ZoneRegen.HasValue); })
+                .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Note))
                 .ForMember(dest => dest.Items, opt => opt.Ignore())
                 .ForMember(dest => dest.Citizens, opt => opt.Ignore())
                 .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.LastUpdateDateUpdate, UserName = src.LastUpdateInfoUserName, UserId = src.LastUpdateInfoUserId }));

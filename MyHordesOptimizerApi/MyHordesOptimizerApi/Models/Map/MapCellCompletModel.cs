@@ -44,5 +44,6 @@ namespace MyHordesOptimizerApi.Models.Map
         public int? NbKm { get; set; }
         public int? NbPa { get; set; }
         public int? ZoneRegen { get; set; }
+        public string Note { get; set; }
     }
 }
