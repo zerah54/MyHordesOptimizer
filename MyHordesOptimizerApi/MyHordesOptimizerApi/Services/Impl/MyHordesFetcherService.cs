@@ -180,7 +180,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                             cells.Add(cell);
                         }
                     }
-                    MyHordesOptimizerRepository.PatchMapCell(town.Id, cells);
+                    MyHordesOptimizerRepository.PatchMapCell(town.Id, cells, forceUpdate: false);
                 }
 
                 _ = Task.Run(() => CheckAndUpdateCellDigs(myHordeMeResponse, town.Id));
@@ -315,7 +315,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                         LevelRegen = scrutLevel,
                         TauxRegen = regenChance
                     });
-                    MyHordesOptimizerRepository.PatchMapCell(townId, cells);
+                    MyHordesOptimizerRepository.PatchMapCell(townId, cells, forceUpdate: false);
                 }
             }
             catch (Exception e)

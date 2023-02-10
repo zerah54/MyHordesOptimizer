@@ -202,15 +202,10 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
                             if(updateCellDto.CitizenId.Any())
                             {
-                                MyHordesOptimizerRepository.UpdateCitizenLocation(updateRequestDto.TownDetails.TownId, realX, realY, updateCellDto.CitizenId);
-                            }
-                            if(updateCellDto.ZoneEmpty)
-                            {
-                                cellToUpdate.AveragePotentialRemainingDig = 0;
-                                cellToUpdate.MaxPotentialRemainingDig = 0;
+                                MyHordesOptimizerRepository.UpdateCitizenLocation(updateRequestDto.TownDetails.TownId, realX, realY, updateCellDto.CitizenId, idLastUpdateInfo);
                             }
                         }
-                        MyHordesOptimizerRepository.PatchMapCell(townId, listCells);
+                        MyHordesOptimizerRepository.PatchMapCell(townId, listCells, forceUpdate: false);
                         MyHordesOptimizerRepository.ClearCellDig(listCells.Where(cell => cell.IsDryed.HasValue && cell.IsDryed.Value).Select(cell => cell.IdCell));
                         if (zoneItemX != -1 && zoneItemY != -1)
                         {

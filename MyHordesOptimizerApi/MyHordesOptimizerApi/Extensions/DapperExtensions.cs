@@ -67,7 +67,7 @@ namespace MyHordesOptimizerApi.Extensions
                 sb.Append($"{string.Join(",", listValues)}");
                 sb.Append($" ON DUPLICATE KEY UPDATE {string.Join(",", listUpdates)}");
                 var query = sb.ToString();
-                connection.Execute(query, param);
+                var res = connection.Execute(query, param);
             }
         }
 

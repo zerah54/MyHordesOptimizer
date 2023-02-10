@@ -445,6 +445,12 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.ItemCount, opt => opt.MapFrom(src => src.ItemCount))
                 .ForMember(dest => dest.IsItemBroken, opt => opt.MapFrom(src => src.IsItemBroken));
 
+            CreateMap<CellItemDto, MapCellItemModel>()
+              .ForMember(dest => dest.IdCell, opt => opt.Ignore())
+              .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.ItemId))
+              .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.ItemCount))
+              .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsItemBroken));
+
             CreateMap<MapCellCompletModel, CellCitizenDto>()
                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CitizenId))
                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CitizenName));
@@ -473,6 +479,29 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             CreateMap<MapCellDigUpdateModel, MyHordesOptimizerMapUpdateDto>()
                 .ForMember(dest => dest.DirectionRegen, opt => opt.MapFrom(src => ((RegenDirectionEnum)src.DirectionRegen).GetDescription()));
+
+            CreateMap<MyHordesOptimizerCellUpdateDto, MapCellModel>()
+                .ForMember(dest => dest.AveragePotentialRemainingDig, opt => opt.Ignore())
+                .ForMember(dest => dest.DangerLevel, opt => opt.Ignore())
+                .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
+                .ForMember(dest => dest.IdRuin, opt => opt.Ignore())
+                .ForMember(dest => dest.IdTown, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDryed, opt => opt.MapFrom(src => src.IsDryed))
+                .ForMember(dest => dest.IsNeverVisited, opt => opt.Ignore())
+                .ForMember(dest => dest.IsRuinCamped, opt => opt.MapFrom(src => src.IsRuinCamped))
+                .ForMember(dest => dest.IsRuinDryed, opt => opt.Ignore())
+                .ForMember(dest => dest.IsTown, opt => opt.Ignore())
+                .ForMember(dest => dest.IsVisitedToday, opt => opt.Ignore())
+                .ForMember(dest => dest.MaxPotentialRemainingDig, opt => opt.Ignore())
+                .ForMember(dest => dest.NbHero, opt => opt.Ignore())
+                .ForMember(dest => dest.NbKm, opt => opt.Ignore())
+                .ForMember(dest => dest.NbPa, opt => opt.Ignore())
+                .ForMember(dest => dest.NbRuinDig, opt => opt.Ignore())
+                .ForMember(dest => dest.NbZombie, opt => opt.MapFrom(src => src.NbZombie))
+                .ForMember(dest => dest.NbZombieKilled, opt => opt.MapFrom(src => src.NbZombieKilled))
+                .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.X))
+                .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.Y))
+                .ForMember(dest => dest.ZoneRegen, opt => opt.Ignore());
         }
 
         private List<string> GetStatusIcons(TownCitizenBagItemCompletModel src)
