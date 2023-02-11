@@ -332,18 +332,9 @@
             "catbox_#00"
         ],
         "out": [
-            [
-                "poison_part_#00",
-                2
-            ],
-            [
-                "pet_cat_#00",
-                4
-            ],
-            [
-                "angryc_#00",
-                4
-            ]
+            "poison_part_#00",
+            "pet_cat_#00",
+            "angryc_#00"
         ],
         "action": "Öffnen"
     },

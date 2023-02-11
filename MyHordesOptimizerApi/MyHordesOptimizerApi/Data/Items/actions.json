@@ -798,7 +798,7 @@
         "meta": [
             "profession_tech",
             "not_have_can_opener_hd",
-            "min_1_cp"
+            "min_1_cp_hd"
         ],
         "result": [
             "minus_1cp",
@@ -810,6 +810,18 @@
             }
         ],
         "message_key": "container_open"
+    },
+    "can_t3": {
+        "label": "Öffnen",
+        "at00": true,
+        "meta": [
+            "profession_tech",
+            "not_have_can_opener_hd",
+            "have_can_opener",
+            "no_cp",
+            "is_not_wounded_hands"
+        ],
+        "result": []
     },
     "eat_6ap": {
         "label": "Essen",
@@ -1810,14 +1822,38 @@
             "consume_item",
             {
                 "spawn": [
-                    "food_pims_#00",
-                    "food_tarte_#00",
-                    "food_chick_#00",
-                    "food_biscuit_#00",
-                    "food_bar3_#00",
-                    "food_bar1_#00",
-                    "food_sandw_#00",
-                    "food_bar2_#00"
+                    [
+                        "food_pims_#00",
+                        186
+                    ],
+                    [
+                        "food_tarte_#00",
+                        174
+                    ],
+                    [
+                        "food_chick_#00",
+                        194
+                    ],
+                    [
+                        "food_biscuit_#00",
+                        188
+                    ],
+                    [
+                        "food_bar3_#00",
+                        181
+                    ],
+                    [
+                        "food_bar1_#00",
+                        168
+                    ],
+                    [
+                        "food_sandw_#00",
+                        162
+                    ],
+                    [
+                        "food_bar2_#00",
+                        222
+                    ]
                 ]
             }
         ],
@@ -2719,13 +2755,13 @@
                         [
                             "do_nothing"
                         ],
-                        20
+                        33
                     ],
                     [
                         [
                             "consume_matches"
                         ],
-                        80
+                        66
                     ]
                 ]
             },
@@ -2735,13 +2771,13 @@
                         [
                             "do_nothing"
                         ],
-                        90
+                        66
                     ],
                     [
                         [
                             "consume_item"
                         ],
-                        10
+                        33
                     ]
                 ]
             },
@@ -2998,7 +3034,7 @@
                     "morph": "pilegun_empty_#00",
                     "consume": false
                 },
-                "group": "g_kill_1z_99_msg2",
+                "group": "g_kill_1z_90_msg2",
                 "message": {
                     "text_key": "battery_use",
                     "ordering": 1000
@@ -3075,7 +3111,7 @@
                                 }
                             }
                         ],
-                        51
+                        50
                     ],
                     [
                         [
@@ -3091,7 +3127,7 @@
                                 }
                             }
                         ],
-                        49
+                        50
                     ]
                 ]
             },
@@ -3176,7 +3212,7 @@
         ],
         "result": [
             {
-                "group": "g_kill_1z_50_taser"
+                "group": "g_kill_1z_30_taser"
             },
             {
                 "group": [
@@ -3184,7 +3220,7 @@
                         [
                             "do_nothing"
                         ],
-                        2
+                        3
                     ],
                     [
                         [
@@ -3198,7 +3234,7 @@
                                 }
                             }
                         ],
-                        8
+                        7
                     ]
                 ]
             }
@@ -3493,6 +3529,38 @@
         ],
         "message_key": "throw_animal"
     },
+    "throw_animal_tekel": {
+        "label": "Waffe einsetzen",
+        "meta": [
+            "must_be_outside_or_exploring",
+            "must_have_zombies"
+        ],
+        "result": [
+            {
+                "group": [
+                    [
+                        [
+                            "do_nothing"
+                        ],
+                        95
+                    ],
+                    [
+                        [
+                            "consume_item",
+                            {
+                                "picto": [
+                                    "r_animal_#00"
+                                ]
+                            }
+                        ],
+                        5
+                    ]
+                ]
+            },
+            "kill_1_zombie_s"
+        ],
+        "message_key": "throw_animal"
+    },
     "throw_animal_angryc": {
         "label": "Waffe einsetzen",
         "meta": [
@@ -3507,13 +3575,13 @@
                         [
                             "inflict_wound"
                         ],
-                        30
+                        50
                     ],
                     [
                         [
                             "kill_all_zombie"
                         ],
-                        70
+                        50
                     ]
                 ]
             },
@@ -3535,7 +3603,7 @@
         ],
         "result": [
             {
-                "group": "g_break_30"
+                "group": "g_break_40"
             },
             "kill_1_zombie"
         ]
@@ -3550,7 +3618,7 @@
         ],
         "result": [
             {
-                "group": "g_break_75"
+                "group": "g_break_80"
             },
             "kill_1_zombie"
         ]
@@ -3566,7 +3634,7 @@
         "result": [
             "break_item",
             {
-                "group": "g_kill_1z_33"
+                "group": "g_kill_1z_50"
             }
         ]
     },
@@ -3580,10 +3648,10 @@
         ],
         "result": [
             {
-                "group": "g_break_30"
+                "group": "g_break_50"
             },
             {
-                "group": "g_kill_1z_85"
+                "group": "g_kill_1z_50"
             }
         ]
     },
@@ -3636,7 +3704,7 @@
                         [
                             "do_nothing"
                         ],
-                        50
+                        60
                     ],
                     [
                         [
@@ -3653,12 +3721,12 @@
                                 }
                             }
                         ],
-                        70
+                        60
                     ]
                 ]
             },
             {
-                "group": "g_kill_1z_33"
+                "group": "g_kill_1z_40"
             }
         ]
     },
@@ -3672,7 +3740,7 @@
         ],
         "result": [
             {
-                "group": "g_break_25"
+                "group": "g_break_33"
             },
             "kill_1_zombie"
         ]
@@ -3687,7 +3755,7 @@
         ],
         "result": [
             {
-                "group": "g_break_30"
+                "group": "g_break_43"
             },
             "kill_1_zombie"
         ]
@@ -3702,10 +3770,10 @@
         ],
         "result": [
             {
-                "group": "g_break_50"
+                "group": "g_break_45"
             },
             {
-                "group": "g_kill_1z_33"
+                "group": "g_kill_1z_15"
             }
         ]
     },
@@ -3719,7 +3787,7 @@
         ],
         "result": [
             {
-                "group": "g_break_20"
+                "group": "g_break_25"
             },
             "kill_2_zombie"
         ]
@@ -3734,7 +3802,7 @@
         ],
         "result": [
             {
-                "group": "g_break_30"
+                "group": "g_break_40"
             },
             "kill_1_zombie"
         ]
@@ -3764,7 +3832,7 @@
         ],
         "result": [
             {
-                "group": "g_break_15"
+                "group": "g_break_20"
             },
             "kill_2_zombie"
         ]
@@ -3779,7 +3847,7 @@
         ],
         "result": [
             {
-                "group": "g_break_35"
+                "group": "g_break_40"
             },
             {
                 "group": "g_kill_1z_20"
@@ -3799,7 +3867,7 @@
                 "group": "g_break_50"
             },
             {
-                "group": "g_kill_1z_33"
+                "group": "g_kill_1z_15"
             }
         ]
     },
@@ -3830,7 +3898,7 @@
         ],
         "result": [
             {
-                "group": "g_break_20"
+                "group": "g_break_50"
             },
             "kill_1_zombie"
         ]
@@ -3845,7 +3913,7 @@
         ],
         "result": [
             {
-                "group": "g_break_50"
+                "group": "g_break_75"
             },
             {
                 "group": "g_kill_1z_10"
@@ -3862,10 +3930,10 @@
         ],
         "result": [
             {
-                "group": "g_break_33"
+                "group": "g_break_20"
             },
             {
-                "group": "g_kill_1z_50"
+                "group": "g_kill_1z_33"
             }
         ]
     },
@@ -4778,11 +4846,11 @@
                 "group": [
                     [
                         "do_nothing",
-                        87
+                        96
                     ],
                     [
                         "become_ghoul_25",
-                        8
+                        4
                     ]
                 ]
             }
@@ -4827,11 +4895,11 @@
                 "group": [
                     [
                         "do_nothing",
-                        256
+                        95
                     ],
                     [
                         "become_ghoul_25",
-                        45
+                        5
                     ]
                 ]
             }
@@ -4886,15 +4954,15 @@
                 "group": [
                     [
                         "do_nothing",
-                        705
+                        47
                     ],
                     [
                         "infect",
-                        776
+                        50
                     ],
                     [
                         "become_ghoul_25",
-                        48
+                        3
                     ]
                 ]
             }
@@ -4952,11 +5020,11 @@
                 "group": [
                     [
                         "infect",
-                        1
+                        10
                     ],
                     [
                         "become_ghoul_5",
-                        9
+                        90
                     ]
                 ]
             }
@@ -5026,11 +5094,11 @@
                 "group": [
                     [
                         "do_nothing",
-                        1
+                        70
                     ],
                     [
                         "unterrorize",
-                        1
+                        30
                     ]
                 ]
             }
@@ -5492,6 +5560,28 @@
         ],
         "message": "Du hast {citizen} auf heldenhafte Weise in die Stadt gebracht!"
     },
+    "hero_generic_friendship": {
+        "label": "Freundschaft",
+        "tooltip": "Du spendest eine deiner noch nicht verwendeten Heldentaten an einen anderen Spieler.",
+        "confirm": true,
+        "confirmMsg": "Möchtest du deine Heldentat {targetAction} an {targetPlayer} spenden? Du kannst sie danach nicht mehr selbst verwenden. ACHTUNG: Wenn {targetPlayer} bereits eine Heldentat von jemand anderem erhalten oder {targetAction} noch nicht selbst verwendet hat, verfällt dein Geschenk.",
+        "target": {
+            "type": "ItemTargetDefinition::ItemFriendshipType"
+        },
+        "meta": [
+            "not_yet_hero",
+            "can_use_friendship"
+        ],
+        "result": [
+            "hero_act",
+            {
+                "custom": [
+                    70
+                ]
+            }
+        ],
+        "message": "Du hast deine Heldentat an {citizen} weitergegeben."
+    },
     "throw_sandball": {
         "label": "Werfen",
         "meta": [
@@ -5901,7 +5991,8 @@
             "min_1_ap",
             "must_be_inside",
             "must_have_guardtower",
-            "not_yet_home_defbuff"
+            "not_yet_home_defbuff",
+            "guard_tower_not_max"
         ],
         "result": [
             "minus_1ap",

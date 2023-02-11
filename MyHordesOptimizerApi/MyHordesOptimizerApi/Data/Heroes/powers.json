@@ -1,15 +1,18 @@
 [
     {
         "name": "hero_generic_return",
-        "unlockable": false
+        "unlockable": false,
+        "used": "Ahh, es ist immer wieder schön in die Stadt zurückzukehren... Nach einer deartigen Anstrengung, kann der Wille schon mal schwach werden. Versuche es in einem nächsten Leben erneut."
     },
     {
         "name": "hero_generic_find",
-        "unlockable": false
+        "unlockable": false,
+        "used": "Du hast heute schon verdammt viel Schwein gehabt. So viel Glück kannst du erst in deinem nächsten Leben wieder haben..."
     },
     {
         "name": "hero_generic_punch",
-        "unlockable": false
+        "unlockable": false,
+        "used": "Ahh... Das hat dir gefallen, nicht wahr? Du kannst deine Fäuste erst in deinem nächsten Leben wieder schwingen lassen..."
     },
     {
         "name": "hero_generic_ap",
@@ -21,10 +24,17 @@
     },
     {
         "name": "hero_generic_find_lucky",
-        "unlockable": true
+        "unlockable": true,
+        "used": "Du hast heute schon verdammt viel Schwein gehabt. So viel Glück kannst du erst in deinem nächsten Leben wieder haben..."
     },
     {
         "name": "hero_generic_rescue",
-        "unlockable": false
+        "unlockable": false,
+        "used": "Du hast bereits versucht, einen deiner Mitbürger zu retten! Für deine nächste Rettungsaktion musst du bis zu deinem nächsten Leben warten!"
+    },
+    {
+        "name": "hero_generic_friendship",
+        "unlockable": false,
+        "used": "Du hast deine Großzügigkeit in diesem Leben bereits unter Beweis gestellt!"
     }
 ]

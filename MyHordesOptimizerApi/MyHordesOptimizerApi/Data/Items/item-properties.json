@@ -494,7 +494,8 @@
     ],
     "fungus_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "radio_on_#00": [
         "impoundable",
@@ -512,17 +513,20 @@
     "can_open_#00": [
         "can_poison",
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "vegetable_#00": [
         "can_poison",
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "fruit_#00": [
         "can_poison",
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "water_can_3_#00": [
         "impoundable",
@@ -577,104 +581,129 @@
     ],
     "bretz_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "undef_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "dish_#00": [
-        "food"
+        "food",
+        "single_use"
     ],
     "chama_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "food_bar1_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "food_bar2_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "food_bar3_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "food_biscuit_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "food_chick_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "food_pims_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "food_tarte_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "food_sandw_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "food_noodles_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "hmeat_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "bone_meat_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "cadaver_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "food_noodles_hot_#00": [
         "food",
-        "esc_fixed"
+        "esc_fixed",
+        "single_use"
     ],
     "meat_#00": [
         "food",
         "esc_fixed",
-        "hero_find_lucky"
+        "hero_find_lucky",
+        "single_use"
     ],
     "vegetable_tasty_#00": [
         "food",
-        "esc_fixed"
+        "esc_fixed",
+        "single_use"
     ],
     "dish_tasty_#00": [
         "impoundable",
         "food",
-        "esc_fixed"
+        "esc_fixed",
+        "single_use"
     ],
     "food_candies_#00": [
         "food",
-        "esc_fixed"
+        "esc_fixed",
+        "single_use"
     ],
     "chama_tasty_#00": [
         "food",
-        "esc_fixed"
+        "esc_fixed",
+        "single_use"
     ],
     "woodsteak_#00": [
         "food",
-        "esc_fixed"
+        "esc_fixed",
+        "single_use"
     ],
     "egg_#00": [
         "food",
-        "esc_fixed"
+        "esc_fixed",
+        "single_use"
     ],
     "apple_#00": [
         "food",
-        "esc_fixed"
+        "esc_fixed",
+        "single_use"
     ],
     "angryc_#00": [
         "pet",
@@ -813,7 +842,8 @@
     ],
     "christmas_candy_#00": [
         "food",
-        "can_cook"
+        "can_cook",
+        "single_use"
     ],
     "omg_this_will_kill_you_#00": [
         "can_cook"
@@ -828,7 +858,8 @@
         "prevent_night"
     ],
     "wood_xmas_#00": [
-        "food"
+        "food",
+        "single_use"
     ],
     "fence_#00": [
         "impoundable"

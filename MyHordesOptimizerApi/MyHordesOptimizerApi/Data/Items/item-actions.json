@@ -56,7 +56,8 @@
     "can_#00": [
         "can",
         "can_t1",
-        "can_t2"
+        "can_t2",
+        "can_t3"
     ],
     "can_open_#00": [
         "eat_6ap"
@@ -440,7 +441,7 @@
     ],
     "tekel_#00": [
         "slaughter_2xs",
-        "throw_animal_dog"
+        "throw_animal_tekel"
     ],
     "pet_dog_#00": [
         "slaughter_2xs",
