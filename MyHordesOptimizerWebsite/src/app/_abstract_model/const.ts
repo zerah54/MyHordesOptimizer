@@ -31,3 +31,93 @@ export const NO_RUIN: RuinDTO = {
     explorable: false, img: '', minDist: 1, maxDist: 1000, drops: []
 };
 
+
+
+/** @see CitizenHandler > getCampingValues > $distance_map */
+export const DISTANCE_MAP: Dictionary<number> = {
+    1: -24,
+    2: -19,
+    3: -14,
+    4: -11,
+    5: -9,
+    6: -9,
+    7: -9,
+    8: -9,
+    9: -9,
+    10: -9,
+    11: -9,
+    12: -8,
+    13: -7.6,
+    14: -7,
+    15: -6,
+    16: -5 // 16 et +
+}
+
+
+/** @see CitizenHandler > getCampingValues > $campings_map */
+export const CAMPINGS_MAP: Dictionary<Dictionary<Dictionary<number>>> = {
+    normal: {
+        nonpro: {
+            0: 0,
+            1: -4,
+            2: -9,
+            3: -13,
+            4: -16,
+            5: -26,
+            6: -36,
+            7: -50, // Totally arbitrary
+            8: -65, // Totally arbitrary
+            9: -80 // Totally arbitrary // 9 et +
+        },
+        pro: {
+            0: 0,
+            1: -2,
+            2: -4,
+            3: -8,
+            4: -10,
+            5: -12,
+            6: -16,
+            7: -26,
+            8: -36,
+            9: -60 // Totally arbitrary // 9 et +
+        }
+    },
+    pande: {
+        nonpro: {
+            0: 0,
+            1: -4,
+            2: -6,
+            3: -8,
+            4: -10,
+            5: -20,
+            6: -36,
+            7: -50,
+            8: -65,
+            9: -80 // 9 et +
+        },
+        pro: {
+            0: 0,
+            1: -1,
+            2: -2,
+            3: -4,
+            4: -6,
+            5: -8,
+            6: -10,
+            7: -20,
+            8: -36,
+            9: -60 // 9 et +
+        }
+    },
+};
+
+/** @see CitizenHandler > getCampingValues > $campers_map */
+export const HIDDEN_CAMPERS_MAP: Dictionary<number> = {
+    0: 0,
+    1: 0,
+    2: -2,
+    3: -6,
+    4: -10,
+    5: -14,
+    6: -20,
+    7: -26
+};

@@ -1,7 +1,9 @@
 @import "variables.scss";
 
 .mho-probabilities {
-    .header, .chances {
+
+    .header,
+    .chances {
         display: flex;
         align-items: center;
         gap: 0.5em;
@@ -21,5 +23,19 @@
     .content {
         display: flex;
         gap: 0.5em;
+    }
+
+    table {
+
+        th,
+        td {
+            padding: 0.5em;
+        }
+
+        tbody {
+            td {
+                text-align: right;
+            }
+        }
     }
 }

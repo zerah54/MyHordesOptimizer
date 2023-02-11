@@ -42,13 +42,16 @@ export class MapUpdateCellComponent implements OnInit {
             nb_zombies: [this.cell.nb_zombie],
             nb_killed_zombies: [this.cell.nb_zombie_killed],
             is_dryed: [this.cell.is_dryed],
-            items: [this.cell.items]
+            items: [this.cell.items],
+            nb_ruin_dig: [this.cell.nb_ruin_dig],
+            is_ruin_dryed: [this.cell.is_ruin_dryed]
         })
 
         this.cell_form.valueChanges.subscribe((values: CellInfoUpdate) => {
             this.cell.is_dryed = values.is_dryed;
             this.cell.nb_zombie = +values.nb_zombies;
             this.cell.nb_zombie_killed = +values.nb_killed_zombies;
+            this.cell.nb_ruin_dig = +values.nb_ruin_dig;
             this.cell.items = [...values.items];
             this.cellChange.next(this.cell);
         })
@@ -122,7 +125,9 @@ export class MapUpdateCellComponent implements OnInit {
 
 interface CellInfoUpdate {
     nb_zombies: number;
-    nb_killed_zombies: number,
-    is_dryed: boolean,
-    items: ItemCountShort[]
+    nb_killed_zombies: number;
+    is_dryed: boolean;
+    items: ItemCountShort[];
+    nb_ruin_dig: number;
+    is_ruin_dryed: boolean;
 }

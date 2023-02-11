@@ -33,6 +33,7 @@ export class Cell extends CommonModel<CellDTO> {
     public zone_regen!: ZoneRegen | undefined;
     public displayed_x!: number;
     public displayed_y!: number;
+    public note!: string;
 
     constructor(dto?: CellDTO) {
         super();
@@ -64,19 +65,24 @@ export class Cell extends CommonModel<CellDTO> {
             nbKm: this.nb_km,
             nbPa: this.nb_pa,
             zoneRegen: this.zone_regen?.key,
-            citizens: modelToDtoArray(this.citizens)
+            citizens: modelToDtoArray(this.citizens),
+            note: this.note
         };
     }
 
     public saveCellDTO(): SaveCellDTO {
         return {
-            cellId: this.cell_id,
+            x: this.x,
+            y: this.y,
             isDryed: this.is_dryed,
-            nbZombie: this.nb_hero,
-            nbZombieKilled: this.nb_zombie_killed,
+            nbZombie: this.nb_hero || 0,
+            nbZombieKilled: this.nb_zombie_killed || 0,
             isRuinCamped: this.is_ruin_camped,
             items: modelToDtoArray(this.items),
-            citizens: modelToDtoArray(this.citizens)
+            citizens: this.citizens.map((citizen: Citizen) => citizen.id),
+            note: this.note,
+            nbRuinDig: this.nb_ruin_dig || 0,
+            isRuinDryed: this.is_ruin_dryed
         };
     }
 
@@ -108,6 +114,7 @@ export class Cell extends CommonModel<CellDTO> {
             this.zone_regen = dto.zoneRegen ? <ZoneRegen>ZoneRegen.getByKey(dto.zoneRegen) : undefined;
             this.displayed_x = getDisplayedXFromArrayX(dto.x);
             this.displayed_y = getDisplayedYFromArrayY(dto.y);
+            this.note = dto.note;
         }
     };
 
