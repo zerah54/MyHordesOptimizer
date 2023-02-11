@@ -245,7 +245,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         if (townDetails.IsDevaste || cell.DeadZombies > 0)
                         {
                             var request = Mapper.Map<GestHordesUpdateCaseRequest>(updateRequestDto);
-                            var dictionnary = request.ToDictionnary();
+                            var dictionnary = request.ToMhoDictionnary();
                             var count = 0;
                             foreach (var item in cell.Objects)
                             {

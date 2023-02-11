@@ -11,7 +11,7 @@ namespace MyHordesOptimizerApi.Extensions
             return JsonConvert.SerializeObject(obj);
         }
 
-        public static IDictionary<string, object> ToDictionnary(this object obj)
+        public static IDictionary<string, object> ToMhoDictionnary(this object obj)
         {
             var json = obj.ToJson();
             var jObject = JObject.Parse(json);

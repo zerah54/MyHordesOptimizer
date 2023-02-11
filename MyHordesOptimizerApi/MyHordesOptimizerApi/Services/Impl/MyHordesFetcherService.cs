@@ -70,7 +70,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     if (wishList != null && wishList.WishList != null)
                     {
-                        var wishlistItem = wishList.WishList.FirstOrDefault(x => x.Item.Id == item.Id);
+                        var wishListItems = wishList.WishList.Values.SelectMany(x => x).ToList();
+                        var wishlistItem = wishListItems.FirstOrDefault(x => x.Item.Id == item.Id);
                         if (wishlistItem != null)
                         {
                             item.WishListCount = wishlistItem.Count;
@@ -403,9 +404,10 @@ namespace MyHordesOptimizerApi.Services.Impl
 
             if (town.WishList != null && town.WishList.WishList != null)
             {
+                var wishListItems = town.WishList.WishList.Values.SelectMany(x => x).ToList();
                 foreach (var bankItem in bankWrapper.Bank)
                 {
-                    var wishlistItem = town.WishList.WishList.FirstOrDefault(x => x.Item.Id == bankItem.Item.Id);
+                    var wishlistItem = wishListItems.FirstOrDefault(x => x.Item.Id == bankItem.Item.Id);
                     if (wishlistItem != null)
                     {
                         bankItem.WishListCount = wishlistItem.Count;

@@ -56,8 +56,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<MyHordesMeResponseDto, SimpleMeJobDetailDto>()
                 .ForMember(dest => dest.Id, opt => { opt.MapFrom(src => src.Job.Id); opt.Condition(src => src.Job != null); })
                 .ForMember(dest => dest.Uid, opt => { opt.MapFrom(src => src.Job.Uid); opt.Condition(src => src.Job != null); })
-                .ForMember(dest => dest.Label, opt => { opt.MapFrom(src => src.Job.Name.ToDictionnary()); opt.Condition(src => src.Job != null); })
-                .ForMember(dest => dest.Description, opt => { opt.MapFrom(src => src.Job.Desc.ToDictionnary()); opt.Condition(src => src.Job != null); });
+                .ForMember(dest => dest.Label, opt => { opt.MapFrom(src => src.Job.Name.ToMhoDictionnary()); opt.Condition(src => src.Job != null); })
+                .ForMember(dest => dest.Description, opt => { opt.MapFrom(src => src.Job.Desc.ToMhoDictionnary()); opt.Condition(src => src.Job != null); });
 
 
             CreateMap<KeyValuePair<string, MyHordesApiRuinDto>, MyHordesOptimizerRuin>()

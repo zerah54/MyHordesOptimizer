@@ -46,7 +46,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             var bank = MyHordesOptimizerRepository.GetBank(townId);
             Logger.LogInformation($"[GetWishList] GetBank : {sw.ElapsedMilliseconds}");
             var allBagsItem = MyHordesOptimizerRepository.GetAllBagItems(townId);
-            foreach (var wishlistItem in wishList.WishList)
+            var wishListItems = wishList.WishList.Values.SelectMany(x => x).ToList();
+            foreach (var wishlistItem in wishListItems)
             {
                 var bankItem = bank.Bank.FirstOrDefault(x => x.Item.Id == wishlistItem.Item.Id);
                 if (bankItem != null)
@@ -66,7 +67,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                                                              && (x.Components.Any(component => component.Id == wishlistItem.Item.Id) || x.Result.Any(result => result.Item.Id == wishlistItem.Item.Id)));
             }
             Logger.LogInformation($"[GetWishList] Récupération bankcount : {sw.ElapsedMilliseconds}");
-            wishList.WishList.ForEach(wishlist => wishlist.Item.Recipes = recipes.GetRecipeForItem(wishlist.Item.Id));
+            wishListItems.ForEach(wishlist => wishlist.Item.Recipes = recipes.GetRecipeForItem(wishlist.Item.Id));
             Logger.LogInformation($"[GetWishList] Association des recipes : {sw.ElapsedMilliseconds}");
             return wishList;
         }
