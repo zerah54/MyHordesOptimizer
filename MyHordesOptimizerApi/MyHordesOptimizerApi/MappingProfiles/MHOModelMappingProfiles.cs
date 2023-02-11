@@ -19,6 +19,7 @@ using MyHordesOptimizerApi.Models.Views.Items.Citizen;
 using MyHordesOptimizerApi.Models.Views.Items.Wishlist;
 using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
+using MyHordesOptimizerApi.Models.Wishlist;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -270,6 +271,13 @@ namespace MyHordesOptimizerApi.MappingProfiles
                  .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
                  .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
                  .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
+
+            CreateMap<IGrouping<int, WishlistCategorieCompletModel>, WishlistCategorieDto>()
+                 .ForMember(dest => dest.IdCategory, opt => opt.MapFrom(src => src.First().IdCategory))
+                 .ForMember(dest => dest.IdUserAuthor, opt => opt.MapFrom(src => src.First().IdUserAuthor))
+                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.First().Name))
+                 .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.First().LabelFr }, { "en", src.First().LabelEn }, { "es", src.First().LabelEs }, { "de", src.First().LabelDe } }))
+                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.ToList().Select(x => x.IdItem).ToList() ));
 
             CreateMap<HomeUpgradeDetailsDto, TownCitizenDetailModel>()
                 .ForMember(dest => dest.ApagCharges, opt => opt.Ignore())

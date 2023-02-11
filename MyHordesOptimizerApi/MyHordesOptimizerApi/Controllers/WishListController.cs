@@ -42,11 +42,18 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Add/{itemId}")]
-        public ActionResult AddItemToWishList(int townId, int itemId, int userId)
+        public ActionResult AddItemToWishList(int townId, int itemId, int userId, int zoneXPa)
         {
-            _wishListService.AddItemToWishList(townId: townId, itemId: itemId, userId: userId);
+            _wishListService.AddItemToWishList(townId: townId, itemId: itemId, userId: userId, zoneXPa: zoneXPa);
             return Ok();
         }
 
+        [HttpGet]
+        [Route("Categories")]
+        public ActionResult<List<WishlistCategorieDto>> GetWishListCategories()
+        {
+            var categories = _wishListService.GetWishListCategories();
+            return categories;
+        }
     }
 }

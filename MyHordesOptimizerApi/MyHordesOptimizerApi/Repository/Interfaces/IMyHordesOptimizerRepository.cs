@@ -38,11 +38,12 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void UpdateCitizenLocation(int townId, int x, int y, IEnumerable<int> citizenId, int lastUpdateInfoId);
 
 
-        void AddItemToWishlist(int townId, int itemId, int userId);
+        void AddItemToWishlist(int townId, int itemId, int userId, int zoneXPa);
         void PutWishList(int townId, int userId, IEnumerable<TownWishlistItemModel> items);
         WishListWrapper GetWishList(int townId);
         void PatchWishlistCategories(List<WishlistCategorieModel> categories);
         void PatchWishlistItemCategories(List<WishlistCategorieItemModel> itemsCategorie);
+        IEnumerable<WishlistCategorieCompletModel> GetWishListCategories();
         void PatchDefaultWishlistItems(List<DefaultWishlistItemModel> modeles);
 
         void PatchRuins(IEnumerable<MyHordesOptimizerRuin> jsonRuins);
@@ -85,6 +86,5 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         MapCellDigCompletModel GetCellDigs(int idCell, int idUser, int day);
         void ClearCellDig(IEnumerable<int> cellId);
         void ClearCellItem(int idCell, int idLastUpdateInfo);
-
     }
 }

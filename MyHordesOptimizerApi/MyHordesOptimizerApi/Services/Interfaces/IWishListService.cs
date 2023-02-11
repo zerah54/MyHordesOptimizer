@@ -8,6 +8,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
     {
         WishListWrapper GetWishList(int townId);
         WishListWrapper PutWishList(int townId, int userId, List<WishListPutResquestDto> wishList);
-        void AddItemToWishList(int townId, int userId, int itemId);
+        void AddItemToWishList(int townId, int userId, int itemId, int zoneXPa);
+        List<WishlistCategorieDto> GetWishListCategories();
     }
 }

@@ -80,10 +80,17 @@ namespace MyHordesOptimizerApi.Services.Impl
             return wishList;
         }
 
-        public void AddItemToWishList(int townId, int userId, int itemId)
+        public void AddItemToWishList(int townId, int userId, int itemId, int zoneXPa)
         {
-            MyHordesOptimizerRepository.AddItemToWishlist(townId, itemId, userId);
+            MyHordesOptimizerRepository.AddItemToWishlist(townId, itemId, userId, zoneXPa);
         }
 
+        public List<WishlistCategorieDto> GetWishListCategories()
+        {
+            var models = MyHordesOptimizerRepository.GetWishListCategories();
+            var groupping = models.GroupBy(x => x.IdCategory);
+            var dtos = Mapper.Map<List<WishlistCategorieDto>>(groupping);
+            return dtos;
+        }
     }
 }

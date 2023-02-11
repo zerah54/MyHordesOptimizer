@@ -398,12 +398,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #region WishList
 
-        public void AddItemToWishlist(int townId, int itemId, int userId)
+        public void AddItemToWishlist(int townId, int itemId, int userId, int zoneXPa)
         {
-            var query = @"CALL AddItemToWishList(@TownId, @UserId, @ItemId, @DateUpdate)";
+            var query = @"CALL AddItemToWishList(@TownId, @UserId, @ItemId, @ZoneXPa, @DateUpdate)";
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            connection.Execute(query, new { TownId = townId, UserId = userId, ItemId = itemId, DateUpdate = DateTime.UtcNow });
+            connection.Execute(query, new { TownId = townId, UserId = userId, ItemId = itemId, ZoneXPa = zoneXPa, DateUpdate = DateTime.UtcNow });
             connection.Close();
         }
 
@@ -501,7 +501,25 @@ namespace MyHordesOptimizerApi.Repository.Impl
         connection.Close();
     }
 
-    public void PatchDefaultWishlistItems(List<DefaultWishlistItemModel> modeles)
+        public IEnumerable<WishlistCategorieCompletModel> GetWishListCategories()
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var modeles = connection.Query<WishlistCategorieCompletModel>(@"SELECT wc.idCategory
+                                                                            ,wc.idUserAuthor
+                                                                            ,wc.name
+                                                                            ,wc.label_fr AS LabelFr
+                                                                            ,wc.label_en AS LabelEn
+                                                                            ,wc.label_es AS LabelEs
+                                                                            ,wc.label_de AS LabelDe
+                                                                            ,wci.idItem
+                                                                            FROM WishlistCategorie wc
+                                                                            RIGHT JOIN WishlistCategorieItem wci ON wc.idCategory = wci.idCategory");
+            connection.Close();
+            return modeles;
+        }
+
+        public void PatchDefaultWishlistItems(List<DefaultWishlistItemModel> modeles)
     {
         using var connection = new MySqlConnection(Configuration.ConnectionString);
         connection.Open();
