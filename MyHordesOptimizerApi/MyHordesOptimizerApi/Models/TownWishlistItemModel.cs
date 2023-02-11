@@ -7,5 +7,6 @@
         public int Count { get; set; }
         public int Depot { get; set; }
         public int Priority { get; set; }
+        public int ZoneXPa { get; set; }
     }
 }

@@ -77,5 +77,21 @@ namespace MyHordesOptimizerApi.Controllers
             await MyHordesImportService.ImportAllAsync();
             return Ok();
         }
+
+        [HttpPost]
+        [Route("WishlistCategories")]
+        public ActionResult ImportWishlistCategorie()
+        {
+            MyHordesImportService.ImportWishlistCategorie();
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("DefaultWishlist")]
+        public ActionResult ImportDefaultWishlist()
+        {
+            MyHordesImportService.ImportDefaultWishlists();
+            return Ok();
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Ruins;
+using MyHordesOptimizerApi.Data.Wishlist;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
@@ -14,5 +15,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         Dictionary<string, Dictionary<string, int>> GetItemsDropRates();
         List<MyHordesHerosCapacitiesCodeModel> GetHeroCapacities();
         Dictionary<string, MyHordesRecipeCodeModel> GetRecipes();
+        List<MyHordesOptimizerWishlistItemCategorie> GetWishlistItemCategories();
+        List<MyHordesOptimizerDefaultWishlist> GetDefaultWishlists();
     }
 }

@@ -9,6 +9,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public int BankCount { get; set; }
         public int BagCount { get; set; }
         public int Priority { get; set; }
+        public int ZoneXPa { get; set; }
         public int Depot { get; set; }
         public bool IsWorkshop { get; set; }
     }

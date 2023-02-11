@@ -9,5 +9,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
         Task ImportCategoriesAsync();
         Task ImportItemsAsync();
         Task ImportAllAsync();
+        void ImportWishlistCategorie();
+        void ImportDefaultWishlists();
     }
 }

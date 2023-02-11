@@ -1,0 +1,92 @@
+﻿[
+	{
+		"id": 1,
+		"name": {
+			"fr": "Armes non encombrantes",
+			"en": "TODO",
+			"es": "TODO",
+			"de": "TODO"
+		},
+		"items": [ 2, 60, 13, 92, 179, 180, 181, 18, 20, 5, 98, 14, 17, 12, 16, 109, 102, 103, 170, 230, 59, 22, 277, 201, 7, 93, 94, 95, 182, 183, 11, 271, 40 ]
+	},
+	{
+		"id": 2,
+		"name": {
+			"fr": "Armes encombrantes",
+			"en": "TODO",
+			"es": "TODO",
+			"de": "TODO"
+		},
+		"items": [ 24, 161, 162, 163, 205 ]
+	},
+	{
+		"id": 3,
+		"name": {
+			"fr": "Objets de defense",
+			"en": "TODO",
+			"es": "TODO",
+			"de": "TODO"
+		},
+		"items": [ 153, 154, 77, 52, 88, 146 ]
+	},
+	{
+		"id": 4,
+		"name": {
+			"fr": "Boost",
+			"en": "TODO",
+			"es": "TODO",
+			"de": "TODO"
+		},
+		"items": [ 6, 43, 70, 55, 268, 78, 355, 336, 298, 54 ]
+	},
+	{
+		"id": 5,
+		"name": {
+			"fr": "Bouffe",
+			"en": "TODO",
+			"es": "TODO",
+			"de": "TODO"
+		},
+		"items": [ 123, 125, 4, 172, 269, 204, 121, 126, 89, 149, 120, 127, 129, 245, 119, 122, 124, 171, 199, 246, 219, 44, 225, 45, 203 ]
+	},
+	{
+		"id": 6,
+		"name": {
+			"fr": "Drogue",
+			"en": "TODO",
+			"es": "TODO",
+			"de": "TODO"
+		},
+		"items": [ 84, 115, 23 ]
+	},
+	{
+		"id": 7,
+		"name": {
+			"fr": "Animaux non emcombrant",
+			"en": "TODO",
+			"es": "TODO",
+			"de": "TODO"
+		},
+		"items": [ 40, 36, 38, 270 ]
+	},
+	{
+		"id": 8,
+		"name": {
+			"fr": "Animaux emcombrant",
+			"en": "TODO",
+			"es": "TODO",
+			"de": "TODO"
+		},
+		"items": [ 41, 37 ]
+	},
+	{
+		"id": 9,
+		"name": {
+			"fr": "Inutile",
+			"en": "TODO",
+			"es": "TODO",
+			"de": "TODO"
+		},
+		"items": [ 24, 25, 28, 29, 30, 31, 34, 53, 56, 63, 81, 86, 87, 133, 148, 150, 155, 164, 165, 166, 167, 168, 169, 173, 174, 184, 194, 207, 224, 237, 300, 301, 303, 304, 314 ]
+	}
+]

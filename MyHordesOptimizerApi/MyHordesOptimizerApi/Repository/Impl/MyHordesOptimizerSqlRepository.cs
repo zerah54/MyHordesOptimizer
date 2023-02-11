@@ -16,6 +16,7 @@ using MyHordesOptimizerApi.Models.Views.Items.Citizen;
 using MyHordesOptimizerApi.Models.Views.Items.Wishlist;
 using MyHordesOptimizerApi.Models.Views.Recipes;
 using MyHordesOptimizerApi.Models.Views.Ruins;
+using MyHordesOptimizerApi.Models.Wishlist;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MySqlConnector;
 using System;
@@ -448,7 +449,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
 							     ,itemProperty.propertyName AS PropertyName
                                  ,twi.count AS WishlistCount
 				                 ,twi.priority AS WishlistPriority
-								 ,twi.depot AS WishlistDepot
+                                 ,twi.zoneXPa AS WishlistZoneXPa
+                                 ,twi.depot AS WishlistDepot
 	                             ,t.idUserWishListUpdater AS LastUpdateInfoUserId
 	                             ,t.wishlistDateUpdate AS LastUpdateDateUpdate
 	                             ,userUpdater.name AS LastUpdateInfoUserName
@@ -481,6 +483,30 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 WishList = wishListItem
             };
             return wishlistWrapper;
+        }
+
+        public void PatchWishlistCategories(List<WishlistCategorieModel> categories)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.BulkInsertOrUpdate("WishlistCategorie", categories);
+            connection.Close();
+        }
+
+        public void PatchWishlistItemCategories(List<WishlistCategorieItemModel> itemsCategorie)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.BulkInsertOrUpdate("WishlistCategorieItem", itemsCategorie);
+            connection.Close();
+        }
+
+        public void PatchDefaultWishlistItems(List<DefaultWishlistItemModel> modeles)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.BulkInsertOrUpdate("DefaultWishlistItem", modeles);
+            connection.Close();
         }
 
         #endregion

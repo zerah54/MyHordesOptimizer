@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Reflection;
 
 namespace MyHordesOptimizerApi.Extensions
 {
@@ -10,7 +13,15 @@ namespace MyHordesOptimizerApi.Extensions
             var dico = new Dictionary<string, Func<TModel, object>>();
             foreach (var propertie in type.GetProperties())
             {
-                dico.Add(propertie.Name, x => propertie.GetValue(x));
+                var attr = propertie.GetCustomAttributes().FirstOrDefault(attr => attr is ColumnAttribute) as ColumnAttribute;
+                if(attr != null)
+                {
+                    dico.Add(attr.Name, x => propertie.GetValue(x));
+                }
+                else
+                {
+                    dico.Add(propertie.Name, x => propertie.GetValue(x));
+                }
             }
             return dico;
         }

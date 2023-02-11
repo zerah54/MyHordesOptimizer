@@ -1,0 +1,250 @@
+﻿[
+  {
+    "id": 1,
+    "name": {
+      "fr": "Opti J1",
+      "en": "TODO",
+      "es": "TODO",
+      "de": "TODO"
+    },
+    "items": [
+      {
+        "itemId": 147,
+        "count": 1000,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 143,
+        "count": 1000,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 161,
+        "count": 1,
+        "priority": 2000,
+        "depot": 0
+      },
+      {
+        "itemId": 136,
+        "count": 13,
+        "priority": 2000,
+        "depot": 0
+      },
+      {
+        "itemId": 137,
+        "count": 1,
+        "priority": 2000,
+        "depot": 0
+      },
+      {
+        "itemId": 162,
+        "count": 4,
+        "priority": 1000,
+        "depot": 0
+      },
+      {
+        "itemId": 41,
+        "count": 1000,
+        "priority": 1000,
+        "depot": 0
+      },
+      {
+        "itemId": 144,
+        "count": 1,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 65,
+        "count": 1,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 35,
+        "count": 2,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 279,
+        "count": 2,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 13,
+        "count": 1,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 280,
+        "count": 1,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 79,
+        "count": 1000,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 76,
+        "count": 1000,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 232,
+        "count": 1,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 284,
+        "count": 1,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 79,
+        "count": 1000,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 67,
+        "count": 3,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 82,
+        "count": 4,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 282,
+        "count": 1000,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 54,
+        "count": 1000,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 100,
+        "count": 1,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 16,
+        "count": 4,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 32,
+        "count": 1,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 130,
+        "count": 1,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 295,
+        "count": 2,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "itemId": 105,
+        "count": 1000,
+        "priority": 2000,
+        "depot": 0
+      },
+      {
+        "itemId": 116,
+        "count": 1000,
+        "priority": 2000,
+        "depot": 0
+      },
+      {
+        "itemId": 151,
+        "count": 1000,
+        "priority": 2000,
+        "depot": 0
+      },
+      {
+        "itemId": 49,
+        "count": 1000,
+        "priority": 2000,
+        "depot": 0
+      },
+      {
+        "itemId": 50,
+        "count": 1000,
+        "priority": 2000,
+        "depot": 0
+      },
+      {
+        "itemId": 58,
+        "count": 5,
+        "priority": 1000,
+        "depot": 0
+      },
+      {
+        "itemId": 59,
+        "count": 2,
+        "priority": 1000,
+        "depot": 0
+      },
+      {
+        "itemId": 187,
+        "count": 2,
+        "priority": 1000,
+        "depot": 0
+      },
+      {
+        "itemId": 36,
+        "count": 2,
+        "priority": 1000,
+        "depot": 0
+      }
+    ],
+    "categories": [
+      {
+        "categorieId": 9,
+        "count": 0,
+        "priority": -1000,
+        "depot": 0
+      },
+      {
+        "categorieId": 4,
+        "count": 1000,
+        "priority": 3000,
+        "depot": 0
+      },
+      {
+        "categorieId": 6,
+        "count": 1000,
+        "priority": 3000,
+        "depot": 0
+      }
+    ]
+  }
+]
+

@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
+using MyHordesOptimizerApi.Data.Wishlist;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.Wishlist;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.MappingProfiles
@@ -43,6 +45,16 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.ActionFr, opt => opt.Ignore())
                 .ForMember(dest => dest.ActionEs, opt => opt.Ignore())
                 .ForMember(dest => dest.ActionEn, opt => opt.Ignore());
+
+
+            CreateMap<MyHordesOptimizerWishlistItemCategorie, WishlistCategorieModel>()
+                .ForMember(dest => dest.IdCategory, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.IdUserAuthor, opt => opt.Ignore())
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name["fr"]))
+                .ForMember(dest => dest.LabelFr, opt => opt.MapFrom(src => src.Name["fr"]))
+                .ForMember(dest => dest.LabelEs, opt => opt.MapFrom(src => src.Name["es"]))
+                .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Name["en"]))
+                .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Name["de"]));
         }
     }
 }

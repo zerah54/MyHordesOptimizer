@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
 using MyHordesOptimizerApi.Models.Citizen.Bags;
 using MyHordesOptimizerApi.Models.Map;
+using MyHordesOptimizerApi.Models.Wishlist;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
@@ -40,6 +41,9 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void AddItemToWishlist(int townId, int itemId, int userId);
         void PutWishList(int townId, int userId, IEnumerable<TownWishlistItemModel> items);
         WishListWrapper GetWishList(int townId);
+        void PatchWishlistCategories(List<WishlistCategorieModel> categories);
+        void PatchWishlistItemCategories(List<WishlistCategorieItemModel> itemsCategorie);
+        void PatchDefaultWishlistItems(List<DefaultWishlistItemModel> modeles);
 
         void PatchRuins(IEnumerable<MyHordesOptimizerRuin> jsonRuins);
         IEnumerable<MyHordesOptimizerRuin> GetRuins();
@@ -81,5 +85,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         MapCellDigCompletModel GetCellDigs(int idCell, int idUser, int day);
         void ClearCellDig(IEnumerable<int> cellId);
         void ClearCellItem(int idCell, int idLastUpdateInfo);
+
     }
 }

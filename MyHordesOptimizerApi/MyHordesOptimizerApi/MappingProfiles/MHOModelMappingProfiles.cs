@@ -236,12 +236,14 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.Depot))
                 .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
+                .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.ZoneXPa))
                 .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count));
 
             CreateMap<IGrouping<TownWishlistItemCompletKeyModel, TownWishlistItemCompletModel>, WishListItem>()
                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.First().WishlistCount))
                .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.First().WishlistDepot))
                .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.First().WishlistPriority))
+               .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.First().WishlistZoneXPa))
                .ForMember(dest => dest.BankCount, opt => opt.Ignore())
                .ForMember(dest => dest.IsWorkshop, opt => opt.Ignore())
                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => new Item() { Id = src.Key.ItemId }));

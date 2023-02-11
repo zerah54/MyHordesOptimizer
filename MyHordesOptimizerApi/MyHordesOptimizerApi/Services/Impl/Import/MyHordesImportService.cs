@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.Wishlist;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using Newtonsoft.Json.Linq;
@@ -52,6 +53,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             await ImportCategoriesAsync();
             await ImportItemsAsync();
             ImportRuins();
+            ImportWishlistCategorie();
+            ImportDefaultWishlists();
         }
 
         #region HeroSkill
@@ -317,6 +320,81 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             }
 
             MyHordesOptimizerRepository.PatchCategories(categories);
+        }
+
+        #endregion
+
+        #region Wishlist
+
+        public void ImportWishlistCategorie()
+        {
+            var wishlistCategories = MyHordesCodeRepository.GetWishlistItemCategories();
+            var categories = Mapper.Map<List<WishlistCategorieModel>>(wishlistCategories);
+
+            var itemsCategorie = new List<WishlistCategorieItemModel>();
+            foreach(var category in wishlistCategories)
+            {
+                foreach(var item in category.Items)
+                {
+                    itemsCategorie.Add(new WishlistCategorieItemModel()
+                    {
+                        IdCategory = category.Id,
+                        IdItem = item
+                    });
+                }
+            }
+
+            MyHordesOptimizerRepository.PatchWishlistCategories(categories);
+            MyHordesOptimizerRepository.PatchWishlistItemCategories(itemsCategorie);
+        }
+
+        public void ImportDefaultWishlists()
+        {
+            var wishlistCategories = MyHordesCodeRepository.GetWishlistItemCategories();
+            var defaultWishlists = MyHordesCodeRepository.GetDefaultWishlists();
+
+            var modeles = new List<DefaultWishlistItemModel>();
+            foreach(var wishlist in defaultWishlists)
+            {
+                foreach(var item in wishlist.Items)
+                {
+                    modeles.Add(new DefaultWishlistItemModel()
+                    {
+                        IdDefaultWishlist = wishlist.Id,
+                        IdItem = item.ItemId,
+                        Name = wishlist.Name["fr"],
+                        LabelFr = wishlist.Name["fr"],
+                        LabelEn = wishlist.Name["en"],
+                        LabelEs = wishlist.Name["es"],
+                        LabelDe = wishlist.Name["de"],
+                        Count = item.Count,
+                        Priority = item.Priority,
+                        ZoneXPa = item.ZoneXPa
+                    });
+                }
+                foreach(var categorie in wishlist.Categories)
+                {
+                    var wishlistCategorie = wishlistCategories.Single(x => x.Id == categorie.CategorieId);
+                    foreach(var itemId in wishlistCategorie.Items)
+                    {
+                        modeles.Add(new DefaultWishlistItemModel()
+                        {
+                            IdDefaultWishlist = wishlist.Id,
+                            IdItem = itemId,
+                            Name = wishlist.Name["fr"],
+                            LabelFr = wishlist.Name["fr"],
+                            LabelEn = wishlist.Name["en"],
+                            LabelEs = wishlist.Name["es"],
+                            LabelDe = wishlist.Name["de"],
+                            Count = categorie.Count,
+                            Priority = categorie.Priority,
+                            ZoneXPa = categorie.ZoneXPa
+                        });
+                    }
+                }
+            }
+
+            MyHordesOptimizerRepository.PatchDefaultWishlistItems(modeles);
         }
 
         #endregion
