@@ -36,7 +36,7 @@
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
 + `[MH][update] Traductions espagnoles (merci Bacchus)\n\n`
-+ `[MH][update] La mise à jour de la liste de courses depuis la fenêtre "Outils" a été retirée et confiée explusivement au site`;
++ `[MH][update] La mise à jour de la liste de courses depuis la fenêtre "Outils" a été retirée et confiée exclusivement au site`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
