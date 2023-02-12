@@ -7,8 +7,14 @@
         width: 100%;
         tr {
             > td {
-                > img {
-                    margin-right: 0.5em;
+                &.name {
+                    > div {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5em;
+                        white-space: nowrap;
+                        flex-wrap: nowrap;
+                    }
                 }
             }
         }

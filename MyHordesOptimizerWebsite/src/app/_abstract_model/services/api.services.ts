@@ -6,7 +6,6 @@ import { getExternalAppId, getItemsWithExpirationDate, getRuinsWithExpirationDat
 import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { environment } from 'src/environments/environment';
 import { CellDTO } from '../dto/cell.dto';
-import { DigDTO } from '../dto/dig.dto';
 import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { ItemDTO } from '../dto/item.dto';
 import { MeDTO } from '../dto/me.dto';
@@ -16,7 +15,6 @@ import { TownDTO } from '../dto/town.dto';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
 import { Cell } from '../types/cell.class';
 import { Citizen } from '../types/citizen.class';
-import { Dig } from '../types/dig.class';
 import { HeroSkill } from '../types/hero-skill.class';
 import { Me } from '../types/me.class';
 import { Recipe } from '../types/recipe.class';
@@ -31,12 +29,9 @@ import { SnackbarService } from './../../shared/services/snackbar.service';
 import { BankInfoDTO } from './../dto/bank-info.dto';
 import { CitizenInfoDTO } from './../dto/citizen-info.dto';
 import { RuinDTO } from './../dto/ruin.dto';
-import { WishlistInfoDTO } from './../dto/wishlist-info.dto';
 import { BankInfo } from './../types/bank-info.class';
 import { CitizenInfo } from './../types/citizen-info.class';
 import { Item } from './../types/item.class';
-import { WishlistInfo } from './../types/wishlist-info.class';
-import { WishlistItem } from './../types/wishlist-item.class';
 import { GlobalServices } from './global.services';
 
 const API_URL: string = environment.api_url;
@@ -127,63 +122,6 @@ export class ApiServices extends GlobalServices {
                 }
             });
     }
-
-    /**
-     * Récupère les informations de liste de course
-     *
-     * @returns {Observable<WishlistInfo>}
-     */
-    public getWishlist(): Observable<WishlistInfo> {
-        return new Observable((sub: Subscriber<WishlistInfo>) => {
-            super.get<WishlistInfoDTO>(API_URL + `/wishlist?townId=${getTown()?.town_id}`)
-                .subscribe({
-                    next: (response: HttpResponse<WishlistInfoDTO>) => {
-                        sub.next(new WishlistInfo(response.body));
-                    }
-                });
-        });
-    }
-
-    /**
-     * Met à jour les données de la wishlist
-     *
-     * @param {WishlistInfo} wishlist_info
-     *
-     * @returns {Observable<WishlistInfo>}
-     */
-    public updateWishlist(wishlist_info: WishlistInfo): Observable<WishlistInfo> {
-        return new Observable((sub: Subscriber<WishlistInfo>) => {
-            let item_list: { id: number, priority: number, count: number }[] = wishlist_info.wishlist_items
-                .filter((wishlist_item: WishlistItem) => wishlist_item.count)
-                .map((wishlist_item: WishlistItem) => {
-                    return { id: wishlist_item.item.id, priority: wishlist_item.priority, count: wishlist_item.count };
-                });
-            super.put<WishlistInfoDTO>(API_URL + `/wishlist?townId=${getTown()?.town_id}&userId=${getUserId()}`, item_list)
-                .subscribe({
-                    next: (response: HttpResponse<WishlistInfoDTO>) => {
-                        sub.next(new WishlistInfo(response.body));
-                        this.snackbar.successSnackbar($localize`La liste de courses a bien été enregistrée`);
-                    }
-                })
-        })
-    }
-
-    /**
-     * Ajoute un élément à la wishlist
-     * @param {Item} item l'élément à ajouter à la wishlist
-     */
-    public addItemToWishlist(item: Item): Observable<void> {
-        return new Observable((sub: Subscriber<void>) => {
-            super.post(API_URL + `/wishlist/add/${item.id}?townId=${getTown()?.town_id}&userId=${getUserId()}`, undefined)
-                .subscribe({
-                    next: () => {
-                        sub.next();
-                        this.snackbar.successSnackbar($localize`L'objet ${item.label[this.locale]} a bien été ajouté à la liste de courses`);
-                    }
-                })
-        })
-    }
-
 
     /**
      * Demande l'estimation à partir des données du tableau

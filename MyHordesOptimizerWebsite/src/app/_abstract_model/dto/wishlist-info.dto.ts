@@ -3,6 +3,6 @@ import { UpdateInfoDTO } from './update-info.dto';
 import { WishlistItemDTO } from './wishlist-item.dto';
 
 export interface WishlistInfoDTO {
-    wishList: Dictionary<WishlistItemDTO>;
+    wishList: Map<string, WishlistItemDTO[]>;
     lastUpdateInfo: UpdateInfoDTO | null;
 }

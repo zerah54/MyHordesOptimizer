@@ -13,8 +13,12 @@
         }
     }
 
-    .mat-select-trigger {
+    .mat-mdc-select-trigger {
         height: 100%;
+    }
+
+    .mat-mdc-select-arrow-wrapper {
+        transform: unset !important;
     }
 }
 
@@ -27,6 +31,10 @@
 
     .options-container {
         max-height: calc(100% - 48px);
+
+        .cdk-overlay-pane {
+            height: 100%;
+        }
 
         .mho-option {
 

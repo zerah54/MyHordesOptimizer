@@ -1,13 +1,17 @@
-import { Item } from '../../_abstract_model/types/item.class';
-import { Component, ViewChild, ElementRef, HostBinding, EventEmitter } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
 import * as moment from 'moment';
+import { SelectComponent } from 'src/app/shared/elements/select/select.component';
+import { ClipboardService } from 'src/app/shared/services/clipboard.service';
+import { WishlistServices } from 'src/app/_abstract_model/services/wishlist.service';
+import { environment } from 'src/environments/environment';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { ApiServices } from '../../_abstract_model/services/api.services';
+import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
-import { MatSelect } from '@angular/material/select';
 
 @Component({
     selector: 'mho-wishlist',
@@ -19,9 +23,9 @@ export class WishlistComponent {
 
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<WishlistItem>;
-    @ViewChild('addItemFilterInput') add_item_filter_input!: ElementRef;
+    @ViewChild(MatTabGroup) tabs!: MatTabGroup;
     @ViewChild('filterInput') filterInput!: ElementRef;
-    @ViewChild('addItemSelect') add_item_select!: MatSelect;
+    @ViewChild('addItemSelect') add_item_select!: SelectComponent<Item>;
 
     /** La wishlist */
     public wishlist_info!: WishlistInfo;
@@ -44,6 +48,10 @@ export class WishlistComponent {
     ];
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: WishlistColumns) => column.id);
+    public readonly basic_list_label: string = $localize`Toute la carte`;
+
+    public selected_tab_key: string = '0';
+    public selected_tab_index: number = 0;
 
     public items: Item[] = [];
     /** Les filtres de la liste de courses */
@@ -71,7 +79,7 @@ export class WishlistComponent {
         { count: 1, label: $localize`Zone de rapatriement` },
     ]
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiServices, private wishlist_sercices: WishlistServices, private clipboard: ClipboardService) {
 
     }
 
@@ -93,9 +101,9 @@ export class WishlistComponent {
 
     /** Met à jour la liste de courses */
     public updateWishlist(): void {
-        this.api.updateWishlist(this.wishlist_info).subscribe((wishlist_info: WishlistInfo) => {
+        this.wishlist_sercices.updateWishlist(this.wishlist_info).subscribe((wishlist_info: WishlistInfo) => {
             this.wishlist_info = wishlist_info;
-            this.datasource.data = wishlist_info.wishlist_items;
+            this.datasource.data = [...<WishlistItem[]>wishlist_info.wishlist_items.get(this.selected_tab_key)];
         })
     }
 
@@ -106,29 +114,86 @@ export class WishlistComponent {
 
     /** Retire une ligne de la liste */
     public remove(row: WishlistItem) {
-        let index = this.wishlist_info.wishlist_items.findIndex((wishlist_item: WishlistItem) => wishlist_item.item.id === row.item.id);
-        this.wishlist_info.wishlist_items.splice(index, 1);
-        this.datasource.data = [...this.wishlist_info.wishlist_items];
-    }
-
-    public isObjectDisplayed(item: Item): boolean {
-        let display_by_filter: boolean = item.label[this.locale].toLowerCase()
-        .indexOf(this.add_item_filter_input ? this.add_item_filter_input.nativeElement.value.toLowerCase() : '') > -1;
-        let not_in_wishlist: boolean = item.wishlist_count === 0;
-        return display_by_filter && not_in_wishlist;
+        let current_list: WishlistItem[] = [...<WishlistItem[]>this.wishlist_info.wishlist_items.get(this.selected_tab_key)];
+        let index: number = current_list.findIndex((wishlist_item: WishlistItem) => wishlist_item.item.id === row.item.id);
+        console.log('index', index);
+        console.log('key', this.selected_tab_key);
+        current_list.splice(index, 1);
+        console.log('test', current_list);
+        setTimeout(() => {
+            this.datasource.data = [...current_list];
+        });
     }
 
     public addItemToWishlist(item: Item) {
-        this.api.addItemToWishlist(item).subscribe(() => {
-            item.wishlist_count = 1;
-            this.add_item_select.value = undefined;
-            this.add_item_filter_input.nativeElement.value = '';
-            this.getWishlist();
-        })
+        if (item) {
+            this.wishlist_sercices.addItemToWishlist(item, this.selected_tab_key).subscribe(() => {
+                item.wishlist_count = 1;
+                this.add_item_select.value = undefined;
+                this.getWishlist();
+            })
+        }
     }
 
     public trackByColumnId(index: number, column: WishlistColumns): string {
         return column.id;
+    }
+
+    public addZone(distance: number): void {
+        if (!this.wishlist_info.wishlist_items.has(distance.toString())) {
+            this.wishlist_info.wishlist_items.set(distance.toString(), []);
+            this.wishlist_info.wishlist_items = new Map(this.wishlist_info.wishlist_items);
+            this.selected_tab_index = this.tabs._allTabs.length - 1;
+        }
+    }
+
+    public changeTab(event: MatTabChangeEvent): void {
+        let keys: string[] = Array.from(this.wishlist_info.wishlist_items.keys());
+        this.selected_tab_key = keys[event.index];
+        this.datasource.data = [...<WishlistItem[]>this.wishlist_info.wishlist_items.get(this.selected_tab_key)];
+    }
+
+    public shareWishlist() {
+        let text: string = `[big][b][i]${$localize`Liste de courses`}[/i][/b][/big]\n\n`;
+        this.wishlist_info.wishlist_items.forEach((items: WishlistItem[], key: string) => {
+            if (key === '0') {
+                text += `[big][i]${this.basic_list_label}[/i][/big]`;
+            } else {
+                text += `[big][i]Z${key}[/i][/big]`
+            }
+            text += `\n`;
+
+            items = items.sort((item_a: WishlistItem, item_b: WishlistItem) => item_b.priority - item_a.priority)
+
+            let heavy: WishlistItem[] = items.filter((item: WishlistItem) => item.item.is_heaver && item.priority >= 0);
+            let light: WishlistItem[] = items.filter((item: WishlistItem) => !item.item.is_heaver && item.priority >= 0);
+            let do_not_bring_back: WishlistItem[] = items.filter((item: WishlistItem) => item.priority < 0);
+
+            if (heavy.length > 0) {
+                text += `\n[b][i]${$localize`Encombrants`}[/i][/b]\n`;
+                heavy.forEach((item: WishlistItem) => {
+                    text += `:middot:${item.item.label[this.locale]} (x${item.count})\n`;
+                })
+            }
+            if (light.length > 0) {
+                text += `\n[b][i]${$localize`Non-Encombrants`}[/i][/b]\n`;
+                light.forEach((item: WishlistItem) => {
+                    text += `:middot:${item.item.label[this.locale]} (x${item.count})\n`;
+                })
+            }
+            if (do_not_bring_back.length > 0) {
+                text += `\n[b][i]${$localize`Ne pas rapporter`}[/i][/b]\n`;
+                do_not_bring_back.forEach((item: WishlistItem) => {
+                    text += `:middot:${item.item.label[this.locale]}\n`;
+                })
+            }
+            text += `\n{hr}\n\n`;
+        })
+
+        text += `[b]${$localize`Dernière mise à jour` + ` : ` + this.wishlist_info.update_info.update_time.format('LLL') + ' ' + $localize`par` + ' ' + this.wishlist_info.update_info.username}[/b]\n`
+        text += `[aparte]${$localize`Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=http://${environment.website_url}my-town/wishlist]ce lien[/link]`}[/aparte]`
+
+        this.clipboard.copy(text, $localize`La liste a bien été copiée au format forum`);
     }
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
@@ -140,9 +205,9 @@ export class WishlistComponent {
     }
 
     private getWishlist(): void {
-        this.api.getWishlist().subscribe((wishlist_info: WishlistInfo) => {
+        this.wishlist_sercices.getWishlist().subscribe((wishlist_info: WishlistInfo) => {
             this.wishlist_info = wishlist_info;
-            this.datasource.data = [...wishlist_info.wishlist_items];
+            this.datasource.data = [...<WishlistItem[]>wishlist_info.wishlist_items.get(this.selected_tab_key)];
         });
     }
 }

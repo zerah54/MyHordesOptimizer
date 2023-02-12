@@ -2,7 +2,7 @@ import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { Component, ElementRef, HostBinding, Input, OnDestroy, Optional, Output, Self, ViewChild, EventEmitter, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, UntypedFormControl, NgControl, ValidationErrors, Validator, Validators } from '@angular/forms';
 import { MatOption } from '@angular/material/core';
-import { MatFormFieldControl } from '@angular/material/form-field';
+import { MatFormField, MatFormFieldControl } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSelect } from '@angular/material/select';
 import { Subject } from 'rxjs';
@@ -20,13 +20,13 @@ import { LabelPipe } from './label.pipe';
             useExisting: SelectComponent
         }
     ],
+    host: {
+        '[class.floating]': 'shouldLabelFloat',
+        '[id]': 'id',
+      },
 })
 export class SelectComponent<T> implements ControlValueAccessor, Validator, MatFormFieldControl<T | string | T[] | string[] | undefined>, OnDestroy {
     @HostBinding('style.display') display: string = 'contents';
-    @HostBinding() id = `mho-select-${SelectComponent.nextId++}`;
-    @HostBinding('class.floating') get shouldLabelFloat() {
-        return this.focused || !this.empty;
-    }
 
     // get reference to the input element
     @ViewChild(MatSelect) select!: MatSelect;
@@ -77,6 +77,12 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         this.stateChanges.next();
     }
 
+    get shouldLabelFloat() {
+        return this.focused || !this.empty;
+    }
+
+    public id = `mho-select-${SelectComponent.nextId++}`;
+
     public displayed_options: (T | string)[] = [];
 
     public stateChanges = new Subject<void>();
@@ -85,7 +91,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     //The internal data model for form control value access
     private innerValue: T | string | T[] | string[] | undefined = undefined;
     // errors for the form control will be stored in this array
-    private errors: string[] = ['This field is required'];
+    private errors: string[] = [$localize`Ce champ est obligatoire`];
     private touched: boolean = false;
     private _placeholder!: string;
     private _required = false;
@@ -99,7 +105,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     public propagateChange = (_: any) => { }
     public onTouched = () => { }
 
-    public constructor(@Optional() @Self() public ngControl: NgControl, @Optional() @Self() public validator: Validators, private _elementRef: ElementRef) {
+    public constructor(@Optional() @Self() public ngControl: NgControl, @Optional() @Self() public validator: Validators, @Optional() public parent_form_field: MatFormField,
+        private _elementRef: ElementRef) {
         if (this.ngControl != null) {
             this.ngControl.valueAccessor = this;
         }

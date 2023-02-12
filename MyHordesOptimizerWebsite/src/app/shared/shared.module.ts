@@ -18,12 +18,14 @@ import { SnackbarService } from './services/snackbar.service';
 import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { DigsServices } from '../_abstract_model/services/digs.service';
 import { FilterRuinsByKmPipe } from './pipes/filter-ruins-by-km.pipe';
+import { WishlistServices } from '../_abstract_model/services/wishlist.service';
+import { CustomKeyValuePipe } from './pipes/key-value.pipe';
 
 let custom_modules: Modules = [MaterialModule, ElementsModule];
 let angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule]
-let services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService]
+let services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService, WishlistServices]
 let guards: Components = [IsInTownGuard];
-let pipes: Components = [ArrayItemDetailsPipe, CitizensFromShortPipe, ItemDetailsPipe, FilterRuinsByKmPipe];
+let pipes: Components = [ArrayItemDetailsPipe, CitizensFromShortPipe, ItemDetailsPipe, FilterRuinsByKmPipe, CustomKeyValuePipe];
 let external_modules: Modules = [TableVirtualScrollModule];
 
 @NgModule({
