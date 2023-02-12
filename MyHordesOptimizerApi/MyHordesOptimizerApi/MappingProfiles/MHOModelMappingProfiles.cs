@@ -287,6 +287,23 @@ namespace MyHordesOptimizerApi.MappingProfiles
               .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.ZoneXPa))
               .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count));
 
+            CreateMap<IGrouping<int, DefaultWishlistItemModel>, WishlistTemplateDto>()
+               .ForMember(dest => dest.IdTemplate, opt => opt.MapFrom(src => src.First().IdDefaultWishlist))
+               .ForMember(dest => dest.IdUserAuthor, opt => opt.MapFrom(src => src.First().IdUserAuthor))
+               .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.First().Name))
+               .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.First().LabelFr }, { "en", src.First().LabelEn }, { "es", src.First().LabelEs }, { "de", src.First().LabelDe } }))
+               .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.ToList()));
+
+            CreateMap<DefaultWishlistItemModel, WishListItem>()
+                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => new Item() { Id = src.IdItem }))
+                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
+                .ForMember(dest => dest.Depot, opt => opt.Ignore())
+                .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
+                .ForMember(dest => dest.BankCount, opt => opt.Ignore())
+                .ForMember(dest => dest.IsWorkshop, opt => opt.Ignore())
+                .ForMember(dest => dest.BagCount, opt => opt.Ignore())
+                .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.Count));            
+
             CreateMap<HomeUpgradeDetailsDto, TownCitizenDetailModel>()
                 .ForMember(dest => dest.ApagCharges, opt => opt.Ignore())
                 .ForMember(dest => dest.ChestLevel, opt => opt.MapFrom(src => src.Chest))

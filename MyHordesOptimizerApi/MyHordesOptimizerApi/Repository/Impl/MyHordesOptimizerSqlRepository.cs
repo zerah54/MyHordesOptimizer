@@ -536,6 +536,26 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return itemTemplates;
         }
 
+        public IEnumerable<DefaultWishlistItemModel> GetWishListTemplates()
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var itemTemplates = connection.Query<DefaultWishlistItemModel>(@"SELECT idDefaultWishlist
+                                                                            ,idUserAuthor
+                                                                            ,name
+                                                                            ,label_fr AS LabelFr
+                                                                            ,label_en AS LabelEn
+                                                                            ,label_es AS LabelEs
+                                                                            ,label_de AS LabelDe
+                                                                            ,idItem
+                                                                            ,count
+                                                                            ,priority
+                                                                            ,zoneXPa
+                                                                            FROM DefaultWishlistItem");
+            connection.Close();
+            return itemTemplates;
+        }
+
         #endregion
 
         #region Citizens

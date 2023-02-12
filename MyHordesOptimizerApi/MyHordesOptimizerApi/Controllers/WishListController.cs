@@ -68,6 +68,14 @@ namespace MyHordesOptimizerApi.Controllers
             return categories;
         }
 
+        [HttpGet]
+        [Route("Templates")]
+        public ActionResult<List<WishlistTemplateDto>> GetWishListTemplates()
+        {
+            var templates = _wishListService.GetWishListTemplates();
+            return templates;
+        }
+
         [HttpPost]
         [Route("Template/{templateId}")]
         public ActionResult<WishListWrapper> CreateFromTemplate(int? townId, int? userId, int? templateId)

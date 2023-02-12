@@ -11,5 +11,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         WishListWrapper CreateFromTemplate(int townId, int userId, int templateId);
         void AddItemToWishList(int townId, int userId, int itemId, int zoneXPa);
         List<WishlistCategorieDto> GetWishListCategories();
+        List<WishlistTemplateDto> GetWishListTemplates();
     }
 }

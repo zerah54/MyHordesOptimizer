@@ -101,5 +101,13 @@ namespace MyHordesOptimizerApi.Services.Impl
             var dtos = Mapper.Map<List<WishlistCategorieDto>>(groupping);
             return dtos;
         }
+
+        public List<WishlistTemplateDto> GetWishListTemplates()
+        {
+            var models = MyHordesOptimizerRepository.GetWishListTemplates();
+            var groupping = models.GroupBy(x => x.IdDefaultWishlist);
+            var dtos = Mapper.Map<List<WishlistTemplateDto>>(groupping);
+            return dtos;
+        }
     }
 }

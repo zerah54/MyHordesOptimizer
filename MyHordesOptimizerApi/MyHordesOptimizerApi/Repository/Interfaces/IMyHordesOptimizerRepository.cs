@@ -46,6 +46,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         IEnumerable<WishlistCategorieCompletModel> GetWishListCategories();
         void PatchDefaultWishlistItems(List<DefaultWishlistItemModel> modeles);
         IEnumerable<DefaultWishlistItemModel> GetWishListTemplate(int templateId);
+        IEnumerable<DefaultWishlistItemModel> GetWishListTemplates();
 
         void PatchRuins(IEnumerable<MyHordesOptimizerRuin> jsonRuins);
         IEnumerable<MyHordesOptimizerRuin> GetRuins();
