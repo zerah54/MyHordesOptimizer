@@ -80,6 +80,15 @@ namespace MyHordesOptimizerApi.Services.Impl
             return wishList;
         }
 
+        public WishListWrapper CreateFromTemplate(int townId, int userId, int templateId)
+        {
+            var itemTemplates = MyHordesOptimizerRepository.GetWishListTemplate(templateId);
+            var items = Mapper.Map<List<TownWishlistItemModel>>(itemTemplates);
+            MyHordesOptimizerRepository.PutWishList(townId, userId, items);
+            var wishList = MyHordesOptimizerRepository.GetWishList(townId);
+            return wishList;
+        }
+
         public void AddItemToWishList(int townId, int userId, int itemId, int zoneXPa)
         {
             MyHordesOptimizerRepository.AddItemToWishlist(townId, itemId, userId, zoneXPa);

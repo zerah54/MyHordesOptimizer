@@ -126,7 +126,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 if (listOfNotPrafDrops.TryGetValue(item.Uid, out var dropWeight))
                 {
-                    item.DropRateNotPraf = dropWeight / totalWeightPraf;
+                    item.DropRateNotPraf = dropWeight / totalWeightNotPraf;
                 }
                 else
                 {

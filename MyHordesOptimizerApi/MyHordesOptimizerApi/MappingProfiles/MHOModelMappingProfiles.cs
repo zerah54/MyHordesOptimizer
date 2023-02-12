@@ -279,6 +279,14 @@ namespace MyHordesOptimizerApi.MappingProfiles
                  .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.First().LabelFr }, { "en", src.First().LabelEn }, { "es", src.First().LabelEs }, { "de", src.First().LabelDe } }))
                  .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.ToList().Select(x => x.IdItem).ToList() ));
 
+            CreateMap<DefaultWishlistItemModel, TownWishlistItemModel>()
+              .ForMember(dest => dest.IdTown, opt => opt.Ignore())
+              .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.IdItem))
+              .ForMember(dest => dest.Depot, opt => opt.Ignore())
+              .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
+              .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.ZoneXPa))
+              .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count));
+
             CreateMap<HomeUpgradeDetailsDto, TownCitizenDetailModel>()
                 .ForMember(dest => dest.ApagCharges, opt => opt.Ignore())
                 .ForMember(dest => dest.ChestLevel, opt => opt.MapFrom(src => src.Chest))

@@ -42,9 +42,21 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Add/{itemId}")]
-        public ActionResult AddItemToWishList(int townId, int itemId, int userId, int zoneXPa)
+        public ActionResult AddItemToWishList(int? townId, int? itemId, int? userId, int zoneXPa)
         {
-            _wishListService.AddItemToWishList(townId: townId, itemId: itemId, userId: userId, zoneXPa: zoneXPa);
+            if (!townId.HasValue)
+            {
+                return BadRequest($"{nameof(townId)} cannot be null");
+            }
+            if (!itemId.HasValue)
+            {
+                return BadRequest($"{nameof(itemId)} cannot be null");
+            }
+            if (!userId.HasValue)
+            {
+                return BadRequest($"{nameof(userId)} cannot be null");
+            }
+            _wishListService.AddItemToWishList(townId: townId.Value, itemId: itemId.Value, userId: userId.Value, zoneXPa: zoneXPa);
             return Ok();
         }
 
@@ -54,6 +66,26 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var categories = _wishListService.GetWishListCategories();
             return categories;
+        }
+
+        [HttpPost]
+        [Route("Template/{templateId}")]
+        public ActionResult<WishListWrapper> CreateFromTemplate(int? townId, int? userId, int? templateId)
+        {
+            if (!townId.HasValue)
+            {
+                return BadRequest($"{nameof(townId)} cannot be null");
+            }
+            if (!userId.HasValue)
+            {
+                return BadRequest($"{nameof(userId)} cannot be null");
+            }
+            if (!templateId.HasValue)
+            {
+                return BadRequest($"{nameof(templateId)} cannot be null");
+            }
+            var wishList = _wishListService.CreateFromTemplate(townId.Value, userId.Value, templateId.Value);
+            return wishList;
         }
     }
 }

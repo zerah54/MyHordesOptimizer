@@ -485,21 +485,21 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return wishlistWrapper;
         }
 
-    public void PatchWishlistCategories(List<WishlistCategorieModel> categories)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.BulkInsertOrUpdate("WishlistCategorie", categories);
-        connection.Close();
-    }
+        public void PatchWishlistCategories(List<WishlistCategorieModel> categories)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.BulkInsertOrUpdate("WishlistCategorie", categories);
+            connection.Close();
+        }
 
-    public void PatchWishlistItemCategories(List<WishlistCategorieItemModel> itemsCategorie)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.BulkInsertOrUpdate("WishlistCategorieItem", itemsCategorie);
-        connection.Close();
-    }
+        public void PatchWishlistItemCategories(List<WishlistCategorieItemModel> itemsCategorie)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.BulkInsertOrUpdate("WishlistCategorieItem", itemsCategorie);
+            connection.Close();
+        }
 
         public IEnumerable<WishlistCategorieCompletModel> GetWishListCategories()
         {
@@ -520,73 +520,82 @@ namespace MyHordesOptimizerApi.Repository.Impl
         }
 
         public void PatchDefaultWishlistItems(List<DefaultWishlistItemModel> modeles)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.BulkInsertOrUpdate("DefaultWishlistItem", modeles);
-        connection.Close();
-    }
-
-    #endregion
-
-    #region Citizens
-
-    public void PatchCitizen(int townId, CitizensWrapper wrapper)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var userIds = wrapper.Citizens.Select(x => x.Id).ToList();
-        var existingUsers = connection.Query<UsersModel>("SELECT * FROM Users WHERE idUser IN @UserIds", new { UserIds = userIds });
-        //  var insertBuilder = new StringBuilder("INSERT INTO User(idUser,name,userKey) VALUES ");
-        foreach (var citizen in wrapper.Citizens)
         {
-            var userModel = Mapper.Map<UsersModel>(citizen);
-            var existingUser = existingUsers.FirstOrDefault(x => x.IdUser == citizen.Id);
-            if (existingUser != null && existingUser.Name != citizen.Name)
-            {
-                // On devrait pas souvent faire des updates, alors on est pas obliger de bulk
-                connection.Execute("UPDATE Users SET name = @Name WHERE idUser = @UserId", new { Name = userModel.Name, UserId = userModel.IdUser });
-            }
-            else if (existingUser == null)
-            {
-                connection.Insert(userModel);
-            }
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.BulkInsertOrUpdate("DefaultWishlistItem", modeles);
+            connection.Close();
         }
-        var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(wrapper.LastUpdateInfo);
-        var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
+
+        public IEnumerable<DefaultWishlistItemModel> GetWishListTemplate(int templateId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var itemTemplates = connection.Query<DefaultWishlistItemModel>(@"SELECT * FROM DefaultWishlistItem WHERE idDefaultWishlist = @templateId", new { TemplateId = templateId });
+            connection.Close();
+            return itemTemplates;
+        }
+
+        #endregion
+
+        #region Citizens
+
+        public void PatchCitizen(int townId, CitizensWrapper wrapper)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var userIds = wrapper.Citizens.Select(x => x.Id).ToList();
+            var existingUsers = connection.Query<UsersModel>("SELECT * FROM Users WHERE idUser IN @UserIds", new { UserIds = userIds });
+            //  var insertBuilder = new StringBuilder("INSERT INTO User(idUser,name,userKey) VALUES ");
+            foreach (var citizen in wrapper.Citizens)
+            {
+                var userModel = Mapper.Map<UsersModel>(citizen);
+                var existingUser = existingUsers.FirstOrDefault(x => x.IdUser == citizen.Id);
+                if (existingUser != null && existingUser.Name != citizen.Name)
+                {
+                    // On devrait pas souvent faire des updates, alors on est pas obliger de bulk
+                    connection.Execute("UPDATE Users SET name = @Name WHERE idUser = @UserId", new { Name = userModel.Name, UserId = userModel.IdUser });
+                }
+                else if (existingUser == null)
+                {
+                    connection.Insert(userModel);
+                }
+            }
+            var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(wrapper.LastUpdateInfo);
+            var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
                                                                    VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
 
-        var townCitizenModels = Mapper.Map<IEnumerable<TownCitizenModel>>(wrapper.Citizens).ToList();
-        townCitizenModels.ForEach(x => { x.IdTown = townId; x.IdLastUpdateInfo = idLastUpdateInfo; });
+            var townCitizenModels = Mapper.Map<IEnumerable<TownCitizenModel>>(wrapper.Citizens).ToList();
+            townCitizenModels.ForEach(x => { x.IdTown = townId; x.IdLastUpdateInfo = idLastUpdateInfo; });
 
-        var existings = connection.Query("SELECT idUser, idBag FROM TownCitizen WHERE idTown = @IdTown", new { IdTown = townId });
+            var existings = connection.Query("SELECT idUser, idBag FROM TownCitizen WHERE idTown = @IdTown", new { IdTown = townId });
 
-        var townCitizenModelsToInsert = townCitizenModels.Where(x => !existings.Any(existing => existing.idUser == x.IdUser)).ToList();
-        connection.BulkInsert("TownCitizen", townCitizenModelsToInsert);
+            var townCitizenModelsToInsert = townCitizenModels.Where(x => !existings.Any(existing => existing.idUser == x.IdUser)).ToList();
+            connection.BulkInsert("TownCitizen", townCitizenModelsToInsert);
 
-        var townCitizenModelsToUpdate = townCitizenModels.Where(x => existings.Any(existing => existing.idUser == x.IdUser)).ToList();
-        foreach (var citizenToUpdate in townCitizenModelsToUpdate)
-        {
-            citizenToUpdate.IdBag = existings.Single(existing => existing.idUser == citizenToUpdate.IdUser).idBag;
-            connection.Execute(@"UPDATE TownCitizen 
+            var townCitizenModelsToUpdate = townCitizenModels.Where(x => existings.Any(existing => existing.idUser == x.IdUser)).ToList();
+            foreach (var citizenToUpdate in townCitizenModelsToUpdate)
+            {
+                citizenToUpdate.IdBag = existings.Single(existing => existing.idUser == citizenToUpdate.IdUser).idBag;
+                connection.Execute(@"UPDATE TownCitizen 
                                      SET HomeMessage = @HomeMessage, JobName = @JobName, JobUID = @JobUID, Avatar = @Avatar, PositionX = @PositionX, PositionY = @PositionY, IsGhost = @IsGhost, IdLastUpdateInfo = @IdLastUpdateInfo 
                                      WHERE IdTown = @IdTown AND IdUser = @IdUser", new { HomeMessage = citizenToUpdate.HomeMessage, JobName = citizenToUpdate.JobName, JobUID = citizenToUpdate.JobUID, Avatar = citizenToUpdate.Avatar, PositionX = citizenToUpdate.PositionX, PositionY = citizenToUpdate.PositionY, IsGhost = citizenToUpdate.IsGhost, IdLastUpdateInfo = citizenToUpdate.IdLastUpdateInfo, IdTown = townId, IdUser = citizenToUpdate.IdUser });
+            }
+            connection.Close();
         }
-        connection.Close();
-    }
 
-    public void PatchCitizenDetail(TownCitizenDetailModel citizenDetail)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var keys = new Dictionary<string, Func<TownCitizenDetailModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser } };
-        connection.Update(citizenDetail, keys, ignoreNull: true);
-        connection.Close();
-    }
+        public void PatchCitizenDetail(TownCitizenDetailModel citizenDetail)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var keys = new Dictionary<string, Func<TownCitizenDetailModel, object>>() { { "idTown", x => x.IdTown }, { "idUser", x => x.IdUser } };
+            connection.Update(citizenDetail, keys, ignoreNull: true);
+            connection.Close();
+        }
 
-    public CitizensWrapper GetCitizens(int townId)
-    {
-        var query = $@"SELECT tc.idTown AS TownId
+        public CitizensWrapper GetCitizens(int townId)
+        {
+            var query = $@"SELECT tc.idTown AS TownId
                                   ,citizen.idUser AS CitizenId
 	                              ,citizen.name AS CitizenName
                                   ,homeMessage AS CitizenHomeMessage
@@ -701,106 +710,106 @@ namespace MyHordesOptimizerApi.Repository.Impl
                               LEFT JOIN LastUpdateInfo ghoulLui ON ghoulLui.idLastUpdateInfo = tc.idLastUpdateInfoGhoulStatus 
                               LEFT JOIN Users ghoulLuiUser ON ghoulLuiUser.idUser = ghoulLui.idUser
                               WHERE tc.idTown = @idTown";
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        var citizens = connection.Query<TownCitizenBagItemCompletModel>(query, new { idTown = townId });
-        connection.Close();
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            var citizens = connection.Query<TownCitizenBagItemCompletModel>(query, new { idTown = townId });
+            connection.Close();
 
 
-        //  var distinctCitizenItem = citizens.Where(x => x.IdItem != 0).Distinct(new TownCitizenItemComparer());
-        var distinctCitizenItem = citizens.Where(x => x.IdItem != 0).Distinct(new TownCitizenItemComparer());
-        var items = Mapper.Map<IEnumerable<Item>>(citizens.Where(x => x.IdItem != 0).Distinct(new ItemIdComparer()));
+            //  var distinctCitizenItem = citizens.Where(x => x.IdItem != 0).Distinct(new TownCitizenItemComparer());
+            var distinctCitizenItem = citizens.Where(x => x.IdItem != 0).Distinct(new TownCitizenItemComparer());
+            var items = Mapper.Map<IEnumerable<Item>>(citizens.Where(x => x.IdItem != 0).Distinct(new ItemIdComparer()));
 
-        foreach (var item in items)
-        {
-            IEnumerable<TownCitizenBagItemCompletModel> matchingItemComplet = citizens.Where(i => i.IdItem == item.Id);
-            item.Actions = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.ActionName)).Select(i => i.ActionName).Distinct();
-            item.Properties = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.PropertyName)).Select(i => i.PropertyName).Distinct();
-        }
-
-        var citizenWrapper = new CitizensWrapper()
-        {
-            LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.First()),
-            Citizens = Mapper.Map<IEnumerable<Citizen>>(citizens.Distinct(new CitizenIdComparer())).ToList()
-        };
-        citizenWrapper.Citizens.ForEach(citizen =>
-        {
-            var citizenItems = distinctCitizenItem.Where(x => x.CitizenId == citizen.Id);
-            citizen.Bag = Mapper.Map<CitizenBag>(citizenItems);
-            if (!citizenItems.Any()) // Si y'a pas d'item dans le sac, il faut aller chercher l'info du last update dans la liste sans le distinct !
+            foreach (var item in items)
             {
-                var c = citizens.First(x => x.CitizenId == citizen.Id);
-                if (c.BagLastUpdateDateUpdate.HasValue)
+                IEnumerable<TownCitizenBagItemCompletModel> matchingItemComplet = citizens.Where(i => i.IdItem == item.Id);
+                item.Actions = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.ActionName)).Select(i => i.ActionName).Distinct();
+                item.Properties = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.PropertyName)).Select(i => i.PropertyName).Distinct();
+            }
+
+            var citizenWrapper = new CitizensWrapper()
+            {
+                LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.First()),
+                Citizens = Mapper.Map<IEnumerable<Citizen>>(citizens.Distinct(new CitizenIdComparer())).ToList()
+            };
+            citizenWrapper.Citizens.ForEach(citizen =>
+            {
+                var citizenItems = distinctCitizenItem.Where(x => x.CitizenId == citizen.Id);
+                citizen.Bag = Mapper.Map<CitizenBag>(citizenItems);
+                if (!citizenItems.Any()) // Si y'a pas d'item dans le sac, il faut aller chercher l'info du last update dans la liste sans le distinct !
                 {
-                    citizen.Bag.LastUpdateInfo = new LastUpdateInfo()
+                    var c = citizens.First(x => x.CitizenId == citizen.Id);
+                    if (c.BagLastUpdateDateUpdate.HasValue)
                     {
-                        UpdateTime = c.BagLastUpdateDateUpdate.Value,
-                        UserName = c.BagLastUpdateUserName
-                    };
+                        citizen.Bag.LastUpdateInfo = new LastUpdateInfo()
+                        {
+                            UpdateTime = c.BagLastUpdateDateUpdate.Value,
+                            UserName = c.BagLastUpdateUserName
+                        };
+                    }
+                    citizen.Bag.IdBag = c.BagId;
                 }
-                citizen.Bag.IdBag = c.BagId;
-            }
-        });
-        return citizenWrapper;
-    }
-
-    public void UpdateCitizenLocation(int townId, int x, int y, IEnumerable<int> citizenId, int lastUpdateInfoId)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var param = new DynamicParameters();
-        param.Add($"@PositionX", x);
-        param.Add($"@PositionY", y);
-        param.Add($"@IdTown", townId);
-        param.Add($"@lastUpdateInfoId", lastUpdateInfoId);
-        var inParamList = new List<string>();
-        foreach (var id in citizenId)
-        {
-            inParamList.Add($"@{id}");
-            param.Add($"@{id}", id);
-        }
-        var query = $"UPDATE TownCitizen SET positionX = @positionX, positionY = @positionY, idLastUpdateInfo = @lastUpdateInfoId WHERE idUser IN ({string.Join(",", inParamList)}) AND idTown = @idTown";
-        connection.Query(query, param);
-        connection.Close();
-    }
-
-    #endregion
-
-    #region Ruins
-
-    public void PatchRuins(IEnumerable<MyHordesOptimizerRuin> ruins)
-    {
-        var model = Mapper.Map<IEnumerable<RuinModel>>(ruins);
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var existings = connection.Query<RuinModel>("SELECT * FROM Ruin");
-        foreach (var ruin in model)
-        {
-            if (existings.Any(r => r.IdRuin == ruin.IdRuin))
-            {
-                connection.Update(ruin);
-            }
-            else
-            {
-                connection.Insert(ruin);
-            }
+            });
+            return citizenWrapper;
         }
 
-        connection.Execute("DELETE FROM RuinItemDrop");
-        foreach (var ruin in ruins)
+        public void UpdateCitizenLocation(int townId, int x, int y, IEnumerable<int> citizenId, int lastUpdateInfoId)
         {
-            foreach (var drop in ruin.Drops)
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var param = new DynamicParameters();
+            param.Add($"@PositionX", x);
+            param.Add($"@PositionY", y);
+            param.Add($"@IdTown", townId);
+            param.Add($"@lastUpdateInfoId", lastUpdateInfoId);
+            var inParamList = new List<string>();
+            foreach (var id in citizenId)
             {
-                var exist = connection.ExecuteScalar<string>("SELECT idRuin, idItem FROM RuinItemDrop WHERE idRuin = @IdRuin AND idItem = @IdItem", new { IdRuin = ruin.Id, IdItem = drop.Item.Id });
-                if (exist != null)
+                inParamList.Add($"@{id}");
+                param.Add($"@{id}", id);
+            }
+            var query = $"UPDATE TownCitizen SET positionX = @positionX, positionY = @positionY, idLastUpdateInfo = @lastUpdateInfoId WHERE idUser IN ({string.Join(",", inParamList)}) AND idTown = @idTown";
+            connection.Query(query, param);
+            connection.Close();
+        }
+
+        #endregion
+
+        #region Ruins
+
+        public void PatchRuins(IEnumerable<MyHordesOptimizerRuin> ruins)
+        {
+            var model = Mapper.Map<IEnumerable<RuinModel>>(ruins);
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var existings = connection.Query<RuinModel>("SELECT * FROM Ruin");
+            foreach (var ruin in model)
+            {
+                if (existings.Any(r => r.IdRuin == ruin.IdRuin))
                 {
-                    var sql = $@"UPDATE RuinItemDrop
-                                SET weight = @Weight
-                                WHERE probability = @Probability";
-                    connection.Execute(sql, new { Weight = drop.Weight, Probability = drop.Probability });
+                    connection.Update(ruin);
                 }
                 else
                 {
-                    connection.Execute($@"INSERT INTO RuinItemDrop
+                    connection.Insert(ruin);
+                }
+            }
+
+            connection.Execute("DELETE FROM RuinItemDrop");
+            foreach (var ruin in ruins)
+            {
+                foreach (var drop in ruin.Drops)
+                {
+                    var exist = connection.ExecuteScalar<string>("SELECT idRuin, idItem FROM RuinItemDrop WHERE idRuin = @IdRuin AND idItem = @IdItem", new { IdRuin = ruin.Id, IdItem = drop.Item.Id });
+                    if (exist != null)
+                    {
+                        var sql = $@"UPDATE RuinItemDrop
+                                SET weight = @Weight
+                                WHERE probability = @Probability";
+                        connection.Execute(sql, new { Weight = drop.Weight, Probability = drop.Probability });
+                    }
+                    else
+                    {
+                        connection.Execute($@"INSERT INTO RuinItemDrop
                                            (idRuin
                                            ,idItem
                                            ,weight
@@ -810,18 +819,18 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                            ,@IdItem
                                            ,@Weight
                                            ,@Probability)", new { IdRuin = ruin.Id, IdItem = drop.Item.Id, Weight = drop.Weight, Probability = drop.Probability });
+                    }
                 }
             }
+            connection.Close();
         }
-        connection.Close();
-    }
 
-    public IEnumerable<MyHordesOptimizerRuin> GetRuins()
-    {
-        var items = GetItems();
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var ruinsComplet = connection.Query<RuinCompletModel>(@"SELECT idRuin
+        public IEnumerable<MyHordesOptimizerRuin> GetRuins()
+        {
+            var items = GetItems();
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var ruinsComplet = connection.Query<RuinCompletModel>(@"SELECT idRuin
                                                                   ,ruinLabel_fr AS RuinLabelFr
                                                                   ,ruinLabel_en AS RuinLabelEn
                                                                   ,ruinLabel_es AS RuinLabelEs
@@ -842,43 +851,43 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                                                   ,dropProbability
                                                                   ,dropWeight
                                                               FROM RuinComplete");
-        connection.Close();
+            connection.Close();
 
-        var ruins = Mapper.Map<IEnumerable<MyHordesOptimizerRuin>>(ruinsComplet.Distinct(new RuinIdComparer()));
-        foreach (var ruin in ruins)
-        {
-            IEnumerable<RuinCompletModel> matchingComplet = ruinsComplet.Where(i => i.IdRuin == ruin.Id);
-            var dropComplet = matchingComplet.Select(r => new { r.IdItem, r.DropWeight, r.DropProbability });
-            foreach (var drop in dropComplet)
+            var ruins = Mapper.Map<IEnumerable<MyHordesOptimizerRuin>>(ruinsComplet.Distinct(new RuinIdComparer()));
+            foreach (var ruin in ruins)
             {
-                if (drop.IdItem != 0)
+                IEnumerable<RuinCompletModel> matchingComplet = ruinsComplet.Where(i => i.IdRuin == ruin.Id);
+                var dropComplet = matchingComplet.Select(r => new { r.IdItem, r.DropWeight, r.DropProbability });
+                foreach (var drop in dropComplet)
                 {
-                    ruin.Drops.Add(new ItemResult()
+                    if (drop.IdItem != 0)
                     {
-                        Item = items.First(i => i.Id == drop.IdItem),
-                        Probability = drop.DropProbability,
-                        Weight = drop.DropWeight
-                    });
+                        ruin.Drops.Add(new ItemResult()
+                        {
+                            Item = items.First(i => i.Id == drop.IdItem),
+                            Probability = drop.DropProbability,
+                            Weight = drop.DropWeight
+                        });
+                    }
                 }
             }
+            return ruins;
         }
-        return ruins;
-    }
 
-    #endregion
+        #endregion
 
-    #region Categories
+        #region Categories
 
-    public void PatchCategories(IEnumerable<CategoryModel> categories)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        foreach (var category in categories)
+        public void PatchCategories(IEnumerable<CategoryModel> categories)
         {
-            var exist = connection.ExecuteScalar<int?>($"SELECT idCategory FROM Category where name = @name", new { category.Name });
-            if (exist.HasValue)
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            foreach (var category in categories)
             {
-                var sql = $@"UPDATE Category
+                var exist = connection.ExecuteScalar<int?>($"SELECT idCategory FROM Category where name = @name", new { category.Name });
+                if (exist.HasValue)
+                {
+                    var sql = $@"UPDATE Category
                                 SET name = @Name
                                     ,label_fr = @LabelFr
                                     ,label_en = @LabelEn
@@ -886,11 +895,11 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                     ,label_de = @LabelDe
                                     ,ordering = @Ordering
                                 WHERE idCategory = @IdCategory";
-                connection.Execute(sql, new { category.Name, category.LabelFr, category.LabelEn, category.LabelEs, category.LabelDe, category.Ordering, category.IdCategory });
-            }
-            else
-            {
-                connection.Execute($@"INSERT INTO Category
+                    connection.Execute(sql, new { category.Name, category.LabelFr, category.LabelEn, category.LabelEs, category.LabelDe, category.Ordering, category.IdCategory });
+                }
+                else
+                {
+                    connection.Execute($@"INSERT INTO Category
                                            (name
                                            ,label_fr
                                            ,label_en
@@ -904,16 +913,16 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                            ,@LabelEs
                                            ,@LabelDe
                                            ,@Ordering)", new { category.Name, category.LabelFr, category.LabelEn, category.LabelEs, category.LabelDe, category.Ordering });
+                }
             }
+            connection.Close();
         }
-        connection.Close();
-    }
 
-    public IEnumerable<CategoryModel> GetCategories()
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var categories = connection.Query<CategoryModel>(@"SELECT idCategory
+        public IEnumerable<CategoryModel> GetCategories()
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var categories = connection.Query<CategoryModel>(@"SELECT idCategory
                                                               ,name
                                                               ,label_fr AS LabelFr
                                                               ,label_en AS LabelEn
@@ -921,365 +930,365 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                                               ,label_de AS LabelDe
                                                               ,ordering
                                                           FROM Category");
-        connection.Close();
-        return categories;
-    }
+            connection.Close();
+            return categories;
+        }
 
-    #endregion
+        #endregion
 
-    #region Properties
+        #region Properties
 
-    public void PatchProperties(IEnumerable<string> properties)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        foreach (var propertie in properties)
+        public void PatchProperties(IEnumerable<string> properties)
         {
-            var exist = connection.ExecuteScalar<string>("SELECT name FROM Property WHERE name = @Name", new { Name = propertie });
-            if (exist != null)
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            foreach (var propertie in properties)
             {
-                var sql = $@"UPDATE Property
+                var exist = connection.ExecuteScalar<string>("SELECT name FROM Property WHERE name = @Name", new { Name = propertie });
+                if (exist != null)
+                {
+                    var sql = $@"UPDATE Property
                                 SET name = @Name
                                 WHERE name = @Name";
-                connection.Execute(sql, new { Name = propertie });
-            }
-            else
-            {
-                connection.Execute($@"INSERT INTO Property
+                    connection.Execute(sql, new { Name = propertie });
+                }
+                else
+                {
+                    connection.Execute($@"INSERT INTO Property
                                            (name)
                                      VALUES
                                            (@Name)", new { Name = propertie });
+                }
             }
+            connection.Close();
         }
-        connection.Close();
-    }
 
-    public void DeleteAllPropertiesItem()
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.Execute("DELETE FROM ItemProperty");
-        connection.Close();
-    }
-
-    public void PatchPropertiesItem(string itemUid, IEnumerable<string> properties)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        try
+        public void DeleteAllPropertiesItem()
         {
-            var existingItem = connection.QuerySingle<ItemModel>($@"SELECT * FROM Item WHERE uid = @itemUid", new { itemUid });
-            foreach (var propertie in properties)
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Execute("DELETE FROM ItemProperty");
+            connection.Close();
+        }
+
+        public void PatchPropertiesItem(string itemUid, IEnumerable<string> properties)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            try
             {
-                var exist = connection.ExecuteScalar<int>("SELECT  count(*) FROM ItemProperty WHERE idItem = @idItem AND propertyName = @propertyName", new { idItem = existingItem.IdItem, propertyName = propertie });
-                if (exist == 0)
+                var existingItem = connection.QuerySingle<ItemModel>($@"SELECT * FROM Item WHERE uid = @itemUid", new { itemUid });
+                foreach (var propertie in properties)
                 {
-                    connection.Execute($@"INSERT INTO ItemProperty
+                    var exist = connection.ExecuteScalar<int>("SELECT  count(*) FROM ItemProperty WHERE idItem = @idItem AND propertyName = @propertyName", new { idItem = existingItem.IdItem, propertyName = propertie });
+                    if (exist == 0)
+                    {
+                        connection.Execute($@"INSERT INTO ItemProperty
                                            (idItem
                                            ,propertyName)
                                      VALUES
                                            (@idItem
                                             ,@propertyName)", new { idItem = existingItem.IdItem, propertyName = propertie });
+                    }
                 }
             }
-        }
-        catch (Exception e)
-        {
-            Logger.LogError($@"{e}{Environment.NewLine}{itemUid}", e);
-        }
-        connection.Close();
-    }
-
-    #endregion
-
-    #region Actions
-
-
-    public void PatchActions(IEnumerable<string> allActions)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        foreach (var action in allActions)
-        {
-            var exist = connection.ExecuteScalar<string>("SELECT name FROM Action WHERE name = @Name", new { Name = action });
-            if (exist != null)
+            catch (Exception e)
             {
-                var sql = $@"UPDATE Action
+                Logger.LogError($@"{e}{Environment.NewLine}{itemUid}", e);
+            }
+            connection.Close();
+        }
+
+        #endregion
+
+        #region Actions
+
+
+        public void PatchActions(IEnumerable<string> allActions)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            foreach (var action in allActions)
+            {
+                var exist = connection.ExecuteScalar<string>("SELECT name FROM Action WHERE name = @Name", new { Name = action });
+                if (exist != null)
+                {
+                    var sql = $@"UPDATE Action
                                 SET name = @Name
                                 WHERE name = @Name";
-                connection.Execute(sql, new { Name = action });
-            }
-            else
-            {
-                connection.Execute($@"INSERT INTO Action
+                    connection.Execute(sql, new { Name = action });
+                }
+                else
+                {
+                    connection.Execute($@"INSERT INTO Action
                                            (name)
                                      VALUES
                                            (@Name)", new { Name = action });
+                }
             }
+            connection.Close();
         }
-        connection.Close();
-    }
 
-    public void DeleteAllActionsItem()
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.Execute("DELETE FROM ItemAction");
-        connection.Close();
-    }
-
-    public void PatchActionsItem(string itemUid, IEnumerable<string> actions)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        try
+        public void DeleteAllActionsItem()
         {
-            var existingItem = connection.QuerySingle<ItemModel>($@"SELECT * FROM Item WHERE uid = @itemUid", new { itemUid });
-            foreach (var action in actions)
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Execute("DELETE FROM ItemAction");
+            connection.Close();
+        }
+
+        public void PatchActionsItem(string itemUid, IEnumerable<string> actions)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            try
             {
-                var exist = connection.ExecuteScalar<int>("SELECT  count(*) FROM ItemAction WHERE idItem = @idItem AND actionName = @actionName", new { idItem = existingItem.IdItem, actionName = action });
-                if (exist == 0)
+                var existingItem = connection.QuerySingle<ItemModel>($@"SELECT * FROM Item WHERE uid = @itemUid", new { itemUid });
+                foreach (var action in actions)
                 {
-                    connection.Execute($@"INSERT INTO ItemAction
+                    var exist = connection.ExecuteScalar<int>("SELECT  count(*) FROM ItemAction WHERE idItem = @idItem AND actionName = @actionName", new { idItem = existingItem.IdItem, actionName = action });
+                    if (exist == 0)
+                    {
+                        connection.Execute($@"INSERT INTO ItemAction
                                            (idItem
                                            ,actionName)
                                      VALUES
                                            (@idItem
                                             ,@actionName)", new { idItem = existingItem.IdItem, actionName = action });
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                Logger.LogError($@"{e}{Environment.NewLine}{itemUid}", e);
+            }
+            connection.Close();
         }
-        catch (Exception e)
+
+        #endregion
+
+        #region Bags
+
+        public void PatchCitizenBags(int townId, LastUpdateInfo lastUpdateInfo, IEnumerable<Citizen> citizens)
         {
-            Logger.LogError($@"{e}{Environment.NewLine}{itemUid}", e);
-        }
-        connection.Close();
-    }
-
-    #endregion
-
-    #region Bags
-
-    public void PatchCitizenBags(int townId, LastUpdateInfo lastUpdateInfo, IEnumerable<Citizen> citizens)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
                                                                    VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.UpdateTime, IdUser = lastUpdateInfo.UserId });
 
-        var param = new DynamicParameters();
-        StringBuilder inBuilder = GenerateInQuery(citizens.Select(x => x.Bag.IdBag), param);
-        connection.ExecuteScalar($"DELETE FROM BagItem WHERE idBag {inBuilder}", param);
+            var param = new DynamicParameters();
+            StringBuilder inBuilder = GenerateInQuery(citizens.Select(x => x.Bag.IdBag), param);
+            connection.ExecuteScalar($"DELETE FROM BagItem WHERE idBag {inBuilder}", param);
 
-        var modeles = new List<BagItem>();
-        foreach (var citizen in citizens)
-        {
-            foreach (var item in citizen.Bag.Items)
+            var modeles = new List<BagItem>();
+            foreach (var citizen in citizens)
             {
-                modeles.Add(new BagItem()
+                foreach (var item in citizen.Bag.Items)
                 {
-                    Count = item.Count,
-                    IsBroken = item.IsBroken,
-                    IdItem = item.Item.Id,
-                    IdBag = citizen.Bag.IdBag.Value
-                });
+                    modeles.Add(new BagItem()
+                    {
+                        Count = item.Count,
+                        IsBroken = item.IsBroken,
+                        IdItem = item.Item.Id,
+                        IdBag = citizen.Bag.IdBag.Value
+                    });
+                }
             }
-        }
-        if (modeles.Any())
-        {
-            connection.BulkInsert("BagItem", modeles);
-        }
-
-        param = new DynamicParameters();
-        param.Add("IdLastUpdateInfo", idLastUpdateInfo);
-        inBuilder = GenerateInQuery(citizens.Select(x => x.Bag.IdBag), param);
-        connection.ExecuteScalar($"UPDATE Bag SET idLastUpdateInfo = @IdLastUpdateInfo WHERE idBag {inBuilder}", param);
-
-        connection.Close();
-    }
-
-    public IDictionary<int, int> GetCitizenBagsId(int townId, IEnumerable<int> userIds)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        var param = new DynamicParameters();
-        param.Add("IdTown", townId);
-        connection.Open();
-        var bagIds = new Dictionary<int, int>();
-        StringBuilder inBuilder = GenerateInQuery(userIds, param);
-        var dynamics = connection.Query($"SELECT idBag, idUser FROM TownCitizen WHERE idTown = @IdTown AND idUser {inBuilder.ToString()}", param);
-        foreach (var result in dynamics)
-        {
-            if (result.idBag == null)
+            if (modeles.Any())
             {
-                var bagId = connection.ExecuteScalar<int>(@"INSERT INTO Bag() VALUES (); SELECT LAST_INSERT_ID()");
-                connection.ExecuteScalar("UPDATE TownCitizen SET idBag = @IdBag WHERE idUser = @IdUser", new { IdBag = bagId, IdUser = result.idUser });
-                bagIds.Add(result.idUser, bagId);
+                connection.BulkInsert("BagItem", modeles);
             }
-            else
-            {
-                bagIds.Add(result.idUser, result.idBag);
-            }
-        }
-        connection.Close();
-        return bagIds;
-    }
 
-    private static StringBuilder GenerateInQuery<TObject>(IEnumerable<TObject> objects, DynamicParameters param)
-    {
-        var inBuilder = new StringBuilder();
-        if (objects.Any())
+            param = new DynamicParameters();
+            param.Add("IdLastUpdateInfo", idLastUpdateInfo);
+            inBuilder = GenerateInQuery(citizens.Select(x => x.Bag.IdBag), param);
+            connection.ExecuteScalar($"UPDATE Bag SET idLastUpdateInfo = @IdLastUpdateInfo WHERE idBag {inBuilder}", param);
+
+            connection.Close();
+        }
+
+        public IDictionary<int, int> GetCitizenBagsId(int townId, IEnumerable<int> userIds)
         {
-            int count = 1;
-            var list = new List<string>();
-            foreach (var obj in objects)
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            var param = new DynamicParameters();
+            param.Add("IdTown", townId);
+            connection.Open();
+            var bagIds = new Dictionary<int, int>();
+            StringBuilder inBuilder = GenerateInQuery(userIds, param);
+            var dynamics = connection.Query($"SELECT idBag, idUser FROM TownCitizen WHERE idTown = @IdTown AND idUser {inBuilder.ToString()}", param);
+            foreach (var result in dynamics)
             {
-                list.Add($"@{count}");
-                param.Add($"{count}", obj);
-                count++;
+                if (result.idBag == null)
+                {
+                    var bagId = connection.ExecuteScalar<int>(@"INSERT INTO Bag() VALUES (); SELECT LAST_INSERT_ID()");
+                    connection.ExecuteScalar("UPDATE TownCitizen SET idBag = @IdBag WHERE idUser = @IdUser", new { IdBag = bagId, IdUser = result.idUser });
+                    bagIds.Add(result.idUser, bagId);
+                }
+                else
+                {
+                    bagIds.Add(result.idUser, result.idBag);
+                }
             }
-            inBuilder.Append($"IN ({string.Join(",", list)})");
+            connection.Close();
+            return bagIds;
         }
-        return inBuilder;
-    }
 
-    public int GetCitizenBagId(int townId, int userId)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var bagId = connection.QuerySingle<int?>("SELECT idBag FROM TownCitizen WHERE idTown = @IdTown AND idUser = @IdUser ", new { IdTown = townId, IdUser = userId });
-        if (bagId == null)
+        private static StringBuilder GenerateInQuery<TObject>(IEnumerable<TObject> objects, DynamicParameters param)
         {
-            bagId = connection.ExecuteScalar<int>(@"INSERT INTO Bag() VALUES (); SELECT LAST_INSERT_ID()");
-            connection.ExecuteScalar("UPDATE TownCitizen SET idBag = @IdBag WHERE idUser = @IdUser", new { IdBag = bagId, IdUser = userId });
+            var inBuilder = new StringBuilder();
+            if (objects.Any())
+            {
+                int count = 1;
+                var list = new List<string>();
+                foreach (var obj in objects)
+                {
+                    list.Add($"@{count}");
+                    param.Add($"{count}", obj);
+                    count++;
+                }
+                inBuilder.Append($"IN ({string.Join(",", list)})");
+            }
+            return inBuilder;
         }
-        connection.Close();
-        return bagId.Value;
-    }
 
-    public IEnumerable<BagItem> GetAllBagItems(int townId)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var bagsItems = connection.Query<BagItem>(@"SELECT bi.idItem
+        public int GetCitizenBagId(int townId, int userId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var bagId = connection.QuerySingle<int?>("SELECT idBag FROM TownCitizen WHERE idTown = @IdTown AND idUser = @IdUser ", new { IdTown = townId, IdUser = userId });
+            if (bagId == null)
+            {
+                bagId = connection.ExecuteScalar<int>(@"INSERT INTO Bag() VALUES (); SELECT LAST_INSERT_ID()");
+                connection.ExecuteScalar("UPDATE TownCitizen SET idBag = @IdBag WHERE idUser = @IdUser", new { IdBag = bagId, IdUser = userId });
+            }
+            connection.Close();
+            return bagId.Value;
+        }
+
+        public IEnumerable<BagItem> GetAllBagItems(int townId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var bagsItems = connection.Query<BagItem>(@"SELECT bi.idItem
                                                                ,SUM(bi.count) AS Count
 				                                               ,bi.isBroken
                                                               FROM BagItem bi
                                                               LEFT JOIN TownCitizen tc ON tc.idBag = bi.idBag
                                                               WHERE tc.idTown = 2154
                                                               GROUP BY  bi.idItem", new { IdTown = townId });
-        connection.Close();
-        return bagsItems;
-    }
+            connection.Close();
+            return bagsItems;
+        }
 
-    #endregion
+        #endregion
 
-    #region Parameters
+        #region Parameters
 
-    public IEnumerable<ParametersModel> GetParameters()
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var parameters = connection.Query<ParametersModel>("SELECT name, value FROM Parameters");
-        connection.Close();
-        return parameters;
-    }
-
-    public void PatchParameter(ParametersModel model)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.InsertOrUpdate("Parameters", model);
-        connection.Close();
-    }
-
-    #endregion
-
-    #region MapCells
-
-    public void PatchMapCell(int townId, IEnumerable<MapCellModel> listCells, bool forceUpdate)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var existings = connection.Query<MapCellModel>("SELECT * FROM MapCell WHERE idTown = @IdTown", new { IdTown = townId });
-        foreach (var cell in listCells)
+        public IEnumerable<ParametersModel> GetParameters()
         {
-            var existingCell = existings.SingleOrDefault(existing => existing.X == cell.X && existing.Y == cell.Y);
-            if (existingCell != null)
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var parameters = connection.Query<ParametersModel>("SELECT name, value FROM Parameters");
+            connection.Close();
+            return parameters;
+        }
+
+        public void PatchParameter(ParametersModel model)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.InsertOrUpdate("Parameters", model);
+            connection.Close();
+        }
+
+        #endregion
+
+        #region MapCells
+
+        public void PatchMapCell(int townId, IEnumerable<MapCellModel> listCells, bool forceUpdate)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var existings = connection.Query<MapCellModel>("SELECT * FROM MapCell WHERE idTown = @IdTown", new { IdTown = townId });
+            foreach (var cell in listCells)
             {
-                cell.IdCell = existingCell.IdCell;
-                foreach (var prop in cell.GetType().GetProperties())
+                var existingCell = existings.SingleOrDefault(existing => existing.X == cell.X && existing.Y == cell.Y);
+                if (existingCell != null)
                 {
-                    if (prop.GetValue(cell) == null)
+                    cell.IdCell = existingCell.IdCell;
+                    foreach (var prop in cell.GetType().GetProperties())
                     {
-                        prop.SetValue(cell, prop.GetValue(existingCell));
+                        if (prop.GetValue(cell) == null)
+                        {
+                            prop.SetValue(cell, prop.GetValue(existingCell));
+                        }
+                    }
+                    if (cell.AveragePotentialRemainingDig < 1 && (cell.IsDryed.HasValue && !cell.IsDryed.Value))
+                    {
+                        cell.AveragePotentialRemainingDig = 1;
+                    }
+                    if (cell.MaxPotentialRemainingDig < 1 && (cell.IsDryed.HasValue && !cell.IsDryed.Value))
+                    {
+                        cell.MaxPotentialRemainingDig = 1;
+                    }
+                    if (cell.IsDryed.HasValue && cell.IsDryed.Value)
+                    {
+                        cell.AveragePotentialRemainingDig = 0;
+                        cell.MaxPotentialRemainingDig = 0;
                     }
                 }
-                if (cell.AveragePotentialRemainingDig < 1 && (cell.IsDryed.HasValue && !cell.IsDryed.Value))
-                {
-                    cell.AveragePotentialRemainingDig = 1;
-                }
-                if (cell.MaxPotentialRemainingDig < 1 && (cell.IsDryed.HasValue && !cell.IsDryed.Value))
-                {
-                    cell.MaxPotentialRemainingDig = 1;
-                }
-                if (cell.IsDryed.HasValue && cell.IsDryed.Value)
-                {
-                    cell.AveragePotentialRemainingDig = 0;
-                    cell.MaxPotentialRemainingDig = 0;
-                }
             }
+            var toUpdate = listCells;
+            if (!forceUpdate)
+            {
+                toUpdate = listCells.Except(existings, new CellModelComparer());
+            }
+            connection.BulkInsertOrUpdate("MapCell", toUpdate);
+            connection.Close();
         }
-        var toUpdate = listCells;
-        if (!forceUpdate)
+
+        public MapCellCompletModel GetCell(int townId, int x, int y)
         {
-            toUpdate = listCells.Except(existings, new CellModelComparer());
-        }
-        connection.BulkInsertOrUpdate("MapCell", toUpdate);
-        connection.Close();
-    }
-
-    public MapCellCompletModel GetCell(int townId, int x, int y)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCellComplet
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCellComplet
                                                                 WHERE idTown = @idtown AND x = @x AND y = @y", new { idTown = townId, x = x, y = y });
-        connection.Close();
-        var cell = cells.Distinct(new CellIdComparer()).Single();
-        return cell;
-    }
+            connection.Close();
+            var cell = cells.Distinct(new CellIdComparer()).Single();
+            return cell;
+        }
 
-    public IEnumerable<MapCellCompletModel> GetCells(int townId)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCellComplet 
+        public IEnumerable<MapCellCompletModel> GetCells(int townId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCellComplet 
                                                                 WHERE idTown = @idtown", new { idTown = townId });
-        connection.Close();
-        return cells;
-    }
+            connection.Close();
+            return cells;
+        }
 
-    public void PatchMapCellItem(int townId, IEnumerable<MapCellItemModel> listCellItems)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.BulkInsertOrUpdate("MapCellItem", listCellItems);
-        connection.Close();
-    }
+        public void PatchMapCellItem(int townId, IEnumerable<MapCellItemModel> listCellItems)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.BulkInsertOrUpdate("MapCellItem", listCellItems);
+            connection.Close();
+        }
 
-    public void PatchCellDig(int townId, IEnumerable<MapCellDigModel> cellDigsToUpdate)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.BulkInsertOrUpdate("MapCellDig", cellDigsToUpdate);
-        connection.Close();
-    }
+        public void PatchCellDig(int townId, IEnumerable<MapCellDigModel> cellDigsToUpdate)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.BulkInsertOrUpdate("MapCellDig", cellDigsToUpdate);
+            connection.Close();
+        }
 
-    public IEnumerable<MapCellDigCompletModel> GetCellsDigs(int townId)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var digs = connection.Query<MapCellDigCompletModel>(@"SELECT mcd.idCell AS CellId
+        public IEnumerable<MapCellDigCompletModel> GetCellsDigs(int townId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var digs = connection.Query<MapCellDigCompletModel>(@"SELECT mcd.idCell AS CellId
 	                                                              ,mcd.idUser AS DiggerId
                                                                   ,mcd.day 
                                                                   ,mcd.nbSucces
@@ -1296,15 +1305,15 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                                             INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mcd.idLastUpdateInfo
                                                             INNER JOIN Users luiUser ON luiUser.idUser = lui.idUser
                                                             WHERE mc.idTown = @idTown", new { idTown = townId });
-        connection.Close();
-        return digs;
-    }
+            connection.Close();
+            return digs;
+        }
 
-    public MapCellDigCompletModel GetCellDigs(int idCell, int idUser, int day)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var dig = connection.QuerySingleOrDefault<MapCellDigCompletModel>(@"SELECT mcd.idCell AS CellId
+        public MapCellDigCompletModel GetCellDigs(int idCell, int idUser, int day)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var dig = connection.QuerySingleOrDefault<MapCellDigCompletModel>(@"SELECT mcd.idCell AS CellId
 	                                                              ,mcd.idUser AS DiggerId
                                                                   ,mcd.day 
                                                                   ,mcd.nbSucces
@@ -1321,79 +1330,79 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                                             INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mcd.idLastUpdateInfo
                                                             INNER JOIN Users luiUser ON luiUser.idUser = lui.idUser
                                                             WHERE mcd.idCell = @idCell AND mcd.idUser = @idUser AND mcd.day", new { idCell = idCell, idUser = idUser, day = day });
-        connection.Close();
-        return dig;
-    }
+            connection.Close();
+            return dig;
+        }
 
-    public MapCellDigUpdateModel GetMapCellDigUpdate(int townId, int day)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var update = connection.QuerySingleOrDefault<MapCellDigUpdateModel>("SELECT * FROM MapCellDigUpdate WHERE idTown = @idTown AND day = @day", new { idTown = townId, day = day });
-        connection.Close();
-        return update;
-    }
+        public MapCellDigUpdateModel GetMapCellDigUpdate(int townId, int day)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var update = connection.QuerySingleOrDefault<MapCellDigUpdateModel>("SELECT * FROM MapCellDigUpdate WHERE idTown = @idTown AND day = @day", new { idTown = townId, day = day });
+            connection.Close();
+            return update;
+        }
 
-    public IEnumerable<MapCellDigUpdateModel> GetMapUpdates(int townId)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var updates = connection.Query<MapCellDigUpdateModel>("SELECT * FROM MapCellDigUpdate WHERE idTown = @idTown", new { idTown = townId });
-        connection.Close();
-        return updates;
-    }
+        public IEnumerable<MapCellDigUpdateModel> GetMapUpdates(int townId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var updates = connection.Query<MapCellDigUpdateModel>("SELECT * FROM MapCellDigUpdate WHERE idTown = @idTown", new { idTown = townId });
+            connection.Close();
+            return updates;
+        }
 
-    public void InsertMapCellDigUpdate(MapCellDigUpdateModel mapCellDigUpdate)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.Insert(mapCellDigUpdate);
-        connection.Close();
-    }
+        public void InsertMapCellDigUpdate(MapCellDigUpdateModel mapCellDigUpdate)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Insert(mapCellDigUpdate);
+            connection.Close();
+        }
 
-    public void PatchMapCellDig(MapCellDigModel model)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.InsertOrUpdate("MapCellDig", model);
-        connection.Close();
-    }
+        public void PatchMapCellDig(MapCellDigModel model)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.InsertOrUpdate("MapCellDig", model);
+            connection.Close();
+        }
 
-    public void DeleteMapCellDig(int idCell, int diggerId, int day)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.Query("DELETE FROM MapCellDig WHERE idCell = @idCell AND idUser = @idUser AND day = @day", new { idCell = idCell, idUser = diggerId, day = day });
-        connection.Close();
-    }
+        public void DeleteMapCellDig(int idCell, int diggerId, int day)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Query("DELETE FROM MapCellDig WHERE idCell = @idCell AND idUser = @idUser AND day = @day", new { idCell = idCell, idUser = diggerId, day = day });
+            connection.Close();
+        }
 
-    public void ClearCellDig(IEnumerable<int> cellId)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.Query("DELETE FROM MapCellDig WHERE idCell IN @cellIds", new { cellIds = cellId });
-        connection.Close();
-    }
+        public void ClearCellDig(IEnumerable<int> cellId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Query("DELETE FROM MapCellDig WHERE idCell IN @cellIds", new { cellIds = cellId });
+            connection.Close();
+        }
 
-    public void ClearCellItem(int idCell, int idLastUpdateInfo)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        connection.Query("DELETE FROM MapCellItem WHERE idCell = @idCell", new { idCell = idCell });
-        connection.Execute(@"UPDATE MapCell SET idLastUpdateInfo = @idLastUpdateInfo WHERE idCell = @idCell", new { idLastUpdateInfo = idLastUpdateInfo, idCell = idCell });
-        connection.Close();
-    }
+        public void ClearCellItem(int idCell, int idLastUpdateInfo)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.Query("DELETE FROM MapCellItem WHERE idCell = @idCell", new { idCell = idCell });
+            connection.Execute(@"UPDATE MapCell SET idLastUpdateInfo = @idLastUpdateInfo WHERE idCell = @idCell", new { idLastUpdateInfo = idLastUpdateInfo, idCell = idCell });
+            connection.Close();
+        }
 
-    #endregion
+        #endregion
 
-    public int CreateLastUpdateInfo(LastUpdateInfo lastUpdateInfo)
-    {
-        using var connection = new MySqlConnection(Configuration.ConnectionString);
-        connection.Open();
-        var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
+        public int CreateLastUpdateInfo(LastUpdateInfo lastUpdateInfo)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
                                                                    VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.UpdateTime, IdUser = lastUpdateInfo.UserId });
-        connection.Close();
-        return idLastUpdateInfo;
+            connection.Close();
+            return idLastUpdateInfo;
+        }
     }
-}
 }
