@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.37
+// @version      1.0.0-beta.38
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,8 +35,9 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH][update] Traductions espagnoles (merci Bacchus)\n\n`
-+ `[MH][update] La mise à jour de la liste de courses depuis la fenêtre "Outils" a été retirée et confiée exclusivement au site`;
++ `[MH][update] Traductions espagnoles (merci Bacchus)\n`
++ `[MH][update] La mise à jour de la liste de courses depuis la fenêtre "Outils" a été retirée et confiée explusivement au site\n\n`
++ `[MH][fix] Le lien vers le site était invalite\n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1695,13 +1696,14 @@ function createOptimizerBtn() {
         let title_second_part = document.createElement('div');
         title.appendChild(title_second_part);
 
-        let website = document.createElement('a');
-        website.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
-        website.href = website;
-        website.target = '_blank';
-        website.style.cursor = 'pointer';
+        let website_link = document.createElement('a');
+        website_link.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
+        website_link.href = website;
+        console.log('website', website);
+        website_link.target = '_blank';
+        website_link.style.cursor = 'pointer';
 
-        title_second_part.appendChild(website);
+        title_second_part.appendChild(website_link);
 
         title_first_part.appendChild(img);
         title_first_part.appendChild(title_hidden);
@@ -2166,7 +2168,7 @@ function displayWishlist() {
     let go_to_website = document.createElement('a');
     go_to_website.classList.add('button');
     go_to_website.target = '_blank';
-    go_to_website.href = `${website}/my-town/wishlist`;
+    go_to_website.href = `${website}my-town/wishlist`;
     go_to_website.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.go_to_website)}`;
     tab_content.appendChild(go_to_website);
 }
@@ -3842,6 +3844,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'esc_fixed':
         case 'slaughter_2xs':
         case 'throw_animal_cat':
+        case 'throw_animal_tekel':
         case 'prevent_night':
         case 'parcel_opener_h':
         case 'hero_tamer_3':
@@ -3849,6 +3852,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'throw_b_machine_1':
         case 'throw_b_machine_2':
         case 'throw_b_machine_3':
+        case 'cuddle_teddy_1':
         case 'cuddle_teddy_2':
         case 'lock':
         case 'home_store_plus2':
@@ -3873,6 +3877,8 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'fill_grenade2':
         case 'fill_splash1':
         case 'fill_splash2':
+        case 'fill_ksplash1':
+        case 'fill_ksplash2':
         case 'fire_pilegun3':
         case 'throw_b_chain':
         case 'nw_shooting':
@@ -3910,6 +3916,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'can':
         case 'can_t1':
         case 'can_t2':
+        case 'can_t3':
         case 'open_doggybag':
         case 'special_dice':
         case 'slaughter_2x':
@@ -3922,6 +3929,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'repair_1':
         case 'light_cig':
         case 'poison_1':
+        case 'poison_2':
         case 'bp_bunker_2':
         case 'fire_mixergun':
         case 'fire_chainsaw':
@@ -4079,6 +4087,11 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'alarm_clock':
             item_action.classList.remove('item-tag');
             break;
+        case 'deco':
+        case 'single_use':
+            /** Déjà géré par MH */
+            item_action.classList.remove('item-tag');
+            break;
         case null:
             item_action.classList.remove('item-tag');
             break;
@@ -4098,10 +4111,11 @@ function createDisplayMapButton() {
 
             let btn_container = document.createElement('div');
             btn_container.id = mho_display_map_id;
-            let postbox = document.getElementById('postbox');
-            let position = postbox.getBoundingClientRect().width + 15;
-            btn_container.setAttribute('style', `right: ${position}px`);
-
+            setTimeout(() => {
+                let postbox = document.getElementById('postbox');
+                let position = postbox.getBoundingClientRect().width + 15;
+                btn_container.setAttribute('style', `right: ${position}px`);
+            }, 500);
             let btn = document.createElement('div');
 
             let btn_mho_img = document.createElement('img');
@@ -5946,7 +5960,7 @@ function createStyles() {
     + 'font-size: 10px;'
     + 'padding: 3px 5px;'
     + 'position: absolute;'
-    + 'right: 10px;'
+    + 'right: 41px;'
     + 'top: 100px;'
     + 'transition: background-color .5s ease-in-out;'
     + '}'
@@ -6835,38 +6849,39 @@ function getCitizens() {
 function getBank() {
     return new Promise((resolve, reject) => {
         startLoading();
-        GM.xmlHttpRequest({
-            method: 'GET',
-            url: api_url + '/myhordesfetcher/bank?userKey=' + external_app_id,
-            responseType: 'json',
-            onload: function(response){
-                if (response.status === 200) {
-                    let bank = [];
-                    response.response.bank.forEach((bank_item) => {
-                        bank_item.item.broken = bank_item.isBroken;
-                        bank.push(bank_item.item);
-                    });
-                    bank = bank.sort((item_a, item_b) => {
-                        if (item_a.category.ordering > item_b.category.ordering) {
-                            return 1;
-                        } else if (item_a.category.ordering === item_b.category.ordering) {
-                            return 0;
-                        } else {
-                            return -1;
-                        }
-                    });
-                    resolve(bank);
-                } else {
-                    addError(response);
-                    reject(response);
-                }
+        fetch(api_url + '/myhordesfetcher/bank?userKey=' + external_app_id)
+            .then((response) => {
+            if (response.status === 200) {
+
                 endLoading();
-            },
-            onerror: function(error){
+                return response.json();
+            } else {
+                addError(response);
+                reject(response);
                 endLoading();
-                addError(error);
-                reject(error);
             }
+        })
+        .then((response) => {
+            let bank = [];
+            response.bank.forEach((bank_item) => {
+                bank_item.item.broken = bank_item.isBroken;
+                bank.push(bank_item.item);
+            });
+            bank = bank.sort((item_a, item_b) => {
+                if (item_a.category.ordering > item_b.category.ordering) {
+                    return 1;
+                } else if (item_a.category.ordering === item_b.category.ordering) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            });
+            resolve(bank);
+        })
+            .catch((error) => {
+            endLoading();
+            addError(error);
+            reject(error);
         });
     });
 }
