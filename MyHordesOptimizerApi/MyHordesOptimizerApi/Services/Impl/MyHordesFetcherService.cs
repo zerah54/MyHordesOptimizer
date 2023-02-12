@@ -286,7 +286,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                                     }
                                     if(regen == RegenDirectionEnum.All)
                                     {
-                                        itemToAdd = itemToAdd / 8;
+                                        itemToAdd = 0;
                                     }
                                     cell.MaxPotentialRemainingDig = max + itemToAdd;
                                 }
