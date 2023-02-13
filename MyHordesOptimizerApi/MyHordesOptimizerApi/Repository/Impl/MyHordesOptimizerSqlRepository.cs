@@ -1194,7 +1194,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 				                                               ,bi.isBroken
                                                               FROM BagItem bi
                                                               LEFT JOIN TownCitizen tc ON tc.idBag = bi.idBag
-                                                              WHERE tc.idTown = 2154
+                                                              WHERE tc.idTown = @IdTown
                                                               GROUP BY  bi.idItem", new { IdTown = townId });
             connection.Close();
             return bagsItems;
