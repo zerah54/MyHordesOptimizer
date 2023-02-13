@@ -37,7 +37,7 @@
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
 + `[MH][update] Traductions espagnoles (merci Bacchus)\n`
 + `[MH][update] La mise à jour de la liste de courses depuis la fenêtre "Outils" a été retirée et confiée explusivement au site\n\n`
-+ `[MH][fix] Le lien vers le site était invalite\n\n`;
++ `[MH][fix] Le lien vers le site était invalide\n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1699,7 +1699,6 @@ function createOptimizerBtn() {
         let website_link = document.createElement('a');
         website_link.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
         website_link.href = website;
-        console.log('website', website);
         website_link.target = '_blank';
         website_link.style.cursor = 'pointer';
 
@@ -3600,7 +3599,7 @@ function displayPriorityOnItems() {
 }
 
 function getWishlistForZone() {
-    let position = getCurrentPosition();
+    let position = getCurrentPosition() || 0;
     let current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
     let zones = Object.keys(wishlist.wishList)
     .map((zone) => +zone)
