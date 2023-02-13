@@ -183,7 +183,7 @@ export class CampingComponent implements OnInit {
 
             /**
               * Nombre d'objets de défense installés sur la case
-              * @see ActionDataService.php : 'cm_campsite_improve'
+              * @see ActionDataService.php ('cm_campsite_improve')
               */
             chances += +this.configuration_form.get('object_improve')?.value * 1.8 * 100;
         } else {

@@ -9,6 +9,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
     public bag_count!: number;
     public priority!: number;
     public depot!: number;
+    public zone_x_pa!: number;
 
     constructor(dto?: WishlistItemDTO) {
         super();
@@ -22,7 +23,8 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             item: this.item.modelToDto(),
             priority: this.priority,
             depot: this.depot,
-            bagCount: this.bag_count
+            bagCount: this.bag_count,
+            zoneXPa: this.zone_x_pa
         };
     };
 
@@ -34,6 +36,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             this.priority = dto.priority;
             this.depot = dto.depot;
             this.bag_count = dto.bagCount;
+            this.zone_x_pa = dto.zoneXPa;
         }
     };
 }

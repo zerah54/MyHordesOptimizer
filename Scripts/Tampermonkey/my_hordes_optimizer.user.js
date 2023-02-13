@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.36
+// @version      1.0.0-beta.38
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,11 +35,15 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH][update] Ajout des chances de réussite du manuel dans le tooltip associé`;
++ `[MH][update] Traductions espagnoles (merci Bacchus)\n`
++ `[MH][update] La mise à jour de la liste de courses depuis la fenêtre "Outils" a été retirée et confiée explusivement au site\n\n`
++ `[MH][fix] Le lien vers le site était invalide\n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
 const is_mh_beta = document.URL.indexOf('staging') >= 0;
+const website = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
+
 
 const gm_bbh_updated_key = 'bbh_updated';
 const gm_gh_updated_key = 'gh_updated';
@@ -245,7 +249,7 @@ const texts = {
         en: `Amount of zombies that will die from despair`,
         fr: `Nombre de zombies qui vont mourir de désespoir`,
         de: `Anzahl von Zombies, die abwandern werden`,
-        es: `TODO`
+        es: `Número de zombis que morirán por desesperación`
     },
     copy_map: {
         en: `Copy map`,
@@ -437,19 +441,31 @@ const texts = {
         en: `Additional information`,
         fr: `Informations complémentaires`,
         de: `Zusätzliche Informationen`,
-        es: `TODO`,
+        es: `Información adicional`,
     },
     manually_add_app_id_key: {
         en: `Your external ID could not be retrieved automatically. You can enter it manually here.`,
         fr: `Votre identifiant n'a pas pu être récupéré automatiquement. Vous pouvez le saisir manuellement ici.`,
         de: `Ihr externe ID konnte nicht automatisch abgerufen werden. Sie können ihn hier manuell eingeben.`,
-        es: `TODO`,
+        es: `Ihr Benutzername konnte nicht automatisch abgerufen werden. Sie können ihn hier manuell eingeben.`,
     },
     edit_add_app_id_key: {
         en: `Enter your external ID here.\nYou can also clear the form field to remove it.`,
         fr: `Saisissez votre identifiant externe pour les applications ici.\nVous pouvez vider le champ pour le supprimer.`,
         de: `Bitte hier Deine externe ID eintragen oder den Inhalt des Felds entfernen, um sie zu löschen.`,
-        es: `TODO`,
+        es: `Introduzca su ID externo aquí. También puede borrar el campo del formulario para eliminarlo.`,
+    },
+    wishlist_moved: {
+        en: `TODO`,
+        fr: `Du fait d'une trop grande complexité, la liste de courses à été déplacée sur le site web.`,
+        de: `TODO`,
+        es: `TODO`
+    },
+    go_to_website: {
+        en: `Go to website`,
+        fr: `Aller sur le site`,
+        de: `TODO`,
+        es: `TODO`
     }
 };
 
@@ -752,10 +768,10 @@ const wishlist_headers = [
         }, id: `priority`},
     {
         label: {
-            en: `Depot`,
+            en: `Location`,
             fr: `Dépôt`,
-            de: `TODO`,
-            es: `TODO`
+            de: `Ort`,
+            es: `Depósito`
         },
         id: `depot`
     },
@@ -772,8 +788,8 @@ const wishlist_headers = [
         label: {
             en: `In rucksack`,
             fr: `En sacs`,
-            de: `TODO`,
-            es: `TODO`
+            de: `In den Rucksäcken`,
+            es: `En las mochilas`
         },
         id: `bag_count`
     },
@@ -1030,10 +1046,10 @@ let params_categories = [
             {
                 id: `update_mho_bags`,
                 label: {
-                    en: `TODO`,
+                    en: `Details of my rucksack and those of my escort`,
                     fr: `Détail de mon sac et de ceux de mon escorte`,
                     de: `Details meines Inventars und des Inventars meiner Eskorte`,
-                    es: `TODO`
+                    es: `Detalles de mi mochila y las de mi escolta`
                 },
                 parent_id: `update_mho`
             },
@@ -1043,7 +1059,7 @@ let params_categories = [
             //         en: `Items in my chest`,
             //         fr: `Contenu de mon coffre`,
             //         de: `Gegenstände in meiner Truhe`,
-            //         es: `TODO`
+            //         es: `Contenido de mi baúl`
             //     },
             //     parent_id: `update_mho`
             // },
@@ -1093,13 +1109,13 @@ let params_categories = [
                     en: `Additional information on the map`,
                     fr: `Informations complémentaires sur la carte`,
                     de: `Zusätzliche Informationen auf der Karte`,
-                    es: `TODO`
+                    es: `Información adicional sobre el mapa`
                 },
                 help: {
                     en: `Amount of zombies killed in a zone; Zone update even after the town has been devastated`,
                     fr: `Marqueurs zombies tués ; Mise à jour en ville dévastée`,
                     de: `Anzahl getöteter Zombies; Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
-                    es: `TODO`
+                    es: `Marcadores zombis matados; Actualización en pueblo devastado`
                 },
                 parent_id: `update_gh`
             },
@@ -1284,7 +1300,7 @@ let params_categories = [
                     en: `Display a tab with additional information on the citizens page in town`,
                     fr: `Afficher un onglet contenant des informations supplémentaires sur la page des citoyens`,
                     de: `Ein Tab mit zusätzlichen Informationen auf der Bürgerliste  in der Stadt anzeigen`,
-                    es: `TODO`
+                    es: `Mostrar una pestaña con información adicional en la página de los habitantes`
                 },
                 parent_id: null
             },
@@ -1400,10 +1416,10 @@ let informations = [
     {
         id: `edit-app-id`,
         label: {
-            en: `TODO`,
+            en: `Change my external ID for apps`,
             fr: `Modifier mon ID externe pour les apps`,
             de: `Meine externe ID für externe Programme ändern`,
-            es: `TODO`
+            es: `Cambiar mi ID externo para las aplicaciones`
         },
         src: undefined,
         action: () => {
@@ -1509,6 +1525,10 @@ function pageIsForum() {
 function getI18N(item) {
     if (!item) return;
     return item[lang] !== 'TODO' ? item[lang] : (item['en'] === 'TODO' ? item['fr'] : item['en'])
+}
+
+function getCurrentPosition() {
+    return document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/')
 }
 
 /** Affiche ou masque la page de chargement de MyHordes en fonction du nombre d'appels en cours */
@@ -1676,13 +1696,13 @@ function createOptimizerBtn() {
         let title_second_part = document.createElement('div');
         title.appendChild(title_second_part);
 
-        let website = document.createElement('a');
-        website.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
-        website.href = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
-        website.target = '_blank';
-        website.style.cursor = 'pointer';
+        let website_link = document.createElement('a');
+        website_link.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
+        website_link.href = website;
+        website_link.target = '_blank';
+        website_link.style.cursor = 'pointer';
 
-        title_second_part.appendChild(website);
+        title_second_part.appendChild(website_link);
 
         title_first_part.appendChild(img);
         title_first_part.appendChild(title_hidden);
@@ -2138,261 +2158,18 @@ function displayBank(tab_id) {
 
 /** Affiche les éléments présents dans la liste de courses */
 function displayWishlist() {
-    getWishlist().then(() => {
-        if (wishlist) {
-            let tab_content = document.getElementById('tab-content');
+    let tab_content = document.getElementById('tab-content');
 
-            let tab_content_header = document.createElement('div');
-            tab_content_header.setAttribute('style', 'margin: 0 0.5em; display: flex; justify-content: space-between; height: 25px;');
-            tab_content.appendChild(tab_content_header);
+    let explanation = document.createElement('div');
+    explanation.innerText = getI18N(texts.wishlist_moved);
+    tab_content.appendChild(explanation);
 
-            let last_update = document.createElement('span');
-            last_update.classList.add('small');
-            last_update.setAttribute('style', 'margin-right: 0.5em;');
-            if (wishlist.lastUpdateInfo) {
-                last_update.innerText = new Intl.DateTimeFormat('default', { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
-            }
-
-            let save_button = document.createElement('button');
-            save_button.setAttribute('style', 'width: 250px;');
-            save_button.classList.add('inline');
-            save_button.innerText = getI18N(texts.save);
-            save_button.addEventListener('click', () => {
-                updateWishlist();
-            });
-
-            let add_item_with_search = createSelectWithSearch();
-            add_item_with_search.setAttribute('style', 'width: 350px; text-align: center;');
-            let label = add_item_with_search.firstElementChild;
-            let input = label.firstElementChild;
-            let close = label.lastElementChild;
-            input.placeholder = getI18N(texts.searchObjectToAdd);
-            input.addEventListener('keyup', (event) => {
-                if (event.key === 'Enter') {
-                    let wishlist_items = Array.from(wishlist_list.getElementsByTagName('li') || []).map((wishlist_item) => wishlist_item.getElementsByClassName('label')[0].textContent);
-                    options.childNodes.forEach((option) => {
-                        let already_in_wishlist = wishlist_items.some((wishlist_item) => option.firstElementChild.textContent === wishlist_item);
-
-                        if (!already_in_wishlist && option.firstElementChild.textContent.toLowerCase().indexOf(input.value.toLowerCase()) > -1) {
-                            option.classList.remove('hidden');
-                        } else {
-                            option.classList.add('hidden');
-                        }
-                    })
-                }
-            });
-            let options = add_item_with_search.lastElementChild;
-            options.style.width = '350px';
-            items.forEach((item) => {
-                let content_div = document.createElement('div');
-                let img = document.createElement('img');
-                img.src = repo_img_hordes_url + item.img;
-                img.setAttribute('style', 'margin-right: 8px');
-
-                let button_div = document.createElement('div');
-                let button = document.createElement('button');
-                button_div.appendChild(button);
-                button.innerHTML = '&#43;';
-                button.setAttribute('style', 'font-size: 16px');
-                button.addEventListener('click', () => {
-                    let wishlist_item = {
-                        item: item,
-                        priority: 0,
-                        depot: 0,
-                        count: 1,
-                        bankCount: item.bankCount,
-                    }
-                    wishlist.wishList.push(wishlist_item);
-                    wishlist_list.insertBefore(createWishlistItemElement(wishlist_item), wishlist_list.firstElementChild.nextSibling);
-                    close.click();
-                });
-                content_div.setAttribute('style', 'text-align: left; display: flex; justify-content: space-between; padding: 6px;');
-
-                content_div.innerHTML = `<div>${img.outerHTML}${getI18N(item.label)}</div>`;
-                content_div.appendChild(button_div);
-                options.appendChild(content_div);
-
-            });
-            tab_content_header.appendChild(add_item_with_search);
-            tab_content_header.appendChild(last_update);
-            tab_content_header.appendChild(save_button);
-
-            let wishlist_list = document.createElement('ul');
-            wishlist_list.id = 'wishlist';
-            tab_content.appendChild(wishlist_list);
-
-            let list_header = document.createElement('div');
-            list_header.classList.add('mho-header');
-            wishlist_list.appendChild(list_header);
-
-            wishlist_headers.forEach((header) => {
-                let header_cell = document.createElement('div');
-                header_cell.innerText = getI18N(header.label);
-                header_cell.classList.add(header.id);
-                list_header.appendChild(header_cell);
-            });
-
-            wishlist.wishList
-                .filter((item) => item.count > 0)
-                .forEach((item) => {
-                wishlist_list.appendChild(createWishlistItemElement(item));
-            });
-        }
-    });
-}
-
-function createWishlistItemElement(item) {
-    let getLi = (target) => {
-        while (target.nodeName.toLowerCase() !== 'li' && target.nodeName.toLowerCase() !== 'body') {
-            target = target.parentNode;
-        }
-        if (target.nodeName.toLowerCase() == 'body') {
-            return false;
-        } else {
-            return target;
-        }
-    };
-
-    let item_element = document.createElement('li');
-    item_element.draggable = true;
-    item_element.setAttribute('itemId', item.item.id);
-    item_element.addEventListener('dragstart', (event) => {
-        let target = getLi(event.target);
-        dragged.element = target;
-        dragged.item = item;
-    });
-    item_element.addEventListener('dragover', function(event) {
-        event.preventDefault();
-    });
-    item_element.addEventListener('dragenter', (event) => {
-        let target = getLi(event.target);
-        if (target !== dragged.element) {
-            target.style['border-bottom'] = '12px solid rgba(0, 0, 0, 0.25)';
-        }
-    });
-    item_element.addEventListener('dragleave', (event) => {
-        let target = getLi(event.target);
-        target.style['border-bottom'] = '';
-    }, false);
-    item_element.addEventListener('drop', (event) => {
-        event.preventDefault();
-        let target = getLi(event.target);
-        if (target !== dragged.element) {
-            target.style['border-bottom'] = '';
-            dragged.element.remove();
-            target.parentNode.insertBefore(dragged.element, target.nextSibling);
-            dragged.element = undefined;
-            dragged.item = undefined;
-        }
-    });
-
-    let item_title_container = document.createElement('div');
-    item_title_container.classList.add('label');
-    item_element.appendChild(item_title_container);
-
-    let item_icon = document.createElement('img');
-    item_icon.setAttribute('style', 'margin-right: 0.5em');
-    item_icon.src = repo_img_hordes_url + item.item.img;
-    item_title_container.appendChild(item_icon);
-
-    let item_title = document.createElement('span');
-    item_title.innerText = getI18N(item.item.label);
-    item_title_container.appendChild(item_title);
-
-    let item_priority_container = document.createElement('div');
-    item_priority_container.classList.add('priority');
-    item_element.appendChild(item_priority_container);
-
-    let item_priority_select = document.createElement('select');
-    item_priority_select.addEventListener('change', () => {
-        item.priority = +item_priority_select.value;
-    });
-    item_priority_container.appendChild(item_priority_select);
-
-    wishlist_priorities.forEach((priority) => {
-        let item_priority_option = document.createElement('option');
-        item_priority_option.value = priority.value;
-        item_priority_option.innerText = getI18N(priority.label);
-        item_priority_select.appendChild(item_priority_option);
-        if (item.priority.toString().slice(0, 1) === priority.value.toString().slice(0,1)) {
-            item_priority_option.selected = true;
-        }
-    });
-
-    let item_depot_container = document.createElement('div');
-    item_depot_container.classList.add('depot');
-    item_element.appendChild(item_depot_container);
-
-    let item_depot_select = document.createElement('select');
-    item_depot_select.addEventListener('change', () => {
-        item.depot = +item_depot_select.value;
-    });
-    item_depot_container.appendChild(item_depot_select);
-
-    wishlist_depot.forEach((depot) => {
-        let item_depot_option = document.createElement('option');
-        item_depot_option.value = depot.value;
-        item_depot_option.innerText = getI18N(depot.label);
-        item_depot_select.appendChild(item_depot_option);
-        if (item.depot === depot.value) {
-            item_depot_option.selected = true;
-        }
-    });
-
-    let item_bank_count = document.createElement('div');
-    item_bank_count.innerText = item.bankCount;
-    item_bank_count.classList.add('bank_count');
-    item_element.appendChild(item_bank_count);
-
-    let item_bag_count = document.createElement('div');
-    item_bag_count.innerText = item.bagCount;
-    item_bag_count.classList.add('bag_count');
-    item_element.appendChild(item_bag_count);
-
-    let item_bank_needed = document.createElement('div');
-    item_bank_needed.classList.add('bank_needed');
-    item_element.appendChild(item_bank_needed);
-
-    let item_bank_needed_input = document.createElement('input');
-    item_bank_needed_input.type = 'number';
-    item_bank_needed_input.value = item.count;
-    item_bank_needed_input.addEventListener('change', (event) => {
-        item_bank_needed_input.value = +event.target.value;
-        item.count = +event.target.value;
-        item_diff_input.value = item.count - item.bankCount - item.bagCount;
-    });
-    item_bank_needed.appendChild(item_bank_needed_input);
-
-    let item_diff = document.createElement('div');
-    item_diff.classList.add('diff');
-    item_element.appendChild(item_diff);
-
-    let item_diff_input = document.createElement('input');
-    item_diff_input.type = 'number';
-    item_diff_input.value = item.count - item.bankCount - item.bagCount;
-    item_diff_input.addEventListener('change', (event) => {
-        item_diff_input.value = +event.target.value;
-        item.count = +item.bankCount + +item.bagCount + +item_diff_input.value;
-        item_bank_needed_input.value = item.count;
-    });
-    item_diff.appendChild(item_diff_input);
-
-    let item_remove = document.createElement('div');
-    item_remove.classList.add('delete');
-    item_element.appendChild(item_remove);
-
-    let item_remove_img = document.createElement('img');
-    item_remove_img.alt = '(X)';
-    item_remove_img.src = repo_img_hordes_url + 'icons/b_close.png';
-    item_remove_img.addEventListener('click', () => {
-        item.count = undefined;
-        item_bank_needed_input.value = item.bankCount;
-        item_diff_input.value = 0;
-        item_element.remove();
-    })
-    item_remove.appendChild(item_remove_img);
-
-    return item_element;
+    let go_to_website = document.createElement('a');
+    go_to_website.classList.add('button');
+    go_to_website.target = '_blank';
+    go_to_website.href = `${website}my-town/wishlist`;
+    go_to_website.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.go_to_website)}`;
+    tab_content.appendChild(go_to_website);
 }
 
 /**
@@ -3623,10 +3400,14 @@ function displayMinApOnBuildings() {
 function displayWishlistInApp() {
     let wishlist_section = document.getElementById('wishlist-section');
 
-    if (wishlist && mho_parameters.display_wishlist && (pageIsWorkshop() || pageIsDesert())) {
+    let is_desert = pageIsDesert();
+    let is_workshop = pageIsWorkshop();
+    if (wishlist && mho_parameters.display_wishlist && (is_workshop || is_desert)) {
         if (wishlist_section) return;
 
-        let list_to_display = wishlist.wishList.filter((item) => {
+        let used_wishlist = is_workshop ? wishlist.wishList['0'] : getWishlistForZone();
+
+        let list_to_display = used_wishlist.filter((item) => {
             if (pageIsWorkshop()) {
                 return item.isWorkshop;
             } else {
@@ -3802,7 +3583,10 @@ function displayPriorityOnItems() {
                 present_items.push(...inventory.getElementsByTagName('img'));
             };
         }
-        wishlist.wishList
+
+        let used_wishlist = getWishlistForZone();
+
+        used_wishlist
             .filter((wishlist_item) => wishlist_item.priority !== 0)
             .forEach((wishlist_item) => {
             present_items
@@ -3812,6 +3596,17 @@ function displayPriorityOnItems() {
             });
         });
     }
+}
+
+function getWishlistForZone() {
+    let position = getCurrentPosition() || 0;
+    let current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
+    let zones = Object.keys(wishlist.wishList)
+    .map((zone) => +zone)
+    .filter((zone) => zone > current_zone && zone !== 0);
+    zones = zones
+        .sort((zone_a, zone_b) => zone_a - zone_b);
+    return zones.length === 0 ? wishlist.wishList[0] : wishlist.wishList[zones[0]];
 }
 
 /** Affiche les tooltips avancés */
@@ -4023,9 +3818,13 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.classList.remove('item-tag');
             break;
         case 'hero_surv_1':
-            var days = mh_user.townDetails.day;
-            var success = Math.round((+days <= 3 ? 1 : Math.max(0.1, 1 - (+days * 0.025))) * 10000) / 100;
-            item_action.innerHTML = `${success}% de chances de réussir son manuel`;
+            if(mh_user.townDetails) {
+                var days = mh_user.townDetails.day;
+                var success = Math.round((+days <= 3 ? 1 : Math.max(0.1, 1 - (+days * 0.025))) * 10000) / 100;
+                item_action.innerHTML = `${success}% de chances de réussir son manuel`;
+            } else {
+                item_action.classList.remove('item-tag');
+            }
             break;
         case 'hero_surv_2':
             // ne pas afficher
@@ -4044,6 +3843,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'esc_fixed':
         case 'slaughter_2xs':
         case 'throw_animal_cat':
+        case 'throw_animal_tekel':
         case 'prevent_night':
         case 'parcel_opener_h':
         case 'hero_tamer_3':
@@ -4051,6 +3851,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'throw_b_machine_1':
         case 'throw_b_machine_2':
         case 'throw_b_machine_3':
+        case 'cuddle_teddy_1':
         case 'cuddle_teddy_2':
         case 'lock':
         case 'home_store_plus2':
@@ -4075,6 +3876,8 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'fill_grenade2':
         case 'fill_splash1':
         case 'fill_splash2':
+        case 'fill_ksplash1':
+        case 'fill_ksplash2':
         case 'fire_pilegun3':
         case 'throw_b_chain':
         case 'nw_shooting':
@@ -4112,6 +3915,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'can':
         case 'can_t1':
         case 'can_t2':
+        case 'can_t3':
         case 'open_doggybag':
         case 'special_dice':
         case 'slaughter_2x':
@@ -4124,6 +3928,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'repair_1':
         case 'light_cig':
         case 'poison_1':
+        case 'poison_2':
         case 'bp_bunker_2':
         case 'fire_mixergun':
         case 'fire_chainsaw':
@@ -4281,6 +4086,11 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'alarm_clock':
             item_action.classList.remove('item-tag');
             break;
+        case 'deco':
+        case 'single_use':
+            /** Déjà géré par MH */
+            item_action.classList.remove('item-tag');
+            break;
         case null:
             item_action.classList.remove('item-tag');
             break;
@@ -4300,10 +4110,11 @@ function createDisplayMapButton() {
 
             let btn_container = document.createElement('div');
             btn_container.id = mho_display_map_id;
-            let postbox = document.getElementById('postbox');
-            let position = postbox.getBoundingClientRect().width + 15;
-            btn_container.setAttribute('style', `right: ${position}px`);
-
+            setTimeout(() => {
+                let postbox = document.getElementById('postbox');
+                let position = postbox.getBoundingClientRect().width + 15;
+                btn_container.setAttribute('style', `right: ${position}px`);
+            }, 500);
             let btn = document.createElement('div');
 
             let btn_mho_img = document.createElement('img');
@@ -6148,7 +5959,7 @@ function createStyles() {
     + 'font-size: 10px;'
     + 'padding: 3px 5px;'
     + 'position: absolute;'
-    + 'right: 10px;'
+    + 'right: 41px;'
     + 'top: 100px;'
     + 'transition: background-color .5s ease-in-out;'
     + '}'
@@ -7037,38 +6848,39 @@ function getCitizens() {
 function getBank() {
     return new Promise((resolve, reject) => {
         startLoading();
-        GM.xmlHttpRequest({
-            method: 'GET',
-            url: api_url + '/myhordesfetcher/bank?userKey=' + external_app_id,
-            responseType: 'json',
-            onload: function(response){
-                if (response.status === 200) {
-                    let bank = [];
-                    response.response.bank.forEach((bank_item) => {
-                        bank_item.item.broken = bank_item.isBroken;
-                        bank.push(bank_item.item);
-                    });
-                    bank = bank.sort((item_a, item_b) => {
-                        if (item_a.category.ordering > item_b.category.ordering) {
-                            return 1;
-                        } else if (item_a.category.ordering === item_b.category.ordering) {
-                            return 0;
-                        } else {
-                            return -1;
-                        }
-                    });
-                    resolve(bank);
-                } else {
-                    addError(response);
-                    reject(response);
-                }
+        fetch(api_url + '/myhordesfetcher/bank?userKey=' + external_app_id)
+            .then((response) => {
+            if (response.status === 200) {
+
                 endLoading();
-            },
-            onerror: function(error){
+                return response.json();
+            } else {
+                addError(response);
+                reject(response);
                 endLoading();
-                addError(error);
-                reject(error);
             }
+        })
+        .then((response) => {
+            let bank = [];
+            response.bank.forEach((bank_item) => {
+                bank_item.item.broken = bank_item.isBroken;
+                bank.push(bank_item.item);
+            });
+            bank = bank.sort((item_a, item_b) => {
+                if (item_a.category.ordering > item_b.category.ordering) {
+                    return 1;
+                } else if (item_a.category.ordering === item_b.category.ordering) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            });
+            resolve(bank);
+        })
+            .catch((error) => {
+            endLoading();
+            addError(error);
+            reject(error);
         });
     });
 }
@@ -7076,30 +6888,34 @@ function getBank() {
 /** Récupère les informations de liste de course */
 function getWishlist() {
     return new Promise((resolve, reject) => {
-        GM.xmlHttpRequest({
-            method: 'GET',
-            url: api_url + '/wishlist?townId=' + mh_user.townDetails.townId,
-            responseType: 'json',
-            onload: function(response){
-                if (response.status === 200) {
-                    wishlist = response.response;
-                    wishlist.wishList = Object.keys(wishlist.wishList)
-                        .map((key) => wishlist.wishList[key])
-                        .sort((item_a, item_b) => item_b.priority > item_a.priority);
-                    wishlist.wishList.forEach((item) => {
-                        item.item.img = item.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3')
-                    });
-                    resolve(response);
-                } else {
-                    wishlist = undefined;
-                    addError(response);
-                    reject(response);
-                }
-            },
-            onerror: function(error){
-                addError(error);
-                reject(error);
+        fetch(api_url + '/wishlist?townId=' + mh_user.townDetails.townId)
+            .then((response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                wishlist = undefined;
+                addError(response);
+                reject(response);
             }
+        })
+            .then((response) => {
+            for (let key in response.wishList) {
+                let wishlist_zone = response.wishList[key];
+                wishlist_zone = Object.keys(wishlist_zone)
+                    .map((item_key) => wishlist_zone[item_key])
+                    .sort((item_a, item_b) => item_b.priority > item_a.priority);
+                wishlist_zone.forEach((item) => {
+                    item.item.img = item.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
+                });
+                response.wishList[key] = wishlist_zone;
+            }
+            wishlist = response;
+            resolve(wishlist);
+        })
+            .catch((error) => {
+            wishlist = undefined;
+            addError(error);
+            reject(error);
         });
     });
 }
@@ -7211,7 +7027,7 @@ function updateExternalTools() {
             isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? (pageIsDesert() && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
         };
 
-        let position = document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/');
+        let position = getCurrentPosition();
         let citizen_list = Array.from(document.querySelectorAll('.citizen-box .username[x-user-id]') || [])?.map((citizen_box) => {
             return { id: +citizen_box.getAttribute('x-user-id'), userName: citizen_box.innerText, job: citizen_box.parentElement.parentElement.querySelector('img[src*=professions').src.replace(/.*professions\/(\w+).*/, '$1'), row: citizen_box }
         });

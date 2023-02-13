@@ -13,5 +13,5 @@
             <mat-icon>check</mat-icon>
         </button>
     </mat-form-field>
-    <a mat-button *ngIf="saved_external_app_id" (click)="updateExternalTools()" i18n>Mettre à jour les outils externes</a>
+    <a mat-button *ngIf="saved_external_app_id && is_in_town" (click)="updateExternalTools()" i18n>Mettre à jour les outils externes</a>
 </mat-toolbar>

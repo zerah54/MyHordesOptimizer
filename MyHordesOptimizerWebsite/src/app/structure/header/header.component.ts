@@ -2,7 +2,7 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, EventEmitter, HostBinding, Output, ViewChild, HostListener } from '@angular/core';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Title } from '@angular/platform-browser';
-import { getExternalAppId, setExternalAppId } from 'src/app/shared/utilities/localstorage.util';
+import { getExternalAppId, getTown, setExternalAppId } from 'src/app/shared/utilities/localstorage.util';
 import { BREAKPOINTS } from 'src/app/_abstract_model/const';
 import { ApiServices } from '../../_abstract_model/services/api.services';
 
@@ -30,6 +30,8 @@ export class HeaderComponent {
     public external_app_id_field_value: string | null = getExternalAppId();
     /** L'idendifiant d'app externe si il existe */
     public saved_external_app_id: string | null = getExternalAppId();
+
+    public is_in_town: boolean = !!getTown()?.town_id;
 
     public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
 

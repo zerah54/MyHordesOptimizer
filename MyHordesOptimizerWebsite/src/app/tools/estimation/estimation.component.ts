@@ -9,7 +9,7 @@ import { Component, HostBinding } from '@angular/core';
 })
 export class EstimationComponent {
     @HostBinding('style.display') display: string = 'contents';
-    
+
     /** Le jour auquel est fait l'estimation */
     public current_day!: number;
     /** Est-ce qu'on fait l'attaque d'aujourd'hui (true) ou de demain (false) */

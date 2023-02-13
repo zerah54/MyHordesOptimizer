@@ -1,7 +1,7 @@
 import { Component, HostBinding, Input } from '@angular/core';
 import * as moment from 'moment';
+import { WishlistServices } from 'src/app/_abstract_model/services/wishlist.service';
 import { HORDES_IMG_REPO } from './../../../_abstract_model/const';
-import { ApiServices } from './../../../_abstract_model/services/api.services';
 import { Item } from './../../../_abstract_model/types/item.class';
 
 @Component({
@@ -22,7 +22,7 @@ export class ItemComponent {
 
     public display_mode: 'simple' | 'advanced' = 'simple';
 
-    constructor(private api: ApiServices) {
+    constructor(private wishlist_services: WishlistServices) {
     }
 
     /**
@@ -31,7 +31,7 @@ export class ItemComponent {
      * @param {Item} item
      */
     public addItemToWishlist(item: Item): void {
-        this.api.addItemToWishlist(item).subscribe(() => {
+        this.wishlist_services.addItemToWishlist(item, '0').subscribe(() => {
             this.item.wishlist_count = 1;
         })
     }
