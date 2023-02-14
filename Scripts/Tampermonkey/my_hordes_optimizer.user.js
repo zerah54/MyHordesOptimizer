@@ -3396,7 +3396,6 @@ function displayMinApOnBuildings() {
 
 /** Affiche la liste de courses dans le désert et l'atelier */
 function displayWishlistInApp() {
-    let wishlist_section = document.getElementById('wishlist-section');
     let interval = setInterval(() => {
         let wishlist_section = document.getElementById('wishlist-section');
 
