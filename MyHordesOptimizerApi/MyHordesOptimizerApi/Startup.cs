@@ -26,6 +26,7 @@ using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
+using Serilog;
 using System.Net.Http;
 using System.Reflection;
 
@@ -48,6 +49,10 @@ namespace MyHordesOptimizerApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration)
+                .CreateLogger();
+
             services.AddControllers();
             services.AddHttpClient();
             services.AddHttpClient(nameof(GestHordesRepository)).ConfigurePrimaryHttpMessageHandler(() =>
@@ -96,11 +101,12 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimizerParametersService>();
             services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
 
-            services.AddHttpLogging(logging =>
+           /* services.AddHttpLogging(logging =>
             {
                 logging.LoggingFields = HttpLoggingFields.All;
             });
-            services.AddApplicationInsightsTelemetry();
+            //services.AddApplicationInsightsTelemetry();
+            services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));*/
         }
 
         protected IMapper BuildAutoMapper()
