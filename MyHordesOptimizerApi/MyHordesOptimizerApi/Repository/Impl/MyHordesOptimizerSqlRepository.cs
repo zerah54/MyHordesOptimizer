@@ -782,12 +782,17 @@ namespace MyHordesOptimizerApi.Repository.Impl
             param.Add($"@IdTown", townId);
             param.Add($"@lastUpdateInfoId", lastUpdateInfoId);
             var inParamList = new List<string>();
-            foreach (var id in citizenId)
+            var idUserWhereClause = string.Empty;
+            if(citizenId.Any())
             {
-                inParamList.Add($"@{id}");
-                param.Add($"@{id}", id);
+                foreach (var id in citizenId)
+                {
+                    inParamList.Add($"@{id}");
+                    param.Add($"@{id}", id);
+                }
+                idUserWhereClause = $"idUser IN ({string.Join(",", inParamList)}) AND";
             }
-            var query = $"UPDATE TownCitizen SET positionX = @positionX, positionY = @positionY, idLastUpdateInfo = @lastUpdateInfoId WHERE idUser IN ({string.Join(",", inParamList)}) AND idTown = @idTown";
+            var query = $"UPDATE TownCitizen SET positionX = @positionX, positionY = @positionY, idLastUpdateInfo = @lastUpdateInfoId WHERE {idUserWhereClause} idTown = @idTown";
             connection.Query(query, param);
             connection.Close();
         }
