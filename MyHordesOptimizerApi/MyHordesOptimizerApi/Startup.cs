@@ -53,6 +53,8 @@ namespace MyHordesOptimizerApi
                 .ReadFrom.Configuration(Configuration)
                 .CreateLogger();
 
+            services.AddHttpContextAccessor();
+
             services.AddControllers();
             services.AddHttpClient();
             services.AddHttpClient(nameof(GestHordesRepository)).ConfigurePrimaryHttpMessageHandler(() =>
@@ -101,12 +103,10 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimizerParametersService>();
             services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
 
-           /* services.AddHttpLogging(logging =>
+            services.AddHttpLogging(logging =>
             {
-                logging.LoggingFields = HttpLoggingFields.All;
-            });
-            //services.AddApplicationInsightsTelemetry();
-            services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));*/
+                logging.LoggingFields = HttpLoggingFields.All | HttpLoggingFields.RequestQuery;
+            });  
         }
 
         protected IMapper BuildAutoMapper()
