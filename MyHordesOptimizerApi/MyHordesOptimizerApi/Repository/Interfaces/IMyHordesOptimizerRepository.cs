@@ -83,7 +83,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         MapCellDigUpdateModel GetMapCellDigUpdate(int id, int days);
         IEnumerable<MapCellDigUpdateModel> GetMapUpdates(int townId);
         void InsertMapCellDigUpdate(MapCellDigUpdateModel mapCellDigUpdate);
-        void PatchMapCellDig(MapCellDigModel model);
+        void PatchMapCellDig(List<MapCellDigModel> models);
         void DeleteMapCellDig(int idCell, int diggerId, int day);
         MapCellDigCompletModel GetCellDigs(int idCell, int idUser, int day);
         void ClearCellDig(IEnumerable<int> cellId);

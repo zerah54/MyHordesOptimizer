@@ -1349,7 +1349,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                                             INNER JOIN Users digger on digger.idUser = mcd.idUser
                                                             INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = mcd.idLastUpdateInfo
                                                             INNER JOIN Users luiUser ON luiUser.idUser = lui.idUser
-                                                            WHERE mcd.idCell = @idCell AND mcd.idUser = @idUser AND mcd.day", new { idCell = idCell, idUser = idUser, day = day });
+                                                            WHERE mcd.idCell = @idCell AND mcd.idUser = @idUser AND mcd.day = @day", new { idCell = idCell, idUser = idUser, day = day });
             connection.Close();
             return dig;
         }
@@ -1380,11 +1380,11 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
         }
 
-        public void PatchMapCellDig(MapCellDigModel model)
+        public void PatchMapCellDig(List<MapCellDigModel> models)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            connection.InsertOrUpdate("MapCellDig", model);
+            connection.BulkInsertOrUpdate("MapCellDig", models);
             connection.Close();
         }
 

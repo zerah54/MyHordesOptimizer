@@ -466,21 +466,30 @@ namespace MyHordesOptimizerApi.Services.Impl
             return dtos;
         }
 
-        public MyHordesOptimizerMapDigDto CreateOrUpdateMapDigs(int? townId, int userId, MyHordesOptimizerMapDigDto request)
+        public List<MyHordesOptimizerMapDigDto> CreateOrUpdateMapDigs(int? townId, int userId, List<MyHordesOptimizerMapDigDto> requests)
         {
             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             var idLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
-            var model = Mapper.Map<MapCellDigModel>(request);
-            model.IdLastUpdateInfo = idLastUpdateInfo;
-            if (model.IdCell == 0)
+            var models = new List<MapCellDigModel>();
+            foreach(var request in requests)
             {
-                var existingCell = MyHordesOptimizerRepository.GetCell(townId.Value, request.X, request.Y);
-                model.IdCell = existingCell.IdCell;
+                var model = Mapper.Map<MapCellDigModel>(request);
+                model.IdLastUpdateInfo = idLastUpdateInfo;
+                if (model.IdCell == 0)
+                {
+                    var existingCell = MyHordesOptimizerRepository.GetCell(townId.Value, request.X, request.Y);
+                    model.IdCell = existingCell.IdCell;
+                }
+                models.Add(model);
             }
-            MyHordesOptimizerRepository.PatchMapCellDig(model);
-            var result = MyHordesOptimizerRepository.GetCellDigs(model.IdCell, model.IdUser, model.Day);
-            var dto = Mapper.Map<MyHordesOptimizerMapDigDto>(result);
-            return dto;
+            MyHordesOptimizerRepository.PatchMapCellDig(models);
+            var results = new List<MapCellDigCompletModel>();
+            foreach (var model in models)
+            {
+                results.Add(MyHordesOptimizerRepository.GetCellDigs(model.IdCell, model.IdUser, model.Day));
+            }    
+            var dtos = Mapper.Map<List<MyHordesOptimizerMapDigDto>>(results);
+            return dtos;
         }
 
         public void DeleteMapDigs(int idCell, int diggerId, int day)

@@ -34,12 +34,12 @@ namespace MyHordesOptimizerApi.Services.Impl
             cell.IdLastUpdateInfo = lastUpdateInfoId;
 
             var cellItems = Mapper.Map<List<MapCellItemModel>>(updateRequest.Items);
-            cellItems.ForEach(cellItem => cellItem.IdCell = cell.IdCell);
 
             var cells = new List<MapCellModel>() { cell };
             MyHordesOptimizerRepository.PatchMapCell(townId, cells, forceUpdate: true);
 
             MyHordesOptimizerRepository.ClearCellItem(cell.IdCell, lastUpdateInfoId);
+            cellItems.ForEach(cellItem => cellItem.IdCell = cell.IdCell);
             MyHordesOptimizerRepository.PatchMapCellItem(townId, cellItems);
 
             MyHordesOptimizerRepository.UpdateCitizenLocation(cell.IdTown, updateRequest.X, updateRequest.Y, updateRequest.Citizens, lastUpdateInfoId);

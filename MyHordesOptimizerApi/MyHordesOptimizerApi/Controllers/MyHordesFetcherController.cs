@@ -4,8 +4,6 @@ using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
-using MyHordesOptimizerApi.Extensions;
-using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System;
@@ -60,7 +58,7 @@ namespace MyHordesOptimizerApi.Controllers
         [HttpGet]
         [Route("HeroSkills")]
         public ActionResult<IEnumerable<HeroSkill>> GetHeroSkills()
-        {      
+        {
             var heroSkills = _myHordesFetcherService.GetHeroSkills().ToList();
             return heroSkills;
         }
@@ -139,18 +137,22 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("MapDigs")]
-        public ActionResult<MyHordesOptimizerMapDigDto> CreaterOrUpdateMapDig([FromQuery] int? townId, [FromQuery] int? userId, [FromBody] MyHordesOptimizerMapDigDto request)
+        public ActionResult<List<MyHordesOptimizerMapDigDto>> CreaterOrUpdateMapDig([FromQuery] int? townId, [FromQuery] int? userId, [FromBody] List<MyHordesOptimizerMapDigDto> requests)
         {
             if (!userId.HasValue)
             {
                 return BadRequest($"{nameof(userId)} cannot be empty");
             }
-            if (request.CellId == 0 && !townId.HasValue)
+            if (!userId.HasValue)
+            {
+                return BadRequest($"{nameof(townId)} cannot be empty");
+            }
+            if (requests == null || !requests.Any() || (requests.Any(x => x.CellId == 0) && townId == null))
             {
                 return BadRequest($"{nameof(townId)} cannot be empty when no cellId is provided");
             }
             UserKeyProvider.UserId = userId.Value;
-            var dto = _myHordesFetcherService.CreateOrUpdateMapDigs(townId, userId.Value, request);
+            var dto = _myHordesFetcherService.CreateOrUpdateMapDigs(townId, userId.Value, requests);
             return Ok(dto);
         }
 
