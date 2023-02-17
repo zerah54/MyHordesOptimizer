@@ -5065,56 +5065,52 @@ function displayCellDetailsOnPage() {
     if(mho_parameters.display_more_informations_from_mho && pageIsDesert()) {
         let cell = getCellDetailsByPosition();
         let cell_note = document.querySelector('#cell-note');
-        if (cell.note !== null && cell.note !== undefined && cell.note !== '') {
-            if (!current_cell || cell.id !== current_cell.id) {
-                current_cell = cell;
-                if (!cell_note) {
-                    cell_note = document.createElement('div');
-                    cell_note.id = 'cell-note';
-                    cell_note.classList.add('row');
+        if (!current_cell || cell.id !== current_cell.id) {
+            current_cell = cell;
+            if (!cell_note) {
+                cell_note = document.createElement('div');
+                cell_note.id = 'cell-note';
+                cell_note.classList.add('row');
 
-                    let cell_note_div = document.createElement('div');
-                    cell_note_div.style.width = '100%';
-                    cell_note_div.classList.add('background', 'cell');
-                    cell_note.appendChild(cell_note_div);
+                let cell_note_div = document.createElement('div');
+                cell_note_div.style.width = '100%';
+                cell_note_div.classList.add('background', 'cell');
+                cell_note.appendChild(cell_note_div);
 
-                    let cell_note_header = document.createElement('h5');
-                    cell_note_header.style.marginTop = '0';
-                    cell_note_header.style.display = 'flex';
-                    cell_note_header.style.justifyContent = 'space-between';
-                    cell_note_header.style.alignItems = 'center';
-                    cell_note_div.appendChild(cell_note_header);
+                let cell_note_header = document.createElement('h5');
+                cell_note_header.style.marginTop = '0';
+                cell_note_header.style.display = 'flex';
+                cell_note_header.style.justifyContent = 'space-between';
+                cell_note_header.style.alignItems = 'center';
+                cell_note_div.appendChild(cell_note_header);
 
-                    let cell_note_header_left = document.createElement('div');
-                    cell_note_header_left.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px; height: 24px; margin-right: 0.5em">${getI18N(texts.note)}`;
-                    cell_note_header.appendChild(cell_note_header_left);
+                let cell_note_header_left = document.createElement('div');
+                cell_note_header_left.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px; height: 24px; margin-right: 0.5em">${getI18N(texts.note)}`;
+                cell_note_header.appendChild(cell_note_header_left);
 
-                    let cell_note_header_right = document.createElement('div');
-                    cell_note_header_right.innerHTML = `🗘`;
-                    cell_note_header_right.style.fontSize = '16px';
-                    cell_note_header_right.style.cursor = 'pointer';
-                    cell_note_header.appendChild(cell_note_header_right);
+                let cell_note_header_right = document.createElement('div');
+                cell_note_header_right.innerHTML = `🗘`;
+                cell_note_header_right.style.fontSize = '16px';
+                cell_note_header_right.style.cursor = 'pointer';
+                cell_note_header.appendChild(cell_note_header_right);
 
-                    cell_note_header_right.addEventListener('click', () => {
-                        cell_note.querySelector('#cell-note-content').innerText = '🗘';
-                        getMap().then(() => {
-                            cell = getCellDetailsByPosition();
-                            cell_note.querySelector('#cell-note-content').innerText = cell.note;
-                        });
+                cell_note_header_right.addEventListener('click', () => {
+                    cell_note.querySelector('#cell-note-content').innerText = '🗘';
+                    getMap().then(() => {
+                        cell = getCellDetailsByPosition();
+                        cell_note.querySelector('#cell-note-content').innerText = cell.note;
                     });
+                });
 
-                    let cell_note_content = document.createElement('div');
-                    cell_note_content.id = 'cell-note-content';
-                    cell_note_div.appendChild(cell_note_content);
+                let cell_note_content = document.createElement('div');
+                cell_note_content.id = 'cell-note-content';
+                cell_note_div.appendChild(cell_note_content);
 
-                    let map_box = document.querySelector('.map-box');
+                let map_box = document.querySelector('.map-box');
 
-                    map_box.parentElement.parentElement.appendChild(cell_note);
-                }
-                cell_note.querySelector('#cell-note-content').innerText = cell.note;
+                map_box.parentElement.parentElement.appendChild(cell_note);
             }
-        } else if (cell_note) {
-            cell_note.remove();
+            cell_note.querySelector('#cell-note-content').innerText = cell.note;
         }
     } else {
         current_cell = undefined;
