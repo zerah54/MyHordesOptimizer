@@ -112,7 +112,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Map")]
-        public ActionResult<MyHordesOptimizerMapDto> GetRuins(int? townId)
+        public ActionResult<MyHordesOptimizerMapDto> GetMap(int? townId)
         {
             if (!townId.HasValue)
             {

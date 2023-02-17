@@ -1248,14 +1248,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
                             prop.SetValue(cell, prop.GetValue(existingCell));
                         }
                     }
-                    if (cell.AveragePotentialRemainingDig < 1 && (cell.IsDryed.HasValue && !cell.IsDryed.Value))
-                    {
-                        cell.AveragePotentialRemainingDig = 1;
-                    }
-                    if (cell.MaxPotentialRemainingDig < 1 && (cell.IsDryed.HasValue && !cell.IsDryed.Value))
-                    {
-                        cell.MaxPotentialRemainingDig = 1;
-                    }
                     if (cell.IsDryed.HasValue && cell.IsDryed.Value)
                     {
                         cell.AveragePotentialRemainingDig = 0;

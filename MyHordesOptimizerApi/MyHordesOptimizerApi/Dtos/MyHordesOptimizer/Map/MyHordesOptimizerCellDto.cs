@@ -9,6 +9,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         public int CellId { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public int DisplayX { get; set; }
+        public int DisplayY { get; set; }
         public bool IsTown { get; set; }
         public bool IsVisitedToday { get; set; }
         public bool IsNeverVisited { get; set; }
