@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.39
+// @version      1.0.0-beta.40
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,7 +35,10 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[MH][update] Le rafraichissement de la liste de courses devrait fonctionner correctement\n\n`;
++ `[update] Traductions et wording divers\n`
++ `[update] Regroupement des options de champs de recherches en une seule option\n\n`
++ `[new] Ajout d'un simulateur de camping directement disponible sur la case\n`
++ `[new] Ajout d'une option permettant d'afficher des notes sur une case, issues de la carte de MHO\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -106,8 +109,10 @@ let ruins;
 let recipes;
 let citizens;
 let hero_skills;
-let wishlist;;
+let wishlist;
 let parameters;
+let map;
+let current_cell;
 
 ///////////////////
 // Les variables //
@@ -454,16 +459,22 @@ const texts = {
         es: `Introduzca su ID externo aquí. También puede borrar el campo del formulario para eliminarlo.`,
     },
     wishlist_moved: {
-        en: `TODO`,
+        en: `Due to too much complexity, the shopping list has been moved to the website.`,
         fr: `Du fait d'une trop grande complexité, la liste de courses à été déplacée sur le site web.`,
-        de: `TODO`,
-        es: `TODO`
+        de: `Aufgrund zu großer Komplexität wurde die Einkaufsliste auf die Website verschoben.`,
+        es: `Debido a demasiada complejidad, la lista de compras se ha movido al sitio web.`
     },
     go_to_website: {
         en: `Go to website`,
         fr: `Aller sur le site`,
-        de: `TODO`,
-        es: `TODO`
+        de: `Gehen Sie zur Website`,
+        es: `Ir al sitio`
+    },
+    note: {
+        en: `Box note`,
+        fr: `Note de la case`,
+        de: `Box-Hinweis`,
+        es: `Nota de caja`
     }
 };
 
@@ -1187,10 +1198,10 @@ let params_categories = [
             {
                 id: `enhanced_tooltips`,
                 label: {
-                    en: `Show detailed tooltips`,
-                    fr: `Afficher des tooltips détaillés`,
-                    de: `Detaillierte Tooltips anzeigen`,
-                    es: `Mostrar tooltips detallados`
+                    en: `Detailed tooltips`,
+                    fr: `Tooltips détaillés`,
+                    de: `Detaillierte Tooltips`,
+                    es: `Tooltips detallados`
                 },
                 parent_id: null
             },
@@ -1205,52 +1216,38 @@ let params_categories = [
                 parent_id: null
             },
             {
-                id: `display_search_field_on_buildings`,
+                id: `display_search_fields`,
                 label: {
-                    en: `Show a search field for construction sites`,
-                    fr: `Afficher un champ de recherche pour les chantiers`,
-                    de: `Ein Suchfeld für Baustellen anzeigen`,
-                    es: `Mostrar la barra buscadora para construcciones`
+                    en: `Additional search fields`,
+                    fr: `Champs de recherches supplémentaires`,
+                    de: `Zusätzliche Suchfelder`,
+                    es: `Campos de búsqueda adicionales`
                 },
-                parent_id: null
-            },
-            {
-                id: `display_search_field_on_recipient_list`,
-                label: {
-                    en: `Display a search box for message recipients`,
-                    fr: `Afficher un champ de recherche pour les destinataires de messages`,
-                    de: `Zeigen Sie ein Suchfeld für Nachrichtenempfänger an`,
-                    es: `Mostrar un cuadro de búsqueda para los destinatarios del mensaje`
+                help: {
+                    en: `Displays a search field in the list of construction sites, and a search field in the list of recipients of a message in his house.`,
+                    fr: `Affiche un champ de recherche dans la liste de chantiers, et un champ de recherche sur la liste des destinataires d'un message dans sa maison.`,
+                    de: `Zeigt ein Suchfeld in der Liste der Baustellen und ein Suchfeld in der Liste der Empfänger einer Nachricht in seinem Haus an.`,
+                    es: `Muestra un campo de búsqueda en la lista de sitios de construcción y un campo de búsqueda en la lista de destinatarios de un mensaje en su casa.`
                 },
                 parent_id: null
             },
             {
                 id: `display_wishlist`,
                 label: {
-                    en: `Display wishlist in interface`,
-                    fr: `Afficher la liste de courses dans l'interface`,
-                    de: `Wunschzettel in der Benutzeroberfläche anzeigen`,
-                    es: `Mostrar la lista de deseos en la interfaz`
+                    en: `Wishlist in interface`,
+                    fr: `Liste de courses dans l'interface`,
+                    de: `Wunschzettel in der Benutzeroberfläche`,
+                    es: `Lista de deseos en la interfaz`
                 },
                 parent_id: null
             },
             {
-                id: `display_wishlist_closed`,
-                label: {
-                    en: `Wishlish folded by default`,
-                    fr: `Liste de courses repliée par défaut`,
-                    de: `Wunschzettel standardmäßig gefaltet`,
-                    es: `Lista de deseos minimizada por defecto`
-                },
-                parent_id: `display_wishlist`
-            },
-            {
                 id: `display_nb_dead_zombies`,
                 label: {
-                    en: `Show the number of zombie that died today`,
-                    fr: `Afficher le nombre de zombies morts aujourd'hui`,
-                    de: `Anzahl der Zombies die heute hier gestorben sind anzeigen`,
-                    es: `Mostrar la cantidad de zombis que murieron hoy`
+                    en: `Number of zombie that died today`,
+                    fr: `Nombre de zombies morts aujourd'hui`,
+                    de: `Anzahl der Zombies die heute hier gestorben sind`,
+                    es: `Cantidad de zombis que murieron hoy`
                 },
                 help: {
                     en: `Allows to display the number of blood splatters on the map`,
@@ -1263,10 +1260,10 @@ let params_categories = [
             {
                 id: `display_translate_tool`,
                 label: {
-                    en: `Show MyHordes' item translation bar`,
-                    fr: `Afficher la barre de traduction des éléments de MyHordes`,
-                    de: `Übersetzungsleiste für MyHordes Elemente anzeigen`,
-                    es: `Mostrar la barra de traducción de elementos de MyHordes`
+                    en: `MyHordes' item translation bar`,
+                    fr: `Barre de traduction des éléments de MyHordes`,
+                    de: `Übersetzungsleiste für MyHordes Elemente`,
+                    es: `Barra de traducción de elementos de MyHordes`
                 },
                 help: {
                     en: `Shows a translation bar. You must choose the initial language, then type the searched element to get the other translations.`,
@@ -1279,10 +1276,10 @@ let params_categories = [
             {
                 id: `display_missing_ap_for_buildings_to_be_safe`,
                 label: {
-                    en: `Show missing AP to repair construction sites`,
-                    fr: `Afficher les PA manquants pour réparer les chantiers`,
-                    de: `Fehlende AP anzeigen, um Konstruktionen zu reparieren`,
-                    es: `Mostrar los PA faltantes para reparar las construcciones`
+                    en: `Missing AP to repair construction sites`,
+                    fr: `PA manquants pour réparer les chantiers`,
+                    de: `Fehlende AP, um Konstruktionen zu reparieren`,
+                    es: `PA faltantes para reparar las construcciones`
                 },
                 help: {
                     en: `In Pandemonium (Hardcore towns), the construction sites are damaged during the attack. The damages can amount to 70% max of the construction's life points (rounded up to the nearest whole number). This option displays over the constructions the number of AP needed to keep them safe.`,
@@ -1295,23 +1292,39 @@ let params_categories = [
             {
                 id: `more_citizens_info`,
                 label: {
-                    en: `Display a tab with additional information on the citizens page in town`,
-                    fr: `Afficher un onglet contenant des informations supplémentaires sur la page des citoyens`,
-                    de: `Ein Tab mit zusätzlichen Informationen auf der Bürgerliste  in der Stadt anzeigen`,
-                    es: `Mostrar una pestaña con información adicional en la página de los habitantes`
+                    en: `Tab with additional information on the citizens page in town`,
+                    fr: `Onglet contenant des informations supplémentaires sur la page des citoyens`,
+                    de: `Tab mit zusätzlichen Informationen auf der Bürgerliste in der Stadt`,
+                    es: `Pestaña con información adicional en la página de los habitantes`
                 },
                 parent_id: null
             },
-            // {
-            //     id: `display_camping_predict`,
-            //     label: {
-            //         en: `TODO`,
-            //         fr: `Dans le désert, afficher des prédictions de camping directement dans la page`,
-            //         de: `TODO`,
-            //         es: `TODO`
-            //     },
-            //     parent_id: null
-            // }
+            {
+                id: `display_camping_predict`,
+                label: {
+                    en: `[Experimental] Camping predictions in area information`,
+                    fr: `[Expérimental] Prédictions de camping dans les informations sur le secteur`,
+                    de: `Campingvorhersagen in Gebietsinformationen`,
+                    es: `[Experimental] Predicciones para acampar en la información del área`
+                },
+                parent_id: null
+            },
+            {
+                id: `display_more_informations_from_mho`,
+                label: {
+                    en: `Miscellaneous information from MyHordes Optimizer`,
+                    fr: `Informations diverses issues de MyHordes Optimizer`,
+                    de: `Verschiedene Informationen von MyHordes Optimizer`,
+                    es: `Información miscelánea de MyHordes Optimizer`
+                },
+                help: {
+                    en: `Displays the note of the box, if it exists.`,
+                    fr: `Affiche la note de la case, si elle existe.`,
+                    de: `Zeigt die Notiz der Box an, falls vorhanden.`,
+                    es: `Muestra la nota de la caja, si existe.`
+                },
+                parent_id: null
+            }
             // {
             //     id: `block_users`,
             //     label: {
@@ -1436,11 +1449,11 @@ let informations = [
 ];
 
 const table_hero_skills_headers = [
-    {id: 'name', label: {en: `Name`, fr: `Nom`, de: `TODO`, es: `Nombre`}, type: 'th'},
-    {id: 'nombreJourHero', label: {en: `Hero days`, fr: `Jours héros`, de: `TODO`, es: `Días de héroe`}, type: 'td'},
-    {id: 'lastSkill', label: {en: `Last power earned`, fr: `Dernier pouvoir gagné`, de: `TODO`, es: `Último poder obtenido`}, type: 'td'},
-    {id: 'uppercut', label: {en: `Vicious uppercut`, fr: `Uppercut Sauvage`, de: `TODO`, es: `Puñetazo salvaje`}, type: 'td', img: ''},
-    {id: 'rescue', label: {en: `Rescue`, fr: `Sauvetage`, de: `TODO`, es: `Rescate`}, type: 'td', img: ''}
+    {id: 'name', label: {en: `Name`, fr: `Nom`, de: `Name`, es: `Nombre`}, type: 'th'},
+    {id: 'nombreJourHero', label: {en: `Hero days`, fr: `Jours héros`, de: `Heldentage`, es: `Días de héroe`}, type: 'td'},
+    {id: 'lastSkill', label: {en: `Last power earned`, fr: `Dernier pouvoir gagné`, de: `Letzte Kraft gewonnen`, es: `Último poder obtenido`}, type: 'td'},
+    {id: 'uppercut', label: {en: `Vicious uppercut`, fr: `Uppercut Sauvage`, de: `Wildstyle Uppercut`, es: `Puñetazo salvaje`}, type: 'td', img: ''},
+    {id: 'rescue', label: {en: `Rescue`, fr: `Sauvetage`, de: `Rettung`, es: `Rescate`}, type: 'td', img: ''}
 ];
 
 const table_skills_headers = [
@@ -1522,11 +1535,16 @@ function pageIsForum() {
 
 function getI18N(item) {
     if (!item) return;
-    return item[lang] !== 'TODO' ? item[lang] : (item['en'] === 'TODO' ? item['fr'] : item['en'])
+    return item[lang] !== 'TODO' ? item[lang] : (item['en'] === 'TODO' ? item['fr'] : item['en']);
 }
 
 function getCurrentPosition() {
-    return document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/')
+    return document.querySelector('.current-location')?.innerText.replace(/.*: ?/, '').split('/');
+}
+
+function getCellDetailsByPosition() {
+    let position = getCurrentPosition();
+    return map.cells.find((cell) => +cell.displayX === +position[0] && +cell.displayY === +position[1]);
 }
 
 /** Affiche ou masque la page de chargement de MyHordes en fonction du nombre d'appels en cours */
@@ -2909,7 +2927,7 @@ function calculateCampingProbabilities(conf) {
         let probability = Math.min(Math.max((100.0 - (Math.abs(Math.min(0, chances)) * 5)) / 100.0, .1), (conf.job === 'survivalist' ? 1.0 : 0.9));
         let camping_result_text = camping_results.find((camping_result) => camping_result.string ? probability < camping_result.probability : probability <= camping_result.probability);
         let result = document.querySelector('#camping-result');
-        result.innerText = `${camping_result_text ? getI18N(camping_result_text.label) : ''} (${probability * 100}%)`;
+        result.innerText = `${camping_result_text ? getI18N(camping_result_text.label) : ''} (${Math.round(probability * 10000) / 100}%)`;
     });
 };
 
@@ -3239,7 +3257,7 @@ function clickOnVotedToRedirect() {
 /** Si l'option associée est activée, affiche un champ de recherche sur la page de chantiers */
 function displaySearchFieldOnBuildings() {
     let search_field = document.getElementById(mho_search_building_field_id);
-    if (mho_parameters.display_search_field_on_buildings && pageIsConstructions()) {
+    if (mho_parameters.display_search_fields && pageIsConstructions()) {
         if (search_field) return;
 
         let tabs = document.querySelector('ul.buildings-tabs');
@@ -3296,7 +3314,7 @@ function displaySearchFieldOnBuildings() {
 /** Si l'option associée est activée, affiche un champ de recherche sur la liste des destinataires d'un message */
 function displaySearchFieldOnRecipientList() {
     let search_field = document.getElementById(mho_search_recipient_field_id);
-    if (mho_parameters.display_search_field_on_recipient_list && pageIsHouse()) {
+    if (mho_parameters.display_search_fields && pageIsHouse()) {
         if (search_field) return;
 
         let recipients = document.querySelector('#recipient_list');
@@ -3502,7 +3520,7 @@ function displayWishlistInApp() {
                 });
 
 
-                if (mho_parameters.display_wishlist_closed && !is_refresh_wishlist) {
+                if (!is_refresh_wishlist) {
                     hide_state.innerText = '>';
                     header_title.show = false;
 
@@ -5043,6 +5061,62 @@ function displayMoreCitizensInformations() {
     }
 }
 
+function displayCellDetailsOnPage() {
+    if(mho_parameters.display_more_informations_from_mho && pageIsDesert()) {
+        let cell = getCellDetailsByPosition();
+        let cell_note = document.querySelector('#cell-note');
+        if (!current_cell || cell.id !== current_cell.id) {
+            current_cell = cell;
+            if (!cell_note) {
+                cell_note = document.createElement('div');
+                cell_note.id = 'cell-note';
+                cell_note.classList.add('row');
+
+                let cell_note_div = document.createElement('div');
+                cell_note_div.style.width = '100%';
+                cell_note_div.classList.add('background', 'cell');
+                cell_note.appendChild(cell_note_div);
+
+                let cell_note_header = document.createElement('h5');
+                cell_note_header.style.marginTop = '0';
+                cell_note_header.style.display = 'flex';
+                cell_note_header.style.justifyContent = 'space-between';
+                cell_note_header.style.alignItems = 'center';
+                cell_note_div.appendChild(cell_note_header);
+
+                let cell_note_header_left = document.createElement('div');
+                cell_note_header_left.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px; height: 24px; margin-right: 0.5em">${getI18N(texts.note)}`;
+                cell_note_header.appendChild(cell_note_header_left);
+
+                let cell_note_header_right = document.createElement('div');
+                cell_note_header_right.innerHTML = `🗘`;
+                cell_note_header_right.style.fontSize = '16px';
+                cell_note_header_right.style.cursor = 'pointer';
+                cell_note_header.appendChild(cell_note_header_right);
+
+                cell_note_header_right.addEventListener('click', () => {
+                    cell_note.querySelector('#cell-note-content').innerText = '🗘';
+                    getMap().then(() => {
+                        cell = getCellDetailsByPosition();
+                        cell_note.querySelector('#cell-note-content').innerText = cell.note;
+                    });
+                });
+
+                let cell_note_content = document.createElement('div');
+                cell_note_content.id = 'cell-note-content';
+                cell_note_div.appendChild(cell_note_content);
+
+                let map_box = document.querySelector('.map-box');
+
+                map_box.parentElement.parentElement.appendChild(cell_note);
+            }
+            cell_note.querySelector('#cell-note-content').innerText = cell.note;
+        }
+    } else {
+        current_cell = undefined;
+    }
+}
+
 function displayCampingPredict() {
     let camping_predict_container = document.getElementById(mho_camping_predict_id);
 
@@ -5108,7 +5182,7 @@ function displayCampingPredict() {
                 object_improve: 0,
                 ruin: ruin
             }
-            console.log('conf', conf);
+            // console.log('conf', conf);
 
             let my_info = document.createElement('div');
             camping_predict_container.appendChild(my_info);
@@ -6721,7 +6795,7 @@ function getItems() {
                             return -1;
                         }
                     })
-                        .filter((item) => is_mh_beta ? true : +item.id !== 302);
+                    .filter((item) => is_mh_beta ? true : +item.id !== 302);
                     let wiki_btn = document.getElementById(wiki_btn_id);
                     if (wiki_btn) {
                         wiki_btn.setAttribute('style', 'display: inherit');
@@ -6799,6 +6873,7 @@ function getMe() {
 
                         if (mh_user !== '' && mh_user.townDetails.townId) {
                             getWishlist().then();
+                            getMap().then();
                         }
                     } else {
                         addError(response);
@@ -6862,7 +6937,7 @@ function getBank() {
                 endLoading();
             }
         })
-            .then((response) => {
+        .then((response) => {
             let bank = [];
             response.bank.forEach((bank_item) => {
                 bank_item.item.broken = bank_item.isBroken;
@@ -6950,41 +7025,6 @@ function addItemToWishlist(item) {
                 reject(error);
             }
         });
-    });
-}
-
-/** Met à jour les données de la wishlist */
-function updateWishlist() {
-    let item_list = wishlist.wishList
-    .filter((item) => item.count)
-    .map((item) => {
-        return {id: item.item.id, priority: item.priority, depot: item.depot, count: item.count};
-    });
-    startLoading();
-    GM.xmlHttpRequest({
-        method: 'PUT',
-        url: api_url + '/wishlist?userId=' + mh_user.id + '&townId=' + mh_user.townDetails.townId,
-        data: JSON.stringify(item_list),
-        responseType: 'json',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        onload: function(response){
-            if (response.status === 200) {
-                // TODO SNACKBAR
-                wishlist = response.response;
-                wishlist.wishList = Object.keys(wishlist.wishList).map((key) => wishlist.wishList[key]);
-
-                addSuccess(getI18N(api_texts.update_wishlist_success));
-            } else {
-                addError(response);
-            }
-            endLoading();
-        },
-        onerror: function(error){
-            endLoading();
-            addError(error);
-        }
     });
 }
 
@@ -7343,6 +7383,8 @@ function updateExternalTools() {
                     if (tools_fail.length > 0) {
                         console.error(`Erreur lors de la mise à jour de l'un des outils`, response.response);
                     }
+
+                    getMap();
                 } else {
                     addError(response);
                     btn.innerHTML = `<img src="${repo_img_hordes_url}professions/death.gif">` + getI18N(texts.update_external_tools_fail_btn_label);
@@ -7493,6 +7535,32 @@ function getParameters() {
         });
     });
 }
+
+
+
+function getMap() {
+    return new Promise((resolve, reject) => {
+        fetch(api_url + '/myhordesfetcher/map?townId=' + mh_user.townDetails.townId)
+            .then((response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                addError(response);
+                reject(response);
+            }
+        })
+        .then((response) => {
+            map = response;
+            resolve(map);
+        })
+            .catch((error) => {
+            endLoading();
+            addError(error);
+            reject(error);
+        });
+    });
+}
+
 
 /** Récupère le chemin optimal à partir d'une carte */
 function getOptimalPath(map, html, button) {
@@ -7782,6 +7850,7 @@ function getDesertLogs() {
                             displayTranslateTool();
                             displayMoreCitizensInformations();
                             notifyOnNewMessage();
+                            displayCellDetailsOnPage();
                             // blockUsersPosts();
                         }, 200);
 
