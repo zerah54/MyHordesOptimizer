@@ -36,6 +36,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var cellItems = Mapper.Map<List<MapCellItemModel>>(updateRequest.Items);
 
             var cells = new List<MapCellModel>() { cell };
+            cells.ForEach(cell => { if (cell.IsDryed.HasValue && cell.IsDryed.Value) { cell.AveragePotentialRemainingDig = 0; cell.MaxPotentialRemainingDig = 0; } });
             MyHordesOptimizerRepository.PatchMapCell(townId, cells, forceUpdate: true);
 
             MyHordesOptimizerRepository.ClearCellItem(cell.IdCell, lastUpdateInfoId);
