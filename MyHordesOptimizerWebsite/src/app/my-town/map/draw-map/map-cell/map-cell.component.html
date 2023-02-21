@@ -5,14 +5,19 @@
     [class.scrut-border-left]="cell|scrutBorderLeft:options:drawedMap"
     [class.scrut-border-top]="cell|scrutBorderTop:options:drawedMap"
     [class.scrut-border-right]="cell|scrutBorderRight:options:drawedMap"
-    [class.scrut-border-bottom]="cell|scrutBorderBottom:options:drawedMap">
-    <!--(click)="openCellUpdate(cell)" (mouseenter)="current_cell = cell" (mouseleave)="current_cell = undefined">-->
+    [class.scrut-border-bottom]="cell|scrutBorderBottom:options:drawedMap"
+    (click)="openCellUpdate()">
+    <!-- (mouseenter)="current_cell = cell" (mouseleave)="current_cell = undefined">-->
 
     <div *ngIf="cell.ruin_id" [class]="'ruin'">
         <span [class.empty-ruin]="cell.is_ruin_dryed">
             <ng-container *ngIf="cell | isRuin:allRuins">R</ng-container>
             <ng-container *ngIf="cell.nb_ruin_dig"><img [src]="HORDES_IMG_REPO + 'building/small_dig.gif'"><span class="nb-digs">{{cell.nb_ruin_dig}}</span></ng-container>
         </span>
+    </div>
+
+    <div *ngIf="cell.is_town" [class]="'town-draw'">
+        <img [src]="HORDES_IMG_REPO + 'icons/map/map_zone_town.svg'">
     </div>
 
     <div *ngIf="cell.is_dryed" [class]="'dried'">
@@ -28,6 +33,7 @@
 
     <div class="content" *ngIf="!cell.is_town">
         <span class="corner-top-left corner">
+            <img *ngIf="cell.note" [src]="HORDES_IMG_REPO + 'icons/small_talk.gif'">
         </span>
         <span class="corner-top-right corner">
             <ng-container *ngIf="options.map_type === 'digs'">

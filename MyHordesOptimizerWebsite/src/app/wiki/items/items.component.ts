@@ -21,7 +21,7 @@ export class ItemsComponent implements OnInit {
 
     public displayed_items!: Item[];
 
-    private readonly locale: string = moment.locale();
+    public readonly locale: string = moment.locale();
 
     /** Le champ de filtre sur les objets */
     public filter_value: string = '';

@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
 import { Components, Modules } from 'src/app/_abstract_model/types/_types';
 import { MaterialModule } from './../material-modules.module';
 import { AccordionComponent } from './accordion/accordion.component';
+import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import { FilterFieldComponent } from './filter-field/filter-field.component';
 import { ItemComponent } from './item/item.component';
 import { LastUpdateComponent } from './last-update/last-update.component';
@@ -24,7 +25,7 @@ import { SelectComponent } from './select/select.component';
 
 let components: Components = [
     ItemComponent, SelectComponent, RecipeComponent, FilterFieldComponent, LastUpdateComponent, AccordionComponent, ListElementAddRemoveComponent, MenuAddComponent,
-    MenuRemoveComponent
+    MenuRemoveComponent, ConfirmDialogComponent
 ];
 let list_headers: Components = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent];
 let local_components: Components = [LabelPipe];

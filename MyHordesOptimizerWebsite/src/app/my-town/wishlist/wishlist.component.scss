@@ -5,18 +5,42 @@
 
     table {
         width: 100%;
+
         tr {
-            > td {
+            >td {
                 &.name {
-                    > div {
+                    >div {
                         display: flex;
                         align-items: center;
                         gap: 0.5em;
-                        white-space: nowrap;
-                        flex-wrap: nowrap;
+
+                    }
+                }
+
+                .count {
+                    width: 100px;
+                }
+            }
+        }
+    }
+}
+
+
+@media screen and (min-width: 600px) {
+
+    .mho-wishlist {
+        table {
+            tr {
+                >td {
+                    &.name {
+                        >div {
+                            white-space: nowrap;
+                            flex-wrap: nowrap;
+                        }
                     }
                 }
             }
         }
     }
+
 }

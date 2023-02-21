@@ -6,8 +6,9 @@
         <tr *ngFor="let row of drawed_map; let row_index = index">
             <mho-map-border [vertical]="true" [horizontal]="false"
                 [index]="+complete_map.town_y - row_index"></mho-map-border>
-            <mho-map-cell *ngFor="let cell of row; trackBy: trackByCellId" [cell]="cell" [allItems]="allItems"
-                [allRuins]="allRuins" [allCitizens]="allCitizens" [options]="options" [drawedMap]="drawed_map"></mho-map-cell>
+            <mho-map-cell *ngFor="let cell of row; trackBy: trackByCellId; let cell_index = index" [cell]="cell"
+                (cellChange)="drawed_map[row_index][cell_index] = $event" [allItems]="allItems" [allRuins]="allRuins"
+                [allCitizens]="allCitizens" [options]="options" [drawedMap]="drawed_map"></mho-map-cell>
             <mho-map-border [vertical]="true" [horizontal]="false"
                 [index]="+complete_map.town_y - row_index"></mho-map-border>
         </tr>

@@ -4,14 +4,10 @@
 <mat-card-content class="mho-citizens">
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
         <mat-tab label="Citoyens" i18n-label>
-            <ng-template matTabContent>
-                <mho-citizens-list [citizenInfo]="citizen_info" (citizenInfoChange)="getCitizens()"></mho-citizens-list>
-            </ng-template>
+            <mho-citizens-list [citizenInfo]="citizen_info" (citizenInfoChange)="getCitizens()"></mho-citizens-list>
         </mat-tab>
         <mat-tab label="Fouilles" i18n-label>
-            <ng-template matTabContent>
-                <mho-citizens-digs [citizenInfo]="citizen_info" (citizenInfoChange)="getCitizens()"></mho-citizens-digs>
-            </ng-template>
+            <mho-citizens-digs [citizenInfo]="citizen_info" (citizenInfoChange)="getCitizens()"></mho-citizens-digs>
         </mat-tab>
     </mat-tab-group>
 </mat-card-content>

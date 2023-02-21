@@ -31,7 +31,7 @@ export class BankComponent implements OnInit {
     /** La liste des filtres */
     public options: (Property | Action)[] = [...<any>Property.getAllValues(), ...<any>Action.getAllValues()];
 
-    private readonly locale: string = moment.locale();
+    public readonly locale: string = moment.locale();
 
     constructor(private api: ApiServices) {
 

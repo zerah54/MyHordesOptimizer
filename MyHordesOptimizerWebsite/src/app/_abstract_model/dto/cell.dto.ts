@@ -6,6 +6,8 @@ export interface CellDTO {
     cellId: number;
     x: number;
     y: number;
+    displayX: number;
+    displayY: number;
     isTown: boolean;
     isVisitedToday: boolean;
     isNeverVisited: boolean;
@@ -28,6 +30,10 @@ export interface CellDTO {
     nbPa: number;
     zoneRegen?: string;
     note: string;
+    nbRuinSuccess: number;
+    nbERuinBlue: number;
+    nbERuinYellow: number;
+    nbERuinViolet: number;
 }
 
 export interface SaveCellDTO {
@@ -42,4 +48,8 @@ export interface SaveCellDTO {
     note: string;
     nbRuinDig: number;
     isRuinDryed: boolean;
+    nbRuinSuccess: number;
+    nbERuinBlue: number;
+    nbERuinYellow: number;
+    nbERuinViolet: number;
 }

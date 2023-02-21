@@ -1,12 +1,12 @@
 import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { MatTable } from '@angular/material/table';
 import * as moment from 'moment';
 import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
-import { MenuAddComponent } from 'src/app/shared/elements/list-elements-add-remove/menu-add/menu-add.component';
-import { MenuRemoveComponent } from 'src/app/shared/elements/list-elements-add-remove/menu-remove/menu-remove.component';
 import { getUser } from 'src/app/shared/utilities/localstorage.util';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
+import { HeroicActionEnum } from 'src/app/_abstract_model/enum/heroic-action.enum';
+import { HomeEnum } from 'src/app/_abstract_model/enum/home.enum';
 import { StatusEnum } from 'src/app/_abstract_model/enum/status.enum';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { CitizenInfo } from 'src/app/_abstract_model/types/citizen-info.class';
@@ -23,8 +23,8 @@ import { UpdateInfo } from 'src/app/_abstract_model/types/update-info.class';
 export class CitizensListComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @ViewChild(MenuAddComponent) menuAdd!: MenuAddComponent;
-    @ViewChild(MenuRemoveComponent) menuRemove!: MenuRemoveComponent;
+    // @ViewChild(MenuAddComponent) menuAdd!: MenuAddComponent;
+    // @ViewChild(MenuRemoveComponent) menuRemove!: MenuRemoveComponent;
 
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
@@ -43,7 +43,7 @@ export class CitizensListComponent {
     public citizen_info!: CitizenInfo;
     /** La datasource pour le tableau */
     // public datasource: TableVirtualScrollDataSource<Citizen> = new TableVirtualScrollDataSource();
-    public datasource: MatTableDataSource<Citizen> = new MatTableDataSource();
+    public datasource: TableVirtualScrollDataSource<Citizen> = new TableVirtualScrollDataSource();
     /** La liste complète des items */
     public all_items: Item[] = [];
     /** Le dossier dans lequel sont stockées les images */
@@ -71,7 +71,7 @@ export class CitizensListComponent {
     }
 
     ngOnInit(): void {
-        this.datasource = new MatTableDataSource();
+        this.datasource = new TableVirtualScrollDataSource();
         this.datasource.sort = this.sort;
 
         this.citizen_filter_change.subscribe(() => {
@@ -246,6 +246,10 @@ export class CitizensListComponent {
 
     public trackByColumnId(index: number, column: CitizenColumn): string {
         return column.id;
+    }
+
+    public trackByKey(index: number, enum_item: HeroicActionEnum | HomeEnum): string {
+        return enum_item.key;
     }
 
 

@@ -15,7 +15,7 @@ export class UpdateInfo extends CommonModel<UpdateInfoDTO> {
 
     public modelToDto(): UpdateInfoDTO {
         return {
-            updateTime: this.update_time.toDate(),
+            updateTime: this.update_time?.toDate(),
             userId: this.user_id,
             userName: this.username,
             userKey: this.userkey

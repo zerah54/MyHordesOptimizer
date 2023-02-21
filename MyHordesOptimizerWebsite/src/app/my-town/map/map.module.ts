@@ -19,6 +19,9 @@ import { MapUpdateCellComponent } from './draw-map/map-update/map-update-cell/ma
 import { HasStillHeroicPipe } from './draw-map/map-update/map-update-citizens/has-still-heroic.pipe';
 import { MapUpdateCitizensComponent } from './draw-map/map-update/map-update-citizens/map-update-citizens.component';
 import { NotInListCitizenPipe } from './draw-map/map-update/map-update-citizens/not-in-list-citizen.pipe';
+import { DigsPerDayPipe } from './draw-map/map-update/map-update-digs/digs-per-day.pipe';
+import { MapUpdateDigsComponent } from './draw-map/map-update/map-update-digs/map-update-digs.component';
+import { NotInListCitizenDigPipe } from './draw-map/map-update/map-update-digs/not-in-list-citizen.pipe';
 import { MapUpdateRuinComponent } from './draw-map/map-update/map-update-ruin/map-update-ruin.component';
 import { MapUpdateComponent } from './draw-map/map-update/map-update.component';
 import { MapComponent } from './map.component';
@@ -26,12 +29,12 @@ import { MapComponent } from './map.component';
 let components: Components = [MapComponent];
 let map_components: Components = [
     DrawMapComponent, MapCellComponent, MapBorderComponent, CompassRoseComponent, MapCellDetailsComponent, MapUpdateComponent, MapUpdateCellComponent,
-    MapUpdateRuinComponent, MapUpdateCitizensComponent
+    MapUpdateRuinComponent, MapUpdateCitizensComponent, MapUpdateDigsComponent
 ];
 let pipes: Components = [
     IsRuinPipe, DigLevelPipe, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop, ScrutBorderBottom, MyCellPipe, AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe,
     CellDetailsLeftPipe, CellDetailsBottomPipe, CellDetailsRightPipe, CellDetailsTopPipe, RuinInCell, HasStillHeroicPipe, ItemsInBagsPipe, DistBorderBottom, DistBorderLeft,
-    DistBorderRight, DistBorderTop, NotInListCitizenPipe
+    DistBorderRight, DistBorderTop, NotInListCitizenPipe, NotInListCitizenDigPipe, DigsPerDayPipe
 ];
 
 @NgModule({

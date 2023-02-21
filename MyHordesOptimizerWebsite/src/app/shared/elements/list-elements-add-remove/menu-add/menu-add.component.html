@@ -9,7 +9,7 @@
         <div class="items">
             <ng-container *ngFor="let item of list">
                 <img *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1"
-                    [src]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id); test()"
+                    [src]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id);"
                     [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
             </ng-container>
         </div>
