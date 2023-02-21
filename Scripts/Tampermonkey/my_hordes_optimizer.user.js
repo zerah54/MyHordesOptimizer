@@ -5620,7 +5620,7 @@ function createStyles() {
     + 'outline: 1px solid #000;'
     + 'position: absolute;'
     + 'top: 10px;'
-    + 'z-index: 9999;'
+    + 'z-index: 997;'
     + '}';
 
     const btn_hover_h1_span_style = `#${btn_id}:hover h1 span, #${btn_id}:hover h1 a {`
