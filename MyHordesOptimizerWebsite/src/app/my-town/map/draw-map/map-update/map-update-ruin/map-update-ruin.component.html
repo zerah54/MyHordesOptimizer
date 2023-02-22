@@ -4,6 +4,39 @@
         <br />
         <div><ng-container i18n>Bonus en camping</ng-container>&nbsp;:&nbsp;{{ruin.camping}}</div>
     </ng-container>
+    <ng-container>
+        <mat-divider></mat-divider>
+        <form [formGroup]="cell_form">
+            <div class="ruin-info">
+                <ng-container *ngIf="!ruin.explorable; else ruinDrops">
+                    <mat-form-field class="nb-digs" *ngIf="+cell.ruin_id < 0">
+                        <img matPrefix [src]="HORDES_IMG_REPO + 'building/small_dig.gif'">
+                        <input matInput formControlName="nb_ruin_dig"></mat-form-field>
+                    <mat-checkbox *ngIf="cell.ruin_id > -1" formControlName="is_ruin_dryed">
+                        <ng-container i18n>Bâtiment vide</ng-container>
+                    </mat-checkbox>
+<!--                    <mat-form-field appearance="outline">
+                        <mat-label i18n>Fouilles réussies</mat-label>
+                        <input matInput type="number" formControlName="nb_ruin_success">
+                    </mat-form-field>-->
+                </ng-container>
+                <ng-template #ruinDrops>
+                    <mat-form-field appearance="outline">
+                        <mat-label i18n>Plans inhabituels sortis</mat-label>
+                        <input matInput type="number" formControlName="nb_eruin_yellow">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label i18n>Plans rares sortis</mat-label>
+                        <input matInput type="number" formControlName="nb_eruin_blue">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label i18n>Plans très rares sortis</mat-label>
+                        <input matInput type="number" formControlName="nb_eruin_violet">
+                    </mat-form-field>
+                </ng-template>
+            </div>
+        </form>
+    </ng-container>
     <ng-container *ngIf="ruin.drops && ruin.drops.length > 0">
         <mat-divider></mat-divider>
         <div class="drops">

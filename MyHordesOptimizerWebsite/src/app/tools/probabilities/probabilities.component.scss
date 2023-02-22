@@ -14,15 +14,24 @@
         justify-content: space-between;
     }
 
-    .chances {
-        min-width: 100px;
-        justify-content: left;
-        flex: 1;
-    }
-
     .content {
         display: flex;
         gap: 0.5em;
+
+
+
+        .chances {
+            min-width: 100px;
+            justify-content: left;
+            flex: 1;
+            align-items: start;
+        }
+
+        .results {
+            border: 1px solid $primary;
+            border-radius: 0.25em;
+            background-color: $item_color;
+        }
     }
 
     table {

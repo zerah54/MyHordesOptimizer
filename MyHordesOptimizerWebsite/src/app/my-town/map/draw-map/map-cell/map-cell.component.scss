@@ -161,6 +161,12 @@ td.map-cell {
 
     &.town {
         background-color: $primary;
+
+        >.town-draw {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     }
 
     .dried {

@@ -5,7 +5,7 @@
             <th mat-header-cell *matHeaderCellDef [ngClass]="[column.id, column.class]">
                 <ng-container [ngSwitch]="column.id">
                     <mho-header-with-select-filter *ngSwitchCase="'avatar_name'" [header]="column.header"
-                        [(filterValue)]="citizen_filters" (filterValueChange)="citizen_filter_change.next()"
+                        [(filterValue)]="filters.citizen" (filterValueChange)="citizen_filter_change.next()"
                         [options]="citizen_info.citizens" [bindLabel]="'name'">
                     </mho-header-with-select-filter>
                     <mho-header-with-number-previous-next-filter class="previous-next" *ngSwitchCase="'today_digs'" [header]="column.header"

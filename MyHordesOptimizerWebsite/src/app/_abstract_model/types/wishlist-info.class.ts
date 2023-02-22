@@ -1,5 +1,6 @@
 import { DictionaryUtils } from 'src/app/shared/utilities/dictionary.util';
 import { ShortWishlistItemDTO } from '../dto/short-wishlist-item.dto';
+import { WishlistItemDTO } from '../dto/wishlist-item.dto';
 import { WishlistInfoDTO } from './../dto/wishlist-info.dto';
 import { UpdateInfo } from './update-info.class';
 import { WishlistItem } from './wishlist-item.class';
@@ -49,7 +50,9 @@ export class WishlistInfo extends CommonModel<WishlistInfoDTO> {
         if (dto) {
             this.wishlist_items = new Map();
             for (let key in dto.wishList) {
-                this.wishlist_items.set(key, dtoToModelArray(WishlistItem, dto.wishList[key]));
+                let list_items: WishlistItemDTO[] = dto.wishList[key];
+                list_items = list_items.sort((item_a: WishlistItemDTO, item_b: WishlistItemDTO) => item_a.priority - item_b.priority);
+                this.wishlist_items.set(key, dtoToModelArray(WishlistItem, list_items));
             }
             this.update_info = new UpdateInfo(dto.lastUpdateInfo)
         }

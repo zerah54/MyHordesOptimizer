@@ -12,14 +12,6 @@
         </mat-form-field>
     </div>
     <div class="content">
-        <div class="chances">
-            <mat-form-field *ngFor="let people of [].constructor(nb_people)" appearance="outline">
-                <mat-label i18n>Chances de survie</mat-label>
-                <input matInput (change)="updateValues()" [value]="0" #chances [min]="0" [max]="100"
-                    type="number">
-                <span matSuffix style="margin-right: 0.5em;">%</span>
-            </mat-form-field>
-        </div>
         <div class="results">
             <table>
                 <thead>
@@ -40,6 +32,14 @@
                     </tr>
                 </tfoot>
             </table>
+        </div>
+        <div class="chances">
+            <mat-form-field *ngFor="let people of [].constructor(nb_people)" appearance="outline" class="short-bottom">
+                <mat-label i18n>Chances de survie</mat-label>
+                <input matInput (change)="updateValues()" [value]="0" #chances [min]="0" [max]="100"
+                    type="number">
+                <span matSuffix style="margin-right: 0.5em;">%</span>
+            </mat-form-field>
         </div>
     </div>
 </mat-card-content>

@@ -13,7 +13,7 @@ import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 export class MenuAddComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @ViewChild(MatMenu) menu!: MatMenu;
+    @ViewChild(MatMenu, {static: true}) menu!: MatMenu;
 
     @Output() add: EventEmitter<number | string> = new EventEmitter();
 
@@ -22,8 +22,5 @@ export class MenuAddComponent {
     /** La langue du site */
     public readonly locale: string = moment.locale();
 
-    test() {
-        console.log('test');
-    }
 }
 

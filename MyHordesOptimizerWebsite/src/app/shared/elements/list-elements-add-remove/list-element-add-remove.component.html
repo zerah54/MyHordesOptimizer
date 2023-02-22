@@ -3,10 +3,8 @@
         {{label}}
 
         <div class="add-remove">
-            <img [src]="HORDES_IMG_REPO + 'icons/small_less.gif'" *ngIf="currentList.length > 0"
-                [matMenuTriggerFor]="remove_menu" [matMenuTriggerData]="{menuLabel: removeLabel, list: currentList, emptyLabel: emptyLabel}">
-            <img [src]="HORDES_IMG_REPO + 'icons/small_more.gif'" [matMenuTriggerFor]="add_menu"
-                [matMenuTriggerData]="{menuLabel: addLabel, list: completeList}">
+            <ng-container *ngTemplateOutlet="buttonRemove"></ng-container>
+            <ng-container *ngTemplateOutlet="buttonAdd"></ng-container>
         </div>
     </div>
     <div class="editable-container">
@@ -18,13 +16,24 @@
             </ng-container>
         </div>
         <div class="add-remove" *ngIf="!label">
-            <img [src]="HORDES_IMG_REPO + 'icons/small_more.gif'" [matMenuTriggerFor]="add_menu"
-                [matMenuTriggerData]="{menuLabel: addLabel, list: completeList}">
-            <img [src]="HORDES_IMG_REPO + 'icons/small_less.gif'" *ngIf="currentList.length > 0"
-                [matMenuTriggerFor]="remove_menu" [matMenuTriggerData]="{menuLabel: removeLabel, list: currentList, emptyLabel: emptyLabel}">
+            <ng-container *ngTemplateOutlet="buttonAdd"></ng-container>
+            <ng-container *ngTemplateOutlet="buttonRemove"></ng-container>
         </div>
     </div>
 </div>
+
+<ng-template #buttonAdd>
+    <img [src]="HORDES_IMG_REPO + 'icons/small_more.gif'" [matMenuTriggerFor]="menuAdd.menu"
+        [matMenuTriggerData]="{menuLabel: addLabel, list: completeList}">
+</ng-template>
+<ng-template #buttonRemove>
+    <img [src]="HORDES_IMG_REPO + 'icons/small_less.gif'" *ngIf="currentList.length > 0"
+        [matMenuTriggerFor]="menuRemove.menu"
+        [matMenuTriggerData]="{menuLabel: removeLabel, list: currentList, emptyLabel: emptyLabel}">
+</ng-template>
+
+<mho-menu-add #menuAdd="menuAdd" (add)="add.next($event);"></mho-menu-add>
+<mho-menu-remove #menuRemove="menuRemove" (remove)="remove.next($event)" (empty)="empty.next($event)"></mho-menu-remove>
 
 <!--<mat-menu #menuAdd="matMenu" class="menu-add">
     <div class="search" (click)="$event.stopPropagation()">

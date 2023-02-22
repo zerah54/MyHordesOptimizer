@@ -39,16 +39,13 @@
                         <ng-container i18n>Tombe</ng-container>
                     </mat-checkbox>
                     <mat-form-field appearance="outline" class="short-bottom">
-                        <mat-label><img [src]="HORDES_IMG_REPO + 'emotes/sleep.gif'">
-                            <span i18n>Nombre de campings déjà effectués</span>
-                        </mat-label>
+                        <mat-label i18n>Nombre de campings déjà effectués</mat-label>
+                        <img matPrefix [src]="HORDES_IMG_REPO + 'emotes/sleep.gif'">
                         <input matInput type="number" [formControlName]="'campings'">
                     </mat-form-field>
                     <mat-form-field appearance="outline" class="short-bottom">
-                        <mat-label><img [src]="HORDES_IMG_REPO + 'emotes/bag.gif'">
-                            <span i18n>Nombre de pelures de peau et de toiles de tentes dans le sac
-                            </span>
-                        </mat-label>
+                        <mat-label i18n>Nombre de pelures de peau et de toiles de tentes dans le sac</mat-label>
+                        <img matPrefix [src]="HORDES_IMG_REPO + 'emotes/bag.gif'">
                         <input matInput type="number" [formControlName]="'objects'">
                     </mat-form-field>
                 </div>
@@ -85,10 +82,8 @@
                 <h3 i18n>Le bâtiment</h3>
                 <div>
                     <mat-form-field appearance="outline" class="short-bottom">
-                        <mat-label>
-                            <img [src]="HORDES_IMG_REPO + 'emotes/explo.gif'">
-                            <span i18n>Distance de la ville (en km)</span>
-                        </mat-label>
+                        <mat-label i18n>Distance de la ville (en km)</mat-label>
+                        <img matPrefix [src]="HORDES_IMG_REPO + 'emotes/explo.gif'">
                         <input matInput type="number" #townDistance [formControlName]="'distance'" min="1">
                     </mat-form-field>
 
@@ -102,18 +97,14 @@
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom">
-                        <mat-label>
-                            <img [src]="HORDES_IMG_REPO + 'emotes/zombie.gif'">
-                            <span i18n>Nombre de zombies sur la case</span>
-                        </mat-label>
+                        <mat-label i18n>Nombre de zombies sur la case</mat-label>
+                        <img matPrefix [src]="HORDES_IMG_REPO + 'emotes/zombie.gif'">
                         <input matInput type="number" [formControlName]="'zombies'">
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom">
-                        <mat-label>
-                            <img [src]="HORDES_IMG_REPO + 'emotes/human.gif'">
-                            <span i18n>Nombre de campeurs déjà cachés sur la case</span>
-                        </mat-label>
+                        <mat-label i18n>Nombre de campeurs déjà cachés sur la case</mat-label>
+                        <img matPrefix [src]="HORDES_IMG_REPO + 'emotes/human.gif'">
                         <input matInput type="number" [formControlName]="'hidden_campers'">
                     </mat-form-field>
 
@@ -126,18 +117,14 @@
                             [color]="'primary'">help_outline</mat-icon>
                     </h3>
                     <mat-form-field appearance="outline" class="short-bottom">
-                        <mat-label>
-                            <img [src]="HORDES_IMG_REPO + 'icons/small_refine.gif'">
-                            <span i18n>Nombre d'améliorations simples faites sur la case</span>
-                        </mat-label>
+                        <mat-label i18n>Nombre d'améliorations simples faites sur la case</mat-label>
+                        <img matPrefix [src]="HORDES_IMG_REPO + 'icons/small_refine.gif'">
                         <input matInput type="number" [formControlName]="'improve'">
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom">
-                        <mat-label>
-                            <img [src]="HORDES_IMG_REPO + 'item/cat_def.gif'">
-                            <span i18n>Nombre d'objets de défense installés sur la case</span>
-                        </mat-label>
+                        <mat-label i18n>Nombre d'objets de défense installés sur la case</mat-label>
+                        <img matPrefix [src]="HORDES_IMG_REPO + 'item/cat_def.gif'">
                         <input matInput type="number" [formControlName]="'object_improve'">
                     </mat-form-field>
                     <div class="or">
@@ -147,11 +134,10 @@
                         </mat-button-toggle-group>
                     </div>
                     <mat-form-field appearance="outline" class="short-bottom">
-                        <mat-label>
-                            <img [src]="HORDES_IMG_REPO + 'icons/small_refine.gif'"> + <img
-                                [src]="HORDES_IMG_REPO + 'item/cat_def.gif'">
-                            <span i18n>Nombre total d'améliotations sur la case</span>
-                        </mat-label>
+                        <mat-label i18n>Nombre total d'améliotations sur la case</mat-label>
+                        <span matPrefix>
+                            <img [src]="HORDES_IMG_REPO + 'icons/small_refine.gif'"> + <img [src]="HORDES_IMG_REPO + 'item/cat_def.gif'">
+                        </span>
                         <input matInput type="number" [formControlName]="'complete_improve'">
                     </mat-form-field>
                 </div>

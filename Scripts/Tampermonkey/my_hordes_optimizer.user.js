@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.40
+// @version      1.0.0-beta.41
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,10 +35,7 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[update] Traductions et wording divers\n`
-+ `[update] Regroupement des options de champs de recherches en une seule option\n\n`
-+ `[new] Ajout d'un simulateur de camping directement disponible sur la case\n`
-+ `[new] Ajout d'une option permettant d'afficher des notes sur une case, issues de la carte de MHO\n`;
++ `[fix] Réparation du menu qui passait sous les éléments d'interface de MH suite à des modifications de leur côté\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -86,6 +83,7 @@ const mh_optimizer_map_window_id = 'optimizer-map-window';
 const btn_id = 'optimizer-btn';
 const content_btn_id = 'optimizer-content-btn';
 const mh_header_id = 'header-reload-area';
+const mh_content_id = 'content';
 const mh_update_external_tools_id = 'mh-update-external-tools';
 const mho_camping_predict_id = 'mho-camping-predict';
 const wiki_btn_id = 'wiki-btn-id';
@@ -1544,7 +1542,9 @@ function getCurrentPosition() {
 
 function getCellDetailsByPosition() {
     let position = getCurrentPosition();
-    return map.cells.find((cell) => +cell.displayX === +position[0] && +cell.displayY === +position[1]);
+    if (position) {
+        return map.cells.find((cell) => +cell.displayX === +position[0] && +cell.displayY === +position[1]);
+    }
 }
 
 /** Affiche ou masque la page de chargement de MyHordes en fonction du nombre d'appels en cours */
@@ -1691,6 +1691,7 @@ function createSelectWithSearch() {
 /** Create Optimize button */
 function createOptimizerBtn() {
     setTimeout(() => {
+        let content_zone = document.getElementById(mh_content_id);
         let header_zone = document.getElementById(mh_header_id);
         let last_header_child = header_zone.lastChild;
         let left_position = last_header_child ? last_header_child.offsetLeft + last_header_child.offsetWidth + 5 : (document.querySelector('#apps')?.getBoundingClientRect().width + 16);
@@ -1731,10 +1732,10 @@ function createOptimizerBtn() {
             event.stopPropagation();
         });
 
-        let content_zone = document.createElement('div');
-        content_zone.id = content_btn_id;
-        header_zone.appendChild(optimizer_btn);
-        header_zone.appendChild(content_zone);
+        let mho_content_zone = document.createElement('div');
+        mho_content_zone.id = content_btn_id;
+        content_zone.appendChild(optimizer_btn);
+        content_zone.appendChild(mho_content_zone);
 
         createOptimizerButtonContent();
     }, 2000);
@@ -5065,7 +5066,7 @@ function displayCellDetailsOnPage() {
     if(mho_parameters.display_more_informations_from_mho && pageIsDesert()) {
         let cell = getCellDetailsByPosition();
         let cell_note = document.querySelector('#cell-note');
-        if (!current_cell || cell.id !== current_cell.id) {
+        if (cell && (!current_cell || cell.id !== current_cell.id)) {
             current_cell = cell;
             if (!cell_note) {
                 cell_note = document.createElement('div');
@@ -5619,7 +5620,7 @@ function createStyles() {
     + 'outline: 1px solid #000;'
     + 'position: absolute;'
     + 'top: 10px;'
-    + 'z-index: 30;'
+    + 'z-index: 997;'
     + '}';
 
     const btn_hover_h1_span_style = `#${btn_id}:hover h1 span, #${btn_id}:hover h1 a {`

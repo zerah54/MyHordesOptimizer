@@ -2,8 +2,9 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, EventEmitter, HostBinding, Output, ViewChild, HostListener } from '@angular/core';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Title } from '@angular/platform-browser';
-import { getExternalAppId, getTown, setExternalAppId } from 'src/app/shared/utilities/localstorage.util';
+import { getExternalAppId, getTown, getUser, setExternalAppId } from 'src/app/shared/utilities/localstorage.util';
 import { BREAKPOINTS } from 'src/app/_abstract_model/const';
+import { Me } from 'src/app/_abstract_model/types/me.class';
 import { ApiServices } from '../../_abstract_model/services/api.services';
 
 @Component({
@@ -27,9 +28,11 @@ export class HeaderComponent {
     public title: string = '';
 
     /** La valeur du champ d'identifiant d'app externe */
-    public external_app_id_field_value: string | null = getExternalAppId();
+    public external_app_id_field_value: string | null = null;
     /** L'idendifiant d'app externe si il existe */
     public saved_external_app_id: string | null = getExternalAppId();
+    /** Les informations de l'utilisateur */
+    public me: Me = getUser();
 
     public is_in_town: boolean = !!getTown()?.town_id;
 
@@ -42,12 +45,26 @@ export class HeaderComponent {
     /** Enregistre le nouvel id d'app externe */
     public saveExternalAppId() {
         setExternalAppId(this.external_app_id_field_value);
-        this.saved_external_app_id = getExternalAppId();
-        this.api.getMe();
+        this.updateMe();
+    }
+
+    /** Supprime l'identifiant d'app externe */
+    public disconnect(): void {
+        setExternalAppId(null);
+        this.updateMe();
     }
 
     /** Mise à jour des outils externes */
     public updateExternalTools() {
         this.api.updateExternalTools();
+    }
+
+    private updateMe(): void {
+        this.api.getMe().subscribe(() => {
+            this.me = getUser();
+            this.external_app_id_field_value = null;
+            this.saved_external_app_id = getExternalAppId();
+            this.is_in_town = !!getTown()?.town_id;
+        });
     }
 }

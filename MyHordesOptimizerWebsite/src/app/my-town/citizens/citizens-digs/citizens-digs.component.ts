@@ -1,7 +1,9 @@
 import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
+import { ConfirmDialogComponent } from 'src/app/shared/elements/confirm-dialog/confirm-dialog.component';
 import { getTown } from 'src/app/shared/utilities/localstorage.util';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 import { DigsServices } from 'src/app/_abstract_model/services/digs.service';
@@ -62,7 +64,7 @@ export class CitizensDigsComponent {
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: CitizenColumn) => column.id);
 
-    constructor(private digs_api: DigsServices) {
+    constructor(private digs_api: DigsServices, private dialog: MatDialog) {
 
     }
 
@@ -72,10 +74,8 @@ export class CitizensDigsComponent {
 
         this.createDigsByCitizenAndDay();
         this.citizen_filter_change.subscribe(() => {
-            console.log('9');
-            this.datasource.filter = JSON.stringify(this.citizen_filters);
+            this.datasource.filter = JSON.stringify(this.filters);
             this.createDigsByCitizenAndDay();
-            console.log('10');
         });
 
         this.datasource.filterPredicate = (data: DigsByCitizen, filter: string) => this.customFilter(data, filter);
@@ -88,31 +88,40 @@ export class CitizensDigsComponent {
     }
 
     public deleteDig(dig_to_delete: Dig): void {
-        this.digs_api.deleteDig(dig_to_delete).subscribe(() => {
-            let delete_dig: number = this.digs.findIndex((dig: Dig) => {
-                return dig.cell_id === dig_to_delete?.cell_id
-                    && dig.digger_id === dig_to_delete?.digger_id
-                    && dig.day === dig_to_delete?.day
-            });
-
-            this.digs.splice(delete_dig, 1);
-            this.createDigsByCitizenAndDay()
+        this.dialog
+        .open(ConfirmDialogComponent, {data: {
+            title: $localize`Confirmer`,
+            text: $localize`Êtes-vous sûr de vouloir supprimer cette fouille ?`
+        }})
+        .afterClosed()
+        .subscribe((confirm: boolean) => {
+            if (confirm) {
+                this.digs_api.deleteDig(dig_to_delete).subscribe(() => {
+                    let delete_dig: number = this.digs.findIndex((dig: Dig) => {
+                        return dig.cell_id === dig_to_delete?.cell_id
+                            && dig.digger_id === dig_to_delete?.digger_id
+                            && dig.day === dig_to_delete?.day
+                    });
+                    this.digs.splice(delete_dig, 1);
+                    this.createDigsByCitizenAndDay()
+                });
+            }
         });
     }
 
     public updateDig(): void {
         if (this.dig_to_update) {
-            this.digs_api.updateDig(this.dig_to_update).subscribe((new_dig: Dig) => {
+            this.digs_api.updateDig([this.dig_to_update]).subscribe((new_digs: Dig[]) => {
                 let replace_dig: number = this.digs.findIndex((dig: Dig) => {
-                    return dig.cell_id === new_dig?.cell_id
-                        && dig.digger_id === new_dig?.digger_id
-                        && dig.day === new_dig?.day
+                    return dig.cell_id === new_digs[0].cell_id
+                        && dig.digger_id === new_digs[0].digger_id
+                        && dig.day === new_digs[0].day
                 });
 
                 if (replace_dig > -1) {
-                    this.digs[replace_dig] = new_dig;
+                    this.digs[replace_dig] = new_digs[0];
                 } else {
-                    this.digs.push(new_dig);
+                    this.digs.push(new_digs[0]);
                 }
 
                 this.dig_to_update = undefined;

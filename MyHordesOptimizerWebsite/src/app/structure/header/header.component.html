@@ -6,12 +6,31 @@
     <div class="title">{{is_gt_xs ? 'MyHordes Optimizer' : 'MHO'}}</div>
     <!-- <span *ngIf="!external_app_id_field_value"> -->
     <span class="spacer"></span>
-    <mat-form-field *ngIf="!saved_external_app_id" class="external-app-id-input">
-        <mat-label for="external-app-id" i18n>Identifiant d'app externe</mat-label>
-        <input id="external-app-id" matInput type="text" [(ngModel)]="external_app_id_field_value">
-        <button matSuffix mat-icon-button (click)="saveExternalAppId();" [disabled]="!external_app_id_field_value">
-            <mat-icon>check</mat-icon>
-        </button>
-    </mat-form-field>
-    <a mat-button *ngIf="saved_external_app_id && is_in_town" (click)="updateExternalTools()" i18n>Mettre à jour les outils externes</a>
+    <button mat-button *ngIf="saved_external_app_id && is_in_town" (click)="updateExternalTools()">
+        <ng-container i18n>Mettre à jour les outils externes</ng-container>
+    </button>
+    <button mat-button class="profil-button" [matMenuTriggerFor]="userMenu">
+        <ng-container
+            *ngIf="saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === ''; else noAppId"
+            i18n>Se connecter</ng-container>
+        <ng-template #noAppId>
+            <ng-container *ngIf="me && me.username && me.username !== ''; else wrongUser">{{me.username}}</ng-container>
+            <ng-template #wrongUser><ng-container i18n>Utilisateur inconnu</ng-container></ng-template>
+        </ng-template>
+    </button>
+
+    <mat-menu #userMenu="matMenu">
+        <div mat-menu-item *ngIf="!saved_external_app_id" (click)="$event.stopPropagation()">
+            <mat-form-field class="external-app-id-input" class="no-bottom">
+                <mat-label for="external-app-id" i18n>Identifiant d'app externe</mat-label>
+                <input id="external-app-id" matInput type="text" placeholder="Identifiant externe pour les app"
+                    i18n-placeholder [(ngModel)]="external_app_id_field_value">
+                <button matSuffix mat-icon-button (click)="saveExternalAppId();"
+                    [disabled]="!external_app_id_field_value">
+                    <mat-icon>check</mat-icon>
+                </button>
+            </mat-form-field>
+        </div>
+        <div mat-menu-item *ngIf="saved_external_app_id" (click)="disconnect()" i18n>Déconnexion</div>
+    </mat-menu>
 </mat-toolbar>

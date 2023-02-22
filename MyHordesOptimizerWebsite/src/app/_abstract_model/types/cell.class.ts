@@ -1,4 +1,3 @@
-import { getDisplayedXFromArrayX, getDisplayedYFromArrayY } from 'src/app/shared/utilities/coordinates.util';
 import { CellDTO, SaveCellDTO } from '../dto/cell.dto';
 import { ZoneRegen } from '../enum/zone-regen.enum';
 import { Citizen } from './citizen.class';
@@ -34,6 +33,10 @@ export class Cell extends CommonModel<CellDTO> {
     public displayed_x!: number;
     public displayed_y!: number;
     public note!: string;
+    public nb_ruin_success!: number;
+    public nb_eruin_blue!: number;
+    public nb_eruin_yellow!: number;
+    public nb_eruin_violet!: number;
 
     constructor(dto?: CellDTO) {
         super();
@@ -51,7 +54,7 @@ export class Cell extends CommonModel<CellDTO> {
             dangerLevel: this.danger_level,
             idRuin: this.ruin_id,
             isDryed: this.is_dryed,
-            nbZombie: this.nb_hero,
+            nbZombie: this.nb_zombie,
             nbZombieKilled: this.nb_zombie_killed,
             nbHero: this.nb_hero,
             isRuinCamped: this.is_ruin_camped,
@@ -66,11 +69,17 @@ export class Cell extends CommonModel<CellDTO> {
             nbPa: this.nb_pa,
             zoneRegen: this.zone_regen?.key,
             citizens: modelToDtoArray(this.citizens),
-            note: this.note
+            note: this.note,
+            nbRuinSuccess: this.nb_ruin_success,
+            nbERuinBlue: this.nb_eruin_blue,
+            nbERuinYellow: this.nb_eruin_yellow,
+            nbERuinViolet: this.nb_eruin_violet,
+            displayX: this.displayed_x,
+            displayY: this.displayed_y
         };
     }
 
-    public saveCellDTO(): SaveCellDTO {
+    public toSaveCellDTO(): SaveCellDTO {
         return {
             x: this.x,
             y: this.y,
@@ -79,10 +88,14 @@ export class Cell extends CommonModel<CellDTO> {
             nbZombieKilled: this.nb_zombie_killed || 0,
             isRuinCamped: this.is_ruin_camped,
             items: modelToDtoArray(this.items),
-            citizens: this.citizens.map((citizen: Citizen) => citizen.id),
             note: this.note,
+            citizens: this.citizens.map((citizen: Citizen) => citizen.id),
             nbRuinDig: this.nb_ruin_dig || 0,
-            isRuinDryed: this.is_ruin_dryed
+            isRuinDryed: this.is_ruin_dryed,
+            nbRuinSuccess: this.nb_ruin_success,
+            nbERuinBlue: this.nb_eruin_blue,
+            nbERuinYellow: this.nb_eruin_yellow,
+            nbERuinViolet: this.nb_eruin_violet
         };
     }
 
@@ -112,9 +125,13 @@ export class Cell extends CommonModel<CellDTO> {
             this.nb_pa = dto.nbPa;
             this.nb_km = dto.nbKm;
             this.zone_regen = dto.zoneRegen ? <ZoneRegen>ZoneRegen.getByKey(dto.zoneRegen) : undefined;
-            this.displayed_x = getDisplayedXFromArrayX(dto.x);
-            this.displayed_y = getDisplayedYFromArrayY(dto.y);
+            this.displayed_x = dto.displayX;
+            this.displayed_y = dto.displayY;
             this.note = dto.note;
+            this.nb_ruin_success = dto.nbRuinSuccess;
+            this.nb_eruin_blue = dto.nbERuinBlue;
+            this.nb_eruin_yellow = dto.nbERuinYellow;
+            this.nb_eruin_violet = dto.nbERuinViolet;
         }
     };
 

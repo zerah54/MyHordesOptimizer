@@ -11,32 +11,37 @@
         </ng-template>
         <small>&nbsp;[{{cell.displayed_x}} ; {{cell.displayed_y}}]</small>
     </h1>
-    <button mat-icon-button mat-dialog-close><mat-icon>close</mat-icon></button>
+    <button mat-icon-button [mat-dialog-close]="data.cell"><mat-icon>close</mat-icon></button>
 </div>
 
 <div mat-dialog-content class="mho-map-update">
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" class="mho-tab-group">
         <mat-tab label="Cellule" i18n-label *ngIf="!cell.is_town">
-            <mho-map-update-cell [cell]="cell"
-                [citizens]="cell.citizens | citizensFromShort:data.all_citizens"
-                (cellChange)="cell = $event"></mho-map-update-cell>
+            <mho-map-update-cell [(cell)]="cell" [citizens]="cell.citizens | citizensFromShort:data.all_citizens">
+            </mho-map-update-cell>
         </mat-tab>
         <mat-tab label="Bâtiment" i18n-label *ngIf="data.ruin">
-            <mho-map-update-ruin [ruin]="data.ruin" [allRuins]="data.all_ruins" [cell]="cell"></mho-map-update-ruin>
+            <mho-map-update-ruin [ruin]="data.ruin" [allRuins]="data.all_ruins" [(cell)]="cell">
+            </mho-map-update-ruin>
         </mat-tab>
         <mat-tab label="Citoyens" i18n-label *ngIf="cell.citizens && cell.citizens.length > 0">
             <mho-map-update-citizens [citizens]="cell.citizens | citizensFromShort:data.all_citizens"
-                (citizensChange)="cell.citizens = $event" [allCitizens]="data.all_citizens"></mho-map-update-citizens>
+                (citizensChange)="cell.citizens = $event" [allCitizens]="data.all_citizens">
+            </mho-map-update-citizens>
         </mat-tab>
         <mat-tab label="Notes" i18n-label *ngIf="!cell.is_town">
             <mat-form-field class="mho-cell-note">
                 <textarea matInput [(ngModel)]="cell.note"></textarea>
             </mat-form-field>
         </mat-tab>
+        <mat-tab label="Fouilles" i18n-label *ngIf="!cell.is_town">
+            <mho-map-update-digs [cell]="cell" [allCitizens]="data.all_citizens" [(digs)]="digs">
+            </mho-map-update-digs>
+        </mat-tab>
     </mat-tab-group>
 </div>
 
 <div mat-dialog-actions [align]="'end'">
-    <button mat-button color="accent" mat-dialog-close>Annuler</button>
+    <button mat-button color="accent" [mat-dialog-close]="data.cell">Fermer</button>
     <button mat-raised-button color="accent" (click)="saveCell()">Enregistrer</button>
 </div>

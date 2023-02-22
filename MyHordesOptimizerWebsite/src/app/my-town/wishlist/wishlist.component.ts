@@ -3,6 +3,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
 import * as moment from 'moment';
+import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
 import { SelectComponent } from 'src/app/shared/elements/select/select.component';
 import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 import { WishlistServices } from 'src/app/_abstract_model/services/wishlist.service';
@@ -30,7 +31,7 @@ export class WishlistComponent {
     /** La wishlist */
     public wishlist_info!: WishlistInfo;
     /** La datasource pour le tableau */
-    public datasource: MatTableDataSource<WishlistItem> = new MatTableDataSource();
+    public datasource: TableVirtualScrollDataSource<WishlistItem> = new TableVirtualScrollDataSource();
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
@@ -40,8 +41,8 @@ export class WishlistComponent {
         { id: 'name', header: $localize`Objet` },
         { id: 'priority', header: $localize`Priorité` },
         { id: 'depot', header: $localize`Dépôt` },
-        { id: 'bank_count', header: $localize`Stock en banque` },
-        { id: 'bag_count', header: $localize`Stock en sacs` },
+        { id: 'bank_count', header: $localize`Banque` },
+        { id: 'bag_count', header: $localize`Sacs` },
         { id: 'count', header: $localize`Stock souhaité` },
         { id: 'needed', header: $localize`Quantité manquante` },
         { id: 'delete', header: `` },
@@ -84,7 +85,7 @@ export class WishlistComponent {
     }
 
     ngOnInit(): void {
-        this.datasource = new MatTableDataSource();
+        this.datasource = new TableVirtualScrollDataSource();
         this.datasource.sort = this.sort;
 
         this.wishlist_filters_change.subscribe(() => {
@@ -116,12 +117,10 @@ export class WishlistComponent {
     public remove(row: WishlistItem) {
         let current_list: WishlistItem[] = [...<WishlistItem[]>this.wishlist_info.wishlist_items.get(this.selected_tab_key)];
         let index: number = current_list.findIndex((wishlist_item: WishlistItem) => wishlist_item.item.id === row.item.id);
-        console.log('index', index);
-        console.log('key', this.selected_tab_key);
         current_list.splice(index, 1);
-        console.log('test', current_list);
         setTimeout(() => {
             this.datasource.data = [...current_list];
+            this.wishlist_info.wishlist_items.get(this.selected_tab_key)?.splice(index, 1);
         });
     }
 
@@ -150,7 +149,9 @@ export class WishlistComponent {
     public changeTab(event: MatTabChangeEvent): void {
         let keys: string[] = Array.from(this.wishlist_info.wishlist_items.keys());
         this.selected_tab_key = keys[event.index];
-        this.datasource.data = [...<WishlistItem[]>this.wishlist_info.wishlist_items.get(this.selected_tab_key)];
+        setTimeout(() => {
+            this.datasource.data = [...<WishlistItem[]>this.wishlist_info.wishlist_items.get(this.selected_tab_key)];
+        });
     }
 
     public shareWishlist() {
@@ -172,26 +173,27 @@ export class WishlistComponent {
             if (heavy.length > 0) {
                 text += `\n[b][i]${$localize`Encombrants`}[/i][/b]\n`;
                 heavy.forEach((item: WishlistItem) => {
-                    text += `:middot:${item.item.label[this.locale]} (x${item.count})\n`;
+                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 1000 ? ` (x${item.count})` : ``) + `\n`;
                 })
             }
             if (light.length > 0) {
                 text += `\n[b][i]${$localize`Non-Encombrants`}[/i][/b]\n`;
                 light.forEach((item: WishlistItem) => {
-                    text += `:middot:${item.item.label[this.locale]} (x${item.count})\n`;
+                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 1000 ? ` (x${item.count})` : ``) + `\n`;
                 })
             }
             if (do_not_bring_back.length > 0) {
-                text += `\n[b][i]${$localize`Ne pas rapporter`}[/i][/b]\n`;
+                text += `\n[collapse=${$localize`Ne pas rapporter`}]\n`;
                 do_not_bring_back.forEach((item: WishlistItem) => {
                     text += `:middot:${item.item.label[this.locale]}\n`;
                 })
+                text += `[/collapse]`;
             }
             text += `\n{hr}\n\n`;
         })
 
         text += `[b]${$localize`Dernière mise à jour` + ` : ` + this.wishlist_info.update_info.update_time.format('LLL') + ' ' + $localize`par` + ' ' + this.wishlist_info.update_info.username}[/b]\n`
-        text += `[aparte]${$localize`Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=http://${environment.website_url}my-town/wishlist]ce lien[/link]`}[/aparte]`
+        text += `[aparte]${$localize`Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=${environment.website_url}my-town/wishlist]ce lien[/link]`}[/aparte]`
 
         this.clipboard.copy(text, $localize`La liste a bien été copiée au format forum`);
     }

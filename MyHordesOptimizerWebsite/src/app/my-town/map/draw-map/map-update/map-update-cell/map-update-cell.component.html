@@ -20,13 +20,6 @@
                     <mat-checkbox formControlName="is_dryed" i18n>Zone épuisée</mat-checkbox>
                 </div>
             </div>
-            <div class="ruin" *ngIf="cell.ruin_id">
-                <mat-form-field class="nb-digs" *ngIf="cell.ruin_id === -1">
-                    <img matPrefix [src]="HORDES_IMG_REPO + 'building/small_dig.gif'">
-                    <input matInput formControlName="nb_ruin_dig">
-                </mat-form-field>
-                <mat-checkbox *ngIf="cell.ruin_id > -1" formControlName="is_ruin_dryed" i18n>Bâtiment vide</mat-checkbox>
-            </div>
             <mat-divider></mat-divider>
         </div>
         <div>

@@ -43,7 +43,7 @@ export class AppComponent implements OnInit {
             this.overlay_container.getContainerElement().classList.add(this.theme);
         }
         this.loaderOnRouting();
-        this.api.getMe();
+        this.api.getMe().subscribe();
 
         this.loading_service.is_loading_obs.subscribe((is_loading: boolean) => {
             this.is_loading = is_loading;

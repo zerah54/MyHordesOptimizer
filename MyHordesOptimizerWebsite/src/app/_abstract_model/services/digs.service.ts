@@ -6,7 +6,7 @@ import { getTown, getUserId } from 'src/app/shared/utilities/localstorage.util';
 import { environment } from 'src/environments/environment';
 import { DigDTO } from '../dto/dig.dto';
 import { Dig } from '../types/dig.class';
-import { dtoToModelArray } from '../types/_common.class';
+import { dtoToModelArray, modelToDtoArray } from '../types/_common.class';
 import { SnackbarService } from './../../shared/services/snackbar.service';
 import { GlobalServices } from './global.services';
 
@@ -27,7 +27,13 @@ export class DigsServices extends GlobalServices {
             super.get<DigDTO[]>(API_URL + `/myhordesfetcher/MapDigs?townId=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<DigDTO[]>) => {
-                        sub.next(dtoToModelArray(Dig, response.body));
+                        let digs: Dig[] = dtoToModelArray(Dig, response.body);
+                        digs = digs.sort((dig_a: Dig, dig_b: Dig) => {
+                            if (dig_a.update_info.update_time.isBefore(dig_b.update_info.update_time)) return -1;
+                            if (dig_a.update_info.update_time.isAfter(dig_b.update_info.update_time)) return 1;
+                            return 0;
+                        })
+                        sub.next(digs);
                     }
                 })
         })
@@ -45,13 +51,13 @@ export class DigsServices extends GlobalServices {
         })
     }
 
-    public updateDig(dig: Dig): Observable<Dig> {
-        return new Observable((sub: Subscriber<Dig>) => {
-            super.post<DigDTO>(API_URL + `/myhordesfetcher/MapDigs?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(dig.modelToDto()))
+    public updateDig(digs: Dig[]): Observable<Dig[]> {
+        return new Observable((sub: Subscriber<Dig[]>) => {
+            super.post<DigDTO[]>(API_URL + `/myhordesfetcher/MapDigs?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(modelToDtoArray(digs)))
                 .subscribe({
-                    next: (response: DigDTO) => {
+                    next: (response: DigDTO[]) => {
                         this.snackbar.successSnackbar(`La fouille a bien été mise à jour`);
-                        sub.next(new Dig(response));
+                        sub.next(dtoToModelArray(Dig, response));
                     }
                 })
         })

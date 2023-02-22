@@ -57,7 +57,7 @@ export class ApiServices extends GlobalServices {
             if (saved_items && saved_items.length > 0 && !force) {
                 sub.next(saved_items);
             } else {
-                super.get<ItemDTO[]>(API_URL + '/myhordesfetcher/items?townId=' + getTown()?.town_id)
+                super.get<ItemDTO[]>(API_URL + `/myhordesfetcher/items?${getTown()?.town_id ? 'townId=' + getTown()?.town_id : ''}`)
                     .subscribe({
                         next: (response: HttpResponse<ItemDTO[]>) => {
                             const items: Item[] = dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302);
@@ -70,12 +70,22 @@ export class ApiServices extends GlobalServices {
     }
 
     /** Récupère l'identifiant de citoyen */
-    public getMe(): void {
-        super.get<MeDTO>(API_URL + `/myhordesfetcher/me?userKey=${getExternalAppId()}`)
-            .subscribe((response: HttpResponse<MeDTO | null>) => {
-                setUser(response.body ? new Me(response.body) : null);
-                setTown(response.body ? new TownDetails(response.body.townDetails) : null);
-            })
+    public getMe(): Observable<Me | null> {
+        return new Observable((sub: Subscriber<Me | null>) => {
+            if (getExternalAppId()) {
+                super.get<MeDTO>(API_URL + `/myhordesfetcher/me?userKey=${getExternalAppId()}`)
+                    .subscribe((response: HttpResponse<MeDTO | null>) => {
+                        let me: Me | null = response.body ? new Me(response.body) : null;
+                        setUser(me);
+                        setTown(response.body ? new TownDetails(response.body.townDetails) : null);
+                        sub.next(me);
+                    })
+            } else {
+                setUser(null);
+                setTown(null);
+                sub.next(null);
+            }
+        });
     }
 
     /**
@@ -115,7 +125,7 @@ export class ApiServices extends GlobalServices {
             townId: getTown()?.town_id || 0
         };
 
-        super.post<any>(API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`, JSON.stringify({ map: {toolsToUpdate: tools_to_update}, townDetails: town_details }))
+        super.post<any>(API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`, JSON.stringify({ map: { toolsToUpdate: tools_to_update }, townDetails: town_details }))
             .subscribe({
                 next: () => {
                     this.snackbar.successSnackbar($localize`Les outils externes ont bien été mis à jour`);
@@ -286,11 +296,11 @@ export class ApiServices extends GlobalServices {
     }
 
     public saveCell(cell: Cell): Observable<Cell> {
-        console.log('cell', cell.saveCellDTO());
         return new Observable((sub: Subscriber<Cell>) => {
-            super.post<CellDTO>(API_URL + `/myhordesfetcher/cell?townid=${getTown()?.town_id}`, JSON.stringify(cell.modelToDto()))
+            super.post<CellDTO>(API_URL + `/MyHordesOptimizerMap/cell?townid=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(cell.toSaveCellDTO()))
                 .subscribe({
                     next: (response: CellDTO) => {
+                        this.snackbar.successSnackbar(`La cellule a bien été modifiée`);
                         sub.next(new Cell(response));
                     }
                 })
