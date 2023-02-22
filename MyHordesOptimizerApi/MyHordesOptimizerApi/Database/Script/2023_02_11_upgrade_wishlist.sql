@@ -38,6 +38,10 @@ CREATE TABLE DefaultWishlistItem
    FOREIGN KEY(idItem) REFERENCES Item(idItem)
 );
 
+ALTER TABLE TownWishListItem
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (idTown,idItem, zoneXPa);
+
 DROP PROCEDURE AddItemToWishList;
 DELIMITER $$
 CREATE PROCEDURE AddItemToWishList
@@ -49,9 +53,7 @@ CREATE PROCEDURE AddItemToWishList
 	IN DateUpdate datetime 
 )
 BEGIN
-	IF (SELECT COUNT(*) FROM TownWishListItem WHERE idTown = TownId AND idItem = ItemId) = 0 THEN
-			UPDATE Town SET idUserWishListUpdater = UserId, wishlistDateUpdate = DateUpdate WHERE idTown = TownId;
-			INSERT INTO TownWishListItem(idTown, idItem, priority, zoneXPa, count, depot) VALUES(TownId, ItemId, 0, zoneXPa, 1, 0);
-		END IF;
+	UPDATE Town SET idUserWishListUpdater = UserId, wishlistDateUpdate = DateUpdate WHERE idTown = TownId;
+	INSERT INTO TownWishListItem(idTown, idItem, priority, zoneXPa, count, depot) VALUES(TownId, ItemId, 0, zoneXPa, 1, 0);
 END $$
 DELIMITER ;
