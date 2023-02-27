@@ -2,6 +2,8 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, EventEmitter, HostBinding, Output, ViewChild, HostListener } from '@angular/core';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Title } from '@angular/platform-browser';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { getExternalAppId, getTown, getUser, setExternalAppId } from 'src/app/shared/utilities/localstorage.util';
 import { BREAKPOINTS } from 'src/app/_abstract_model/const';
 import { Me } from 'src/app/_abstract_model/types/me.class';
@@ -38,6 +40,8 @@ export class HeaderComponent {
 
     public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     public constructor(private breakpoint_observer: BreakpointObserver, private title_service: Title, private api: ApiServices) {
         this.title = this.title_service.getTitle();
     }
@@ -60,11 +64,13 @@ export class HeaderComponent {
     }
 
     private updateMe(): void {
-        this.api.getMe().subscribe(() => {
-            this.me = getUser();
-            this.external_app_id_field_value = null;
-            this.saved_external_app_id = getExternalAppId();
-            this.is_in_town = !!getTown()?.town_id;
-        });
+        this.api.getMe()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe(() => {
+                this.me = getUser();
+                this.external_app_id_field_value = null;
+                this.saved_external_app_id = getExternalAppId();
+                this.is_in_town = !!getTown()?.town_id;
+            });
     }
 }

@@ -1,6 +1,8 @@
 import { Component, EventEmitter, HostBinding, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import * as moment from 'moment';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { Cell } from 'src/app/_abstract_model/types/cell.class';
@@ -29,14 +31,18 @@ export class MapUpdateCellComponent implements OnInit {
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(private api: ApiServices, private fb: FormBuilder) {
 
     }
 
     public ngOnInit(): void {
-        this.api.getItems().subscribe((all_items: Item[]) => {
-            this.all_items = all_items;
-        })
+        this.api.getItems()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((all_items: Item[]) => {
+                this.all_items = all_items;
+            })
 
         this.cell_form = this.fb.group({
             nb_zombies: [this.cell.nb_zombie],
@@ -45,13 +51,15 @@ export class MapUpdateCellComponent implements OnInit {
             items: [this.cell.items],
         })
 
-        this.cell_form.valueChanges.subscribe((values: CellInfoUpdate) => {
-            this.cell.is_dryed = values.is_dryed;
-            this.cell.nb_zombie = +values.nb_zombies;
-            this.cell.nb_zombie_killed = +values.nb_killed_zombies;
-            this.cell.items = [...values.items];
-            this.cellChange.next(this.cell);
-        })
+        this.cell_form.valueChanges
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((values: CellInfoUpdate) => {
+                this.cell.is_dryed = values.is_dryed;
+                this.cell.nb_zombie = +values.nb_zombies;
+                this.cell.nb_zombie_killed = +values.nb_killed_zombies;
+                this.cell.items = [...values.items];
+                this.cellChange.next(this.cell);
+            })
     }
 
 

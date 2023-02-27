@@ -1,6 +1,8 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { Regen } from 'src/app/_abstract_model/types/regen.class';
 import { ApiServices } from '../../../_abstract_model/services/api.services';
 
@@ -26,12 +28,16 @@ export class ScrutateurComponent implements OnInit {
     public readonly columns_ids: string[] = this.columns.map((column: RegenColumn) => column.id);
     private readonly locale: string = moment.locale();
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(private api: ApiServices) {
 
     }
 
     ngOnInit(): void {
-        this.api.getScrutList().subscribe((regens: Regen[]) => {
+        this.api.getScrutList()
+        .pipe(takeUntil(this.destroy_sub))
+        .subscribe((regens: Regen[]) => {
             this.datasource.data = [...regens];
         });
     }

@@ -5,8 +5,9 @@ import { Analytics } from '@angular/fire/analytics';
 import { Event, NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { getAnalytics } from 'firebase/analytics';
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import { filter } from 'rxjs';
+import { filter, Subject, takeUntil } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { AutoDestroy } from './shared/decorators/autodestroy.decorator';
 import { LoadingOverlayService } from './shared/services/loading-overlay.service';
 import { BREAKPOINTS } from './_abstract_model/const';
 import { ApiServices } from './_abstract_model/services/api.services';
@@ -33,6 +34,8 @@ export class AppComponent implements OnInit {
 
     public readonly theme: string | null = localStorage.getItem('theme');
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(public loading_service: LoadingOverlayService, private api: ApiServices, private router: Router,
         private overlay_container: OverlayContainer, private breakpoint_observer: BreakpointObserver) {
     }
@@ -43,16 +46,20 @@ export class AppComponent implements OnInit {
             this.overlay_container.getContainerElement().classList.add(this.theme);
         }
         this.loaderOnRouting();
-        this.api.getMe().subscribe();
+        this.api.getMe()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe();
 
-        this.loading_service.is_loading_obs.subscribe((is_loading: boolean) => {
-            this.is_loading = is_loading;
-        })
+        this.loading_service.is_loading_obs
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((is_loading: boolean) => {
+                this.is_loading = is_loading;
+            })
     }
 
     private loaderOnRouting(): void {
         this.router.events
-            .pipe(filter((event: Event) => event instanceof NavigationStart || event instanceof NavigationEnd))
+            .pipe(filter((event: Event) => event instanceof NavigationStart || event instanceof NavigationEnd), takeUntil(this.destroy_sub))
             .subscribe((event: Event) => {
                 this.loading_service.setLoading(event instanceof NavigationStart ? true : false);
             })

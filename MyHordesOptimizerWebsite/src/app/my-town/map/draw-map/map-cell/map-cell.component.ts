@@ -1,6 +1,8 @@
 import { Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import * as moment from 'moment';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 import { Cell } from 'src/app/_abstract_model/types/cell.class';
 import { Citizen } from 'src/app/_abstract_model/types/citizen.class';
@@ -32,6 +34,7 @@ export class MapCellComponent {
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     constructor(private dialog: MatDialog) {
 
@@ -49,6 +52,7 @@ export class MapCellComponent {
                 }
             })
             .afterClosed()
+            .pipe(takeUntil(this.destroy_sub))
             .subscribe((new_cell: Cell) => {
                 this.cell = new_cell;
                 this.cellChange.next(new_cell);

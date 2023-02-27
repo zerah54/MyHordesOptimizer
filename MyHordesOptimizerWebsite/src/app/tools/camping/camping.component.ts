@@ -3,6 +3,8 @@ import { Component, HostBinding, OnInit, ViewEncapsulation } from '@angular/core
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 import { JobEnum } from 'src/app/_abstract_model/enum/job.enum';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
@@ -85,6 +87,8 @@ export class CampingComponent implements OnInit {
 
     private readonly added_ruins: Ruin[] = dtoToModelArray(Ruin, [NO_RUIN]);
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
 
 
     constructor(private api: ApiServices, private fb: UntypedFormBuilder, private route: ActivatedRoute, private clipboard: ClipboardService, private router: Router,
@@ -92,8 +96,12 @@ export class CampingComponent implements OnInit {
     }
 
     public ngOnInit(): void {
-        this.route.queryParams.subscribe((params: Record<string, string>) => {
-            this.api.getRuins().subscribe((ruins: Ruin[]) => {
+        this.route.queryParams
+        .pipe(takeUntil(this.destroy_sub))
+        .subscribe((params: Record<string, string>) => {
+            this.api.getRuins()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((ruins: Ruin[]) => {
                 ruins = ruins.sort((ruin_a: Ruin, ruin_b: Ruin) => ruin_a.label[this.locale].toLocaleLowerCase().localeCompare(ruin_b.label[this.locale].toLocaleLowerCase()));
                 this.ruins = [...this.added_ruins].concat([...ruins]);
 
@@ -119,7 +127,9 @@ export class CampingComponent implements OnInit {
                     ruin: [this.added_ruins[0]]
                 });
                 this.calculateProbabilities();
-                this.configuration_form.valueChanges.subscribe(() => this.calculateProbabilities())
+                this.configuration_form.valueChanges
+                .pipe(takeUntil(this.destroy_sub))
+                .subscribe(() => this.calculateProbabilities())
 
                 const url = this.router.createUrlTree([], { relativeTo: this.activated_route }).toString()
                 this.location.go(url);

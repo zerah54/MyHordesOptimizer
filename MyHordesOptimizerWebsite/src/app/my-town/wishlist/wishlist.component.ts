@@ -1,9 +1,11 @@
 import { Component, ElementRef, EventEmitter, HostBinding, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { MatTable } from '@angular/material/table';
 import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
 import * as moment from 'moment';
 import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { SelectComponent } from 'src/app/shared/elements/select/select.component';
 import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 import { WishlistServices } from 'src/app/_abstract_model/services/wishlist.service';
@@ -80,6 +82,8 @@ export class WishlistComponent {
         { count: 1, label: $localize`Zone de rapatriement` },
     ]
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(private api: ApiServices, private wishlist_sercices: WishlistServices, private clipboard: ClipboardService) {
 
     }
@@ -88,21 +92,27 @@ export class WishlistComponent {
         this.datasource = new TableVirtualScrollDataSource();
         this.datasource.sort = this.sort;
 
-        this.wishlist_filters_change.subscribe(() => {
+        this.wishlist_filters_change
+        .pipe(takeUntil(this.destroy_sub))
+        .subscribe(() => {
             this.datasource.filter = JSON.stringify(this.wishlist_filters);
         });
 
         this.datasource.filterPredicate = (data: WishlistItem, filter: string) => this.customFilter(data, filter);
 
         this.getWishlist();
-        this.api.getItems(true).subscribe((items: Item[]) => {
+        this.api.getItems(true)
+        .pipe(takeUntil(this.destroy_sub))
+        .subscribe((items: Item[]) => {
             this.items = items;
         });
     }
 
     /** Met à jour la liste de courses */
     public updateWishlist(): void {
-        this.wishlist_sercices.updateWishlist(this.wishlist_info).subscribe((wishlist_info: WishlistInfo) => {
+        this.wishlist_sercices.updateWishlist(this.wishlist_info)
+        .pipe(takeUntil(this.destroy_sub))
+        .subscribe((wishlist_info: WishlistInfo) => {
             this.wishlist_info = wishlist_info;
             this.datasource.data = [...<WishlistItem[]>wishlist_info.wishlist_items.get(this.selected_tab_key)];
         })
@@ -126,7 +136,9 @@ export class WishlistComponent {
 
     public addItemToWishlist(item: Item) {
         if (item) {
-            this.wishlist_sercices.addItemToWishlist(item, this.selected_tab_key).subscribe(() => {
+            this.wishlist_sercices.addItemToWishlist(item, this.selected_tab_key)
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe(() => {
                 item.wishlist_count = 1;
                 this.add_item_select.value = undefined;
                 this.getWishlist();
@@ -207,7 +219,9 @@ export class WishlistComponent {
     }
 
     private getWishlist(): void {
-        this.wishlist_sercices.getWishlist().subscribe((wishlist_info: WishlistInfo) => {
+        this.wishlist_sercices.getWishlist()
+        .pipe(takeUntil(this.destroy_sub))
+        .subscribe((wishlist_info: WishlistInfo) => {
             this.wishlist_info = wishlist_info;
             this.datasource.data = [...<WishlistItem[]>wishlist_info.wishlist_items.get(this.selected_tab_key)];
         });

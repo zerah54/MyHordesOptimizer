@@ -3,6 +3,8 @@ import { FormBuilder } from '@angular/forms';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
 import { HORDES_IMG_REPO } from './../../_abstract_model/const';
@@ -51,39 +53,45 @@ export class RuinsComponent implements OnInit {
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: RuinColumns) => column.id);
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(private api: ApiServices, private fb: FormBuilder) {
     }
 
     ngOnInit(): void {
-        this.api.getRuins().subscribe((ruins: Ruin[]) => {
-            this.ruins = ruins;
-            this.ruins_filters_change.subscribe(() => {
-                this.datasource.filter = JSON.stringify(this.ruins_filters);
-            });
+        this.api.getRuins()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((ruins: Ruin[]) => {
+                this.ruins = ruins;
+                this.ruins_filters_change
+                    .pipe(takeUntil(this.destroy_sub))
+                    .subscribe(() => {
+                        this.datasource.filter = JSON.stringify(this.ruins_filters);
+                    });
 
-            this.items = [];
-            this.ruins.forEach((ruin: Ruin) => {
-                ruin.drops.forEach((ruin_item: RuinItem) => {
-                    if (!this.items.some((item: RuinItem) => item.item.id === ruin_item.item.id)) {
-                        this.items.push(ruin_item);
-                    }
+                this.items = [];
+                this.ruins.forEach((ruin: Ruin) => {
+                    ruin.drops.forEach((ruin_item: RuinItem) => {
+                        if (!this.items.some((item: RuinItem) => item.item.id === ruin_item.item.id)) {
+                            this.items.push(ruin_item);
+                        }
+                    })
                 })
-            })
 
-            this.datasource = new MatTableDataSource(this.ruins);
-            this.datasource.filterPredicate = this.customFilter;
-            this.datasource.sortingDataAccessor = (item: Ruin, property: string): any => {
-                switch (property) {
-                    case 'label':
-                        return item.label[this.locale];
-                    default:
-                        return item[property as keyof Ruin];
-                }
-            };
-            setTimeout(() => {
-                this.datasource.sort = this.sort;
+                this.datasource = new MatTableDataSource(this.ruins);
+                this.datasource.filterPredicate = this.customFilter;
+                this.datasource.sortingDataAccessor = (item: Ruin, property: string): any => {
+                    switch (property) {
+                        case 'label':
+                            return item.label[this.locale];
+                        default:
+                            return item[property as keyof Ruin];
+                    }
+                };
+                setTimeout(() => {
+                    this.datasource.sort = this.sort;
+                });
             });
-        });
     }
 
     /** Filtre la liste à afficher */
