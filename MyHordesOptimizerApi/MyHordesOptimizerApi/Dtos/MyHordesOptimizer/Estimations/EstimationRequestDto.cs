@@ -4,6 +4,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations
 {
     public class EstimationRequestDto
     {
+
         [JsonProperty("day")]
         public int? Day { get; set; }
 
@@ -12,5 +13,11 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations
 
         [JsonProperty("planif")]
         public EstimationsDto Planif { get; set; }
+
+        public EstimationRequestDto()
+        {
+            Estim = new EstimationsDto();
+            Planif = new EstimationsDto();
+        }
     }
 }

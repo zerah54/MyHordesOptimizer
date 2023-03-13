@@ -46,10 +46,16 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
         public EstimationRequestDto GetEstimations(int townId, int day)
         {
             var estimations = MyHordesOptimizerRepository.GetEstimations(townId, day);
-            var hihi = estimations.First(x => !x.IsPlanif);
-            var hoho = hihi._0Min.HasValue && hihi._0Max.HasValue;
-            var dto = Mapper.Map<EstimationRequestDto>(estimations);
-            return dto;
+            if(estimations.Any())
+            {
+                var dto = Mapper.Map<EstimationRequestDto>(estimations);
+                return dto;
+            }
+
+            return new EstimationRequestDto()
+            {
+                Day = day
+            };
         }
     }
 }
