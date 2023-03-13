@@ -4,7 +4,9 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Attributes;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Interfaces.Estimations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,16 +15,63 @@ using System.Text;
 namespace MyHordesOptimizerApi.Controllers
 {
     [ApiController]
-    [BasicAuthentication]
     [Route("[controller]")]
     public class AttaqueEstimationController : AbstractMyHordesOptimizerControllerBase
     {
-        public AttaqueEstimationController(ILogger<AbstractMyHordesOptimizerControllerBase> logger, IUserInfoProvider userKeyProvider) : base(logger, userKeyProvider)
+        protected IMyHordesOptimizerEstimationService EstimationService { get; private set; }
+
+        public AttaqueEstimationController(ILogger<AbstractMyHordesOptimizerControllerBase> logger, IUserInfoProvider userKeyProvider, IMyHordesOptimizerEstimationService estimationService) : base(logger, userKeyProvider)
         {
+            EstimationService = estimationService;
+        }
+
+        [HttpPost]
+        [Route("Estimations")]
+        public ActionResult PostEstimations([FromBody] EstimationRequestDto request, [FromQuery] int? townId, [FromQuery] int? userId)
+        {
+            if (!townId.HasValue)
+            {
+                return BadRequest($"{nameof(townId)} cannot be empty");
+            }
+            if (request == null)
+            {
+                return BadRequest($"{nameof(request)} cannot be null");
+            }
+            if (request.Day == null)
+            {
+                return BadRequest($"{nameof(request.Day)} cannot be null");
+            }
+            if (!userId.HasValue)
+            {
+                return BadRequest($"{nameof(userId)} cannot be empty");
+            }
+            UserKeyProvider.UserId = userId.Value;
+
+            EstimationService.UpdateEstimations(townId.Value, request);
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("Estimations/{day}")]
+        public ActionResult<EstimationRequestDto> GetEstimations([FromRoute] int? day, [FromQuery] int? townId)
+        {
+            if (!townId.HasValue)
+            {
+                return BadRequest($"{nameof(townId)} cannot be empty");
+            }
+            if (!day.HasValue)
+            {
+                return BadRequest($"{nameof(day)} cannot be empty");
+            }
+
+            var estimations = EstimationService.GetEstimations(townId.Value, day.Value);
+
+            return Ok(estimations);
         }
 
         [HttpPost]
         [Route("PlanifClassique")]
+        [BasicAuthentication]
         public ActionResult<string> PlanifClassique(AttaqueEstimationRequest request)
         {
             var offsetMinInit = 15;
@@ -66,6 +115,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Planif")]
+        [BasicAuthentication]
         public ActionResult<string> Planif(AttaqueEstimationRequest request)
         {
             var resultPerOffsetTuple = new Dictionary<OffsetTuple, List<double>>();
@@ -92,8 +142,8 @@ namespace MyHordesOptimizerApi.Controllers
                 var startVariance = 48 - 10;
                 var stopVariance = 48 + 10;
                 allVariancePossible.AddRange(Enumerable.Range(startVariance, stopVariance - startVariance + 1));
-            //    allShiftPossible.Add(10);
-            //    allVariancePossible.Add(58);
+                //    allShiftPossible.Add(10);
+                //    allVariancePossible.Add(58);
             }
 
             var results = new List<double>();
@@ -136,11 +186,11 @@ namespace MyHordesOptimizerApi.Controllers
                             if (min == min2 && max == max2)
                             {
                                 results.Add(attaque);
-                                if(attaque < minEver)
+                                if (attaque < minEver)
                                 {
                                     minEver = attaque;
                                 }
-                                if(attaque > maxEver)
+                                if (attaque > maxEver)
                                 {
                                     maxEver = attaque;
                                 }

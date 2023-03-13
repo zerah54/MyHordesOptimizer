@@ -19,10 +19,12 @@ using MyHordesOptimizerApi.Repository.Impl.ExternalTools;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Impl;
+using MyHordesOptimizerApi.Services.Impl.Estimations;
 using MyHordesOptimizerApi.Services.Impl.ExternalTools;
 using MyHordesOptimizerApi.Services.Impl.Import;
 using MyHordesOptimizerApi.Services.Impl.Translations;
 using MyHordesOptimizerApi.Services.Interfaces;
+using MyHordesOptimizerApi.Services.Interfaces.Estimations;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
@@ -102,6 +104,7 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<IMyHordesRuineService, MyHordesRuineService>();
             services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimizerParametersService>();
             services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
+            services.AddScoped<IMyHordesOptimizerEstimationService, MyHordesOptimizerEstimationService>();
 
             services.AddHttpLogging(logging =>
             {

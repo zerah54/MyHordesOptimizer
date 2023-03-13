@@ -8,6 +8,7 @@ using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
 using MyHordesOptimizerApi.Models.Citizen.Bags;
+using MyHordesOptimizerApi.Models.Estimations;
 using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
@@ -1416,5 +1417,26 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
             return idLastUpdateInfo;
         }
+
+        #region Estimations 
+
+        public void UpdateEstimation(int townId, TownEstimationModel estimation)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            connection.InsertOrUpdate("TownEstimation", estimation);
+            connection.Close();
+        }
+
+        public IEnumerable<TownEstimationModel> GetEstimations(int townId, int day)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var estimations = connection.Query<TownEstimationModel>("SELECT * FROM TownEstimation WHERE idTown = @idTown AND day = @day", new { idTown = townId, day = day});
+            connection.Close();
+            return estimations;
+        }
+
+        #endregion
     }
 }

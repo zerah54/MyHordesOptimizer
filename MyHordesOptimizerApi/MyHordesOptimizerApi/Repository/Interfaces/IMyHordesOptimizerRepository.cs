@@ -6,6 +6,7 @@ using MyHordesOptimizerApi.Models.Citizen.Bags;
 using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Models.Wishlist;
 using System.Collections.Generic;
+using MyHordesOptimizerApi.Models.Estimations;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
 {
@@ -88,5 +89,8 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         MapCellDigCompletModel GetCellDigs(int idCell, int idUser, int day);
         void ClearCellDig(IEnumerable<int> cellId);
         void ClearCellItem(int idCell, int idLastUpdateInfo);
+
+        void UpdateEstimation(int townId, TownEstimationModel estimation);
+        IEnumerable<TownEstimationModel> GetEstimations(int townId, int day);
     }
 }
