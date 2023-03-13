@@ -1,11 +1,13 @@
-import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { Component, HostBinding, OnInit } from '@angular/core';
-import { Recipe } from 'src/app/_abstract_model/types/recipe.class';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
+import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
+import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { Item } from 'src/app/_abstract_model/types/item.class';
 import { RecipeResultItem } from 'src/app/_abstract_model/types/recipe-result-item.class';
-import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
+import { Recipe } from 'src/app/_abstract_model/types/recipe.class';
 
 @Component({
     selector: 'mho-recipes',
@@ -34,14 +36,18 @@ export class RecipesComponent implements OnInit {
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: RecipeColumns) => column.id);
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(private api: ApiServices) { }
 
     ngOnInit(): void {
-        this.api.getRecipes().subscribe((recipes: Recipe[]) => {
-            this.recipes = recipes;
-            this.datasource.data = [...recipes];
-            this.datasource.filterPredicate = this.customFilter;
-        });
+        this.api.getRecipes()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((recipes: Recipe[]) => {
+                this.recipes = recipes;
+                this.datasource.data = [...recipes];
+                this.datasource.filterPredicate = this.customFilter;
+            });
     }
 
     /** Filtre la liste à afficher */
@@ -52,7 +58,7 @@ export class RecipesComponent implements OnInit {
     private customFilter(data: Recipe, filter: string): boolean {
         let locale: string = moment.locale();
         return data.components.some((component: Item) => component.label[locale].toLowerCase().indexOf(filter) > -1)
-        || data.result.some((result: RecipeResultItem) => result.item.label[locale].toLowerCase().indexOf(filter) > -1)
+            || data.result.some((result: RecipeResultItem) => result.item.label[locale].toLowerCase().indexOf(filter) > -1)
     }
 }
 

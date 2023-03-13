@@ -1,6 +1,8 @@
-import { Component, HostBinding, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import * as moment from 'moment';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
 import { Cell } from 'src/app/_abstract_model/types/cell.class';
 import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
@@ -26,6 +28,8 @@ export class MapUpdateRuinComponent implements OnInit {
 
     public cell_form!: FormGroup;
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(private fb: FormBuilder) {
 
     }
@@ -41,14 +45,16 @@ export class MapUpdateRuinComponent implements OnInit {
             is_ruin_dryed: [this.cell.is_ruin_dryed]
         })
 
-        this.cell_form.valueChanges.subscribe((values: RuinInfoUpdate) => {
-            // this.cell.nb_ruin_success = values.nb_ruin_success;
-            this.cell.nb_eruin_yellow = +values.nb_eruin_yellow;
-            this.cell.nb_eruin_blue = +values.nb_eruin_blue;
-            this.cell.nb_eruin_violet = +values.nb_eruin_violet;
-            this.cell.nb_ruin_dig = +values.nb_ruin_dig;
-            this.cellChange.next(this.cell);
-        })
+        this.cell_form.valueChanges
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((values: RuinInfoUpdate) => {
+                // this.cell.nb_ruin_success = values.nb_ruin_success;
+                this.cell.nb_eruin_yellow = +values.nb_eruin_yellow;
+                this.cell.nb_eruin_blue = +values.nb_eruin_blue;
+                this.cell.nb_eruin_violet = +values.nb_eruin_violet;
+                this.cell.nb_ruin_dig = +values.nb_ruin_dig;
+                this.cellChange.next(this.cell);
+            })
     }
 }
 

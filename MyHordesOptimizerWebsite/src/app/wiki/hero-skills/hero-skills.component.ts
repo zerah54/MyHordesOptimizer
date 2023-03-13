@@ -1,6 +1,8 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { HORDES_IMG_REPO } from './../../_abstract_model/const';
 import { HeroSkill } from './../../_abstract_model/types/hero-skill.class';
@@ -32,15 +34,19 @@ export class HeroSkillsComponent implements OnInit {
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: HeroSkillColumns) => column.id);
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(private api: ApiServices) {
 
     }
 
     ngOnInit(): void {
-        this.api.getHeroSkill().subscribe((hero_skill: HeroSkill[]) => {
-            this.hero_skills = hero_skill;
-            this.datasource.data = [...hero_skill];
-        });
+        this.api.getHeroSkill()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((hero_skill: HeroSkill[]) => {
+                this.hero_skills = hero_skill;
+                this.datasource.data = [...hero_skill];
+            });
     }
 }
 

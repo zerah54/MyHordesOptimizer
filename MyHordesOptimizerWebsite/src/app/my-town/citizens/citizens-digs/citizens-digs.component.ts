@@ -3,6 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { ConfirmDialogComponent } from 'src/app/shared/elements/confirm-dialog/confirm-dialog.component';
 import { getTown } from 'src/app/shared/utilities/localstorage.util';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
@@ -64,6 +66,8 @@ export class CitizensDigsComponent {
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: CitizenColumn) => column.id);
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(private digs_api: DigsServices, private dialog: MatDialog) {
 
     }
@@ -73,10 +77,12 @@ export class CitizensDigsComponent {
         this.datasource.sort = this.sort;
 
         this.createDigsByCitizenAndDay();
-        this.citizen_filter_change.subscribe(() => {
-            this.datasource.filter = JSON.stringify(this.filters);
-            this.createDigsByCitizenAndDay();
-        });
+        this.citizen_filter_change
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe(() => {
+                this.datasource.filter = JSON.stringify(this.filters);
+                this.createDigsByCitizenAndDay();
+            });
 
         this.datasource.filterPredicate = (data: DigsByCitizen, filter: string) => this.customFilter(data, filter);
         this.getDigs();
@@ -89,29 +95,36 @@ export class CitizensDigsComponent {
 
     public deleteDig(dig_to_delete: Dig): void {
         this.dialog
-        .open(ConfirmDialogComponent, {data: {
-            title: $localize`Confirmer`,
-            text: $localize`Êtes-vous sûr de vouloir supprimer cette fouille ?`
-        }})
-        .afterClosed()
-        .subscribe((confirm: boolean) => {
-            if (confirm) {
-                this.digs_api.deleteDig(dig_to_delete).subscribe(() => {
-                    let delete_dig: number = this.digs.findIndex((dig: Dig) => {
-                        return dig.cell_id === dig_to_delete?.cell_id
-                            && dig.digger_id === dig_to_delete?.digger_id
-                            && dig.day === dig_to_delete?.day
+            .open(ConfirmDialogComponent, {
+                data: {
+                    title: $localize`Confirmer`,
+                    text: $localize`Êtes-vous sûr de vouloir supprimer cette fouille ?`
+                }
+            })
+            .afterClosed()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((confirm: boolean) => {
+                if (confirm) {
+                    this.digs_api.deleteDig(dig_to_delete)
+                    .pipe(takeUntil(this.destroy_sub))
+                    .subscribe(() => {
+                        let delete_dig: number = this.digs.findIndex((dig: Dig) => {
+                            return dig.cell_id === dig_to_delete?.cell_id
+                                && dig.digger_id === dig_to_delete?.digger_id
+                                && dig.day === dig_to_delete?.day
+                        });
+                        this.digs.splice(delete_dig, 1);
+                        this.createDigsByCitizenAndDay()
                     });
-                    this.digs.splice(delete_dig, 1);
-                    this.createDigsByCitizenAndDay()
-                });
-            }
-        });
+                }
+            });
     }
 
     public updateDig(): void {
         if (this.dig_to_update) {
-            this.digs_api.updateDig([this.dig_to_update]).subscribe((new_digs: Dig[]) => {
+            this.digs_api.updateDig([this.dig_to_update])
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((new_digs: Dig[]) => {
                 let replace_dig: number = this.digs.findIndex((dig: Dig) => {
                     return dig.cell_id === new_digs[0].cell_id
                         && dig.digger_id === new_digs[0].digger_id
@@ -167,7 +180,9 @@ export class CitizensDigsComponent {
     }
 
     private getDigs(): void {
-        this.digs_api.getDigs().subscribe((digs: Dig[]) => {
+        this.digs_api.getDigs()
+        .pipe(takeUntil(this.destroy_sub))
+        .subscribe((digs: Dig[]) => {
             this.digs = digs;
             this.createDigsByCitizenAndDay();
         });

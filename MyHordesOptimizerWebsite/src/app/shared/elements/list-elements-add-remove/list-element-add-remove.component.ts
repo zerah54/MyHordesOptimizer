@@ -24,7 +24,9 @@ export class ListElementAddRemoveComponent {
     @Output() add: EventEmitter<number | string> = new EventEmitter();
     // @Input() set menuAddComponent(menu_add_component: MenuAddComponent) {
     //     this.add_menu = menu_add_component.menu;
-    //     menu_add_component.add.subscribe((id: number | string) => {
+    //     menu_add_component.add
+    //                .pipe(takeUntil(this.destroy_sub))
+    //                .subscribe((id: number | string) => {
     //         this.add.next(id);
     //     })
     // };
@@ -33,12 +35,16 @@ export class ListElementAddRemoveComponent {
     @Output() remove: EventEmitter<number | string> = new EventEmitter();
     // @Input() set menuRemoveComponent(menu_remove_component: MenuRemoveComponent) {
     //     this.remove_menu = menu_remove_component.menu;
-    //     menu_remove_component.remove.subscribe((id: number | string) => {
+    //     menu_remove_component.remove
+    //                .pipe(takeUntil(this.destroy_sub))
+    //                .subscribe((id: number | string) => {
     //         console.log('citizen', this.citizen);
     //         // this.remove.next(id);
     //     })
 
-    //     menu_remove_component.empty.subscribe(() => {
+    //     menu_remove_component.empty
+    //                .pipe(takeUntil(this.destroy_sub))
+    //                .subscribe(() => {
     //         console.log('citizen', this.citizen);
     //         // this.empty.next();
     //     })

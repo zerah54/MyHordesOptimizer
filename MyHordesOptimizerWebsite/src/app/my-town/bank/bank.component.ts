@@ -1,5 +1,7 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import * as moment from 'moment';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { Action } from 'src/app/_abstract_model/enum/action.enum';
 import { Property } from 'src/app/_abstract_model/enum/property.enum';
 import { Item } from 'src/app/_abstract_model/types/item.class';
@@ -33,27 +35,31 @@ export class BankComponent implements OnInit {
 
     public readonly locale: string = moment.locale();
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(private api: ApiServices) {
 
     }
 
     ngOnInit(): void {
-        this.api.getBank().subscribe((bank: BankInfo) => {
-            this.bank = bank;
-            if (this.bank) {
-                this.bank.items = this.bank?.items
-                    .sort((bank_item_a: Item, bank_item_b: Item) =>{
-                        if (bank_item_a.category.ordering < bank_item_b.category.ordering) {
-                            return -1;
-                        } else if (bank_item_a.category.ordering === bank_item_b.category.ordering) {
-                            return 0;
-                        } else {
-                            return 1;
-                        }
-                    })
-                this.displayed_bank_items = [...this.bank.items];
-            }
-        });
+        this.api.getBank()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((bank: BankInfo) => {
+                this.bank = bank;
+                if (this.bank) {
+                    this.bank.items = this.bank?.items
+                        .sort((bank_item_a: Item, bank_item_b: Item) => {
+                            if (bank_item_a.category.ordering < bank_item_b.category.ordering) {
+                                return -1;
+                            } else if (bank_item_a.category.ordering === bank_item_b.category.ordering) {
+                                return 0;
+                            } else {
+                                return 1;
+                            }
+                        })
+                    this.displayed_bank_items = [...this.bank.items];
+                }
+            });
     }
 
     public applyFilters(): void {

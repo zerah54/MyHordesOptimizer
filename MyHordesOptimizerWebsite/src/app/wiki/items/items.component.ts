@@ -1,10 +1,12 @@
-import { Item } from './../../_abstract_model/types/item.class';
-import { ApiServices } from './../../_abstract_model/services/api.services';
-import { Dictionary } from './../../_abstract_model/types/_types';
 import { Component, HostBinding, OnInit } from '@angular/core';
 import * as moment from 'moment';
-import { Property } from 'src/app/_abstract_model/enum/property.enum';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { Action } from 'src/app/_abstract_model/enum/action.enum';
+import { Property } from 'src/app/_abstract_model/enum/property.enum';
+import { ApiServices } from './../../_abstract_model/services/api.services';
+import { Item } from './../../_abstract_model/types/item.class';
+import { Dictionary } from './../../_abstract_model/types/_types';
 
 @Component({
     selector: 'mho-items',
@@ -31,26 +33,30 @@ export class ItemsComponent implements OnInit {
     /** La liste des filtres */
     public options: (Property | Action)[] = [...<any>Property.getAllValues(), ...<any>Action.getAllValues()];
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(private api: ApiServices) {
 
     }
 
     ngOnInit(): void {
-        this.api.getItems(true).subscribe((items: Item[]) => {
-            this.items = items;
-            if (this.items) {
-                this.items = this.items.sort((item_a: Item, item_b: Item) => {
-                    if (item_a.category.ordering < item_b.category.ordering) {
-                        return -1;
-                    } else if (item_a.category.ordering === item_b.category.ordering) {
-                        return 0;
-                    } else {
-                        return 1;
-                    }
-                });
-                this.displayed_items = [...this.items];
-            }
-        });
+        this.api.getItems(true)
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((items: Item[]) => {
+                this.items = items;
+                if (this.items) {
+                    this.items = this.items.sort((item_a: Item, item_b: Item) => {
+                        if (item_a.category.ordering < item_b.category.ordering) {
+                            return -1;
+                        } else if (item_a.category.ordering === item_b.category.ordering) {
+                            return 0;
+                        } else {
+                            return 1;
+                        }
+                    });
+                    this.displayed_items = [...this.items];
+                }
+            });
     }
 
     public applyFilters(): void {

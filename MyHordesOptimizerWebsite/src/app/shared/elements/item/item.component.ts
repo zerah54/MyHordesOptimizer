@@ -1,6 +1,8 @@
 import { Component, HostBinding, Input } from '@angular/core';
 import * as moment from 'moment';
+import { Subject, takeUntil } from 'rxjs';
 import { WishlistServices } from 'src/app/_abstract_model/services/wishlist.service';
+import { AutoDestroy } from '../../decorators/autodestroy.decorator';
 import { HORDES_IMG_REPO } from './../../../_abstract_model/const';
 import { Item } from './../../../_abstract_model/types/item.class';
 
@@ -22,6 +24,8 @@ export class ItemComponent {
 
     public display_mode: 'simple' | 'advanced' = 'simple';
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(private wishlist_services: WishlistServices) {
     }
 
@@ -31,9 +35,11 @@ export class ItemComponent {
      * @param {Item} item
      */
     public addItemToWishlist(item: Item): void {
-        this.wishlist_services.addItemToWishlist(item, '0').subscribe(() => {
-            this.item.wishlist_count = 1;
-        })
+        this.wishlist_services.addItemToWishlist(item, '0')
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe(() => {
+                this.item.wishlist_count = 1;
+            })
     }
 
     public toggleAdvancedMode(): void {

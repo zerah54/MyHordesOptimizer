@@ -1,5 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { BREAKPOINTS } from 'src/app/_abstract_model/const';
 import { ZoneRegen } from 'src/app/_abstract_model/enum/zone-regen.enum';
 import { CitizenInfo } from 'src/app/_abstract_model/types/citizen-info.class';
@@ -46,21 +48,31 @@ export class MapComponent implements OnInit {
         distances: []
     }
 
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+
     constructor(private breakpoint_observer: BreakpointObserver, private api: ApiServices) {
 
     }
 
     ngOnInit(): void {
-        this.api.getMap().subscribe((map: Town) => {
+        this.api.getMap()
+        .pipe(takeUntil(this.destroy_sub))
+        .subscribe((map: Town) => {
             this.map = map;
         });
-        this.api.getRuins().subscribe((ruins: Ruin[]) => {
+        this.api.getRuins()
+        .pipe(takeUntil(this.destroy_sub))
+        .subscribe((ruins: Ruin[]) => {
             this.all_ruins = ruins;
         });
-        this.api.getItems().subscribe((items: Item[]) => {
+        this.api.getItems()
+        .pipe(takeUntil(this.destroy_sub))
+        .subscribe((items: Item[]) => {
             this.all_items = items;
         });
-        this.api.getCitizens().subscribe((citizens: CitizenInfo) => {
+        this.api.getCitizens()
+        .pipe(takeUntil(this.destroy_sub))
+        .subscribe((citizens: CitizenInfo) => {
             this.all_citizens = citizens.citizens;
         });
 
