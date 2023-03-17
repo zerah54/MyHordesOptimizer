@@ -37,7 +37,7 @@
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
     + `[correctif] Position de l'icône MHO\n\n`
     + `[mise à jour] Lors d'une mise à jour de GH, la page n'est plus intégralement rechargée, seulement sa carte\n\n`
-    + `[supression] Suite à une discussion avec l'équipe de MyHordes (qui fait elle-même suite à une discussion intense sur le forum monde), la fonctionnalité d'informations complémentaires sur les citoyens - appelée par certains "Omniscience++" ou "O++" pour les plus flemmards - a été supprimée.`;
+    + `[suppression] Suite à une discussion avec l'équipe de MyHordes (qui fait elle-même suite à une discussion intense sur le forum monde), la fonctionnalité d'informations complémentaires sur les citoyens - appelée par certains "Omniscience++" ou "O++" pour les plus flemmards - a été supprimée.`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
