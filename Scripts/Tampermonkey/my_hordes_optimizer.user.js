@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.42
+// @version      1.0.0-beta.43
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,9 +35,8 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Position de l'icône MHO\n\n`
-    + `[mise à jour] Lors d'une mise à jour de GH, la page n'est plus intégralement rechargée, seulement sa carte\n\n`
-    + `[suppression] Suite à une discussion avec l'équipe de MyHordes (qui fait elle-même suite à une discussion intense sur le forum monde), la fonctionnalité d'informations complémentaires sur les citoyens - appelée par certains "Omniscience++" ou "O++" pour les plus flemmards - a été supprimée.`;
+    + `[correctif] Ajout de traductions manquantes\n\n`
+    + `[amélioration] Une note est affichée sur la carte si l'option de fouilles est activée mais que les données de fouilles ne sont pas complètes (lignes du registre non chargées)`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -94,6 +93,7 @@ const content_btn_id = 'optimizer-content-btn';
 const mh_header_id = 'header-reload-area';
 const mh_content_id = 'content';
 const mh_update_external_tools_id = 'mh-update-external-tools';
+const mho_warn_missing_logs_id = 'mho-warn-missing-logs';
 const mho_camping_predict_id = 'mho-camping-predict';
 const wiki_btn_id = 'wiki-btn-id';
 const zone_info_zombies_id = 'zone-info-zombies';
@@ -480,10 +480,16 @@ const texts = {
         es: `Nota de caja`
     },
     anti_abuse_title: {
-        en: `TODO`,
+        en: `Anti-abuse counter`,
         fr: `Compteur anti-abus`,
-        de: `TODO`,
-        es: `TODO`
+        de: `Zähler gegen Missbrauch`,
+        es: `Contador anti-abuso`
+    },
+    warn_missing_logs: {
+        en: `Warning: Missing searches data<br /><br />Not all registry entries in your file are displayed on the page. You must click the <strong>"Show All Entries"</strong> button at the bottom of the registry for the information to be complete.`,
+        fr: `Attention : Données de fouilles manquantes<br /><br />Toutes les entrées du registre de votre case ne sont pas affichées dans la page. Vous devez cliquer sur le bouton <strong>"Afficher toutes les entrées"</strong> en bas du registre pour que les informations soient complètes.`,
+        de: `Warnung: Fehlende Ausgrabungsdaten<br /><br />Nicht alle Registrierungseinträge in Ihrer Datei werden auf der Seite angezeigt. Sie müssen unten in der Registrierung auf die Schaltfläche <strong>"Alle Einträge anzeigen"</strong> klicken, damit die Informationen vollständig sind.`,
+        es: `Advertencia: Faltan datos de excavación<br /><br />No todas las entradas de registro en su archivo se muestran en la página. Debe hacer clic en el botón <strong>"Mostrar todas las entradas"</strong> en la parte inferior del registro para que la información esté completa.`,
     }
 };
 
@@ -1738,7 +1744,7 @@ function initOptions() {
 
 /**
  * Copie un texte
- * @param {string} text le texte à copier
+ * @param {string} le texte à copier
  */
 function copyToClipboard(text) {
     let input = document.createElement('input');
@@ -3308,37 +3314,50 @@ function createUpdateExternalToolsButton() {
 
     /** Cette fonction ne doit s'exécuter que si on a un id d'app externe ET au moins l'une des options qui est cochée dans les paramètres ET qu'on est hors de la ville */
     if (nb_tools_to_update > 0 && external_app_id && (zone_marker || (chest && pageIsHouse()))) {
-        if (update_external_tools_btn) return;
+        if (!update_external_tools_btn) {
 
-        let el = zone_marker?.parentElement.parentElement.parentElement || chest.parentElement;
+            let el = zone_marker?.parentElement.parentElement.parentElement || chest.parentElement;
 
-        let updater_bloc = document.createElement('div');
-        el.appendChild(updater_bloc);
-        let updater_title = document.createElement('h5');
-        let updater_title_mho_img = document.createElement('img');
-        updater_title_mho_img.src = mh_optimizer_icon;
-        updater_title_mho_img.style.height = '24px';
-        updater_title_mho_img.style.marginRight = '0.5em';
-        updater_title.appendChild(updater_title_mho_img);
+            let updater_bloc = document.createElement('div');
+            el.appendChild(updater_bloc);
+            let updater_title = document.createElement('h5');
+            let updater_title_mho_img = document.createElement('img');
+            updater_title_mho_img.src = mh_optimizer_icon;
+            updater_title_mho_img.style.height = '24px';
+            updater_title_mho_img.style.marginRight = '0.5em';
+            updater_title.appendChild(updater_title_mho_img);
 
-        let updater_title_text = document.createElement('text');
-        updater_title_text.innerHTML = GM_info.script.name;
-        updater_title.appendChild(updater_title_text);
+            let updater_title_text = document.createElement('text');
+            updater_title_text.innerHTML = GM_info.script.name;
+            updater_title.appendChild(updater_title_text);
 
-        updater_bloc.appendChild(updater_title);
+            updater_bloc.appendChild(updater_title);
 
-        let btn = document.createElement('button');
+            let btn = document.createElement('button');
 
-        btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/arrowright.gif">' + getI18N(texts.update_external_tools_needed_btn_label);
-        btn.id = mh_update_external_tools_id;
+            btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/arrowright.gif">' + getI18N(texts.update_external_tools_needed_btn_label);
+            btn.id = mh_update_external_tools_id;
 
-        btn.addEventListener('click', () => {
-            /** Au clic sur le bouton, on appelle la fonction de mise à jour */
-            btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/middot.gif">' + getI18N(texts.update_external_tools_pending_btn_label);
-            updateExternalTools().then();
-        })
+            btn.addEventListener('click', () => {
+                /** Au clic sur le bouton, on appelle la fonction de mise à jour */
+                btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/middot.gif">' + getI18N(texts.update_external_tools_pending_btn_label);
+                updateExternalTools().then();
+            })
 
-        updater_bloc.appendChild(btn);
+            updater_bloc.appendChild(btn);
+        }
+
+        let warn_missing_logs = document.getElementById(mho_warn_missing_logs_id);
+
+        if (!warn_missing_logs && document.querySelector('.log-complete-link') && zone_marker && update_external_tools_btn && mho_parameters.update_mho_digs) {
+            warn_missing_logs = document.createElement('div');
+            warn_missing_logs.id = mho_warn_missing_logs_id;
+            warn_missing_logs.classList.add('note', 'note-important');
+            warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs);
+            update_external_tools_btn.parentElement.appendChild(warn_missing_logs);
+        } else if (warn_missing_logs && (!document.querySelector('.log-complete-link') || !mho_parameters.update_mho_digs)) {
+            warn_missing_logs.remove();
+        }
     } else if (update_external_tools_btn && (nb_tools_to_update === 0 || !external_app_id || !(zone_marker && pageIsHouse()))) {
         update_external_tools_btn.parentElement.remove();
     }
@@ -7331,7 +7350,7 @@ function updateExternalTools() {
                 isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_digs
             };
 
-            let logs = await getDesertLogs();
+            let logs = Array.from(document.querySelectorAll('div.log-entry'));
             let arrivals_texts = {
                 de: `angekommen`,
                 en: `has arrived from the`,
@@ -7722,41 +7741,6 @@ function getApiKey() {
     });
 }
 
-function getDesertLogs() {
-    return new Promise((resolve, reject) => {
-        GM.xmlHttpRequest({
-            method: 'POST',
-            url: location.origin + '/api/beyond/desert/log',
-            responseType: 'document',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-Request-Intent': 'WebNavigation',
-                'X-Render-Target': 'content'
-            },
-            data: JSON.stringify({
-                day: -1,
-                town: mh_user.townDetails.townId
-            }),
-            onload: function (response) {
-                if (response.status === 200) {
-                    let temp_body = document.createElement('body');
-                    temp_body.innerHTML = response.response.body.innerHTML;
-                    resolve(Array.from(temp_body.querySelectorAll('div.log-entry')));
-                } else {
-                    reject(response);
-                }
-                endLoading();
-            },
-            onerror: function (error) {
-                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
-                endLoading();
-                reject(error);
-            }
-        });
-    });
-}
-
 ///////////////////////////
 //     MAIN FUNCTION     //
 ///////////////////////////
@@ -7797,10 +7781,8 @@ function getDesertLogs() {
             GM.getValue(current_key).then((current) => {
                 if (current && !document.hidden) {
                     GM.setValue(current_key, false);
-                    if (current_key === 'gh_updated') {
-                        if (document.getElementById('#zoneRefresh')) {
-                            document.getElementById('#zoneRefresh').click();
-                        }
+                    if (current_key === 'gh_updated' && document.getElementById('#zoneRefresh')) {
+                        document.getElementById('#zoneRefresh').click();
                     } else {
                         location.reload();
                     }
