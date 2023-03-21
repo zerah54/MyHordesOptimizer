@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.43
+// @version      1.0.0-beta.44
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,8 +35,7 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Ajout de traductions manquantes\n\n`
-    + `[amélioration] Une note est affichée sur la carte si l'option de fouilles est activée mais que les données de fouilles ne sont pas complètes (lignes du registre non chargées)`;
+    + `[amélioration] Visuel de la note qui est affichée si l'option de fouilles est activée mais que les données de fouilles ne sont pas complètes`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -485,11 +484,17 @@ const texts = {
         de: `Zähler gegen Missbrauch`,
         es: `Contador anti-abuso`
     },
-    warn_missing_logs: {
-        en: `Warning: Missing searches data<br /><br />Not all registry entries in your file are displayed on the page. You must click the <strong>"Show All Entries"</strong> button at the bottom of the registry for the information to be complete.`,
-        fr: `Attention : Données de fouilles manquantes<br /><br />Toutes les entrées du registre de votre case ne sont pas affichées dans la page. Vous devez cliquer sur le bouton <strong>"Afficher toutes les entrées"</strong> en bas du registre pour que les informations soient complètes.`,
-        de: `Warnung: Fehlende Ausgrabungsdaten<br /><br />Nicht alle Registrierungseinträge in Ihrer Datei werden auf der Seite angezeigt. Sie müssen unten in der Registrierung auf die Schaltfläche <strong>"Alle Einträge anzeigen"</strong> klicken, damit die Informationen vollständig sind.`,
-        es: `Advertencia: Faltan datos de excavación<br /><br />No todas las entradas de registro en su archivo se muestran en la página. Debe hacer clic en el botón <strong>"Mostrar todas las entradas"</strong> en la parte inferior del registro para que la información esté completa.`,
+    warn_missing_logs_title: {
+        en: `Warning: Missing searches data`,
+        fr: `Attention : Données de fouilles manquantes`,
+        de: `Warnung: Fehlende Ausgrabungsdaten`,
+        es: `Advertencia: Faltan datos de excavación`,
+    },
+    warn_missing_logs_help: {
+        en: `This message appears because you checked the option <strong>"Save successful searches"</strong> and not all of the registry entries in your cell are displayed in the page.<br /><br />You must click the <strong>"Show All Entries"</strong> button at the bottom of the registry for the information to be complete.`,
+        fr: `Ce message s'affiche parce que vous avez coché l'option <strong>"Enregistrer les fouilles réussies"</strong> et que toutes les entrées du registre de votre case ne sont pas affichées dans la page.<br /><br />Vous devez cliquer sur le bouton <strong>"Afficher toutes les entrées"</strong> en bas du registre pour que les informations soient complètes.`,
+        de: `Diese Meldung wird angezeigt, weil Sie die Option <strong>"Erfolgreiche Ausgrabungen speichern"</strong> aktiviert haben und nicht alle Registrierungseinträge in Ihrer Box auf der Seite angezeigt werden.<br /><br />Sie müssen auf die Schaltfläche <strong >"Alle Einträge anzeigen"</strong> unten in der Registrierung, damit die Informationen vollständig sind.`,
+        es: `Este mensaje aparece porque seleccionó la opción <strong>"Guardar excavaciones exitosas"</strong> y no todas las entradas de registro en su casilla se muestran en la página.<br /><br />Debe hacer clic en <strong >"Mostrar todas las entradas"</strong> en la parte inferior del registro para que la información esté completa.`,
     }
 };
 
@@ -849,84 +854,6 @@ const wishlist_headers = [
         id: 'delete'
     },
 ];
-
-const more_citizen_info_headers = [
-    {
-        id: 'username',
-        label: {
-            en: ``,
-            fr: `Citoyen`,
-            de: ``,
-            es: ``
-        },
-        header_class: ['padded', 'cell', 'rw-4', 'left', 'factor-1'],
-        content_class: [] // récupéré automatiquement
-    },
-    {
-        id: 'clock',
-        label: {
-            en: ``,
-            fr: `Dernière connexion`,
-            de: ``,
-            es: ``
-        },
-        header_class: ['padded', 'cell', 'rw-5', 'header-center-vertical'],
-        content_class: ['padded', 'cell', 'rw-5', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'plaintes',
-        icon: 'emotes/warning.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'rations',
-        icon: 'icons/small_well.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'injured',
-        icon: 'status/status_wound1.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'infection',
-        icon: 'status/status_infection.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'thirsty',
-        icon: 'status/status_thirst2.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'addict',
-        icon: 'status/status_addict.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'terror',
-        icon: 'status/status_terror.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'travaux',
-        label: {
-            en: `Building upgrades`,
-            fr: `Travaux`,
-            de: `Bauarbeiten`,
-            es: `Obras`
-        },
-        header_class: ['padded', 'cell', 'rw-4'],
-        content_class: ['padded', 'cell', 'rw-4', 'small', 'citizen-box']
-    },
-]
 
 //////////////////////////////////
 // La liste des onglets du wiki //
@@ -1905,11 +1832,11 @@ function createOptimizerButtonContent() {
 
         let informations_list = document.createElement('ul');
 
-        let infomations_container = document.createElement('div');
-        infomations_container.id = 'informations';
+        let informations_container = document.createElement('div');
+        informations_container.id = 'informations';
 
-        infomations_container.appendChild(informations_title);
-        infomations_container.appendChild(informations_list);
+        informations_container.appendChild(informations_title);
+        informations_container.appendChild(informations_list);
 
         informations.forEach((information) => {
             let information_link = document.createElement('a');
@@ -1931,7 +1858,7 @@ function createOptimizerButtonContent() {
             informations_list.appendChild(information_container);
         });
 
-        content.appendChild(infomations_container);
+        content.appendChild(informations_container);
 
     } else {
         let no_external_app_id = document.createElement('div');
@@ -3277,11 +3204,13 @@ function createHelpButton(text_to_display) {
 
     let help_tooltip = document.createElement('div')
     help_tooltip.classList.add('tooltip', 'help', 'hidden');
-    help_tooltip.setAttribute('style', 'text-transform: initial;');
+    help_tooltip.setAttribute('style', `text-transform: initial; display: block; position: absolute;`);
     help_tooltip.innerHTML = text_to_display;
     help_button.appendChild(help_tooltip);
 
     help_button.addEventListener('mouseenter', function () {
+        help_tooltip.style.top = help_button.getBoundingClientRect().top;
+        help_tooltip.style.right = help_button.getBoundingClientRect().right;
         help_tooltip.classList.remove('hidden');
     })
     help_button.addEventListener('mouseleave', function () {
@@ -3319,8 +3248,12 @@ function createUpdateExternalToolsButton() {
             let el = zone_marker?.parentElement.parentElement.parentElement || chest.parentElement;
 
             let updater_bloc = document.createElement('div');
+            updater_bloc.style.marginTop = '1em';
+            updater_bloc.style.padding = '0.25em';
+            updater_bloc.style.border = '1px solid #ddab76';
             el.appendChild(updater_bloc);
             let updater_title = document.createElement('h5');
+            updater_title.style.margin = '0 0 0.5em'
             let updater_title_mho_img = document.createElement('img');
             updater_title_mho_img.src = mh_optimizer_icon;
             updater_title_mho_img.style.height = '24px';
@@ -3353,7 +3286,10 @@ function createUpdateExternalToolsButton() {
             warn_missing_logs = document.createElement('div');
             warn_missing_logs.id = mho_warn_missing_logs_id;
             warn_missing_logs.classList.add('note', 'note-important');
-            warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs);
+            warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title);
+            let warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
+            warn_missing_logs.appendChild(warn_help);
+
             update_external_tools_btn.parentElement.appendChild(warn_missing_logs);
         } else if (warn_missing_logs && (!document.querySelector('.log-complete-link') || !mho_parameters.update_mho_digs)) {
             warn_missing_logs.remove();
@@ -5214,7 +5150,6 @@ function displayCampingPredict() {
 
             camping_predict_container.appendChild(updater_title);
 
-            console.log('mh_user', mh_user);
             let zone_ruin = document.querySelector('.ruin-info b');
             let ruin = '';
             if (zone_ruin) {
