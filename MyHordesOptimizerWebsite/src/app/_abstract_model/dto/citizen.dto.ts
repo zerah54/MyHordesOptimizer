@@ -1,7 +1,7 @@
-import { BagDTO } from "./bag.dto";
-import { HeroicActionsDTO } from "./heroic-actions.dto";
-import { HomeDTO } from "./home.dto";
-import { StatusDTO } from "./status.dto";
+import { BagDTO } from './bag.dto';
+import { HeroicActionsDTO } from './heroic-actions.dto';
+import { HomeDTO } from './home.dto';
+import { StatusDTO } from './status.dto';
 
 export interface CitizenDTO {
     avatar?: string;
@@ -19,4 +19,4 @@ export interface CitizenDTO {
     home?: HomeDTO;
     status?: StatusDTO;
     actionsHeroic?: HeroicActionsDTO;
-};
+}

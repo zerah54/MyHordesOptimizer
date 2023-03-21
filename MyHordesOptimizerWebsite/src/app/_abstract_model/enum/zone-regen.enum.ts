@@ -1,4 +1,4 @@
-import { CommonEnum, CommonEnumData } from "./_common.enum";
+import { CommonEnum, CommonEnumData } from './_common.enum';
 
 const NORTH_KEY: string = 'Norden';
 const NORTHEAST_KEY: string = 'Nordosten';
@@ -9,14 +9,14 @@ const SOUTHWEST_KEY: string = 'Südwesten';
 const WEST_KEY: string = 'Westen';
 const NORTHWEST_KEY: string = 'Nordwesten';
 
-const NORTH_DATA: ZoneRegenData = { label: $localize`Nord`, class: 'north' };
-const NORTHEAST_DATA: ZoneRegenData = { label: $localize`Nord-Est`, class: 'north-east' };
-const EAST_DATA: ZoneRegenData = { label: $localize`Est`, class: 'east' };
-const SOUTHEAST_DATA: ZoneRegenData = { label: $localize`Sud-Est`, class: 'south-east' };
-const SOUTH_DATA: ZoneRegenData = { label: $localize`Sud`, class: 'south' };
-const SOUTHWEST_DATA: ZoneRegenData = { label: $localize`Sud-Ouest`, class: 'south-west' };
-const WEST_DATA: ZoneRegenData = { label: $localize`Ouest`, class: 'west' };
-const NORTHWEST_DATA: ZoneRegenData = { label: $localize`Nord-Ouest`, class: 'north-west' };
+const NORTH_DATA: ZoneRegenData = {label: $localize`Nord`, class: 'north', diag: false, order_by: 1};
+const NORTHEAST_DATA: ZoneRegenData = {label: $localize`Nord-Est`, class: 'north-east', diag: true, order_by: 2};
+const EAST_DATA: ZoneRegenData = {label: $localize`Est`, class: 'east', diag: false, order_by: 3};
+const SOUTHEAST_DATA: ZoneRegenData = {label: $localize`Sud-Est`, class: 'south-east', diag: true, order_by: 4};
+const SOUTH_DATA: ZoneRegenData = {label: $localize`Sud`, class: 'south', diag: false, order_by: 5};
+const SOUTHWEST_DATA: ZoneRegenData = {label: $localize`Sud-Ouest`, class: 'south-west', diag: true, order_by: 6};
+const WEST_DATA: ZoneRegenData = {label: $localize`Ouest`, class: 'west', diag: false, order_by: 7};
+const NORTHWEST_DATA: ZoneRegenData = {label: $localize`Nord-Ouest`, class: 'north-west', diag: true, order_by: 8};
 
 
 /** Type de champs de propriétés existants */
@@ -49,4 +49,6 @@ export class ZoneRegen extends CommonEnum {
 interface ZoneRegenData extends CommonEnumData {
     label: string;
     class: string;
+    diag: boolean;
+    order_by: number;
 }

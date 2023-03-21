@@ -19,9 +19,7 @@ export class MapUpdateRuinComponent implements OnInit {
     @Input() allRuins!: Ruin[];
     @Input() cell!: Cell;
 
-    @Output() cellChange: EventEmitter<Cell> = new EventEmitter()
-
-    public nb_search_ruin_success!: number;
+    @Output() cellChange: EventEmitter<Cell> = new EventEmitter();
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
@@ -43,7 +41,7 @@ export class MapUpdateRuinComponent implements OnInit {
             nb_eruin_violet: [this.cell.nb_eruin_violet],
             nb_ruin_dig: [this.cell.nb_ruin_dig],
             is_ruin_dryed: [this.cell.is_ruin_dryed]
-        })
+        });
 
         this.cell_form.valueChanges
             .pipe(takeUntil(this.destroy_sub))
@@ -54,7 +52,7 @@ export class MapUpdateRuinComponent implements OnInit {
                 this.cell.nb_eruin_violet = +values.nb_eruin_violet;
                 this.cell.nb_ruin_dig = +values.nb_ruin_dig;
                 this.cellChange.next(this.cell);
-            })
+            });
     }
 }
 

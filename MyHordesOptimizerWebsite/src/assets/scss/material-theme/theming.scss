@@ -1,8 +1,8 @@
 @use "@angular/material" as mat;
 
-@import "default-theme";
-@import "noel-theme";
-@import "pink-theme";
+@use "default-theme";
+@use "noel-theme";
+@use "pink-theme";
 
 @include mat.all-component-typographies();
 @include mat.core();
@@ -12,20 +12,21 @@
 
     &:not(.pink):not(.noel),
     &.brown {
-        @include mat.all-component-themes($default-theme);
-        @include default-theme($default-theme);
+        @include mat.all-component-themes(default-theme.$default-theme);
+        @include default-theme.default-theme(default-theme.$default-theme);
     }
 
     &.pink {
-        @include mat.all-component-themes($pink-theme);
-        @include pink-theme($pink-theme);
+        @include mat.all-component-themes(pink-theme.$pink-theme);
+        @include pink-theme.pink-theme(pink-theme.$pink-theme);
     }
 
     &.noel {
-        @include mat.all-component-themes($noel-theme);
-        @include noel-theme($noel-theme);
+        @include mat.all-component-themes(noel-theme.$noel-theme);
+        @include noel-theme.noel-theme(noel-theme.$noel-theme);
     }
 
 
-    --mdc-icon-button-icon-size: '16px';
+    --mdc-icon-button-icon-size: 16px;
+    --mdc-checkbox-state-layer-size: 32px;
 }

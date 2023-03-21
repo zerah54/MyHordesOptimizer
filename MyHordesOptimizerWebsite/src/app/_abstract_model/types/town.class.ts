@@ -52,6 +52,6 @@ export class Town extends CommonModel<TownDTO> {
             this.day = dto.day;
             this.cells = dtoToModelArray(Cell, dto.cells);
         }
-    };
+    }
 
 }

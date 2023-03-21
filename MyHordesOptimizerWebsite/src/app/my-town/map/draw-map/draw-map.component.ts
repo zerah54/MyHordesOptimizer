@@ -23,27 +23,27 @@ export class DrawMapComponent {
     @Input() set map(map: Town) {
         if (map) {
             this.complete_map = map;
-            this.x_row = Array.from({ length: map?.map_width }, (_, i) => { return i - +map.town_x });
+            this.x_row = Array.from({length: map?.map_width}, (_: unknown, i: number) => i - +map.town_x);
 
-            let rows: Cell[][] = groupBy(map?.cells || [], (cell: Cell) => cell.y);
+            const rows: Cell[][] = groupBy(map?.cells || [], (cell: Cell) => cell.y);
 
             rows.forEach((row: Cell[]) => {
-                row.sort((cell_a, cell_b) => {
+                row.sort((cell_a: Cell, cell_b: Cell) => {
                     if (cell_a.x < cell_b.x) return -1;
                     if (cell_a.x > cell_b.x) return 1;
-                    return 0
-                })
+                    return 0;
+                });
             });
 
             rows.sort((row_a: Cell[], row_b: Cell[]) => {
                 if (row_a[0].y < row_b[0].y) return -1;
                 if (row_a[0].y > row_b[0].y) return 1;
-                return 0
-            })
+                return 0;
+            });
 
             this.drawed_map = rows;
         }
-    };
+    }
 
     public x_row: number[] = [];
 

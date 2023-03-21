@@ -5,7 +5,7 @@ import { CitizensDigsComponent } from './citizens-digs/citizens-digs.component';
 import { CitizensListComponent } from './citizens-list/citizens-list.component';
 import { CitizensComponent } from './citizens.component';
 
-let components: Components = [CitizensComponent, CitizensListComponent, CitizensDigsComponent];
+const components: Components = [CitizensComponent, CitizensListComponent, CitizensDigsComponent];
 
 @NgModule({
     imports: [SharedModule],

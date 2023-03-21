@@ -6,7 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { Components, Modules } from 'src/app/_abstract_model/types/_types';
-import { MaterialModule } from './../material-modules.module';
+import { MaterialModule } from '../material-modules.module';
 import { AccordionComponent } from './accordion/accordion.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import { FilterFieldComponent } from './filter-field/filter-field.component';
@@ -23,15 +23,15 @@ import { RecipeComponent } from './recipe/recipe.component';
 import { LabelPipe } from './select/label.pipe';
 import { SelectComponent } from './select/select.component';
 
-let components: Components = [
+const components: Components = [
     ItemComponent, SelectComponent, RecipeComponent, FilterFieldComponent, LastUpdateComponent, AccordionComponent, ListElementAddRemoveComponent, MenuAddComponent,
     MenuRemoveComponent, ConfirmDialogComponent
 ];
-let list_headers: Components = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent];
-let local_components: Components = [LabelPipe];
-let custom_modules: Modules = [MaterialModule];
-let angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule];
-let pipes: Components = [DecimalPipe];
+const list_headers: Components = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent];
+const local_components: Components = [LabelPipe];
+const custom_modules: Modules = [MaterialModule];
+const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule];
+const pipes: Components = [DecimalPipe];
 
 @NgModule({
     imports: [...custom_modules, ...angular_modules],

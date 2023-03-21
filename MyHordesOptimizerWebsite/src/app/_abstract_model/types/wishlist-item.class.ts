@@ -26,7 +26,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             bagCount: this.bag_count,
             zoneXPa: this.zone_x_pa
         };
-    };
+    }
 
     protected dtoToModel(dto?: WishlistItemDTO): void {
         if (dto) {
@@ -38,5 +38,5 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             this.bag_count = dto.bagCount;
             this.zone_x_pa = dto.zoneXPa;
         }
-    };
+    }
 }

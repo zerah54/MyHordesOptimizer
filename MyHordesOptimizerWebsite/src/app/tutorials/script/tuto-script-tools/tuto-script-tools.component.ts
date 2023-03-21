@@ -1,4 +1,4 @@
-import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 import { AccordionItem } from 'src/app/shared/elements/accordion/accordion.component';
 import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 
@@ -30,7 +30,7 @@ export class TutoScriptToolsComponent {
     }
 
     public copyUrl(): void {
-        let url: string = window.location.href;
+        const url: string = window.location.href;
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
@@ -38,10 +38,10 @@ export class TutoScriptToolsComponent {
         let text: string = '';
 
         text += `[b][big]${this.title}[/big][/b]`;
-        text += `\n\n`;
+        text += '\n\n';
         this.tuto_script_items.forEach((item: AccordionItem) => {
             text += `[collapse=${item.title}]${item.content.replace(/<br \/><br \/>/g, '\n')}[/collapse]\n\n`;
-        })
+        });
 
         this.clipboard.copy(text, $localize`Le texte a bien été copié`);
     }

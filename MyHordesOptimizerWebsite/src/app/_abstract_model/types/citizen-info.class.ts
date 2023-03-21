@@ -1,9 +1,9 @@
 import { CitizenInfoDTO } from '../dto/citizen-info.dto';
-import { DictionaryUtils } from './../../shared/utilities/dictionary.util';
-import { CitizenDTO } from './../dto/citizen.dto';
 import { Citizen } from './citizen.class';
 import { UpdateInfo } from './update-info.class';
 import { CommonModel, dtoToModelArray, modelArrayToDictionnary } from './_common.class';
+import { DictionaryUtils } from '../../shared/utilities/dictionary.util';
+import { CitizenDTO } from '../dto/citizen.dto';
 
 export class CitizenInfo extends CommonModel<CitizenInfoDTO> {
     citizens: Citizen[] = [];
@@ -18,8 +18,8 @@ export class CitizenInfo extends CommonModel<CitizenInfoDTO> {
         return {
             citizens: modelArrayToDictionnary(this.citizens, 'item.xml_name'),
             lastUpdateInfo: this.update_info.modelToDto()
-        }
-    };
+        };
+    }
 
     protected dtoToModel(dto?: CitizenInfoDTO | null): void {
         if (dto) {
@@ -32,8 +32,8 @@ export class CitizenInfo extends CommonModel<CitizenInfoDTO> {
                     return -1;
                 }
                 return 0;
-            })
-            this.update_info = new UpdateInfo(dto.lastUpdateInfo)
+            });
+            this.update_info = new UpdateInfo(dto.lastUpdateInfo);
         }
-    };
+    }
 }

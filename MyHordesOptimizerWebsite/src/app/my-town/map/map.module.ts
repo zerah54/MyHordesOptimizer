@@ -26,12 +26,12 @@ import { MapUpdateRuinComponent } from './draw-map/map-update/map-update-ruin/ma
 import { MapUpdateComponent } from './draw-map/map-update/map-update.component';
 import { MapComponent } from './map.component';
 
-let components: Components = [MapComponent];
-let map_components: Components = [
+const components: Components = [MapComponent];
+const map_components: Components = [
     DrawMapComponent, MapCellComponent, MapBorderComponent, CompassRoseComponent, MapCellDetailsComponent, MapUpdateComponent, MapUpdateCellComponent,
     MapUpdateRuinComponent, MapUpdateCitizensComponent, MapUpdateDigsComponent
 ];
-let pipes: Components = [
+const pipes: Components = [
     IsRuinPipe, DigLevelPipe, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop, ScrutBorderBottom, MyCellPipe, AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe,
     CellDetailsLeftPipe, CellDetailsBottomPipe, CellDetailsRightPipe, CellDetailsTopPipe, RuinInCell, HasStillHeroicPipe, ItemsInBagsPipe, DistBorderBottom, DistBorderLeft,
     DistBorderRight, DistBorderTop, NotInListCitizenPipe, NotInListCitizenDigPipe, DigsPerDayPipe

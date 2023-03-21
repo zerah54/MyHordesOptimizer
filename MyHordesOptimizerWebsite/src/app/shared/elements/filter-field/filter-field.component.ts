@@ -1,4 +1,4 @@
-import { Component, HostBinding, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Output } from '@angular/core';
 
 @Component({
     selector: 'mho-filter',
@@ -11,8 +11,8 @@ export class FilterFieldComponent {
     @Output() filterChange: EventEmitter<string> = new EventEmitter<string>();
 
     public filter_value: string = '';
-    
-    public applyFilter(value: string) {
+
+    public applyFilter(value: string): void {
         this.filterChange.next(value);
     }
 }

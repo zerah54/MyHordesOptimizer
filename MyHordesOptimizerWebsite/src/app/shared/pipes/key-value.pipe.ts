@@ -1,4 +1,3 @@
-
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
@@ -10,7 +9,7 @@ export class CustomKeyValuePipe<T> implements PipeTransform {
             return {
                 key: entry[0],
                 value: entry[1]
-            }
+            };
         });
     }
 }

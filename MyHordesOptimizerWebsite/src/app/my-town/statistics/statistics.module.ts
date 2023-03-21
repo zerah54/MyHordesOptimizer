@@ -3,12 +3,15 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { Components } from 'src/app/_abstract_model/types/_types';
 import { ScrutateurComponent } from './scrutateur/scrutateur.component';
 import { StatisticsComponent } from './statistics.component';
+import { EstimationsComponent } from './estimations/estimations.component';
+import { SelectedDayEstimationPipe } from './estimations/selected-day-estimations.pipe';
 
-let components: Components = [StatisticsComponent, ScrutateurComponent];
+const components: Components = [StatisticsComponent, ScrutateurComponent, EstimationsComponent];
+const pipes: Components = [SelectedDayEstimationPipe];
 
 @NgModule({
     imports: [SharedModule],
-    declarations: [...components],
+    declarations: [...components, ...pipes],
     exports: [...components]
 })
 

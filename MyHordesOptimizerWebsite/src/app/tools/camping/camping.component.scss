@@ -1,4 +1,4 @@
-@import "variables.scss";
+@use "variables";
 
 .mho-camping {
     .camping-params {
@@ -6,7 +6,7 @@
         flex-wrap: wrap;
         column-gap: 1em;
 
-        >div {
+        > div {
             flex: 1;
             min-width: 300px;
 
@@ -38,10 +38,10 @@
                 margin-bottom: 1em;
 
                 .mat-button-toggle-group {
-                    border-color: $primary;
+                    border-color: variables.$primary;
 
                     .mat-button-toggle {
-                        border-color: $primary;
+                        border-color: variables.$primary;
                     }
 
                     .mat-button-toggle-label-content {
@@ -49,7 +49,7 @@
                     }
 
                     .mat-button-toggle-checked {
-                        background-color: $item_color;
+                        background-color: variables.$item_color;
                     }
                 }
             }

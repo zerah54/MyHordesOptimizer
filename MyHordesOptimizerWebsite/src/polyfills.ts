@@ -45,26 +45,23 @@
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
-import 'zone.js';  // Included with Angular CLI.
-
-
+import 'zone.js'; // Included with Angular CLI.
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
-
 /***************************************************************************************************
  *  i18n
  */
- import '@angular/localize/init';
- import { clearTranslations, loadTranslations } from '@angular/localize';
+import '@angular/localize/init';
+import { clearTranslations, loadTranslations } from '@angular/localize';
 
 declare let require: any;
 
- /** Récupère la langue à utiliser : si l'utilisateur avait sélectionné une langue par le passé, l'utilise, sinon utilise le français */
- const user_lang: string = localStorage.getItem('mho-locale') || 'fr';
- if (user_lang !== 'fr') {
-     let translations: any = require(`src/assets/i18n/${user_lang}.json`);
-     loadTranslations(translations);
- } else {
-     clearTranslations();
- }
+/** Récupère la langue à utiliser : si l'utilisateur avait sélectionné une langue par le passé, l'utilise, sinon utilise le français */
+const user_lang: string = localStorage.getItem('mho-locale') || 'fr';
+if (user_lang !== 'fr') {
+    const translations: Record<string, string> = require(`src/assets/i18n/${user_lang}.json`);
+    loadTranslations(translations);
+} else {
+    clearTranslations();
+}

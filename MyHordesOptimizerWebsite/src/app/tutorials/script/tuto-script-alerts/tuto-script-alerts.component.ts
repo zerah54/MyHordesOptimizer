@@ -1,4 +1,4 @@
-import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 import { AccordionItem } from 'src/app/shared/elements/accordion/accordion.component';
 import { ClipboardService } from 'src/app/shared/services/clipboard.service';
 
@@ -18,7 +18,8 @@ export class TutoScriptAlertsComponent {
                 Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, alors au moment de fermer la fenêtre ou l'onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.`
         },
         {
-            title: $localize`Notification à la fin de la fouille`, content: $localize`Si vous cochez l'option "Me notifier à la fin de la fouille", vous recevrez une notification de votre navigateur quelques secondes avant la fin de votre fouille à condition que votre navigateur soit toujours ouvert sur la page du désert.`
+            title: $localize`Notification à la fin de la fouille`,
+            content: $localize`Si vous cochez l'option "Me notifier à la fin de la fouille", vous recevrez une notification de votre navigateur quelques secondes avant la fin de votre fouille à condition que votre navigateur soit toujours ouvert sur la page du désert.`
         },
     ];
 
@@ -27,7 +28,7 @@ export class TutoScriptAlertsComponent {
     }
 
     public copyUrl(): void {
-        let url: string = window.location.href;
+        const url: string = window.location.href;
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
@@ -35,10 +36,10 @@ export class TutoScriptAlertsComponent {
         let text: string = '';
 
         text += `[b][big]${this.title}[/big][/b]`;
-        text += `\n\n`;
+        text += '\n\n';
         this.tuto_script_items.forEach((item: AccordionItem) => {
             text += `[collapse=${item.title}]${item.content}[/collapse]\n\n`;
-        })
+        });
 
         this.clipboard.copy(text, $localize`Le texte a bien été copié`);
     }

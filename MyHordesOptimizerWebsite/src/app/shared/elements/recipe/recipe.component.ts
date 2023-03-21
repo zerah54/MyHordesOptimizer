@@ -1,8 +1,7 @@
 import { Component, HostBinding, Input } from '@angular/core';
 import * as moment from 'moment';
-import { RecipeResultItem } from 'src/app/_abstract_model/types/recipe-result-item.class';
 import { Recipe } from 'src/app/_abstract_model/types/recipe.class';
-import { HORDES_IMG_REPO } from './../../../_abstract_model/const';
+import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 
 @Component({
     selector: 'mho-recipe',

@@ -1,4 +1,4 @@
-import { CommonEnum, CommonEnumData } from "./_common.enum";
+import { CommonEnum, CommonEnumData } from './_common.enum';
 
 const CITIZEN_KEY: string = 'basic';
 const SCAVENGER_KEY: string = 'dig';

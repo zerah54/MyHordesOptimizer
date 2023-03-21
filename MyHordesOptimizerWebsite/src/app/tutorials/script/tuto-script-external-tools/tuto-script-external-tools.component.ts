@@ -28,7 +28,8 @@ export class TutoScriptExternalToolsComponent {
                 <li><strong>États :</strong> Enregistre vos différents états (rassasié, soif, etc... Attention : n'enregistre pas l'état goule)</li>
                 <li><strong>Entregistrer les fouilles réussies :</strong> Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte dédiée</li>
             </ul>
-        ` },
+        `
+        },
         {
             title: $localize`Gest'Hordes`, content: $localize`En cochant l'option "Mettre à jour Gest'Hordes", quand vous cliquerez sur le boutton "Mettre à jour les outils externes", la mise à jour de Gest'Hordes se fera automatiquement.
             Vous rendez également accessibles d'autres options de mise à jour avancées.
@@ -41,10 +42,12 @@ export class TutoScriptExternalToolsComponent {
         `
         },
         {
-            title: $localize`BigBroth'Hordes`, content: $localize`En cochant l'option "Mettre à jour BigBroth'Hordes", quand vous cliquerez sur le boutton "Mettre à jour les outils externes", la mise à jour de BigBroth'Hordes se fera automatiquement.`
+            title: $localize`BigBroth'Hordes`,
+            content: $localize`En cochant l'option "Mettre à jour BigBroth'Hordes", quand vous cliquerez sur le boutton "Mettre à jour les outils externes", la mise à jour de BigBroth'Hordes se fera automatiquement.`
         },
         {
-            title: $localize`Fata Morgana`, content: $localize`En cochant l'option "Mettre à jour Fata Morgana", quand vous cliquerez sur le boutton "Mettre à jour les outils externes", la mise à jour de Fata Morgana se fera automatiquement.`
+            title: $localize`Fata Morgana`,
+            content: $localize`En cochant l'option "Mettre à jour Fata Morgana", quand vous cliquerez sur le boutton "Mettre à jour les outils externes", la mise à jour de Fata Morgana se fera automatiquement.`
         },
         {
             title: $localize`Affichage des cartes issues des outils externes`, content: $localize`
@@ -62,7 +65,7 @@ export class TutoScriptExternalToolsComponent {
     }
 
     public copyUrl(): void {
-        let url: string = window.location.href;
+        const url: string = window.location.href;
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 
@@ -70,12 +73,12 @@ export class TutoScriptExternalToolsComponent {
         let text: string = '';
 
         text += `[b][big]${this.title}[/big][/b]`;
-        text += `\n\n`;
+        text += '\n\n';
         text += this.header;
-        text += `\n\n`;
+        text += '\n\n';
         this.tuto_script_items.forEach((item: AccordionItem) => {
             text += `[collapse=${item.title}]${item.content.replace(/<ul>/g, '').replace(/<\/ul>/g, '').replace(/<li>/g, '[0]').replace(/<\/li>/g, '').replace(/<br \/><br \/>/g, '\n').replace(/<strong>/g, '[b]').replace(/<\/strong>/g, '[/b]')}[/collapse]\n\n`;
-        })
+        });
 
         this.clipboard.copy(text, $localize`Le texte a bien été copié`);
     }

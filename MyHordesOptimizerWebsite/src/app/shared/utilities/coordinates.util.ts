@@ -1,4 +1,4 @@
-import { getTown } from "./localstorage.util";
+import { getTown } from './localstorage.util';
 
 export function getArrayXFromDisplayedX(displayed_x: number): number {
     return displayed_x + (getTown()?.town_x || 0);

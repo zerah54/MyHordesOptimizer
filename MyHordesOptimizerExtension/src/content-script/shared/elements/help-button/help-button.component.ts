@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, Inject, Input } from '@angular/core';
 import { browser } from 'webextension-polyfill-ts';
-import { MH_TOOLTIP_CONTAINER_ID } from './../../const';
+import { MH_TOOLTIP_CONTAINER_ID } from '../../const';
 
 @Component({
     selector: 'mho-help-button',

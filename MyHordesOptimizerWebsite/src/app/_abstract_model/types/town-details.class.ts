@@ -1,5 +1,5 @@
 import { TownDetailsDTO } from '../dto/town-details.dto';
-import { CommonModel } from "./_common.class";
+import { CommonModel } from './_common.class';
 
 export class TownDetails extends CommonModel<TownDetailsDTO> {
     public town_id!: number;
@@ -9,7 +9,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
     public town_max_y!: number;
     public is_devaste!: boolean;
     public day!: number;
-    public town_type!: "RE" | "RNE" | "PANDE";
+    public town_type!: 'RE' | 'RNE' | 'PANDE';
 
     constructor(dto?: TownDetailsDTO) {
         super();
@@ -27,7 +27,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
             day: this.day,
             townType: this.town_type
         };
-    };
+    }
 
     protected dtoToModel(dto?: TownDetailsDTO): void {
         if (dto) {
@@ -40,5 +40,5 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
             this.day = dto.day;
             this.town_type = dto.townType;
         }
-    };
+    }
 }

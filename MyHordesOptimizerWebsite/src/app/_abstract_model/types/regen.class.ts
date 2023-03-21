@@ -1,6 +1,6 @@
 import { RegenDTO } from '../dto/regen.dto';
 import { ZoneRegen } from '../enum/zone-regen.enum';
-import { CommonModel } from "./_common.class";
+import { CommonModel } from './_common.class';
 
 export class Regen extends CommonModel<RegenDTO> {
     public day!: number;
@@ -21,8 +21,8 @@ export class Regen extends CommonModel<RegenDTO> {
             idTown: this.id_town,
             levelRegen: this.level_regen,
             tauxRegen: this.taux_regen
-        }
-    };
+        };
+    }
 
     protected dtoToModel(dto?: RegenDTO | null): void {
         if (dto) {
@@ -32,6 +32,6 @@ export class Regen extends CommonModel<RegenDTO> {
             this.level_regen = dto.levelRegen;
             this.taux_regen = dto.tauxRegen;
         }
-    };
+    }
 
 }

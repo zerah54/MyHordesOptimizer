@@ -1,4 +1,4 @@
-@import 'variables.scss';
+@use "variables";
 
 .mho-footer {
     overflow-x: auto;
@@ -11,10 +11,11 @@
         font-size: 12px !important;
         font-weight: normal !important;
         overflow-x: hidden !important;
-        overflow-x: visible !important;
+
         &:first-child {
             margin-top: auto;
         }
+
         &:last-child {
             margin-bottom: auto;
         }
@@ -24,8 +25,9 @@
             text-decoration: none;
             color: inherit;
             cursor: pointer;
+
             &:hover {
-                color: $accent;
+                color: variables.$accent;
             }
         }
 

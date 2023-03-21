@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import * as moment from 'moment';
@@ -22,7 +22,7 @@ import { UpdateInfo } from 'src/app/_abstract_model/types/update-info.class';
     styleUrls: ['./citizens-list.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
-export class CitizensListComponent {
+export class CitizensListComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     // @ViewChild(MenuAddComponent) menuAdd!: MenuAddComponent;
@@ -74,7 +74,7 @@ export class CitizensListComponent {
     constructor(private api: ApiServices) {
     }
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.datasource = new TableVirtualScrollDataSource();
         this.datasource.sort = this.sort;
 
@@ -84,16 +84,11 @@ export class CitizensListComponent {
             this.datasource.filter = JSON.stringify(this.citizen_filters);
         });
 
-        this.datasource.filterPredicate = (data: Citizen, filter: string) => this.customFilter(data, filter);
+        this.datasource.filterPredicate = (data: Citizen, filter: string): boolean => this.customFilter(data, filter);
 
         this.api.getItems()
         .pipe(takeUntil(this.destroy_sub))
-        .subscribe((items: Item[]) => this.all_items = items)
-    }
-
-    /** Filtre la liste à afficher */
-    public applyFilter(value: string): void {
-        this.datasource.filter = value.trim().toLowerCase();
+        .subscribe((items: Item[]) => this.all_items = items);
     }
 
     /**
@@ -106,7 +101,7 @@ export class CitizensListComponent {
     public addItem(citizen_id: number, item_id: number): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.bag) {
-            citizen.bag.items.push(<Item>this.all_items.find((item: Item) => item.id === item_id))
+            citizen.bag.items.push(<Item>this.all_items.find((item: Item) => item.id === item_id));
 
             this.api.updateBag(citizen)
             .pipe(takeUntil(this.destroy_sub))
@@ -173,7 +168,7 @@ export class CitizensListComponent {
     public addStatus(citizen_id: number, status_key: string): void {
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.status) {
-            citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status.key === status_key))
+            citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status.key === status_key));
 
             this.api.updateStatus(citizen)
             .pipe(takeUntil(this.destroy_sub))
@@ -280,7 +275,7 @@ export class CitizensListComponent {
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: Citizen, filter: string): boolean {
 
-        let filter_object: Citizen[] = JSON.parse(filter.toLowerCase());
+        const filter_object: Citizen[] = JSON.parse(filter.toLowerCase());
         if (filter_object.length === 0) return true;
         if (filter_object.some((citizen: Citizen) => citizen.id === data.id)) return true;
         return false;

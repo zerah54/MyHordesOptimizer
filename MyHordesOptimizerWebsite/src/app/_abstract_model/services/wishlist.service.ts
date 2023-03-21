@@ -53,13 +53,14 @@ export class WishlistServices extends GlobalServices {
                         sub.next(new WishlistInfo(response.body));
                         this.snackbar.successSnackbar($localize`La liste de courses a bien été enregistrée`);
                     }
-                })
-        })
+                });
+        });
     }
 
     /**
      * Ajoute un élément à la wishlist
      * @param {Item} item l'élément à ajouter à la wishlist
+     * @param {string} zone
      */
     public addItemToWishlist(item: Item, zone: string): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
@@ -69,8 +70,8 @@ export class WishlistServices extends GlobalServices {
                         sub.next();
                         this.snackbar.successSnackbar($localize`L'objet ${item.label[this.locale]} a bien été ajouté à la liste de courses`);
                     }
-                })
-        })
+                });
+        });
     }
 
 }

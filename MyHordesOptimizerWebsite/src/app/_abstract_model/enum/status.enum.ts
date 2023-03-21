@@ -1,4 +1,4 @@
-import { CommonEnum, CommonEnumData } from "./_common.enum";
+import { CommonEnum, CommonEnumData } from './_common.enum';
 
 const ADDICT_KEY: string = 'addict';
 const CAMPER_KEY: string = 'camper';
@@ -30,7 +30,7 @@ export class StatusEnum extends CommonEnum {
     static CLEAN: StatusEnum = new StatusEnum(CLEAN_KEY, {}, $localize``, 'status/status_' + CLEAN_KEY + '.gif', CLEAN_KEY);
     static DRUGGED: StatusEnum = new StatusEnum(DRUGGED_KEY, {}, $localize``, 'status/status_' + DRUGGED_KEY + '.gif', DRUGGED_KEY);
     static DRUNK: StatusEnum = new StatusEnum(DRUNK_KEY, {}, $localize``, 'status/status_' + DRUNK_KEY + '.gif', DRUNK_KEY);
-    static HASDRUNK: StatusEnum = new StatusEnum(HASDRUNK_KEY, {}, $localize``, 'status/status_'  + HASDRUNK_KEY + '.gif', HASDRUNK_KEY);
+    static HASDRUNK: StatusEnum = new StatusEnum(HASDRUNK_KEY, {}, $localize``, 'status/status_' + HASDRUNK_KEY + '.gif', HASDRUNK_KEY);
     static HASEATEN: StatusEnum = new StatusEnum(HASEATEN_KEY, {}, $localize``, 'status/status_' + HASEATEN_KEY + '.gif', HASEATEN_KEY);
     static HEALED: StatusEnum = new StatusEnum(HEALED_KEY, {}, $localize``, 'status/status_' + HEALED_KEY + '.gif', HEALED_KEY);
     static HSURVIVE: StatusEnum = new StatusEnum(HSURVIVE_KEY, {}, $localize``, 'status/status_' + HSURVIVE_KEY + '.gif', HSURVIVE_KEY);
@@ -53,9 +53,12 @@ export class StatusEnum extends CommonEnum {
      * Le constructeur privé empêche la création d'autres instances de cette classe.
      *
      * @param {string} key
-     * @param {StatusEnumData} value
+     * @param {CommonEnumData} value
+     * @param {string} label
+     * @param {string} img
+     * @param {string} id
      */
-    protected constructor(public override key: string, public override value: StatusEnumData, public label: string, public img: string, public id: string) {
+    protected constructor(public override key: string, public override value: CommonEnumData, public label: string, public img: string, public id: string) {
         super(key, value);
     }
 
@@ -63,7 +66,4 @@ export class StatusEnum extends CommonEnum {
         return this.label;
     }
 
-}
-
-interface StatusEnumData extends CommonEnumData {
 }

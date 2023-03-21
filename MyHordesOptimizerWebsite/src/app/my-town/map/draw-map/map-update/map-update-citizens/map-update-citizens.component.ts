@@ -15,7 +15,7 @@ export class MapUpdateCitizensComponent {
     @Input() citizens!: Citizen[];
     @Input() allCitizens!: Citizen[];
 
-    @Output() citizensChange: EventEmitter<Citizen[]> = new EventEmitter()
+    @Output() citizensChange: EventEmitter<Citizen[]> = new EventEmitter();
 
     public heroics: HeroicActionEnum[] = HeroicActionEnum.getAllValues();
 

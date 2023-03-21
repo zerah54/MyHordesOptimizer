@@ -18,18 +18,18 @@ export class BankInfo extends CommonModel<BankInfoDTO> {
         return {
             bank: modelArrayToDictionnary([], 'item.id'),
             lastUpdateInfo: this.update_info?.modelToDto()
-        }
-    };
+        };
+    }
 
     protected dtoToModel(dto?: BankInfoDTO | null): void {
         if (dto) {
             this.items = [];
             (<BankItemDTO[]>DictionaryUtils.getValues(dto.bank)).forEach((bank_item: BankItemDTO) => {
-                let item: Item = new Item(bank_item.item);
+                const item: Item = new Item(bank_item.item);
                 item.is_broken = bank_item.isBroken;
-                this.items.push(item)
-            })
+                this.items.push(item);
+            });
             this.update_info = new UpdateInfo(dto.lastUpdateInfo);
         }
-    };
+    }
 }

@@ -1,12 +1,12 @@
-@import "variables.scss";
+@use "variables";
 
 
 .mho-map-cell-detail {
     position: absolute;
     min-width: 250px;
     max-width: 500px;
-    background-color: $map-details-color;
-    border: 2px solid $primary;
+    background-color: variables.$map-details-color;
+    border: 2px solid variables.$primary;
     z-index: 100;
     white-space: pre-wrap;
     padding: 0.5em;
@@ -28,7 +28,7 @@
 
         .coords-distance {
 
-            >span:not(:last-child) {
+            > span:not(:last-child) {
                 &::after {
                     margin: 0 0.5em;
                     content: ' - ';
@@ -55,7 +55,8 @@
             align-items: center;
         }
 
-        .pdc {}
+        .pdc {
+        }
     }
 
     .citizens {
@@ -65,11 +66,11 @@
         align-items: center;
         white-space: pre-wrap;
 
-        >div:not(:last-child)::after {
+        > div:not(:last-child)::after {
             content: ', ';
         }
 
-        >div>img {
+        > div > img {
             margin-right: 0.25em;
         }
     }

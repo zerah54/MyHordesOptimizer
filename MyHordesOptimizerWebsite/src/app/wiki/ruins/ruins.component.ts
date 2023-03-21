@@ -1,5 +1,4 @@
 import { Component, EventEmitter, HostBinding, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
@@ -7,8 +6,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
-import { HORDES_IMG_REPO } from './../../_abstract_model/const';
-import { RuinItem } from './../../_abstract_model/types/ruin-item.class';
+import { HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
 
 @Component({
     selector: 'mho-ruins',
@@ -33,12 +32,12 @@ export class RuinsComponent implements OnInit {
     public datasource: MatTableDataSource<Ruin> = new MatTableDataSource();
     /** La liste des colonnes */
     public readonly columns: RuinColumns[] = [
-        { id: 'label', header: $localize`Nom du bâtiment`, sortable: true },
-        { id: 'description', header: $localize`Description`, sortable: false },
-        { id: 'min_dist', header: $localize`Distance minimum`, sortable: true },
-        { id: 'max_dist', header: $localize`Distance maximum`, sortable: true },
-        { id: 'camping', header: $localize`Bonus en camping`, sortable: true },
-        { id: 'drops', header: $localize`Objets`, sortable: false }
+        {id: 'label', header: $localize`Nom du bâtiment`, sortable: true},
+        {id: 'description', header: $localize`Description`, sortable: false},
+        {id: 'min_dist', header: $localize`Distance minimum`, sortable: true},
+        {id: 'max_dist', header: $localize`Distance maximum`, sortable: true},
+        {id: 'camping', header: $localize`Bonus en camping`, sortable: true},
+        {id: 'drops', header: $localize`Objets`, sortable: false}
     ];
 
     public ruins_filters: RuinFilters = {
@@ -55,7 +54,7 @@ export class RuinsComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices, private fb: FormBuilder) {
+    constructor(private api: ApiServices) {
     }
 
     ngOnInit(): void {
@@ -75,17 +74,17 @@ export class RuinsComponent implements OnInit {
                         if (!this.items.some((item: RuinItem) => item.item.id === ruin_item.item.id)) {
                             this.items.push(ruin_item);
                         }
-                    })
-                })
+                    });
+                });
 
                 this.datasource = new MatTableDataSource(this.ruins);
                 this.datasource.filterPredicate = this.customFilter;
-                this.datasource.sortingDataAccessor = (item: Ruin, property: string): any => {
+                this.datasource.sortingDataAccessor = (item: Ruin, property: string): string | number => {
                     switch (property) {
                         case 'label':
                             return item.label[this.locale];
                         default:
-                            return item[property as keyof Ruin];
+                            return <string>item[property as keyof Ruin];
                     }
                 };
                 setTimeout(() => {
@@ -94,14 +93,9 @@ export class RuinsComponent implements OnInit {
             });
     }
 
-    /** Filtre la liste à afficher */
-    public applyFilter(value: string): void {
-        this.datasource.filter = value.trim().toLowerCase();
-    }
-
     private customFilter(data: Ruin, filter: string): boolean {
-        let filter_object: RuinFilters = JSON.parse(filter.toLowerCase());
-        let locale: string = moment.locale();
+        const filter_object: RuinFilters = JSON.parse(filter.toLowerCase());
+        const locale: string = moment.locale();
         if (filter_object.label === '' && filter_object.min_dist === '' && filter_object.max_dist === '' && filter_object.objects.length === 0) {
             return true;
         }

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { faQuestionCircle } from '@fortawesome/free-regular-svg-icons';
 import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { browser } from 'webextension-polyfill-ts';
-import { UserService } from './../../shared/services/user.service';
+import { UserService } from '../../shared/services/user.service';
 
 /**
  * La toolbox est la fenêtre accessible depuis un clic sur l'icône de l'extension dans le navigateur

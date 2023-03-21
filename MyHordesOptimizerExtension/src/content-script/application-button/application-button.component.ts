@@ -2,7 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { browser } from 'webextension-polyfill-ts';
 import packageJson from '../../../package.json';
-import { APPLICATION_BUTTON_SELECTOR, HORDES_IMG_URL, LOGO_URL, MAIL, MHO_BUTTON_ID, MH_HEADER_ID, TITLE, WEBSITE } from './../shared/const';
+import { APPLICATION_BUTTON_SELECTOR, HORDES_IMG_URL, LOGO_URL, MAIL, MHO_BUTTON_ID, MH_HEADER_ID, TITLE, WEBSITE } from '../shared/const';
 
 @Component({
     selector: APPLICATION_BUTTON_SELECTOR,

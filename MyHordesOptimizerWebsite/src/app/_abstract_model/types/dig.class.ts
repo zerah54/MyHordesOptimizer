@@ -44,6 +44,6 @@ export class Dig extends CommonModel<DigDTO> {
             this.nb_total_dig = dto.nbTotalDig;
             this.update_info = new UpdateInfo(dto.lastUpdateInfo);
         }
-    };
+    }
 
 }

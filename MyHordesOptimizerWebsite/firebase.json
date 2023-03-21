@@ -2,7 +2,6 @@
     "hosting": [
         {
             "target": "prod",
-            "site": "myhordes-optimizer",
             "public": "dist/my-hordes-optimizer-website",
             "ignore": [
                 "firebase.json",
@@ -18,7 +17,6 @@
         },
         {
             "target": "dev",
-            "site": "myhordes-optimizer-dev",
             "public": "dist/my-hordes-optimizer-website",
             "ignore": [
                 "firebase.json",

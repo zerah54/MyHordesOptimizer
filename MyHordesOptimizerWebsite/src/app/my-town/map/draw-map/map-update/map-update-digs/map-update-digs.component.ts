@@ -22,11 +22,11 @@ export class MapUpdateDigsComponent {
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
-    public current_day: number = getTown()?.day || 1;
+    public readonly current_day: number = getTown()?.day || 1;
     public selected_day: number = this.current_day;
 
     public addCitizen(citizen: Citizen): void {
-        let new_dig: Dig = new Dig();
+        const new_dig: Dig = new Dig();
         new_dig.digger_name = citizen.name;
         new_dig.digger_id = citizen.id;
         new_dig.x = this.cell.displayed_x;
@@ -40,7 +40,7 @@ export class MapUpdateDigsComponent {
     }
 
     public removeCitizen(citizen_id: number): void {
-        let citizen_digs_index: number = this.digs.findIndex((dig: Dig) => dig.digger_id === citizen_id);
+        const citizen_digs_index: number = this.digs.findIndex((dig: Dig) => dig.digger_id === citizen_id);
         if (citizen_digs_index > -1) {
             this.digs.splice(citizen_digs_index, 1);
             this.digs = [...this.digs];

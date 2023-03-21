@@ -10,7 +10,7 @@ import * as moment from 'moment';
 export class ProbabilitiesComponent implements AfterViewInit {
     @HostBinding('style.display') display: string = 'contents';
 
-    @ViewChildren('chances', { read: MatInput }) chances!: QueryList<MatInput>;
+    @ViewChildren('chances', {read: MatInput}) chances!: QueryList<MatInput>;
 
     public nb_people: number = 1;
     public current_chances: number[] = [];
@@ -40,17 +40,17 @@ export class ProbabilitiesComponent implements AfterViewInit {
     private calculateProbabilities(): void {
 
         if (!this.current_chances) {
-            this.result_probabilities = []
+            this.result_probabilities = [];
         } else {
 
             const death_probabilities: number[] = this.current_chances.map((value: number) => (100 - +value) / 100);
             const nb_watchers: number = death_probabilities.length;
             const result_map: number[][] = new Array(nb_watchers + 1);
             let nb_deaths: number = 0;
-            let previous_watchers = 0;
+            let previous_watchers: number = 0;
             let results: number[] = [];
 
-            for (let i = 0; i <= nb_watchers; i++) {
+            for (let i: number = 0; i <= nb_watchers; i++) {
                 result_map[i] = new Array(nb_watchers + 1).fill(0);
             }
 
@@ -77,7 +77,7 @@ export class ProbabilitiesComponent implements AfterViewInit {
             }
             results = new Array(nb_watchers + 1);
 
-            for (let i = 0; i <= nb_watchers; i++) {
+            for (let i: number = 0; i <= nb_watchers; i++) {
                 results[i] = result_map[i][nb_watchers];
             }
 
@@ -88,12 +88,12 @@ export class ProbabilitiesComponent implements AfterViewInit {
 
     private calculateAverage(): void {
         let average: number;
-        let nb_watchers: number = this.result_probabilities.length
+        const nb_watchers: number = this.result_probabilities.length;
 
         average = 0;
-        for (let i = 0; i < nb_watchers; i++) {
+        for (let i: number = 0; i < nb_watchers; i++) {
             average = average + i * this.result_probabilities[i];
         }
-        this.result_average = average;
+        this.result_average = average * 100;
     }
 }

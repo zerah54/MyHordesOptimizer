@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
@@ -20,7 +20,7 @@ import { Dig } from 'src/app/_abstract_model/types/dig.class';
     styleUrls: ['./citizens-digs.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
-export class CitizensDigsComponent {
+export class CitizensDigsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatSort) sort!: MatSort;
@@ -45,23 +45,20 @@ export class CitizensDigsComponent {
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
-    public citizen_filters: Citizen[] = [];
     /** La liste des citoyens a été mise à jour */
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: CitizenColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center' },
-        { id: 'today_digs', header: $localize`Fouilles du jour`, class: '' },
+        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center'},
+        {id: 'today_digs', header: $localize`Fouilles du jour`, class: ''},
     ];
-    public current_day: number = getTown()?.day || 1;
+    public readonly current_day: number = getTown()?.day || 1;
     public filters: DigFilter = {
         selected_day: this.current_day,
         citizen: []
-    }
+    };
     /** La fouille qu'on est en train de modifier */
     public dig_to_update!: Dig | undefined;
-    /** La liste des jours passés */
-    public avalaible_days: number[] = Array.from({ length: this.filters.selected_day }, (_, i) => { return i + 1 });
 
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: CitizenColumn) => column.id);
@@ -72,7 +69,7 @@ export class CitizensDigsComponent {
 
     }
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.datasource = new MatTableDataSource();
         this.datasource.sort = this.sort;
 
@@ -84,13 +81,8 @@ export class CitizensDigsComponent {
                 this.createDigsByCitizenAndDay();
             });
 
-        this.datasource.filterPredicate = (data: DigsByCitizen, filter: string) => this.customFilter(data, filter);
+        this.datasource.filterPredicate = (data: DigsByCitizen, filter: string): boolean => this.customFilter(data, filter);
         this.getDigs();
-    }
-
-    /** Filtre la liste à afficher */
-    public applyFilter(value: string): void {
-        this.datasource.filter = value.trim().toLowerCase();
     }
 
     public deleteDig(dig_to_delete: Dig): void {
@@ -106,16 +98,16 @@ export class CitizensDigsComponent {
             .subscribe((confirm: boolean) => {
                 if (confirm) {
                     this.digs_api.deleteDig(dig_to_delete)
-                    .pipe(takeUntil(this.destroy_sub))
-                    .subscribe(() => {
-                        let delete_dig: number = this.digs.findIndex((dig: Dig) => {
-                            return dig.cell_id === dig_to_delete?.cell_id
-                                && dig.digger_id === dig_to_delete?.digger_id
-                                && dig.day === dig_to_delete?.day
+                        .pipe(takeUntil(this.destroy_sub))
+                        .subscribe(() => {
+                            const delete_dig: number = this.digs.findIndex((dig: Dig) => {
+                                return dig.cell_id === dig_to_delete?.cell_id
+                                    && dig.digger_id === dig_to_delete?.digger_id
+                                    && dig.day === dig_to_delete?.day;
+                            });
+                            this.digs.splice(delete_dig, 1);
+                            this.createDigsByCitizenAndDay();
                         });
-                        this.digs.splice(delete_dig, 1);
-                        this.createDigsByCitizenAndDay()
-                    });
                 }
             });
     }
@@ -123,30 +115,30 @@ export class CitizensDigsComponent {
     public updateDig(): void {
         if (this.dig_to_update) {
             this.digs_api.updateDig([this.dig_to_update])
-            .pipe(takeUntil(this.destroy_sub))
-            .subscribe((new_digs: Dig[]) => {
-                let replace_dig: number = this.digs.findIndex((dig: Dig) => {
-                    return dig.cell_id === new_digs[0].cell_id
-                        && dig.digger_id === new_digs[0].digger_id
-                        && dig.day === new_digs[0].day
+                .pipe(takeUntil(this.destroy_sub))
+                .subscribe((new_digs: Dig[]) => {
+                    const replace_dig: number = this.digs.findIndex((dig: Dig) => {
+                        return dig.cell_id === new_digs[0].cell_id
+                            && dig.digger_id === new_digs[0].digger_id
+                            && dig.day === new_digs[0].day;
+                    });
+
+                    if (replace_dig > -1) {
+                        this.digs[replace_dig] = new_digs[0];
+                    } else {
+                        this.digs.push(new_digs[0]);
+                    }
+
+                    this.dig_to_update = undefined;
+                    this.createDigsByCitizenAndDay();
                 });
-
-                if (replace_dig > -1) {
-                    this.digs[replace_dig] = new_digs[0];
-                } else {
-                    this.digs.push(new_digs[0]);
-                }
-
-                this.dig_to_update = undefined;
-                this.createDigsByCitizenAndDay();
-            });
         }
     }
 
     public changeDigToUpdate(citizen: Citizen, dig?: Dig): void {
         this.dig_to_update = undefined;
         if (dig) {
-            this.dig_to_update = new Dig(dig.modelToDto())
+            this.dig_to_update = new Dig(dig.modelToDto());
         } else {
             this.dig_to_update = new Dig({
                 cellId: undefined,
@@ -155,16 +147,11 @@ export class CitizensDigsComponent {
                 diggerName: citizen.name,
                 nbSucces: 0,
                 nbTotalDig: 0,
-                x: 0 + (getTown()?.town_x || 0),
-                y: 0 + (getTown()?.town_y || 0)
+                x: getTown()?.town_x || 0,
+                y: getTown()?.town_y || 0
             });
         }
     }
-
-    public changeDay(): void {
-        this.createDigsByCitizenAndDay();
-    }
-
 
     public trackByColumnId(index: number, column: CitizenColumn): string {
         return column.id;
@@ -173,7 +160,7 @@ export class CitizensDigsComponent {
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: DigsByCitizen, filter: string): boolean {
-        let filter_object: DigFilter = JSON.parse(filter.toLowerCase());
+        const filter_object: DigFilter = JSON.parse(filter.toLowerCase());
         if (!filter_object.citizen || filter_object.citizen.length === 0) return true;
         if (filter_object.citizen.some((citizen: Citizen) => citizen.id === data.citizen.id)) return true;
         return false;
@@ -181,11 +168,11 @@ export class CitizensDigsComponent {
 
     private getDigs(): void {
         this.digs_api.getDigs()
-        .pipe(takeUntil(this.destroy_sub))
-        .subscribe((digs: Dig[]) => {
-            this.digs = digs;
-            this.createDigsByCitizenAndDay();
-        });
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((digs: Dig[]) => {
+                this.digs = digs;
+                this.createDigsByCitizenAndDay();
+            });
     }
 
     private createDigsByCitizenAndDay(): void {
@@ -195,8 +182,8 @@ export class CitizensDigsComponent {
                 return {
                     citizen: citizen,
                     digs: this.digs.filter((dig: Dig) => dig.digger_id === citizen.id && dig.day === this.filters.selected_day)
-                }
-            })]
+                };
+            })];
         }
     }
 }

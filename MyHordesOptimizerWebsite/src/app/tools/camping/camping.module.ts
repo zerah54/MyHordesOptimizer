@@ -3,7 +3,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { Components } from 'src/app/_abstract_model/types/_types';
 import { CampingComponent } from './camping.component';
 
-let components: Components = [CampingComponent];
+const components: Components = [CampingComponent];
 
 @NgModule({
     imports: [SharedModule],

@@ -24,7 +24,7 @@ registerLocaleData(localeEN);
 registerLocaleData(localeES);
 registerLocaleData(localeFR);
 
-let app_modules: Modules = [StructureModule, WikiModule, ThanksModule, ToolsModule, TutorialsModule, MyTownModule];
+const app_modules: Modules = [StructureModule, WikiModule, ThanksModule, ToolsModule, TutorialsModule, MyTownModule];
 @NgModule({
     declarations: [AppComponent],
     imports: [
@@ -36,7 +36,7 @@ let app_modules: Modules = [StructureModule, WikiModule, ThanksModule, ToolsModu
         { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
         {
             provide: LOCALE_ID,
-            useFactory: () => localStorage.getItem('mho-locale') || 'fr'
+            useFactory: (): string | null => localStorage.getItem('mho-locale') || 'fr'
         }
     ],
     bootstrap: [AppComponent]

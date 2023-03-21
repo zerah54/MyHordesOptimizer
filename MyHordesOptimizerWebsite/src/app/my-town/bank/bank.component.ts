@@ -5,9 +5,9 @@ import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { Action } from 'src/app/_abstract_model/enum/action.enum';
 import { Property } from 'src/app/_abstract_model/enum/property.enum';
 import { Item } from 'src/app/_abstract_model/types/item.class';
-import { Dictionary } from 'src/app/_abstract_model/types/_types';
-import { ApiServices } from './../../_abstract_model/services/api.services';
-import { BankInfo } from './../../_abstract_model/types/bank-info.class';
+import { ApiServices } from '../../_abstract_model/services/api.services';
+import { BankInfo } from '../../_abstract_model/types/bank-info.class';
+
 @Component({
     selector: 'mho-bank',
     templateUrl: './bank.component.html',
@@ -22,8 +22,6 @@ export class BankComponent implements OnInit {
     /** Les objets affichés par le filtre */
     public displayed_bank_items!: Item[];
 
-    /** Les objets en banque triés par catégorie */
-    public bank_by_categories!: Dictionary<unknown>;
 
     /** Le champ de filtre sur les objets */
     public filter_value: string = '';
@@ -31,7 +29,7 @@ export class BankComponent implements OnInit {
     public select_value: (Property | Action)[] = [];
 
     /** La liste des filtres */
-    public options: (Property | Action)[] = [...<any>Property.getAllValues(), ...<any>Action.getAllValues()];
+    public options: (Property | Action)[] = [...<Property[]>Property.getAllValues(), ...<Action[]>Action.getAllValues()];
 
     public readonly locale: string = moment.locale();
 
@@ -56,7 +54,7 @@ export class BankComponent implements OnInit {
                             } else {
                                 return 1;
                             }
-                        })
+                        });
                     this.displayed_bank_items = [...this.bank.items];
                 }
             });
@@ -64,9 +62,9 @@ export class BankComponent implements OnInit {
 
     public applyFilters(): void {
         if (this.filter_value !== null && this.filter_value !== undefined && this.filter_value !== '') {
-            this.displayed_bank_items = [...this.bank.items.filter((bank_item: Item) => bank_item.label[this.locale].toLowerCase().indexOf(this.filter_value.toLowerCase()) > -1)]
+            this.displayed_bank_items = [...this.bank.items.filter((bank_item: Item) => bank_item.label[this.locale].toLowerCase().indexOf(this.filter_value.toLowerCase()) > -1)];
         } else {
-            this.displayed_bank_items = [...this.bank.items]
+            this.displayed_bank_items = [...this.bank.items];
         }
 
         if (this.select_value && this.select_value.length > 0) {

@@ -1,5 +1,5 @@
-import { Component, HostBinding, Inject, ViewEncapsulation } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, HostBinding, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
@@ -16,7 +16,7 @@ import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
     styleUrls: ['./map-update.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
-export class MapUpdateComponent {
+export class MapUpdateComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     /** La cellule potentiellement modifiée */
@@ -28,7 +28,7 @@ export class MapUpdateComponent {
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     constructor(@Inject(MAT_DIALOG_DATA) public data: MapUpdateData, private api: ApiServices, private digs_services: DigsServices) {
-        this.cell = new Cell({ ...this.data.cell.modelToDto() });
+        this.cell = new Cell({...this.data.cell.modelToDto()});
     }
 
     public ngOnInit(): void {
@@ -36,14 +36,14 @@ export class MapUpdateComponent {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((digs: Dig[]) => {
                 this.digs = digs.filter((dig: Dig) => dig.x === this.cell.displayed_x && dig.y === this.cell.displayed_y);
-            })
+            });
     }
 
     saveCell(): void {
         this.api.saveCell(this.cell)
             .pipe(takeUntil(this.destroy_sub))
             .subscribe(() => {
-                this.data.cell = new Cell({ ...this.cell.modelToDto() });
+                this.data.cell = new Cell({...this.cell.modelToDto()});
             });
         this.digs_services.updateDig(this.digs)
             .pipe(takeUntil(this.destroy_sub))

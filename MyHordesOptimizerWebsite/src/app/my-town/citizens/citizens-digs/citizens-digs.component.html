@@ -136,8 +136,7 @@
             <td class="mat-cell" colspan="6">
                 <ng-container
                     *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
-                    <ng-container *i18n>Aucun objet ne correspond au filtre
-                        "{{filterInput.nativeElement.value}}"</ng-container>
+                    <ng-container i18n>Aucun objet ne correspond au filtre "{{filterInput.nativeElement.value}}"</ng-container>
                 </ng-container>
                 <ng-template #emptyTable>
                     <ng-container i18n>La liste est vide</ng-container>

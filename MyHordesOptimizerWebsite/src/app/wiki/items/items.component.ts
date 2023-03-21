@@ -4,9 +4,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { Action } from 'src/app/_abstract_model/enum/action.enum';
 import { Property } from 'src/app/_abstract_model/enum/property.enum';
-import { ApiServices } from './../../_abstract_model/services/api.services';
-import { Item } from './../../_abstract_model/types/item.class';
-import { Dictionary } from './../../_abstract_model/types/_types';
+import { ApiServices } from '../../_abstract_model/services/api.services';
+import { Item } from '../../_abstract_model/types/item.class';
 
 @Component({
     selector: 'mho-items',
@@ -18,8 +17,6 @@ export class ItemsComponent implements OnInit {
 
     /** La liste des objets du jeu */
     public items!: Item[];
-    /** Les objets triés par catégorie */
-    public items_by_category!: Dictionary<unknown>;
 
     public displayed_items!: Item[];
 
@@ -61,9 +58,9 @@ export class ItemsComponent implements OnInit {
 
     public applyFilters(): void {
         if (this.filter_value !== null && this.filter_value !== undefined && this.filter_value !== '') {
-            this.displayed_items = [...this.items.filter((item: Item) => item.label[this.locale].toLowerCase().indexOf(this.filter_value.toLowerCase()) > -1)]
+            this.displayed_items = [...this.items.filter((item: Item) => item.label[this.locale].toLowerCase().indexOf(this.filter_value.toLowerCase()) > -1)];
         } else {
-            this.displayed_items = [...this.items]
+            this.displayed_items = [...this.items];
         }
 
         if (this.select_value && this.select_value.length > 0) {

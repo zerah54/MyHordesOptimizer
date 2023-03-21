@@ -1,5 +1,5 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { Component, EventEmitter, HostBinding, Output, ViewChild, HostListener } from '@angular/core';
+import { Component, EventEmitter, HostBinding, HostListener, Output, ViewChild } from '@angular/core';
 import { MatToolbar } from '@angular/material/toolbar';
 import { Title } from '@angular/platform-browser';
 import { Subject, takeUntil } from 'rxjs';
@@ -17,14 +17,10 @@ import { ApiServices } from '../../_abstract_model/services/api.services';
 export class HeaderComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @HostListener('window:resize', ['$event'])
-    onResize() {
-        this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
-    }
-
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
 
     @Output() changeSidenavStatus: EventEmitter<void> = new EventEmitter();
+
 
     /** Le titre de l'application */
     public title: string = '';
@@ -42,12 +38,17 @@ export class HeaderComponent {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
+    @HostListener('window:resize', ['$event'])
+    onResize(): void {
+        this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
+    }
+
     public constructor(private breakpoint_observer: BreakpointObserver, private title_service: Title, private api: ApiServices) {
         this.title = this.title_service.getTitle();
     }
 
     /** Enregistre le nouvel id d'app externe */
-    public saveExternalAppId() {
+    public saveExternalAppId(): void {
         setExternalAppId(this.external_app_id_field_value);
         this.updateMe();
     }
@@ -59,7 +60,7 @@ export class HeaderComponent {
     }
 
     /** Mise à jour des outils externes */
-    public updateExternalTools() {
+    public updateExternalTools(): void {
         this.api.updateExternalTools();
     }
 

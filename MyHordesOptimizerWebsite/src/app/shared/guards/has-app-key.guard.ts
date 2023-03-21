@@ -21,12 +21,12 @@ export class IsInTownGuard implements CanActivate {
      */
     public canActivate(): boolean {
         const town: TownDetails | null = getTown();
-        let is_in_town: boolean = true;
+        let is_in_town: boolean;
         if (!town) {
-            is_in_town = false
+            is_in_town = false;
         } else {
-            is_in_town = town.town_id !== null && town.town_id !== undefined && town.town_id !== 0
-        };
+            is_in_town = town.town_id !== null && town.town_id !== undefined && town.town_id !== 0;
+        }
         if (!is_in_town) {
             this.router.navigate(['/wiki/items']);
         }

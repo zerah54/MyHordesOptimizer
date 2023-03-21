@@ -9,8 +9,8 @@ import { RecipesComponent } from './recipes/recipes.component';
 import { RuinsComponent } from './ruins/ruins.component';
 import { WikiRoutingModule } from './wiki.routing.module';
 
-let components: Components = [HeroSkillsComponent, ItemsComponent, RecipesComponent, RuinsComponent, MiscellaneousInfoComponent];
-let local_components: Components = [DespairDeathsPipe];
+const components: Components = [HeroSkillsComponent, ItemsComponent, RecipesComponent, RuinsComponent, MiscellaneousInfoComponent];
+const local_components: Components = [DespairDeathsPipe];
 
 @NgModule({
     imports: [SharedModule, WikiRoutingModule],

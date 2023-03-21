@@ -1,4 +1,5 @@
 import { Component, HostBinding } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'mho-statistics',
@@ -7,4 +8,6 @@ import { Component, HostBinding } from '@angular/core';
 })
 export class StatisticsComponent {
     @HostBinding('style.display') display: string = 'contents';
+
+    public is_dev: boolean = !environment.production;
 }

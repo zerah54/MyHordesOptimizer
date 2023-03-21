@@ -3,8 +3,8 @@ import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { WishlistServices } from 'src/app/_abstract_model/services/wishlist.service';
 import { AutoDestroy } from '../../decorators/autodestroy.decorator';
-import { HORDES_IMG_REPO } from './../../../_abstract_model/const';
-import { Item } from './../../../_abstract_model/types/item.class';
+import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
+import { Item } from '../../../_abstract_model/types/item.class';
 
 @Component({
     selector: 'mho-item',
@@ -39,7 +39,7 @@ export class ItemComponent {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe(() => {
                 this.item.wishlist_count = 1;
-            })
+            });
     }
 
     public toggleAdvancedMode(): void {

@@ -22,7 +22,7 @@ export class MapUpdateCellComponent implements OnInit {
     @Input() cell!: Cell;
     @Input() citizens!: Citizen[];
 
-    @Output() cellChange: EventEmitter<Cell> = new EventEmitter()
+    @Output() cellChange: EventEmitter<Cell> = new EventEmitter();
 
     public all_items: Item[] = [];
 
@@ -42,14 +42,14 @@ export class MapUpdateCellComponent implements OnInit {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((all_items: Item[]) => {
                 this.all_items = all_items;
-            })
+            });
 
         this.cell_form = this.fb.group({
             nb_zombies: [this.cell.nb_zombie],
             nb_killed_zombies: [this.cell.nb_zombie_killed],
             is_dryed: [this.cell.is_dryed],
             items: [this.cell.items],
-        })
+        });
 
         this.cell_form.valueChanges
             .pipe(takeUntil(this.destroy_sub))
@@ -59,7 +59,7 @@ export class MapUpdateCellComponent implements OnInit {
                 this.cell.nb_zombie_killed = +values.nb_killed_zombies;
                 this.cell.items = [...values.items];
                 this.cellChange.next(this.cell);
-            })
+            });
     }
 
 
@@ -76,12 +76,12 @@ export class MapUpdateCellComponent implements OnInit {
             if (item_in_list_index !== undefined && item_in_list_index !== null && item_in_list_index > -1) {
                 cell.items[item_in_list_index].count++;
             } else {
-                let item: Item = <Item>this.all_items.find((item: Item) => item.id === item_id);
-                let short_item: ItemCountShort = new ItemCountShort({
+                const item: Item = <Item>this.all_items.find((item: Item) => item.id === item_id);
+                const short_item: ItemCountShort = new ItemCountShort({
                     isItemBroken: item.is_broken,
                     itemCount: 1,
                     itemId: item.id
-                })
+                });
                 cell.items.push(short_item);
                 cell.items = [...cell.items];
             }

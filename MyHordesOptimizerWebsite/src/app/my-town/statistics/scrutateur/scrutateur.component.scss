@@ -1,3 +1,23 @@
 .mho-scrut {
+    .info {
+        display: flex;
+        flex-wrap: wrap;
 
+        table {
+            flex: 1;
+            min-width: 400px;
+        }
+
+        .charts {
+            flex: 1;
+
+            > div {
+                canvas {
+                    margin: auto;
+                    min-width: 400px;
+                    aspect-ratio: 1;
+                }
+            }
+        }
+    }
 }

@@ -30,7 +30,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { Modules } from '../_abstract_model/types/_types';
 
-let material_modules: Modules = [
+const material_modules: Modules = [
     MatButtonModule, MatButtonToggleModule, MatCardModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatProgressSpinnerModule,
     MatSelectModule, MatSidenavModule, MatSnackBarModule, MatTableModule, MatToolbarModule, MatRadioModule, MatCheckboxModule, ClipboardModule, CdkAccordionModule, MatChipsModule,
     MatTooltipModule, MatSortModule, MatTabsModule, MatBadgeModule, ScrollingModule

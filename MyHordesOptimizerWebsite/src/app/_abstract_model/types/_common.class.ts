@@ -1,6 +1,8 @@
 import { Dictionary } from './_types';
+
 export abstract class CommonModel<DTO> {
     public abstract modelToDto(): DTO;
+
     protected abstract dtoToModel(dto?: DTO): void;
 
 }
@@ -19,14 +21,14 @@ export function modelToDtoArray<DTO, MODEL extends CommonModel<DTO>>(models: MOD
 }
 
 export function modelArrayToDictionnary<DTO, MODEL extends CommonModel<DTO>>(models: MODEL[], key: string): Dictionary<DTO> {
-    let items: Dictionary<DTO> = <Dictionary<DTO>><unknown>[];
+    const items: Dictionary<DTO> = <Dictionary<DTO>><unknown>[];
     models.forEach((model_item: MODEL) => {
-        let key_parts: string[] = key.split('.');
+        const key_parts: string[] = key.split('.');
         let item_key: any = model_item;
         key_parts.forEach((key_part: string) => {
             item_key = item_key[<any>key_part];
-        })
+        });
         items[<any>item_key] = model_item.modelToDto();
-    })
+    });
     return items;
 }

@@ -37,6 +37,6 @@ export class Status extends CommonModel<StatusDTO> {
             this.ghoul_voracity = dto.ghoulVoracity;
             this.is_ghoul = dto.isGhoul;
         }
-    };
+    }
 
 }

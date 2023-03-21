@@ -1,8 +1,8 @@
 export function groupBy<T>(list: T[], key_getter: (item: T) => number | string): T[][] {
     const map: Map<string | number, T[]> = new Map();
     list.forEach((item: T) => {
-        const key = key_getter(item);
-        const collection = map.get(key);
+        const key: number | string = key_getter(item);
+        const collection: T[] | undefined = map.get(key);
         if (!collection) {
             map.set(key, [item]);
         } else {
@@ -10,10 +10,10 @@ export function groupBy<T>(list: T[], key_getter: (item: T) => number | string):
         }
     });
 
-    let map_flat: T[][] = [];
-    map.forEach((map_item) => {
+    const map_flat: T[][] = [];
+    map.forEach((map_item: T[]) => {
         map_flat.push(map_item);
-    })
+    });
 
     return map_flat;
 }

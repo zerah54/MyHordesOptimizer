@@ -10,6 +10,6 @@ export class ClipboardService {
 
     public copy(text: string, success: string): void {
         this.clipboard.copy(text);
-        this.snackbar_service.successSnackbar(success)
+        this.snackbar_service.successSnackbar(success);
     }
 }

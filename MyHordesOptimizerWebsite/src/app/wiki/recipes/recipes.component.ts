@@ -28,17 +28,18 @@ export class RecipesComponent implements OnInit {
 
     /** La liste des colonnes */
     public readonly columns: RecipeColumns[] = [
-        { id: 'type', header: $localize`Type de recette` },
-        { id: 'components', header: $localize`Composants` },
-        { id: 'transformation', header: `` },
-        { id: 'result', header: $localize`Résultat` },
+        {id: 'type', header: $localize`Type de recette`},
+        {id: 'components', header: $localize`Composants`},
+        {id: 'transformation', header: ''},
+        {id: 'result', header: $localize`Résultat`},
     ];
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: RecipeColumns) => column.id);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices) { }
+    constructor(private api: ApiServices) {
+    }
 
     ngOnInit(): void {
         this.api.getRecipes()
@@ -56,9 +57,9 @@ export class RecipesComponent implements OnInit {
     }
 
     private customFilter(data: Recipe, filter: string): boolean {
-        let locale: string = moment.locale();
+        const locale: string = moment.locale();
         return data.components.some((component: Item) => component.label[locale].toLowerCase().indexOf(filter) > -1)
-            || data.result.some((result: RecipeResultItem) => result.item.label[locale].toLowerCase().indexOf(filter) > -1)
+            || data.result.some((result: RecipeResultItem) => result.item.label[locale].toLowerCase().indexOf(filter) > -1);
     }
 }
 

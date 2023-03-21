@@ -1,4 +1,4 @@
-@import "variables.scss";
+@use "variables";
 
 $green: #80c27e;
 $yellow: khaki;
@@ -10,49 +10,49 @@ $empty-color: gray;
 td.map-cell {
     height: 30px;
     width: 30px;
-    border: 1px solid $item_color;
+    border: 1px solid variables.$item_color;
     padding: 0;
     position: relative;
     z-index: 0;
     cursor: pointer;
 
     &.scrut-border-left {
-        border-left: 1px solid $primary;
+        border-left: 1px solid variables.$primary;
     }
 
     &.scrut-border-right {
-        border-right: 1px solid $primary;
+        border-right: 1px solid variables.$primary;
     }
 
     &.scrut-border-top {
-        border-top: 1px solid $primary;
+        border-top: 1px solid variables.$primary;
     }
 
     &.scrut-border-bottom {
-        border-bottom: 1px solid $primary;
+        border-bottom: 1px solid variables.$primary;
     }
 
-    >.dist-border-left {
+    > .dist-border-left {
         border-left: 2px solid white;
     }
 
-    >.dist-border-right {
+    > .dist-border-right {
         border-right: 2px solid white;
     }
 
-    >.dist-border-top {
+    > .dist-border-top {
         border-top: 2px solid white;
     }
 
-    >.dist-border-bottom {
+    > .dist-border-bottom {
         border-bottom: 2px solid white;
     }
 
-    >.my-cell {
+    > .my-cell {
         box-shadow: inset 0 0 0.25em 2px white;
     }
 
-    >div {
+    > div {
         position: absolute;
         top: 0;
         left: 0;
@@ -116,7 +116,7 @@ td.map-cell {
             height: 100%;
             z-index: 2;
 
-            >span {
+            > span {
                 position: absolute;
                 line-height: 10px;
                 font-size: 10px;
@@ -160,9 +160,9 @@ td.map-cell {
     }
 
     &.town {
-        background-color: $primary;
+        background-color: variables.$primary;
 
-        >.town-draw {
+        > .town-draw {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -176,25 +176,25 @@ td.map-cell {
         z-index: 0;
 
         background-image: -moz-linear-gradient(45deg, $empty-color 25%, transparent 25%),
-            -moz-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
-            -moz-linear-gradient(45deg, transparent 75%, $empty-color 75%),
-            -moz-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
+        -moz-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
+        -moz-linear-gradient(45deg, transparent 75%, $empty-color 75%),
+        -moz-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
         background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, $empty-color), color-stop(.25, transparent)),
-            -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, $empty-color), color-stop(.25, transparent)),
-            -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, $empty-color)),
-            -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, $empty-color));
+        -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, $empty-color), color-stop(.25, transparent)),
+        -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, $empty-color)),
+        -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, $empty-color));
         background-image: -webkit-linear-gradient(45deg, $empty-color 25%, transparent 25%),
-            -webkit-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
-            -webkit-linear-gradient(45deg, transparent 75%, $empty-color 75%),
-            -webkit-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
+        -webkit-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
+        -webkit-linear-gradient(45deg, transparent 75%, $empty-color 75%),
+        -webkit-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
         background-image: -o-linear-gradient(45deg, $empty-color 25%, transparent 25%),
-            -o-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
-            -o-linear-gradient(45deg, transparent 75%, $empty-color 75%),
-            -o-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
+        -o-linear-gradient(-45deg, $empty-color 25%, transparent 25%),
+        -o-linear-gradient(45deg, transparent 75%, $empty-color 75%),
+        -o-linear-gradient(-45deg, transparent 75%, $empty-color 75%);
         background-image: linear-gradient(45deg, $empty-color 25%, transparent 25%),
-            linear-gradient(-45deg, $empty-color 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, $empty-color 75%),
-            linear-gradient(-45deg, transparent 75%, $empty-color 75%);
+        linear-gradient(-45deg, $empty-color 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, $empty-color 75%),
+        linear-gradient(-45deg, transparent 75%, $empty-color 75%);
         -moz-background-size: 2px 2px;
         background-size: 2px 2px;
         /* override value for webkit */
@@ -210,10 +210,10 @@ td.map-cell {
         align-items: center;
         z-index: 1;
 
-        >span {
+        > span {
             width: 65%;
             height: 65%;
-            background-color: $primary;
+            background-color: variables.$primary;
             color: white;
             display: flex;
             justify-content: center;

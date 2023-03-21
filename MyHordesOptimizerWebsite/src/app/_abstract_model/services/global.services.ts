@@ -1,6 +1,6 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from "@angular/common/http";
-import { catchError, Observable, throwError } from "rxjs";
-import { SnackbarService } from './../../shared/services/snackbar.service';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { catchError, Observable, throwError } from 'rxjs';
+import { SnackbarService } from '../../shared/services/snackbar.service';
 
 export class GlobalServices {
 
@@ -19,7 +19,7 @@ export class GlobalServices {
     }
 
     protected post<T>(url: string, params?: string): Observable<T> {
-        const headers = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
+        const headers: HttpHeaders = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
         return this._http.post<T>(url, params, {responseType: 'json', headers: headers}).pipe(
             // retry(3),
             catchError(this.handleError)
@@ -33,13 +33,13 @@ export class GlobalServices {
             {
                 responseType: 'json',
                 headers: {
-                    "Content-Type": "application/json"
+                    'Content-Type': 'application/json'
                 },
                 observe: 'response'
             }).pipe(
-                // retry(3),
-                catchError(this.handleError)
-            );
+            // retry(3),
+            catchError(this.handleError)
+        );
     }
 
     protected delete<T>(url: string): Observable<HttpResponse<T>> {

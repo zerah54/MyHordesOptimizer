@@ -5,4 +5,4 @@ import { CitizenDTO } from './citizen.dto';
 export interface CitizenInfoDTO {
     citizens: Dictionary<CitizenDTO>;
     lastUpdateInfo: UpdateInfoDTO;
-};
+}

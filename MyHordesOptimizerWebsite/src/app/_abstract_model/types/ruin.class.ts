@@ -1,7 +1,7 @@
-import { RuinDTO } from './../dto/ruin.dto';
+import { RuinDTO } from '../dto/ruin.dto';
 import { RuinItem } from './ruin-item.class';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
-import { I18nLabels } from "./_types";
+import { I18nLabels } from './_types';
 
 export class Ruin extends CommonModel<RuinDTO> {
     public id!: number | string;
@@ -32,8 +32,8 @@ export class Ruin extends CommonModel<RuinDTO> {
             minDist: this.min_dist,
             maxDist: this.max_dist,
             drops: modelToDtoArray(this.drops)
-        }
-    };
+        };
+    }
 
     protected dtoToModel(dto?: RuinDTO): void {
         if (dto) {
@@ -48,5 +48,5 @@ export class Ruin extends CommonModel<RuinDTO> {
             this.max_dist = dto.maxDist;
             this.drops = dtoToModelArray(RuinItem, dto.drops);
         }
-    };
+    }
 }

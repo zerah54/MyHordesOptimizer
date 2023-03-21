@@ -1,5 +1,5 @@
-@import "variables.scss";
-@import "tables.scss";
+@use "variables";
+@use "tables";
 
 
 html,
@@ -10,7 +10,7 @@ body {
 body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
-    color: $primary;
+    color: variables.$primary;
     overflow: hidden;
 }
 

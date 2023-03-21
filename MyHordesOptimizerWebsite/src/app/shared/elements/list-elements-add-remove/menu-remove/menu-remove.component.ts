@@ -1,9 +1,7 @@
-import { Component, EventEmitter, HostBinding, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatMenu } from '@angular/material/menu';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
-import { StatusEnum } from 'src/app/_abstract_model/enum/status.enum';
-import { Item } from 'src/app/_abstract_model/types/item.class';
 
 @Component({
     selector: 'mho-menu-remove',

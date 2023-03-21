@@ -1,5 +1,4 @@
 import { ItemCountDTO } from '../dto/item-count.dto';
-import { ShortItemCountDTO } from '../dto/short-item-count.dto';
 import { Item } from './item.class';
 import { CommonModel } from './_common.class';
 
@@ -27,6 +26,6 @@ export class ItemCount extends CommonModel<ItemCountDTO> {
             this.is_broken = dto.isBroken;
             this.item = new Item(dto.item);
         }
-    };
+    }
 
 }

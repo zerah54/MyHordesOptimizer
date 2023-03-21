@@ -13,12 +13,12 @@ export function setUser(user: Me | null): void {
 }
 
 export function getUser(): Me {
-    let user: string | null = localStorage.getItem(USER_KEY);
+    const user: string | null = localStorage.getItem(USER_KEY);
     return user ? JSON.parse(user) : null;
 }
 
 export function getUserId(): number | null {
-    let user_id: number | undefined = getUser()?.id;
+    const user_id: number | undefined = getUser()?.id;
     return user_id ? +user_id : null;
 }
 
@@ -31,7 +31,7 @@ export function setExternalAppId(id: string | null): void {
 }
 
 export function getTown(): TownDetails | null {
-    let town: string | null = localStorage.getItem(TOWN_KEY);
+    const town: string | null = localStorage.getItem(TOWN_KEY);
     return town ? JSON.parse(town) : null;
 }
 
@@ -50,10 +50,10 @@ export function getItemsWithExpirationDate(): Item[] {
 }
 
 export function setItemsWithExpirationDate(items: Item[]): void {
-    let element_with_expiration: ElementWithExpiration<ItemDTO[] | null> = {
+    const element_with_expiration: ElementWithExpiration<ItemDTO[] | null> = {
         expire_at: moment().endOf('day'),
         element: modelToDtoArray(items)
-    }
+    };
     localStorage.setItem(ITEMS_KEY, JSON.stringify(element_with_expiration));
 }
 
@@ -68,10 +68,10 @@ export function getRuinsWithExpirationDate(): Ruin[] {
 }
 
 export function setRuinsWithExpirationDate(items: Ruin[]): void {
-    let element_with_expiration: ElementWithExpiration<RuinDTO[] | null> = {
+    const element_with_expiration: ElementWithExpiration<RuinDTO[] | null> = {
         expire_at: moment().endOf('day'),
         element: modelToDtoArray(items)
-    }
+    };
     localStorage.setItem(RUINS_KEY, JSON.stringify(element_with_expiration));
 }
 

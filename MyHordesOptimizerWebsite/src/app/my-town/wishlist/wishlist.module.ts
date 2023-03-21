@@ -4,8 +4,8 @@ import { Components } from 'src/app/_abstract_model/types/_types';
 import { IsItemDisplayedPipe } from './is-item-displayed.pipe';
 import { WishlistComponent } from './wishlist.component';
 
-let components: Components = [WishlistComponent];
-let pipes: Components = [IsItemDisplayedPipe];
+const components: Components = [WishlistComponent];
+const pipes: Components = [IsItemDisplayedPipe];
 
 @NgModule({
     imports: [SharedModule],

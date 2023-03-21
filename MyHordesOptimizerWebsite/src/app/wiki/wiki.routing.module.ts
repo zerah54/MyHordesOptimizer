@@ -6,7 +6,7 @@ import { MiscellaneousInfoComponent } from './miscellaneous-info/miscellaneous-i
 import { RecipesComponent } from './recipes/recipes.component';
 import { RuinsComponent } from './ruins/ruins.component';
 
-let routes: Routes = [
+const routes: Routes = [
     { path: 'wiki', redirectTo: 'wiki/items' },
     {
         path: 'wiki', children: [
@@ -17,7 +17,7 @@ let routes: Routes = [
             { path: 'ruins', component: RuinsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Wiki` + ' - ' + $localize`Bâtiments` },
         ]
     }
-]
+];
 
 @NgModule({
     imports: [RouterModule.forChild(routes)],

@@ -1,7 +1,7 @@
-@import "variables.scss";
+@use "variables";
 
 .list-element-add-remove {
-    background-color: $item_color;
+    background-color: variables.$item_color;
     border-radius: 0.25em;
     padding: 0.5em;
 
@@ -25,7 +25,7 @@
         .list {
             margin: auto 0;
 
-            >img {
+            > img {
                 vertical-align: middle;
             }
         }
@@ -52,6 +52,7 @@
 .menu-add,
 .menu-remove {
     padding: 8px;
+
     .mat-mdc-menu-content {
 
         .empty-bag {
@@ -64,7 +65,7 @@
             flex-wrap: wrap;
             gap: 0.25em;
 
-            >img {
+            > img {
                 cursor: pointer;
             }
         }
