@@ -4,10 +4,12 @@ import { Subject, takeUntil } from 'rxjs';
 import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { Regen } from 'src/app/_abstract_model/types/regen.class';
 import { ApiServices } from '../../../_abstract_model/services/api.services';
-import Chart from 'chart.js/auto';
 import { ZoneRegen } from '../../../_abstract_model/enum/zone-regen.enum';
 import { MatTableDataSource } from '@angular/material/table';
 import { groupBy } from '../../../shared/utilities/array.util';
+import Chart from 'chart.js/auto';
+
+// import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 
 @Component({
     selector: 'mho-scrutateur',
@@ -81,6 +83,18 @@ export class ScrutateurComponent implements OnInit {
                             legend: {
                                 position: 'bottom'
                             }
+                        },
+                        scales: {
+                            r: {
+                                startAngle: -(360 / 8) / 2,
+                                pointLabels: {
+                                    display: true,
+                                    centerPointLabels: true
+                                },
+                                ticks: {
+                                    display: false
+                                }
+                            }
                         }
                     }
                 });
@@ -105,6 +119,7 @@ export class ScrutateurComponent implements OnInit {
                             data: pie_data
                         }]
                     },
+                    // plugins: [ChartDataLabels],
                     options: {
                         plugins: {
                             title: {
@@ -113,7 +128,15 @@ export class ScrutateurComponent implements OnInit {
                             },
                             legend: {
                                 position: 'bottom'
-                            }
+                            },
+                            // datalabels: {
+                            //     formatter: (value: number, ctx: Context): string => {
+                            //         const data_array: number[] = <number[]>ctx.chart.data.datasets[0].data;
+                            //         const sum: number = data_array.reduce((accumulator: number, value: number) => accumulator + value, 0);
+                            //         const percentage: number = (value * 100 / sum);
+                            //         return percentage.toFixed(2) + ' %';
+                            //     }
+                            // }
                         }
                     }
                 });
