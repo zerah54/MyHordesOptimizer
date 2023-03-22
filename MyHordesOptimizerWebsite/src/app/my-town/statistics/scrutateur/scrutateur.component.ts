@@ -1,5 +1,4 @@
 import { Component, ElementRef, HostBinding, OnInit, ViewChild } from '@angular/core';
-import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
 import { Regen } from 'src/app/_abstract_model/types/regen.class';
@@ -37,7 +36,6 @@ export class ScrutateurComponent implements OnInit {
 
     /** La liste des id des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: RegenColumn) => column.id);
-    private readonly locale: string = moment.locale();
 
     private all_zones_regen: ZoneRegen[] = (<ZoneRegen[]>ZoneRegen.getAllValues()).sort((zone_a: ZoneRegen, zone_b: ZoneRegen) => {
         return zone_a.value.order_by - zone_b.value.order_by;
@@ -81,7 +79,7 @@ export class ScrutateurComponent implements OnInit {
                                 text: $localize`Direction des regénérations`
                             },
                             legend: {
-                                position: 'bottom'
+                                display: false
                             }
                         },
                         scales: {
