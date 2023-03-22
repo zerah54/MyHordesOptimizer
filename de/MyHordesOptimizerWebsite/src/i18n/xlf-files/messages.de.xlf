@@ -725,7 +725,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
-          <context context-type="linenumber">5</context>
+          <context context-type="linenumber">6</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
@@ -1429,24 +1429,12 @@
         <source>Estimations du jour</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
-          <context context-type="linenumber">9</context>
+          <context context-type="linenumber">10</context>
         </context-group>
         <target state="needs-translation">Estimations du jour</target>
       </trans-unit>
       <trans-unit id="2806568446192626314" datatype="html">
         <source>Qualité</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
-          <context context-type="linenumber">11</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
-          <context context-type="linenumber">28</context>
-        </context-group>
-        <target state="needs-translation">Qualité</target>
-      </trans-unit>
-      <trans-unit id="4912803901980915876" datatype="html">
-        <source>Min</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
           <context context-type="linenumber">12</context>
@@ -1455,10 +1443,10 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Min</target>
+        <target state="needs-translation">Qualité</target>
       </trans-unit>
-      <trans-unit id="3667949571823271511" datatype="html">
-        <source>Max</source>
+      <trans-unit id="4912803901980915876" datatype="html">
+        <source>Min</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
           <context context-type="linenumber">13</context>
@@ -1467,13 +1455,25 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
+        <target state="needs-translation">Min</target>
+      </trans-unit>
+      <trans-unit id="3667949571823271511" datatype="html">
+        <source>Max</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
         <target state="needs-translation">Max</target>
       </trans-unit>
       <trans-unit id="963124499945334039" datatype="html">
         <source>Estimations du scrutateur</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
-          <context context-type="linenumber">26</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <target state="needs-translation">Estimations du scrutateur</target>
       </trans-unit>
@@ -1521,7 +1521,7 @@
         <source>Droite</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">111</context>
         </context-group>
         <target state="needs-translation">Droite</target>
       </trans-unit>
@@ -1529,7 +1529,7 @@
         <source>Diagonale</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">111</context>
         </context-group>
         <target state="needs-translation">Diagonale</target>
       </trans-unit>
@@ -1537,7 +1537,7 @@
         <source>Axe des regénérations</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">109</context>
+          <context context-type="linenumber">120</context>
         </context-group>
         <target state="needs-translation">Axe des regénérations</target>
       </trans-unit>
@@ -1665,7 +1665,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <target state="needs-translation">Moyenne</target>
       </trans-unit>
@@ -2737,7 +2737,7 @@
         <source>Chances de survie</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">39</context>
         </context-group>
         <target state="needs-translation">Chances de survie</target>
       </trans-unit>
