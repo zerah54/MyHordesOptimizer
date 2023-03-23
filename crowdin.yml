@@ -1,0 +1,3 @@
+files:
+  - source: /MyHordesOptimizerWebsite/src/i18n/messages.xlf
+    translation: /MyHordesOptimizerWebsite/src/assets/i18n/xlf-files/messages.%two_letters_code%.xlf
