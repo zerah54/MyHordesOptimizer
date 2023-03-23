@@ -1841,7 +1841,7 @@
         </context-group>
         <target state="needs-translation">Discord</target>
       </trans-unit>
-      <trans-unit id="3288296146842467237" datatype="html">
+      <trans-unit id="3288296146842467237" datatype="html" approved="yes">
         <source>Remerciements</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
@@ -1851,7 +1851,7 @@
           <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Remerciements</target>
+        <target state="final">Special Thanks</target>
       </trans-unit>
       <trans-unit id="5186837657495593523" datatype="html">
         <source>Ce site n&apos;est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a color=&quot;accent&quot; href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
@@ -3509,13 +3509,13 @@
         </context-group>
         <target state="needs-translation">Atelier </target>
       </trans-unit>
-      <trans-unit id="8270843063367812639" datatype="html">
+      <trans-unit id="8270843063367812639" datatype="html" approved="yes">
         <source> Atelier, Chaman uniquement</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
           <context context-type="linenumber">32,33</context>
         </context-group>
-        <target state="needs-translation"> Atelier, Chaman uniquement</target>
+        <target state="final"> Workshop, Shaman only</target>
       </trans-unit>
       <trans-unit id="8924763758161915362" datatype="html">
         <source>Type de recette</source>
@@ -3541,21 +3541,21 @@
         </context-group>
         <target state="needs-translation">Nom du bâtiment</target>
       </trans-unit>
-      <trans-unit id="7533053521139949104" datatype="html">
+      <trans-unit id="7533053521139949104" datatype="html" approved="yes">
         <source>Distance minimum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Distance minimum</target>
+        <target state="final">Min distance</target>
       </trans-unit>
-      <trans-unit id="3656199934377633082" datatype="html">
+      <trans-unit id="3656199934377633082" datatype="html" approved="yes">
         <source>Distance maximum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Distance maximum</target>
+        <target state="final">Max distance</target>
       </trans-unit>
     </body>
   </file>
