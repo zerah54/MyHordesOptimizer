@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.44
+// @version      1.0.0-beta.45
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,7 +35,8 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[amélioration] Visuel de la note qui est affichée si l'option de fouilles est activée mais que les données de fouilles ne sont pas complètes`;
+    + `[correctif] Suppression d'erreurs en console\n`
+    + `[correctif] La carte ne s'ouvrait plus`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -3484,6 +3485,8 @@ function displayWishlistInApp() {
 
             let used_wishlist = is_workshop ? wishlist.wishList['0'] : getWishlistForZone();
 
+            if (!used_wishlist) return;
+
             let list_to_display = used_wishlist.filter((item) => {
                 if (pageIsWorkshop()) {
                     return item.isWorkshop;
@@ -6031,6 +6034,7 @@ function createStyles() {
         + 'right: 41px;'
         + 'top: 100px;'
         + 'transition: background-color .5s ease-in-out;'
+        + 'z-index: 996;'
         + '}'
 
     const mho_map_td = `.mho-map tr td {`
