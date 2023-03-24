@@ -12,6 +12,10 @@
         width: 100%;
     }
 
+    .mat-divider {
+        margin: 0.5em 0;
+    }
+
     > div {
         background-color: variables.$item-color;
         width: 100%;
@@ -51,7 +55,7 @@
         }
 
         .advanced-part {
-            margin: 0 1em;
+            margin: 0 1em 1em;
 
             img {
                 margin-right: 0.5em;

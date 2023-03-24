@@ -3,23 +3,28 @@
         <div class="title-part" (click)="toggleAdvancedMode()">
             <div class="item_title">
                 <div class="item_img">
-                    <img [src]="HORDES_IMG_REPO + item.img" />
+                    <img [src]="HORDES_IMG_REPO + item.img"/>
                     <span class="item_count" *ngIf="item.bank_count && item.bank_count > 1">{{item.bank_count}}</span>
                 </div>
-                <span class="item_label">{{item.label[locale]}}<ng-container
+                <span class="item_label">{{item.label[locale]}}
+                    <ng-container
                         *ngIf="item?.is_broken">&nbsp;(<ng-container i18n>Cassé</ng-container>)</ng-container>
                 </span>
             </div>
             <div class="add_to_wishlist" *ngIf="item.wishlist_count === 0">
                 <button mat-icon-button type="button"
-                    (click)="$event.stopPropagation(); addItemToWishlist(item)">
+                        (click)="$event.stopPropagation(); addItemToWishlist(item)">
                     <img [src]="HORDES_IMG_REPO + 'item/item_cart.gif'">
                 </button>
             </div>
         </div>
         <div *ngIf="display_mode === 'advanced'" class="advanced-part">
+            <ng-container>
+                <div>{{item.description[locale]}}</div>
+            </ng-container>
+
             <ng-container *ngIf="item.drop_rate_praf > 0 || item.drop_rate_not_praf > 0">
-                <hr>
+                <mat-divider></mat-divider>
                 <div *ngIf="item.drop_rate_praf > 0">
                     <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone praf</ng-container>
                     {{item.drop_rate_praf * 100 | number:'1.0-2':locale}}%
@@ -29,36 +34,50 @@
                     {{item.drop_rate_not_praf * 100 | number:'1.0-2':locale}}%
                 </div>
             </ng-container>
-            <hr>
-            <div>{{item.description[locale]}}</div>
-            <hr>
+
             <ng-container *ngIf="item.recipes.length > 0">
+                <mat-divider></mat-divider>
                 <div *ngFor="let recipe of item.recipes">
                     <mho-recipe [recipe]="recipe"></mho-recipe>
                 </div>
-                <hr>
+            </ng-container>
+
+            <ng-container *ngIf="item.deco || item.guard || item.is_heaver">
+                <mat-divider></mat-divider>
+                <div *ngIf="item.deco">
+                    <!--                    <img [src]="HORDES_IMG_REPO + property.value.img">-->
+                    <ng-container i18n>Objet de décoration</ng-container>&nbsp;(+{{item.deco}})
+                </div>
+                <div *ngIf="item.guard">
+                    <!--                    <img [src]="HORDES_IMG_REPO + property.value.img">-->
+                    <ng-container i18n>Arme de veille</ng-container>&nbsp;(+{{item.guard}})
+                </div>
+                <div *ngIf="item.is_heaver">
+                    <!--                    <img [src]="HORDES_IMG_REPO + property.value.img">-->
+                    <ng-container i18n>Objet encombrant</ng-container>
+                </div>
             </ng-container>
 
             <ng-container
                 *ngIf="item.properties && item.properties.length > 0">
+                <mat-divider></mat-divider>
                 <div *ngFor="let property of item.properties">
                     <ng-container *ngIf="property">
                         <img *ngIf="property.value.img && property.value.img !== ''"
-                            [src]="HORDES_IMG_REPO + property.value.img">{{property.value.label}}
+                             [src]="HORDES_IMG_REPO + property.value.img">{{property.value.label}}
                     </ng-container>
                 </div>
-                <hr>
             </ng-container>
 
             <ng-container
                 *ngIf="item.actions && item.actions.length > 0">
+                <mat-divider></mat-divider>
                 <div *ngFor="let action of item.actions">
                     <ng-container *ngIf="action">
                         <img *ngIf="action.value.img && action.value.img !== ''"
-                            [src]="HORDES_IMG_REPO + action.value.img">{{action.value.label}}
+                             [src]="HORDES_IMG_REPO + action.value.img">{{action.value.label}}
                     </ng-container>
                 </div>
-                <hr>
             </ng-container>
         </div>
     </div>
