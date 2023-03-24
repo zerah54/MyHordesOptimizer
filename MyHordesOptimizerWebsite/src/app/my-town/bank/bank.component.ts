@@ -69,10 +69,16 @@ export class BankComponent implements OnInit {
 
         if (this.select_value && this.select_value.length > 0) {
             this.displayed_bank_items = this.displayed_bank_items.filter((item: Item) => {
-                const item_actions_and_properties: (Action | Property)[] = [...item.actions.filter((action: Action) => action), ...item.properties.filter((property: Property) => property)];
-                return item_actions_and_properties.some((action_or_property: Action | Property) => this.select_value.some((selected: Action | Property) => selected.key === action_or_property.key));
+                const item_actions_and_properties: (Action | Property)[] = [
+                    ...item.actions.filter((action: Action) => action),
+                    ...item.properties.filter((property: Property) => property)
+                ];
+                const item_has_action_or_property: boolean = item_actions_and_properties.some((action_or_property: Action | Property) => {
+                    return this.select_value.some((selected: Action | Property) => selected.key === action_or_property.key);
+                });
+                const item_has_key: boolean = this.select_value.some((filter: Property | Action) => item[filter.key]);
+                return item_has_action_or_property || item_has_key;
             });
         }
     }
-
 }
