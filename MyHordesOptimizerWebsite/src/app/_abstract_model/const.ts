@@ -2,6 +2,7 @@ import { RuinDTO } from './dto/ruin.dto';
 import { Dictionary } from './types/_types';
 
 export const EXTERNAL_APP_ID_KEY: string = 'external_app_id';
+export const BANK_CONDENSED_DISPLAY_KEY: string = 'bank_condensed_display';
 export const USER_KEY: string = 'user';
 export const TOWN_KEY: string = 'town';
 export const ITEMS_KEY: string = 'all_items';

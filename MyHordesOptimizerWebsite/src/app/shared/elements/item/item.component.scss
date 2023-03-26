@@ -12,6 +12,11 @@
         width: 100%;
     }
 
+
+    &.force-open > div .title-part {
+        cursor: default !important;
+    }
+
     .mat-divider {
         margin: 0.5em 0;
     }
@@ -21,6 +26,7 @@
         width: 100%;
         height: 100%;
         border-radius: 0.25em;
+        padding-bottom: 1em;
 
         .title-part {
             height: 48px;
@@ -55,7 +61,7 @@
         }
 
         .advanced-part {
-            margin: 0 1em 1em;
+            margin: 0 1em;
 
             img {
                 margin-right: 0.5em;
@@ -70,4 +76,5 @@
             }
         }
     }
+
 }

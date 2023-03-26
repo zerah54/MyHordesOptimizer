@@ -29,11 +29,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { Modules } from '../_abstract_model/types/_types';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 
 const material_modules: Modules = [
     MatButtonModule, MatButtonToggleModule, MatCardModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatProgressSpinnerModule,
     MatSelectModule, MatSidenavModule, MatSnackBarModule, MatTableModule, MatToolbarModule, MatRadioModule, MatCheckboxModule, ClipboardModule, CdkAccordionModule, MatChipsModule,
-    MatTooltipModule, MatSortModule, MatTabsModule, MatBadgeModule, ScrollingModule
+    MatTooltipModule, MatSortModule, MatTabsModule, MatBadgeModule, ScrollingModule, MatSlideToggleModule
 ];
 
 @NgModule({
@@ -41,4 +42,5 @@ const material_modules: Modules = [
     exports: [...material_modules]
 })
 
-export class MaterialModule { }
+export class MaterialModule {
+}

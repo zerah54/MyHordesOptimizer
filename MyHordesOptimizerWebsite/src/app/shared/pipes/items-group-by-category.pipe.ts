@@ -12,7 +12,7 @@ export class ItemsGroupByCategory implements PipeTransform {
 
     private locale: string = moment.locale();
 
-    transform(items: Item[]): CategoryWithItem[] {
+    transform(items: Item[], order_by?: 'id'): CategoryWithItem[] {
         items = items.sort((item_a: Item, item_b: Item) => {
             return item_a.label[this.locale].toLowerCase().localeCompare(item_b.label[this.locale].toLowerCase());
         });
@@ -25,6 +25,14 @@ export class ItemsGroupByCategory implements PipeTransform {
             };
         });
         categories = categories.sort((category_a: CategoryWithItem, category_b: CategoryWithItem) => category_a.category.ordering - category_b.category.ordering);
+
+        if (order_by) {
+            categories.forEach((category: CategoryWithItem) => {
+                category.items
+                    .sort((item_a: Item, item_b: Item) => item_a.id - item_b.id)
+                    .sort((item_a: Item, item_b: Item) => item_b.img.localeCompare(item_a.img));
+            });
+        }
         return categories;
     }
 }

@@ -1,4 +1,4 @@
-<li [ngClass]="['mho-item', display_mode]" *ngIf="item">
+<li [ngClass]="['mho-item', display_mode, forceOpen ? 'force-open' : '']" *ngIf="item">
     <div [class.broken]="item.is_broken">
         <div class="title-part" (click)="toggleAdvancedMode()">
             <div class="item_title">

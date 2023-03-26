@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input } from '@angular/core';
+import { Component, HostBinding, Input, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { WishlistServices } from 'src/app/_abstract_model/services/wishlist.service';
@@ -11,11 +11,13 @@ import { Item } from '../../../_abstract_model/types/item.class';
     templateUrl: './item.component.html',
     styleUrls: ['./item.component.scss']
 })
-export class ItemComponent {
+export class ItemComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     /** L'élément à afficher si c'est un objet standard */
     @Input() item!: Item;
+    /** Force l'ouverture de l'élément */
+    @Input() forceOpen: boolean = false;
 
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
@@ -27,6 +29,12 @@ export class ItemComponent {
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     constructor(private wishlist_services: WishlistServices) {
+    }
+
+    public ngOnInit(): void {
+        if (this.forceOpen) {
+            this.display_mode = 'advanced';
+        }
     }
 
     /**
@@ -43,7 +51,11 @@ export class ItemComponent {
     }
 
     public toggleAdvancedMode(): void {
-        this.display_mode = this.display_mode === 'simple' ? 'advanced' : 'simple';
+        if (this.forceOpen) {
+            this.display_mode = 'advanced';
+        } else {
+            this.display_mode = this.display_mode === 'simple' ? 'advanced' : 'simple';
+        }
     }
 }
 

@@ -7,6 +7,7 @@ import { Property } from 'src/app/_abstract_model/enum/property.enum';
 import { Item } from 'src/app/_abstract_model/types/item.class';
 import { ApiServices } from '../../_abstract_model/services/api.services';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
+import { BANK_CONDENSED_DISPLAY_KEY, HORDES_IMG_REPO } from '../../_abstract_model/const';
 
 @Component({
     selector: 'mho-bank',
@@ -21,6 +22,8 @@ export class BankComponent implements OnInit {
 
     /** Les objets affichés par le filtre */
     public displayed_bank_items!: Item[];
+    /** L'objet dont le détail est affiché */
+    public detailed_item!: Item;
 
 
     /** Le champ de filtre sur les objets */
@@ -28,11 +31,13 @@ export class BankComponent implements OnInit {
     /** Le champ de filtres sur les propriétés */
     public select_value: (Property | Action)[] = [];
 
+    public condensed_display: boolean = JSON.parse(localStorage.getItem(BANK_CONDENSED_DISPLAY_KEY) || 'false');
+
     /** La liste des filtres */
     public options: (Property | Action)[] = [...<Property[]>Property.getAllValues(), ...<Action[]>Action.getAllValues()];
 
     public readonly locale: string = moment.locale();
-
+    public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     constructor(private api: ApiServices) {
@@ -80,5 +85,12 @@ export class BankComponent implements OnInit {
                 return item_has_action_or_property || item_has_key;
             });
         }
+    }
+
+    /**
+     * Enregistre le mode d'affichage de la banque
+     */
+    public changeCondensedDisplay(): void {
+        localStorage.setItem(BANK_CONDENSED_DISPLAY_KEY, JSON.stringify(this.condensed_display));
     }
 }
