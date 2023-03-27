@@ -1,7 +1,7 @@
 <mat-card-header>
     <mat-card-title>
         <ng-container i18n>Camping</ng-container>
-        <button mat-icon-button (click)="shareCamping()">
+        <button mat-icon-button (click)="shareCamping()" matTooltip="Copier le lien de la simulation" i18n-matTooltip>
             <mat-icon>share</mat-icon>
         </button>
     </mat-card-title>
@@ -90,10 +90,11 @@
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Bâtiment</mat-label>
                         <mho-select [formControlName]="'ruin'" [options]="ruins | filterRuinsByKm:townDistance.value"
-                            [bindLabel]="'label.' + locale" [moreInfo]="getMoreRuinInfo">
+                                    [bindLabel]="'label.' + locale" [moreInfo]="getMoreRuinInfo">
                         </mho-select>
                         <mat-icon matSuffix [matTooltip]="help_ruins" style="vertical-align: middle"
-                            [color]="'primary'">help_outline</mat-icon>
+                                  [color]="'primary'">help_outline
+                        </mat-icon>
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom">
@@ -113,8 +114,9 @@
                     <h3>
                         <ng-container i18n>Améliorations</ng-container>
                         <mat-icon matSuffix [matTooltip]="help_amelio"
-                            style="vertical-align: middle; margin-left: 0.25em;"
-                            [color]="'primary'">help_outline</mat-icon>
+                                  style="vertical-align: middle; margin-left: 0.25em;"
+                                  [color]="'primary'">help_outline
+                        </mat-icon>
                     </h3>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre d'améliorations simples faites sur la case</mat-label>

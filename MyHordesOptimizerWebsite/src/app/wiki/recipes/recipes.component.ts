@@ -8,6 +8,7 @@ import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { Item } from 'src/app/_abstract_model/types/item.class';
 import { RecipeResultItem } from 'src/app/_abstract_model/types/recipe-result-item.class';
 import { Recipe } from 'src/app/_abstract_model/types/recipe.class';
+import { normalizeString } from '../../shared/utilities/string.utils';
 
 @Component({
     selector: 'mho-recipes',
@@ -58,8 +59,8 @@ export class RecipesComponent implements OnInit {
 
     private customFilter(data: Recipe, filter: string): boolean {
         const locale: string = moment.locale();
-        return data.components.some((component: Item) => component.label[locale].toLowerCase().indexOf(filter) > -1)
-            || data.result.some((result: RecipeResultItem) => result.item.label[locale].toLowerCase().indexOf(filter) > -1);
+        return data.components.some((component: Item) => normalizeString(component.label[locale]).indexOf(normalizeString(filter)) > -1)
+            || data.result.some((result: RecipeResultItem) => normalizeString(result.item.label[locale]).indexOf(normalizeString(filter)) > -1);
     }
 }
 

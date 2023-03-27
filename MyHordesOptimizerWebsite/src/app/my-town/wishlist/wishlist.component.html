@@ -1,7 +1,7 @@
 <mat-card-header>
     <mat-card-title>
         <ng-container i18n>Liste de courses</ng-container>
-        <button mat-icon-button (click)="shareWishlist()">
+        <button mat-icon-button (click)="shareWishlist()" matTooltip="Copier au format forum" i18n-matTooltip>
             <mat-icon>share</mat-icon>
         </button>
     </mat-card-title>
@@ -10,9 +10,9 @@
 <mat-card-content class="mho-wishlist">
     <ng-container *ngIf="wishlist_info">
         <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selected_tab_index"
-            (selectedTabChange)="changeTab($event)">
+                       (selectedTabChange)="changeTab($event)">
             <mat-tab *ngFor="let item of (wishlist_info.wishlist_items | customKeyValue)"
-                [label]="!item.key || item.key === '0' ? basic_list_label : 'Z' + item.key">
+                     [label]="!item.key || item.key === '0' ? basic_list_label : 'Z' + item.key">
                 <ng-template matTabContent>
                     <div class="mat-elevation-z8" style="overflow: hidden">
                         <cdk-virtual-scroll-viewport [tvsItemSize]="49" [headerHeight]="98" style="height: calc(100% - 48px); width: 100%;">
@@ -23,22 +23,22 @@
                                             <mat-form-field class="no-bottom">
                                                 <mat-label i18n>Ajouter un objet à la liste</mat-label>
                                                 <mho-select #addItemSelect [emptyOption]="true"
-                                                    placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
-                                                    (ngModelChange)="addItemToWishlist($any($event))"
-                                                    [options]="items | isItemDisplayed:datasource.data"
-                                                    [bindLabel]="'label.' + locale"></mho-select>
+                                                            placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
+                                                            (ngModelChange)="addItemToWishlist($any($event))"
+                                                            [options]="items | isItemDisplayed:datasource.data"
+                                                            [bindLabel]="'label.' + locale"></mho-select>
                                             </mat-form-field>
                                         </div>
                                     </td>
                                 </ng-container>
 
                                 <ng-container *ngFor="let column of columns; trackBy: trackByColumnId"
-                                    [matColumnDef]="column.id" [sticky]="column.id === 'name'">
+                                              [matColumnDef]="column.id" [sticky]="column.id === 'name'">
                                     <th mat-header-cell *matHeaderCellDef>
                                         <ng-container [ngSwitch]="column.id">
                                             <mho-header-with-string-filter *ngSwitchCase="'name'"
-                                                [header]="column.header" [(filterValue)]="wishlist_filters.items"
-                                                (filterValueChange)="wishlist_filters_change.next()">
+                                                                           [header]="column.header" [(filterValue)]="wishlist_filters.items"
+                                                                           (filterValueChange)="wishlist_filters_change.next()">
                                             </mho-header-with-string-filter>
                                             <ng-container *ngSwitchCase="'priority'">
                                                 {{column.header}}
@@ -68,7 +68,7 @@
                                         <ng-container [ngSwitch]="column.id">
                                             <ng-container *ngSwitchCase="'name'">
                                                 <div>
-                                                    <img [src]="HORDES_IMG_REPO + row.item.img" />
+                                                    <img [src]="HORDES_IMG_REPO + row.item.img"/>
                                                     <span>{{row.item.label[locale]}}</span>
                                                 </div>
                                             </ng-container>
@@ -77,7 +77,7 @@
                                                 <mat-form-field class="no-bottom">
                                                     <mat-select [(value)]="row.priority">
                                                         <mat-option *ngFor="let priority of priorities"
-                                                            [value]="priority.count">
+                                                                    [value]="priority.count">
                                                             {{priority.label}}
                                                         </mat-option>
                                                     </mat-select>
@@ -111,8 +111,8 @@
                                             <ng-container *ngSwitchCase="'needed'">
                                                 <mat-form-field class="no-bottom count">
                                                     <input matInput type="number"
-                                                        [ngModel]="row.count - row.bank_count - row.bag_count"
-                                                        (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
+                                                           [ngModel]="row.count - row.bank_count - row.bag_count"
+                                                           (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
                                                 </mat-form-field>
                                             </ng-container>
 
@@ -136,7 +136,8 @@
                                         <ng-container
                                             *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
                                             <ng-container i18n>Aucun objet ne correspond au filtre
-                                                "{{filterInput.nativeElement.value}}"</ng-container>
+                                                "{{filterInput.nativeElement.value}}"
+                                            </ng-container>
                                         </ng-container>
                                         <ng-template #emptyTable>
                                             <ng-container i18n>La liste est vide</ng-container>
@@ -147,13 +148,14 @@
                         </cdk-virtual-scroll-viewport>
                         <!-- Footer -->
                         <div #cell
-                            style="width: 100%; height: 48px; display: flex; justify-content: right; align-items: center;">
+                             style="width: 100%; height: 48px; display: flex; justify-content: right; align-items: center;">
                             <div
                                 style="display: flex; flex-direction: row; justify-content: end; align-content: center; align-items: center; padding-right: 1em">
                                 <mho-last-update [lastUpdateInfo]="wishlist_info.update_info"
-                                    [thresholds]="[24*60, 24*2*60, 24*3*60, 24*4]"></mho-last-update>
+                                                 [thresholds]="[24*60, 24*2*60, 24*3*60, 24*4]"></mho-last-update>
                                 <button mat-button [color]="'accent'" (click)="updateWishlist()"
-                                    i18n>Enregistrer</button>
+                                        i18n>Enregistrer
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -170,7 +172,9 @@
                         <mat-form-field appearance="outline">
                             <mat-label i18n>Zone de ramassage</mat-label>
                             <input #zone matInput type="number">
-                            <button matSuffix mat-icon-button type="submit"><mat-icon>check</mat-icon></button>
+                            <button matSuffix mat-icon-button type="submit">
+                                <mat-icon>check</mat-icon>
+                            </button>
                         </mat-form-field>
                     </form>
                 </mat-menu>

@@ -3,6 +3,7 @@ import * as moment from 'moment';
 import { Category } from 'src/app/_abstract_model/types/category.class';
 import { Item } from 'src/app/_abstract_model/types/item.class';
 import { groupBy } from '../utilities/array.util';
+import { normalizeString } from '../utilities/string.utils';
 
 
 @Pipe({
@@ -14,7 +15,7 @@ export class ItemsGroupByCategory implements PipeTransform {
 
     transform(items: Item[], order_by?: 'id'): CategoryWithItem[] {
         items = items.sort((item_a: Item, item_b: Item) => {
-            return item_a.label[this.locale].toLowerCase().localeCompare(item_b.label[this.locale].toLowerCase());
+            return normalizeString(item_a.label[this.locale]).localeCompare(normalizeString(item_b.label[this.locale]));
         });
         const items_by_categories: Item[][] = groupBy(items, (item: Item) => item.category.id_category);
 

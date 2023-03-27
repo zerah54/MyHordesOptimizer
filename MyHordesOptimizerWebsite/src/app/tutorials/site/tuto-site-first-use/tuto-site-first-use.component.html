@@ -1,7 +1,7 @@
 <mat-card-header>
     <mat-card-title>
         {{ title }}
-        <button mat-icon-button [matMenuTriggerFor]="shareMenu">
+        <button mat-icon-button [matMenuTriggerFor]="shareMenu" matTooltip="Choisir le mode de partage" i18n-matTooltip>
             <mat-icon>share</mat-icon>
         </button>
         <mat-menu #shareMenu>

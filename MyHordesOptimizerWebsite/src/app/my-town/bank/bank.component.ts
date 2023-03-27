@@ -8,6 +8,7 @@ import { Item } from 'src/app/_abstract_model/types/item.class';
 import { ApiServices } from '../../_abstract_model/services/api.services';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { BANK_CONDENSED_DISPLAY_KEY, HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { normalizeString } from '../../shared/utilities/string.utils';
 
 @Component({
     selector: 'mho-bank',
@@ -67,7 +68,7 @@ export class BankComponent implements OnInit {
 
     public applyFilters(): void {
         if (this.filter_value !== null && this.filter_value !== undefined && this.filter_value !== '') {
-            this.displayed_bank_items = [...this.bank.items.filter((bank_item: Item) => bank_item.label[this.locale].toLowerCase().indexOf(this.filter_value.toLowerCase()) > -1)];
+            this.displayed_bank_items = [...this.bank.items.filter((bank_item: Item) => normalizeString(bank_item.label[this.locale]).indexOf(normalizeString(this.filter_value)) > -1)];
         } else {
             this.displayed_bank_items = [...this.bank.items];
         }

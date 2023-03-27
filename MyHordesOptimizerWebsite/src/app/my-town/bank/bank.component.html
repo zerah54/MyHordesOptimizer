@@ -27,7 +27,8 @@
                     <div class="category" *ngFor="let category of (displayed_bank_items | itemsGroupByCategory:'id')">
                         <h2>{{category.category.label[locale]}}</h2>
                         <ul class="items">
-                            <li *ngFor="let bank_item of category.items" class="item" (click)="detailed_item = bank_item" [class.broken]="bank_item.is_broken">
+                            <li *ngFor="let bank_item of category.items" class="item" (click)="detailed_item = bank_item" [class.broken]="bank_item.is_broken"
+                                [matTooltip]="bank_item.label[locale]">
                                 <img class="item-icon" [src]="HORDES_IMG_REPO + bank_item.img">
                                 <span class="item-count" *ngIf="bank_item.bank_count > 1">{{bank_item.bank_count}}</span>
                             </li>

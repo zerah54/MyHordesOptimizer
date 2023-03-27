@@ -6,6 +6,7 @@ import { Action } from 'src/app/_abstract_model/enum/action.enum';
 import { Property } from 'src/app/_abstract_model/enum/property.enum';
 import { ApiServices } from '../../_abstract_model/services/api.services';
 import { Item } from '../../_abstract_model/types/item.class';
+import { normalizeString } from '../../shared/utilities/string.utils';
 
 @Component({
     selector: 'mho-items',
@@ -58,7 +59,7 @@ export class ItemsComponent implements OnInit {
 
     public applyFilters(): void {
         if (this.filter_value !== null && this.filter_value !== undefined && this.filter_value !== '') {
-            this.displayed_items = [...this.items.filter((item: Item) => item.label[this.locale].toLowerCase().indexOf(this.filter_value.toLowerCase()) > -1)];
+            this.displayed_items = [...this.items.filter((item: Item) => normalizeString(item.label[this.locale]).indexOf(normalizeString(this.filter_value)) > -1)];
         } else {
             this.displayed_items = [...this.items];
         }
