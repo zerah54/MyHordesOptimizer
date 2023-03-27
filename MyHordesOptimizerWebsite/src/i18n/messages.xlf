@@ -709,10 +709,6 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
-          <context context-type="linenumber">178</context>
-        </context-group>
       </trans-unit>
       <trans-unit id="1711750570766225138" datatype="html">
         <source>Annuler</source>
@@ -764,10 +760,6 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
-          <context context-type="linenumber">162</context>
-        </context-group>
       </trans-unit>
       <trans-unit id="8265078634979801865" datatype="html">
         <source>La liste est vide</source>
@@ -781,7 +773,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
-          <context context-type="linenumber">165</context>
+          <context context-type="linenumber">143</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8297073205000664921" datatype="html">
@@ -1585,21 +1577,21 @@
         <source>Droite</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1575744069418173844" datatype="html">
         <source>Diagonale</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">114</context>
+          <context context-type="linenumber">115</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6355589699962619386" datatype="html">
         <source>Axe des regénérations</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">125</context>
         </context-group>
       </trans-unit>
       <trans-unit id="866656223631702865" datatype="html">
@@ -1614,6 +1606,13 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/statistics.component.html</context>
           <context context-type="linenumber">9</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2633316885507998490" datatype="html">
+        <source>Copier au format forum</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
+          <context context-type="linenumber">4</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7730918363143562137" datatype="html">
@@ -1655,14 +1654,28 @@
         <source>Ajouter un objet à la liste</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2263659396368488813" datatype="html">
+        <source>Aucun objet ne correspond au filtre &quot;<x id="INTERPOLATION" equiv-text="{{filterInput.nativeElement.value}}"/>&quot; </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
+          <context context-type="linenumber">138,140</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1618503561919586395" datatype="html">
+        <source>Enregistrer </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
+          <context context-type="linenumber">157,158</context>
         </context-group>
       </trans-unit>
       <trans-unit id="515657175878356073" datatype="html">
         <source>Zone de ramassage</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
-          <context context-type="linenumber">193</context>
+          <context context-type="linenumber">173</context>
         </context-group>
       </trans-unit>
       <trans-unit id="291877573183684359" datatype="html">
@@ -1901,42 +1914,42 @@
         <source>Cassé</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context>
-          <context context-type="linenumber">10</context>
+          <context context-type="linenumber">11</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6906288566408280890" datatype="html">
         <source>Taux d&apos;obtention en cas de fouille réussie sur une zone praf</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">29</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5983300914001148035" datatype="html">
         <source>Taux d&apos;obtention en cas de fouille réussie sur une zone non-praf</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4891425129271004735" datatype="html">
         <source>Objet de décoration</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">49</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5678708974631071290" datatype="html">
         <source>Arme de veille</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context>
-          <context context-type="linenumber">52</context>
+          <context context-type="linenumber">53</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1229846018197621216" datatype="html">
         <source>Objet encombrant</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">57</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8559558498834606319" datatype="html">
@@ -2609,7 +2622,7 @@
         <source>Résultat</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">152</context>
+          <context context-type="linenumber">151</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context>
