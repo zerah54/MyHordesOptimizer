@@ -32,7 +32,13 @@ export class WishlistServices extends GlobalServices {
             super.get<WishlistInfoDTO>(API_URL + `/wishlist?townId=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
-                        sub.next(new WishlistInfo(response.body));
+                        const wishlist: WishlistInfo = new WishlistInfo(response.body);
+                        console.log('wishlist', wishlist.wishlist_items);
+                        if (!wishlist.wishlist_items.has('0')) {
+                            wishlist.wishlist_items.set('0', []);
+                        }
+                        console.log('wishlist', wishlist.wishlist_items);
+                        sub.next(wishlist);
                     }
                 });
         });
