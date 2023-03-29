@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.45
+// @version      1.0.0-beta.46
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,8 +35,8 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Suppression d'erreurs en console\n`
-    + `[correctif] La carte ne s'ouvrait plus`;
+    + `[correctif] La copie de la carte de BBH fonctionne à nouveau\n`
+    + `[correctif] La taille des tooltips d'aide est de nouveau convenable`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -711,7 +711,7 @@ const action_types = [
 
 const wishlist_priorities = [
     {
-        value: -1000,
+        value: -1,
         label: {
             en: `Do not bring to town`,
             fr: `Ne pas ramener`,
@@ -729,7 +729,7 @@ const wishlist_priorities = [
         }
     },
     {
-        value: 1000,
+        value: 1,
         label: {
             en: `Low`,
             fr: `Basse`,
@@ -738,7 +738,7 @@ const wishlist_priorities = [
         }
     },
     {
-        value: 2000,
+        value: 2,
         label: {
             en: `Medium`,
             fr: `Moyenne`,
@@ -747,7 +747,7 @@ const wishlist_priorities = [
         }
     },
     {
-        value: 3000,
+        value: 3,
         label: {
             en: `High`,
             fr: `Haute`,
@@ -1664,8 +1664,32 @@ function calculateDespairDeaths(nb_killed_zombies) {
 
 
 function initOptions() {
+
+    /** Gère le bouton de mise à jour des outils externes) */
+    if (!buttonOptimizerExists()) {
+        createStyles();
+        createOptimizerBtn();
+        createWindow();
+    }
+
     preventFromLeaving();
     createDisplayMapButton();
+
+    displayWishlistInApp();
+    createUpdateExternalToolsButton();
+    clickOnVotedToRedirect();
+    displaySearchFieldOnBuildings();
+    displaySearchFieldOnRecipientList();
+    displayMinApOnBuildings();
+    displayPriorityOnItems();
+    displayNbDeadZombies();
+    displayTranslateTool();
+    notifyOnNewMessage();
+    displayCellDetailsOnPage();
+    // displayEstimationsOnWatchtower();
+    // displayAntiAbuseCounter();
+
+    // blockUsersPosts();
 
     count_pending_notifications = document.querySelector('#postbox-new-msg-counter')?.innerText;
 }
@@ -1722,59 +1746,57 @@ function createSelectWithSearch() {
 
 /** Create Optimize button */
 function createOptimizerBtn() {
-    setInterval(() => {
-        let optimizer_btn = document.getElementById(btn_id);
-        if (!optimizer_btn) {
-            let content_zone = document.getElementById(mh_content_id);
-            let header_zone = document.getElementById(mh_header_id);
-            let last_header_child = header_zone.lastChild;
-            let mhe_button = document.querySelector('#mhe_button')
-            let left_position = last_header_child ? last_header_child.offsetLeft + last_header_child.offsetWidth + 5 : (mhe_button ? mhe_button.offsetLeft + mhe_button.offsetWidth + 5 : document.querySelector('#apps')?.getBoundingClientRect().width + 16);
+    let optimizer_btn = document.getElementById(btn_id);
+    if (!optimizer_btn) {
+        let content_zone = document.getElementById(mh_content_id);
+        let header_zone = document.getElementById(mh_header_id);
+        let last_header_child = header_zone.lastChild;
+        let mhe_button = document.querySelector('#mhe_button')
+        let left_position = last_header_child ? last_header_child.offsetLeft + last_header_child.offsetWidth + 5 : (mhe_button ? mhe_button.offsetLeft + mhe_button.offsetWidth + 5 : document.querySelector('#apps')?.getBoundingClientRect().width + 16);
 
-            let img = document.createElement('img');
-            img.src = mh_optimizer_icon;
-            img.setAttribute('height', '16px');
-            img.setAttribute('width', '16px');
+        let img = document.createElement('img');
+        img.src = mh_optimizer_icon;
+        img.setAttribute('height', '16px');
+        img.setAttribute('width', '16px');
 
-            let title_hidden = document.createElement('span');
-            title_hidden.classList.add('label_text');
-            title_hidden.innerHTML = mho_title;
+        let title_hidden = document.createElement('span');
+        title_hidden.classList.add('label_text');
+        title_hidden.innerHTML = mho_title;
 
-            let title = document.createElement('h1');
+        let title = document.createElement('h1');
 
-            let title_first_part = document.createElement('div');
-            title.appendChild(title_first_part);
+        let title_first_part = document.createElement('div');
+        title.appendChild(title_first_part);
 
-            let title_second_part = document.createElement('div');
-            title.appendChild(title_second_part);
+        let title_second_part = document.createElement('div');
+        title.appendChild(title_second_part);
 
-            let website_link = document.createElement('a');
-            website_link.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
-            website_link.href = website;
-            website_link.target = '_blank';
-            website_link.style.cursor = 'pointer';
+        let website_link = document.createElement('a');
+        website_link.innerHTML = `<img src="${repo_img_hordes_url}icons/small_world.gif" style="vertical-align: top; margin-right: 0.25em;">${getI18N(texts.website)}`;
+        website_link.href = website;
+        website_link.target = '_blank';
+        website_link.style.cursor = 'pointer';
 
-            title_second_part.appendChild(website_link);
+        title_second_part.appendChild(website_link);
 
-            title_first_part.appendChild(img);
-            title_first_part.appendChild(title_hidden);
+        title_first_part.appendChild(img);
+        title_first_part.appendChild(title_hidden);
 
-            optimizer_btn = document.createElement('div');
-            optimizer_btn.appendChild(title);
-            optimizer_btn.id = btn_id;
-            optimizer_btn.setAttribute('style', 'left: ' + left_position + 'px');
-            optimizer_btn.addEventListener('click', (event) => {
-                event.stopPropagation();
-            });
+        optimizer_btn = document.createElement('div');
+        optimizer_btn.appendChild(title);
+        optimizer_btn.id = btn_id;
+        optimizer_btn.setAttribute('style', 'left: ' + left_position + 'px');
+        optimizer_btn.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
 
-            let mho_content_zone = document.createElement('div');
-            mho_content_zone.id = content_btn_id;
-            content_zone.appendChild(optimizer_btn);
-            content_zone.appendChild(mho_content_zone);
+        let mho_content_zone = document.createElement('div');
+        mho_content_zone.id = content_btn_id;
+        content_zone.appendChild(optimizer_btn);
+        content_zone.appendChild(mho_content_zone);
 
-            createOptimizerButtonContent();
-        }
-    }, 500);
+        createOptimizerButtonContent();
+    }
 }
 
 /** Crée le contenu du bouton de l'optimizer (bouton de wiki, bouton de configuration, etc) */
@@ -3205,7 +3227,7 @@ function createHelpButton(text_to_display) {
 
     let help_tooltip = document.createElement('div')
     help_tooltip.classList.add('tooltip', 'help', 'hidden');
-    help_tooltip.setAttribute('style', `text-transform: initial; display: block; position: absolute;`);
+    help_tooltip.setAttribute('style', `text-transform: initial; display: block; position: absolute; width: 250px;`);
     help_tooltip.innerHTML = text_to_display;
     help_button.appendChild(help_tooltip);
 
@@ -3475,190 +3497,189 @@ function displayMinApOnBuildings() {
 
 /** Affiche la liste de courses dans le désert et l'atelier */
 function displayWishlistInApp() {
-    let interval = setInterval(() => {
-        let wishlist_section = document.getElementById('wishlist-section');
+    let wishlist_section = document.getElementById('wishlist-section');
 
-        let is_desert = pageIsDesert();
-        let is_workshop = pageIsWorkshop();
-        if (wishlist && mho_parameters.display_wishlist && (is_workshop || is_desert)) {
-            if (wishlist_section) return;
+    let is_desert = pageIsDesert();
+    let is_workshop = pageIsWorkshop();
+    if (wishlist && mho_parameters.display_wishlist && (is_workshop || is_desert)) {
+        if (wishlist_section) return;
 
-            let used_wishlist = is_workshop ? wishlist.wishList['0'] : getWishlistForZone();
+        let used_wishlist = is_workshop ? wishlist.wishList['0'] : getWishlistForZone();
 
-            if (!used_wishlist) return;
+        if (!used_wishlist) return;
 
-            let list_to_display = used_wishlist.filter((item) => {
-                if (pageIsWorkshop()) {
-                    return item.isWorkshop;
-                } else {
-                    return item.count - item.bankCount > 0
-                }
-            });
-            if (pageIsWorkshop() && list_to_display.length === 0) return;
+        let list_to_display = used_wishlist.filter((item) => {
+            if (pageIsWorkshop()) {
+                return item.isWorkshop;
+            } else {
+                return true;
+            }
+        });
+        if (pageIsWorkshop() && list_to_display.length === 0) return;
 
-            let refreshWishlist = () => {
-                let update_section = document.createElement('div');
-                header.appendChild(update_section);
+        let refreshWishlist = () => {
+            let update_section = document.createElement('div');
+            header.appendChild(update_section);
 
-                let last_update = document.createElement('span');
-                last_update.classList.add('small');
-                last_update.setAttribute('style', 'margin-right: 0.5em;');
-                if (wishlist.lastUpdateInfo) {
-                    last_update.innerText = new Intl.DateTimeFormat('default', {
-                        dateStyle: 'medium',
-                        timeStyle: 'medium'
-                    }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
-                }
-                update_section.appendChild(last_update);
+            let last_update = document.createElement('span');
+            last_update.classList.add('small');
+            last_update.setAttribute('style', 'margin-right: 0.5em;');
+            if (wishlist.lastUpdateInfo) {
+                last_update.innerText = new Intl.DateTimeFormat('default', {
+                    dateStyle: 'medium',
+                    timeStyle: 'medium'
+                }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
+            }
+            update_section.appendChild(last_update);
 
-                let update_btn = document.createElement('button');
-                update_btn.classList.add('inline');
-                update_btn.innerText = getI18N(texts.update);
-                update_btn.addEventListener('click', () => {
-                    is_refresh_wishlist = true;
-                    wishlist = undefined;
-                    wishlist_section = undefined;
-                    clearInterval(interval);
-                    getWishlist().then(() => {
-                        displayWishlistInApp();
-                    });
+            let update_btn = document.createElement('button');
+            update_btn.classList.add('inline');
+            update_btn.innerText = getI18N(texts.update);
+            update_btn.addEventListener('click', () => {
+                is_refresh_wishlist = true;
+                displayWishlistInApp();
+                wishlist = undefined;
+                wishlist_section = undefined;
+                getWishlist().then(() => {
+                    displayWishlistInApp();
                 });
-                update_section.appendChild(update_btn);
+            });
+            update_section.appendChild(update_btn);
 
-                let list = document.createElement('div');
-                list.classList.add('row-table');
-                content.appendChild(list);
+            let list = document.createElement('div');
+            list.classList.add('row-table');
+            content.appendChild(list);
 
-                let list_header = document.createElement('div');
-                list_header.classList.add('row-flex', 'mho-header', 'bottom');
-                list.appendChild(list_header);
+            let list_header = document.createElement('div');
+            list_header.classList.add('row-flex', 'mho-header', 'bottom');
+            list.appendChild(list_header);
 
-                wishlist_headers
-                    .filter((header_cell_item) => header_cell_item.id !== 'delete')
-                    .forEach((header_cell_item) => {
-                        let header_cell = document.createElement('div');
-                        header_cell.classList.add('padded', 'cell');
-                        header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : ((header_cell_item.id === 'priority' || header_cell_item.id === 'depot') ? 'rw-3' : 'rw-2'));
-                        header_cell.innerText = getI18N(header_cell_item.label);
-                        list_header.appendChild(header_cell);
-                    });
+            wishlist_headers
+                .filter((header_cell_item) => header_cell_item.id !== 'delete')
+                .forEach((header_cell_item) => {
+                    let header_cell = document.createElement('div');
+                    header_cell.classList.add('padded', 'cell');
+                    header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : ((header_cell_item.id === 'priority' || header_cell_item.id === 'depot') ? 'rw-3' : 'rw-2'));
+                    header_cell.innerText = getI18N(header_cell_item.label);
+                    list_header.appendChild(header_cell);
+                });
 
-                list_to_display
-                    .forEach((item) => {
-                        let list_item = document.createElement('div');
-                        list_item.classList.add('row-flex');
-                        list.appendChild(list_item);
+            list_to_display
+                .forEach((item) => {
+                    let list_item = document.createElement('div');
+                    list_item.classList.add('row-flex');
+                    list.appendChild(list_item);
 
-                        let title = document.createElement('div');
-                        title.classList.add('padded', 'cell', 'rw-5');
-                        title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
-                        list_item.appendChild(title);
+                    let title = document.createElement('div');
+                    title.classList.add('padded', 'cell', 'rw-5');
+                    title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" class="priority_${item.priority_main}"  style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
+                    list_item.appendChild(title);
 
-                        let item_priority = document.createElement('span');
-                        item_priority.classList.add('padded', 'cell', 'rw-3');
-                        item_priority.innerHTML = `<span class="small">${getI18N(wishlist_priorities.find((priority) => item.priority.toString().slice(0, 1) === priority.value.toString().slice(0, 1)).label)}</span>`;
-                        list_item.appendChild(item_priority);
+                    let item_priority = document.createElement('span');
+                    item_priority.classList.add('padded', 'cell', 'rw-3');
+                    item_priority.innerHTML = `<span class="small">${getI18N(wishlist_priorities.find((priority) => item.priority_main === priority.value).label)}</span>`;
+                    list_item.appendChild(item_priority);
 
-                        let item_depot = document.createElement('span');
-                        item_depot.classList.add('padded', 'cell', 'rw-3');
-                        item_depot.innerHTML = `<span class="small">${getI18N(wishlist_depot.find((depot) => item.depot === depot.value).label)}</span>`;
-                        list_item.appendChild(item_depot);
+                    let item_depot = document.createElement('span');
+                    item_depot.classList.add('padded', 'cell', 'rw-3');
+                    item_depot.innerHTML = `<span class="small">${getI18N(wishlist_depot.find((depot) => item.depot === depot.value).label)}</span>`;
+                    list_item.appendChild(item_depot);
 
-                        let bank_count = document.createElement('span');
-                        bank_count.classList.add('padded', 'cell', 'rw-2');
-                        bank_count.innerHTML = `<span class="small">${item.bankCount}</span>`;
-                        list_item.appendChild(bank_count);
+                    let bank_count = document.createElement('span');
+                    bank_count.classList.add('padded', 'cell', 'rw-2');
+                    bank_count.innerHTML = `<span class="small">${item.bankCount}</span>`;
+                    list_item.appendChild(bank_count);
 
-                        let bag_count = document.createElement('span');
-                        bag_count.classList.add('padded', 'cell', 'rw-2');
-                        bag_count.innerHTML = `<span class="small">${item.bagCount}</span>`;
-                        list_item.appendChild(bag_count);
+                    let bag_count = document.createElement('span');
+                    bag_count.classList.add('padded', 'cell', 'rw-2');
+                    bag_count.innerHTML = `<span class="small">${item.bagCount}</span>`;
+                    list_item.appendChild(bag_count);
 
-                        let bank_need = document.createElement('span');
-                        bank_need.classList.add('padded', 'cell', 'rw-2');
-                        bank_need.innerHTML = `<span class="small">${item.count}</span>`;
-                        list_item.appendChild(bank_need);
+                    let bank_need = document.createElement('span');
+                    bank_need.classList.add('padded', 'cell', 'rw-2');
+                    bank_need.innerHTML = `<span class="small">${item.count}</span>`;
+                    list_item.appendChild(bank_need);
 
-                        let needed = document.createElement('span');
-                        needed.classList.add('padded', 'cell', 'rw-2');
-                        needed.innerHTML = `<span class="small">${item.count - item.bankCount - item.bagCount}</span>`;
-                        list_item.appendChild(needed);
-                    });
+                    let needed = document.createElement('span');
+                    needed.classList.add('padded', 'cell', 'rw-2');
+                    needed.innerHTML = `<span class="small">${item.count - item.bankCount - item.bagCount}</span>`;
+                    list_item.appendChild(needed);
+                });
 
 
-                if (!is_refresh_wishlist) {
+            if (!is_refresh_wishlist) {
+                hide_state.innerText = '>';
+                header_title.show = false;
+
+                list.classList.add('hidden');
+                update_section.classList.add('hidden');
+            } else {
+                hide_state.innerText = '˅';
+                header_title.show = true;
+            }
+            header_title.addEventListener('click', () => {
+                if (header_title.show) {
                     hide_state.innerText = '>';
-                    header_title.show = false;
-
-                    list.classList.add('hidden');
-                    update_section.classList.add('hidden');
                 } else {
                     hide_state.innerText = '˅';
-                    header_title.show = true;
                 }
-                header_title.addEventListener('click', () => {
-                    if (header_title.show) {
-                        hide_state.innerText = '>';
-                    } else {
-                        hide_state.innerText = '˅';
-                    }
-                    list.classList.toggle('hidden');
-                    update_section.classList.toggle('hidden');
-                    header_title.show = !header_title.show;
-                });
-                is_refresh_wishlist = false
-            };
+                list.classList.toggle('hidden');
+                update_section.classList.toggle('hidden');
+                header_title.show = !header_title.show;
+            });
+            is_refresh_wishlist = false
+            displayWishlistInApp();
+        };
 
-            wishlist_section = document.createElement('div');
-            wishlist_section.id = 'wishlist-section';
-            wishlist_section.classList.add('row');
+        wishlist_section = document.createElement('div');
+        wishlist_section.id = 'wishlist-section';
+        wishlist_section.classList.add('row');
 
-            if (pageIsWorkshop()) {
-                let workshop_table = document.getElementsByClassName('row-table')[0];
-                if (workshop_table) {
-                    workshop_table.parentNode.insertBefore(wishlist_section, workshop_table.nextSibling);
-                }
-            } else {
-                let actions_box = document.getElementsByClassName('actions-box')[0];
-                if (actions_box) {
-                    let main_actions = actions_box.parentNode;
-                    main_actions.parentNode.insertBefore(wishlist_section, main_actions.nextSibling);
-                }
+        if (pageIsWorkshop()) {
+            let workshop_table = document.getElementsByClassName('row-table')[0];
+            if (workshop_table) {
+                workshop_table.parentNode.insertBefore(wishlist_section, workshop_table.nextSibling);
             }
-
-            let cell = document.createElement('div');
-            wishlist_section.appendChild(cell);
-
-            let header = document.createElement('h5');
-            header.setAttribute('style', 'display: flex; justify-content: space-between;');
-            cell.appendChild(header);
-
-            let header_title = document.createElement('span');
-            header_title.setAttribute('style', 'margin-top: 7px; cursor: pointer;')
-            header.appendChild(header_title);
-
-            let hide_state = document.createElement('span');
-            hide_state.setAttribute('style', 'margin-right: 0.5em');
-            header_title.appendChild(hide_state);
-
-            let header_mho_img = document.createElement('img');
-            header_mho_img.src = mh_optimizer_icon;
-            header_mho_img.style.height = '24px';
-            header_mho_img.style.marginRight = '0.5em';
-            header_title.appendChild(header_mho_img);
-
-            let header_label = document.createElement('span');
-            header_label.innerText = getI18N(tabs_list.tools.find((tool) => tool.id === 'wishlist').label);
-            header_title.appendChild(header_label);
-
-            let content = document.createElement('div');
-            cell.appendChild(content);
-
-            refreshWishlist();
-        } else if (wishlist_section) {
-            wishlist_section.remove();
+        } else {
+            let actions_box = document.getElementsByClassName('actions-box')[0];
+            if (actions_box) {
+                let main_actions = actions_box.parentNode;
+                main_actions.parentNode.insertBefore(wishlist_section, main_actions.nextSibling);
+            }
         }
-    }, 0);
+
+        let cell = document.createElement('div');
+        wishlist_section.appendChild(cell);
+
+        let header = document.createElement('h5');
+        header.setAttribute('style', 'display: flex; justify-content: space-between;');
+        cell.appendChild(header);
+
+        let header_title = document.createElement('span');
+        header_title.setAttribute('style', 'margin-top: 7px; cursor: pointer;')
+        header.appendChild(header_title);
+
+        let hide_state = document.createElement('span');
+        hide_state.setAttribute('style', 'margin-right: 0.5em');
+        header_title.appendChild(hide_state);
+
+        let header_mho_img = document.createElement('img');
+        header_mho_img.src = mh_optimizer_icon;
+        header_mho_img.style.height = '24px';
+        header_mho_img.style.marginRight = '0.5em';
+        header_title.appendChild(header_mho_img);
+
+        let header_label = document.createElement('span');
+        header_label.innerText = getI18N(tabs_list.tools.find((tool) => tool.id === 'wishlist').label);
+        header_title.appendChild(header_label);
+
+        let content = document.createElement('div');
+        cell.appendChild(content);
+
+        refreshWishlist();
+    } else if (wishlist_section) {
+        wishlist_section.remove();
+    }
 }
 
 /** Affiche la priorité directement sur les éléments si l'option associée est cochée */
@@ -3681,7 +3702,7 @@ function displayPriorityOnItems() {
                     present_items
                         .filter((present_item) => present_item.src.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3').indexOf(wishlist_item.item.img) > 0)
                         .forEach((present_item) => {
-                            present_item.parentElement.parentElement.classList.add('priority_' + wishlist_item.priority);
+                            present_item.parentElement.parentElement.classList.add('priority_' + wishlist_item.priority_main);
                         });
                 });
         }
@@ -5089,7 +5110,7 @@ function displayAntiAbuseCounter() {
             old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
 
             document.addEventListener('mh-navigation-complete', (event) => {
-                console.log('event mh-navigation-complete', event);
+                // console.log('event mh-navigation-complete', event);
                 let new_bag = document.querySelectorAll("#gma ul.rucksack li.item");
                 if (old_bag.length < new_bag.length) {
 
@@ -5995,7 +6016,7 @@ function createStyles() {
     const item_priority_10 = `li.item[class^='priority_1'], li.item[class*=' priority_1'], img[class^='priority_1'], img[class*=' priority_1'] {`
         + 'box-shadow: inset 0 0 0.30em darkgoldenrod, 0 0 0.5em darkgoldenrod;'
         + '}';
-    const item_priority_trash = 'li.item.priority_-1000, img.priority_-1000 {'
+    const item_priority_trash = 'li.item.priority_-1, img.priority_-1 {'
         + 'box-shadow: inset 0 0 0.30em darkslategrey, 0 0 0.5em darkslategrey;'
         + '}';
 
@@ -6451,7 +6472,7 @@ function getBBHMap() {
                                             expedition_arrows: [],
                                             not_yet_visited: cell.querySelector('.nv'),
                                             not_visited_today: cell.querySelector('.nvt'),
-                                            zombies: cell.querySelector('.zombies') ? Array.from(cell.querySelector('.zombies').classList).find((class_name) => class_name.startsWith('z_dng_')).replace('z_dng_', '') : undefined,
+                                            zombies: cell.querySelector('.zombies') ? Array.from(cell.querySelector('.zombies').classList).find((class_name) => class_name.startsWith('z_')).replace('z_', '') : undefined,
                                             empty: cell.querySelector('.praf'),
                                             empty_bat: cell.querySelector('.mark1'),
                                             ruin: cell.querySelector('.tag_11')
@@ -6982,6 +7003,20 @@ function getWishlist() {
                     let wishlist_zone = response.wishList[key];
                     wishlist_zone = Object.keys(wishlist_zone)
                         .map((item_key) => wishlist_zone[item_key])
+                        .map((item) => {
+                            if (item.priority < 0) {
+                                item.priority_main = -1;
+                            } else if (item.priority < 1000) {
+                                item.priority_main = 0;
+                            } else if (item.priority < 2000) {
+                                item.priority_main = 1;
+                            } else if (item.priority < 3000) {
+                                item.priority_main = 2;
+                            } else {
+                                item.priority_main = 3;
+                            }
+                            return item;
+                        })
                         .sort((item_a, item_b) => item_b.priority > item_a.priority);
                     wishlist_zone.forEach((item) => {
                         item.item.img = item.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
@@ -7767,32 +7802,13 @@ function getApiKey() {
 
                 getApiKey().then(() => {
                     getMe().then(() => {
-                        initOptions();
-                        /** Gère le bouton de mise à jour des outils externes) */
-                        if (!buttonOptimizerExists()) {
-                            createStyles();
-                            createOptimizerBtn();
-                            createWindow();
-                        }
-
                         notifyOnSearchEnd();
-                        displayWishlistInApp();
 
-                        setInterval(() => {
-                            createUpdateExternalToolsButton();
-                            clickOnVotedToRedirect();
-                            displaySearchFieldOnBuildings();
-                            displaySearchFieldOnRecipientList();
-                            displayMinApOnBuildings();
-                            displayPriorityOnItems();
-                            displayNbDeadZombies();
-                            displayTranslateTool();
-                            notifyOnNewMessage();
-                            displayCellDetailsOnPage();
-                            // displayEstimationsOnWatchtower();
-                            // displayAntiAbuseCounter();
-                            // blockUsersPosts();
-                        }, 200);
+                        initOptions();
+
+                        document.addEventListener('mh-navigation-complete', (event) => {
+                            initOptions();
+                        })
 
                         setInterval(() => {
                             displayCampingPredict();
@@ -7800,7 +7816,7 @@ function getApiKey() {
 
                         setInterval(() => {
                             displayAdvancedTooltips();
-                        }, 100);
+                        }, 10);
                     });
                 });
             });
