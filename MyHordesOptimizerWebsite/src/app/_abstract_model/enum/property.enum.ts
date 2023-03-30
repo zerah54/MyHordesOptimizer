@@ -37,7 +37,7 @@ const FOUND_POISONED_DATA: PropertyData = {label: $localize`Peut être trouvé e
 const PREVENT_TERROR_DATA: PropertyData = {label: $localize`Empêche d'être terrorisé à cause d'un objet`, category: '', img: ''};
 const HERO_FIND_LUCKY_DATA: PropertyData = {label: $localize`Trouvaille améliorée`, category: '', img: ''};
 const HERO_FIND_DATA: PropertyData = {label: $localize`Trouvaille`, category: '', img: ''};
-const IMPOUNDABLE_DATA: PropertyData = {label: $localize`Conservé en cas de banissement`, category: '', img: ''};
+const IMPOUNDABLE_DATA: PropertyData = {label: $localize`Conservé en cas de bannissement`, category: '', img: ''};
 const PREVENT_NIGHT_DATA: PropertyData = {label: $localize`Annule le malus de nuit sur la case une fois posé au sol`, category: '', img: ''};
 const IS_WATER_DATA: PropertyData = {label: $localize`Désaltère`, category: '', img: 'status/status_hasdrunk.gif'};
 

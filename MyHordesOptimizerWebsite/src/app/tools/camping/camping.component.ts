@@ -231,12 +231,12 @@ export class CampingComponent implements OnInit {
     private convertFormToEasyReadable(): string {
         let url_string: string = '';
         for (const key in this.configuration_form.value) {
-            const element: string | number | boolean | TownType = this.configuration_form.value[key];
+            const element: string | number | boolean | TownType | JobEnum = this.configuration_form.value[key];
             if (element !== null && element !== undefined && element !== '') {
                 if (typeof element === 'string' || typeof element === 'number' || typeof element === 'boolean') {
                     url_string += `&${key}=${element.toString()}`;
                 } else {
-                    url_string += `&${key}=${element.id}`;
+                    url_string += `&${key}=${element['id'] ? element['id'] : element['value']['id']}`;
                 }
             } else {
                 url_string += `&${key}=`;

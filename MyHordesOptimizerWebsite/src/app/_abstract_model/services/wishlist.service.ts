@@ -33,11 +33,9 @@ export class WishlistServices extends GlobalServices {
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         const wishlist: WishlistInfo = new WishlistInfo(response.body);
-                        console.log('wishlist', wishlist.wishlist_items);
                         if (!wishlist.wishlist_items.has('0')) {
                             wishlist.wishlist_items.set('0', []);
                         }
-                        console.log('wishlist', wishlist.wishlist_items);
                         sub.next(wishlist);
                     }
                 });

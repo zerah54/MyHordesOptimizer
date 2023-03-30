@@ -15,6 +15,7 @@ import { ApiServices } from '../../_abstract_model/services/api.services';
 import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
     selector: 'mho-wishlist',
@@ -40,6 +41,7 @@ export class WishlistComponent implements OnInit {
     public readonly locale: string = moment.locale();
     /** La liste des colonnes */
     public readonly columns: WishlistColumns[] = [
+        {id: 'sort', header: ''},
         {id: 'name', header: $localize`Objet`},
         {id: 'priority', header: $localize`Priorité`},
         {id: 'depot', header: $localize`Dépôt`},
@@ -68,11 +70,11 @@ export class WishlistComponent implements OnInit {
 
     /** La liste des priorités */
     public readonly priorities: PriorityOrDepot[] = [
-        {count: -1000, label: $localize`Ne pas ramener`},
+        {count: -1, label: $localize`Ne pas ramener`},
         {count: 0, label: $localize`Non définie`},
-        {count: 1000, label: $localize`Basse`},
-        {count: 2000, label: $localize`Moyenne`},
-        {count: 3000, label: $localize`Haute`}
+        {count: 1, label: $localize`Basse`},
+        {count: 2, label: $localize`Moyenne`},
+        {count: 3, label: $localize`Haute`}
     ];
 
     /** La liste des dépôts */
@@ -203,6 +205,42 @@ export class WishlistComponent implements OnInit {
         text += `[aparte]${$localize`Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=${environment.website_url}my-town/wishlist]ce lien[/link]`}[/aparte]`;
 
         this.clipboard.copy(text, $localize`La liste a bien été copiée au format forum`);
+    }
+
+    public sortWishlist(event: CdkDragDrop<TableVirtualScrollDataSource<WishlistItem>>): void {
+        const current_wishlist_items: WishlistItem[] = this.wishlist_info.wishlist_items.get(this.selected_tab_key) || [];
+        const previous_index_in_real_array: number = current_wishlist_items.findIndex((item: WishlistItem) => item.item.id === event.item.data.item.id);
+        let current_index_in_real_array: number;
+        if (this.datasource.dataOfRange$['_buffer'][0][event.currentIndex - 1]) {
+            current_index_in_real_array = current_wishlist_items
+                .findIndex((item: WishlistItem) => item.item.id === this.datasource.dataOfRange$['_buffer'][0][event.currentIndex - 1].item.id) + 1;
+        } else if (this.datasource.dataOfRange$['_buffer'][0][event.currentIndex + 1]) {
+            current_index_in_real_array = current_wishlist_items
+                .findIndex((item: WishlistItem) => item.item.id === this.datasource.dataOfRange$['_buffer'][0][event.currentIndex + 1].item.id) - 1;
+        } else {
+            current_index_in_real_array = 0;
+        }
+        moveItemInArray(current_wishlist_items, previous_index_in_real_array, current_index_in_real_array);
+        if (current_wishlist_items[current_index_in_real_array - 1]) {
+            current_wishlist_items[current_index_in_real_array].priority_main = current_wishlist_items[current_index_in_real_array - 1].priority_main;
+            current_wishlist_items[current_index_in_real_array].priority = current_wishlist_items[current_index_in_real_array - 1].priority;
+        } else if (current_wishlist_items[current_index_in_real_array + 1]) {
+            current_wishlist_items[current_index_in_real_array].priority_main = current_wishlist_items[current_index_in_real_array + 1].priority_main;
+            current_wishlist_items[current_index_in_real_array].priority = current_wishlist_items[current_index_in_real_array + 1].priority;
+        }
+
+        this.datasource.data = [...this.resetPriorities(current_wishlist_items)];
+    }
+
+    public resetPriorities(array: WishlistItem[]): WishlistItem[] {
+
+        let priority_factor: number = 999;
+        array.forEach((item: WishlistItem) => {
+            item.priority = parseInt(item.priority_main.toString() + (item.priority_main > 0 ? priority_factor.toString() : (1000 - priority_factor).toString()));
+            priority_factor--;
+        });
+        array = array.sort((item_a: WishlistItem, item_b: WishlistItem) => item_b.priority - item_a.priority);
+        return array;
     }
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */

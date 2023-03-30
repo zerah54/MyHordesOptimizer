@@ -1,8 +1,8 @@
 @use "@angular/material" as mat;
 
-@use "default-theme";
+@use "brown-light-theme";
 @use "noel-theme";
-@use "pink-theme";
+@use "pink-light-theme";
 
 @include mat.all-component-typographies();
 @include mat.core();
@@ -12,13 +12,13 @@
 
     &:not(.pink):not(.noel),
     &.brown {
-        @include mat.all-component-themes(default-theme.$default-theme);
-        @include default-theme.default-theme(default-theme.$default-theme);
+        @include mat.all-component-themes(brown-light-theme.$default-theme);
+        @include brown-light-theme.brown-light-theme(brown-light-theme.$default-theme);
     }
 
     &.pink {
-        @include mat.all-component-themes(pink-theme.$pink-theme);
-        @include pink-theme.pink-theme(pink-theme.$pink-theme);
+        @include mat.all-component-themes(pink-light-theme.$pink-theme);
+        @include pink-light-theme.pink-light-theme(pink-light-theme.$pink-theme);
     }
 
     &.noel {

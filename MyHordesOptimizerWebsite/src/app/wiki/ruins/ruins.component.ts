@@ -8,6 +8,8 @@ import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
+import { getTown } from '../../shared/utilities/localstorage.util';
+import { normalizeString } from '../../shared/utilities/string.utils';
 
 @Component({
     selector: 'mho-ruins',
@@ -26,6 +28,8 @@ export class RuinsComponent implements OnInit {
 
     /** La liste des bâtiments du jeu */
     public ruins!: Ruin[];
+    /** La liste des bâtiments de la ville */
+    public town_ruins!: Ruin[];
     /** La liste des objets du jeu */
     public items: RuinItem[] = [];
     /** La datasource pour le tableau */
@@ -44,7 +48,8 @@ export class RuinsComponent implements OnInit {
         label: '',
         min_dist: '',
         max_dist: '',
-        objects: []
+        objects: [],
+        inside_town: false
     };
 
     public ruins_filters_change: EventEmitter<void> = new EventEmitter();
@@ -62,6 +67,7 @@ export class RuinsComponent implements OnInit {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((ruins: Ruin[]) => {
                 this.ruins = ruins;
+                getTown();
                 this.ruins_filters_change
                     .pipe(takeUntil(this.destroy_sub))
                     .subscribe(() => {
@@ -96,13 +102,17 @@ export class RuinsComponent implements OnInit {
     private customFilter(data: Ruin, filter: string): boolean {
         const filter_object: RuinFilters = JSON.parse(filter.toLowerCase());
         const locale: string = moment.locale();
-        if (filter_object.label === '' && filter_object.min_dist === '' && filter_object.max_dist === '' && filter_object.objects.length === 0) {
+        if (filter_object.label === '' && filter_object.min_dist === '' && filter_object.max_dist === '' && filter_object.objects.length === 0
+            && !filter_object.inside_town) {
             return true;
         }
-        return (filter_object.label !== '' && filter_object.label !== undefined && data.label[locale].toLowerCase().indexOf(filter_object.label) > -1)
+        if (filter_object.inside_town) {
+
+        }
+        return (filter_object.label !== '' && filter_object.label !== undefined && normalizeString(data.label[locale]).indexOf(normalizeString(filter_object.label)) > -1)
             || (filter_object.min_dist !== '' && filter_object.min_dist !== undefined && +data.min_dist >= +filter_object.min_dist)
             || (filter_object.max_dist !== '' && filter_object.max_dist !== undefined && +data.max_dist <= +filter_object.max_dist)
-            || (filter_object.objects.length > 0 && data.drops.some((drop: RuinItem) => filter_object.objects.some((object: RuinItem) => drop.item.label[locale].toLowerCase() === object.item.label[locale])));
+            || (filter_object.objects.length > 0 && data.drops.some((drop: RuinItem) => filter_object.objects.some((object: RuinItem) => normalizeString(drop.item.label[locale]) === normalizeString(object.item.label[locale]))));
     }
 }
 
@@ -116,5 +126,6 @@ interface RuinFilters {
     label: string;
     min_dist: string | number;
     max_dist: string | number;
-    objects: RuinItem[]
+    objects: RuinItem[];
+    inside_town: boolean;
 }

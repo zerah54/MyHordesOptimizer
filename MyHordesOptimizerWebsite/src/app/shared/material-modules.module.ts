@@ -30,11 +30,12 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { Modules } from '../_abstract_model/types/_types';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 const material_modules: Modules = [
     MatButtonModule, MatButtonToggleModule, MatCardModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatProgressSpinnerModule,
     MatSelectModule, MatSidenavModule, MatSnackBarModule, MatTableModule, MatToolbarModule, MatRadioModule, MatCheckboxModule, ClipboardModule, CdkAccordionModule, MatChipsModule,
-    MatTooltipModule, MatSortModule, MatTabsModule, MatBadgeModule, ScrollingModule, MatSlideToggleModule
+    MatTooltipModule, MatSortModule, MatTabsModule, MatBadgeModule, ScrollingModule, MatSlideToggleModule, DragDropModule
 ];
 
 @NgModule({
