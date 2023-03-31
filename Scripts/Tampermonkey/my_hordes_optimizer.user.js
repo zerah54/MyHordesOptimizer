@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.46
+// @version      1.0.0-beta.47
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,8 +35,8 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] La copie de la carte de BBH fonctionne à nouveau\n`
-    + `[correctif] La taille des tooltips d'aide est de nouveau convenable`;
+    + `[correctif] Boucle infinie quand on était pris en escorte (oups)\n`
+    + `[correctif] Affichage des pa manquants pour que le chantier ne soit pas détruit dans la nuit`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -3442,7 +3442,7 @@ function displaySearchFieldOnRecipientList() {
 /** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */
 function displayMinApOnBuildings() {
     if (mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
-        let complete_buildings = document.querySelectorAll('.row.complete');
+        let complete_buildings = document.querySelectorAll('.row-flex.complete');
         if (!complete_buildings || complete_buildings.length === 0) return;
 
         let broken_buildings = Array.from(complete_buildings).filter((complete_building) => complete_building.querySelector('.ap-bar'));
@@ -3504,6 +3504,15 @@ function displayWishlistInApp() {
     if (wishlist && mho_parameters.display_wishlist && (is_workshop || is_desert)) {
         if (wishlist_section) return;
 
+        let zone_to_insert;
+        if (pageIsWorkshop()) {
+            zone_to_insert = document.getElementsByClassName('row-table')[0];
+        } else {
+            zone_to_insert = document.getElementsByClassName('actions-box')[0];
+        }
+
+        if (!zone_to_insert) return;
+
         let used_wishlist = is_workshop ? wishlist.wishList['0'] : getWishlistForZone();
 
         if (!used_wishlist) return;
@@ -3537,11 +3546,13 @@ function displayWishlistInApp() {
             update_btn.innerText = getI18N(texts.update);
             update_btn.addEventListener('click', () => {
                 is_refresh_wishlist = true;
-                displayWishlistInApp();
                 wishlist = undefined;
                 wishlist_section = undefined;
-                getWishlist().then(() => {
+                setTimeout(() => {
                     displayWishlistInApp();
+                    getWishlist().then(() => {
+                        displayWishlistInApp();
+                    });
                 });
             });
             update_section.appendChild(update_btn);
@@ -3636,16 +3647,10 @@ function displayWishlistInApp() {
         wishlist_section.classList.add('row');
 
         if (pageIsWorkshop()) {
-            let workshop_table = document.getElementsByClassName('row-table')[0];
-            if (workshop_table) {
-                workshop_table.parentNode.insertBefore(wishlist_section, workshop_table.nextSibling);
-            }
+            zone_to_insert.parentNode.insertBefore(wishlist_section, zone_to_insert.nextSibling);
         } else {
-            let actions_box = document.getElementsByClassName('actions-box')[0];
-            if (actions_box) {
-                let main_actions = actions_box.parentNode;
-                main_actions.parentNode.insertBefore(wishlist_section, main_actions.nextSibling);
-            }
+            let main_actions = zone_to_insert.parentNode;
+            main_actions.parentNode.insertBefore(wishlist_section, main_actions.nextSibling);
         }
 
         let cell = document.createElement('div');
