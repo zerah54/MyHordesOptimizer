@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.47
+// @version      1.0.0-beta.48
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,8 +35,7 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Boucle infinie quand on était pris en escorte (oups)\n`
-    + `[correctif] Affichage des pa manquants pour que le chantier ne soit pas détruit dans la nuit`;
+    + `[correctif] La valeur de la clôture est envoyée correctement à GH\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -7282,8 +7281,13 @@ function updateExternalTools() {
             if (amelios && amelios.length > 0) {
                 amelios.forEach((amelio) => {
                     let amelio_img = amelio.querySelector('img');
-                    let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
-                    data.amelios.values[amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1')] = amelio_value ? +amelio_value[0] : 0;
+                    let name = amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1');
+                    if (name !== 'fence') {
+                        let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
+                        data.amelios.values[name] = amelio_value ? +amelio_value[0] : 0;
+                    } else {
+                        data.amelios.values[name] = !amelio.querySelector('button[x-upgrade-id]') ? 1 : 0;
+                    }
                 });
             }
             let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt;
