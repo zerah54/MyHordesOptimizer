@@ -4,14 +4,14 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { ConfirmDialogComponent } from 'src/app/shared/elements/confirm-dialog/confirm-dialog.component';
-import { getTown } from 'src/app/shared/utilities/localstorage.util';
-import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
-import { DigsServices } from 'src/app/_abstract_model/services/digs.service';
-import { CitizenInfo } from 'src/app/_abstract_model/types/citizen-info.class';
-import { Citizen } from 'src/app/_abstract_model/types/citizen.class';
-import { Dig } from 'src/app/_abstract_model/types/dig.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
+import { Dig } from '../../../_abstract_model/types/dig.class';
+import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
+import { getTown } from '../../../shared/utilities/localstorage.util';
+import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
+import { DigsServices } from '../../../_abstract_model/services/digs.service';
+import { ConfirmDialogComponent } from '../../../shared/elements/confirm-dialog/confirm-dialog.component';
 
 
 @Component({
@@ -153,7 +153,7 @@ export class CitizensDigsComponent implements OnInit {
         }
     }
 
-    public trackByColumnId(index: number, column: CitizenColumn): string {
+    public trackByColumnId(_index: number, column: CitizenColumn): string {
         return column.id;
     }
 

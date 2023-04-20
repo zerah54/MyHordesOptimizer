@@ -22,9 +22,10 @@ import { CustomKeyValuePipe } from './pipes/key-value.pipe';
 import { ItemsGroupByCategory } from './pipes/items-group-by-category.pipe';
 import { InDevModeGuard } from './guards/in-dev-mode.guard';
 import { ApiServices } from '../_abstract_model/services/api.services';
+import { NgOptimizedImage } from '@angular/common';
 
 const custom_modules: Modules = [MaterialModule, ElementsModule];
-const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule];
+const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule, NgOptimizedImage];
 const services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService, WishlistServices];
 const guards: Components = [IsInTownGuard, InDevModeGuard];
 const pipes: Components = [ArrayItemDetailsPipe, CitizensFromShortPipe, ItemDetailsPipe, FilterRuinsByKmPipe, CustomKeyValuePipe, ItemsGroupByCategory];

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
-import { Components } from 'src/app/_abstract_model/types/_types';
 import { SharedModule } from '../../shared/shared.module';
 import { FooterComponent } from './footer.component';
+import { Components } from '../../_abstract_model/types/_types';
 
 const components: Components = [FooterComponent];
 

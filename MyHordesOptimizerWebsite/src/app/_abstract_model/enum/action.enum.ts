@@ -1,5 +1,5 @@
-import { environment } from 'src/environments/environment';
 import { CommonEnum, CommonEnumData } from './_common.enum';
+import { environment } from '../../../environments/environment';
 
 
 const EAT_6AP_KEY: string = 'eat_6ap';

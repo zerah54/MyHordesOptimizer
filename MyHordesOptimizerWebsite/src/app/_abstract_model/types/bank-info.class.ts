@@ -1,9 +1,9 @@
-import { DictionaryUtils } from 'src/app/shared/utilities/dictionary.util';
 import { BankInfoDTO } from '../dto/bank-info.dto';
 import { BankItemDTO } from '../dto/bank-item.dto';
 import { Item } from './item.class';
 import { UpdateInfo } from './update-info.class';
 import { CommonModel, modelArrayToDictionnary } from './_common.class';
+import { DictionaryUtils } from '../../shared/utilities/dictionary.util';
 
 export class BankInfo extends CommonModel<BankInfoDTO> {
     public items: Item[] = [];

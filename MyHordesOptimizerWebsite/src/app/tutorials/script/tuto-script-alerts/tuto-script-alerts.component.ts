@@ -1,6 +1,6 @@
 import { Component, HostBinding } from '@angular/core';
-import { AccordionItem } from 'src/app/shared/elements/accordion/accordion.component';
-import { ClipboardService } from 'src/app/shared/services/clipboard.service';
+import { ClipboardService } from '../../../shared/services/clipboard.service';
+import { AccordionItem } from '../../../shared/elements/accordion/accordion.component';
 
 @Component({
     selector: 'mho-tuto-script-alerts',
@@ -37,7 +37,7 @@ export class TutoScriptAlertsComponent {
 
         text += `[b][big]${this.title}[/big][/b]`;
         text += '\n\n';
-        this.tuto_script_items.forEach((item: AccordionItem) => {
+        this.tuto_script_items.forEach((item: AccordionItem): void => {
             text += `[collapse=${item.title}]${item.content}[/collapse]\n\n`;
         });
 

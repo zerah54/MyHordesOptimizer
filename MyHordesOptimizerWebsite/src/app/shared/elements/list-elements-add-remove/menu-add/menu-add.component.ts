@@ -1,7 +1,7 @@
 import { Component, EventEmitter, HostBinding, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatMenu } from '@angular/material/menu';
 import * as moment from 'moment';
-import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
+import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 
 @Component({
     selector: 'mho-menu-add',

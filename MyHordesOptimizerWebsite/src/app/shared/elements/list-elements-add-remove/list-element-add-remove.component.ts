@@ -1,9 +1,9 @@
 import { Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
 import * as moment from 'moment';
-import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
-import { StatusEnum } from 'src/app/_abstract_model/enum/status.enum';
-import { Citizen } from 'src/app/_abstract_model/types/citizen.class';
-import { Item } from 'src/app/_abstract_model/types/item.class';
+import { Item } from '../../../_abstract_model/types/item.class';
+import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 
 @Component({
     selector: 'mho-list-element-add-remove',

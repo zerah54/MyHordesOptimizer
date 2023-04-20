@@ -1,6 +1,4 @@
 import { NgModule } from '@angular/core';
-import { SharedModule } from 'src/app/shared/shared.module';
-import { Components } from 'src/app/_abstract_model/types/_types';
 import { CompassRoseComponent } from './compass-rose/compass-rose.component';
 import { AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe } from './compass-rose/is-scrut-direction-selected.pipe';
 import { DrawMapComponent } from './draw-map/draw-map.component';
@@ -25,6 +23,8 @@ import { NotInListCitizenDigPipe } from './draw-map/map-update/map-update-digs/n
 import { MapUpdateRuinComponent } from './draw-map/map-update/map-update-ruin/map-update-ruin.component';
 import { MapUpdateComponent } from './draw-map/map-update/map-update.component';
 import { MapComponent } from './map.component';
+import { Components } from '../../_abstract_model/types/_types';
+import { SharedModule } from '../../shared/shared.module';
 
 const components: Components = [MapComponent];
 const map_components: Components = [

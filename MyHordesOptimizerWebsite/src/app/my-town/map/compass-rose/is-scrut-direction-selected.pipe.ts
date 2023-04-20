@@ -1,6 +1,5 @@
-
 import { Pipe, PipeTransform } from '@angular/core';
-import { Dictionary } from 'src/app/_abstract_model/types/_types';
+import { Dictionary } from '../../../_abstract_model/types/_types';
 
 
 @Pipe({

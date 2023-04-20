@@ -4,12 +4,12 @@ import { SnackbarService } from '../../shared/services/snackbar.service';
 
 export class GlobalServices {
 
-    constructor(private _http: HttpClient, private _snackbar: SnackbarService) {
+    constructor(private http: HttpClient, private snackbar: SnackbarService) {
 
     }
 
     protected get<T>(url: string): Observable<HttpResponse<T>> {
-        return this._http.get<T>(url, {
+        return this.http.get<T>(url, {
             responseType: 'json',
             observe: 'response'
         }).pipe(
@@ -20,14 +20,14 @@ export class GlobalServices {
 
     protected post<T>(url: string, params?: string): Observable<T> {
         const headers: HttpHeaders = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
-        return this._http.post<T>(url, params, {responseType: 'json', headers: headers}).pipe(
+        return this.http.post<T>(url, params, {responseType: 'json', headers: headers}).pipe(
             // retry(3),
             catchError(this.handleError)
         );
     }
 
     protected put<T>(url: string, body: unknown): Observable<HttpResponse<T>> {
-        return this._http.put<T>(
+        return this.http.put<T>(
             url,
             body,
             {
@@ -43,7 +43,7 @@ export class GlobalServices {
     }
 
     protected delete<T>(url: string): Observable<HttpResponse<T>> {
-        return this._http.delete<T>(url, {
+        return this.http.delete<T>(url, {
             responseType: 'json',
             observe: 'response'
         }).pipe(
@@ -70,7 +70,7 @@ export class GlobalServices {
         }
         // Return an observable with a user-facing error message.
         return throwError(() => {
-            this._snackbar.errorSnackbar(`Une erreur s'est produite lors de l'appel (Erreur ${error.status})`);
+            this.snackbar.errorSnackbar(`Une erreur s'est produite lors de l'appel (Erreur ${error.status})`);
         });
     }
 }

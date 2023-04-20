@@ -1,10 +1,10 @@
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import * as moment from 'moment';
-import { getTown } from 'src/app/shared/utilities/localstorage.util';
-import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
-import { Cell } from 'src/app/_abstract_model/types/cell.class';
-import { Citizen } from 'src/app/_abstract_model/types/citizen.class';
-import { Dig } from 'src/app/_abstract_model/types/dig.class';
+import { Cell } from '../../../../../_abstract_model/types/cell.class';
+import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
+import { Dig } from '../../../../../_abstract_model/types/dig.class';
+import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
+import { getTown } from '../../../../../shared/utilities/localstorage.util';
 
 @Component({
     selector: 'mho-map-update-digs',

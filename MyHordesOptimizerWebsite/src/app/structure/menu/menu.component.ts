@@ -1,8 +1,8 @@
 import { Component, HostBinding, Inject, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
 import * as moment from 'moment';
-import { getTown } from 'src/app/shared/utilities/localstorage.util';
-import { TownDetails } from 'src/app/_abstract_model/types/town-details.class';
 import { environment } from '../../../environments/environment';
+import { getTown } from '../../shared/utilities/localstorage.util';
+import { TownDetails } from '../../_abstract_model/types/town-details.class';
 
 @Component({
     selector: 'mho-menu',

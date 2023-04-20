@@ -1,15 +1,15 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { BREAKPOINTS } from 'src/app/_abstract_model/const';
-import { CitizenInfo } from 'src/app/_abstract_model/types/citizen-info.class';
-import { Citizen } from 'src/app/_abstract_model/types/citizen.class';
-import { Item } from 'src/app/_abstract_model/types/item.class';
-import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
-import { Town } from 'src/app/_abstract_model/types/town.class';
-import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { ApiServices } from '../../_abstract_model/services/api.services';
+import { Town } from '../../_abstract_model/types/town.class';
+import { Ruin } from '../../_abstract_model/types/ruin.class';
+import { Item } from '../../_abstract_model/types/item.class';
+import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { BREAKPOINTS } from '../../_abstract_model/const';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
+import { Dictionary } from '../../_abstract_model/types/_types';
 
 @Component({
     selector: 'mho-map',
@@ -72,7 +72,7 @@ export class MapComponent implements OnInit {
             });
         this.api.getCitizens()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((citizens: CitizenInfo) => {
+            .subscribe((citizens: CitizenInfo): void => {
                 this.all_citizens = citizens.citizens;
             });
 

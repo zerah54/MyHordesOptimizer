@@ -1,20 +1,7 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
-import { Observable, of, Subscriber } from 'rxjs';
-import {
-    getExternalAppId,
-    getItemsWithExpirationDate,
-    getRuinsWithExpirationDate,
-    getTown,
-    getUserId,
-    setItemsWithExpirationDate,
-    setRuinsWithExpirationDate,
-    setTown,
-    setUser
-} from 'src/app/shared/utilities/localstorage.util';
-import { Dictionary } from 'src/app/_abstract_model/types/_types';
-import { environment } from 'src/environments/environment';
+import { Observable, Subscriber } from 'rxjs';
 import { CellDTO } from '../dto/cell.dto';
 import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { ItemDTO } from '../dto/item.dto';
@@ -33,8 +20,8 @@ import { Ruin } from '../types/ruin.class';
 import { TownDetails } from '../types/town-details.class';
 import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
-import { dtoToModelArray, modelToDtoArray } from '../types/_common.class';
-import { ToolsToUpdate } from '../types/_types';
+import { dtoToModelArray } from '../types/_common.class';
+import { Dictionary, ToolsToUpdate } from '../types/_types';
 import { GlobalServices } from './global.services';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { Item } from '../types/item.class';
@@ -45,6 +32,18 @@ import { CitizenInfo } from '../types/citizen-info.class';
 import { CitizenInfoDTO } from '../dto/citizen-info.dto';
 import { Estimations } from '../types/estimations.class';
 import { EstimationsDTO } from '../dto/estimations.dto';
+import {
+    getExternalAppId,
+    getItemsWithExpirationDate,
+    getRuinsWithExpirationDate,
+    getTown,
+    getUserId,
+    setItemsWithExpirationDate,
+    setRuinsWithExpirationDate,
+    setTown,
+    setUser
+} from '../../shared/utilities/localstorage.util';
+import { environment } from '../../../environments/environment';
 
 const API_URL: string = environment.api_url;
 
@@ -54,8 +53,8 @@ export class ApiServices extends GlobalServices {
     /** La locale */
     private readonly locale: string = moment.locale();
 
-    constructor(private http: HttpClient, private snackbar: SnackbarService) {
-        super(http, snackbar);
+    constructor(_http: HttpClient, private _snackbar: SnackbarService) {
+        super(_http, _snackbar);
     }
 
     /**
@@ -143,7 +142,7 @@ export class ApiServices extends GlobalServices {
         }))
             .subscribe({
                 next: () => {
-                    this.snackbar.successSnackbar($localize`Les outils externes ont bien été mis à jour`);
+                    this._snackbar.successSnackbar($localize`Les outils externes ont bien été mis à jour`);
                 }
             });
     }
@@ -325,7 +324,7 @@ export class ApiServices extends GlobalServices {
             super.post<CellDTO>(API_URL + `/MyHordesOptimizerMap/cell?townid=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(cell.toSaveCellDTO()))
                 .subscribe({
                     next: (response: CellDTO) => {
-                        this.snackbar.successSnackbar($localize`La cellule a bien été modifiée`);
+                        this._snackbar.successSnackbar($localize`La cellule a bien été modifiée`);
                         sub.next(new Cell(response));
                     }
                 });

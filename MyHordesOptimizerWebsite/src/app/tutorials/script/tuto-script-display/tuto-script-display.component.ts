@@ -1,6 +1,6 @@
 import { Component, HostBinding } from '@angular/core';
-import { AccordionItem } from 'src/app/shared/elements/accordion/accordion.component';
-import { ClipboardService } from 'src/app/shared/services/clipboard.service';
+import { ClipboardService } from '../../../shared/services/clipboard.service';
+import { AccordionItem } from '../../../shared/elements/accordion/accordion.component';
 
 @Component({
     selector: 'mho-tuto-script-display',
@@ -66,7 +66,7 @@ export class TutoScriptDisplayComponent {
 
         text += `[b][big]${this.title}[/big][/b]`;
         text += '\n\n';
-        this.tuto_script_items.forEach((item: AccordionItem) => {
+        this.tuto_script_items.forEach((item: AccordionItem): void => {
             text += `[collapse=${item.title}]${item.content.replace(/<ul>/g, '').replace(/<\/ul>/g, '').replace(/<li>/g, '[0]').replace(/<\/li>/g, '').replace(/<br \/><br \/>/g, '\n').replace(/<strong>/g, '[b]').replace(/<\/strong>/g, '[/b]')}[/collapse]\n\n`;
         });
 

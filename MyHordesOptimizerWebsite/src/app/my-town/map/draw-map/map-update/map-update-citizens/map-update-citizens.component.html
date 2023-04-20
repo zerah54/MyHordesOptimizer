@@ -2,43 +2,44 @@
 
     <table>
         <thead>
-            <th>
-                <button mat-button [matMenuTriggerFor]="addCitizenMenu"
-                    *ngIf="(allCitizens | notInListCitizen:citizens).length > 0" i18n>Ajouter un citoyen</button>
-            </th>
-            <th i18n>Sac</th>
-            <th *ngFor="let action of heroics">
-                <img [src]="HORDES_IMG_REPO + action.value.img" [title]="action.value.label">
-            </th>
+        <th>
+            <button mat-button [matMenuTriggerFor]="addCitizenMenu"
+                    *ngIf="(allCitizens | notInListCitizen:citizens).length > 0" i18n>Ajouter un citoyen
+            </button>
+        </th>
+        <th i18n>Sac</th>
+        <th *ngFor="let action of heroics">
+            <img [ngSrc]="HORDES_IMG_REPO + action.value.img" [title]="action.value.label" width="16" height="16">
+        </th>
         </thead>
         <tbody>
-            <tr *ngFor="let citizen of citizens">
-                <th class="name">
-                    <img [src]="HORDES_IMG_REPO + 'professions/' + citizen.job?.value?.img + '.gif'">{{citizen.name}}
-                </th>
-                <td class="bag">
-                    <img *ngFor="let item of citizen.bag?.items" [src]="HORDES_IMG_REPO + item.img"
-                        [class.broken]="item.is_broken" [title]="item.label[locale]">
-                </td>
-                <td *ngFor="let action of heroics">
-                    <ng-container *ngIf="(citizen.heroic_actions | hasStillHeroic:action) as value_left">
-                        <ng-container *ngIf="action.value.max_lvl > 1; else onlyOne">
-                            {{value_left}}
-                        </ng-container>
-                        <ng-template #onlyOne>
-                            <mat-icon>check</mat-icon>
-                        </ng-template>
+        <tr *ngFor="let citizen of citizens">
+            <th class="name">
+                <img [ngSrc]="HORDES_IMG_REPO + 'professions/' + citizen.job?.value?.img + '.gif'" width="16" height="16">{{citizen.name}}
+            </th>
+            <td class="bag">
+                <img *ngFor="let item of citizen.bag?.items" [ngSrc]="HORDES_IMG_REPO + item.img"
+                     [class.broken]="item.is_broken" [title]="item.label[locale]" width="16" height="16">
+            </td>
+            <td *ngFor="let action of heroics">
+                <ng-container *ngIf="(citizen.heroic_actions | hasStillHeroic:action) as value_left">
+                    <ng-container *ngIf="action.value.max_lvl > 1; else onlyOne">
+                        {{value_left}}
                     </ng-container>
-                </td>
-            </tr>
+                    <ng-template #onlyOne>
+                        <mat-icon>check</mat-icon>
+                    </ng-template>
+                </ng-container>
+            </td>
+        </tr>
         </tbody>
     </table>
 
     <mat-menu #addCitizenMenu="matMenu">
         <mat-list class="mho-add-citizen-list">
             <mat-list-item *ngFor="let citizen of (allCitizens | notInListCitizen:citizens)"
-                (click)="addCitizen(citizen)">
-                <img [src]="HORDES_IMG_REPO + 'professions/' + citizen.job?.value?.img + '.gif'">{{citizen.name}}
+                           (click)="addCitizen(citizen)">
+                <img [ngSrc]="HORDES_IMG_REPO + 'professions/' + citizen.job?.value?.img + '.gif'" width="16" height="16">{{citizen.name}}
             </mat-list-item>
         </mat-list>
     </mat-menu>

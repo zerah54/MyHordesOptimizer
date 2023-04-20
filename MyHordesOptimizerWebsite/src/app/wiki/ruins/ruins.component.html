@@ -48,7 +48,7 @@
                     <td mat-cell *matCellDef="let row" [ngClass]="column.id">
                         <ng-container [ngSwitch]="column.id">
                             <ng-container *ngSwitchCase="'label'">
-                                <img [src]="HORDES_IMG_REPO + 'ruin/' + row.img + '.gif'"/>
+                                <img [ngSrc]="HORDES_IMG_REPO + 'ruin/' + row.img + '.gif'" width="16" height="16">
                                 <div>{{row[column.id][locale]}}</div>
                             </ng-container>
                             <ng-container *ngSwitchCase="'description'">
@@ -57,7 +57,7 @@
                             <ng-container *ngSwitchCase="'drops'">
                                 <div class="drops-list">
                                     <div *ngFor="let drop of row[column.id]" [title]="drop.item.label[locale]">
-                                        <img [src]="HORDES_IMG_REPO + drop.item.img">
+                                        <img [ngSrc]="HORDES_IMG_REPO + drop.item.img" width="16" height="16">
                                         <div>{{(drop.probability * 100) | number:'1.1-1':locale}}%</div>
                                     </div>
                                 </div>

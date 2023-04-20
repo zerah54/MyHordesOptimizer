@@ -1,8 +1,8 @@
 import { Component, HostBinding } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { Dictionary } from 'src/app/_abstract_model/types/_types';
 import { ApiServices } from '../../_abstract_model/services/api.services';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { Dictionary } from '../../_abstract_model/types/_types';
 
 @Component({
     selector: 'mho-estimation',
@@ -49,10 +49,10 @@ export class EstimationComponent {
             rows_data[row.percent] = row.min && row.max ? row.min + ' - ' + row.max : ' ';
         });
         this.api_services.estimateAttack(rows_data, this.today, this.current_day)
-        .pipe(takeUntil(this.destroy_sub))
-        .subscribe((response: string) => {
-            console.log('response', response);
-        });
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((response: string) => {
+                console.log('response', response);
+            });
     }
 }
 

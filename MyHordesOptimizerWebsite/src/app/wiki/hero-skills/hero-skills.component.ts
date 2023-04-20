@@ -2,10 +2,10 @@ import { Component, HostBinding, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { ApiServices } from 'src/app/_abstract_model/services/api.services';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { HeroSkill } from '../../_abstract_model/types/hero-skill.class';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { ApiServices } from '../../_abstract_model/services/api.services';
 
 @Component({
     selector: 'mho-hero-skills',
@@ -26,10 +26,10 @@ export class HeroSkillsComponent implements OnInit {
     public datasource: MatTableDataSource<HeroSkill> = new MatTableDataSource();
     /** La liste des colonnes */
     public readonly columns: HeroSkillColumns[] = [
-        { id: 'icon', header: '' },
-        { id: 'label', header: $localize`Pouvoir` },
-        { id: 'days_needed', header: $localize`Jours héros nécessaires` },
-        { id: 'description', header: $localize`Description` }
+        {id: 'icon', header: ''},
+        {id: 'label', header: $localize`Pouvoir`},
+        {id: 'days_needed', header: $localize`Jours héros nécessaires`},
+        {id: 'description', header: $localize`Description`}
     ];
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: HeroSkillColumns) => column.id);

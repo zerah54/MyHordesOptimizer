@@ -1,12 +1,12 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { Action } from 'src/app/_abstract_model/enum/action.enum';
-import { Property } from 'src/app/_abstract_model/enum/property.enum';
 import { ApiServices } from '../../_abstract_model/services/api.services';
 import { Item } from '../../_abstract_model/types/item.class';
 import { normalizeString } from '../../shared/utilities/string.utils';
+import { Property } from '../../_abstract_model/enum/property.enum';
+import { Action } from '../../_abstract_model/enum/action.enum';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 
 @Component({
     selector: 'mho-items',
@@ -29,7 +29,7 @@ export class ItemsComponent implements OnInit {
     public select_value: (Property | Action)[] = [];
 
     /** La liste des filtres */
-    public options: (Property | Action)[] = [...<any>Property.getAllValues(), ...<any>Action.getAllValues()];
+    public options: (Property | Action)[] = [...<Property[]>Property.getAllValues(), ...<Action[]>Action.getAllValues()];
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 

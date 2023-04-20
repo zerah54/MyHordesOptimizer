@@ -1,5 +1,5 @@
 import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
-import { ClipboardService } from 'src/app/shared/services/clipboard.service';
+import { ClipboardService } from '../../../shared/services/clipboard.service';
 
 @Component({
     selector: 'mho-tuto-site-first-use',

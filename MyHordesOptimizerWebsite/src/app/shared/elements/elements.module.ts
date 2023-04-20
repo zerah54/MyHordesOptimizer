@@ -1,11 +1,10 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
-import { Components, Modules } from 'src/app/_abstract_model/types/_types';
 import { MaterialModule } from '../material-modules.module';
 import { AccordionComponent } from './accordion/accordion.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
@@ -22,6 +21,7 @@ import { HeaderWithStringFilterComponent } from './lists/header-with-string-filt
 import { RecipeComponent } from './recipe/recipe.component';
 import { LabelPipe } from './select/label.pipe';
 import { SelectComponent } from './select/select.component';
+import { Components, Modules } from '../../_abstract_model/types/_types';
 
 const components: Components = [
     ItemComponent, SelectComponent, RecipeComponent, FilterFieldComponent, LastUpdateComponent, AccordionComponent, ListElementAddRemoveComponent, MenuAddComponent,
@@ -30,7 +30,7 @@ const components: Components = [
 const list_headers: Components = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent];
 const local_components: Components = [LabelPipe];
 const custom_modules: Modules = [MaterialModule];
-const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule];
+const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, NgOptimizedImage];
 const pipes: Components = [DecimalPipe];
 
 @NgModule({

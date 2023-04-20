@@ -1,6 +1,6 @@
 import { Component, HostBinding } from '@angular/core';
-import { AccordionItem } from 'src/app/shared/elements/accordion/accordion.component';
-import { ClipboardService } from 'src/app/shared/services/clipboard.service';
+import { AccordionItem } from '../../../shared/elements/accordion/accordion.component';
+import { ClipboardService } from '../../../shared/services/clipboard.service';
 
 @Component({
     selector: 'mho-tuto-script-installation',
@@ -15,12 +15,12 @@ export class TutoScriptInstallationComponent {
     public readonly tuto_script_items: AccordionItem[] = [
         {
             title: $localize`Ordinateur`,
-            content: $localize`Il faut d'abord installer l'application de gestion des scripts de votre choix. Il en existe plusieurs, comme par exemple Tampermonkey, Violentmonkey. Ensuite, il suffit de cliquer sur le ${this.download_link}, qui lancera la procédure d'installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.`
+            content: $localize`Il faut d'abord installer l'application de gestion des scripts de votre choix. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le ${this.download_link}, qui lancera la procédure d'installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.`
         },
         {
             title: $localize`Android`, content: $localize`<ul>
-                <li>Installer Kiwi Browser ;</li>
-                <li>Rechercher l'application de gestion des scripts de votre choix dans la barre de recherche de Kiwi Browser. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;</li>
+                <li>Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox Nightly ;</li>
+                <li>Rechercher l'extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;</li>
                 <li>Installer l'extension pour Chrome ;</li>
                 <li>Cliquer sur le ${this.download_link} ;</li>
                 <li>Confirmer l'installation dans la page qui se sera ouverte.</li>
@@ -46,7 +46,7 @@ export class TutoScriptInstallationComponent {
             </ul>`
         }
     ];
-    public readonly final_text: string = $localize`Une fois le script installé, vous verrez apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.`;
+    public readonly final_text: string = '\n' + $localize`Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.`;
 
     public constructor(private clipboard: ClipboardService) {
 

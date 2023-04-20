@@ -3,18 +3,17 @@
         <div class="title-part" (click)="toggleAdvancedMode()">
             <div class="item_title">
                 <div class="item_img">
-                    <img [src]="HORDES_IMG_REPO + item.img"/>
+                    <img [ngSrc]="HORDES_IMG_REPO + item.img" width="16" height="16">
                     <span class="item_count" *ngIf="item.bank_count && item.bank_count > 1">{{item.bank_count}}</span>
                 </div>
                 <span class="item_label">{{item.label[locale]}}
-                    <ng-container
-                        *ngIf="item?.is_broken">&nbsp;(<ng-container i18n>Cassé</ng-container>)</ng-container>
+                    <ng-container *ngIf="item?.is_broken">&nbsp;(<ng-container i18n>Cassé</ng-container>)</ng-container>
                 </span>
             </div>
             <div class="add_to_wishlist" *ngIf="item.wishlist_count === 0">
                 <button mat-icon-button type="button"
                         (click)="$event.stopPropagation(); addItemToWishlist(item)">
-                    <img [src]="HORDES_IMG_REPO + 'item/item_cart.gif'">
+                    <img [ngSrc]="HORDES_IMG_REPO + 'item/item_cart.gif'" width="16" height="16">
                 </button>
             </div>
         </div>
@@ -45,15 +44,15 @@
             <ng-container *ngIf="item.deco || item.guard || item.is_heaver">
                 <mat-divider></mat-divider>
                 <div *ngIf="item.deco">
-                    <!--                    <img [src]="HORDES_IMG_REPO + property.value.img">-->
+                    <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
                     <ng-container i18n>Objet de décoration</ng-container>&nbsp;(+{{item.deco}})
                 </div>
                 <div *ngIf="item.guard">
-                    <!--                    <img [src]="HORDES_IMG_REPO + property.value.img">-->
+                    <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
                     <ng-container i18n>Arme de veille</ng-container>&nbsp;(+{{item.guard}})
                 </div>
                 <div *ngIf="item.is_heaver">
-                    <!--                    <img [src]="HORDES_IMG_REPO + property.value.img">-->
+                    <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
                     <ng-container i18n>Objet encombrant</ng-container>
                 </div>
             </ng-container>
@@ -64,7 +63,7 @@
                 <div *ngFor="let property of item.properties">
                     <ng-container *ngIf="property">
                         <img *ngIf="property.value.img && property.value.img !== ''"
-                             [src]="HORDES_IMG_REPO + property.value.img">{{property.value.label}}
+                             [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">{{property.value.label}}
                     </ng-container>
                 </div>
             </ng-container>
@@ -75,7 +74,7 @@
                 <div *ngFor="let action of item.actions">
                     <ng-container *ngIf="action">
                         <img *ngIf="action.value.img && action.value.img !== ''"
-                             [src]="HORDES_IMG_REPO + action.value.img">{{action.value.label}}
+                             [ngSrc]="HORDES_IMG_REPO + action.value.img" width="16" height="16">{{action.value.label}}
                     </ng-container>
                 </div>
             </ng-container>

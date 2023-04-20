@@ -3,13 +3,13 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { ApiServices } from 'src/app/_abstract_model/services/api.services';
-import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
 import { getTown } from '../../shared/utilities/localstorage.util';
 import { normalizeString } from '../../shared/utilities/string.utils';
+import { Ruin } from '../../_abstract_model/types/ruin.class';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { ApiServices } from '../../_abstract_model/services/api.services';
 
 @Component({
     selector: 'mho-ruins',

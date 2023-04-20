@@ -3,11 +3,11 @@ import { Component, EventEmitter, HostBinding, HostListener, Output, ViewChild }
 import { MatToolbar } from '@angular/material/toolbar';
 import { Title } from '@angular/platform-browser';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { getExternalAppId, getTown, getUser, setExternalAppId } from 'src/app/shared/utilities/localstorage.util';
-import { BREAKPOINTS } from 'src/app/_abstract_model/const';
-import { Me } from 'src/app/_abstract_model/types/me.class';
 import { ApiServices } from '../../_abstract_model/services/api.services';
+import { Me } from '../../_abstract_model/types/me.class';
+import { getExternalAppId, getTown, getUser, setExternalAppId } from '../../shared/utilities/localstorage.util';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { BREAKPOINTS } from '../../_abstract_model/const';
 
 @Component({
     selector: 'mho-header',

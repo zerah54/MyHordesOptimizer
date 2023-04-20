@@ -8,8 +8,9 @@
         </div>
         <div class="items">
             <ng-container *ngFor="let item of list">
-                <img *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1"
-                    [src]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id);"
+                <img
+                    *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1"
+                    [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id);" width="16" height="16"
                     [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
             </ng-container>
         </div>

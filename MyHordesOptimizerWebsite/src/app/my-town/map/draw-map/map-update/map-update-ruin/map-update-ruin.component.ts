@@ -2,10 +2,10 @@ import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@an
 import { FormBuilder, FormGroup } from '@angular/forms';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
-import { Cell } from 'src/app/_abstract_model/types/cell.class';
-import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
+import { Ruin } from '../../../../../_abstract_model/types/ruin.class';
+import { Cell } from '../../../../../_abstract_model/types/cell.class';
+import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
+import { AutoDestroy } from '../../../../../shared/decorators/autodestroy.decorator';
 
 @Component({
     selector: 'mho-map-update-ruin',

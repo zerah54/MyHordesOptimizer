@@ -1,12 +1,12 @@
 import { Component, ElementRef, HostBinding, OnInit, ViewChild } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { Regen } from 'src/app/_abstract_model/types/regen.class';
 import { ApiServices } from '../../../_abstract_model/services/api.services';
 import { ZoneRegen } from '../../../_abstract_model/enum/zone-regen.enum';
 import { MatTableDataSource } from '@angular/material/table';
 import { groupBy } from '../../../shared/utilities/array.util';
 import Chart from 'chart.js/auto';
+import { Regen } from '../../../_abstract_model/types/regen.class';
+import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 
 // import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 
@@ -50,7 +50,7 @@ export class ScrutateurComponent implements OnInit {
     ngOnInit(): void {
         this.api.getScrutList()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((regens: Regen[]) => {
+            .subscribe((regens: Regen[]): void => {
                 this.datasource.data = [...regens];
 
                 let regens_for_polar: Regen[] = [...regens];
@@ -58,10 +58,9 @@ export class ScrutateurComponent implements OnInit {
                 regens_for_polar.sort((regen_a: Regen, regen_b: Regen) => {
                     return (<ZoneRegen>regen_a.direction_regen).value.order_by - (<ZoneRegen>regen_b.direction_regen).value.order_by;
                 });
-                const group_by_direction: Regen[][] = groupBy(regens_for_polar, this.groupByRegenDirection);
-                const polar_data: number[] = [];
-                group_by_direction.forEach((regen: Regen[]) => {
-                    polar_data.push(regen.length);
+                let polar_data: number[] = new Array(8).fill(0);
+                polar_data = polar_data.map((_data: number, index: number) => {
+                    return regens_for_polar.filter((regen: Regen): boolean => regen.direction_regen?.value.order_by === index + 1).length;
                 });
                 const polar_ctx: CanvasRenderingContext2D = this.polar_canvas.nativeElement.getContext('2d');
                 this.polar_chart = new Chart<'polarArea'>(polar_ctx, {
@@ -99,12 +98,12 @@ export class ScrutateurComponent implements OnInit {
 
                 let regens_for_pie: Regen[] = [...regens];
                 regens_for_pie = regens_for_pie.filter((regen: Regen) => regen && regen.direction_regen);
-                regens_for_pie.sort((regen_a: Regen) => {
+                regens_for_pie.sort((regen_a: Regen): number => {
                     return (<ZoneRegen>regen_a.direction_regen).value.diag ? 1 : -1;
                 });
                 const group_by_diag: Regen[][] = groupBy(regens_for_pie, this.groupByDiago);
                 const pie_data: number[] = [];
-                group_by_diag.forEach((regen: Regen[]) => {
+                group_by_diag.forEach((regen: Regen[]): void => {
                     pie_data.push(regen.length);
                 });
 
@@ -141,12 +140,8 @@ export class ScrutateurComponent implements OnInit {
             });
     }
 
-    public trackByColumnId(index: number, column: RegenColumn): string {
+    public trackByColumnId(_index: number, column: RegenColumn): string {
         return column.id;
-    }
-
-    public groupByRegenDirection(item: Regen): string {
-        return item.direction_regen?.key || '';
     }
 
     public groupByDiago(item: Regen): string {

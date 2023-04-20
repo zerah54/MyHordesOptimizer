@@ -11,7 +11,7 @@
                     <td mat-cell *matCellDef="let row">
                         <ng-container [ngSwitch]="column.id">
                             <ng-container *ngSwitchCase="'icon'">
-                                <img [src]="HORDES_IMG_REPO + 'heroskill/' + row[column.id] + '.gif'" />
+                                <img [ngSrc]="HORDES_IMG_REPO + 'heroskill/' + row[column.id] + '.gif'" width="16" height="16">
                             </ng-container>
                             <ng-container *ngSwitchCase="'label'">
                                 {{row[column.id][locale]}}

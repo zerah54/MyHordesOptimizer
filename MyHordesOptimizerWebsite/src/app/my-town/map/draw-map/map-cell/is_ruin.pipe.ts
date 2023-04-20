@@ -1,7 +1,6 @@
-
 import { Pipe, PipeTransform } from '@angular/core';
-import { Cell } from 'src/app/_abstract_model/types/cell.class';
-import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
+import { Cell } from '../../../../_abstract_model/types/cell.class';
+import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 
 
 @Pipe({

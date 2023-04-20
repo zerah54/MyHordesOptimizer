@@ -1,11 +1,11 @@
 import { Component, HostBinding, Input } from '@angular/core';
 import * as moment from 'moment';
-import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
-import { Cell } from 'src/app/_abstract_model/types/cell.class';
-import { Citizen } from 'src/app/_abstract_model/types/citizen.class';
-import { Item } from 'src/app/_abstract_model/types/item.class';
-import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
 import { MapOptions } from '../../map.component';
+import { Cell } from '../../../../_abstract_model/types/cell.class';
+import { Ruin } from '../../../../_abstract_model/types/ruin.class';
+import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { Item } from '../../../../_abstract_model/types/item.class';
+import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 
 @Component({
     selector: 'mho-map-cell-details',

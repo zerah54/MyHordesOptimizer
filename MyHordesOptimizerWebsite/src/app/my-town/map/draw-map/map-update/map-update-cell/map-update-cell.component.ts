@@ -2,13 +2,13 @@ import { Component, EventEmitter, HostBinding, Input, OnInit, Output, ViewEncaps
 import { FormBuilder, FormGroup } from '@angular/forms';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
-import { ApiServices } from 'src/app/_abstract_model/services/api.services';
-import { Cell } from 'src/app/_abstract_model/types/cell.class';
-import { Citizen } from 'src/app/_abstract_model/types/citizen.class';
-import { ItemCountShort } from 'src/app/_abstract_model/types/item-count-short.class';
-import { Item } from 'src/app/_abstract_model/types/item.class';
+import { Cell } from '../../../../../_abstract_model/types/cell.class';
+import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
+import { Item } from '../../../../../_abstract_model/types/item.class';
+import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
+import { AutoDestroy } from '../../../../../shared/decorators/autodestroy.decorator';
+import { ApiServices } from '../../../../../_abstract_model/services/api.services';
+import { ItemCountShort } from '../../../../../_abstract_model/types/item-count-short.class';
 
 @Component({
     selector: 'mho-map-update-cell',
@@ -72,7 +72,7 @@ export class MapUpdateCellComponent implements OnInit {
      */
     public addItem(cell: Cell, item_id: number): void {
         if (cell) {
-            const item_in_list_index: number | undefined = cell.items.findIndex((item_in_cell: ItemCountShort) => item_in_cell.item_id === item_id);
+            const item_in_list_index: number | undefined = cell.items.findIndex((item_in_cell: ItemCountShort): boolean => item_in_cell.item_id === item_id);
             if (item_in_list_index !== undefined && item_in_list_index !== null && item_in_list_index > -1) {
                 cell.items[item_in_list_index].count++;
             } else {

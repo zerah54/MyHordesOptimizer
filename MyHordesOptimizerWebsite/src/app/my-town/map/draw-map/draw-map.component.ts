@@ -1,11 +1,11 @@
 import { Component, HostBinding, Input } from '@angular/core';
-import { groupBy } from 'src/app/shared/utilities/array.util';
-import { Cell } from 'src/app/_abstract_model/types/cell.class';
-import { Citizen } from 'src/app/_abstract_model/types/citizen.class';
-import { Item } from 'src/app/_abstract_model/types/item.class';
-import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
-import { Town } from 'src/app/_abstract_model/types/town.class';
 import { MapOptions } from '../map.component';
+import { Cell } from '../../../_abstract_model/types/cell.class';
+import { groupBy } from '../../../shared/utilities/array.util';
+import { Ruin } from '../../../_abstract_model/types/ruin.class';
+import { Item } from '../../../_abstract_model/types/item.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { Town } from '../../../_abstract_model/types/town.class';
 
 @Component({
     selector: 'mho-draw-map',
@@ -50,7 +50,7 @@ export class DrawMapComponent {
     public complete_map!: Town;
     public drawed_map: Cell[][] = [];
 
-    public trackByCellId(index: number, column: Cell): number {
+    public trackByCellId(_index: number, column: Cell): number {
         return column.cell_id;
     }
 }

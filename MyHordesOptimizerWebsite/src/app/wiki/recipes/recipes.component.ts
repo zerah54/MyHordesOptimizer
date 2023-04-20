@@ -2,13 +2,13 @@ import { Component, HostBinding, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
-import { ApiServices } from 'src/app/_abstract_model/services/api.services';
-import { Item } from 'src/app/_abstract_model/types/item.class';
-import { RecipeResultItem } from 'src/app/_abstract_model/types/recipe-result-item.class';
-import { Recipe } from 'src/app/_abstract_model/types/recipe.class';
 import { normalizeString } from '../../shared/utilities/string.utils';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { ApiServices } from '../../_abstract_model/services/api.services';
+import { Recipe } from '../../_abstract_model/types/recipe.class';
+import { Item } from '../../_abstract_model/types/item.class';
+import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item.class';
+import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 
 @Component({
     selector: 'mho-recipes',
@@ -45,7 +45,7 @@ export class RecipesComponent implements OnInit {
     ngOnInit(): void {
         this.api.getRecipes()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((recipes: Recipe[]) => {
+            .subscribe((recipes: Recipe[]): void => {
                 this.recipes = recipes;
                 this.datasource.data = [...recipes];
                 this.datasource.filterPredicate = this.customFilter;
@@ -59,8 +59,8 @@ export class RecipesComponent implements OnInit {
 
     private customFilter(data: Recipe, filter: string): boolean {
         const locale: string = moment.locale();
-        return data.components.some((component: Item) => normalizeString(component.label[locale]).indexOf(normalizeString(filter)) > -1)
-            || data.result.some((result: RecipeResultItem) => normalizeString(result.item.label[locale]).indexOf(normalizeString(filter)) > -1);
+        return data.components.some((component: Item): boolean => normalizeString(component.label[locale]).indexOf(normalizeString(filter)) > -1)
+            || data.result.some((result: RecipeResultItem): boolean => normalizeString(result.item.label[locale]).indexOf(normalizeString(filter)) > -1);
     }
 }
 

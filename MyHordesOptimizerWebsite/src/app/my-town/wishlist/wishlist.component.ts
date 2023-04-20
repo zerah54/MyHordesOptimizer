@@ -5,17 +5,21 @@ import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
 import * as moment from 'moment';
 import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { SelectComponent } from 'src/app/shared/elements/select/select.component';
-import { ClipboardService } from 'src/app/shared/services/clipboard.service';
-import { WishlistServices } from 'src/app/_abstract_model/services/wishlist.service';
-import { environment } from 'src/environments/environment';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { ApiServices } from '../../_abstract_model/services/api.services';
 import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { WishlistServices } from '../../_abstract_model/services/wishlist.service';
+import { ClipboardService } from '../../shared/services/clipboard.service';
+import { environment } from '../../../environments/environment';
+import { SelectComponent } from '../../shared/elements/select/select.component';
+import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';
+import { ConfirmDialogComponent } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+
 
 @Component({
     selector: 'mho-wishlist',
@@ -68,6 +72,18 @@ export class WishlistComponent implements OnInit {
 
     public wishlist_filters_change: EventEmitter<void> = new EventEmitter();
 
+    private readonly excel_headers: { [key: string]: { label: string, comment?: string } } = {
+        id: {label: $localize`Identifiant`},
+        name: {label: $localize`Nom de l'objet`},
+        priority: {
+            label: $localize`Priorité`,
+            comment: `(3 : ${$localize`Haute`}, 2 : ${$localize`Moyenne`}, 1 : ${$localize`Basse`}, 0 : ${$localize`Non définie`}, -1 : ${$localize`Ne pas ramener`})`
+        },
+        count: {label: $localize`Quantité souhaitée`},
+        depot: {label: $localize`Zone de dépôt`, comment: `(0 : ${$localize`Banque`}, 1 : ${$localize`Zone de rappatriement`}, 2 : ${$localize`Non définie`})`},
+    };
+
+
     /** La liste des priorités */
     public readonly priorities: PriorityOrDepot[] = [
         {count: -1, label: $localize`Ne pas ramener`},
@@ -86,7 +102,7 @@ export class WishlistComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices, private wishlist_sercices: WishlistServices, private clipboard: ClipboardService) {
+    constructor(private api: ApiServices, private wishlist_sercices: WishlistServices, private clipboard: ClipboardService, private dialog: MatDialog) {
 
     }
 
@@ -96,7 +112,7 @@ export class WishlistComponent implements OnInit {
 
         this.wishlist_filters_change
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe(() => {
+            .subscribe((): void => {
                 this.datasource.filter = JSON.stringify(this.wishlist_filters);
             });
 
@@ -105,7 +121,7 @@ export class WishlistComponent implements OnInit {
         this.getWishlist();
         this.api.getItems(true)
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((items: Item[]) => {
+            .subscribe((items: Item[]): void => {
                 this.items = items;
             });
     }
@@ -114,16 +130,16 @@ export class WishlistComponent implements OnInit {
     public updateWishlist(): void {
         this.wishlist_sercices.updateWishlist(this.wishlist_info)
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((wishlist_info: WishlistInfo) => {
+            .subscribe((wishlist_info: WishlistInfo): void => {
                 this.wishlist_info = wishlist_info;
-                this.datasource.data = [...<WishlistItem[]>wishlist_info.wishlist_items.get(this.selected_tab_key)];
+                this.datasource.data = [...<WishlistItem[]>wishlist_info.wishlist_items.get(this.selected_tab_key) || this.wishlist_info.wishlist_items.get('0') || []];
             });
     }
 
     /** Retire une ligne de la liste */
     public remove(row: WishlistItem): void {
-        const current_list: WishlistItem[] = [...<WishlistItem[]>this.wishlist_info.wishlist_items.get(this.selected_tab_key)];
-        const index: number = current_list.findIndex((wishlist_item: WishlistItem) => wishlist_item.item.id === row.item.id);
+        const current_list: WishlistItem[] = [...<WishlistItem[]>this.wishlist_info.wishlist_items.get(this.selected_tab_key) || this.wishlist_info.wishlist_items.get('0') || []];
+        const index: number = current_list.findIndex((wishlist_item: WishlistItem): boolean => wishlist_item.item.id === row.item.id);
         current_list.splice(index, 1);
         setTimeout(() => {
             this.datasource.data = [...current_list];
@@ -143,7 +159,7 @@ export class WishlistComponent implements OnInit {
         }
     }
 
-    public trackByColumnId(index: number, column: WishlistColumns): string {
+    public trackByColumnId(_index: number, column: WishlistColumns): string {
         return column.id;
     }
 
@@ -158,12 +174,10 @@ export class WishlistComponent implements OnInit {
     public changeTab(event: MatTabChangeEvent): void {
         const keys: string[] = Array.from(this.wishlist_info.wishlist_items.keys());
         this.selected_tab_key = keys[event.index];
-        setTimeout(() => {
-            this.datasource.data = [...<WishlistItem[]>this.wishlist_info.wishlist_items.get(this.selected_tab_key)];
-        });
+        this.datasource.data = [...<WishlistItem[]>this.wishlist_info.wishlist_items.get(this.selected_tab_key) || this.wishlist_info.wishlist_items.get('0') || []];
     }
 
-    public shareWishlist(): void {
+    public shareWishlistForum(): void {
         let text: string = `[big][b][i]${$localize`Liste de courses`}[/i][/b][/big]\n\n`;
         this.wishlist_info.wishlist_items.forEach((items: WishlistItem[], key: string) => {
             if (key === '0') {
@@ -180,23 +194,25 @@ export class WishlistComponent implements OnInit {
             const do_not_bring_back: WishlistItem[] = items.filter((item: WishlistItem) => item.priority < 0);
 
             if (heavy.length > 0) {
-                text += `\n[b][i]${$localize`Encombrants`}[/i][/b]\n`;
-                heavy.forEach((item: WishlistItem) => {
-                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 1000 ? ` (x${item.count})` : '') + '\n';
+                text += `\n[collapse=${$localize`Encombrants`}]\n`;
+                heavy.forEach((item: WishlistItem): void => {
+                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '') + '\n';
                 });
+                text += '[/collapse]\n';
             }
             if (light.length > 0) {
-                text += `\n[b][i]${$localize`Non-Encombrants`}[/i][/b]\n`;
-                light.forEach((item: WishlistItem) => {
-                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 1000 ? ` (x${item.count})` : '') + '\n';
+                text += `\n[collapse=${$localize`Non-Encombrants`}]\n`;
+                light.forEach((item: WishlistItem): void => {
+                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '') + '\n';
                 });
+                text += '[/collapse]\n';
             }
             if (do_not_bring_back.length > 0) {
                 text += `\n[collapse=${$localize`Ne pas rapporter`}]\n`;
-                do_not_bring_back.forEach((item: WishlistItem) => {
+                do_not_bring_back.forEach((item: WishlistItem): void => {
                     text += `:middot:${item.item.label[this.locale]}\n`;
                 });
-                text += '[/collapse]';
+                text += '[/collapse]\n';
             }
             text += '\n{hr}\n\n';
         });
@@ -207,8 +223,108 @@ export class WishlistComponent implements OnInit {
         this.clipboard.copy(text, $localize`La liste a bien été copiée au format forum`);
     }
 
+    public shareExcel(): void {
+
+        const workbook: WorkBook = {
+            Props: {
+                Author: 'MyHordes Optimizer',
+                Title: `MyHordes Optimizer - ${$localize`Liste de course`}`
+            },
+            Sheets: {},
+            SheetNames: []
+        };
+
+        for (const wishlist_zone_key of Array.from(this.wishlist_info.wishlist_items)) {
+            const zone_items_key: string = wishlist_zone_key[0];
+            const zone_items: WishlistItem[] = wishlist_zone_key[1];
+            const simplify_item: { [key: string]: string | number }[] = zone_items.map((item: WishlistItem): { [key: string]: string | number } => {
+                const final_item: { [key: string]: string | number } = {};
+                final_item[this.excel_headers['id'].label] = item.item.id;
+                final_item[this.excel_headers['name'].label] = item.item.label[this.locale];
+                final_item[this.excel_headers['priority'].label] = item.priority_main;
+                final_item[this.excel_headers['count'].label] = item.item.wishlist_count;
+                final_item[this.excel_headers['depot'].label] = item.depot;
+                return final_item;
+            });
+            const data: WorkSheet = utils.json_to_sheet(simplify_item, {cellStyles: true});
+            workbook.SheetNames.push(zone_items_key);
+            workbook.Sheets[zone_items_key] = data;
+        }
+
+        const u8: Uint8Array = write(workbook, {type: 'buffer', bookType: 'xlsx'});
+        const blob: Blob = new Blob([u8], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+
+        const url: string = window.URL.createObjectURL(blob);
+        const hidden_link: HTMLAnchorElement = document.createElement('a');
+        document.body.appendChild(hidden_link);
+        hidden_link.style.display = 'none';
+        hidden_link.href = url;
+        hidden_link.download = `MyHordes Optimizer - ${$localize`Liste de courses`}`;
+        hidden_link.click();
+        hidden_link.remove();
+        window.URL.revokeObjectURL(url);
+    }
+
+    public importExcel(event: Event): void {
+        this.dialog
+            .open(ConfirmDialogComponent, {
+                data: {
+                    title: $localize`Confirmer`,
+                    text: $localize`Voulez-vous écraser la liste actuelle ? Elle sera perdue.`
+                }
+            })
+            .afterClosed()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((confirm: boolean): void => {
+                if (confirm) {
+
+                    const target: HTMLInputElement = <HTMLInputElement>event.target;
+                    if (!target || !target.files || target.files.length === 0) {
+                        return;
+                    }
+
+                    const file: File = target.files[0];
+
+                    file.arrayBuffer().then((data: ArrayBuffer): void => {
+                        const workbook: WorkBook = read(data);
+                        const new_wishlist: WishlistInfo = new WishlistInfo();
+                        new_wishlist.update_info = this.wishlist_info.update_info;
+                        new_wishlist.wishlist_items = new Map();
+                        for (const sheet_key in workbook.Sheets) {
+                            if (typeof +sheet_key === 'number') {
+                                const zone: { [key: string]: string | number }[] = utils.sheet_to_json(workbook.Sheets[sheet_key]);
+                                const items: WishlistItem[] = [];
+                                zone.forEach((item: { [key: string]: string | number }): void => {
+                                    const new_item: WishlistItem = new WishlistItem();
+                                    const complete_item: Item | undefined = this.items
+                                        .find((item_in_all: Item): boolean => item_in_all.id === item[this.excel_headers['id'].label]);
+                                    if (complete_item) {
+                                        new_item.zone_x_pa = +sheet_key;
+                                        new_item.depot = <number>item[this.excel_headers['depot'].label];
+                                        new_item.count = <number>item[this.excel_headers['count'].label];
+                                        new_item.priority_main = <number>item[this.excel_headers['priority'].label];
+                                        new_item.item = complete_item;
+                                        new_item.bank_count = complete_item.bank_count;
+                                    }
+                                    items.push(new_item);
+                                });
+                                new_wishlist.wishlist_items.set(sheet_key, [...this.resetPriorities(items)]);
+
+                            }
+                        }
+
+                        if (new_wishlist.wishlist_items) {
+                            this.wishlist_info = new_wishlist;
+                            this.updateWishlist();
+                        }
+
+                    });
+                }
+            });
+    }
+
     public sortWishlist(event: CdkDragDrop<TableVirtualScrollDataSource<WishlistItem>>): void {
-        const current_wishlist_items: WishlistItem[] = this.wishlist_info.wishlist_items.get(this.selected_tab_key) || [];
+        const current_wishlist_items: WishlistItem[] = this.wishlist_info.wishlist_items.get(this.selected_tab_key) || this.wishlist_info.wishlist_items.get('0') || [];
         const previous_index_in_real_array: number = current_wishlist_items.findIndex((item: WishlistItem) => item.item.id === event.item.data.item.id);
         let current_index_in_real_array: number;
         if (this.datasource.dataOfRange$['_buffer'][0][event.currentIndex - 1]) {
@@ -256,7 +372,7 @@ export class WishlistComponent implements OnInit {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((wishlist_info: WishlistInfo) => {
                 this.wishlist_info = wishlist_info;
-                this.datasource.data = [...<WishlistItem[]>wishlist_info.wishlist_items.get(this.selected_tab_key)];
+                this.datasource.data = [...<WishlistItem[]>wishlist_info.wishlist_items.get(this.selected_tab_key) || this.wishlist_info.wishlist_items.get('0') || []];
             });
     }
 }

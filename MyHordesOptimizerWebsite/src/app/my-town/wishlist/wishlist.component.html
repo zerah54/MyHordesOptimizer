@@ -1,10 +1,23 @@
-<mat-card-header>
+<mat-card-header class="mho-wishlist-header">
     <mat-card-title>
         <ng-container i18n>Liste de courses</ng-container>
-        <button mat-icon-button (click)="shareWishlist()" matTooltip="Copier au format forum" i18n-matTooltip>
+        <button mat-icon-button matTooltip="Copier au format forum" i18n-matTooltip (click)="shareWishlistForum()">
             <mat-icon>share</mat-icon>
         </button>
     </mat-card-title>
+
+    <div class="import-export">
+        <button mat-icon-button [matMenuTriggerFor]="shareMenu" matTooltip="Import / Export" i18n-matTooltip>
+            <mat-icon>import_export</mat-icon>
+        </button>
+
+        <mat-menu #shareMenu="matMenu">
+            <div mat-menu-item (click)="shareExcel()" i18n>Enregistrer dans un fichier Excel</div>
+            <div mat-menu-item (click)="importFileInput.click()" i18n>Importer depuis un fichier Excel</div>
+            <input #importFileInput type="file" style="display: none;" (change)="importExcel($event)"
+                   accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+        </mat-menu>
+    </div>
 
 </mat-card-header>
 <mat-card-content class="mho-wishlist">
@@ -80,7 +93,7 @@
                                             </ng-container>
                                             <ng-container *ngSwitchCase="'name'">
                                                 <div>
-                                                    <img [src]="HORDES_IMG_REPO + row.item.img"/>
+                                                    <img [ngSrc]="HORDES_IMG_REPO + row.item.img" width="16" height="16">
                                                     <span>{{row.item.label[locale]}}</span>
                                                 </div>
                                             </ng-container>

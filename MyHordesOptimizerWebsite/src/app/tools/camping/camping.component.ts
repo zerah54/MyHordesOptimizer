@@ -4,14 +4,14 @@ import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { ClipboardService } from 'src/app/shared/services/clipboard.service';
-import { JobEnum } from 'src/app/_abstract_model/enum/job.enum';
-import { ApiServices } from 'src/app/_abstract_model/services/api.services';
-import { dtoToModelArray } from 'src/app/_abstract_model/types/_common.class';
 import { CAMPINGS_MAP, DISTANCE_MAP, HIDDEN_CAMPERS_MAP, HORDES_IMG_REPO, NO_RUIN } from '../../_abstract_model/const';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { Dictionary } from '../../_abstract_model/types/_types';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { dtoToModelArray } from '../../_abstract_model/types/_common.class';
+import { JobEnum } from '../../_abstract_model/enum/job.enum';
+import { ApiServices } from '../../_abstract_model/services/api.services';
+import { ClipboardService } from '../../shared/services/clipboard.service';
 
 @Component({
     selector: 'mho-camping',

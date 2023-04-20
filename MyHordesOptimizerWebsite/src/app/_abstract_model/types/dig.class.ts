@@ -1,7 +1,7 @@
-import { getArrayXFromDisplayedX, getArrayYFromDisplayedY, getDisplayedXFromArrayX, getDisplayedYFromArrayY } from 'src/app/shared/utilities/coordinates.util';
 import { DigDTO } from '../dto/dig.dto';
 import { UpdateInfo } from './update-info.class';
 import { CommonModel } from './_common.class';
+import { getArrayXFromDisplayedX, getArrayYFromDisplayedY, getDisplayedXFromArrayX, getDisplayedYFromArrayY } from '../../shared/utilities/coordinates.util';
 
 export class Dig extends CommonModel<DigDTO> {
     public cell_id?: number;

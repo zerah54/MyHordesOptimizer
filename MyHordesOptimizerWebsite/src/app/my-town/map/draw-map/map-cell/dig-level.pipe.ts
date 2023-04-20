@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Cell } from 'src/app/_abstract_model/types/cell.class';
+import { Cell } from '../../../../_abstract_model/types/cell.class';
 
 
 @Pipe({

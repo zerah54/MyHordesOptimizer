@@ -1,10 +1,10 @@
 import { Component, HostBinding, Input, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { WishlistServices } from 'src/app/_abstract_model/services/wishlist.service';
 import { AutoDestroy } from '../../decorators/autodestroy.decorator';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { Item } from '../../../_abstract_model/types/item.class';
+import { WishlistServices } from '../../../_abstract_model/services/wishlist.service';
 
 @Component({
     selector: 'mho-item',

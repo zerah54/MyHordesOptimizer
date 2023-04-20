@@ -57,6 +57,7 @@
         "ngx-i18nsupport": "^0.17.1",
         "tslib": "^2.5.0",
         "typescript": "~4.9.5",
-        "xliff": "^6.0.3"
+        "xliff": "^6.0.3",
+        "xlsx": "^0.18.5"
     }
 }
