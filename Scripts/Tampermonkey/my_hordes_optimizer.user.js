@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.48
+// @version      1.0.0-beta.49
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,7 +35,8 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] La valeur de la clôture est envoyée correctement à GH\n`;
+    + `[correctif] Typo\n`
+    + `[correctif] Affichage du warning en cas de registre incomplet\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1202,7 +1203,7 @@ let params_categories = [
                 },
                 help: {
                     en: `Allows to display the number of blood splatters on the map`,
-                    fr: `Permet d'afficher le nombre de tâches de sang sur la carte`,
+                    fr: `Permet d'afficher le nombre de taches de sang sur la carte`,
                     de: `Ermöglicht die Anzeige der Anzahl der Blutfleck auf der Karte`,
                     es: `Permite mostrar la cantidad de manchas de sangre en el mapa`
                 },
@@ -3288,18 +3289,18 @@ function createUpdateExternalToolsButton() {
 
             updater_bloc.appendChild(updater_title);
 
-            let btn = document.createElement('button');
+            update_external_tools_btn = document.createElement('button');
 
-            btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/arrowright.gif">' + getI18N(texts.update_external_tools_needed_btn_label);
-            btn.id = mh_update_external_tools_id;
+            update_external_tools_btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/arrowright.gif">' + getI18N(texts.update_external_tools_needed_btn_label);
+            update_external_tools_btn.id = mh_update_external_tools_id;
 
-            btn.addEventListener('click', () => {
+            update_external_tools_btn.addEventListener('click', () => {
                 /** Au clic sur le bouton, on appelle la fonction de mise à jour */
-                btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/middot.gif">' + getI18N(texts.update_external_tools_pending_btn_label);
+                update_external_tools_btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/middot.gif">' + getI18N(texts.update_external_tools_pending_btn_label);
                 updateExternalTools().then();
             })
 
-            updater_bloc.appendChild(btn);
+            updater_bloc.appendChild(update_external_tools_btn);
         }
 
         let warn_missing_logs = document.getElementById(mho_warn_missing_logs_id);
