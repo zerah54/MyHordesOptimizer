@@ -30,7 +30,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
 
         public void Update()
         {
-            var url = AddParameterToQuery($"{FataMorganaConfiguration.Url}/{_endpointMap}/{_endpointUpdateMyZone}", _parameterUserKey, UserKeyProvider.UserKey);
+            var url = AddParameterToQuery($"{FataMorganaConfiguration.Url}/{_endpointUpdateMyZone}", _parameterUserKey, UserKeyProvider.UserKey);
 
             base.Post(url: url, body: null);
         }
