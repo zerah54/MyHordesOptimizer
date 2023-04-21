@@ -3,8 +3,14 @@
 </mat-card-header>
 <mat-card-content class="mho-stats">
     <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+        <mat-tab *ngIf="is_dev" label="Estimations" i18n-label>
+            <mho-estimations></mho-estimations>
+        </mat-tab>
         <mat-tab label="Scrutateur" i18n-label>
             <mho-scrutateur></mho-scrutateur>
+        </mat-tab>
+        <mat-tab label="Registre" i18n-label>
+            <mho-registry></mho-registry>
         </mat-tab>
     </mat-tab-group>
 </mat-card-content>

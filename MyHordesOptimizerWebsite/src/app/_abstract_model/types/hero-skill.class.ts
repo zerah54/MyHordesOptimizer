@@ -1,6 +1,6 @@
-import { HeroSkillDTO } from './../dto/hero-skill.dto';
-import { CommonModel } from "./_common.class";
-import { I18nLabels } from "./_types";
+import { HeroSkillDTO } from '../dto/hero-skill.dto';
+import { I18nLabels } from './_types';
+import { CommonModel } from './_common.class';
 
 export class HeroSkill extends CommonModel<HeroSkillDTO> {
     public name!: string;
@@ -25,7 +25,7 @@ export class HeroSkill extends CommonModel<HeroSkillDTO> {
             daysNeeded: this.days_needed
 
         };
-    };
+    }
 
     protected dtoToModel(dto?: HeroSkillDTO): void {
         if (dto) {
@@ -36,5 +36,5 @@ export class HeroSkill extends CommonModel<HeroSkillDTO> {
             this.nb_uses = dto.nbUses;
             this.days_needed = dto.daysNeeded;
         }
-    };
+    }
 }

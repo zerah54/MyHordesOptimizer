@@ -21,35 +21,36 @@
                             <ng-container *ngSwitchCase="'type'">
                                 <div>
                                     <ng-container *ngIf="row[column.id] === 'Recipe::ManualAnywhere'; else workshop">
-                                        <img [src]="HORDES_IMG_REPO + 'log/citizen.gif'">
+                                        <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" width="16" height="16">
                                         <ng-container i18n>Action de citoyen</ng-container>
                                     </ng-container>
                                     <ng-template #workshop>
-                                        <img [src]="HORDES_IMG_REPO + 'log/workshop.gif'">
+                                        <img [ngSrc]="HORDES_IMG_REPO + 'log/workshop.gif'" width="16" height="16">
                                         <ng-container *ngIf="row[column.id] === 'Recipe::WorkshopType'" i18n>Atelier
                                         </ng-container>
                                         <ng-container *ngIf="row[column.id] === 'Recipe::WorkshopTypeShamanSpecific'"
-                                            i18n>
-                                            Atelier, Chaman uniquement</ng-container>
+                                                      i18n>
+                                            Atelier, Chaman uniquement
+                                        </ng-container>
                                     </ng-template>
                                 </div>
                             </ng-container>
 
                             <ng-container *ngSwitchCase="'components'">
                                 <ng-container *ngFor="let component of row[column.id]">
-                                    <div><img [src]="HORDES_IMG_REPO + component.img">{{component.label[locale]}}
+                                    <div><img [ngSrc]="HORDES_IMG_REPO + component.img" width="16" height="16">{{component.label[locale]}}
                                     </div>
                                 </ng-container>
                             </ng-container>
 
                             <ng-container *ngSwitchCase="'transformation'">
-                                <img [src]="HORDES_IMG_REPO + 'icons/small_move.gif'">
+                                <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_move.gif'" width="16" height="16">
                             </ng-container>
 
                             <ng-container *ngSwitchCase="'result'">
                                 <ng-container *ngFor="let result of row[column.id]">
                                     <div>
-                                        <img [src]="HORDES_IMG_REPO + result.item.img">
+                                        <img [ngSrc]="HORDES_IMG_REPO + result.item.img" width="16" height="16">
                                         {{result.item.label[locale]}}
                                         <small *ngIf="result.probability !== 1">({{result.probability * 100 |
                                             number:'1.0-2':locale}}%)</small>

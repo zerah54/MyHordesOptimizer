@@ -24,7 +24,9 @@
       "dom"
     ]
   },
-  "types": ["vite/client"], // for vite
+  "types": [
+    "vite/client"
+  ],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,

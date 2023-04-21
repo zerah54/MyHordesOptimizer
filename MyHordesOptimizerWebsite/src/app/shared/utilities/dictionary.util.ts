@@ -1,4 +1,4 @@
-import { Dictionary } from './../../_abstract_model/types/_types';
+import { Dictionary } from '../../_abstract_model/types/_types';
 
 export class DictionaryUtils {
     public static getKeys(dictionary: Dictionary<unknown>): string[] | number[] {

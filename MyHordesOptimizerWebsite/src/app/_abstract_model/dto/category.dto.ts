@@ -1,4 +1,4 @@
-import { I18nLabels } from "../types/_types";
+import { I18nLabels } from '../types/_types';
 
 export interface CategoryDTO {
     idCategory: number;

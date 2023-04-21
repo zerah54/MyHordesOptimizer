@@ -1,7 +1,7 @@
-@import "variables.scss";
+@use "variables";
 
-@import 'noel/snow.scss';
-@import 'noel/guirlande.scss';
+@use 'noel/snow';
+@use 'noel/guirlande';
 
 
 $snow-1: url('/assets/img/noel/s1.png');
@@ -27,16 +27,16 @@ $snow-3: url('/assets/img/noel/s3.png');
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: $sidenav_bg_color;
+    background-color: variables.$sidenav_bg_color;
 
     .mho-container {
         flex: 1;
         overflow: hidden;
-        background-color: $sidenav_bg_color !important;
+        background-color: variables.$sidenav_bg_color !important;
 
         > .mat-sidenav,
         > .mho-content {
-            background-color: $sidenav_bg_color !important;
+            background-color: variables.$sidenav_bg_color !important;
             border-width: 0;
         }
 

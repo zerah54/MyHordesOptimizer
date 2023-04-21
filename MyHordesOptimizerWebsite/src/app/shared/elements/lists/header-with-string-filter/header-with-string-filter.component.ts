@@ -20,7 +20,7 @@ export class HeaderWithStringFilterComponent {
     public visible: boolean = false;
 
     /** Affiche le filtre */
-    public displayFilter() {
+    public displayFilter(): void {
         this.visible = true;
         setTimeout(() => {
             this.filter.nativeElement.focus();
@@ -28,7 +28,7 @@ export class HeaderWithStringFilterComponent {
     }
 
     /** Vérifie si le filtre doit toujours être affiché */
-    public checkVisibility() {
+    public checkVisibility(): void {
         this.visible = this.filterValue !== '' && this.filterValue !== null && this.filterValue !== undefined;
     }
 

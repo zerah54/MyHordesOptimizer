@@ -1,4 +1,4 @@
-import { I18nLabels } from './../types/_types';
+import { I18nLabels } from '../types/_types';
 import { RuinItemDTO } from './ruin-item.dto';
 
 export interface RuinDTO {

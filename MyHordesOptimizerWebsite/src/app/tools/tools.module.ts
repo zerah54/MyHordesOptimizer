@@ -6,7 +6,7 @@ import { EstimationModule } from './estimation/estimation.module';
 import { ProbabilitiesModule } from './probabilities/probabilities.module';
 import { ToolsRoutingModule } from './tools.routing.module';
 
-let modules: Modules = [CampingModule, EstimationModule, ProbabilitiesModule]
+const modules: Modules = [CampingModule, EstimationModule, ProbabilitiesModule];
 
 @NgModule({
     imports: [SharedModule, ToolsRoutingModule, ...modules],

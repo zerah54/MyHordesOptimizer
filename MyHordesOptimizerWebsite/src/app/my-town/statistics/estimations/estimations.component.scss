@@ -1,0 +1,26 @@
+.mho-estimations {
+    .header {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5em;
+        justify-content: space-between;
+    }
+
+    .tables {
+        display: flex;
+        justify-content: center;
+        gap: 0.5em;
+
+        align-items: baseline;
+
+        table {
+            width: 50%;
+            margin: 0;
+
+            td {
+                text-align: right;
+            }
+        }
+    }
+}

@@ -1,8 +1,7 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
     "compileOnSave": false,
     "compilerOptions": {
-        "baseUrl": "./",
+        "baseUrl": "",
         "outDir": "./dist/out-tsc",
         "forceConsistentCasingInFileNames": true,
         "strict": true,
@@ -10,6 +9,8 @@
         "noPropertyAccessFromIndexSignature": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
         "sourceMap": true,
         "declaration": false,
         "downlevelIteration": true,
@@ -19,17 +20,13 @@
         "importHelpers": true,
         "preserveSymlinks": true,
         "target": "ES2022",
-        "module": "es2020",
+        "module": "ES2022",
         "lib": [
-            "es2020",
+            "ES2022",
             "dom"
         ],
-        "types": [
-            "node"
-        ],
         "typeRoots": [
-            "node_modules/@types",
-            "node_modules"
+            "node_modules/@types"
         ],
         "useDefineForClassFields": false
     },

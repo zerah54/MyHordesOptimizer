@@ -2,7 +2,7 @@
     <button mat-icon-button type="button" (click)="changeSidenavStatus.next();">
         <mat-icon>menu</mat-icon>
     </button>
-    <img [src]="'assets/img/logo/logo_mho_64x64.png'" height="48px" width="48px">
+    <img [ngSrc]="'assets/img/logo/logo_mho_64x64.png'" height="48" width="48" priority>
     <div class="title">{{is_gt_xs ? 'MyHordes Optimizer' : 'MHO'}}</div>
     <!-- <span *ngIf="!external_app_id_field_value"> -->
     <span class="spacer"></span>
@@ -12,10 +12,13 @@
     <button mat-button class="profil-button" [matMenuTriggerFor]="userMenu">
         <ng-container
             *ngIf="saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === ''; else noAppId"
-            i18n>Se connecter</ng-container>
+            i18n>Se connecter
+        </ng-container>
         <ng-template #noAppId>
             <ng-container *ngIf="me && me.username && me.username !== ''; else wrongUser">{{me.username}}</ng-container>
-            <ng-template #wrongUser><ng-container i18n>Utilisateur inconnu</ng-container></ng-template>
+            <ng-template #wrongUser>
+                <ng-container i18n>Utilisateur inconnu</ng-container>
+            </ng-template>
         </ng-template>
     </button>
 
@@ -24,9 +27,9 @@
             <mat-form-field class="external-app-id-input" class="no-bottom">
                 <mat-label for="external-app-id" i18n>Identifiant d'app externe</mat-label>
                 <input id="external-app-id" matInput type="text" placeholder="Identifiant externe pour les app"
-                    i18n-placeholder [(ngModel)]="external_app_id_field_value">
+                       i18n-placeholder [(ngModel)]="external_app_id_field_value">
                 <button matSuffix mat-icon-button (click)="saveExternalAppId();"
-                    [disabled]="!external_app_id_field_value">
+                        [disabled]="!external_app_id_field_value">
                     <mat-icon>check</mat-icon>
                 </button>
             </mat-form-field>

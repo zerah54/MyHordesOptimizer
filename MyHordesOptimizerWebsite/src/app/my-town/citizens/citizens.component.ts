@@ -1,8 +1,8 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { ApiServices } from 'src/app/_abstract_model/services/api.services';
-import { CitizenInfo } from 'src/app/_abstract_model/types/citizen-info.class';
+import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { ApiServices } from '../../_abstract_model/services/api.services';
 
 @Component({
     selector: 'mho-citizens',
@@ -26,10 +26,10 @@ export class CitizensComponent implements OnInit {
 
     public getCitizens(): void {
         this.api.getCitizens()
-        .pipe(takeUntil(this.destroy_sub))
-        .subscribe((citizen_info: CitizenInfo) => {
-            this.citizen_info = citizen_info;
-        });
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((citizen_info: CitizenInfo) => {
+                this.citizen_info = citizen_info;
+            });
     }
 }
 

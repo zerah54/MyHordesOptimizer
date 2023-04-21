@@ -25,6 +25,6 @@ export class ItemCountShort extends CommonModel<ItemCountShortDTO> {
             this.is_broken = dto.isItemBroken;
             this.item_id = dto.itemId;
         }
-    };
+    }
 
 }

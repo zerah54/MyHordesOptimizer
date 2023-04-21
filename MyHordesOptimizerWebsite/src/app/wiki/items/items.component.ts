@@ -1,12 +1,12 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { Action } from 'src/app/_abstract_model/enum/action.enum';
-import { Property } from 'src/app/_abstract_model/enum/property.enum';
-import { ApiServices } from './../../_abstract_model/services/api.services';
-import { Item } from './../../_abstract_model/types/item.class';
-import { Dictionary } from './../../_abstract_model/types/_types';
+import { ApiServices } from '../../_abstract_model/services/api.services';
+import { Item } from '../../_abstract_model/types/item.class';
+import { normalizeString } from '../../shared/utilities/string.utils';
+import { Property } from '../../_abstract_model/enum/property.enum';
+import { Action } from '../../_abstract_model/enum/action.enum';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 
 @Component({
     selector: 'mho-items',
@@ -18,8 +18,6 @@ export class ItemsComponent implements OnInit {
 
     /** La liste des objets du jeu */
     public items!: Item[];
-    /** Les objets triés par catégorie */
-    public items_by_category!: Dictionary<unknown>;
 
     public displayed_items!: Item[];
 
@@ -31,7 +29,7 @@ export class ItemsComponent implements OnInit {
     public select_value: (Property | Action)[] = [];
 
     /** La liste des filtres */
-    public options: (Property | Action)[] = [...<any>Property.getAllValues(), ...<any>Action.getAllValues()];
+    public options: (Property | Action)[] = [...<Property[]>Property.getAllValues(), ...<Action[]>Action.getAllValues()];
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
@@ -61,15 +59,22 @@ export class ItemsComponent implements OnInit {
 
     public applyFilters(): void {
         if (this.filter_value !== null && this.filter_value !== undefined && this.filter_value !== '') {
-            this.displayed_items = [...this.items.filter((item: Item) => item.label[this.locale].toLowerCase().indexOf(this.filter_value.toLowerCase()) > -1)]
+            this.displayed_items = [...this.items.filter((item: Item) => normalizeString(item.label[this.locale]).indexOf(normalizeString(this.filter_value)) > -1)];
         } else {
-            this.displayed_items = [...this.items]
+            this.displayed_items = [...this.items];
         }
 
         if (this.select_value && this.select_value.length > 0) {
             this.displayed_items = this.displayed_items.filter((item: Item) => {
-                const item_actions_and_properties: (Action | Property)[] = [...item.actions.filter((action: Action) => action), ...item.properties.filter((property: Property) => property)];
-                return item_actions_and_properties.some((action_or_property: Action | Property) => this.select_value.some((selected: Action | Property) => selected.key === action_or_property.key));
+                const item_actions_and_properties: (Action | Property)[] = [
+                    ...item.actions.filter((action: Action) => action),
+                    ...item.properties.filter((property: Property) => property)
+                ];
+                const item_has_action_or_property: boolean = item_actions_and_properties.some((action_or_property: Action | Property) => {
+                    return this.select_value.some((selected: Action | Property) => selected.key === action_or_property.key);
+                });
+                const item_has_key: boolean = this.select_value.some((filter: Property | Action) => item[filter.key]);
+                return item_has_action_or_property || item_has_key;
             });
         }
     }

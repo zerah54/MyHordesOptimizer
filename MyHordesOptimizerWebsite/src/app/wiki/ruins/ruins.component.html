@@ -1,30 +1,26 @@
 <mat-card-header>
     <mat-card-title i18n>Bâtiments</mat-card-title>
+    <!--    <mat-checkbox [(ngModel)]="ruins_filters.inside_town" (ngModelChange)="ruins_filters_change.next()" i18n>Dans ma ville</mat-checkbox>-->
 </mat-card-header>
 <mat-card-content class="mho-ruins">
     <ng-container *ngIf="ruins">
         <div class="mat-elevation-z8">
-            <table mat-table [dataSource]="datasource" matSort matSortActive="label" matSortDisableClear
-                matSortDirection="asc">
+            <table mat-table [dataSource]="datasource" matSort matSortActive="label" matSortDisableClear matSortDirection="asc">
 
-                <ng-container *ngFor="let column of columns" [matColumnDef]="column.id"
-                    [sticky]="column.id === 'label'">
+                <ng-container *ngFor="let column of columns" [matColumnDef]="column.id" [sticky]="column.id === 'label'">
                     <ng-container *ngIf="column.sortable">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>
                             <ng-container [ngSwitch]="column.id">
                                 <mho-header-with-string-filter *ngSwitchCase="'label'" [header]="column.header"
-                                    [(filterValue)]="ruins_filters.label"
-                                    (filterValueChange)="ruins_filters_change.next()">
+                                                               [(filterValue)]="ruins_filters.label" (filterValueChange)="ruins_filters_change.next()">
                                 </mho-header-with-string-filter>
 
                                 <mho-header-with-number-filter *ngSwitchCase="'min_dist'" [header]="column.header"
-                                    [(filterValue)]="ruins_filters.min_dist"
-                                    (filterValueChange)="ruins_filters_change.next()">
+                                                               [(filterValue)]="ruins_filters.min_dist" (filterValueChange)="ruins_filters_change.next()">
                                 </mho-header-with-number-filter>
 
                                 <mho-header-with-number-filter *ngSwitchCase="'max_dist'" [header]="column.header"
-                                    [(filterValue)]="ruins_filters.max_dist"
-                                    (filterValueChange)="ruins_filters_change.next()">
+                                                               [(filterValue)]="ruins_filters.max_dist" (filterValueChange)="ruins_filters_change.next()">
                                 </mho-header-with-number-filter>
 
                                 <ng-container *ngSwitchCase="'camping'">
@@ -40,10 +36,10 @@
                                     {{column.header}}
                                 </ng-container>
                                 <mho-header-with-select-filter *ngSwitchCase="'drops'" [header]="column.header"
-                                    [(filterValue)]="ruins_filters.objects"
-                                    (filterValueChange)="ruins_filters_change.next()"
-                                    [options]="items"
-                                    [bindLabel]="'item.label.' + locale">
+                                                               [(filterValue)]="ruins_filters.objects"
+                                                               (filterValueChange)="ruins_filters_change.next()"
+                                                               [options]="items"
+                                                               [bindLabel]="'item.label.' + locale">
                                 </mho-header-with-select-filter>
                             </ng-container>
                         </th>
@@ -52,7 +48,7 @@
                     <td mat-cell *matCellDef="let row" [ngClass]="column.id">
                         <ng-container [ngSwitch]="column.id">
                             <ng-container *ngSwitchCase="'label'">
-                                <img [src]="HORDES_IMG_REPO + 'ruin/' + row.img + '.gif'" />
+                                <img [ngSrc]="HORDES_IMG_REPO + 'ruin/' + row.img + '.gif'" width="16" height="16">
                                 <div>{{row[column.id][locale]}}</div>
                             </ng-container>
                             <ng-container *ngSwitchCase="'description'">
@@ -61,7 +57,7 @@
                             <ng-container *ngSwitchCase="'drops'">
                                 <div class="drops-list">
                                     <div *ngFor="let drop of row[column.id]" [title]="drop.item.label[locale]">
-                                        <img [src]="HORDES_IMG_REPO + drop.item.img">
+                                        <img [ngSrc]="HORDES_IMG_REPO + drop.item.img" width="16" height="16">
                                         <div>{{(drop.probability * 100) | number:'1.1-1':locale}}%</div>
                                     </div>
                                 </div>
@@ -80,7 +76,6 @@
                 <tr mat-row *matRowDef="let row; columns: columns_ids;"></tr>
             </table>
         </div>
-
 
 
     </ng-container>

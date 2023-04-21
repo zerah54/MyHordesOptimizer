@@ -1,7 +1,8 @@
-@import "variables.scss";
+@use "variables";
 
 .mho-last-update {
     white-space: nowrap;
+
     img {
         cursor: pointer;
         vertical-align: bottom;

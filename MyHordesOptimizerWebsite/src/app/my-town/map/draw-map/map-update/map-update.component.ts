@@ -1,14 +1,14 @@
-import { Component, HostBinding, Inject, ViewEncapsulation } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, HostBinding, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from 'src/app/shared/decorators/autodestroy.decorator';
-import { ApiServices } from 'src/app/_abstract_model/services/api.services';
-import { DigsServices } from 'src/app/_abstract_model/services/digs.service';
-import { Cell } from 'src/app/_abstract_model/types/cell.class';
-import { Citizen } from 'src/app/_abstract_model/types/citizen.class';
-import { Dig } from 'src/app/_abstract_model/types/dig.class';
-import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
+import { Cell } from '../../../../_abstract_model/types/cell.class';
+import { Dig } from '../../../../_abstract_model/types/dig.class';
+import { AutoDestroy } from '../../../../shared/decorators/autodestroy.decorator';
+import { ApiServices } from '../../../../_abstract_model/services/api.services';
+import { DigsServices } from '../../../../_abstract_model/services/digs.service';
+import { Ruin } from '../../../../_abstract_model/types/ruin.class';
+import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 
 @Component({
     selector: 'mho-map-update',
@@ -16,7 +16,7 @@ import { Ruin } from 'src/app/_abstract_model/types/ruin.class';
     styleUrls: ['./map-update.component.scss'],
     encapsulation: ViewEncapsulation.None
 })
-export class MapUpdateComponent {
+export class MapUpdateComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     /** La cellule potentiellement modifiée */
@@ -28,22 +28,22 @@ export class MapUpdateComponent {
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     constructor(@Inject(MAT_DIALOG_DATA) public data: MapUpdateData, private api: ApiServices, private digs_services: DigsServices) {
-        this.cell = new Cell({ ...this.data.cell.modelToDto() });
+        this.cell = new Cell({...this.data.cell.modelToDto()});
     }
 
     public ngOnInit(): void {
         this.digs_services.getDigs()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((digs: Dig[]) => {
+            .subscribe((digs: Dig[]): void => {
                 this.digs = digs.filter((dig: Dig) => dig.x === this.cell.displayed_x && dig.y === this.cell.displayed_y);
-            })
+            });
     }
 
     saveCell(): void {
         this.api.saveCell(this.cell)
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe(() => {
-                this.data.cell = new Cell({ ...this.cell.modelToDto() });
+            .subscribe((): void => {
+                this.data.cell = new Cell({...this.cell.modelToDto()});
             });
         this.digs_services.updateDig(this.digs)
             .pipe(takeUntil(this.destroy_sub))

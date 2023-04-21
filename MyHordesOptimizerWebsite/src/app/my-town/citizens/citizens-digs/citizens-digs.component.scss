@@ -1,4 +1,4 @@
-@import 'variables.scss';
+@use "variables";
 
 .mho-citizens-digs {
     table {
@@ -6,7 +6,7 @@
 
         tr {
 
-            >td {
+            > td {
                 padding: 0 0.5em;
 
                 &.center {
@@ -14,12 +14,12 @@
                 }
 
                 &.avatar_name {
-                    >img {
+                    > img {
                         width: 100px;
                         height: 100px;
                     }
 
-                    >div {
+                    > div {
                         text-align: center;
                         margin: auto;
                     }
@@ -31,7 +31,7 @@
                     flex-wrap: wrap;
 
                     .dig {
-                        background-color: $item_color;
+                        background-color: variables.$item_color;
                         max-width: 150px;
                         border-radius: 0.25em;
                         padding: 0.5em;
@@ -51,7 +51,7 @@
                         .positions {
                             margin-bottom: 0.5em;
 
-                            >img {
+                            > img {
                                 margin-right: 0.5em;
                             }
                         }
@@ -59,11 +59,11 @@
                         .values {
                             margin-bottom: 0.5em;
 
-                            .success>img {
+                            .success > img {
                                 margin-right: 0.5em;
                             }
 
-                            .total>img {
+                            .total > img {
                                 margin-left: 0.5em;
                             }
                         }
@@ -96,7 +96,8 @@
                 display: flex;
                 gap: 0.5em;
                 white-space: nowrap;
-                >div {
+
+                > div {
                     flex-wrap: nowrap;
                 }
             }

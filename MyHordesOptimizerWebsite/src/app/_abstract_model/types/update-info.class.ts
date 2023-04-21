@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import { UpdateInfoDTO } from './../dto/update-info.dto';
+import { UpdateInfoDTO } from '../dto/update-info.dto';
 import { CommonModel } from './_common.class';
 
 export class UpdateInfo extends CommonModel<UpdateInfoDTO> {
@@ -19,9 +19,8 @@ export class UpdateInfo extends CommonModel<UpdateInfoDTO> {
             userId: this.user_id,
             userName: this.username,
             userKey: this.userkey
-        }
-
-    };
+        };
+    }
 
     protected dtoToModel(dto?: UpdateInfoDTO | null): void {
         if (dto) {
@@ -30,6 +29,6 @@ export class UpdateInfo extends CommonModel<UpdateInfoDTO> {
             this.username = dto.userName;
             this.userkey = dto.userKey;
         }
-    };
+    }
 
 }

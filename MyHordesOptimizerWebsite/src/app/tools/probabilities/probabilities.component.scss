@@ -1,4 +1,4 @@
-@import "variables.scss";
+@use "variables";
 
 .mho-probabilities {
 
@@ -17,7 +17,7 @@
     .content {
         display: flex;
         gap: 0.5em;
-
+        align-items: baseline;
 
 
         .chances {
@@ -28,9 +28,9 @@
         }
 
         .results {
-            border: 1px solid $primary;
+            border: 1px solid variables.$primary;
             border-radius: 0.25em;
-            background-color: $item_color;
+            background-color: variables.$item_color;
         }
     }
 
@@ -38,7 +38,7 @@
 
         th,
         td {
-            padding: 0.5em;
+            padding: 0.25em;
         }
 
         tbody {

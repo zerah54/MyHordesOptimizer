@@ -1,8 +1,8 @@
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import * as moment from 'moment';
-import { HORDES_IMG_REPO } from 'src/app/_abstract_model/const';
-import { HeroicActionEnum } from 'src/app/_abstract_model/enum/heroic-action.enum';
-import { Citizen } from 'src/app/_abstract_model/types/citizen.class';
+import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
+import { HeroicActionEnum } from '../../../../../_abstract_model/enum/heroic-action.enum';
+import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 
 @Component({
     selector: 'mho-map-update-citizens',
@@ -15,7 +15,7 @@ export class MapUpdateCitizensComponent {
     @Input() citizens!: Citizen[];
     @Input() allCitizens!: Citizen[];
 
-    @Output() citizensChange: EventEmitter<Citizen[]> = new EventEmitter()
+    @Output() citizensChange: EventEmitter<Citizen[]> = new EventEmitter();
 
     public heroics: HeroicActionEnum[] = HeroicActionEnum.getAllValues();
 

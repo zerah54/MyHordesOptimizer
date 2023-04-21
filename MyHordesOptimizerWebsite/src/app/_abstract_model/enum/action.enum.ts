@@ -1,5 +1,5 @@
-import { environment } from "src/environments/environment";
-import { CommonEnum, CommonEnumData } from "./_common.enum";
+import { CommonEnum, CommonEnumData } from './_common.enum';
+import { environment } from '../../../environments/environment';
 
 
 const EAT_6AP_KEY: string = 'eat_6ap';
@@ -14,16 +14,20 @@ const SPECIAl_GUITAR_KEY: string = 'special_guitar';
 const LOAD_PILEGUN_KEY: string = 'load_pilegun';
 
 
-const EAT_6AP_DATA: ActionData = { label: $localize`Restaure l'ensemble des points d'actions`, category: 'food', img: '' };
-const EAT_7AP_DATA: ActionData = { label: $localize`Restaure l'ensemble des points d'actions plus un point`, category: 'food', img: '' };
+const EAT_6AP_DATA: ActionData = {label: $localize`Restaure l'ensemble des points d'actions`, category: 'food', img: ''};
+const EAT_7AP_DATA: ActionData = {label: $localize`Restaure l'ensemble des points d'actions plus un point`, category: 'food', img: ''};
 
-const COFFEE_DATA: ActionData = { label: $localize`Restaure 4 points d'actions`, category: '', img: '' };
+const COFFEE_DATA: ActionData = {label: $localize`Restaure 4 points d'actions`, category: '', img: ''};
 
-const ALCOHOL_DATA: ActionData = { label: $localize`Restaure l'ensemble des points d'actions`, category: 'alcohol', img: '' };
+const ALCOHOL_DATA: ActionData = {label: $localize`Restaure l'ensemble des points d'actions`, category: 'alcohol', img: ''};
 
-const SPECIAl_GUITAR_DATA: ActionData = { label: $localize`Rend un point d'action à toute personne en ville, dans la limite du nombre maximum de point d'action de chacun. Rend deux points d'action aux citoyens ayant l'état ivre ou l'état drogué`, category: '', img: '' };
+const SPECIAl_GUITAR_DATA: ActionData = {
+    label: $localize`Rend un point d'action à toute personne en ville, dans la limite du nombre maximum de point d'action de chacun. Rend deux points d'action aux citoyens ayant l'état ivre ou l'état drogué`,
+    category: '',
+    img: ''
+};
 
-const LOAD_PILEGUN_DATA: ActionData = { label: $localize`Peut être rechargé avec une pile`, category: 'reload', img: '' };
+const LOAD_PILEGUN_DATA: ActionData = {label: $localize`Peut être rechargé avec une pile`, category: 'reload', img: ''};
 
 /** Type de champs de propriétés existants */
 export class Action extends CommonEnum {
@@ -58,10 +62,10 @@ export class Action extends CommonEnum {
      */
     public static override getByKey<T extends CommonEnum>(key: string): T | undefined {
         if (key && key.startsWith('load_pilegun')) {
-            key = 'load_pilegun'
+            key = 'load_pilegun';
         }
         const elements: T[] = <T[]>this.getAllValues<CommonEnum>();
-        const element: T | undefined = elements.find((_element: T) => _element.key === key)
+        const element: T | undefined = elements.find((_element: T) => _element.key === key);
         if (!element) {
             if (!environment.production) {
                 console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);

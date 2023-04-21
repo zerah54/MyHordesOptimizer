@@ -1,10 +1,7 @@
-import { Component } from '@angular/core';
-import { btn_id, content_btn_id, mh_optimizer_icon, mh_optimizer_map_window_id, repo_img_hordes_url, wiki_btn_id } from './const/const';
-import { params_categories } from './const/params.const';
-import { texts } from './const/texts.const';
+import {Component} from '@angular/core';
 
 @Component({
-  selector: 'app-root',
+  selector: 'mho-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -15,13 +12,10 @@ export class AppComponent {
   }
 
 
-
-
   // const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
   // + `[fix] Correctif des erreurs liées à la mise à jour du contenu des sacs`;
 
   // const lang = (document.documentElement.lang || navigator.language).substring(0, 2) || 'fr';
-
 
 
   // let mho_parameters = localStorage.getItem(gm_parameters_key);
@@ -5966,29 +5960,6 @@ export class AppComponent {
   //         });
   //     }
   // })();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

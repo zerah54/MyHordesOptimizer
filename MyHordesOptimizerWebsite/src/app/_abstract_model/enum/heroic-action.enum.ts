@@ -1,5 +1,4 @@
-import * as moment from "moment";
-import { CommonEnum, CommonEnumData } from "./_common.enum";
+import { CommonEnum, CommonEnumData } from './_common.enum';
 
 
 const HAS_RESCUE_KEY: string = 'hasRescue';
@@ -12,15 +11,20 @@ const HAS_HEROICRETURN_KEY: string = 'hasHeroicReturn';
 const HAS_BREAKTHROUGH_KEY: string = 'hasBreakThrough';
 const HAS_BROTHERSINARM_KEY: string = 'hasBrotherInArms';
 
-const HAS_RESCUE_DATA: HeroicActionEnumData = { label: $localize`Sauvetage`, max_lvl: 1, img: 'emotes/gate.gif' };
-const APAG_CHARGES_DATA: HeroicActionEnumData = { label: $localize`Appareil Photo d'Avant-Guerre`, max_lvl: 3, img: 'heroskill/f_cam.gif', options: Array.from({ length: 4 }, (_, i) => { return i }) };
-const HAS_UPPERCUT_DATA: HeroicActionEnumData = { label: $localize`Uppercut Sauvage`, max_lvl: 1, img: 'icons/map/map_icon_splatter.png' };
-const HAS_SECONDWIND_DATA: HeroicActionEnumData = { label: $localize`Second Souffle`, max_lvl: 1, img: 'heroskill/small_pa.gif' };
-const HAS_LUCKYFIND_DATA: HeroicActionEnumData = { label: $localize`Trouvaille`, max_lvl: 1, img: 'heroskill/item_chest_hero.gif' };
-const HAS_CHEATDEATH_DATA: HeroicActionEnumData = { label: $localize`Vaincre la Mort`, max_lvl: 1, img: 'heroskill/small_wrestle.gif' };
-const HAS_HEROICRETURN_DATA: HeroicActionEnumData = { label: $localize`Retour du Héro`, max_lvl: 1, img: 'emotes/hero.gif' };
-const HAS_BREAKTHROUGH_DATA: HeroicActionEnumData = { label: $localize`Passage en Force`, max_lvl: 1, img: 'icons/small_arma.gif' };
-const HAS_BROTHERSINARM_DATA: HeroicActionEnumData = { label: $localize`Camaraderie`, max_lvl: 1, img: 'heroskill/r_share.gif' };
+const HAS_RESCUE_DATA: HeroicActionEnumData = {label: $localize`Sauvetage`, max_lvl: 1, img: 'emotes/gate.gif'};
+const APAG_CHARGES_DATA: HeroicActionEnumData = {
+    label: $localize`Appareil Photo d'Avant-Guerre`,
+    max_lvl: 3,
+    img: 'heroskill/f_cam.gif',
+    options: Array.from({length: 4}, (_: unknown, i: number) => i)
+};
+const HAS_UPPERCUT_DATA: HeroicActionEnumData = {label: $localize`Uppercut Sauvage`, max_lvl: 1, img: 'icons/map/map_icon_splatter.png'};
+const HAS_SECONDWIND_DATA: HeroicActionEnumData = {label: $localize`Second Souffle`, max_lvl: 1, img: 'heroskill/small_pa.gif'};
+const HAS_LUCKYFIND_DATA: HeroicActionEnumData = {label: $localize`Trouvaille`, max_lvl: 1, img: 'heroskill/item_chest_hero.gif'};
+const HAS_CHEATDEATH_DATA: HeroicActionEnumData = {label: $localize`Vaincre la Mort`, max_lvl: 1, img: 'heroskill/small_wrestle.gif'};
+const HAS_HEROICRETURN_DATA: HeroicActionEnumData = {label: $localize`Retour du Héro`, max_lvl: 1, img: 'emotes/hero.gif'};
+const HAS_BREAKTHROUGH_DATA: HeroicActionEnumData = {label: $localize`Passage en Force`, max_lvl: 1, img: 'icons/small_arma.gif'};
+const HAS_BROTHERSINARM_DATA: HeroicActionEnumData = {label: $localize`Camaraderie`, max_lvl: 1, img: 'heroskill/r_share.gif'};
 
 
 /** Type de champs de propriétés existants */

@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, Output, ViewChild } from '@angular/core';
 import { SelectComponent } from '../../select/select.component';
 
 @Component({
@@ -24,7 +24,7 @@ export class HeaderWithSelectFilterComponent<T> {
     public visible: boolean = false;
 
     /** Affiche le filtre */
-    public displayFilter() {
+    public displayFilter(): void {
         this.visible = true;
         setTimeout(() => {
             this.filter.select.open();
@@ -32,14 +32,14 @@ export class HeaderWithSelectFilterComponent<T> {
     }
 
     /** Vérifie si le filtre doit toujours être affiché */
-    public checkVisibility() {
+    public checkVisibility(): void {
         setTimeout(() => {
             if (this.filter.select.panelOpen) {
                 this.visible = true;
             } else {
                 this.visible = this.filterValue !== null && this.filterValue !== undefined && this.filterValue.length > 0;
             }
-        })
+        });
     }
 
 }

@@ -1,6 +1,6 @@
 import { RecipeResultItemDTO } from '../dto/recipe-result-item.dto';
 import { Item } from './item.class';
-import { CommonModel } from "./_common.class";
+import { CommonModel } from './_common.class';
 
 export class RecipeResultItem extends CommonModel<RecipeResultItemDTO> {
     public probability!: number;
@@ -19,8 +19,8 @@ export class RecipeResultItem extends CommonModel<RecipeResultItemDTO> {
             weight: this.weight,
             item: this.item.modelToDto(),
             pictoUid: this.picto_uid
-        }
-    };
+        };
+    }
 
     protected dtoToModel(dto?: RecipeResultItemDTO | null): void {
         if (dto) {
@@ -29,6 +29,6 @@ export class RecipeResultItem extends CommonModel<RecipeResultItemDTO> {
             this.weight = dto.weight;
             this.picto_uid = dto.pictoUid;
         }
-    };
+    }
 
 }

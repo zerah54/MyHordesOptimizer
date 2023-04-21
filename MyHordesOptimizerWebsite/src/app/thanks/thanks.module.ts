@@ -3,7 +3,7 @@ import { SharedModule } from '../shared/shared.module';
 import { Components } from '../_abstract_model/types/_types';
 import { ThanksComponent } from './thanks.component';
 
-let components: Components = [ThanksComponent];
+const components: Components = [ThanksComponent];
 
 @NgModule({
     imports: [SharedModule],

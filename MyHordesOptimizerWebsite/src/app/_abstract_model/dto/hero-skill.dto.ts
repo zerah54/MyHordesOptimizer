@@ -1,4 +1,4 @@
-import { I18nLabels } from './../types/_types';
+import { I18nLabels } from '../types/_types';
 
 export interface HeroSkillDTO {
     name: string;
@@ -7,4 +7,4 @@ export interface HeroSkillDTO {
     label: I18nLabels;
     nbUses: number;
     daysNeeded: number;
-};
+}

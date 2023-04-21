@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
-import { SharedModule } from 'src/app/shared/shared.module';
-import { Components } from 'src/app/_abstract_model/types/_types';
 import { BankComponent } from './bank.component';
+import { SharedModule } from '../../shared/shared.module';
+import { Components } from '../../_abstract_model/types/_types';
 
-let components: Components = [BankComponent];
+const components: Components = [BankComponent];
 
 @NgModule({
     imports: [SharedModule],

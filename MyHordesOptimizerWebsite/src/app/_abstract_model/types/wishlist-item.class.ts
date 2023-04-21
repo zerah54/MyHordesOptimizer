@@ -8,6 +8,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
     public bank_count!: number;
     public bag_count!: number;
     public priority!: number;
+    public priority_main!: number;
     public depot!: number;
     public zone_x_pa!: number;
 
@@ -26,7 +27,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             bagCount: this.bag_count,
             zoneXPa: this.zone_x_pa
         };
-    };
+    }
 
     protected dtoToModel(dto?: WishlistItemDTO): void {
         if (dto) {
@@ -34,9 +35,20 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             this.bank_count = dto.bankCount;
             this.item = new Item(dto.item);
             this.priority = dto.priority;
+            if (dto.priority < 0) {
+                this.priority_main = -1;
+            } else if (dto.priority < 1000) {
+                this.priority_main = 0;
+            } else if (dto.priority < 2000) {
+                this.priority_main = 1;
+            } else if (dto.priority < 3000) {
+                this.priority_main = 2;
+            } else {
+                this.priority_main = 3;
+            }
             this.depot = dto.depot;
             this.bag_count = dto.bagCount;
             this.zone_x_pa = dto.zoneXPa;
         }
-    };
+    }
 }

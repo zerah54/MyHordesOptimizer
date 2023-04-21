@@ -1,6 +1,6 @@
-import { Component, HostBinding, Input, Output, EventEmitter } from '@angular/core';
-import { Dictionary } from 'src/app/_abstract_model/types/_types';
+import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import { AreAllScrutDirectionsSelectedPipe } from './is-scrut-direction-selected.pipe';
+import { Dictionary } from '../../../_abstract_model/types/_types';
 
 @Component({
     selector: 'mho-compass-rose',
@@ -12,13 +12,14 @@ export class CompassRoseComponent {
 
     @Input() selectedScrutZone!: Dictionary<boolean>;
 
-    @Output() selectedScrutZoneChange: EventEmitter<Dictionary<boolean>> = new EventEmitter()
+    @Output() selectedScrutZoneChange: EventEmitter<Dictionary<boolean>> = new EventEmitter();
 
     public constructor(private are_all_scrut_direction_selected_pipe: AreAllScrutDirectionsSelectedPipe) {
 
     }
+
     public addToSelection(direction: string): void {
-        let selected_scrut: Dictionary<boolean> = { ...this.selectedScrutZone };
+        const selected_scrut: Dictionary<boolean> = {...this.selectedScrutZone};
         selected_scrut[direction] = !selected_scrut[direction];
         this.selectedScrutZoneChange.next(selected_scrut);
     }
@@ -26,7 +27,7 @@ export class CompassRoseComponent {
     public addAllToSelection(): void {
         const is_all_selected: boolean = this.are_all_scrut_direction_selected_pipe.transform(this.selectedScrutZone);
 
-        let selected_scrut: Dictionary<boolean> = { ...this.selectedScrutZone };
+        const selected_scrut: Dictionary<boolean> = {...this.selectedScrutZone};
 
         Object.keys(this.selectedScrutZone).forEach((key: string) => {
             selected_scrut[key] = !is_all_selected;

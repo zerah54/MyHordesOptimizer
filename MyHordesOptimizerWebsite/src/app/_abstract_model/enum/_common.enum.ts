@@ -1,4 +1,4 @@
-import { environment } from "src/environments/environment";
+import { environment } from '../../../environments/environment';
 
 export abstract class CommonEnum {
 
@@ -43,7 +43,7 @@ export abstract class CommonEnum {
      */
     public static getByKey<T extends CommonEnum>(key: string): T | undefined {
         const elements: T[] = <T[]>this.getAllValues<CommonEnum>();
-        const element: T | undefined = elements.find((_element: T) => _element.key === key)
+        const element: T | undefined = elements.find((_element: T) => _element.key === key);
         if (!element) {
             if (key !== null) {// TODO TEMPORAIRE
                 // console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);

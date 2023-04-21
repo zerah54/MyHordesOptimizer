@@ -1,10 +1,10 @@
 <div class="mho-recipe">
     <ul class="components">
-        <li *ngFor="let component of recipe.components"><img [src]="HORDES_IMG_REPO + component.img">{{component.label[locale]}}</li>
+        <li *ngFor="let component of recipe.components"><img [ngSrc]="HORDES_IMG_REPO + component.img" width="16" height="16">{{component.label[locale]}}</li>
     </ul>
-    <div class="transformation"><img [src]="HORDES_IMG_REPO + 'icons/small_move.gif'"></div>
+    <div class="transformation"><img [ngSrc]="HORDES_IMG_REPO + 'icons/small_move.gif'" width="16" height="16"></div>
     <ul class="results">
-        <li *ngFor="let result of recipe.result"><img [src]="HORDES_IMG_REPO + result.item.img">
+        <li *ngFor="let result of recipe.result"><img [ngSrc]="HORDES_IMG_REPO + result.item.img" width="16" height="16">
             {{result.item.label[locale]}}
             <small *ngIf="result.probability !== 1">&nbsp;({{result.probability * 100 | number:'1.0-2':locale}}%)</small>
         </li>

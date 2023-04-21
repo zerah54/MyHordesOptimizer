@@ -1,5 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, ViewChild, OnInit } from '@angular/core';
-import { SelectComponent } from '../../select/select.component';
+import { Component, ElementRef, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 @Component({
     selector: 'mho-header-with-number-previous-next-filter',
@@ -13,7 +12,7 @@ export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
 
     @Input() header!: string;
     @Input() textAlign?: string = 'left';
-    
+
     @Input() min: number = 1;
     @Input() max: number = 1;
 
@@ -27,7 +26,7 @@ export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
     }
 
     /** Affiche le filtre */
-    public displayFilter() {
+    public displayFilter(): void {
         this.visible = true;
         setTimeout(() => {
             this.filter.nativeElement.focus();
@@ -35,7 +34,7 @@ export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
     }
 
     /** Vérifie si le filtre doit toujours être affiché */
-    public checkVisibility() {
+    public checkVisibility(): void {
         this.visible = this.filterValue !== null && this.filterValue !== undefined;
     }
 }

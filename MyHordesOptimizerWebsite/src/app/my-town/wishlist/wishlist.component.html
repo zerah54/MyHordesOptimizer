@@ -1,44 +1,64 @@
-<mat-card-header>
+<mat-card-header class="mho-wishlist-header">
     <mat-card-title>
         <ng-container i18n>Liste de courses</ng-container>
-        <button mat-icon-button (click)="shareWishlist()">
+        <button mat-icon-button matTooltip="Copier au format forum" i18n-matTooltip (click)="shareWishlistForum()">
             <mat-icon>share</mat-icon>
         </button>
     </mat-card-title>
+
+    <div class="import-export">
+        <button mat-icon-button [matMenuTriggerFor]="shareMenu" matTooltip="Import / Export" i18n-matTooltip>
+            <mat-icon>import_export</mat-icon>
+        </button>
+
+        <mat-menu #shareMenu="matMenu">
+            <div mat-menu-item (click)="shareExcel()" i18n>Enregistrer dans un fichier Excel</div>
+            <div mat-menu-item (click)="importFileInput.click()" i18n>Importer depuis un fichier Excel</div>
+            <input #importFileInput type="file" style="display: none;" (change)="importExcel($event)"
+                   accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+        </mat-menu>
+    </div>
 
 </mat-card-header>
 <mat-card-content class="mho-wishlist">
     <ng-container *ngIf="wishlist_info">
         <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selected_tab_index"
-            (selectedTabChange)="changeTab($event)">
+                       (selectedTabChange)="changeTab($event)">
             <mat-tab *ngFor="let item of (wishlist_info.wishlist_items | customKeyValue)"
-                [label]="!item.key || item.key === '0' ? basic_list_label : 'Z' + item.key">
+                     [label]="!item.key || item.key === '0' ? basic_list_label : 'Z' + item.key">
                 <ng-template matTabContent>
                     <div class="mat-elevation-z8" style="overflow: hidden">
                         <cdk-virtual-scroll-viewport [tvsItemSize]="49" [headerHeight]="98" style="height: calc(100% - 48px); width: 100%;">
-                            <table mat-table [dataSource]="datasource">
+                            <table mat-table [dataSource]="datasource"
+                                   cdkDropList
+                                   cdkDropListLockAxis="y"
+                                   [cdkDropListData]="datasource"
+                                   (cdkDropListDropped)="sortWishlist($event)">
                                 <ng-container matColumnDef="filters">
-                                    <td mat-header-cell *matHeaderCellDef colspan="8">
+                                    <td mat-header-cell *matHeaderCellDef colspan="9">
                                         <div class="table-filters">
                                             <mat-form-field class="no-bottom">
                                                 <mat-label i18n>Ajouter un objet à la liste</mat-label>
                                                 <mho-select #addItemSelect [emptyOption]="true"
-                                                    placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
-                                                    (ngModelChange)="addItemToWishlist($any($event))"
-                                                    [options]="items | isItemDisplayed:datasource.data"
-                                                    [bindLabel]="'label.' + locale"></mho-select>
+                                                            placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
+                                                            (ngModelChange)="addItemToWishlist($any($event))"
+                                                            [options]="items | isItemDisplayed:datasource.data"
+                                                            [bindLabel]="'label.' + locale"></mho-select>
                                             </mat-form-field>
                                         </div>
                                     </td>
                                 </ng-container>
 
                                 <ng-container *ngFor="let column of columns; trackBy: trackByColumnId"
-                                    [matColumnDef]="column.id" [sticky]="column.id === 'name'">
+                                              [matColumnDef]="column.id" [sticky]="column.id === 'name' || column.id === 'sort'">
                                     <th mat-header-cell *matHeaderCellDef>
                                         <ng-container [ngSwitch]="column.id">
+
+                                            <ng-container *ngSwitchCase="'sort'">
+                                            </ng-container>
                                             <mho-header-with-string-filter *ngSwitchCase="'name'"
-                                                [header]="column.header" [(filterValue)]="wishlist_filters.items"
-                                                (filterValueChange)="wishlist_filters_change.next()">
+                                                                           [header]="column.header" [(filterValue)]="wishlist_filters.items"
+                                                                           (filterValueChange)="wishlist_filters_change.next()">
                                             </mho-header-with-string-filter>
                                             <ng-container *ngSwitchCase="'priority'">
                                                 {{column.header}}
@@ -66,18 +86,22 @@
 
                                     <td mat-cell *matCellDef="let row" [ngClass]="[column.id || '']">
                                         <ng-container [ngSwitch]="column.id">
+                                            <ng-container *ngSwitchCase="'sort'">
+                                                <div cdkDragHandle class="dragdrop-indicator">
+                                                    <mat-icon>drag_indicator</mat-icon>
+                                                </div>
+                                            </ng-container>
                                             <ng-container *ngSwitchCase="'name'">
                                                 <div>
-                                                    <img [src]="HORDES_IMG_REPO + row.item.img" />
+                                                    <img [ngSrc]="HORDES_IMG_REPO + row.item.img" width="16" height="16">
                                                     <span>{{row.item.label[locale]}}</span>
                                                 </div>
                                             </ng-container>
 
                                             <ng-container *ngSwitchCase="'priority'">
                                                 <mat-form-field class="no-bottom">
-                                                    <mat-select [(value)]="row.priority">
-                                                        <mat-option *ngFor="let priority of priorities"
-                                                            [value]="priority.count">
+                                                    <mat-select [(ngModel)]="row.priority_main" (ngModelChange)="resetPriorities(this.datasource.data)">
+                                                        <mat-option *ngFor="let priority of priorities" [value]="priority.count">
                                                             {{priority.label}}
                                                         </mat-option>
                                                     </mat-select>
@@ -111,8 +135,8 @@
                                             <ng-container *ngSwitchCase="'needed'">
                                                 <mat-form-field class="no-bottom count">
                                                     <input matInput type="number"
-                                                        [ngModel]="row.count - row.bank_count - row.bag_count"
-                                                        (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
+                                                           [ngModel]="row.count - row.bank_count - row.bag_count"
+                                                           (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
                                                 </mat-form-field>
                                             </ng-container>
 
@@ -128,15 +152,14 @@
 
                                 <tr mat-header-row *matHeaderRowDef="['filters']; sticky: true"></tr>
                                 <tr mat-header-row *matHeaderRowDef="columns_ids; sticky: true"></tr>
-                                <tr mat-row *matRowDef="let row; columns: columns_ids;"></tr>
+                                <tr mat-row *matRowDef="let row; columns: columns_ids;" cdkDrag [cdkDragData]="row"></tr>
 
                                 <!-- Row shown when there is no matching data. -->
                                 <tr class="mat-row" *matNoDataRow>
-                                    <td class="mat-cell" colspan="8">
+                                    <td class="mat-cell" colspan="9">
                                         <ng-container
                                             *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
-                                            <ng-container i18n>Aucun objet ne correspond au filtre
-                                                "{{filterInput.nativeElement.value}}"</ng-container>
+                                            <ng-container i18n>Aucun objet ne correspond au filtre "{{filterInput.nativeElement.value}}"</ng-container>
                                         </ng-container>
                                         <ng-template #emptyTable>
                                             <ng-container i18n>La liste est vide</ng-container>
@@ -147,19 +170,18 @@
                         </cdk-virtual-scroll-viewport>
                         <!-- Footer -->
                         <div #cell
-                            style="width: 100%; height: 48px; display: flex; justify-content: right; align-items: centen;">
+                             style="width: 100%; height: 48px; display: flex; justify-content: right; align-items: center;">
                             <div
                                 style="display: flex; flex-direction: row; justify-content: end; align-content: center; align-items: center; padding-right: 1em">
                                 <mho-last-update [lastUpdateInfo]="wishlist_info.update_info"
-                                    [thresholds]="[24*60, 24*2*60, 24*3*60, 24*4]"></mho-last-update>
-                                <button mat-button [color]="'accent'" (click)="updateWishlist()"
-                                    i18n>Enregistrer</button>
+                                                 [thresholds]="[24*60, 24*2*60, 24*3*60, 24*4]"></mho-last-update>
+                                <button mat-button [color]="'accent'" (click)="updateWishlist()" i18n>Enregistrer</button>
                             </div>
                         </div>
                     </div>
                 </ng-template>
             </mat-tab>
-            <mat-tab i18n-label disabled>
+            <mat-tab disabled>
                 <ng-template mat-tab-label>
                     <button mat-icon-button [matMenuTriggerFor]="addItem">
                         <mat-icon>add</mat-icon>
@@ -170,7 +192,9 @@
                         <mat-form-field appearance="outline">
                             <mat-label i18n>Zone de ramassage</mat-label>
                             <input #zone matInput type="number">
-                            <button matSuffix mat-icon-button type="submit"><mat-icon>check</mat-icon></button>
+                            <button matSuffix mat-icon-button type="submit">
+                                <mat-icon>check</mat-icon>
+                            </button>
                         </mat-form-field>
                     </form>
                 </mat-menu>

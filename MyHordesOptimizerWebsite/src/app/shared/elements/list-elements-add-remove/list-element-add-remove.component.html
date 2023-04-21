@@ -10,9 +10,9 @@
     <div class="editable-container">
         <div class="list">
             <ng-container *ngFor="let item of currentList">
-                <img [src]="HORDES_IMG_REPO + item.img"
-                    [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)"
-                    style="cursor: pointer">
+                <img [ngSrc]="HORDES_IMG_REPO + item.img"
+                     [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)"
+                     style="cursor: pointer" width="16" height="16">
             </ng-container>
         </div>
         <div class="add-remove" *ngIf="!label">
@@ -23,13 +23,13 @@
 </div>
 
 <ng-template #buttonAdd>
-    <img [src]="HORDES_IMG_REPO + 'icons/small_more.gif'" [matMenuTriggerFor]="menuAdd.menu"
-        [matMenuTriggerData]="{menuLabel: addLabel, list: completeList}">
+    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_more.gif'" [matMenuTriggerFor]="menuAdd.menu"
+         [matMenuTriggerData]="{menuLabel: addLabel, list: completeList}" width="16" height="16">
 </ng-template>
 <ng-template #buttonRemove>
-    <img [src]="HORDES_IMG_REPO + 'icons/small_less.gif'" *ngIf="currentList.length > 0"
-        [matMenuTriggerFor]="menuRemove.menu"
-        [matMenuTriggerData]="{menuLabel: removeLabel, list: currentList, emptyLabel: emptyLabel}">
+    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_less.gif'" *ngIf="currentList.length > 0"
+         [matMenuTriggerFor]="menuRemove.menu"
+         [matMenuTriggerData]="{menuLabel: removeLabel, list: currentList, emptyLabel: emptyLabel}" width="16" height="16">
 </ng-template>
 
 <mho-menu-add #menuAdd="menuAdd" (add)="add.next($event);"></mho-menu-add>
@@ -45,8 +45,8 @@
     <div class="items">
         <ng-container *ngFor="let item of completeList">
             <img *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1"
-                [src]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id)"
-                [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+                [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id)"
+                [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
         </ng-container>
     </div>
 </mat-menu>
@@ -61,13 +61,13 @@
         <ng-container *ngFor="let item of currentList">
             <ng-container
                 *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1">
-                <img [src]="HORDES_IMG_REPO + item.img" (click)="remove.next(item.id)"
-                    [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+                <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="remove.next(item.id)"
+                    [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
             </ng-container>
         </ng-container>
     </div>
     <div mat-menu-item class="empty-bag" (click)="empty.next()">
-        <img [src]="HORDES_IMG_REPO + 'icons/b_close.png'" style="margin-right: 0.5em">
+        <img [ngSrc]="HORDES_IMG_REPO + 'icons/b_close.png'" style="margin-right: 0.5em" width="16" height="16">
         <span>{{emptyLabel}}</span>
     </div>
 </mat-menu>

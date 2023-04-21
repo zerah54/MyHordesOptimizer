@@ -133,6 +133,6 @@ export class Cell extends CommonModel<CellDTO> {
             this.nb_eruin_yellow = dto.nbERuinYellow;
             this.nb_eruin_violet = dto.nbERuinViolet;
         }
-    };
+    }
 
 }

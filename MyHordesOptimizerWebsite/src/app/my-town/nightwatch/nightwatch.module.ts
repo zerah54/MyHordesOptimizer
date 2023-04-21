@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
-import { SharedModule } from 'src/app/shared/shared.module';
-import { Components } from 'src/app/_abstract_model/types/_types';
 import { NightwatchComponent } from './nightwatch.component';
+import { Components } from '../../_abstract_model/types/_types';
+import { SharedModule } from '../../shared/shared.module';
 
-let components: Components = [NightwatchComponent];
+const components: Components = [NightwatchComponent];
 
 @NgModule({
     imports: [SharedModule],

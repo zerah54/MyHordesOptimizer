@@ -8,36 +8,37 @@
         <mat-form-field>
             <mat-label i18n>Nombre de personnes</mat-label>
             <input matInput [(ngModel)]="nb_people" (ngModelChange)="updateValues()" [min]="1" [max]="40"
-                type="number" placeholder="Nombre de personnes" i18n-placeholder>
+                   type="number" placeholder="Nombre de personnes" i18n-placeholder>
         </mat-form-field>
     </div>
     <div class="content">
         <div class="results">
             <table>
                 <thead>
-                    <tr>
-                        <th i18n>Nombre de morts</th>
-                        <th i18n>Probabilité</th>
-                    </tr>
+                <tr>
+                    <th i18n>Nombre de morts</th>
+                    <th i18n>Probabilité</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let result of result_probabilities; let index = index">
-                        <th>{{index}}</th>
-                        <td>{{result * 100 | number:'1.0-2':locale}}%</td>
-                    </tr>
+                <tr *ngFor="let result of result_probabilities; let index = index">
+                    <th>{{index}}</th>
+                    <td>{{result * 100 | number:'1.0-2':locale}}%</td>
+                </tr>
                 </tbody>
                 <tfoot>
-                    <tr>
-                        <th colspan="2"><ng-container i18n>Moyenne</ng-container>&nbsp;:&nbsp;{{result_average}}</th>
-                    </tr>
+                <tr>
+                    <th colspan="2">
+                        <ng-container i18n>Moyenne</ng-container>&nbsp;:&nbsp;{{result_average | number:'1.0-2':locale}}
+                    </th>
+                </tr>
                 </tfoot>
             </table>
         </div>
         <div class="chances">
             <mat-form-field *ngFor="let people of [].constructor(nb_people)" appearance="outline" class="short-bottom">
                 <mat-label i18n>Chances de survie</mat-label>
-                <input matInput (change)="updateValues()" [value]="0" #chances [min]="0" [max]="100"
-                    type="number">
+                <input matInput type="number" (change)="updateValues()" [value]="'0'" #chances [min]="0" [max]="100">
                 <span matSuffix style="margin-right: 0.5em;">%</span>
             </mat-form-field>
         </div>

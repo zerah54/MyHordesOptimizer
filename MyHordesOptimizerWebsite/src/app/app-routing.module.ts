@@ -6,7 +6,7 @@ const routes: Routes = [
 ];
 const extra_options: ExtraOptions = {
     useHash: false, anchorScrolling: 'enabled', onSameUrlNavigation: 'reload', scrollPositionRestoration: 'enabled'
-}
+};
 
 @NgModule({
     imports: [RouterModule.forRoot(routes, extra_options)],

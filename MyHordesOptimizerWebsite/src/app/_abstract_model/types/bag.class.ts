@@ -24,10 +24,10 @@ export class Bag extends CommonModel<BagDTO> {
     }
 
     public toShortItemCountList(): ItemCountDTO[] {
-        let short_items_count: ItemCountDTO[] = [];
+        const short_items_count: ItemCountDTO[] = [];
         this.items?.forEach((item: Item) => {
-            let item_in_existing_list: ItemCountDTO | undefined = short_items_count.find((short_item_count: ItemCountDTO) => {
-                return short_item_count.item.id === item.id && short_item_count.isBroken === item.is_broken
+            const item_in_existing_list: ItemCountDTO | undefined = short_items_count.find((short_item_count: ItemCountDTO) => {
+                return short_item_count.item.id === item.id && short_item_count.isBroken === item.is_broken;
             });
             if (item_in_existing_list) {
                 item_in_existing_list.count += 1;
@@ -36,10 +36,10 @@ export class Bag extends CommonModel<BagDTO> {
                     count: 1,
                     item: item.modelToDto(),
                     isBroken: item.is_broken
-                })
+                });
             }
         });
-        return short_items_count
+        return short_items_count;
     }
 
 
@@ -48,14 +48,14 @@ export class Bag extends CommonModel<BagDTO> {
             this.bag_id = dto.idBag;
             this.items = [];
             dto.items.forEach((item_count: ItemCountDTO) => {
-                for (let i = 0; i < item_count.count; i++) {
-                    let item: Item = new Item(item_count.item);
+                for (let i: number = 0; i < item_count.count; i++) {
+                    const item: Item = new Item(item_count.item);
                     item.is_broken = item_count.isBroken;
                     this.items.push(item);
                 }
-            })
-            this.update_info = new UpdateInfo(dto.lastUpdateInfo)
+            });
+            this.update_info = new UpdateInfo(dto.lastUpdateInfo);
         }
-    };
+    }
 
 }

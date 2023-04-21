@@ -1,4 +1,4 @@
-@import "variables.scss";
+@use "variables";
 
 
 .mho-compass-rose {
@@ -39,7 +39,7 @@
             z-index: 1;
 
             &.selected {
-                border-color: $compass-selected-cardinals-color transparent transparent transparent !important;
+                border-color: variables.$compass-selected-cardinals-color transparent transparent transparent !important;
             }
 
         }
@@ -48,18 +48,18 @@
             z-index: 0;
 
             &.selected {
-                border-color: $compass-selected-ordinals-color transparent transparent transparent !important;
+                border-color: variables.$compass-selected-ordinals-color transparent transparent transparent !important;
             }
 
         }
     }
 
     .cardial-points .pointer {
-        border-color: $compass-cardinals-color transparent transparent transparent;
+        border-color: variables.$compass-cardinals-color transparent transparent transparent;
     }
 
     .ordinal-points .pointer {
-        border-color: $compass-ordinals-color transparent transparent transparent;
+        border-color: variables.$compass-ordinals-color transparent transparent transparent;
     }
 
     .north-pointer {
@@ -118,11 +118,11 @@
         top: calc(50% - 12px);
         left: calc(50% - 8px);
         display: block;
-        background: $compass-center-color;
+        background: variables.$compass-center-color;
         border-radius: 50%;
 
         &.all-selected {
-            background: $compass-selected-center-color;
+            background: variables.$compass-selected-center-color;
         }
     }
 

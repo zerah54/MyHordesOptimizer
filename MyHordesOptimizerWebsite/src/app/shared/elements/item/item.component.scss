@@ -1,16 +1,28 @@
-@import "variables.scss";
+@use "variables";
 
 .mho-item {
     list-style: none;
+
     &.simple {
         min-width: 250px;
         flex: 1;
     }
+
     &.advanced {
         width: 100%;
     }
+
+
+    &.force-open > div .title-part {
+        cursor: default !important;
+    }
+
+    .mat-divider {
+        margin: 0.5em 0;
+    }
+
     > div {
-        background-color: $item-color;
+        background-color: variables.$item-color;
         width: 100%;
         height: 100%;
         border-radius: 0.25em;
@@ -40,6 +52,7 @@
                         font-size: 0.75em;
                     }
                 }
+
                 .item_label {
                     vertical-align: middle;
                 }
@@ -48,6 +61,8 @@
 
         .advanced-part {
             margin: 0 1em;
+            padding-bottom: 1em;
+
             img {
                 margin-right: 0.5em;
             }
@@ -61,4 +76,5 @@
             }
         }
     }
+
 }

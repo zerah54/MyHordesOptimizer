@@ -20,8 +20,8 @@ export class Category extends CommonModel<CategoryDTO> {
             label: this.label,
             name: this.name,
             ordering: this.ordering
-        }
-    };
+        };
+    }
 
     protected dtoToModel(dto?: CategoryDTO): void {
         if (dto) {
@@ -30,6 +30,6 @@ export class Category extends CommonModel<CategoryDTO> {
             this.label = dto.label;
             this.ordering = dto.ordering;
         }
-    };
+    }
 
 }

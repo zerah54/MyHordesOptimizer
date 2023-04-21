@@ -3,17 +3,17 @@
         <div class="content">
             <div class="zombies">
                 <mat-form-field class="zombies-here">
-                    <img matPrefix [src]="HORDES_IMG_REPO + 'icons/small_zombie.gif'">
+                    <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="16" height="16">
                     <input matInput formControlName="nb_zombies">
                 </mat-form-field>
                 <mat-form-field class="killed-zombies">
-                    <img matPrefix [src]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'">
+                    <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'" width="16" height="16">
                     <input matInput formControlName="nb_killed_zombies">
                 </mat-form-field>
             </div>
             <div class="zone">
                 <div class="pdc">
-                    <img [src]="HORDES_IMG_REPO + 'emotes/human.gif'">
+                    <img [ngSrc]="HORDES_IMG_REPO + 'emotes/human.gif'" width="16" height="16">
                     {{cell.nb_hero}}&nbsp;<span i18n>points</span>
                 </div>
                 <div class="empty">
@@ -26,9 +26,9 @@
             <div class="items-header">
                 <h4 i18n>Liste des objets</h4>
                 <div class="add-remove">
-                    <img [src]="HORDES_IMG_REPO + 'icons/small_less.gif'" *ngIf="cell.items && cell.items.length > 0"
-                        [mat-menu-trigger-for]="menuRemove">
-                    <img [src]="HORDES_IMG_REPO + 'icons/small_more.gif'" [mat-menu-trigger-for]="menuAdd">
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_less.gif'" *ngIf="cell.items && cell.items.length > 0"
+                         [mat-menu-trigger-for]="menuRemove" width="16" height="16">
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_more.gif'" [mat-menu-trigger-for]="menuAdd" width="16" height="16">
                 </div>
             </div>
 
@@ -36,7 +36,7 @@
             <div class="items">
                 <div *ngFor="let item of cell.items">
                     <img *ngIf="(item | itemDetails:all_items) as complete_item"
-                        [src]="HORDES_IMG_REPO + complete_item.img" [class.broken]="item.is_broken">
+                         [ngSrc]="HORDES_IMG_REPO + complete_item.img" [class.broken]="item.is_broken" width="16" height="16">
                     <span class="item-quantity">{{item.count}}</span>
                 </div>
             </div>
@@ -51,8 +51,8 @@
 
             <div class="items">
                 <div *ngFor="let item of (cell.citizens | itemsInBags:citizens)">
-                    <img *ngIf="item" [src]="HORDES_IMG_REPO + item.item.img" [class.broken]="item.is_broken"
-                        [title]="item.item.label[locale]">
+                    <img *ngIf="item" [ngSrc]="HORDES_IMG_REPO + item.item.img" [class.broken]="item.is_broken"
+                         [title]="item.item.label[locale]" width="16" height="16">
                     <span class="item-quantity">{{item.count}}</span>
                 </div>
             </div>
@@ -60,7 +60,9 @@
             <mat-divider></mat-divider>
         </div>
 
-        <div class="last-update"><mho-last-update [lastUpdateInfo]="cell.update_info"></mho-last-update></div>
+        <div class="last-update">
+            <mho-last-update [lastUpdateInfo]="cell.update_info"></mho-last-update>
+        </div>
     </form>
 </div>
 
@@ -73,9 +75,10 @@
     </div>
     <div class="items">
         <ng-container *ngFor="let item of all_items">
-            <img *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1"
-                [src]="HORDES_IMG_REPO + item.img" (click)="addItem(cell, item.id)"
-                [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+            <img
+                *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1"
+                [ngSrc]="HORDES_IMG_REPO + item.img" (click)="addItem(cell, item.id)"
+                [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
         </ng-container>
     </div>
 </mat-menu>
@@ -90,13 +93,13 @@
         <ng-container *ngFor="let item of (cell.items | arrayItemDetails:all_items)">
             <ng-container
                 *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1">
-                <img [src]="HORDES_IMG_REPO + item.img" (click)="removeItem(cell, item.id)"
-                    [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+                <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="removeItem(cell, item.id)"
+                     [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
             </ng-container>
         </ng-container>
     </div>
     <div mat-menu-item class="empty-bag" (click)="emptyItems(cell)">
-        <img [src]="HORDES_IMG_REPO + 'icons/b_close.png'" style="margin-right: 0.5em">
+        <img [ngSrc]="HORDES_IMG_REPO + 'icons/b_close.png'" style="margin-right: 0.5em" width="16" height="16">
         <span i18n>Retirer tous les objets</span>
     </div>
 </mat-menu>

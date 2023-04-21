@@ -1,12 +1,13 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { Component, ElementRef, HostBinding, Input, OnDestroy, Optional, Output, Self, ViewChild, EventEmitter, ViewEncapsulation } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, UntypedFormControl, NgControl, ValidationErrors, Validator, Validators } from '@angular/forms';
+import { Component, ElementRef, EventEmitter, HostBinding, Input, OnDestroy, Optional, Output, Self, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AbstractControl, ControlValueAccessor, NgControl, UntypedFormControl, ValidationErrors, Validator, Validators } from '@angular/forms';
 import { MatOption } from '@angular/material/core';
 import { MatFormField, MatFormFieldControl } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatSelect } from '@angular/material/select';
 import { Subject } from 'rxjs';
 import { LabelPipe } from './label.pipe';
+import { normalizeString } from '../../utilities/string.utils';
 
 @Component({
     selector: 'mho-select',
@@ -19,14 +20,16 @@ import { LabelPipe } from './label.pipe';
             multi: true,
             useExisting: SelectComponent
         }
-    ],
-    host: {
-        '[class.floating]': 'shouldLabelFloat',
-        '[id]': 'id',
-      },
+    ]
 })
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 export class SelectComponent<T> implements ControlValueAccessor, Validator, MatFormFieldControl<T | string | T[] | string[] | undefined>, OnDestroy {
+
+    private static nextId: number = 0;
+
     @HostBinding('style.display') display: string = 'contents';
+    @HostBinding('class.floating') floating: boolean = this.shouldLabelFloat;
 
     // get reference to the input element
     @ViewChild(MatSelect) select!: MatSelect;
@@ -44,31 +47,30 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     @Input() set options(options: (T | string)[]) {
         this.displayed_options = [...options];
         this.complete_options = [...options];
-    };
+    }
 
-    @Input('aria-describedby') userAriaDescribedBy!: string;
+    @Input() userAriaDescribedBy!: string;
 
-    @Input() get placeholder() {
+    @Input() get placeholder(): string {
         return this._placeholder;
-    }
-
-    @Input() get required() {
-        return this._required;
-    }
-
-    @Input() get disabled(): boolean { return this._disabled; }
-
-    @Output() filterChange: EventEmitter<T | string | T[] | string[] | undefined> = new EventEmitter<T | string | T[] | string[] | undefined>();
-    @Output() closed: EventEmitter<void> = new EventEmitter<void>();
-
-    set required(req) {
-        this._required = coerceBooleanProperty(req);
-        this.stateChanges.next();
     }
 
     set placeholder(plh: string) {
         this._placeholder = plh;
         this.stateChanges.next();
+    }
+
+    @Input() get required(): boolean {
+        return this._required;
+    }
+
+    set required(req: boolean) {
+        this._required = coerceBooleanProperty(req);
+        this.stateChanges.next();
+    }
+
+    @Input() get disabled(): boolean {
+        return this._disabled;
     }
 
     set disabled(value: boolean) {
@@ -77,43 +79,54 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         this.stateChanges.next();
     }
 
-    get shouldLabelFloat() {
+    @Output() filterChange: EventEmitter<T | string | T[] | string[] | undefined> = new EventEmitter<T | string | T[] | string[] | undefined>();
+    @Output() closed: EventEmitter<void> = new EventEmitter<void>();
+
+
+    get shouldLabelFloat(): boolean {
         return this.focused || !this.empty;
     }
 
-    public id = `mho-select-${SelectComponent.nextId++}`;
+    public id: string = `mho-select-${SelectComponent.nextId++}`;
 
     public displayed_options: (T | string)[] = [];
 
-    public stateChanges = new Subject<void>();
+    public stateChanges: Subject<void> = new Subject<void>();
+    public controlType?: string | undefined;
+    public autofilled?: boolean | undefined;
 
     private complete_options: (T | string)[] = [];
     //The internal data model for form control value access
     private innerValue: T | string | T[] | string[] | undefined = undefined;
-    // errors for the form control will be stored in this array
+    /** errors for the form control will be stored in this array */
     private errors: string[] = [$localize`Ce champ est obligatoire`];
     private touched: boolean = false;
     private _placeholder!: string;
-    private _required = false;
-    private _disabled = false;
+    private _required: boolean = false;
+    private _disabled: boolean = false;
 
     private label_pipe: LabelPipe<T> = new LabelPipe();
 
-    private static nextId: number = 0; focused = false;
+    private focused: boolean = false;
 
-    //propagate changes into the custom form control
-    public propagateChange = (_: any) => { }
-    public onTouched = () => { }
+    /** propagate changes into the custom form control */
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    public propagateChange = (_: unknown): void => {
+        //no-empty
+    };
+    public onTouched = (): void => {
+        //no-empty
+    };
 
-    public constructor(@Optional() @Self() public ngControl: NgControl, @Optional() @Self() public validator: Validators, @Optional() public parent_form_field: MatFormField,
-        private _elementRef: ElementRef) {
-        if (this.ngControl != null) {
+    public constructor(@Optional() @Self() public ngControl: NgControl, @Optional() @Self() public validator: Validators,
+                       @Optional() public parent_form_field: MatFormField, private _elementRef: ElementRef) {
+        if (this.ngControl !== null) {
             this.ngControl.valueAccessor = this;
         }
     }
 
     // event fired when input value is changed . later propagated up to the form control using the custom value accessor interface
-    public onChange(value: T | string | undefined) {
+    public onChange(value: T | string | undefined): void {
         //set changed value
         this.innerValue = value;
         // propagate value into form control using control value accessor interface
@@ -122,7 +135,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         //reset errors
         this.errors = [];
         //setting, resetting error messages into an array (to loop) and adding the validation messages to show below the field area
-        for (var key in this.form_control.errors) {
+        for (const key in this.form_control.errors) {
+            // eslint-disable-next-line no-prototype-builtins
             if (this.form_control.errors.hasOwnProperty(key)) {
                 this.errors.push(this.form_control.errors[key]);
             }
@@ -144,7 +158,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     //get accessor
     public get value(): T | string | T[] | string[] | undefined {
         return this.innerValue;
-    };
+    }
 
     //set accessor including call the onchange callback
     public set value(v: T | string | T[] | string[] | undefined) {
@@ -154,29 +168,30 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         }
     }
 
-    public setDescribedByIds(ids: string[]) {
-        const controlElement = this._elementRef.nativeElement.querySelector('.mho-select-input-container')!;
+    public setDescribedByIds(ids: string[]): void {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const controlElement: HTMLElement = this._elementRef.nativeElement.querySelector('.mho-select-input-container')!;
         if (controlElement) {
             controlElement.setAttribute('aria-describedby', ids.join(' '));
         }
     }
 
-    public onContainerClick(event: MouseEvent) {
+    public onContainerClick(): void {
         if (this.filter_input) {
             this.filter_input.focus();
         }
     }
 
-    public filter(event: Event) {
-        const value: string = (<HTMLInputElement>event.target)?.value?.toLowerCase();
+    public filter(event: Event): void {
+        const value: string = normalizeString((<HTMLInputElement>event.target)?.value);
         this.displayed_options = [...this.complete_options.filter((option: T | string) => {
-            const label: string = this.label_pipe.transform(option, this.bindLabel);
-            return label.toLowerCase().indexOf(value) > -1;
-        })]
+            const label: string = normalizeString(this.label_pipe.transform(option, this.bindLabel));
+            return label.indexOf(value) > -1;
+        })];
     }
 
     //From ControlValueAccessor interface
-    public writeValue(value: T | string | undefined) {
+    public writeValue(value: T | string | undefined): void {
         // console.log('value', value)
         this.innerValue = value;
         this.onChange(value);
@@ -184,23 +199,23 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     }
 
     //From ControlValueAccessor interface
-    public registerOnChange(fn: any) {
+    public registerOnChange(fn: () => void): void {
         this.propagateChange = fn;
     }
 
     //From ControlValueAccessor interface
-    public registerOnTouched(fn: any) {
-
+    public registerOnTouched(): void {
+        // no-empty
     }
 
-    public onFocusIn(event: FocusEvent) {
+    public onFocusIn(): void {
         if (!this.focused) {
             this.focused = true;
             this.stateChanges.next();
         }
     }
 
-    public onFocusOut(event: FocusEvent) {
+    public onFocusOut(event: FocusEvent): void {
         if (!this._elementRef.nativeElement.contains(event.relatedTarget as Element)) {
             this.touched = true;
             this.focused = false;
@@ -209,12 +224,12 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
         }
     }
 
-    public get empty() {
+    public get empty(): boolean {
         return this.value === undefined || this.value === null || this.value === '' || (Array.isArray(this.value) && this.value.length === 0);
     }
 
     public validate(control: AbstractControl): ValidationErrors | null {
-        const quantity = control.value;
+        const quantity: number = control.value;
         if (quantity <= 0) {
             return {
                 mustBePositive: {

@@ -24,8 +24,10 @@
                         "outputPath": "dist/my-hordes-optimizer-website",
                         "index": "src/index.html",
                         "main": "src/main.ts",
-                        "polyfills": "src/polyfills.ts",
                         "tsConfig": "tsconfig.app.json",
+                        "polyfills": [
+                            "zone.js"
+                        ],
                         "inlineStyleLanguage": "scss",
                         "assets": [
                             "src/favicon.ico",
@@ -38,7 +40,8 @@
                         ],
                         "stylePreprocessorOptions": {
                             "includePaths": [
-                                "src/assets/scss"
+                                "src/assets/scss",
+                                "src/assets/scss/**/"
                             ]
                         },
                         "scripts": []
@@ -97,10 +100,12 @@
                 "test": {
                     "builder": "@angular-devkit/build-angular:karma",
                     "options": {
-                        "main": "src/test.ts",
-                        "polyfills": "src/polyfills.ts",
-                        "tsConfig": "tsconfig.spec.json",
                         "karmaConfig": "karma.conf.js",
+                        "tsConfig": "tsconfig.spec.json",
+                        "polyfills": [
+                            "zone.js",
+                            "zone.js.testing"
+                        ],
                         "inlineStyleLanguage": "scss",
                         "assets": [
                             "src/favicon.ico",
@@ -112,7 +117,8 @@
                         ],
                         "stylePreprocessorOptions": {
                             "includePaths": [
-                                "src/assets/scss"
+                                "src/assets/scss",
+                                "src/assets/scss/**/"
                             ]
                         },
                         "scripts": []

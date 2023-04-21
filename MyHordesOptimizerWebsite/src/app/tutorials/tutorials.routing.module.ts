@@ -8,30 +8,58 @@ import { TutoScriptToolsComponent } from './script/tuto-script-tools/tuto-script
 import { TutoScriptWikiComponent } from './script/tuto-script-wiki/tuto-script-wiki.component';
 import { TutoSiteFirstUseComponent } from './site/tuto-site-first-use/tuto-site-first-use.component';
 
-let routes: Routes = [
-    { path: 'tutorials', redirectTo: 'tutorials/script/installation' },
+const routes: Routes = [
+    {path: 'tutorials', redirectTo: 'tutorials/script/installation'},
     {
         path: 'tutorials', children: [
-            { path: 'script', redirectTo: 'script/installation' },
+            {path: 'script', redirectTo: 'script/installation'},
             {
                 path: 'script', children: [
-                    { path: 'alerts', component: TutoScriptAlertsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Notifications` },
-                    { path: 'display', component: TutoScriptDisplayComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Affichage` },
-                    { path: 'external-tools', component: TutoScriptExternalToolsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Outils externes` },
-                    { path: 'installation', component: TutoScriptInstallationComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Installation` },
-                    { path: 'tools', component: TutoScriptToolsComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Outils` },
-                    { path: 'wiki', component: TutoScriptWikiComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Wiki` },
+                    {
+                        path: 'alerts',
+                        component: TutoScriptAlertsComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Notifications`
+                    },
+                    {
+                        path: 'display',
+                        component: TutoScriptDisplayComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Affichage`
+                    },
+                    {
+                        path: 'external-tools',
+                        component: TutoScriptExternalToolsComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Outils externes`
+                    },
+                    {
+                        path: 'installation',
+                        component: TutoScriptInstallationComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Installation`
+                    },
+                    {
+                        path: 'tools',
+                        component: TutoScriptToolsComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Outils`
+                    },
+                    {
+                        path: 'wiki',
+                        component: TutoScriptWikiComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Script` + ' - ' + $localize`Wiki`
+                    },
                 ]
             },
-            { path: 'site', redirectTo: 'site/first-use' },
+            {path: 'site', redirectTo: 'site/first-use'},
             {
                 path: 'site', children: [
-                    { path: 'first-use', component: TutoSiteFirstUseComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Site` + ' - ' + $localize` diverses` },
+                    {
+                        path: 'first-use',
+                        component: TutoSiteFirstUseComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Site` + ' - ' + $localize` diverses`
+                    },
                 ]
             },
         ]
     }
-]
+];
 
 @NgModule({
     imports: [RouterModule.forChild(routes)],

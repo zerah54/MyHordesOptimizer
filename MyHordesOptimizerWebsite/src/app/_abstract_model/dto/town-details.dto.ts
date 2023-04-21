@@ -1,4 +1,3 @@
-
 export interface TownDetailsDTO {
     townId: number;
     townX: number;
@@ -7,5 +6,5 @@ export interface TownDetailsDTO {
     townMaxY: number;
     isDevaste: boolean;
     day: number;
-    townType: "RE" | "RNE" | "PANDE";
+    townType: 'RE' | 'RNE' | 'PANDE';
 }

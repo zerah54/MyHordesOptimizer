@@ -1,4 +1,4 @@
-import { CommonEnum, CommonEnumData } from "./_common.enum";
+import { CommonEnum, CommonEnumData } from './_common.enum';
 
 
 const ESC_FIXED_KEY: string = 'esc_fixed';
@@ -31,34 +31,38 @@ const PET_KEY: string = 'pet';
 const DECO_KEY: string = 'deco';
 
 
-const ESC_FIXED_DATA: PropertyData = { label: $localize`Ne peut pas être déposé par le chef d'escorte`, category: '', img: '' };
-const LOCK_DATA: PropertyData = { label: $localize`Sécurise le coffre dans lequel il se trouve`, category: '', img: '' };
-const FOUND_POISONED_DATA: PropertyData = { label: $localize`Peut être trouvé empoisonné`, category: '', img: '' };
-const PREVENT_TERROR_DATA: PropertyData = { label: $localize`Empêche d'être terrorisé à cause d'un objet`, category: '', img: '' };
-const HERO_FIND_LUCKY_DATA: PropertyData = { label: $localize`Trouvaille améliorée`, category: '', img: '' };
-const HERO_FIND_DATA: PropertyData = { label: $localize`Trouvaille`, category: '', img: '' };
-const IMPOUNDABLE_DATA: PropertyData = { label: $localize`Conservé en cas de banissement`, category: '', img: '' };
-const PREVENT_NIGHT_DATA: PropertyData = { label: $localize`Annule le malus de nuit sur la case une fois posé au sol`, category: '', img: '' };
-const IS_WATER_DATA: PropertyData = { label: $localize`Désaltère`, category: '', img: 'status/status_hasdrunk.gif' };
+const ESC_FIXED_DATA: PropertyData = {label: $localize`Ne peut pas être déposé par le chef d'escorte`, category: '', img: ''};
+const LOCK_DATA: PropertyData = {label: $localize`Sécurise le coffre dans lequel il se trouve`, category: '', img: ''};
+const FOUND_POISONED_DATA: PropertyData = {label: $localize`Peut être trouvé empoisonné`, category: '', img: ''};
+const PREVENT_TERROR_DATA: PropertyData = {label: $localize`Empêche d'être terrorisé à cause d'un objet`, category: '', img: ''};
+const HERO_FIND_LUCKY_DATA: PropertyData = {label: $localize`Trouvaille améliorée`, category: '', img: ''};
+const HERO_FIND_DATA: PropertyData = {label: $localize`Trouvaille`, category: '', img: ''};
+const IMPOUNDABLE_DATA: PropertyData = {label: $localize`Conservé en cas de bannissement`, category: '', img: ''};
+const PREVENT_NIGHT_DATA: PropertyData = {label: $localize`Annule le malus de nuit sur la case une fois posé au sol`, category: '', img: ''};
+const IS_WATER_DATA: PropertyData = {label: $localize`Désaltère`, category: '', img: 'status/status_hasdrunk.gif'};
 
 /** Veille */
-const NW_ARMORY_DATA: PropertyData = { label: $localize`Compte dans le calcul du bonus de veille donné par l'armurerie`, category: 'nightwatch', img: '' };
-const NW_IKEA_DATA: PropertyData = { label: $localize`Compte dans le calcul du bonus de veille donné par le magasin suédois`, category: 'nightwatch', img: '' };
-const NW_TREBUCHET_DATA: PropertyData = { label: $localize`Compte dans le calcul du bonus de veille donné par le lance-bête`, category: 'nightwatch', img: '' };
-const NW_SHOOTING_DATA: PropertyData = { label: $localize`Compte dans le calcul du bonus de veille donné par la tourelle lance-eau`, category: 'nightwatch', img: '' };
+const NW_ARMORY_DATA: PropertyData = {label: $localize`Compte dans le calcul du bonus de veille donné par l'armurerie`, category: 'nightwatch', img: ''};
+const NW_IKEA_DATA: PropertyData = {label: $localize`Compte dans le calcul du bonus de veille donné par le magasin suédois`, category: 'nightwatch', img: ''};
+const NW_TREBUCHET_DATA: PropertyData = {label: $localize`Compte dans le calcul du bonus de veille donné par le lance-bête`, category: 'nightwatch', img: ''};
+const NW_SHOOTING_DATA: PropertyData = {
+    label: $localize`Compte dans le calcul du bonus de veille donné par la tourelle lance-eau`,
+    category: 'nightwatch',
+    img: ''
+};
 
 /** Modifications possibles */
-const CAN_POISON_DATA: PropertyData = { label: $localize`Peut être empoisonné`, category: 'modification', img: '' };
-const CAN_COOK_DATA: PropertyData = { label: $localize`Peut être cuisiné`, category: 'modification', img: '' };
+const CAN_POISON_DATA: PropertyData = {label: $localize`Peut être empoisonné`, category: 'modification', img: ''};
+const CAN_COOK_DATA: PropertyData = {label: $localize`Peut être cuisiné`, category: 'modification', img: ''};
 
 /** Catégories */
-const FOOD_DATA: PropertyData = { label: $localize`Provisions`, category: 'category', img: '' };
-const DRUG_DATA: PropertyData = { label: $localize`Pharmacie`, category: 'category', img: '' };
-const WEAPON_DATA: PropertyData = { label: $localize`Arme`, category: 'category', img: '' };
-const RESSOURCE_DATA: PropertyData = { label: $localize`Ressource`, category: 'category', img: '' };
-const DEFENCE_DATA: PropertyData = { label: $localize`Objet de défense`, category: 'category', img: '' };
-const PET_DATA: PropertyData = { label: $localize`Animal`, category: 'category', img: '' };
-const DECO_DATA: PropertyData = { label: $localize`Décoration`, category: 'category', img: '' };
+const FOOD_DATA: PropertyData = {label: $localize`Provisions`, category: 'category', img: ''};
+const DRUG_DATA: PropertyData = {label: $localize`Pharmacie`, category: 'category', img: ''};
+const WEAPON_DATA: PropertyData = {label: $localize`Arme`, category: 'category', img: ''};
+const RESSOURCE_DATA: PropertyData = {label: $localize`Ressource`, category: 'category', img: ''};
+const DEFENCE_DATA: PropertyData = {label: $localize`Objet de défense`, category: 'category', img: ''};
+const PET_DATA: PropertyData = {label: $localize`Animal`, category: 'category', img: ''};
+const DECO_DATA: PropertyData = {label: $localize`Décoration`, category: 'category', img: ''};
 
 /** Type de champs de propriétés existants */
 export class Property extends CommonEnum {

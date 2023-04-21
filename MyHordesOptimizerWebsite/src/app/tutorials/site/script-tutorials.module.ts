@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
-import { SharedModule } from 'src/app/shared/shared.module';
-import { Components } from 'src/app/_abstract_model/types/_types';
 import { TutoSiteFirstUseComponent } from './tuto-site-first-use/tuto-site-first-use.component';
+import { Components } from '../../_abstract_model/types/_types';
+import { SharedModule } from '../../shared/shared.module';
 
 
 const components: Components = [TutoSiteFirstUseComponent];
@@ -12,4 +12,5 @@ const components: Components = [TutoSiteFirstUseComponent];
     imports: [SharedModule],
     exports: [...components],
 })
-export class SiteTutorialsModule { }
+export class SiteTutorialsModule {
+}

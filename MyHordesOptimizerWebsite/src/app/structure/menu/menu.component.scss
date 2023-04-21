@@ -1,4 +1,4 @@
-@import "variables.scss";
+@use "variables";
 
 .app-menu {
     height: 100%;
@@ -20,7 +20,7 @@
             text-decoration: none;
 
             &.link-selected {
-                color: $primary !important;
+                color: variables.$primary !important;
             }
 
             @for $i from 1 through 10 {

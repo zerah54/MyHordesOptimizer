@@ -1,5 +1,5 @@
-import { ComponentType } from "@angular/cdk/portal";
-import { ModuleWithProviders, Type } from "@angular/core";
+import { ComponentType } from '@angular/cdk/portal';
+import { ModuleWithProviders, Type } from '@angular/core';
 
 export type Modules = Type<unknown>[] | ModuleWithProviders<unknown>[];
 export type Components = ComponentType<unknown>[] | Type<unknown>[];
@@ -9,7 +9,7 @@ export interface ToolsToUpdate {
     isFataMorgana: 'none' | 'cell' | 'api';
     isGestHordes: 'none' | 'cell' | 'api';
     isMyHordesOptimizer: 'none' | 'cell' | 'api';
-};
+}
 
 export type I18nLabels = Dictionary<string>;
 

@@ -1,10 +1,10 @@
 import { Action } from '../enum/action.enum';
 import { Property } from '../enum/property.enum';
-import { ItemDTO } from './../dto/item.dto';
 import { Category } from './category.class';
 import { Recipe } from './recipe.class';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { I18nLabels } from './_types';
+import { ItemDTO } from '../dto/item.dto';
 
 export class Item extends CommonModel<ItemDTO> {
     public uid!: string;
@@ -70,6 +70,6 @@ export class Item extends CommonModel<ItemDTO> {
             this.drop_rate_not_praf = dto.dropRateNotPraf;
             this.drop_rate_praf = dto.dropRatePraf;
         }
-    };
+    }
 
 }

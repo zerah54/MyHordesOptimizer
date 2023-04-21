@@ -1,5 +1,6 @@
-<mat-card-header>
+<mat-card-header class="mho-bank-header">
     <mat-card-title i18n>Banque</mat-card-title>
+    <mat-slide-toggle i18n [(ngModel)]="condensed_display" (ngModelChange)="changeCondensedDisplay()">Affichage condensé</mat-slide-toggle>
 </mat-card-header>
 <mat-card-content class="mho-bank">
     <ng-container *ngIf="displayed_bank_items">
@@ -8,11 +9,11 @@
             <mat-form-field class="properties-filter">
                 <mat-label i18n>Chercher des objets par propriétés</mat-label>
                 <mho-select [multiple]="true" [options]="options" [bindLabel]="'value.label'" [(ngModel)]="select_value"
-                    (filterChange)="applyFilters()">
+                            (filterChange)="applyFilters()">
                 </mho-select>
             </mat-form-field>
         </div>
-        <ul>
+        <ul *ngIf="!condensed_display; else condensedDisplay">
             <div class="category" *ngFor="let category of (displayed_bank_items | itemsGroupByCategory)">
                 <h2>{{category.category.label[locale]}}</h2>
                 <div class="items">
@@ -20,5 +21,24 @@
                 </div>
             </div>
         </ul>
+        <ng-template #condensedDisplay>
+            <div class="condensed">
+                <div class="bank">
+                    <div class="category" *ngFor="let category of (displayed_bank_items | itemsGroupByCategory:'id')">
+                        <h2>{{category.category.label[locale]}}</h2>
+                        <ul class="items">
+                            <li *ngFor="let bank_item of category.items" class="item" (click)="detailed_item = bank_item" [class.broken]="bank_item.is_broken"
+                                [matTooltip]="bank_item.label[locale]">
+                                <img class="item-icon" [ngSrc]="HORDES_IMG_REPO + bank_item.img" width="16" height="16">
+                                <span class="item-count" *ngIf="bank_item.bank_count > 1">{{bank_item.bank_count}}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="detail">
+                    <mho-item [item]="detailed_item" [forceOpen]="true"></mho-item>
+                </div>
+            </div>
+        </ng-template>
     </ng-container>
 </mat-card-content>

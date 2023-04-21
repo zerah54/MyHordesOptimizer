@@ -1,7 +1,7 @@
 <mat-card-header>
     <mat-card-title>
         <ng-container i18n>Camping</ng-container>
-        <button mat-icon-button (click)="shareCamping()">
+        <button mat-icon-button (click)="shareCamping()" matTooltip="Copier le lien de la simulation" i18n-matTooltip>
             <mat-icon>share</mat-icon>
         </button>
     </mat-card-title>
@@ -27,25 +27,25 @@
                         </mho-select>
                     </mat-form-field>
                     <mat-checkbox [formControlName]="'vest'" *ngIf="$any(jobSelect.value)?.id === 'scout'">
-                        <img [src]="HORDES_IMG_REPO +  'emotes/proscout.gif'">
+                        <img [ngSrc]="HORDES_IMG_REPO +  'emotes/proscout.gif'" width="16" height="16">
                         <ng-container i18n>Tenue de camouflage</ng-container>
                     </mat-checkbox>
                     <mat-checkbox [formControlName]="'pro'">
-                        <img [src]="HORDES_IMG_REPO + 'status/status_camper.gif'">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'status/status_camper.gif'" width="16" height="16">
                         <ng-container i18n>Campeur professionnel</ng-container>
                     </mat-checkbox>
                     <mat-checkbox [formControlName]="'tomb'" style="margin-bottom: 0.5em">
-                        <img [src]="HORDES_IMG_REPO + 'building/small_cemetery.gif'">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'building/small_cemetery.gif'" width="16" height="16">
                         <ng-container i18n>Tombe</ng-container>
                     </mat-checkbox>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre de campings déjà effectués</mat-label>
-                        <img matPrefix [src]="HORDES_IMG_REPO + 'emotes/sleep.gif'">
+                        <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/sleep.gif'" width="16" height="16">
                         <input matInput type="number" [formControlName]="'campings'">
                     </mat-form-field>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre de pelures de peau et de toiles de tentes dans le sac</mat-label>
-                        <img matPrefix [src]="HORDES_IMG_REPO + 'emotes/bag.gif'">
+                        <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/bag.gif'" width="16" height="16">
                         <input matInput type="number" [formControlName]="'objects'">
                     </mat-form-field>
                 </div>
@@ -62,15 +62,15 @@
                         </mho-select>
                     </mat-form-field>
                     <mat-checkbox [formControlName]="'night'">
-                        <img [src]="HORDES_IMG_REPO +  'pictos/r_doutsd.gif'">
+                        <img [ngSrc]="HORDES_IMG_REPO +  'pictos/r_doutsd.gif'" width="16" height="16">
                         <ng-container i18n>Nuit</ng-container>
                     </mat-checkbox>
                     <mat-checkbox [formControlName]="'devastated'">
-                        <img [src]="HORDES_IMG_REPO + 'item/item_out_def_broken.gif'">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'item/item_out_def_broken.gif'" width="16" height="16">
                         <ng-container i18n>Ville dévastée</ng-container>
                     </mat-checkbox>
                     <mat-checkbox [formControlName]="'phare'">
-                        <img [src]="HORDES_IMG_REPO + 'building/small_lighthouse.gif'">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'building/small_lighthouse.gif'" width="16" height="16">
                         <ng-container i18n>Phare</ng-container>
                     </mat-checkbox>
                 </div>
@@ -83,28 +83,29 @@
                 <div>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Distance de la ville (en km)</mat-label>
-                        <img matPrefix [src]="HORDES_IMG_REPO + 'emotes/explo.gif'">
+                        <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/explo.gif'" width="16" height="16">
                         <input matInput type="number" #townDistance [formControlName]="'distance'" min="1">
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Bâtiment</mat-label>
                         <mho-select [formControlName]="'ruin'" [options]="ruins | filterRuinsByKm:townDistance.value"
-                            [bindLabel]="'label.' + locale" [moreInfo]="getMoreRuinInfo">
+                                    [bindLabel]="'label.' + locale" [moreInfo]="getMoreRuinInfo">
                         </mho-select>
                         <mat-icon matSuffix [matTooltip]="help_ruins" style="vertical-align: middle"
-                            [color]="'primary'">help_outline</mat-icon>
+                                  [color]="'primary'">help_outline
+                        </mat-icon>
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre de zombies sur la case</mat-label>
-                        <img matPrefix [src]="HORDES_IMG_REPO + 'emotes/zombie.gif'">
+                        <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/zombie.gif'" width="16" height="16">
                         <input matInput type="number" [formControlName]="'zombies'">
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre de campeurs déjà cachés sur la case</mat-label>
-                        <img matPrefix [src]="HORDES_IMG_REPO + 'emotes/human.gif'">
+                        <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/human.gif'" width="16" height="16">
                         <input matInput type="number" [formControlName]="'hidden_campers'">
                     </mat-form-field>
 
@@ -113,18 +114,19 @@
                     <h3>
                         <ng-container i18n>Améliorations</ng-container>
                         <mat-icon matSuffix [matTooltip]="help_amelio"
-                            style="vertical-align: middle; margin-left: 0.25em;"
-                            [color]="'primary'">help_outline</mat-icon>
+                                  style="vertical-align: middle; margin-left: 0.25em;"
+                                  [color]="'primary'">help_outline
+                        </mat-icon>
                     </h3>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre d'améliorations simples faites sur la case</mat-label>
-                        <img matPrefix [src]="HORDES_IMG_REPO + 'icons/small_refine.gif'">
+                        <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'icons/small_refine.gif'" width="16" height="16">
                         <input matInput type="number" [formControlName]="'improve'">
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre d'objets de défense installés sur la case</mat-label>
-                        <img matPrefix [src]="HORDES_IMG_REPO + 'item/cat_def.gif'">
+                        <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'item/cat_def.gif'" width="16" height="16">
                         <input matInput type="number" [formControlName]="'object_improve'">
                     </mat-form-field>
                     <div class="or">
@@ -136,7 +138,8 @@
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre total d'améliotations sur la case</mat-label>
                         <span matPrefix>
-                            <img [src]="HORDES_IMG_REPO + 'icons/small_refine.gif'"> + <img [src]="HORDES_IMG_REPO + 'item/cat_def.gif'">
+                            <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_refine.gif'" width="16" height="16"> + <img
+                            [ngSrc]="HORDES_IMG_REPO + 'item/cat_def.gif'" width="16" height="16">
                         </span>
                         <input matInput type="number" [formControlName]="'complete_improve'">
                     </mat-form-field>

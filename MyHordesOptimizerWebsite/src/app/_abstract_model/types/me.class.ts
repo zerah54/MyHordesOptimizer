@@ -1,6 +1,6 @@
 import { MeDTO } from '../dto/me.dto';
 import { TownDetails } from './town-details.class';
-import { CommonModel } from "./_common.class";
+import { CommonModel } from './_common.class';
 
 export class Me extends CommonModel<MeDTO> {
     public id!: number;
@@ -18,7 +18,7 @@ export class Me extends CommonModel<MeDTO> {
             userName: this.username,
             townDetails: this.town_details.modelToDto()
         };
-    };
+    }
 
     protected dtoToModel(dto?: MeDTO): void {
         if (dto) {
@@ -26,5 +26,5 @@ export class Me extends CommonModel<MeDTO> {
             this.username = dto.userName;
             this.town_details = new TownDetails(dto.townDetails);
         }
-    };
+    }
 }

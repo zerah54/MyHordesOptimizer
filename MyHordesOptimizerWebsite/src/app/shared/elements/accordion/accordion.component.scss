@@ -1,4 +1,4 @@
-@import "variables.scss";
+@use "variables";
 
 .mho-accordion {
     display: block;
@@ -6,7 +6,7 @@
 
     .mho-accordion-item {
         display: block;
-        border: solid 1px $item_color;
+        border: solid 1px variables.$item_color;
 
         .mho-accordion-item-header {
             display: flex;
@@ -15,7 +15,7 @@
 
             &:hover {
                 cursor: pointer;
-                background-color: $item_color;
+                background-color: variables.$item_color;
             }
         }
 
@@ -36,7 +36,7 @@
 
     }
 
-    .mho-accordion-item+.mho-accordion-item {
+    .mho-accordion-item + .mho-accordion-item {
         border-top: none;
     }
 }

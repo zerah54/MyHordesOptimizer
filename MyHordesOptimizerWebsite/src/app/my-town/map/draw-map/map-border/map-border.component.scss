@@ -1,12 +1,12 @@
-@import "variables.scss";
+@use "variables";
 
 $small: 20px;
 $large: 30px;
 
 th.border-cell {
 
-    background-color: $sidenav_bg_color;
-    border: 1px solid $sidenav_bg_color;
+    background-color: variables.$sidenav_bg_color;
+    border: 1px solid variables.$sidenav_bg_color;
     font-weight: normal;
     padding: 0;
     position: sticky;

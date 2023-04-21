@@ -1,4 +1,9 @@
+.mho-wishlist-header {
+    justify-content: space-between;
+}
+
 .mho-wishlist {
+
     .hidden {
         display: none;
     }
@@ -7,9 +12,9 @@
         width: 100%;
 
         tr {
-            >td {
+            > td {
                 &.name {
-                    >div {
+                    > div {
                         display: flex;
                         align-items: center;
                         gap: 0.5em;
@@ -20,8 +25,36 @@
                 .count {
                     width: 100px;
                 }
+
+                .dragdrop-indicator {
+                    display: flex;
+
+                    .mat-icon {
+                        margin: auto;
+                    }
+                }
             }
         }
+    }
+
+    .cdk-drag-preview {
+        box-sizing: border-box;
+        border-radius: 4px;
+        box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+        0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    }
+
+    .cdk-drag-placeholder {
+        opacity: 0;
+    }
+
+    .cdk-drag-animating {
+        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .table.cdk-drop-list-dragging .tr:not(.cdk-drag-placeholder) {
+        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
     }
 }
 
@@ -31,9 +64,9 @@
     .mho-wishlist {
         table {
             tr {
-                >td {
+                > td {
                     &.name {
-                        >div {
+                        > div {
                             white-space: nowrap;
                             flex-wrap: nowrap;
                         }

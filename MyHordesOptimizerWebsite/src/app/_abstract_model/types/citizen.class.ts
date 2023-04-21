@@ -48,8 +48,8 @@ export class Citizen extends CommonModel<CitizenDTO> {
             status: this.status?.modelToDto(),
             home: this.home?.modelToDto(),
             actionsHeroic: this.heroic_actions?.modelToDto()
-        }
-    };
+        };
+    }
 
     public toCitizenBagDto(): { userId: number, objects: ShortItemCountDTO[] } {
         return {
@@ -59,30 +59,34 @@ export class Citizen extends CommonModel<CitizenDTO> {
                     count: item.count,
                     id: item.item.id,
                     isBroken: item.isBroken
-                }
+                };
             }) || [],
-        }
+        };
     }
 
     public toCitizenStatusDto(): { userId: number, status: string[] } {
         return {
             userId: this.id,
             status: this.status?.icons.map((icon: StatusEnum) => icon.key) || [],
-        }
+        };
     }
 
     public toCitizenHeroicActionsDto(): { userId: number, heroicActions: Dictionary<number | boolean> } {
         return {
             userId: this.id,
-            heroicActions: this.heroic_actions?.content.reduce((accumulator, content: HeroicActionsWithValue) => { return { ...accumulator, [content.element.key]: content.value } }, {}) || []
-        }
+            heroicActions: this.heroic_actions?.content.reduce((accumulator: Dictionary<number | boolean>, content: HeroicActionsWithValue) => {
+                return {...accumulator, [content.element.key]: content.value};
+            }, {}) || {}
+        };
     }
 
     public toCitizenHomeDto(): { userId: number, home: Dictionary<number | boolean> } {
         return {
             userId: this.id,
-            home: this.home?.content.reduce((accumulator, content: HomeWithValue) => { return { ...accumulator, [content.element.key]: content.value } }, {}) || []
-        }
+            home: this.home?.content.reduce((accumulator: Dictionary<number | boolean>, content: HomeWithValue) => {
+                return {...accumulator, [content.element.key]: content.value};
+            }, {}) || {}
+        };
     }
 
     protected dtoToModel(dto?: CitizenDTO): void {
@@ -102,5 +106,5 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.home = new Home(dto.home);
             this.heroic_actions = new HeroicActions(dto.actionsHeroic);
         }
-    };
+    }
 }

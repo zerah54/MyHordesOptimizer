@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.41
+// @version      1.0.0-beta.49
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -35,7 +35,8 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-+ `[fix] Réparation du menu qui passait sous les éléments d'interface de MH suite à des modifications de leur côté\n`;
+    + `[correctif] Typo\n`
+    + `[correctif] Affichage du warning en cas de registre incomplet\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -50,14 +51,21 @@ const gm_mh_external_app_id_key = is_mh_beta ? 'mh_beta_external_app_id' : 'mh_e
 const gm_parameters_key = 'mh_optimizer_parameters';
 const mh_user_key = 'mh_user';
 const mho_map_key = 'mho_map';
-const mho_blacklist_key = 'mho_blacklist'
+const mho_blacklist_key = 'mho_blacklist';
+const mho_anti_abuse_key = 'mho_anti_abuse';
 
 let mho_parameters;
-GM.getValue(gm_parameters_key).then((params) => {mho_parameters = params || {}});
+GM.getValue(gm_parameters_key).then((params) => {
+    mho_parameters = params || {};
+});
 let mh_user;
-GM.getValue(mh_user_key).then((user) => {mh_user = user});
+GM.getValue(mh_user_key).then((user) => {
+    mh_user = user;
+});
 let external_app_id;
-GM.getValue(gm_mh_external_app_id_key).then((app_id) => {external_app_id = app_id});
+GM.getValue(gm_mh_external_app_id_key).then((app_id) => {
+    external_app_id = app_id;
+});
 
 
 ////////////////////
@@ -85,6 +93,7 @@ const content_btn_id = 'optimizer-content-btn';
 const mh_header_id = 'header-reload-area';
 const mh_content_id = 'content';
 const mh_update_external_tools_id = 'mh-update-external-tools';
+const mho_warn_missing_logs_id = 'mho-warn-missing-logs';
 const mho_camping_predict_id = 'mho-camping-predict';
 const wiki_btn_id = 'wiki-btn-id';
 const zone_info_zombies_id = 'zone-info-zombies';
@@ -96,7 +105,9 @@ const mho_display_map_id = 'mho-display-map';
 const mho_search_building_field_id = 'mho-search-building-field';
 const mho_search_recipient_field_id = 'mho-search-recipient-field';
 const mho_display_translate_input_id = 'mho-display-translate-input';
-const mho_more_citizens_info_id = 'mho-more-citizens-info';
+const mho_watchtower_estim_id = 'mho-watchtower-estim';
+const mho_anti_abuse_counter_id = 'mho-anti-abuse-counter';
+
 
 //////////////////////////////////////
 // Les éléments récupérés via l'API //
@@ -438,12 +449,6 @@ const texts = {
         de: `Kaputt`,
         es: `Roto/a`,
     },
-    more_citizens_info: {
-        en: `Additional information`,
-        fr: `Informations complémentaires`,
-        de: `Zusätzliche Informationen`,
-        es: `Información adicional`,
-    },
     manually_add_app_id_key: {
         en: `Your external ID could not be retrieved automatically. You can enter it manually here.`,
         fr: `Votre identifiant n'a pas pu être récupéré automatiquement. Vous pouvez le saisir manuellement ici.`,
@@ -473,6 +478,24 @@ const texts = {
         fr: `Note de la case`,
         de: `Box-Hinweis`,
         es: `Nota de caja`
+    },
+    anti_abuse_title: {
+        en: `Anti-abuse counter`,
+        fr: `Compteur anti-abus`,
+        de: `Zähler gegen Missbrauch`,
+        es: `Contador anti-abuso`
+    },
+    warn_missing_logs_title: {
+        en: `Warning: Missing searches data`,
+        fr: `Attention : Données de fouilles manquantes`,
+        de: `Warnung: Fehlende Ausgrabungsdaten`,
+        es: `Advertencia: Faltan datos de excavación`,
+    },
+    warn_missing_logs_help: {
+        en: `This message appears because you checked the option <strong>"Save successful searches"</strong> and not all of the registry entries in your cell are displayed in the page.<br /><br />You must click the <strong>"Show All Entries"</strong> button at the bottom of the registry for the information to be complete.`,
+        fr: `Ce message s'affiche parce que vous avez coché l'option <strong>"Enregistrer les fouilles réussies"</strong> et que toutes les entrées du registre de votre case ne sont pas affichées dans la page.<br /><br />Vous devez cliquer sur le bouton <strong>"Afficher toutes les entrées"</strong> en bas du registre pour que les informations soient complètes.`,
+        de: `Diese Meldung wird angezeigt, weil Sie die Option <strong>"Erfolgreiche Ausgrabungen speichern"</strong> aktiviert haben und nicht alle Registrierungseinträge in Ihrer Box auf der Seite angezeigt werden.<br /><br />Sie müssen auf die Schaltfläche <strong >"Alle Einträge anzeigen"</strong> unten in der Registrierung, damit die Informationen vollständig sind.`,
+        es: `Este mensaje aparece porque seleccionó la opción <strong>"Guardar excavaciones exitosas"</strong> y no todas las entradas de registro en su casilla se muestran en la página.<br /><br />Debe hacer clic en <strong >"Mostrar todas las entradas"</strong> en la parte inferior del registro para que la información esté completa.`,
     }
 };
 
@@ -564,10 +587,10 @@ const jobs = [
         id: 'citizen',
         img: 'basic',
         label: {
-            de : `Einwohner`,
-            en : `Citizen`,
-            es : `Resident`,
-            fr : `Habitant`
+            de: `Einwohner`,
+            en: `Citizen`,
+            es: `Resident`,
+            fr: `Habitant`
         },
         camping_factor: 0.9
     },
@@ -575,10 +598,10 @@ const jobs = [
         id: 'scavenger',
         img: 'dig',
         label: {
-            de : `Buddler`,
-            en : `Scavenger`,
-            es : `Excavador`,
-            fr : `Fouineur`
+            de: `Buddler`,
+            en: `Scavenger`,
+            es: `Excavador`,
+            fr: `Fouineur`
         },
         camping_factor: 0.9
     },
@@ -586,10 +609,10 @@ const jobs = [
         id: 'scout',
         img: 'vest',
         label: {
-            de : `Aufklärer`,
-            en : `Scout`,
-            es : `Explorador`,
-            fr : `Éclaireur`
+            de: `Aufklärer`,
+            en: `Scout`,
+            es: `Explorador`,
+            fr: `Éclaireur`
         },
         camping_factor: 0.9
     },
@@ -597,10 +620,10 @@ const jobs = [
         id: 'guardian',
         img: 'shield',
         label: {
-            de : `Wächter`,
-            en : `Guardian`,
-            es : `Guardián`,
-            fr : `Gardien`
+            de: `Wächter`,
+            en: `Guardian`,
+            es: `Guardián`,
+            fr: `Gardien`
         },
         camping_factor: 0.9
     },
@@ -608,10 +631,10 @@ const jobs = [
         id: 'survivalist',
         img: 'book',
         label: {
-            de : `Einsiedler`,
-            en : `Survivalist`,
-            es : `Ermitaño`,
-            fr : `Ermite`
+            de: `Einsiedler`,
+            en: `Survivalist`,
+            es: `Ermitaño`,
+            fr: `Ermite`
         },
         camping_factor: 1
     },
@@ -619,10 +642,10 @@ const jobs = [
         id: 'tamer',
         img: 'tamer',
         label: {
-            de : `Dompteur`,
-            en : `Tamer`,
-            es : `Domador`,
-            fr : `Apprivoiseur`
+            de: `Dompteur`,
+            en: `Tamer`,
+            es: `Domador`,
+            fr: `Apprivoiseur`
         },
         camping_factor: 0.9
     },
@@ -630,10 +653,10 @@ const jobs = [
         id: 'technician',
         img: 'tech',
         label: {
-            de : `Techniker`,
-            en : `Technician`,
-            es : `Técnico`,
-            fr : `Technicien`
+            de: `Techniker`,
+            en: `Technician`,
+            es: `Técnico`,
+            fr: `Technicien`
         },
         camping_factor: 0.9
     },
@@ -673,14 +696,22 @@ const api_texts = {
 };
 
 const action_types = [
-    {id: `Recipe::ManualAnywhere`, label: {en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante`}, ordering: 1},
+    {
+        id: `Recipe::ManualAnywhere`,
+        label: {en: `Citizen actions`, fr: `Actions du citoyen`, de: `Bürgeraktionen`, es: `Acciones del habitante`},
+        ordering: 1
+    },
     {id: `Recipe::WorkshopType`, label: {en: `Workshop`, fr: `Atelier`, de: `Werkstatt`, es: `Taller`}, ordering: 0},
-    {id: `Recipe::WorkshopTypeShamanSpecific`, label: {en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán`}, ordering: 2},
+    {
+        id: `Recipe::WorkshopTypeShamanSpecific`,
+        label: {en: `Workshop - Shaman`, fr: `Atelier - Chaman`, de: `Werkstatt - Schamane`, es: `Taller - Chamán`},
+        ordering: 2
+    },
 ];
 
 const wishlist_priorities = [
     {
-        value: -1000,
+        value: -1,
         label: {
             en: `Do not bring to town`,
             fr: `Ne pas ramener`,
@@ -698,7 +729,7 @@ const wishlist_priorities = [
         }
     },
     {
-        value: 1000,
+        value: 1,
         label: {
             en: `Low`,
             fr: `Basse`,
@@ -707,7 +738,7 @@ const wishlist_priorities = [
         }
     },
     {
-        value: 2000,
+        value: 2,
         label: {
             en: `Medium`,
             fr: `Moyenne`,
@@ -716,7 +747,7 @@ const wishlist_priorities = [
         }
     },
     {
-        value: 3000,
+        value: 3,
         label: {
             en: `High`,
             fr: `Haute`,
@@ -772,7 +803,8 @@ const wishlist_headers = [
             fr: `Priorité`,
             de: `Priorität`,
             es: `Prioridad`
-        }, id: `priority`},
+        }, id: `priority`
+    },
     {
         label: {
             en: `Location`,
@@ -823,84 +855,6 @@ const wishlist_headers = [
         id: 'delete'
     },
 ];
-
-const more_citizen_info_headers = [
-    {
-        id: 'username',
-        label: {
-            en: ``,
-            fr: `Citoyen`,
-            de: ``,
-            es: ``
-        },
-        header_class: ['padded', 'cell', 'rw-4', 'left', 'factor-1'],
-        content_class: [] // récupéré automatiquement
-    },
-    {
-        id: 'clock',
-        label: {
-            en: ``,
-            fr: `Dernière connexion`,
-            de: ``,
-            es: ``
-        },
-        header_class: ['padded', 'cell', 'rw-5', 'header-center-vertical'],
-        content_class: ['padded', 'cell', 'rw-5', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'plaintes',
-        icon: 'emotes/warning.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'rations',
-        icon: 'icons/small_well.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'injured',
-        icon: 'status/status_wound1.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'infection',
-        icon: 'status/status_infection.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'thirsty',
-        icon: 'status/status_thirst2.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'addict',
-        icon: 'status/status_addict.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'terror',
-        icon: 'status/status_terror.gif',
-        header_class: ['cell', 'rw-1', 'center', 'header-center-vertical'],
-        content_class: ['cell', 'rw-1', 'center', 'small', 'citizen-box', 'content-center-vertical']
-    },
-    {
-        id: 'travaux',
-        label: {
-            en: `Building upgrades`,
-            fr: `Travaux`,
-            de: `Bauarbeiten`,
-            es: `Obras`
-        },
-        header_class: ['padded', 'cell', 'rw-4'],
-        content_class: ['padded', 'cell', 'rw-4', 'small', 'citizen-box']
-    },
-]
 
 //////////////////////////////////
 // La liste des onglets du wiki //
@@ -1249,7 +1203,7 @@ let params_categories = [
                 },
                 help: {
                     en: `Allows to display the number of blood splatters on the map`,
-                    fr: `Permet d'afficher le nombre de tâches de sang sur la carte`,
+                    fr: `Permet d'afficher le nombre de taches de sang sur la carte`,
                     de: `Ermöglicht die Anzeige der Anzahl der Blutfleck auf der Karte`,
                     es: `Permite mostrar la cantidad de manchas de sangre en el mapa`
                 },
@@ -1288,16 +1242,6 @@ let params_categories = [
                 parent_id: null
             },
             {
-                id: `more_citizens_info`,
-                label: {
-                    en: `Tab with additional information on the citizens page in town`,
-                    fr: `Onglet contenant des informations supplémentaires sur la page des citoyens`,
-                    de: `Tab mit zusätzlichen Informationen auf der Bürgerliste in der Stadt`,
-                    es: `Pestaña con información adicional en la página de los habitantes`
-                },
-                parent_id: null
-            },
-            {
                 id: `display_camping_predict`,
                 label: {
                     en: `[Experimental] Camping predictions in area information`,
@@ -1322,7 +1266,27 @@ let params_categories = [
                     es: `Muestra la nota de la caja, si existe.`
                 },
                 parent_id: null
-            }
+            },
+            // {
+            //     id: `display_estimations_on_watchtower`,
+            //     label: {
+            //         en: `TODO`,
+            //         fr: `Affiche les estimations enregistrées sur la page de la tour de guet`,
+            //         de: `TODO`,
+            //         es: `TODO`
+            //     },
+            //     parent_id: null
+            // },
+            // {
+            //     id: `display_anti_abuse`,
+            //     label: {
+            //         en: `TODO`,
+            //         fr: `Affiche un compteur pour gérer l'anti-abus`,
+            //         de: `TODO`,
+            //         es: `TODO`
+            //     },
+            //     parent_id: null
+            // }
             // {
             //     id: `block_users`,
             //     label: {
@@ -1407,7 +1371,9 @@ let informations = [
             es: `Notas de la versión ${GM_info.script.version}`
         },
         src: undefined,
-        action: () => {alert(changelog)},
+        action: () => {
+            alert(changelog);
+        },
         img: `emotes/rptext.gif`
     },
     {
@@ -1448,31 +1414,83 @@ let informations = [
 
 const table_hero_skills_headers = [
     {id: 'name', label: {en: `Name`, fr: `Nom`, de: `Name`, es: `Nombre`}, type: 'th'},
-    {id: 'nombreJourHero', label: {en: `Hero days`, fr: `Jours héros`, de: `Heldentage`, es: `Días de héroe`}, type: 'td'},
-    {id: 'lastSkill', label: {en: `Last power earned`, fr: `Dernier pouvoir gagné`, de: `Letzte Kraft gewonnen`, es: `Último poder obtenido`}, type: 'td'},
-    {id: 'uppercut', label: {en: `Vicious uppercut`, fr: `Uppercut Sauvage`, de: `Wildstyle Uppercut`, es: `Puñetazo salvaje`}, type: 'td', img: ''},
+    {
+        id: 'nombreJourHero',
+        label: {en: `Hero days`, fr: `Jours héros`, de: `Heldentage`, es: `Días de héroe`},
+        type: 'td'
+    },
+    {
+        id: 'lastSkill',
+        label: {
+            en: `Last power earned`,
+            fr: `Dernier pouvoir gagné`,
+            de: `Letzte Kraft gewonnen`,
+            es: `Último poder obtenido`
+        },
+        type: 'td'
+    },
+    {
+        id: 'uppercut',
+        label: {en: `Vicious uppercut`, fr: `Uppercut Sauvage`, de: `Wildstyle Uppercut`, es: `Puñetazo salvaje`},
+        type: 'td',
+        img: ''
+    },
     {id: 'rescue', label: {en: `Rescue`, fr: `Sauvetage`, de: `Rettung`, es: `Rescate`}, type: 'td', img: ''}
 ];
 
 const table_skills_headers = [
     {id: 'icon', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
     {id: 'label', label: {en: `Skill`, fr: `Capacité`, de: `Fähigkeit`, es: `Poder`}, type: 'th'},
-    {id: 'daysNeeded', label: {en: `Hero days needed`, fr: `Jours héros nécessaires`, de: `Benötigte Heldentage`, es: `Días de héroe necesarios`}, type: 'td'},
-    {id: 'description', label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción`}, type: 'td'}
+    {
+        id: 'daysNeeded',
+        label: {
+            en: `Hero days needed`,
+            fr: `Jours héros nécessaires`,
+            de: `Benötigte Heldentage`,
+            es: `Días de héroe necesarios`
+        },
+        type: 'td'
+    },
+    {
+        id: 'description',
+        label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción`},
+        type: 'td'
+    }
 ];
 
 const table_ruins_headers = [
     {id: 'img', label: {en: ``, fr: ``, de: ``, es: ``}, type: 'th'},
     {id: 'label', label: {en: `Name`, fr: 'Nom', de: `Name`, es: `Nombre`}, type: 'th'},
-    {id: 'description', label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción`}, type: 'td'},
-    {id: 'minDist', label: {en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `Distancia mínima`}, type: 'td'},
-    {id: 'maxDist', label: {en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima`}, type: 'td'},
+    {
+        id: 'description',
+        label: {en: `Description`, fr: `Description`, de: `Beschreibung`, es: `Descripción`},
+        type: 'td'
+    },
+    {
+        id: 'minDist',
+        label: {en: `Minimum distance`, fr: `Distance minimum`, de: `Mindestabstand`, es: `Distancia mínima`},
+        type: 'td'
+    },
+    {
+        id: 'maxDist',
+        label: {en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima`},
+        type: 'td'
+    },
     {id: 'drops', label: {en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `Objetos`}, type: 'td'},
 ];
 
 const added_ruins = [
     {id: '', camping: 0, label: {en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna`}},
-    {id: 'nondig', camping: 8, label: {en: `Buried building`, fr: `Bâtiment non déterré`, de: `Verschüttete Ruine`, es: `Edificio no desenterrado`}}
+    {
+        id: 'nondig',
+        camping: 8,
+        label: {
+            en: `Buried building`,
+            fr: `Bâtiment non déterré`,
+            de: `Verschüttete Ruine`,
+            es: `Edificio no desenterrado`
+        }
+    }
 ];
 
 const town_type = [
@@ -1510,6 +1528,20 @@ function pageIsHouse() {
     return document.URL.indexOf('town/house') > -1;
 }
 
+/** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
+function pageIsWatchtower() {
+    return document.URL.indexOf('town/watchtower') > -1;
+}
+
+/** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
+function pageIsWell() {
+    return document.URL.indexOf('town/well') > -1;
+}
+
+/** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
+function pageIsBank() {
+    return document.URL.indexOf('town/bank') > -1;
+}
 
 /** @return {boolean}    true si la page de l'utilisateur est la liste des citoyens */
 function pageIsCitizens() {
@@ -1627,13 +1659,37 @@ function addError(error) {
 
 /** Calcule le nombre de zombies qui vont mourir par désespoir */
 function calculateDespairDeaths(nb_killed_zombies) {
-    return Math.floor(Math.max(0, (nb_killed_zombies - 1 ) / 2));
+    return Math.floor(Math.max(0, (nb_killed_zombies - 1) / 2));
 }
 
 
 function initOptions() {
+
+    /** Gère le bouton de mise à jour des outils externes) */
+    if (!buttonOptimizerExists()) {
+        createStyles();
+        createOptimizerBtn();
+        createWindow();
+    }
+
     preventFromLeaving();
     createDisplayMapButton();
+
+    displayWishlistInApp();
+    createUpdateExternalToolsButton();
+    clickOnVotedToRedirect();
+    displaySearchFieldOnBuildings();
+    displaySearchFieldOnRecipientList();
+    displayMinApOnBuildings();
+    displayPriorityOnItems();
+    displayNbDeadZombies();
+    displayTranslateTool();
+    notifyOnNewMessage();
+    displayCellDetailsOnPage();
+    // displayEstimationsOnWatchtower();
+    // displayAntiAbuseCounter();
+
+    // blockUsersPosts();
 
     count_pending_notifications = document.querySelector('#postbox-new-msg-counter')?.innerText;
 }
@@ -1690,11 +1746,13 @@ function createSelectWithSearch() {
 
 /** Create Optimize button */
 function createOptimizerBtn() {
-    setTimeout(() => {
+    let optimizer_btn = document.getElementById(btn_id);
+    if (!optimizer_btn) {
         let content_zone = document.getElementById(mh_content_id);
         let header_zone = document.getElementById(mh_header_id);
         let last_header_child = header_zone.lastChild;
-        let left_position = last_header_child ? last_header_child.offsetLeft + last_header_child.offsetWidth + 5 : (document.querySelector('#apps')?.getBoundingClientRect().width + 16);
+        let mhe_button = document.querySelector('#mhe_button')
+        let left_position = last_header_child ? last_header_child.offsetLeft + last_header_child.offsetWidth + 5 : (mhe_button ? mhe_button.offsetLeft + mhe_button.offsetWidth + 5 : document.querySelector('#apps')?.getBoundingClientRect().width + 16);
 
         let img = document.createElement('img');
         img.src = mh_optimizer_icon;
@@ -1724,7 +1782,7 @@ function createOptimizerBtn() {
         title_first_part.appendChild(img);
         title_first_part.appendChild(title_hidden);
 
-        let optimizer_btn = document.createElement('div');
+        optimizer_btn = document.createElement('div');
         optimizer_btn.appendChild(title);
         optimizer_btn.id = btn_id;
         optimizer_btn.setAttribute('style', 'left: ' + left_position + 'px');
@@ -1738,7 +1796,7 @@ function createOptimizerBtn() {
         content_zone.appendChild(mho_content_zone);
 
         createOptimizerButtonContent();
-    }, 2000);
+    }
 }
 
 /** Crée le contenu du bouton de l'optimizer (bouton de wiki, bouton de configuration, etc) */
@@ -1797,16 +1855,16 @@ function createOptimizerButtonContent() {
 
         let informations_list = document.createElement('ul');
 
-        let infomations_container = document.createElement('div');
-        infomations_container.id = 'informations';
+        let informations_container = document.createElement('div');
+        informations_container.id = 'informations';
 
-        infomations_container.appendChild(informations_title);
-        infomations_container.appendChild(informations_list);
+        informations_container.appendChild(informations_title);
+        informations_container.appendChild(informations_list);
 
         informations.forEach((information) => {
             let information_link = document.createElement('a');
             information_link.id = information.id;
-            information_link.innerHTML = (information.img ? `<img src="${information.img.startsWith('http') ? information.img : repo_img_hordes_url + information.img}" style="margin: 0 4px 0 3px; width: 16px">` : ``)+ `<span class=small>${getI18N(information.label)}</span>`;
+            information_link.innerHTML = (information.img ? `<img src="${information.img.startsWith('http') ? information.img : repo_img_hordes_url + information.img}" style="margin: 0 4px 0 3px; width: 16px">` : ``) + `<span class=small>${getI18N(information.label)}</span>`;
             information_link.href = information.src;
             information_link.target = '_blank';
 
@@ -1823,7 +1881,7 @@ function createOptimizerButtonContent() {
             informations_list.appendChild(information_container);
         });
 
-        content.appendChild(infomations_container);
+        content.appendChild(informations_container);
 
     } else {
         let no_external_app_id = document.createElement('div');
@@ -1875,7 +1933,9 @@ function createParams() {
                 }
                 new_params[param.id] = event.target.checked;
                 GM.setValue(gm_parameters_key, new_params);
-                GM.getValue(gm_parameters_key).then((params) => {mho_parameters = params});
+                GM.getValue(gm_parameters_key).then((params) => {
+                    mho_parameters = params
+                });
 
                 /** Si l'option a des "enfants" alors on les affiche uniquement si elle est cochée */
                 if (param_children.length > 0) {
@@ -1955,9 +2015,9 @@ function createWindow() {
 }
 
 /**
-* Crée la liste des onglets de la page de wiki
-* @param {string} window_type
-*/
+ * Crée la liste des onglets de la page de wiki
+ * @param {string} window_type
+ */
 function createTabs(window_type) {
     let window_content = document.getElementById(mh_optimizer_window_id + '-content');
     window_content.innerHTML = '';
@@ -1965,16 +2025,16 @@ function createTabs(window_type) {
     let tabs_ul = document.createElement('ul');
 
     let current_tabs_list = tabs_list[window_type]
-    .filter((tab) => mh_user.townDetails.townId || !tab.needs_town)
-    .sort((a, b) => {
-        if (a.ordering > b.ordering) {
-            return 1;
-        } else if (a.ordering === b.ordering) {
-            return 0;
-        } else {
-            return -1;
-        }
-    });
+        .filter((tab) => mh_user.townDetails.townId || !tab.needs_town)
+        .sort((a, b) => {
+            if (a.ordering > b.ordering) {
+                return 1;
+            } else if (a.ordering === b.ordering) {
+                return 0;
+            } else {
+                return -1;
+            }
+        });
     current_tabs_list.forEach((tab, index) => {
         let tab_link = document.createElement('div');
 
@@ -1999,7 +2059,7 @@ function createTabs(window_type) {
             if (!tab_li.classList.contains('selected')) {
                 for (let li of tabs_ul.children) {
                     li.classList.remove('selected');
-                };
+                }
                 tab_li.classList.add('selected');
             }
             dispatchContent(window_type, tab);
@@ -2086,9 +2146,9 @@ function createMapWindow() {
 }
 
 /**
-* Affiche la fenêtre de wiki et charge la liste d'objets si elle n'a jamais été chargée
-* @param {string} window_type
-*/
+ * Affiche la fenêtre de wiki et charge la liste d'objets si elle n'a jamais été chargée
+ * @param {string} window_type
+ */
 function displayWindow(window_type) {
     document.getElementById(mh_optimizer_window_id).classList.add('visible');
     let body = document.getElementsByTagName('body')[0];
@@ -2097,9 +2157,9 @@ function displayWindow(window_type) {
 }
 
 /**
-* Crée le bloc de contenu de la page
-* @param {string} window_tyme     Le type de fenêtre à afficher, correspondant au nom utilisé dans la liste des onglets
-*/
+ * Crée le bloc de contenu de la page
+ * @param {string} window_tyme     Le type de fenêtre à afficher, correspondant au nom utilisé dans la liste des onglets
+ */
 function createTabContent(window_type) {
     let window_content = document.getElementById(mh_optimizer_window_id + '-content');
 
@@ -2114,10 +2174,10 @@ function createTabContent(window_type) {
 }
 
 /**
-* Détermine quelle fonction appeler en fonction de l'onglet sélectionné
-* @param {string} window_type     Le type de l'onglet
-* @param tab                      L'onglet à afficher
-*/
+ * Détermine quelle fonction appeler en fonction de l'onglet sélectionné
+ * @param {string} window_type     Le type de l'onglet
+ * @param tab                      L'onglet à afficher
+ */
 function dispatchContent(window_type, tab) {
 
     createTabContent(window_type);
@@ -2126,7 +2186,7 @@ function dispatchContent(window_type, tab) {
     if (list) {
         list.innerHTML = '';
     }
-    switch(tab.id) {
+    switch (tab.id) {
         case 'items':
             displayItems(items, tab.id);
             break;
@@ -2190,10 +2250,10 @@ function displayWishlist() {
 }
 
 /**
-* Affiche la liste des objets
-* @param filtered_items
-* @param {string} tab_id l'onglet dans lequel on se trouve
-*/
+ * Affiche la liste des objets
+ * @param filtered_items
+ * @param {string} tab_id l'onglet dans lequel on se trouve
+ */
 function displayItems(filtered_items, tab_id) {
     let tab_content = document.getElementById('tab-content');
 
@@ -2295,10 +2355,10 @@ function displayCitizens() {
             let header_cells = [...table_hero_skills_headers];
 
             let skills_with_uses = hero_skills
-            .filter((skill) => skill.nbUses > 0)
-            .map((skill) => {
-                return {id: skill.name, label: skill.label, type: 'td', img: skill.icon}
-            });
+                .filter((skill) => skill.nbUses > 0)
+                .map((skill) => {
+                    return {id: skill.name, label: skill.label, type: 'td', img: skill.icon}
+                });
             console.log('skills_with_uses', skills_with_uses);
             header_cells.push(...skills_with_uses);
 
@@ -2332,7 +2392,7 @@ function displayCitizens() {
                 header_cells.forEach((header_cell) => {
                     let cell = document.createElement(header_cell.type);
                     if (is_me) {
-                        switch(header_cell.id) {
+                        switch (header_cell.id) {
                             case 'name':
                                 cell.innerText = citizen[header_cell.id];
                                 break;
@@ -2350,7 +2410,7 @@ function displayCitizens() {
                                 break;
                         }
                     } else {
-                        switch(header_cell.id) {
+                        switch (header_cell.id) {
                             case 'name':
                             case 'nombreJourHero':
                                 cell.innerText = citizen[header_cell.id];
@@ -2959,7 +3019,7 @@ function displaySkills() {
             header_cells.forEach((header_cell) => {
                 let cell = document.createElement(header_cell.type);
                 let img = document.createElement('img');
-                switch(header_cell.id) {
+                switch (header_cell.id) {
                     case 'icon':
                         img.src = repo_img_hordes_url + 'heroskill/' + skill[header_cell.id] + '.gif';
                         cell.appendChild(img);
@@ -3007,7 +3067,7 @@ function displayRuins() {
                 header_cells.forEach((header_cell) => {
                     let cell = document.createElement(header_cell.type);
                     let img = document.createElement('img');
-                    switch(header_cell.id) {
+                    switch (header_cell.id) {
                         case 'img':
                             img.src = `${repo_img_hordes_url}ruin/${ruin[header_cell.id]}.gif`;
                             cell.appendChild(img);
@@ -3036,7 +3096,7 @@ function displayRuins() {
                                 // let item_label = document.createElement('span');
                                 // item_label.innerText = getI18N(item.item.label);
                                 let item_proba = document.createElement('span');
-                                item_proba.innerText = Math.round(item.probability * 1000)/10 + '%';
+                                item_proba.innerText = Math.round(item.probability * 1000) / 10 + '%';
                                 item_proba.style.display = 'block';
                                 item_proba.style.margin = 'auto';
 
@@ -3156,9 +3216,9 @@ function getRecipeElement(recipe) {
 }
 
 /**
-* Crée un bouton d'aide
-* @param {string} text_to_display    Le contenu de la popup d'aide
-*/
+ * Crée un bouton d'aide
+ * @param {string} text_to_display    Le contenu de la popup d'aide
+ */
 function createHelpButton(text_to_display) {
 
     let help_button = document.createElement('a');
@@ -3167,14 +3227,16 @@ function createHelpButton(text_to_display) {
 
     let help_tooltip = document.createElement('div')
     help_tooltip.classList.add('tooltip', 'help', 'hidden');
-    help_tooltip.setAttribute('style', 'text-transform: initial;');
+    help_tooltip.setAttribute('style', `text-transform: initial; display: block; position: absolute; width: 250px;`);
     help_tooltip.innerHTML = text_to_display;
     help_button.appendChild(help_tooltip);
 
-    help_button.addEventListener('mouseenter', function() {
+    help_button.addEventListener('mouseenter', function () {
+        help_tooltip.style.top = help_button.getBoundingClientRect().top;
+        help_tooltip.style.right = help_button.getBoundingClientRect().right;
         help_tooltip.classList.remove('hidden');
     })
-    help_button.addEventListener('mouseleave', function() {
+    help_button.addEventListener('mouseleave', function () {
         help_tooltip.classList.add('hidden');
     })
 
@@ -3203,38 +3265,58 @@ function createUpdateExternalToolsButton() {
     const chest = document.querySelector('.inventory.chest');
 
     /** Cette fonction ne doit s'exécuter que si on a un id d'app externe ET au moins l'une des options qui est cochée dans les paramètres ET qu'on est hors de la ville */
-    if (nb_tools_to_update > 0 && external_app_id && (zone_marker || (chest && pageIsHouse())) ) {
-        if (update_external_tools_btn) return;
+    if (nb_tools_to_update > 0 && external_app_id && (zone_marker || (chest && pageIsHouse()))) {
+        if (!update_external_tools_btn) {
 
-        let el = zone_marker?.parentElement.parentElement.parentElement || chest.parentElement;
+            let el = zone_marker?.parentElement.parentElement.parentElement || chest.parentElement;
 
-        let updater_bloc = document.createElement('div');
-        el.appendChild(updater_bloc);
-        let updater_title = document.createElement('h5');
-        let updater_title_mho_img = document.createElement('img');
-        updater_title_mho_img.src = mh_optimizer_icon;
-        updater_title_mho_img.style.height = '24px';
-        updater_title_mho_img.style.marginRight = '0.5em';
-        updater_title.appendChild(updater_title_mho_img);
+            let updater_bloc = document.createElement('div');
+            updater_bloc.style.marginTop = '1em';
+            updater_bloc.style.padding = '0.25em';
+            updater_bloc.style.border = '1px solid #ddab76';
+            el.appendChild(updater_bloc);
+            let updater_title = document.createElement('h5');
+            updater_title.style.margin = '0 0 0.5em'
+            let updater_title_mho_img = document.createElement('img');
+            updater_title_mho_img.src = mh_optimizer_icon;
+            updater_title_mho_img.style.height = '24px';
+            updater_title_mho_img.style.marginRight = '0.5em';
+            updater_title.appendChild(updater_title_mho_img);
 
-        let updater_title_text = document.createElement('text');
-        updater_title_text.innerHTML = GM_info.script.name;
-        updater_title.appendChild(updater_title_text);
+            let updater_title_text = document.createElement('text');
+            updater_title_text.innerHTML = GM_info.script.name;
+            updater_title.appendChild(updater_title_text);
 
-        updater_bloc.appendChild(updater_title);
+            updater_bloc.appendChild(updater_title);
 
-        let btn = document.createElement('button');
+            update_external_tools_btn = document.createElement('button');
 
-        btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/arrowright.gif">' + getI18N(texts.update_external_tools_needed_btn_label);
-        btn.id = mh_update_external_tools_id;
+            update_external_tools_btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/arrowright.gif">' + getI18N(texts.update_external_tools_needed_btn_label);
+            update_external_tools_btn.id = mh_update_external_tools_id;
 
-        btn.addEventListener('click', () => {
-            /** Au clic sur le bouton, on appelle la fonction de mise à jour */
-            btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/middot.gif">' + getI18N(texts.update_external_tools_pending_btn_label);
-            updateExternalTools().then();
-        })
+            update_external_tools_btn.addEventListener('click', () => {
+                /** Au clic sur le bouton, on appelle la fonction de mise à jour */
+                update_external_tools_btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/middot.gif">' + getI18N(texts.update_external_tools_pending_btn_label);
+                updateExternalTools().then();
+            })
 
-        updater_bloc.appendChild(btn);
+            updater_bloc.appendChild(update_external_tools_btn);
+        }
+
+        let warn_missing_logs = document.getElementById(mho_warn_missing_logs_id);
+
+        if (!warn_missing_logs && document.querySelector('.log-complete-link') && zone_marker && update_external_tools_btn && mho_parameters.update_mho_digs) {
+            warn_missing_logs = document.createElement('div');
+            warn_missing_logs.id = mho_warn_missing_logs_id;
+            warn_missing_logs.classList.add('note', 'note-important');
+            warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title);
+            let warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
+            warn_missing_logs.appendChild(warn_help);
+
+            update_external_tools_btn.parentElement.appendChild(warn_missing_logs);
+        } else if (warn_missing_logs && (!document.querySelector('.log-complete-link') || !mho_parameters.update_mho_digs)) {
+            warn_missing_logs.remove();
+        }
     } else if (update_external_tools_btn && (nb_tools_to_update === 0 || !external_app_id || !(zone_marker && pageIsHouse()))) {
         update_external_tools_btn.parentElement.remove();
     }
@@ -3289,7 +3371,7 @@ function displaySearchFieldOnBuildings() {
                 });
 
                 buildings.forEach((building) => {
-                    if(Array.from(building.children).every((child) => child.classList.contains('hidden'))) {
+                    if (Array.from(building.children).every((child) => child.classList.contains('hidden'))) {
                         building.classList.add('hidden');
                     } else {
                         building.classList.remove('hidden');
@@ -3360,7 +3442,7 @@ function displaySearchFieldOnRecipientList() {
 /** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */
 function displayMinApOnBuildings() {
     if (mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
-        let complete_buildings = document.querySelectorAll('.row.complete');
+        let complete_buildings = document.querySelectorAll('.row-flex.complete');
         if (!complete_buildings || complete_buildings.length === 0) return;
 
         let broken_buildings = Array.from(complete_buildings).filter((complete_building) => complete_building.querySelector('.ap-bar'));
@@ -3399,7 +3481,7 @@ function displayMinApOnBuildings() {
             }
             missing_ap_info.style.fontWeight = 'initial';
             missing_ap_info.style.fontSize = '0.8em';
-            missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts/nb_pts_per_ap));
+            missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
             nb_ap.appendChild(missing_ap_info);
         });
     } else if (pageIsConstructions()) {
@@ -3415,62 +3497,77 @@ function displayMinApOnBuildings() {
 
 /** Affiche la liste de courses dans le désert et l'atelier */
 function displayWishlistInApp() {
-    let interval = setInterval(() => {
-        let wishlist_section = document.getElementById('wishlist-section');
+    let wishlist_section = document.getElementById('wishlist-section');
 
-        let is_desert = pageIsDesert();
-        let is_workshop = pageIsWorkshop();
-        if (wishlist && mho_parameters.display_wishlist && (is_workshop || is_desert)) {
-            if (wishlist_section) return;
+    let is_desert = pageIsDesert();
+    let is_workshop = pageIsWorkshop();
+    if (wishlist && mho_parameters.display_wishlist && (is_workshop || is_desert)) {
+        if (wishlist_section) return;
 
-            let used_wishlist = is_workshop ? wishlist.wishList['0'] : getWishlistForZone();
+        let zone_to_insert;
+        if (pageIsWorkshop()) {
+            zone_to_insert = document.getElementsByClassName('row-table')[0];
+        } else {
+            zone_to_insert = document.getElementsByClassName('actions-box')[0];
+        }
 
-            let list_to_display = used_wishlist.filter((item) => {
-                if (pageIsWorkshop()) {
-                    return item.isWorkshop;
-                } else {
-                    return item.count - item.bankCount > 0
-                }
-            });
-            if (pageIsWorkshop() && list_to_display.length === 0) return;
+        if (!zone_to_insert) return;
 
-            let refreshWishlist = () => {
-                let update_section = document.createElement('div');
-                header.appendChild(update_section);
+        let used_wishlist = is_workshop ? wishlist.wishList['0'] : getWishlistForZone();
 
-                let last_update = document.createElement('span');
-                last_update.classList.add('small');
-                last_update.setAttribute('style', 'margin-right: 0.5em;');
-                if (wishlist.lastUpdateInfo) {
-                    last_update.innerText = new Intl.DateTimeFormat('default', { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
-                }
-                update_section.appendChild(last_update);
+        if (!used_wishlist) return;
 
-                let update_btn = document.createElement('button');
-                update_btn.classList.add('inline');
-                update_btn.innerText = getI18N(texts.update);
-                update_btn.addEventListener('click', () => {
-                    is_refresh_wishlist = true;
-                    wishlist = undefined;
-                    wishlist_section = undefined;
-                    clearInterval(interval);
+        let list_to_display = used_wishlist.filter((item) => {
+            if (pageIsWorkshop()) {
+                return item.isWorkshop;
+            } else {
+                return true;
+            }
+        });
+        if (pageIsWorkshop() && list_to_display.length === 0) return;
+
+        let refreshWishlist = () => {
+            let update_section = document.createElement('div');
+            header.appendChild(update_section);
+
+            let last_update = document.createElement('span');
+            last_update.classList.add('small');
+            last_update.setAttribute('style', 'margin-right: 0.5em;');
+            if (wishlist.lastUpdateInfo) {
+                last_update.innerText = new Intl.DateTimeFormat('default', {
+                    dateStyle: 'medium',
+                    timeStyle: 'medium'
+                }).format(new Date(wishlist.lastUpdateInfo.updateTime)) + ' - ' + wishlist.lastUpdateInfo.userName;
+            }
+            update_section.appendChild(last_update);
+
+            let update_btn = document.createElement('button');
+            update_btn.classList.add('inline');
+            update_btn.innerText = getI18N(texts.update);
+            update_btn.addEventListener('click', () => {
+                is_refresh_wishlist = true;
+                wishlist = undefined;
+                wishlist_section = undefined;
+                setTimeout(() => {
+                    displayWishlistInApp();
                     getWishlist().then(() => {
                         displayWishlistInApp();
                     });
                 });
-                update_section.appendChild(update_btn);
+            });
+            update_section.appendChild(update_btn);
 
-                let list = document.createElement('div');
-                list.classList.add('row-table');
-                content.appendChild(list);
+            let list = document.createElement('div');
+            list.classList.add('row-table');
+            content.appendChild(list);
 
-                let list_header = document.createElement('div');
-                list_header.classList.add('row-flex', 'mho-header', 'bottom');
-                list.appendChild(list_header);
+            let list_header = document.createElement('div');
+            list_header.classList.add('row-flex', 'mho-header', 'bottom');
+            list.appendChild(list_header);
 
-                wishlist_headers
-                    .filter((header_cell_item) => header_cell_item.id !== 'delete')
-                    .forEach((header_cell_item) => {
+            wishlist_headers
+                .filter((header_cell_item) => header_cell_item.id !== 'delete')
+                .forEach((header_cell_item) => {
                     let header_cell = document.createElement('div');
                     header_cell.classList.add('padded', 'cell');
                     header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : ((header_cell_item.id === 'priority' || header_cell_item.id === 'depot') ? 'rw-3' : 'rw-2'));
@@ -3478,20 +3575,20 @@ function displayWishlistInApp() {
                     list_header.appendChild(header_cell);
                 });
 
-                list_to_display
-                    .forEach((item) => {
+            list_to_display
+                .forEach((item) => {
                     let list_item = document.createElement('div');
                     list_item.classList.add('row-flex');
                     list.appendChild(list_item);
 
                     let title = document.createElement('div');
                     title.classList.add('padded', 'cell', 'rw-5');
-                    title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" class="priority_${item.priority}"  style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
+                    title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" class="priority_${item.priority_main}"  style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
                     list_item.appendChild(title);
 
                     let item_priority = document.createElement('span');
                     item_priority.classList.add('padded', 'cell', 'rw-3');
-                    item_priority.innerHTML = `<span class="small">${getI18N(wishlist_priorities.find((priority) => item.priority.toString().slice(0, 1) === priority.value.toString().slice(0, 1)).label)}</span>`;
+                    item_priority.innerHTML = `<span class="small">${getI18N(wishlist_priorities.find((priority) => item.priority_main === priority.value).label)}</span>`;
                     list_item.appendChild(item_priority);
 
                     let item_depot = document.createElement('span');
@@ -3521,79 +3618,73 @@ function displayWishlistInApp() {
                 });
 
 
-                if (!is_refresh_wishlist) {
-                    hide_state.innerText = '>';
-                    header_title.show = false;
+            if (!is_refresh_wishlist) {
+                hide_state.innerText = '>';
+                header_title.show = false;
 
-                    list.classList.add('hidden');
-                    update_section.classList.add('hidden');
+                list.classList.add('hidden');
+                update_section.classList.add('hidden');
+            } else {
+                hide_state.innerText = '˅';
+                header_title.show = true;
+            }
+            header_title.addEventListener('click', () => {
+                if (header_title.show) {
+                    hide_state.innerText = '>';
                 } else {
                     hide_state.innerText = '˅';
-                    header_title.show = true;
                 }
-                header_title.addEventListener('click', () => {
-                    if (header_title.show) {
-                        hide_state.innerText = '>';
-                    } else {
-                        hide_state.innerText = '˅';
-                    }
-                    list.classList.toggle('hidden');
-                    update_section.classList.toggle('hidden');
-                    header_title.show = !header_title.show;
-                });
-                is_refresh_wishlist = false
-            };
+                list.classList.toggle('hidden');
+                update_section.classList.toggle('hidden');
+                header_title.show = !header_title.show;
+            });
+            is_refresh_wishlist = false
+            displayWishlistInApp();
+        };
 
-            wishlist_section = document.createElement('div');
-            wishlist_section.id = 'wishlist-section';
-            wishlist_section.classList.add('row');
+        wishlist_section = document.createElement('div');
+        wishlist_section.id = 'wishlist-section';
+        wishlist_section.classList.add('row');
 
-            if (pageIsWorkshop()) {
-                let workshop_table = document.getElementsByClassName('row-table')[0];
-                if (workshop_table) {
-                    workshop_table.parentNode.insertBefore(wishlist_section, workshop_table.nextSibling);
-                }
-            } else {
-                let actions_box = document.getElementsByClassName('actions-box')[0];
-                if (actions_box) {
-                    let main_actions = actions_box.parentNode;
-                    main_actions.parentNode.insertBefore(wishlist_section, main_actions.nextSibling);
-                }
-            }
-
-            let cell = document.createElement('div');
-            wishlist_section.appendChild(cell);
-
-            let header = document.createElement('h5');
-            header.setAttribute('style', 'display: flex; justify-content: space-between;');
-            cell.appendChild(header);
-
-            let header_title = document.createElement('span');
-            header_title.setAttribute('style', 'margin-top: 7px; cursor: pointer;')
-            header.appendChild(header_title);
-
-            let hide_state = document.createElement('span');
-            hide_state.setAttribute('style', 'margin-right: 0.5em');
-            header_title.appendChild(hide_state);
-
-            let header_mho_img = document.createElement('img');
-            header_mho_img.src = mh_optimizer_icon;
-            header_mho_img.style.height = '24px';
-            header_mho_img.style.marginRight = '0.5em';
-            header_title.appendChild(header_mho_img);
-
-            let header_label = document.createElement('span');
-            header_label.innerText = getI18N(tabs_list.tools.find((tool) => tool.id === 'wishlist').label);
-            header_title.appendChild(header_label);
-
-            let content = document.createElement('div');
-            cell.appendChild(content);
-
-            refreshWishlist();
-        } else if (wishlist_section) {
-            wishlist_section.remove();
+        if (pageIsWorkshop()) {
+            zone_to_insert.parentNode.insertBefore(wishlist_section, zone_to_insert.nextSibling);
+        } else {
+            let main_actions = zone_to_insert.parentNode;
+            main_actions.parentNode.insertBefore(wishlist_section, main_actions.nextSibling);
         }
-    }, 200);
+
+        let cell = document.createElement('div');
+        wishlist_section.appendChild(cell);
+
+        let header = document.createElement('h5');
+        header.setAttribute('style', 'display: flex; justify-content: space-between;');
+        cell.appendChild(header);
+
+        let header_title = document.createElement('span');
+        header_title.setAttribute('style', 'margin-top: 7px; cursor: pointer;')
+        header.appendChild(header_title);
+
+        let hide_state = document.createElement('span');
+        hide_state.setAttribute('style', 'margin-right: 0.5em');
+        header_title.appendChild(hide_state);
+
+        let header_mho_img = document.createElement('img');
+        header_mho_img.src = mh_optimizer_icon;
+        header_mho_img.style.height = '24px';
+        header_mho_img.style.marginRight = '0.5em';
+        header_title.appendChild(header_mho_img);
+
+        let header_label = document.createElement('span');
+        header_label.innerText = getI18N(tabs_list.tools.find((tool) => tool.id === 'wishlist').label);
+        header_title.appendChild(header_label);
+
+        let content = document.createElement('div');
+        cell.appendChild(content);
+
+        refreshWishlist();
+    } else if (wishlist_section) {
+        wishlist_section.remove();
+    }
 }
 
 /** Affiche la priorité directement sur les éléments si l'option associée est cochée */
@@ -3604,29 +3695,34 @@ function displayPriorityOnItems() {
         if (inventories) {
             for (let inventory of inventories) {
                 present_items.push(...inventory.getElementsByTagName('img'));
-            };
+            }
         }
 
         let used_wishlist = getWishlistForZone();
 
-        used_wishlist
-            .filter((wishlist_item) => wishlist_item.priority !== 0)
-            .forEach((wishlist_item) => {
-            present_items
-                .filter((present_item) => present_item.src.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3').indexOf(wishlist_item.item.img) > 0)
-                .forEach((present_item) => {
-                present_item.parentElement.parentElement.classList.add('priority_' + wishlist_item.priority);
-            });
-        });
+        if (used_wishlist) {
+            used_wishlist
+                .filter((wishlist_item) => wishlist_item.priority !== 0)
+                .forEach((wishlist_item) => {
+                    present_items
+                        .filter((present_item) => present_item.src.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3').indexOf(wishlist_item.item.img) > 0)
+                        .forEach((present_item) => {
+                            present_item.parentElement.parentElement.classList.add('priority_' + wishlist_item.priority_main);
+                        });
+                });
+        }
     }
 }
 
 function getWishlistForZone() {
+
+    if (!wishlist || !wishlist.wishList) return undefined;
+
     let position = getCurrentPosition() || 0;
     let current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
     let zones = Object.keys(wishlist.wishList)
-    .map((zone) => +zone)
-    .filter((zone) => zone > current_zone && zone !== 0);
+        .map((zone) => +zone)
+        .filter((zone) => zone > current_zone && zone !== 0);
     zones = zones
         .sort((zone_a, zone_b) => zone_a - zone_b);
     return zones.length === 0 ? wishlist.wishList[0] : wishlist.wishList[zones[0]];
@@ -3754,7 +3850,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'eat_6ap':
         case 'eat_7ap':
             item_action.classList.add(`item-tag-food`);
-            item_action.innerHTML = `+${property_or_action.slice(4,5)}<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
+            item_action.innerHTML = `+${property_or_action.slice(4, 5)}<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
             break;
         case 'coffee':
             item_action.classList.add(`item-tag-coffee`);
@@ -3763,7 +3859,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'drug_6ap_1':
         case 'drug_8ap_1':
             item_action.classList.add(`item-tag-drug`);
-            item_action.innerHTML = `+${property_or_action.slice(5,6)}<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
+            item_action.innerHTML = `+${property_or_action.slice(5, 6)}<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
             break;
         case 'alcohol':
             item_action.classList.add(`item-tag-alcohol`);
@@ -3788,16 +3884,16 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.innerHTML = `Ressource`;
             break;
         case 'flash_photo_1':
-            var fail_1 = Math.round(60/90*100);
-            item_action.innerHTML = `${100-fail_1}% de chances de pouvoir fuir pendant 30 secondes`;
+            var fail_1 = Math.round(60 / 90 * 100);
+            item_action.innerHTML = `${100 - fail_1}% de chances de pouvoir fuir pendant 30 secondes`;
             break;
         case 'flash_photo_2':
-            var fail_2 = Math.round(30/90*100);
-            item_action.innerHTML = `${100-fail_2}% de chances de pouvoir fuir pendant 60 secondes`;
+            var fail_2 = Math.round(30 / 90 * 100);
+            item_action.innerHTML = `${100 - fail_2}% de chances de pouvoir fuir pendant 60 secondes`;
             break;
         case 'flash_photo_3':
             var fail_3 = 1;
-            item_action.innerHTML = `Succès : ${100-fail_3}% de chances de pouvoir fuir pendant 120 secondes`;
+            item_action.innerHTML = `Succès : ${100 - fail_3}% de chances de pouvoir fuir pendant 120 secondes`;
             break;
         case 'can_cook':
             item_action.innerHTML = `Peut être cuisiné`;
@@ -3841,7 +3937,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.classList.remove('item-tag');
             break;
         case 'hero_surv_1':
-            if(mh_user.townDetails) {
+            if (mh_user.townDetails) {
                 var days = mh_user.townDetails.day;
                 var success = Math.round((+days <= 3 ? 1 : Math.max(0.1, 1 - (+days * 0.025))) * 10000) / 100;
                 item_action.innerHTML = `${success}% de chances de réussir son manuel`;
@@ -4481,23 +4577,23 @@ function mapToOptimize() {
     rows.forEach((row, row_index) => {
         let cols = Array.from(row.querySelectorAll('td') || []);
         let final_cols = cols
-        .filter((col) => !col.classList.contains('around-map')) // Colonne d'index
-        .map((col, col_index) => {
-            if (col.classList.contains('empty')) {
-                // Pas de passage
-                return 0;
-            } else {
-                // Porte
-                if (col.classList.contains('door')) {
-                    doors_positions.push({colIndex: col_index, rowIndex: row_index});
+            .filter((col) => !col.classList.contains('around-map')) // Colonne d'index
+            .map((col, col_index) => {
+                if (col.classList.contains('empty')) {
+                    // Pas de passage
+                    return 0;
+                } else {
+                    // Porte
+                    if (col.classList.contains('door')) {
+                        doors_positions.push({colIndex: col_index, rowIndex: row_index});
+                    }
+                    // Entrée
+                    if (col.classList.contains('exit')) {
+                        entrance = {colIndex: col_index, rowIndex: row_index};
+                    }
+                    return 1;
                 }
-                // Entrée
-                if (col.classList.contains('exit')) {
-                    entrance = {colIndex: col_index, rowIndex: row_index};
-                }
-                return 1;
-            }
-        });
+            });
         final_rows.push(final_cols);
     });
     return {
@@ -4510,12 +4606,12 @@ function mapToOptimize() {
 function displayOptimalPath(html, response) {
     console.log('display opti');
     let rows = Array.from(html.querySelectorAll('tr') || [])
-    .filter((row) => Array.from(row.querySelectorAll('td') || []).some((col) => {
-        return !col.classList.contains('bordCarteRuine') // Ligne d'index
-    }))
-    .map((row) => {
-        return Array.from(row.querySelectorAll('td') || []).filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
-    });
+        .filter((row) => Array.from(row.querySelectorAll('td') || []).some((col) => {
+            return !col.classList.contains('bordCarteRuine') // Ligne d'index
+        }))
+        .map((row) => {
+            return Array.from(row.querySelectorAll('td') || []).filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
+        });
 
     rows.forEach((row, row_index) => {
         let response_pos_in_row = response.filter((response_pos) => response_pos.row === row_index);
@@ -4861,48 +4957,48 @@ function displayTranslateTool() {
                     }
                     response.translations
                         .forEach((translation) => {
-                        if (response.translations.length > 1) {
-                            let context_div = document.createElement('div');
-                            context_div.setAttribute('style', 'text-align: center; padding: 4px; font-variant: small-caps; font-size: 14px;');
-                            context_div.innerHTML = getI18N(texts.translation_file_context) + ` <img src="${repo_img_hordes_url}/emotes/arrowright.gif"> ` + translation.key.context;
-                            if (!translation.key.isExactMatch && show_exact_match) {
-                                context_div.classList.add('not-exact','hidden');
-                            }
-                            block_to_display.appendChild(context_div);
-                        }
-                        let key_index = 0;
-                        for (let lang_key in translation.value) {
-                            let lang = translation.value[lang_key];
-                            lang.forEach((result) => {
-                                let content_div = document.createElement('div');
-                                let img = document.createElement('img');
-                                img.src = `${repo_img_hordes_url}/lang/${lang_key}.png`
-                                img.setAttribute('style', 'margin-right: 8px');
-
-                                let button_div = document.createElement('div');
-                                let button = document.createElement('button');
-                                button_div.appendChild(button);
-                                button.innerHTML = '&#10697';
-                                button.setAttribute('style', 'font-size: 16px');
-                                button.addEventListener('click', () => {
-                                    copyToClipboard(result);
-                                });
-                                content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px;');
-
-                                if (key_index === Object.keys(translation.value).length - 1) {
-                                    content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid;');
-                                }
-                                content_div.innerHTML = `<div>${img.outerHTML}${result}</div>`;
-                                content_div.appendChild(button_div);
-
+                            if (response.translations.length > 1) {
+                                let context_div = document.createElement('div');
+                                context_div.setAttribute('style', 'text-align: center; padding: 4px; font-variant: small-caps; font-size: 14px;');
+                                context_div.innerHTML = getI18N(texts.translation_file_context) + ` <img src="${repo_img_hordes_url}/emotes/arrowright.gif"> ` + translation.key.context;
                                 if (!translation.key.isExactMatch && show_exact_match) {
-                                    content_div.classList.add('not-exact','hidden');
+                                    context_div.classList.add('not-exact', 'hidden');
                                 }
-                                block_to_display.appendChild(content_div);
-                            });
-                            key_index ++;
-                        };
-                    });
+                                block_to_display.appendChild(context_div);
+                            }
+                            let key_index = 0;
+                            for (let lang_key in translation.value) {
+                                let lang = translation.value[lang_key];
+                                lang.forEach((result) => {
+                                    let content_div = document.createElement('div');
+                                    let img = document.createElement('img');
+                                    img.src = `${repo_img_hordes_url}/lang/${lang_key}.png`
+                                    img.setAttribute('style', 'margin-right: 8px');
+
+                                    let button_div = document.createElement('div');
+                                    let button = document.createElement('button');
+                                    button_div.appendChild(button);
+                                    button.innerHTML = '&#10697';
+                                    button.setAttribute('style', 'font-size: 16px');
+                                    button.addEventListener('click', () => {
+                                        copyToClipboard(result);
+                                    });
+                                    content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px;');
+
+                                    if (key_index === Object.keys(translation.value).length - 1) {
+                                        content_div.setAttribute('style', 'display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid;');
+                                    }
+                                    content_div.innerHTML = `<div>${img.outerHTML}${result}</div>`;
+                                    content_div.appendChild(button_div);
+
+                                    if (!translation.key.isExactMatch && show_exact_match) {
+                                        content_div.classList.add('not-exact', 'hidden');
+                                    }
+                                    block_to_display.appendChild(content_div);
+                                });
+                                key_index++;
+                            }
+                        });
                 });
             }
         });
@@ -4912,158 +5008,8 @@ function displayTranslateTool() {
     }
 }
 
-function displayMoreCitizensInformations() {
-    if (mho_parameters.more_citizens_info && pageIsCitizens()) {
-        let mho_more_citizens_tab = document.querySelector(`li#${mho_more_citizens_info_id}`);
-        if (!mho_more_citizens_tab) {
-            let tabs = document.querySelector('ul.tabs');
-            mho_more_citizens_tab = document.createElement('li');
-            mho_more_citizens_tab.id = mho_more_citizens_info_id;
-            mho_more_citizens_tab.classList.add('tab');
-
-            let mho_more_citizens_tab_title = document.createElement('div');
-            mho_more_citizens_tab_title.innerHTML = `<img src="${mh_optimizer_icon}" style="height: 16px;"><span class="hide-sm hide-md hide-lg" style="margin-left: 0.5em">${getI18N(texts.more_citizens_info)}</span>`;
-            mho_more_citizens_tab_title.classList.add('tab-link');
-            mho_more_citizens_tab.appendChild(mho_more_citizens_tab_title);
-
-            let citizens_list = document.querySelector('.citizens-list');
-            if (citizens_list) {
-                mho_more_citizens_tab.addEventListener('click', () => {
-                    let usernames = Array.from(citizens_list.querySelectorAll('.citizen-box-name, .citizen-box-name-me') || []);
-                    let citizens_houses = Array.from(citizens_list.querySelectorAll('.row-flex.stretch') || []).map((row) => row.querySelector('[x-ajax-href]')).map((div, index) => { return {username: usernames[index], link: div.getAttribute('x-ajax-href')}});
-
-                    let selected = document.querySelector('.tab.selected');
-                    selected.classList.remove('selected');
-
-                    mho_more_citizens_tab.classList.add('selected');
-
-                    citizens_list.innerHTML = '';
-
-                    let new_table_header = document.createElement('div');
-                    new_table_header.classList.add('row-flex','header');
-                    new_table_header.style.position = 'sticky';
-                    new_table_header.style.top = '0';
-                    new_table_header.style.backgroundColor = '#7e4d2a';
-
-                    more_citizen_info_headers.forEach((header) => {
-                        let header_div = document.createElement('div');
-                        header_div.innerHTML = getI18N(header.label) || (header.icon ? `<img src="${repo_img_hordes_url + header.icon}" >` : '');
-                        header_div.classList.add(...header.header_class);
-
-                        new_table_header.appendChild(header_div);
-                    });
-
-                    citizens_list.appendChild(new_table_header);
-
-                    let citizen_gossip_mapping = {
-                        clock: {
-                            label: {
-                                de: `zuletzt`,
-                                en: `was seen last`,
-                                es: `última vez`,
-                                fr: `pour la dernière fois`
-                            }
-                        },
-                        rations: {
-                            label: {
-                                de: `Brunnen`,
-                                en: `well`,
-                                es: `pozo`,
-                                fr: `puits`
-                            }
-                        },
-                        injured: {
-                            label: {
-                                de: `verletzt`,
-                                en: `wounded`,
-                                es: `herido`,
-                                fr: `blessé`
-                            }
-                        },
-                        infection: {
-                            label: {
-                                de: `Infektion`,
-                                en: `infection`,
-                                es: `Infección`,
-                                fr: `infection`
-                            }
-                        },
-                        thirsty: {
-                            label: {
-                                de: `durstig`,
-                                en: `Thirsty`,
-                                es: `pueblo`,
-                                fr: `soif`
-                            }
-                        },
-                        addict: {
-                            label: {
-                                de: `süchtig`,
-                                en: `dependant`,
-                                es: `dependencia`,
-                                fr: `dépendance`
-                            }
-                        },
-                        terror: {
-                            label: {
-                                de: `schlafen`,
-                                en: `sleep`,
-                                es: `dormir`,
-                                fr: `dormir`
-                            }
-                        },
-                    }
-
-
-                    let for_loop = async _ => {
-                        for (let i = 0; i < citizens_houses.length; i++) {
-                            let citizen_house = citizens_houses[i];
-                            await getCitizenHouseContent(citizen_house.link).then((more_info) => {
-                                citizen_house.plaintes = more_info.plaintes;
-                                citizen_house.travaux = more_info.travaux;
-                                citizen_house.clock = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.clock.label[lang].toLowerCase()) > -1)?.querySelector('strong')?.innerText || '';
-                                citizen_house.rations = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.rations.label[lang].toLowerCase()) > -1)?.innerText.replace(/.*(\d+).*/, '$1') || '';
-                                citizen_house.injured = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.injured.label[lang].toLowerCase()) > -1) ? `<img src="${repo_img_hordes_url}/icons/tickOn.gif" >` : '';
-                                citizen_house.infection = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.infection.label[lang].toLowerCase()) > -1) ? `<img src="${repo_img_hordes_url}/icons/tickOn.gif" >` : '';
-                                citizen_house.thirsty = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.thirsty.label[lang].toLowerCase()) > -1) ? `<img src="${repo_img_hordes_url}/icons/tickOn.gif" >` : '';
-                                citizen_house.addict = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.addict.label[lang].toLowerCase()) > -1) ? `<img src="${repo_img_hordes_url}/icons/tickOn.gif" >` : '';
-                                citizen_house.terror = Array.from(more_info.gossips.querySelectorAll('li')).find((li_item) => li_item.innerText.toLowerCase()?.indexOf(citizen_gossip_mapping.terror.label[lang].toLowerCase()) > -1) ? `<img src="${repo_img_hordes_url}/icons/tickOn.gif" >` : '';
-
-                                let new_table_row = document.createElement('div');
-                                new_table_row.classList.add('row-flex', 'stretch');
-
-                                more_citizen_info_headers.forEach((cell) => {
-                                    if (cell.id === 'username') {
-                                        new_table_row.appendChild(citizen_house[cell.id] || document.createElement('div'));
-                                    } else {
-                                        let cell_div = document.createElement('div');
-                                        cell_div.classList.add(...cell.content_class);
-                                        if (typeof citizen_house[cell.id] === 'string' || !citizen_house[cell.id]) {
-                                            cell_div.innerHTML = citizen_house[cell.id] || '';
-                                        } else {
-                                            cell_div.appendChild(citizen_house[cell.id] || document.createElement('div'));
-                                        }
-                                        new_table_row.appendChild(cell_div);
-                                    }
-                                });
-
-                                citizens_list.appendChild(new_table_row);
-                            });
-                        };
-                    };
-
-                    for_loop();
-                });
-
-                // a faire en dernier
-                tabs.appendChild(mho_more_citizens_tab);
-            }
-        }
-    }
-}
-
 function displayCellDetailsOnPage() {
-    if(mho_parameters.display_more_informations_from_mho && pageIsDesert()) {
+    if (mho_parameters.display_more_informations_from_mho && pageIsDesert()) {
         let cell = getCellDetailsByPosition();
         let cell_note = document.querySelector('#cell-note');
         if (cell && (!current_cell || cell.id !== current_cell.id)) {
@@ -5118,6 +5064,80 @@ function displayCellDetailsOnPage() {
     }
 }
 
+function displayEstimationsOnWatchtower() {
+    if (mho_parameters.display_estimations_on_watchtower && pageIsWatchtower()) {
+        let estim_block = document.querySelector(`#${mho_watchtower_estim_id}`);
+        let small_note = document.querySelector('.small-note');
+        if (estim_block || !small_note) return;
+
+        estim_block = document.createElement('div');
+        estim_block.id = mho_watchtower_estim_id;
+
+        small_note.parentElement.insertBefore(estim_block, small_note);
+
+        getEstimations().then((estimations) => {
+            let saved_estimations = estimations;
+            let updated_estimations = estimations;
+            console.log('estimations', estimations);
+        })
+
+    }
+}
+
+function displayAntiAbuseCounter() {
+    const controller = new AbortController();
+    if (mho_parameters.display_anti_abuse && (pageIsBank() || pageIsWell())) {
+        let mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
+        if (mho_anti_abuse_counter) return;
+        mho_anti_abuse_counter = document.createElement('div');
+        mho_anti_abuse_counter.id = mho_anti_abuse_counter_id;
+        mho_anti_abuse_counter.style.marginBottom = '0.5em';
+        if (pageIsBank()) {
+            let forum_preview = document.querySelector('.forum-preview-wrapper-bank');
+            if (!forum_preview) return;
+            forum_preview.parentElement.insertBefore(mho_anti_abuse_counter, forum_preview);
+        } else {
+            let actions_box = document.querySelector('.actions-box');
+            if (!actions_box) return;
+            actions_box.parentElement.insertBefore(mho_anti_abuse_counter, actions_box);
+        }
+
+        let header = document.createElement('h5');
+        mho_anti_abuse_counter.appendChild(header);
+        header.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 30px !important; vertical-align: middle; margin-right: 0.5em;">${getI18N(texts.anti_abuse_title)}`;
+
+        let content = document.createElement('div');
+        mho_anti_abuse_counter.appendChild(content);
+
+        let old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+
+        document.addEventListener('click', () => {
+            old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+
+            document.addEventListener('mh-navigation-complete', (event) => {
+                // console.log('event mh-navigation-complete', event);
+                let new_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+                if (old_bag.length < new_bag.length) {
+
+                    GM.getValue(mho_anti_abuse_key).then((counter_values) => {
+                        if (!counter_values) {
+                            counter_values = [];
+                        }
+                        if (counter_values.length < 5) {
+                            counter_values.push({item: '', take_at: new Date()});
+                            GM.setValue(mho_anti_abuse_key, counter_values);
+                        }
+                    })
+                }
+                old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+            }, {once: true});
+        }, {signal: controller.signal})
+
+    } else {
+        controller.abort();
+    }
+}
+
 function displayCampingPredict() {
     let camping_predict_container = document.getElementById(mho_camping_predict_id);
 
@@ -5159,7 +5179,6 @@ function displayCampingPredict() {
 
             camping_predict_container.appendChild(updater_title);
 
-            console.log('mh_user', mh_user);
             let zone_ruin = document.querySelector('.ruin-info b');
             let ruin = '';
             if (zone_ruin) {
@@ -5494,7 +5513,7 @@ function blockUsersPosts() {
                         blacklist = [];
                     }
 
-                    let is_user_in_blacklist = blacklist.some((blacklist_user_id) => blacklist_user_id === user_id) ;
+                    let is_user_in_blacklist = blacklist.some((blacklist_user_id) => blacklist_user_id === user_id);
                     let original_post_content = post.querySelector('.forum-post-content:not(.replace-original)');
                     let new_post_content = post.querySelector('.replace-original');
 
@@ -5577,9 +5596,9 @@ function createCopyButton(source, map, map_id, button_block_id) {
     let copy_button_parent = document.getElementById(button_block_id);
     let copy_button = document.createElement('button');
     let copyText = (text, add) => {
-        return `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="30" height="30"><span style="margin: auto; vertical-align: middle;">${text}<br /><small>${add}</small></span>`;
+        return `<img src="${mh_optimizer_icon}" style="margin: auto; vertical-align: middle;" width="20" height="20"><span style="margin: auto; vertical-align: middle;">${text}<br /><small>${add}</small></span>`;
     }
-    copy_button.setAttribute('style', 'max-width: initial');
+    copy_button.setAttribute('style', 'max-width: initial; float: right');
     copy_button.innerHTML = copyText(getI18N(texts.copy_map), '');
     copy_button.id = mho_copy_map_id;
     copy_button.addEventListener('click', () => {
@@ -5615,520 +5634,521 @@ function createCopyButton(source, map, map_id, button_block_id) {
 /** Add styles to this page */
 function createStyles() {
     const btn_style = `#${btn_id} {`
-    + 'background-color: #5c2b20;'
-    + 'border: 1px solid #f0d79e;'
-    + 'outline: 1px solid #000;'
-    + 'position: absolute;'
-    + 'top: 10px;'
-    + 'z-index: 997;'
-    + '}';
+        + 'background-color: #5c2b20;'
+        + 'border: 1px solid #f0d79e;'
+        + 'outline: 1px solid #000;'
+        + 'position: absolute;'
+        + 'top: 10px;'
+        + 'z-index: 997;'
+        + '}';
 
     const btn_hover_h1_span_style = `#${btn_id}:hover h1 span, #${btn_id}:hover h1 a {`
-    + 'display: inline;'
-    + '}';
+        + 'display: inline;'
+        + '}';
 
     const btn_hover_div_style = `#${btn_id}:hover div {`
-    + 'display: block;'
-    + '}';
+        + 'display: block;'
+        + '}';
 
     const btn_h1_style = `#${btn_id} h1 {`
-    + 'height: auto;'
-    + 'font-size: 8pt;'
-    + 'text-transform: none;'
-    + 'font-variant: small-caps;'
-    + 'background: none;'
-    + 'cursor: help;'
-    + 'margin: 0 5px;'
-    + 'padding: 0;'
-    + 'line-height: 17px;'
-    + 'color: #f0d79e;'
-    + 'display: flex;'
-    + 'justify-content: space-between;'
-    + 'align-items: center;'
-    + '}';
+        + 'height: auto;'
+        + 'font-size: 8pt;'
+        + 'text-transform: none;'
+        + 'font-variant: small-caps;'
+        + 'background: none;'
+        + 'cursor: help;'
+        + 'margin: 0 5px;'
+        + 'padding: 0;'
+        + 'line-height: 17px;'
+        + 'color: #f0d79e;'
+        + 'display: flex;'
+        + 'justify-content: space-between;'
+        + 'align-items: center;'
+        + '}';
 
     const btn_h1_img_style = `#${btn_id} h1 > div > img {`
-    + 'vertical-align: -9%;'
-    + '}';
+        + 'vertical-align: -9%;'
+        + '}';
 
     const btn_h1_hover_style = `#${btn_id}:hover h1 {`
-    + 'border-bottom: 1px solid #b37c4a;'
-    + 'margin-bottom: 5px;'
-    + '}'
+        + 'border-bottom: 1px solid #b37c4a;'
+        + 'margin-bottom: 5px;'
+        + '}'
 
     const btn_h1_span_style = `#${btn_id} h1 span, #${btn_id} h1 a {`
-    + 'color: #f0d79e;'
-    + 'cursor: help;'
-    + 'font-family: Trebuchet MS,Arial,Verdana,sans-serif;'
-    + 'letter-spacing: 1px;'
-    + 'line-height: 17px;'
-    + 'text-align: left;'
-    + 'text-transform: none;'
-    + 'margin-left: 1em;'
-    + 'display: none;'
-    + '}';
+        + 'color: #f0d79e;'
+        + 'cursor: help;'
+        + 'font-family: Trebuchet MS,Arial,Verdana,sans-serif;'
+        + 'letter-spacing: 1px;'
+        + 'line-height: 17px;'
+        + 'text-align: left;'
+        + 'text-transform: none;'
+        + 'margin-left: 1em;'
+        + 'display: none;'
+        + '}';
 
     const btn_div_style = '#' + btn_id + ' > div {'
-    + 'display: none;'
-    + 'margin: 0 5px 8px 5px;'
-    + 'font-size: 0.9em;'
-    + 'width: 350px;'
-    + '}';
+        + 'display: none;'
+        + 'margin: 0 5px 8px 5px;'
+        + 'font-size: 0.9em;'
+        + 'width: 350px;'
+        + '}';
 
     const mh_optimizer_window_style = '#' + mh_optimizer_window_id + '{'
-    + 'background: url(' + repo_img_hordes_url + 'background/mask.png);'
-    + 'height: 100%;'
-    + 'opacity: 1;'
-    + 'position: fixed;'
-    + 'transition: opacity 1s ease;'
-    + 'width: 100%;'
-    + 'z-index: 999;'
-    + 'padding: 0;'
-    + '}';
+        + 'background: url(' + repo_img_hordes_url + 'background/mask.png);'
+        + 'height: 100%;'
+        + 'opacity: 1;'
+        + 'position: fixed;'
+        + 'transition: opacity 1s ease;'
+        + 'width: 100%;'
+        + 'z-index: 999;'
+        + 'padding: 0;'
+        + '}';
 
     const mh_optimizer_window_hidden = `#${mh_optimizer_window_id}:not(.visible), #${mh_optimizer_map_window_id}:not(.visible) {`
-    + 'opacity: 0;'
-    + 'pointer-events: none;'
-    + '}';
+        + 'opacity: 0;'
+        + 'pointer-events: none;'
+        + '}';
 
     const mh_optimizer_window_box_style_hidden = `#${mh_optimizer_window_id}:not(.visible) #${mh_optimizer_window_id}-box, #${mh_optimizer_map_window_id}:not(.visible) #${mh_optimizer_map_window_id}-box {`
-    + 'transform: scale(0) translateY(1000px);'
-    + '}';
+        + 'transform: scale(0) translateY(1000px);'
+        + '}';
 
     const mh_optimizer_window_box_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box {`
-    + 'background: url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
-    + 'border-radius: 8px;'
-    + 'box-shadow: 0 0 10px #000;'
-    + 'left: calc(50% - 750px);'
-    + 'position: absolute;'
-    + 'top: 10px;'
-    + 'bottom: 10px;'
-    + 'right: 10px;'
-    + 'left: 10px;'
-    + 'transform: scale(1) translateY(0);'
-    + 'transition: transform .5s ease;'
-    + '}';
+        + 'background: url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
+        + 'border-radius: 8px;'
+        + 'box-shadow: 0 0 10px #000;'
+        + 'left: calc(50% - 750px);'
+        + 'position: absolute;'
+        + 'top: 10px;'
+        + 'bottom: 10px;'
+        + 'right: 10px;'
+        + 'left: 10px;'
+        + 'transform: scale(1) translateY(0);'
+        + 'transition: transform .5s ease;'
+        + '}';
 
     const mh_optimizer_map_window_box_style = `#${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box {`
-    + 'background: url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
-    + 'border-radius: 8px;'
-    + 'box-shadow: 0 0 10px #000;'
-    + 'position: absolute;'
-    + 'transform: scale(1) translateY(0);'
-    + 'transition: transform .5s ease;'
-    + 'resize: both;'
-    + 'overflow: auto;'
-    + 'z-index: 9999;'
-    + '}';
+        + 'background: url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
+        + 'border-radius: 8px;'
+        + 'box-shadow: 0 0 10px #000;'
+        + 'position: absolute;'
+        + 'transform: scale(1) translateY(0);'
+        + 'transition: transform .5s ease;'
+        + 'resize: both;'
+        + 'overflow: auto;'
+        + 'z-index: 9999;'
+        + '}';
 
     const mh_optimizer_window_overlay_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box #${mh_optimizer_window_id}-overlay, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay {`
-    + 'position: absolute;'
-    + 'right: 12px;'
-    + 'top: -6px;'
-    + 'text-align: right;'
-    + '}'
+        + 'position: absolute;'
+        + 'right: 12px;'
+        + 'top: -6px;'
+        + 'text-align: right;'
+        + '}'
 
     const wiki_window_overlay_ul_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box #${mh_optimizer_window_id}-overlay ul, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay ul {`
-    + 'margin: 2px;'
-    + 'padding: 0;'
-    + '}'
+        + 'margin: 2px;'
+        + 'padding: 0;'
+        + '}'
 
     const mh_optimizer_window_overlay_ul_li_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box #${mh_optimizer_window_id}-overlay ul li, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay ul li {`
-    + 'cursor: pointer;'
-    + 'display: inline-block;'
-    + '}'
+        + 'cursor: pointer;'
+        + 'display: inline-block;'
+        + '}'
 
     const mh_optimizer_window_content = `#${mh_optimizer_window_id}-content, #${mh_optimizer_map_window_id}-content {`
-    + 'background: #7e4d2a;'
-    + 'bottom: 0;'
-    + 'color: #fff;'
-    + 'left: 0;'
-    + 'overflow: auto;'
-    + 'padding: 2px;'
-    + 'position: absolute;'
-    + 'right: 0;'
-    + 'top: 0;'
-    + 'background: url(' + repo_img_hordes_url + 'background/box/panel_00.gif) 0 0 no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_02.gif) 100% 0 no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_20.gif) 0 100% no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_22.gif) 100% 100% no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_01.gif) 0 0 repeat-x,url(' + repo_img_hordes_url + 'background/box/panel_10.gif) 0 0 repeat-y,url(' + repo_img_hordes_url + 'background/box/panel_12.gif) 100% 0 repeat-y,url(' + repo_img_hordes_url + 'background/box/panel_21.gif) 0 100% repeat-x,#7e4d2a;'
-    + 'border-radius: 12px;'
-    + 'left: 18px;'
-    + 'padding: 8px;'
-    + 'right: 5px;'
-    + '}';
+        + 'background: #7e4d2a;'
+        + 'bottom: 0;'
+        + 'color: #fff;'
+        + 'left: 0;'
+        + 'overflow: auto;'
+        + 'padding: 2px;'
+        + 'position: absolute;'
+        + 'right: 0;'
+        + 'top: 0;'
+        + 'background: url(' + repo_img_hordes_url + 'background/box/panel_00.gif) 0 0 no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_02.gif) 100% 0 no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_20.gif) 0 100% no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_22.gif) 100% 100% no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_01.gif) 0 0 repeat-x,url(' + repo_img_hordes_url + 'background/box/panel_10.gif) 0 0 repeat-y,url(' + repo_img_hordes_url + 'background/box/panel_12.gif) 100% 0 repeat-y,url(' + repo_img_hordes_url + 'background/box/panel_21.gif) 0 100% repeat-x,#7e4d2a;'
+        + 'border-radius: 12px;'
+        + 'left: 18px;'
+        + 'padding: 8px;'
+        + 'right: 5px;'
+        + '}';
 
     const tabs_style = '#tabs {'
-    + 'color: #ddab76;'
-    + 'font-size: 1.2rem;'
-    + 'margin-bottom: 20px;'
-    + 'position: relative;'
-    + 'height: 25px;'
-    + 'border-bottom: 1px solid #ddab76;'
-    + '}';
+        + 'color: #ddab76;'
+        + 'font-size: 1.2rem;'
+        + 'margin-bottom: 20px;'
+        + 'position: relative;'
+        + 'height: 25px;'
+        + 'border-bottom: 1px solid #ddab76;'
+        + '}';
 
     const tabs_ul_style = '#tabs ul {'
-    + 'display: flex;'
-    + 'flex-wrap: wrap;'
-    + 'padding: 0;'
-    + `background: url(${repo_img_hordes_url}background/tabs-header-plain.gif) 0 100% round;`
-    + 'background-size: cover;'
-    + 'height: 24px;'
-    + 'margin-top: 2px;'
-    + 'margin-right: 20px;'
-    + 'padding-left: 0.5em;'
-    + '}';
+        + 'display: flex;'
+        + 'flex-wrap: wrap;'
+        + 'padding: 0;'
+        + `background: url(${repo_img_hordes_url}background/tabs-header-plain.gif) 0 100% round;`
+        + 'background-size: cover;'
+        + 'height: 24px;'
+        + 'margin-top: 2px;'
+        + 'margin-right: 20px;'
+        + 'padding-left: 0.5em;'
+        + '}';
 
     const tabs_ul_li_style = '#tabs > ul > li {'
-    + 'cursor: pointer;'
-    + 'display: inline-block;'
-    + 'margin-top: auto;'
-    + 'margin-bottom: auto;'
-    + '}';
+        + 'cursor: pointer;'
+        + 'display: inline-block;'
+        + 'margin-top: auto;'
+        + 'margin-bottom: auto;'
+        + '}';
 
     const tabs_ul_li_spacing_style = '#tabs > ul > li > div > img {'
-    + 'margin-right: 0.5em;'
-    + '}';
+        + 'margin-right: 0.5em;'
+        + '}';
 
     const tabs_ul_li_div_style = '#tabs > ul > li > div {'
-    + 'background-image: url(' + repo_img_hordes_url + 'background/tab.gif);'
-    + 'background-position: 0 0;'
-    + 'background-repeat: no-repeat;'
-    + 'border-left: 1px solid #694023;'
-    + 'border-right: 1px solid #694023;'
-    + 'color: #f0d79e;'
-    + 'cursor: pointer;'
-    + 'float: right;'
-    + 'font-family: Arial,sans-serif;'
-    + 'font-size: 1rem;'
-    + 'font-variant: small-caps;'
-    + 'height: 21px;'
-    + 'margin-left: 2px;'
-    + 'margin-right: 0;'
-    + 'margin-top: 3px;'
-    + 'padding: 2px 4px 0;'
-    + 'text-decoration: underline;'
-    + 'white-space: nowrap;'
-    + '}';
+        + 'background-image: url(' + repo_img_hordes_url + 'background/tab.gif);'
+        + 'background-position: 0 0;'
+        + 'background-repeat: no-repeat;'
+        + 'border-left: 1px solid #694023;'
+        + 'border-right: 1px solid #694023;'
+        + 'color: #f0d79e;'
+        + 'cursor: pointer;'
+        + 'float: right;'
+        + 'font-family: Arial,sans-serif;'
+        + 'font-size: 1rem;'
+        + 'font-variant: small-caps;'
+        + 'height: 21px;'
+        + 'margin-left: 2px;'
+        + 'margin-right: 0;'
+        + 'margin-top: 3px;'
+        + 'padding: 2px 4px 0;'
+        + 'text-decoration: underline;'
+        + 'white-space: nowrap;'
+        + '}';
 
     const tabs_ul_li_div_hover_style = '#tabs > ul > li > div:hover {'
-    + 'outline: 1px solid #f0d79e;'
-    + 'text-decoration: underline;'
-    + '}';
+        + 'outline: 1px solid #f0d79e;'
+        + 'text-decoration: underline;'
+        + '}';
 
     const tabs_ul_li_selected_style = '#tabs > ul > li.selected {'
-    + 'position: relative;'
-    + 'top: 2px;'
-    + '}';
+        + 'position: relative;'
+        + 'top: 2px;'
+        + '}';
 
     const tab_content_style = '#tab-content {'
-    + 'position: absolute;'
-    + 'bottom: 10px;'
-    + 'left: 10px;'
-    + 'right: 8px;'
-    + 'top: 40px;'
-    + 'overflow: auto;'
-    + '}';
+        + 'position: absolute;'
+        + 'bottom: 10px;'
+        + 'left: 10px;'
+        + 'right: 8px;'
+        + 'top: 40px;'
+        + 'overflow: auto;'
+        + '}';
 
     const tab_content_item_list_style = '#tab-content > ul {'
-    + 'display: flex;'
-    + 'flex-wrap: wrap;'
-    + 'padding: 0;'
-    + 'margin: 0 0.5em;'
-    + '}';
+        + 'display: flex;'
+        + 'flex-wrap: wrap;'
+        + 'padding: 0;'
+        + 'margin: 0 0.5em;'
+        + '}';
 
     const tab_content_item_list_item_style = '#tab-content > ul > li {'
-    + 'min-width: 300px;'
-    + 'flex-basis: min-content;'
-    + 'padding: 0.125em 0.5em;'
-    + 'margin: 0;'
-    + '}';
+        + 'min-width: 300px;'
+        + 'flex-basis: min-content;'
+        + 'padding: 0.125em 0.5em;'
+        + 'margin: 0;'
+        + '}';
 
     const tab_content_item_list_item_selected_style = '#tab-content > ul > li.selected {'
-    + 'flex-basis: 100%;'
-    + 'padding: 0.25em;'
-    + 'margin: 0.25em 1px;'
-    + '}';
+        + 'flex-basis: 100%;'
+        + 'padding: 0.25em;'
+        + 'margin: 0.25em 1px;'
+        + '}';
 
     const tab_content_item_list_item_not_selected_properties_style = '#tab-content > ul > li:not(.selected) .properties {'
-    + 'display: none;'
-    + '}';
+        + 'display: none;'
+        + '}';
 
     const item_category = '#tab-content > ul div.mho-category {'
-    + 'width: 100%;'
-    + 'border-bottom: 1px solid;'
-    + 'margin: 1em 0 0.5em;'
-    + '}';
+        + 'width: 100%;'
+        + 'border-bottom: 1px solid;'
+        + 'margin: 1em 0 0.5em;'
+        + '}';
 
     const parameters_informations_style = '#categories, .parameters, #informations {'
-    + 'margin-top: 0.5em;'
-    + '}';
+        + 'margin-top: 0.5em;'
+        + '}';
 
     const parameters_informations_ul_style = '#categories > ul, ul.parameters, #informations > ul {'
-    + 'padding: 0;'
-    + 'margin: 0;'
-    + 'color: #f0d79e;'
-    + '}';
+        + 'padding: 0;'
+        + 'margin: 0;'
+        + 'color: #f0d79e;'
+        + '}';
 
     const li_style = '#categories > ul > li, ul.parameters > li, #tab-content ul > li {'
-    + 'list-style: none;'
-    + '}';
+        + 'list-style: none;'
+        + '}';
 
     const mho_table_style = '.mho-table {'
-    + 'border-collapse: collapse;'
-    + 'border-bottom: 1px solid #ddab76;'
-    + '}';
+        + 'border-collapse: collapse;'
+        + 'border-bottom: 1px solid #ddab76;'
+        + '}';
 
     const mho_table_header_style = '.mho-header {'
-    + 'font-size: 10pt;'
-    + 'background: linear-gradient(0deg,#643b25 0,rgba(100,59,37,0) 50%,rgba(100,59,37,0)) !important;'
-    + 'border-bottom: 2px solid #f0d79e;'
-    + 'color: #fff;'
-    + 'font-family: Trebuchet MS,Arial,Verdana,sans-serif;'
-    + 'font-weight: 700;'
-    + '}';
+        + 'font-size: 10pt;'
+        + 'background: linear-gradient(0deg,#643b25 0,rgba(100,59,37,0) 50%,rgba(100,59,37,0)) !important;'
+        + 'border-bottom: 2px solid #f0d79e;'
+        + 'color: #fff;'
+        + 'font-family: Trebuchet MS,Arial,Verdana,sans-serif;'
+        + 'font-weight: 700;'
+        + '}';
 
     const mho_table_row_style = '.mho-table tr:not(.mho-header) {'
-    + 'background-color: #5c2b20;'
-    + 'border-bottom: 1px solid #7e4d2a;'
-    + '}';
+        + 'background-color: #5c2b20;'
+        + 'border-bottom: 1px solid #7e4d2a;'
+        + '}';
 
     const mho_table_cells_style = '.mho-table tr th, .mho-table tr td {'
-    + 'padding: 0.25em;'
-    + '}';
+        + 'padding: 0.25em;'
+        + '}';
 
     const mho_table_cells_td_style = '.mho-table tr td {'
-    + 'border-left: 1px solid #7e4d2a;'
-    + 'color: #f0d79e;'
-    + 'font-size: 9pt;'
-    + '}';
+        + 'border-left: 1px solid #7e4d2a;'
+        + 'color: #f0d79e;'
+        + 'font-size: 9pt;'
+        + '}';
 
     const recipe_style = '#tab-content #recipes-list > li, #wishlist > li {'
-    + 'min-width: 100% !important;'
-    + 'display: flex;'
-    + '}';
+        + 'min-width: 100% !important;'
+        + 'display: flex;'
+        + '}';
 
     const item_title_style = '.item-title {'
-    + 'display: flex;'
-    + 'justify-content: space-between;'
-    + '}';
+        + 'display: flex;'
+        + 'justify-content: space-between;'
+        + '}';
 
     const item_list_element_style = 'ul#item-list > li {'
-    + 'background-color: #5c2b20;'
-    + 'margin: 1px 1px;'
-    + 'padding: 0.25em 0.5em;'
-    + '}';
+        + 'background-color: #5c2b20;'
+        + 'margin: 1px 1px;'
+        + 'padding: 0.25em 0.5em;'
+        + '}';
 
     const add_to_wishlist_button_img_style = '.add-to-wishlist > button > img {'
-    + 'margin-right: 0;'
-    + '}';
+        + 'margin-right: 0;'
+        + '}';
 
     const input_number_webkit_style = 'input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {'
-    + '-webkit-appearance: none;'
-    + 'margin: 0;'
-    + '}';
+        + '-webkit-appearance: none;'
+        + 'margin: 0;'
+        + '}';
 
     const input_number_firefox_style = 'input[type=number] {'
-    + '-moz-appearance: textfield;'
-    + '}';
+        + '-moz-appearance: textfield;'
+        + '}';
 
     const wishlist_header = '#wishlist .mho-header, #wishlist > li {'
-    + 'padding: 0 8px;'
-    + 'margin: 0.125em 0;'
-    + 'width: 100%;'
-    + '}';
+        + 'padding: 0 8px;'
+        + 'margin: 0.125em 0;'
+        + 'width: 100%;'
+        + '}';
 
     const wishlist_even = '#tab-content #recipes-list > li:nth-child(even), #wishlist > li:nth-child(even) {'
-    + 'background-color: #5c2b20;'
-    + '}';
+        + 'background-color: #5c2b20;'
+        + '}';
 
     const wishlist_header_cell = '#wishlist .mho-header > div {'
-    + 'display: inline-block;'
-    + 'vertical-align: middle;'
-    + '}'
+        + 'display: inline-block;'
+        + 'vertical-align: middle;'
+        + '}'
 
     const wishlist_label = '#wishlist .label {'
-    + 'width: calc(100% - 775px);'
-    + 'min-width: 200px;'
-    + 'padding: 0 4px;'
-    + '}';
+        + 'width: calc(100% - 775px);'
+        + 'min-width: 200px;'
+        + 'padding: 0 4px;'
+        + '}';
 
     const label_text = '.label_text {'
-    + 'font-size: 1.2rem;'
-    + 'font-variant: small-caps;'
-    + '}';
+        + 'font-size: 1.2rem;'
+        + 'font-variant: small-caps;'
+        + '}';
 
     const wishlist_cols = '#wishlist .priority, #wishlist .depot, #wishlist .bank_count, #wishlist .bag_count, #wishlist .bank_needed, #wishlist .diff {'
-    + 'width: 125px;'
-    + 'padding: 0 4px;'
-    + '}';
+        + 'width: 125px;'
+        + 'padding: 0 4px;'
+        + '}';
 
     const wishlist_delete = '#wishlist .delete {'
-    + 'width: 25px;'
-    + 'text-align: center;'
-    + '}';
+        + 'width: 25px;'
+        + 'text-align: center;'
+        + '}';
 
     const wishlist_in_app = '#wishlist-section ul {'
-    + 'padding-left: 0;'
-    + '}';
+        + 'padding-left: 0;'
+        + '}';
 
     const wishlist_in_app_item = '#wishlist-section ul > li {'
-    + 'display: flex;'
-    + 'justify-content: space-between;'
-    + '}';
+        + 'display: flex;'
+        + 'justify-content: space-between;'
+        + '}';
 
     const advanced_tooltip_recipe_li = '#mho-advanced-tooltip > div.recipe > li, #item-list > li.selected > .properties > .recipe > li {'
-    + 'display: flex;'
-    + 'padding: 0.25em 0;'
-    + '}';
+        + 'display: flex;'
+        + 'padding: 0.25em 0;'
+        + '}';
 
     const item_recipe_li = '#item-list > li.selected > .properties > .recipe > li:not(:last-child) {'
-    + 'border-bottom: 1px dotted white;'
-    + '}';
+        + 'border-bottom: 1px dotted white;'
+        + '}';
 
     const advanced_tooltip_recipe_li_ul = '#mho-advanced-tooltip > div.recipe > li > ul {'
-    + 'min-width: 0 !important;'
-    + 'width: calc(100% - 15px) !important;'
-    + '}';
+        + 'min-width: 0 !important;'
+        + 'width: calc(100% - 15px) !important;'
+        + '}';
 
     const large_tooltip = 'div.large-tooltip {'
-    + 'width: 400px !important;'
-    + 'max-width: 400px; !important'
-    + '}';
+        + 'width: 400px !important;'
+        + 'max-width: 400px; !important'
+        + '}';
 
     const item_priority_30 = `li.item[class^='priority_3'], li.item[class*=' priority_3'], img[class^='priority_3'], img[class*=' priority_3'] {`
-    + 'box-shadow: inset 0 0 0.30em springgreen, 0 0 0.5em springgreen;'
-    + '}';
+        + 'box-shadow: inset 0 0 0.30em springgreen, 0 0 0.5em springgreen;'
+        + '}';
     const item_priority_20 = `li.item[class^='priority_2'], li.item[class*=' priority_2'], img[class^='priority_2'], img[class*=' priority_2'] {`
-    + 'box-shadow: inset 0 0 0.30em yellowgreen, 0 0 0.5em yellowgreen;'
-    + '}';
+        + 'box-shadow: inset 0 0 0.30em yellowgreen, 0 0 0.5em yellowgreen;'
+        + '}';
     const item_priority_10 = `li.item[class^='priority_1'], li.item[class*=' priority_1'], img[class^='priority_1'], img[class*=' priority_1'] {`
-    + 'box-shadow: inset 0 0 0.30em darkgoldenrod, 0 0 0.5em darkgoldenrod;'
-    + '}';
-    const item_priority_trash = 'li.item.priority_-1000, img.priority_-1000 {'
-    + 'box-shadow: inset 0 0 0.30em darkslategrey, 0 0 0.5em darkslategrey;'
-    + '}';
+        + 'box-shadow: inset 0 0 0.30em darkgoldenrod, 0 0 0.5em darkgoldenrod;'
+        + '}';
+    const item_priority_trash = 'li.item.priority_-1, img.priority_-1 {'
+        + 'box-shadow: inset 0 0 0.30em darkslategrey, 0 0 0.5em darkslategrey;'
+        + '}';
 
     const item_tag_food = 'div.item-tag-food::after {'
-    + `background: url(${repo_img_hordes_url}status/status_haseaten.gif) 50%/contain no-repeat;`
-    + '}';
+        + `background: url(${repo_img_hordes_url}status/status_haseaten.gif) 50%/contain no-repeat;`
+        + '}';
 
     const item_tag_load = 'div.item-tag-load::after {'
-    + `background: url(${repo_img_hordes_url}item/item_pile.gif) 50%/contain no-repeat;`
-    + '}';
+        + `background: url(${repo_img_hordes_url}item/item_pile.gif) 50%/contain no-repeat;`
+        + '}';
 
     const item_tag_hero = 'div.item-tag-hero::after {'
-    + `background: url(${repo_img_hordes_url}icons/star.gif) 50%/contain no-repeat;`
-    + '}';
+        + `background: url(${repo_img_hordes_url}icons/star.gif) 50%/contain no-repeat;`
+        + '}';
 
     const item_tag_alcohol = 'div.item-tag-alcohol::after {'
-    + `background: url(${repo_img_hordes_url}status/status_drunk.gif) 50%/contain no-repeat;`
-    + '}';
+        + `background: url(${repo_img_hordes_url}status/status_drunk.gif) 50%/contain no-repeat;`
+        + '}';
 
     const item_tag_drug = 'div.item-tag-drug::after {'
-    + `background: url(${repo_img_hordes_url}status/status_drugged.gif) 50%/contain no-repeat;`
-    + '}';
+        + `background: url(${repo_img_hordes_url}status/status_drugged.gif) 50%/contain no-repeat;`
+        + '}';
 
     const item_tag_smokebomb = 'div.item-tag-smokebomb {'
-    + `height: 36px;`
-    + '}';
+        + `height: 36px;`
+        + '}';
 
     const display_map_btn = `#${mho_display_map_id} {`
-    + 'background-color: rgba(62,36,23,.75);'
-    + 'border-radius: 6px;'
-    + 'color: #ddab76;'
-    + 'cursor: pointer;'
-    + 'font-size: 10px;'
-    + 'padding: 3px 5px;'
-    + 'position: absolute;'
-    + 'right: 41px;'
-    + 'top: 100px;'
-    + 'transition: background-color .5s ease-in-out;'
-    + '}'
+        + 'background-color: rgba(62,36,23,.75);'
+        + 'border-radius: 6px;'
+        + 'color: #ddab76;'
+        + 'cursor: pointer;'
+        + 'font-size: 10px;'
+        + 'padding: 3px 5px;'
+        + 'position: absolute;'
+        + 'right: 41px;'
+        + 'top: 100px;'
+        + 'transition: background-color .5s ease-in-out;'
+        + 'z-index: 996;'
+        + '}'
 
     const mho_map_td = `.mho-map tr td {`
-    + `border: 1px dotted;`
-    + `width: 30px;`
-    + `min-width: 30px;`
-    + `height: 30px;`
-    + `min-height: 30px;`
-    + `text-align: center;`
-    + `vertical-align: middle;`
-    + `}`;
+        + `border: 1px dotted;`
+        + `width: 30px;`
+        + `min-width: 30px;`
+        + `height: 30px;`
+        + `min-height: 30px;`
+        + `text-align: center;`
+        + `vertical-align: middle;`
+        + `}`;
 
     const dotted_background = '.dotted-background {'
-    + `background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%),
+        + `background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%),
                          -moz-linear-gradient(-45deg, #444 25%, transparent 25%),
                          -moz-linear-gradient(45deg, transparent 75%, #444 75%),
                          -moz-linear-gradient(-45deg, transparent 75%, #444 75%);`
-    + `background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, #444), color-stop(.25, transparent)),
+        + `background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, #444), color-stop(.25, transparent)),
                          -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, #444), color-stop(.25, transparent)),
                          -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, #444)),
                          -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, #444));`
-    + `background-image: -webkit-linear-gradient(45deg, #444 25%, transparent 25%),
+        + `background-image: -webkit-linear-gradient(45deg, #444 25%, transparent 25%),
                          -webkit-linear-gradient(-45deg, #444 25%, transparent 25%),
                          -webkit-linear-gradient(45deg, transparent 75%, #444 75%),
                          -webkit-linear-gradient(-45deg, transparent 75%, #444 75%);`
-    + `background-image: -o-linear-gradient(45deg, #444 25%, transparent 25%),
+        + `background-image: -o-linear-gradient(45deg, #444 25%, transparent 25%),
                          -o-linear-gradient(-45deg, #444 25%, transparent 25%),
                          -o-linear-gradient(45deg, transparent 75%, #444 75%),
                          -o-linear-gradient(-45deg, transparent 75%, #444 75%);`
-    + `background-image: linear-gradient(45deg, #444 25%, transparent 25%),
+        + `background-image: linear-gradient(45deg, #444 25%, transparent 25%),
                          linear-gradient(-45deg, #444 25%, transparent 25%),
                          linear-gradient(45deg, transparent 75%, #444 75%),
                          linear-gradient(-45deg, transparent 75%, #444 75%);`
-    + `-moz-background-size: 2px 2px;`
-    + `background-size: 2px 2px;`
-    + `-webkit-background-size: 2px 2px; /* override value for webkit */`
-    + `background-position: 0 0, 1px 0, 1px -1px, 0px 1px;`
-    + '}';
+        + `-moz-background-size: 2px 2px;`
+        + `background-size: 2px 2px;`
+        + `-webkit-background-size: 2px 2px; /* override value for webkit */`
+        + `background-position: 0 0, 1px 0, 1px -1px, 0px 1px;`
+        + '}';
 
     let empty_bat_before_after = '.empty-bat:before, .empty-bat:after {'
-    + 'position: absolute;'
-    + 'content: "";'
-    + 'background: black;'
-    + 'display: block;'
-    + 'width: 1px;'
-    + 'height: 25px;'
-    + '-webkit-transform: rotate(-45deg);'
-    + 'transform: rotate(-45deg);'
-    + 'left: 0;'
-    + 'right: 0;'
-    + 'top: 0;'
-    + 'bottom: 0;'
-    + 'margin: auto;'
-    + '}';
+        + 'position: absolute;'
+        + 'content: "";'
+        + 'background: black;'
+        + 'display: block;'
+        + 'width: 1px;'
+        + 'height: 25px;'
+        + '-webkit-transform: rotate(-45deg);'
+        + 'transform: rotate(-45deg);'
+        + 'left: 0;'
+        + 'right: 0;'
+        + 'top: 0;'
+        + 'bottom: 0;'
+        + 'margin: auto;'
+        + '}';
 
     let empty_bat_after = '.empty-bat:after {'
-    + '-webkit-transform: rotate(45deg);'
-    + 'transform: rotate(45deg);'
-    + '}';
+        + '-webkit-transform: rotate(45deg);'
+        + 'transform: rotate(45deg);'
+        + '}';
 
     let camping_spaced_label = '.spaced-label:after {'
-    + `content: '\\00a0:\\00a0'`
-    + '}';
+        + `content: '\\00a0:\\00a0'`
+        + '}';
 
     let citizen_list_more_info_content = '.content-center-vertical.center {'
-    + `justify-content: center;`
-    + `min-width: 18px;`
-    + `}`;
+        + `justify-content: center;`
+        + `min-width: 18px;`
+        + `}`;
 
     let citizen_list_more_info_header_content = '.header-center-vertical {'
-    + `text-align: center;`
-    + `padding-bottom: 4px;`
-    + `min-width: 18px;`
-    + `}`;
+        + `text-align: center;`
+        + `padding-bottom: 4px;`
+        + `min-width: 18px;`
+        + `}`;
 
 
     let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
-    + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
-    + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
-    + tabs_style + tabs_ul_style + tabs_ul_li_style + tabs_ul_li_spacing_style + tabs_ul_li_div_style + tabs_ul_li_div_hover_style + tabs_ul_li_selected_style
-    + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
-    + parameters_informations_style + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
-    + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style + label_text
-    + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + item_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
-    + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
-    + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
-    + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
-    + citizen_list_more_info_header_content;
+        + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
+        + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
+        + tabs_style + tabs_ul_style + tabs_ul_li_style + tabs_ul_li_spacing_style + tabs_ul_li_div_style + tabs_ul_li_div_hover_style + tabs_ul_li_selected_style
+        + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
+        + parameters_informations_style + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
+        + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style + label_text
+        + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + item_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
+        + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
+        + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
+        + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
+        + citizen_list_more_info_header_content;
 
     let style = document.createElement('style');
 
@@ -6265,34 +6285,34 @@ function getGHMap() {
             map
                 .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('caseCarte')))
                 .forEach((row) => {
-                let cells = [];
-                let y;
-                Array.from(row.children).forEach((cell, index) => {
-                    if (cell.classList.contains('fondNoir')) {
-                        y = cell.innerText;
-                    } else {
-                        let cell_parts = Array.from(cell.children);
+                    let cells = [];
+                    let y;
+                    Array.from(row.children).forEach((cell, index) => {
+                        if (cell.classList.contains('fondNoir')) {
+                            y = cell.innerText;
+                        } else {
+                            let cell_parts = Array.from(cell.children);
 
-                        let new_cell = {
-                            horizontal: y,
-                            vertical: x_mapping[index],
-                            town: cell.querySelector('.caseVille'),
-                            bat: cell.querySelector('.bat'),
-                            my_pos: cell.querySelector('.posJoueur'),
-                            expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& Array.from(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
-                            expedition_arrows: [],/*Array.from(cell_parts.find((cell_part) => cell_part.classList.contains('expeditionVille')).children).map((arrow) => getArrow(arrow)), */
-                            not_yet_visited: cell.querySelector('.zone-NonExplo'),
-                            not_visited_today: !cell.querySelector('.danger') && !cell.querySelector('.caseVille'),
-                            zombies: cell.querySelector('.danger') ? Array.from(cell.querySelector('.danger').classList).filter((class_name) => class_name.startsWith('zone-danger')).map((class_name) => class_name.replace('zone-danger', ''))[0] : undefined,
-                            empty: cell.querySelector('.epuise'),
-                            empty_bat: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-e',
-                            ruin: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-r',
-                        };
-                        cells.push(new_cell);
-                    }
+                            let new_cell = {
+                                horizontal: y,
+                                vertical: x_mapping[index],
+                                town: cell.querySelector('.caseVille'),
+                                bat: cell.querySelector('.bat'),
+                                my_pos: cell.querySelector('.posJoueur'),
+                                expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& Array.from(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
+                                expedition_arrows: [],/*Array.from(cell_parts.find((cell_part) => cell_part.classList.contains('expeditionVille')).children).map((arrow) => getArrow(arrow)), */
+                                not_yet_visited: cell.querySelector('.zone-NonExplo'),
+                                not_visited_today: !cell.querySelector('.danger') && !cell.querySelector('.caseVille'),
+                                zombies: cell.querySelector('.danger') ? Array.from(cell.querySelector('.danger').classList).filter((class_name) => class_name.startsWith('zone-danger')).map((class_name) => class_name.replace('zone-danger', ''))[0] : undefined,
+                                empty: cell.querySelector('.epuise'),
+                                empty_bat: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-e',
+                                ruin: cell.querySelector('.bat') && cell.querySelector('.bat').firstChild.href.baseVal.replace(/^(.*)#/, '') === 'bat-r',
+                            };
+                            cells.push(new_cell);
+                        }
+                    });
+                    new_map.push(cells);
                 });
-                new_map.push(cells);
-            });
             resolve({map: new_map, vertical_mapping: x_mapping});
             endLoading();
         });
@@ -6315,104 +6335,105 @@ function getGHRuin() {
                 rows
                     .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('caseCarteRuine')))
                     .forEach((row, row_index, rows_array) => {
-                    let new_cells = [];
-                    let cells = Array.from(row.children);
-                    let y;
-                    cells.forEach((cell, cell_index, cell_array) => {
-                        if (cell.classList.contains('bordCarteRuine')) {
-                            y = cell.innerText;
-                        } else {
+                        let new_cells = [];
+                        let cells = Array.from(row.children);
+                        let y;
+                        cells.forEach((cell, cell_index, cell_array) => {
+                            if (cell.classList.contains('bordCarteRuine')) {
+                                y = cell.innerText;
+                            } else {
 
-                            let cell_parts = Array.from(cell.children);
-                            let new_cell = {
-                                horizontal: y,
-                                vertical: x_mapping[cell_index],
-                                borders: '0000',
-                                zombies: cell.firstElementChild.getAttribute('data-z')
-                            };
+                                let cell_parts = Array.from(cell.children);
+                                let new_cell = {
+                                    horizontal: y,
+                                    vertical: x_mapping[cell_index],
+                                    borders: '0000',
+                                    zombies: cell.firstElementChild.getAttribute('data-z')
+                                };
 
-                            let img_path = cell.querySelector('.ruineCarte')?.firstElementChild.href.baseVal.replace(/^(.*)#/, '');
-                            switch (img_path) {
-                                case 'ruineCarte_0':
-                                    new_cell.borders = '0101';
-                                    break;
-                                case 'ruineCarte_1':
-                                    new_cell.borders = '1010';
-                                    break;
-                                case 'ruineCarte_2':
-                                    new_cell.borders = '1100';
-                                    break;
-                                case 'ruineCarte_3':
-                                    new_cell.borders = '0110';
-                                    break;
-                                case 'ruineCarte_4':
-                                    new_cell.borders = '1001';
-                                    break;
-                                case 'ruineCarte_5':
-                                    new_cell.borders = '0011';
-                                    break;
-                                case 'ruineCarte_6':
-                                    new_cell.borders = '1111';
-                                    break;
-                                case 'ruineCarte_7':
-                                    new_cell.borders = '0111';
-                                    break;
-                                case 'ruineCarte_8':
-                                    new_cell.borders = '1101';
-                                    break;
-                                case 'ruineCarte_9':
-                                    new_cell.borders = '1110';
-                                    break;
-                                case 'ruineCarte_10':
-                                    new_cell.borders = '1011';
-                                    break;
-                                case 'ruineCarte_11':
-                                    new_cell.borders = '1000';
-                                    break;
-                                case 'ruineCarte_12':
-                                    new_cell.borders = '0100';
-                                    break;
-                                case 'ruineCarte_13':
-                                    new_cell.borders = '0001';
-                                    break;
-                                case 'ruineCarte_14':
-                                    new_cell.borders = '0010';
-                                    break;
-                                case 'ruineCarte_15':
-                                    new_cell.borders = 'exit';
-                                    break;
-                                case 'ruineCarte_17':
-                                    new_cell.borders = '1010';
-                                    break;
-                                default:
-                                    new_cell.borders = '0000';
-                                    break;
-                            };
+                                let img_path = cell.querySelector('.ruineCarte')?.firstElementChild.href.baseVal.replace(/^(.*)#/, '');
+                                switch (img_path) {
+                                    case 'ruineCarte_0':
+                                        new_cell.borders = '0101';
+                                        break;
+                                    case 'ruineCarte_1':
+                                        new_cell.borders = '1010';
+                                        break;
+                                    case 'ruineCarte_2':
+                                        new_cell.borders = '1100';
+                                        break;
+                                    case 'ruineCarte_3':
+                                        new_cell.borders = '0110';
+                                        break;
+                                    case 'ruineCarte_4':
+                                        new_cell.borders = '1001';
+                                        break;
+                                    case 'ruineCarte_5':
+                                        new_cell.borders = '0011';
+                                        break;
+                                    case 'ruineCarte_6':
+                                        new_cell.borders = '1111';
+                                        break;
+                                    case 'ruineCarte_7':
+                                        new_cell.borders = '0111';
+                                        break;
+                                    case 'ruineCarte_8':
+                                        new_cell.borders = '1101';
+                                        break;
+                                    case 'ruineCarte_9':
+                                        new_cell.borders = '1110';
+                                        break;
+                                    case 'ruineCarte_10':
+                                        new_cell.borders = '1011';
+                                        break;
+                                    case 'ruineCarte_11':
+                                        new_cell.borders = '1000';
+                                        break;
+                                    case 'ruineCarte_12':
+                                        new_cell.borders = '0100';
+                                        break;
+                                    case 'ruineCarte_13':
+                                        new_cell.borders = '0001';
+                                        break;
+                                    case 'ruineCarte_14':
+                                        new_cell.borders = '0010';
+                                        break;
+                                    case 'ruineCarte_15':
+                                        new_cell.borders = 'exit';
+                                        break;
+                                    case 'ruineCarte_17':
+                                        new_cell.borders = '1010';
+                                        break;
+                                    default:
+                                        new_cell.borders = '0000';
+                                        break;
+                                }
+                                ;
 
-                            switch (cell.firstElementChild.getAttribute('data-porte')) {
-                                case 'pC':
-                                    new_cell.door = 'item_lock';
-                                    break;
-                                case 'p':
-                                    new_cell.door = 'item_door';
-                                    break;
-                                case 'pD':
-                                    new_cell.door = 'item_classicKey';
-                                    break;
-                                case 'pP':
-                                    new_cell.door = 'item_bumpKey';
-                                    break;
-                                case 'pM':
-                                    new_cell.door = 'item_magneticKey';
-                                    break;
-                                default:
-                                    break;
+                                switch (cell.firstElementChild.getAttribute('data-porte')) {
+                                    case 'pC':
+                                        new_cell.door = 'item_lock';
+                                        break;
+                                    case 'p':
+                                        new_cell.door = 'item_door';
+                                        break;
+                                    case 'pD':
+                                        new_cell.door = 'item_classicKey';
+                                        break;
+                                    case 'pP':
+                                        new_cell.door = 'item_bumpKey';
+                                        break;
+                                    case 'pM':
+                                        new_cell.door = 'item_magneticKey';
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                new_cells.push(new_cell);
                             }
-                            new_cells.push(new_cell);
-                        }
+                        });
+                        new_map.push(new_cells);
                     });
-                    new_map.push(new_cells);
-                });
                 resolve({map: new_map, vertical_mapping: x_mapping});
             }
         })
@@ -6430,7 +6451,7 @@ function getBBHMap() {
             method: 'GET',
             url: `https://bbh.fred26.fr/?cid=5-${mh_user.townDetails.townId}&pg=map`,
             responseType: 'document',
-            onload: function(response){
+            onload: function (response) {
                 if (response.status === 200) {
                     let new_map = [];
                     let map = response.response.querySelector('#carte');
@@ -6441,30 +6462,30 @@ function getBBHMap() {
                         if (map.querySelector('#cases')) {
                             Array.from(map.querySelector('#cases')?.querySelectorAll('tr') || [])
                                 .forEach((row, row_index) => {
-                                let cells = [];
-                                let y;
-                                Array.from(row.children).forEach((cell, cell_index) => {
-                                    let cell_parts = Array.from(cell.querySelector('.divs')?.children);
+                                    let cells = [];
+                                    let y;
+                                    Array.from(row.children).forEach((cell, cell_index) => {
+                                        let cell_parts = Array.from(cell.querySelector('.divs')?.children);
 
-                                    let new_cell = {
-                                        horizontal: map.querySelector('.lgd_l')?.firstElementChild.children[row_index].firstElementChild.innerText,
-                                        vertical: x_mapping[cell_index],
-                                        town: cell.querySelector('.door'),
-                                        bat: cell.querySelector('.bat'),
-                                        my_pos: cell.querySelector('.me'),
-                                        expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& Array.from(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
-                                        expedition_arrows: [],
-                                        not_yet_visited: cell.querySelector('.nv'),
-                                        not_visited_today: cell.querySelector('.nvt'),
-                                        zombies: cell.querySelector('.zombies') ? Array.from(cell.querySelector('.zombies').classList).find((class_name) => class_name.startsWith('z_dng_')).replace('z_dng_', '') : undefined,
-                                        empty: cell.querySelector('.praf'),
-                                        empty_bat: cell.querySelector('.mark1'),
-                                        ruin: cell.querySelector('.tag_11')
-                                    };
-                                    cells.push(new_cell);
+                                        let new_cell = {
+                                            horizontal: map.querySelector('.lgd_l')?.firstElementChild.children[row_index].firstElementChild.innerText,
+                                            vertical: x_mapping[cell_index],
+                                            town: cell.querySelector('.door'),
+                                            bat: cell.querySelector('.bat'),
+                                            my_pos: cell.querySelector('.me'),
+                                            expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& Array.from(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
+                                            expedition_arrows: [],
+                                            not_yet_visited: cell.querySelector('.nv'),
+                                            not_visited_today: cell.querySelector('.nvt'),
+                                            zombies: cell.querySelector('.zombies') ? Array.from(cell.querySelector('.zombies').classList).find((class_name) => class_name.startsWith('z_')).replace('z_', '') : undefined,
+                                            empty: cell.querySelector('.praf'),
+                                            empty_bat: cell.querySelector('.mark1'),
+                                            ruin: cell.querySelector('.tag_11')
+                                        };
+                                        cells.push(new_cell);
+                                    });
+                                    new_map.push(cells);
                                 });
-                                new_map.push(cells);
-                            });
                             resolve({map: new_map, vertical_mapping: x_mapping});
                         }
                     }
@@ -6475,7 +6496,7 @@ function getBBHMap() {
                 }
                 endLoading();
             },
-            onerror: function(error){
+            onerror: function (error) {
                 endLoading();
                 addError(error);
                 reject(error);
@@ -6500,113 +6521,114 @@ function getBBHRuin() {
                 rows
                     .filter((row) => Array.from(row.children).some((cell) => cell.querySelector('.divs')))
                     .forEach((row, row_index, rows_array) => {
-                    let new_cells = [];
-                    let cells = Array.from(row.children);
-                    let y;
-                    cells.forEach((cell, cell_index, cell_array) => {
-                        if (!cell.querySelector('.divs')) {
-                            y = cell.innerText;
-                        } else {
+                        let new_cells = [];
+                        let cells = Array.from(row.children);
+                        let y;
+                        cells.forEach((cell, cell_index, cell_array) => {
+                            if (!cell.querySelector('.divs')) {
+                                y = cell.innerText;
+                            } else {
 
-                            let cell_parts = Array.from(cell.firstElementChild.children);
+                                let cell_parts = Array.from(cell.firstElementChild.children);
 
-                            let div_zombies = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('z')))
-                            let zombies = div_zombies ? Array.from(div_zombies.classList).find(() => (class_name) => class_name.startsWith('z')) : undefined;
+                                let div_zombies = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('z')))
+                                let zombies = div_zombies ? Array.from(div_zombies.classList).find(() => (class_name) => class_name.startsWith('z')) : undefined;
 
-                            let new_cell = {
-                                horizontal: y,
-                                vertical: x_mapping[cell_index],
-                                borders: '0000',
-                                zombies: zombies ? zombies[1] : ''
-                            };
+                                let new_cell = {
+                                    horizontal: y,
+                                    vertical: x_mapping[cell_index],
+                                    borders: '0000',
+                                    zombies: zombies ? zombies[1] : ''
+                                };
 
-                            let div_path = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('m')))
-                            let img_path = div_path ? Array.from(div_path.classList).find(() => (class_name) => class_name.startsWith('m')) : undefined;
-                            switch (img_path) {
-                                case 'm1':
-                                    new_cell.borders = 'exit';
-                                    break;
-                                case 'm2':
-                                    new_cell.borders = '0000';
-                                    break;
-                                case 'm11':
-                                    new_cell.borders = '0101';
-                                    break;
-                                case 'm12':
-                                    new_cell.borders = '1010';
-                                    break;
-                                case 'm13':
-                                    new_cell.borders = '1111';
-                                    break;
-                                case 'm21':
-                                    new_cell.borders = '0111';
-                                    break;
-                                case 'm22':
-                                    new_cell.borders = '1110';
-                                    break;
-                                case 'm23':
-                                    new_cell.borders = '1101';
-                                    break;
-                                case 'm24':
-                                    new_cell.borders = '1011';
-                                    break;
-                                case 'm31':
-                                    new_cell.borders = '0110';
-                                    break;
-                                case 'm32':
-                                    new_cell.borders = '1100';
-                                    break;
-                                case 'm33':
-                                    new_cell.borders = '0011';
-                                    break;
-                                case 'm34':
-                                    new_cell.borders = '1001';
-                                    break;
-                                case 'm41':
-                                    new_cell.borders = '0100';
-                                    break;
-                                case 'm42':
-                                    new_cell.borders = '1000';
-                                    break;
-                                case 'm43':
-                                    new_cell.borders = '0001';
-                                    break;
-                                case 'm44':
-                                    new_cell.borders = '0010';
-                                    break
-                                default:
-                                    new_cell.borders = '0000';
-                                    break;
-                            };
-
-                            let div_door = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('p')))
-                            let img_door = div_door ? Array.from(div_door.classList).find(() => (class_name) => class_name.startsWith('p')) : undefined;
-                            if (img_door) {
-                                switch (img_door) {
-                                    case 'p2':
-                                        new_cell.door = 'item_lock';
+                                let div_path = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('m')))
+                                let img_path = div_path ? Array.from(div_path.classList).find(() => (class_name) => class_name.startsWith('m')) : undefined;
+                                switch (img_path) {
+                                    case 'm1':
+                                        new_cell.borders = 'exit';
                                         break;
-                                    case 'p1':
-                                        new_cell.door = 'item_door';
+                                    case 'm2':
+                                        new_cell.borders = '0000';
                                         break;
-                                    case 'p5':
-                                        new_cell.door = 'item_classicKey';
+                                    case 'm11':
+                                        new_cell.borders = '0101';
                                         break;
-                                    case 'p4':
-                                        new_cell.door = 'item_bumpKey';
+                                    case 'm12':
+                                        new_cell.borders = '1010';
                                         break;
-                                    case 'p3':
-                                        new_cell.door = 'item_magneticKey';
+                                    case 'm13':
+                                        new_cell.borders = '1111';
                                         break;
+                                    case 'm21':
+                                        new_cell.borders = '0111';
+                                        break;
+                                    case 'm22':
+                                        new_cell.borders = '1110';
+                                        break;
+                                    case 'm23':
+                                        new_cell.borders = '1101';
+                                        break;
+                                    case 'm24':
+                                        new_cell.borders = '1011';
+                                        break;
+                                    case 'm31':
+                                        new_cell.borders = '0110';
+                                        break;
+                                    case 'm32':
+                                        new_cell.borders = '1100';
+                                        break;
+                                    case 'm33':
+                                        new_cell.borders = '0011';
+                                        break;
+                                    case 'm34':
+                                        new_cell.borders = '1001';
+                                        break;
+                                    case 'm41':
+                                        new_cell.borders = '0100';
+                                        break;
+                                    case 'm42':
+                                        new_cell.borders = '1000';
+                                        break;
+                                    case 'm43':
+                                        new_cell.borders = '0001';
+                                        break;
+                                    case 'm44':
+                                        new_cell.borders = '0010';
+                                        break
                                     default:
+                                        new_cell.borders = '0000';
                                         break;
                                 }
+                                ;
+
+                                let div_door = cell_parts.find((cell_part) => Array.from(cell_part.classList).some((class_name) => class_name.startsWith('p')))
+                                let img_door = div_door ? Array.from(div_door.classList).find(() => (class_name) => class_name.startsWith('p')) : undefined;
+                                if (img_door) {
+                                    switch (img_door) {
+                                        case 'p2':
+                                            new_cell.door = 'item_lock';
+                                            break;
+                                        case 'p1':
+                                            new_cell.door = 'item_door';
+                                            break;
+                                        case 'p5':
+                                            new_cell.door = 'item_classicKey';
+                                            break;
+                                        case 'p4':
+                                            new_cell.door = 'item_bumpKey';
+                                            break;
+                                        case 'p3':
+                                            new_cell.door = 'item_magneticKey';
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                new_cells.push(new_cell);
                             }
-                            new_cells.push(new_cell);
-                        }
+                        });
+                        new_map.push(new_cells);
                     });
-                    new_map.push(new_cells);
-                });
                 resolve({map: new_map, vertical_mapping: x_mapping});
             }
         })
@@ -6631,34 +6653,34 @@ function getFMMap() {
             map
                 .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
                 .forEach((row) => {
-                let cells = [];
-                let y;
-                Array.from(row.children).forEach((cell, index) => {
-                    if (cell.classList.contains('mapruler')) {
-                        y = cell.innerText;
-                    } else {
-                        let cell_parts = Array.from(cell.children);
+                    let cells = [];
+                    let y;
+                    Array.from(row.children).forEach((cell, index) => {
+                        if (cell.classList.contains('mapruler')) {
+                            y = cell.innerText;
+                        } else {
+                            let cell_parts = Array.from(cell.children);
 
-                        let new_cell = {
-                            horizontal: y,
-                            vertical: x_mapping[index],
-                            town: cell.classList.contains('city'),
-                            bat: cell_parts.some((cell_part) => cell_part.classList.contains('building')),
-                            my_pos: cell_parts.some((cell_part) => cell_part.classList.contains('posJoueur')),
-                            expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('route-counter')),
-                            expedition_arrows: [],
-                            not_yet_visited: cell.classList.contains('nyv'),
-                            not_visited_today: cell.classList.contains('nvt'),
-                            zombies: Array.from(cell.classList).filter((class_name) => class_name.startsWith('danger')).map((class_name) => class_name.replace('danger', ''))[0],
-                            empty: !cell.querySelector('.zone-status-full'),
-                            empty_bat: cell.querySelector('.depleted-building'),
-                            ruin: cell.querySelector('.explorable-building'),
-                        };
-                        cells.push(new_cell);
-                    }
+                            let new_cell = {
+                                horizontal: y,
+                                vertical: x_mapping[index],
+                                town: cell.classList.contains('city'),
+                                bat: cell_parts.some((cell_part) => cell_part.classList.contains('building')),
+                                my_pos: cell_parts.some((cell_part) => cell_part.classList.contains('posJoueur')),
+                                expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('route-counter')),
+                                expedition_arrows: [],
+                                not_yet_visited: cell.classList.contains('nyv'),
+                                not_visited_today: cell.classList.contains('nvt'),
+                                zombies: Array.from(cell.classList).filter((class_name) => class_name.startsWith('danger')).map((class_name) => class_name.replace('danger', ''))[0],
+                                empty: !cell.querySelector('.zone-status-full'),
+                                empty_bat: cell.querySelector('.depleted-building'),
+                                ruin: cell.querySelector('.explorable-building'),
+                            };
+                            cells.push(new_cell);
+                        }
+                    });
+                    new_map.push(cells);
                 });
-                new_map.push(cells);
-            });
             resolve({map: new_map, vertical_mapping: x_mapping});
             endLoading();
         });
@@ -6680,93 +6702,94 @@ function getFMRuin() {
                 rows
                     .filter((row) => Array.from(row.children).some((cell) => cell.classList.contains('mapzone')))
                     .forEach((row, row_index, rows_array) => {
-                    let new_cells = [];
-                    let cells = Array.from(row.children);
-                    let y;
-                    cells.forEach((cell, cell_index, cell_array) => {
-                        if (cell.classList.contains('mapruler')) {
-                            y = cell.innerText;
-                        } else {
-                            let new_cell = {
-                                horizontal: y,
-                                vertical: x_mapping[cell_index],
-                                borders: '0000',
-                                zombies: cell.getAttribute('z')
-                            };
+                        let new_cells = [];
+                        let cells = Array.from(row.children);
+                        let y;
+                        cells.forEach((cell, cell_index, cell_array) => {
+                            if (cell.classList.contains('mapruler')) {
+                                y = cell.innerText;
+                            } else {
+                                let new_cell = {
+                                    horizontal: y,
+                                    vertical: x_mapping[cell_index],
+                                    borders: '0000',
+                                    zombies: cell.getAttribute('z')
+                                };
 
-                            let img = Array.from(cell.classList).find((class_name) => class_name.startsWith('tile-'));
-                            switch (img) {
-                                case 'tile-1':
-                                    new_cell.borders = '0100';
-                                    break;
-                                case 'tile-2':
-                                    new_cell.borders = '0010';
-                                    break;
-                                case 'tile-3':
-                                    new_cell.borders = '0001';
-                                    break;
-                                case 'tile-4':
-                                    new_cell.borders = '1000';
-                                    break;
-                                case 'tile-5':
-                                    if (cell.classList.contains('ruinEntry')) {
-                                        new_cell.borders = 'exit';
-                                    } else {
-                                        new_cell.borders = '0101';
-                                    }
-                                    break;
-                                case 'tile-6':
-                                    new_cell.borders = '1010';
-                                    break;
-                                case 'tile-7':
-                                    new_cell.borders = '1111';
-                                    break;
-                                case 'tile-8':
-                                    new_cell.borders = '0110';
-                                    break;
-                                case 'tile-9':
-                                    new_cell.borders = '0011';
-                                    break;
-                                case 'tile-10':
-                                    new_cell.borders = '1001';
-                                    break;
-                                case 'tile-11':
-                                    new_cell.borders = '1100';
-                                    break;
-                                case 'tile-12':
-                                    new_cell.borders = '1110';
-                                    break;
-                                case 'tile-13':
-                                    new_cell.borders = '0111';
-                                    break;
-                                case 'tile-14':
-                                    new_cell.borders = '1011';
-                                    break;
-                                case 'tile-15':
-                                    new_cell.borders = '1101';
-                                    break;
-                                case 'tile-0':
-                                default:
-                                    new_cell.borders = '0000';
-                                    break;
-                            };
+                                let img = Array.from(cell.classList).find((class_name) => class_name.startsWith('tile-'));
+                                switch (img) {
+                                    case 'tile-1':
+                                        new_cell.borders = '0100';
+                                        break;
+                                    case 'tile-2':
+                                        new_cell.borders = '0010';
+                                        break;
+                                    case 'tile-3':
+                                        new_cell.borders = '0001';
+                                        break;
+                                    case 'tile-4':
+                                        new_cell.borders = '1000';
+                                        break;
+                                    case 'tile-5':
+                                        if (cell.classList.contains('ruinEntry')) {
+                                            new_cell.borders = 'exit';
+                                        } else {
+                                            new_cell.borders = '0101';
+                                        }
+                                        break;
+                                    case 'tile-6':
+                                        new_cell.borders = '1010';
+                                        break;
+                                    case 'tile-7':
+                                        new_cell.borders = '1111';
+                                        break;
+                                    case 'tile-8':
+                                        new_cell.borders = '0110';
+                                        break;
+                                    case 'tile-9':
+                                        new_cell.borders = '0011';
+                                        break;
+                                    case 'tile-10':
+                                        new_cell.borders = '1001';
+                                        break;
+                                    case 'tile-11':
+                                        new_cell.borders = '1100';
+                                        break;
+                                    case 'tile-12':
+                                        new_cell.borders = '1110';
+                                        break;
+                                    case 'tile-13':
+                                        new_cell.borders = '0111';
+                                        break;
+                                    case 'tile-14':
+                                        new_cell.borders = '1011';
+                                        break;
+                                    case 'tile-15':
+                                        new_cell.borders = '1101';
+                                        break;
+                                    case 'tile-0':
+                                    default:
+                                        new_cell.borders = '0000';
+                                        break;
+                                }
+                                ;
 
-                            if (cell.classList.contains('doorlock-1')) {
-                                new_cell.door = 'item_lock';
-                            } else if (cell.classList.contains('doorlock-2')) {
-                                new_cell.door = 'item_door';
-                            } else if (cell.classList.contains('doorlock-3')) {
-                                new_cell.door = 'item_classicKey';
-                            } else if (cell.classList.contains('doorlock-4')) {
-                                new_cell.door = 'item_bumpKey';
-                            } else if (cell.classList.contains('doorlock-5')) {
-                                new_cell.door = 'item_magneticKey';
+                                if (cell.classList.contains('doorlock-1')) {
+                                    new_cell.door = 'item_lock';
+                                } else if (cell.classList.contains('doorlock-2')) {
+                                    new_cell.door = 'item_door';
+                                } else if (cell.classList.contains('doorlock-3')) {
+                                    new_cell.door = 'item_classicKey';
+                                } else if (cell.classList.contains('doorlock-4')) {
+                                    new_cell.door = 'item_bumpKey';
+                                } else if (cell.classList.contains('doorlock-5')) {
+                                    new_cell.door = 'item_magneticKey';
+                                }
+                                new_cells.push(new_cell);
                             }
-                            new_cells.push(new_cell);
-                        }
+                        });
+                        new_map.push(new_cells);
                     });
-                    new_map.push(new_cells);
-                });
                 resolve({map: new_map, vertical_mapping: x_mapping});
             }
         })
@@ -6784,19 +6807,19 @@ function getItems() {
             method: 'GET',
             url: api_url + '/myhordesfetcher/items' + (mh_user && mh_user.townDetails ? ('?townId=' + mh_user.townDetails.townId) : ''),
             responseType: 'json',
-            onload: function(response){
+            onload: function (response) {
                 if (response.status === 200) {
                     items = response.response
                         .sort((item_a, item_b) => {
-                        if (item_a.category.ordering > item_b.category.ordering) {
-                            return 1;
-                        } else if (item_a.category.ordering === item_b.category.ordering) {
-                            return 0;
-                        } else {
-                            return -1;
-                        }
-                    })
-                    .filter((item) => is_mh_beta ? true : +item.id !== 302);
+                            if (item_a.category.ordering > item_b.category.ordering) {
+                                return 1;
+                            } else if (item_a.category.ordering === item_b.category.ordering) {
+                                return 0;
+                            } else {
+                                return -1;
+                            }
+                        })
+                        .filter((item) => is_mh_beta ? true : +item.id !== 302);
                     let wiki_btn = document.getElementById(wiki_btn_id);
                     if (wiki_btn) {
                         wiki_btn.setAttribute('style', 'display: inherit');
@@ -6807,7 +6830,7 @@ function getItems() {
                     reject(response);
                 }
             },
-            onerror: function(error){
+            onerror: function (error) {
                 endLoading();
                 addError(error);
                 reject(error);
@@ -6824,11 +6847,15 @@ function getRuins() {
                 method: 'GET',
                 url: api_url + '/myhordesfetcher/ruins?userKey=' + external_app_id,
                 responseType: 'json',
-                onload: function(response){
+                onload: function (response) {
                     if (response.status === 200) {
                         ruins = response.response.sort((a, b) => {
-                            if(getI18N(a.label) < getI18N(b.label)) { return -1; }
-                            if(getI18N(a.label) > getI18N(b.label)) { return 1; }
+                            if (getI18N(a.label) < getI18N(b.label)) {
+                                return -1;
+                            }
+                            if (getI18N(a.label) > getI18N(b.label)) {
+                                return 1;
+                            }
                             return 0;
                         });
                         resolve(ruins);
@@ -6838,7 +6865,7 @@ function getRuins() {
                     }
                     endLoading();
                 },
-                onerror: function(error){
+                onerror: function (error) {
                     endLoading();
                     addError(error);
                     reject(error);
@@ -6860,7 +6887,7 @@ function getMe() {
                 method: 'GET',
                 url: api_url + '/myhordesfetcher/me?userKey=' + external_app_id,
                 responseType: 'json',
-                onload: function(response){
+                onload: function (response) {
                     if (response.status === 200) {
                         mh_user = response.response;
                         if (!mh_user || mh_user.id === 0 && mh_user.townDetails.townId === 0) {
@@ -6881,7 +6908,7 @@ function getMe() {
                         reject(response);
                     }
                 },
-                onerror: function(error){
+                onerror: function (error) {
                     addError(error);
                     reject(error);
                 }
@@ -6901,7 +6928,7 @@ function getCitizens() {
                 method: 'GET',
                 url: api_url + `/myhordesfetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails.townId}`,
                 responseType: 'json',
-                onload: function(response){
+                onload: function (response) {
                     if (response.status === 200) {
                         citizens = response.response;
                         citizens.citizens = Object.keys(citizens.citizens).map((key) => citizens.citizens[key])
@@ -6912,7 +6939,7 @@ function getCitizens() {
                     }
                     endLoading();
                 },
-                onerror: function(error){
+                onerror: function (error) {
                     endLoading();
                     addError(error);
                     reject(error);
@@ -6928,38 +6955,38 @@ function getBank() {
         startLoading();
         fetch(api_url + '/myhordesfetcher/bank?userKey=' + external_app_id)
             .then((response) => {
-            if (response.status === 200) {
+                if (response.status === 200) {
 
-                endLoading();
-                return response.json();
-            } else {
-                addError(response);
-                reject(response);
-                endLoading();
-            }
-        })
-        .then((response) => {
-            let bank = [];
-            response.bank.forEach((bank_item) => {
-                bank_item.item.broken = bank_item.isBroken;
-                bank.push(bank_item.item);
-            });
-            bank = bank.sort((item_a, item_b) => {
-                if (item_a.category.ordering > item_b.category.ordering) {
-                    return 1;
-                } else if (item_a.category.ordering === item_b.category.ordering) {
-                    return 0;
+                    endLoading();
+                    return response.json();
                 } else {
-                    return -1;
+                    addError(response);
+                    reject(response);
+                    endLoading();
                 }
-            });
-            resolve(bank);
-        })
+            })
+            .then((response) => {
+                let bank = [];
+                response.bank.forEach((bank_item) => {
+                    bank_item.item.broken = bank_item.isBroken;
+                    bank.push(bank_item.item);
+                });
+                bank = bank.sort((item_a, item_b) => {
+                    if (item_a.category.ordering > item_b.category.ordering) {
+                        return 1;
+                    } else if (item_a.category.ordering === item_b.category.ordering) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                });
+                resolve(bank);
+            })
             .catch((error) => {
-            endLoading();
-            addError(error);
-            reject(error);
-        });
+                endLoading();
+                addError(error);
+                reject(error);
+            });
     });
 }
 
@@ -6968,40 +6995,54 @@ function getWishlist() {
     return new Promise((resolve, reject) => {
         fetch(api_url + '/wishlist?townId=' + mh_user.townDetails.townId)
             .then((response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                wishlist = undefined;
-                addError(response);
-                reject(response);
-            }
-        })
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    wishlist = undefined;
+                    addError(response);
+                    reject(response);
+                }
+            })
             .then((response) => {
-            for (let key in response.wishList) {
-                let wishlist_zone = response.wishList[key];
-                wishlist_zone = Object.keys(wishlist_zone)
-                    .map((item_key) => wishlist_zone[item_key])
-                    .sort((item_a, item_b) => item_b.priority > item_a.priority);
-                wishlist_zone.forEach((item) => {
-                    item.item.img = item.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
-                });
-                response.wishList[key] = wishlist_zone;
-            }
-            wishlist = response;
-            resolve(wishlist);
-        })
+                for (let key in response.wishList) {
+                    let wishlist_zone = response.wishList[key];
+                    wishlist_zone = Object.keys(wishlist_zone)
+                        .map((item_key) => wishlist_zone[item_key])
+                        .map((item) => {
+                            if (item.priority < 0) {
+                                item.priority_main = -1;
+                            } else if (item.priority < 1000) {
+                                item.priority_main = 0;
+                            } else if (item.priority < 2000) {
+                                item.priority_main = 1;
+                            } else if (item.priority < 3000) {
+                                item.priority_main = 2;
+                            } else {
+                                item.priority_main = 3;
+                            }
+                            return item;
+                        })
+                        .sort((item_a, item_b) => item_b.priority > item_a.priority);
+                    wishlist_zone.forEach((item) => {
+                        item.item.img = item.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
+                    });
+                    response.wishList[key] = wishlist_zone;
+                }
+                wishlist = response;
+                resolve(wishlist);
+            })
             .catch((error) => {
-            wishlist = undefined;
-            addError(error);
-            reject(error);
-        });
+                wishlist = undefined;
+                addError(error);
+                reject(error);
+            });
     });
 }
 
 /**
-  * Ajoute un élément à la wishlist
-  * @param item l'élément à ajouter à la wishlist
-  */
+ * Ajoute un élément à la wishlist
+ * @param item l'élément à ajouter à la wishlist
+ */
 function addItemToWishlist(item) {
     return new Promise((resolve, reject) => {
         startLoading();
@@ -7009,7 +7050,7 @@ function addItemToWishlist(item) {
             method: 'POST',
             url: api_url + '/wishlist/add/' + item.id + '?userId=' + mh_user.id + '&townId=' + mh_user.townDetails.townId,
             responseType: 'json',
-            onload: function(response){
+            onload: function (response) {
                 if (response.status === 200) {
                     item.wishListCount = 1;
                     resolve(item);
@@ -7020,7 +7061,7 @@ function addItemToWishlist(item) {
                 }
                 endLoading();
             },
-            onerror: function(error){
+            onerror: function (error) {
                 endLoading();
                 addError(error);
                 reject(error);
@@ -7072,11 +7113,16 @@ function updateExternalTools() {
 
         let position = getCurrentPosition();
         let citizen_list = Array.from(document.querySelectorAll('.citizen-box .username[x-user-id]') || [])?.map((citizen_box) => {
-            return { id: +citizen_box.getAttribute('x-user-id'), userName: citizen_box.innerText, job: citizen_box.parentElement.parentElement.querySelector('img[src*=professions').src.replace(/.*professions\/(\w+).*/, '$1'), row: citizen_box }
+            return {
+                id: +citizen_box.getAttribute('x-user-id'),
+                userName: citizen_box.innerText,
+                job: citizen_box.parentElement.parentElement.querySelector('img[src*=professions]').src.replace(/.*professions\/(\w+).*/, '$1'),
+                row: citizen_box
+            }
         });
 
         if (!citizen_list || citizen_list.length === 0) {
-            citizen_list = [ { id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid } ];
+            citizen_list = [{id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid}];
         }
 
         if ((mho_parameters.update_gh_without_api || mho_parameters.update_mho) && pageIsDesert()) {
@@ -7161,7 +7207,7 @@ function updateExternalTools() {
 
 
         /** Récupération des pouvoirs héroïques */
-        if ((mho_parameters.update_gh && mho_parameters.update_gh_ah) || (mho_parameters.update_mho &&mho_parameters.update_mho_actions)) {
+        if ((mho_parameters.update_gh && mho_parameters.update_gh_ah) || (mho_parameters.update_mho && mho_parameters.update_mho_actions)) {
 
             let no_interaction = document.querySelector('.no-interaction');
 
@@ -7236,8 +7282,13 @@ function updateExternalTools() {
             if (amelios && amelios.length > 0) {
                 amelios.forEach((amelio) => {
                     let amelio_img = amelio.querySelector('img');
-                    let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
-                    data.amelios.values[amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1')] = amelio_value ? +amelio_value[0] : 0;
+                    let name = amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1');
+                    if (name !== 'fence') {
+                        let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
+                        data.amelios.values[name] = amelio_value ? +amelio_value[0] : 0;
+                    } else {
+                        data.amelios.values[name] = !amelio.querySelector('button[x-upgrade-id]') ? 1 : 0;
+                    }
                 });
             }
             let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt;
@@ -7258,12 +7309,12 @@ function updateExternalTools() {
             if (statuses && statuses.length > 0) {
                 statuses
                     .filter((status) => {
-                    let status_name = status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1');
-                    return status.src.indexOf('/status') > -1 && status_name !== 'ghoul' && status_name !== 'unknown';
-                })
+                        let status_name = status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1');
+                        return status.src.indexOf('/status') > -1 && status_name !== 'ghoul' && status_name !== 'unknown';
+                    })
                     .forEach((status) => {
-                    data.status.values.push(status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1'));
-                });
+                        data.status.values.push(status.src.replace(/.*\/status\/status_(.*)\..*\..*/, '$1'));
+                    });
             }
         }
 
@@ -7283,7 +7334,7 @@ function updateExternalTools() {
                 isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_digs
             };
 
-            let logs = await getDesertLogs();
+            let logs = Array.from(document.querySelectorAll('div.log-entry'));
             let arrivals_texts = {
                 de: `angekommen`,
                 en: `has arrived from the`,
@@ -7302,57 +7353,56 @@ function updateExternalTools() {
 
             citizen_list
                 .filter((citizen) => { // On ne garde que les citoyens actuellement en train de fouiller
-                let is_digging = false;
-                if (citizen.id === mh_user.id) { // Il s'agit de l'utilisateur qui a cliqué sur le bouton
-                    is_digging = document.querySelector('#mgd-digging-note [x-countdown]') ? true : false
-                } else { // Les autres
-                    is_digging = citizen.row.parentElement.parentElement.parentElement.querySelector('li.status img[src*=small_gather]') ? true : false;
-                }
-                return is_digging;
-            })
+                    let is_digging = false;
+                    if (citizen.id === mh_user.id) { // Il s'agit de l'utilisateur qui a cliqué sur le bouton
+                        is_digging = document.querySelector('#mgd-digging-note [x-countdown]') ? true : false
+                    } else { // Les autres
+                        is_digging = citizen.row.parentElement.parentElement.parentElement.querySelector('li.status img[src*=small_gather]') ? true : false;
+                    }
+                    return is_digging;
+                })
                 .forEach((citizen) => {
 
-                let failed_texts = {
-                    de: `durch Graben nichts gefunden...`,
-                    en: `found nothing during their last search...`,
-                    es: `no encontró nada...`,
-                    fr: `rien trouvé...`
-                };
-                let failed_digs = Array.from(logs.filter((log) => log.innerText.toLowerCase().indexOf(getI18N(failed_texts).toLowerCase()) > -1) || []).filter((log) =>log.innerText.indexOf(citizen.userName) > -1) || [];
-                let nb_failed_digs = failed_digs.length;
+                    let failed_texts = {
+                        de: `durch Graben nichts gefunden...`,
+                        en: `found nothing during their last search...`,
+                        es: `no encontró nada...`,
+                        fr: `rien trouvé...`
+                    };
+                    let failed_digs = Array.from(logs.filter((log) => log.innerText.toLowerCase().indexOf(getI18N(failed_texts).toLowerCase()) > -1) || []).filter((log) => log.innerText.indexOf(citizen.userName) > -1) || [];
+                    let nb_failed_digs = failed_digs.length;
 
-                let nb_minutes_for_dig = citizen.job === 'dig' ? 90 : 120; // Une fouille = 2h = 120 minutes pour un tous les métiers, ou 1h30 = 90 minutes pour une pelle
+                    let nb_minutes_for_dig = citizen.job === 'dig' ? 90 : 120; // Une fouille = 2h = 120 minutes pour un tous les métiers, ou 1h30 = 90 minutes pour une pelle
 
-                let citizen_arrivals = arrivals.filter((arrival) => arrival.citizen === citizen.userName); // Les heures d'arrivées du citoyen sur la case
+                    let citizen_arrivals = arrivals.filter((arrival) => arrival.citizen === citizen.userName); // Les heures d'arrivées du citoyen sur la case
 
-                let citizen_last_arrival = citizen_arrivals[0]?.time;
-                let start_date;
+                    let citizen_last_arrival = citizen_arrivals[0]?.time;
+                    let start_date;
 
-                if (citizen_last_arrival) { // Si le citoyen a une heure d'arrivée alors on se base sur cette heure comme heure de début de fouilles
-                    start_date = citizen_last_arrival;
-                } else { // Sinon, on se base sur le cooldown
-                    start_date = nb_failed_digs === 0 ? null : failed_digs[failed_digs.length - 1].querySelector('.log-part-time').innerText;
-                }
+                    if (citizen_last_arrival) { // Si le citoyen a une heure d'arrivée alors on se base sur cette heure comme heure de début de fouilles
+                        start_date = citizen_last_arrival;
+                    } else { // Sinon, on se base sur le cooldown
+                        start_date = nb_failed_digs === 0 ? null : failed_digs[failed_digs.length - 1].querySelector('.log-part-time').innerText;
+                    }
 
-                let nb_digs;
-                if (start_date) {
-                    let now_minutes = (+now.split(':')[0]*60) + (+now.split(':')[1]);
-                    let start_date_minutes = (+start_date.split(':')[0]*60) + (+start_date.split(':')[1]);
+                    let nb_digs;
+                    if (start_date) {
+                        let now_minutes = (+now.split(':')[0] * 60) + (+now.split(':')[1]);
+                        let start_date_minutes = (+start_date.split(':')[0] * 60) + (+start_date.split(':')[1]);
 
-                    let nb_minutes_digging = now_minutes - start_date_minutes; // Le nombre total de minutes passées à fouiller
-                    nb_digs = Math.floor(nb_minutes_digging / nb_minutes_for_dig) + 1;
+                        let nb_minutes_digging = now_minutes - start_date_minutes; // Le nombre total de minutes passées à fouiller
+                        nb_digs = Math.floor(nb_minutes_digging / nb_minutes_for_dig) + 1;
 
-                } else {
-                    nb_digs = 1;
-                }
-                data.successedDig.values.push({
-                    citizenId: citizen.id,
-                    successDigs: nb_digs - nb_failed_digs,
-                    totalDigs: nb_digs
-                })
-            });
+                    } else {
+                        nb_digs = 1;
+                    }
+                    data.successedDig.values.push({
+                        citizenId: citizen.id,
+                        successDigs: nb_digs - nb_failed_digs,
+                        totalDigs: nb_digs
+                    })
+                });
         }
-
 
 
         console.log('Voici ce que j\'envoie :', data);
@@ -7365,20 +7415,24 @@ function updateExternalTools() {
                 'Content-Type': 'application/json'
             },
             responseType: 'json',
-            onload: function(response){
+            onload: function (response) {
                 if (response.status === 200) {
                     if (response.response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_bbh_updated_key, true);
                     if (response.response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
                     if (response.response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
 
                     let tools_fail = [];
-                    let response_items = Object.keys(response.response).map((key) => {return {key: key, value: response.response[key]}});
+                    let response_items = Object.keys(response.response).map((key) => {
+                        return {key: key, value: response.response[key]}
+                    });
                     response_items.forEach((response_item, index) => {
-                        let final = Object.keys(response_item.value).map((key) => {return {key: key, value: response_item.value[key]}});
+                        let final = Object.keys(response_item.value).map((key) => {
+                            return {key: key, value: response_item.value[key]}
+                        });
                         tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
                         if (index >= response_items.length - 1) {
                             btn.innerHTML = tools_fail.length === 0 ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
-                            : `<img src ="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ' : KO')).join('<br>')}`;
+                                : `<img src ="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ` : ${item.value}`)).join('<br>')}`;
                         }
                     });
                     if (tools_fail.length > 0) {
@@ -7392,7 +7446,7 @@ function updateExternalTools() {
                 }
                 endLoading();
             },
-            onerror: function(error){
+            onerror: function (error) {
                 endLoading();
                 addError(error);
             }
@@ -7409,7 +7463,7 @@ function getHeroSkills() {
                 method: 'GET',
                 url: api_url + '/myhordesfetcher/heroSkills',
                 responseType: 'json',
-                onload: function(response){
+                onload: function (response) {
                     if (response.status === 200) {
                         hero_skills = response.response.sort((a, b) => {
                             if (a.daysNeeded > b.daysNeeded) {
@@ -7427,7 +7481,7 @@ function getHeroSkills() {
                     }
                     endLoading();
                 },
-                onerror: function(error){
+                onerror: function (error) {
                     endLoading();
                     addError(error);
                     reject(error);
@@ -7451,7 +7505,7 @@ function getTranslation(string_to_translate, source_language) {
                 method: 'GET',
                 url: api_url + '/myhordestranslation?' + locale + '&' + sourceString,
                 responseType: 'json',
-                onload: function(response){
+                onload: function (response) {
                     if (response.status === 200) {
                         resolve(response.response);
                     } else {
@@ -7460,7 +7514,7 @@ function getTranslation(string_to_translate, source_language) {
                     }
                     endLoading();
                 },
-                onerror: function(error){
+                onerror: function (error) {
                     endLoading();
                     addError(error);
                     reject(error);
@@ -7479,21 +7533,21 @@ function getRecipes() {
                 method: 'GET',
                 url: api_url + '/myhordesfetcher/recipes',
                 responseType: 'json',
-                onload: function(response){
+                onload: function (response) {
                     if (response.status === 200) {
                         recipes = response.response.map((recipe) => {
                             recipe.type = action_types.find((type) => type.id === recipe.type);
                             return recipe;
                         })
                             .sort((a, b) => {
-                            if (a.type.ordering > b.type.ordering) {
-                                return 1;
-                            } else if (a.type.ordering === b.type.ordering) {
-                                return 0;
-                            } else {
-                                return -1;
-                            }
-                        });
+                                if (a.type.ordering > b.type.ordering) {
+                                    return 1;
+                                } else if (a.type.ordering === b.type.ordering) {
+                                    return 0;
+                                } else {
+                                    return -1;
+                                }
+                            });
                         resolve(recipes);
                     } else {
                         addError(response);
@@ -7501,7 +7555,7 @@ function getRecipes() {
                     }
                     endLoading();
                 },
-                onerror: function(error){
+                onerror: function (error) {
                     endLoading();
                     addError(error);
                     reject(error);
@@ -7521,14 +7575,14 @@ function getParameters() {
             method: 'GET',
             url: api_url + '/parameters/parameters',
             responseType: 'json',
-            onload: function(response){
+            onload: function (response) {
                 if (response.status === 200) {
                     parameters = response.response
                 }
                 resolve();
                 endLoading();
             },
-            onerror: function(error){
+            onerror: function (error) {
                 endLoading();
                 addError(error);
                 resolve(error);
@@ -7537,28 +7591,48 @@ function getParameters() {
     });
 }
 
-
-
 function getMap() {
     return new Promise((resolve, reject) => {
         fetch(api_url + '/myhordesfetcher/map?townId=' + mh_user.townDetails.townId)
             .then((response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                addError(response);
-                reject(response);
-            }
-        })
-        .then((response) => {
-            map = response;
-            resolve(map);
-        })
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    addError(response);
+                    reject(response);
+                }
+            })
+            .then((response) => {
+                map = response;
+                resolve(map);
+            })
             .catch((error) => {
-            endLoading();
-            addError(error);
-            reject(error);
-        });
+                endLoading();
+                addError(error);
+                reject(error);
+            });
+    });
+}
+
+function getEstimations() {
+    return new Promise((resolve, reject) => {
+        fetch(api_url + `/AttaqueEstimation/Estimations/${mh_user.townDetails.day}?townId=${mh_user.townDetails.townId}`)
+            .then((response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    addError(response);
+                    reject(response);
+                }
+            })
+            .then((response) => {
+                resolve(response);
+            })
+            .catch((error) => {
+                endLoading();
+                addError(error);
+                reject(error);
+            });
     });
 }
 
@@ -7577,7 +7651,7 @@ function getOptimalPath(map, html, button) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            onload: function(response){
+            onload: function (response) {
                 if (response.status === 200) {
                     resolve(response.reponse);
                 } else {
@@ -7586,7 +7660,7 @@ function getOptimalPath(map, html, button) {
                 }
                 endLoading();
             },
-            onerror: function(error){
+            onerror: function (error) {
                 console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
                 endLoading();
                 reject(error);
@@ -7609,7 +7683,7 @@ function getApiKey() {
                     'X-Render-Target': 'content'
                 },
                 data: JSON.stringify({}),
-                onload: function(response){
+                onload: function (response) {
                     if (response.status === 200) {
                         let manual = () => {
                             let manual_app_id_key = prompt(getI18N(texts.manually_add_app_id_key));
@@ -7640,7 +7714,7 @@ function getApiKey() {
                         reject(response);
                     }
                 },
-                onerror: function(error){
+                onerror: function (error) {
                     console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
                     reject(error);
                 }
@@ -7651,105 +7725,10 @@ function getApiKey() {
     });
 }
 
-/** Récupère le contenu de la maison d'un citoyen pour tout afficher dans la nouvelle page de l'onglet citoyens */
-function getCitizenHouseContent(link) {
-    return new Promise((resolve, reject) => {
-        GM.xmlHttpRequest({
-            method: 'POST',
-            url: location.origin + link,
-            responseType: 'document',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-Request-Intent': 'WebNavigation',
-                'X-Render-Target': 'content'
-            },
-            data: JSON.stringify({}),
-            onload: function(response){
-                if (response.status === 200) {
-                    let temp_body = document.createElement('body');
-                    temp_body.innerHTML = response.response.body.innerHTML;
-                    let more_info = {};
-
-                    let citizen_home = temp_body.querySelector('.citizen-home');
-                    let lightbox = temp_body.querySelector('.lightbox')?.firstElementChild;
-                    let town_summary = temp_body.querySelector('.town-summary');
-
-                    let gossips_div = document.createElement('div');
-                    let gossips_title = citizen_home.querySelector('.citizen-gossips');
-                    let gossips = gossips_title ? gossips_title.nextElementSibling : undefined
-                    if (gossips_title) {
-                        gossips_div.appendChild(gossips_title);
-                        if (gossips) {
-                            gossips.classList.remove('gossips');
-                            gossips.classList.add('citizen-gossips');
-                            gossips_div.appendChild(gossips);
-                        }
-                    }
-                    more_info.gossips = gossips_div;
-
-                    let plaintes = citizen_home.querySelector('.note');
-                    let nb_plaintes = plaintes ? plaintes.querySelector('b')?.innerText : '';
-                    more_info.plaintes = nb_plaintes;
-
-
-                    let travaux_row = lightbox ? lightbox.querySelectorAll('.row')[3] : undefined;
-                    let travaux = travaux_row ? travaux_row.lastElementChild : (town_summary.querySelectorAll('.row-detail') ? town_summary.querySelectorAll('.row-detail')[1] : undefined);
-                    more_info.travaux = travaux ? travaux.innerHTML.replace(/\<b\>/g, '').replace(/\<\/b\>/g, '').replace(/ , /g, '').replace(/\n/g, '').replace(/(\d+)/g, '$1<br />') : '';
-                    resolve(more_info);
-                } else {
-                    reject(response);
-                }
-                endLoading();
-            },
-            onerror: function(error){
-                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
-                endLoading();
-                reject(error);
-            }
-        });
-    });
-}
-
-function getDesertLogs() {
-    return new Promise((resolve, reject) => {
-        GM.xmlHttpRequest({
-            method: 'POST',
-            url: location.origin + '/api/beyond/desert/log',
-            responseType: 'document',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-Request-Intent': 'WebNavigation',
-                'X-Render-Target': 'content'
-            },
-            data: JSON.stringify({
-                day: -1,
-                town: mh_user.townDetails.townId
-            }),
-            onload: function(response){
-                if (response.status === 200) {
-                    let temp_body = document.createElement('body');
-                    temp_body.innerHTML = response.response.body.innerHTML;
-                    resolve(Array.from(temp_body.querySelectorAll('div.log-entry')));
-                } else {
-                    reject(response);
-                }
-                endLoading();
-            },
-            onerror: function(error){
-                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
-                endLoading();
-                reject(error);
-            }
-        });
-    });
-}
-
 ///////////////////////////
 //     MAIN FUNCTION     //
 ///////////////////////////
-(function() {
+(function () {
     if (document.URL.startsWith('https://bbh.fred26.fr/') || document.URL.startsWith('https://gest-hordes2.eragaming.fr/') || document.URL.startsWith('https://fatamorgana.md26.eu/')) {
         let current_key = '';
         let map_block_id = '';
@@ -7782,11 +7761,15 @@ function getDesertLogs() {
         }
 
         // Si on est sur le site de BBH ou GH ou Fata et que BBH ou GH ou Fata a été mis à jour depuis MyHordes, alors on recharge BBH ou GH ou Fata au moment de revenir sur l'onglet
-        document.addEventListener('visibilitychange', function() {
+        document.addEventListener('visibilitychange', function () {
             GM.getValue(current_key).then((current) => {
                 if (current && !document.hidden) {
                     GM.setValue(current_key, false);
-                    location.reload();
+                    if (current_key === 'gh_updated' && document.getElementById('#zoneRefresh')) {
+                        document.getElementById('#zoneRefresh').click();
+                    } else {
+                        location.reload();
+                    }
                 }
             });
         });
@@ -7829,31 +7812,13 @@ function getDesertLogs() {
 
                 getApiKey().then(() => {
                     getMe().then(() => {
-                        initOptions();
-                        /** Gère le bouton de mise à jour des outils externes) */
-                        if (!buttonOptimizerExists()) {
-                            createStyles();
-                            createOptimizerBtn();
-                            createWindow();
-                        }
-
                         notifyOnSearchEnd();
-                        displayWishlistInApp();
 
-                        setInterval(() => {
-                            createUpdateExternalToolsButton();
-                            clickOnVotedToRedirect();
-                            displaySearchFieldOnBuildings();
-                            displaySearchFieldOnRecipientList();
-                            displayMinApOnBuildings();
-                            displayPriorityOnItems();
-                            displayNbDeadZombies();
-                            displayTranslateTool();
-                            displayMoreCitizensInformations();
-                            notifyOnNewMessage();
-                            displayCellDetailsOnPage();
-                            // blockUsersPosts();
-                        }, 200);
+                        initOptions();
+
+                        document.addEventListener('mh-navigation-complete', (event) => {
+                            initOptions();
+                        })
 
                         setInterval(() => {
                             displayCampingPredict();
@@ -7861,7 +7826,7 @@ function getDesertLogs() {
 
                         setInterval(() => {
                             displayAdvancedTooltips();
-                        }, 100);
+                        }, 10);
                     });
                 });
             });

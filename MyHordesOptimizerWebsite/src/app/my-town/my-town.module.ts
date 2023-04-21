@@ -11,7 +11,7 @@ import { NightwatchModule } from './nightwatch/nightwatch.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 
-let modules: Modules = [CitizensModule, BankModule, MapModule, StatisticsModule, WishlistModule, NightwatchModule, BuildingsModule, CampingsModule]
+const modules: Modules = [CitizensModule, BankModule, MapModule, StatisticsModule, WishlistModule, NightwatchModule, BuildingsModule, CampingsModule];
 
 @NgModule({
     imports: [SharedModule, MyTownRoutingModule, ...modules],

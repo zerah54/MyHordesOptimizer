@@ -1,8 +1,8 @@
-import { RuinDTO } from "./dto/ruin.dto";
-import { Dictionary } from "./types/_types";
+import { RuinDTO } from './dto/ruin.dto';
+import { Dictionary } from './types/_types';
 
 export const EXTERNAL_APP_ID_KEY: string = 'external_app_id';
-export const USER_ID_KEY: string = 'user_id';
+export const BANK_CONDENSED_DISPLAY_KEY: string = 'bank_condensed_display';
 export const USER_KEY: string = 'user';
 export const TOWN_KEY: string = 'town';
 export const ITEMS_KEY: string = 'all_items';
@@ -23,14 +23,13 @@ export const BREAKPOINTS: Dictionary<string> = {
     'gt-sm': 'screen and (min-width: 960px)',
     'gt-md': 'screen and (min-width: 1280px)',
     'gt-lg': 'screen and (min-width: 1920px)',
-}
+};
 
 
 export const NO_RUIN: RuinDTO = {
-    id: 'none', camping: 0, label: { en: `None`, fr: `Aucun`, de: `Kein`, es: `TODO` }, chance: 0, description: { en: ``, fr: ``, de: ``, es: `` },
+    id: 'none', camping: 0, label: {en: 'None', fr: 'Aucun', de: 'Kein', es: 'TODO'}, chance: 0, description: {en: '', fr: '', de: '', es: ''},
     explorable: false, img: '', minDist: 1, maxDist: 1000, drops: []
 };
-
 
 
 /** @see CitizenHandler > getCampingValues > $distance_map */
@@ -51,7 +50,7 @@ export const DISTANCE_MAP: Dictionary<number> = {
     14: -7,
     15: -6,
     16: -5 // 16 et +
-}
+};
 
 
 /** @see CitizenHandler > getCampingValues > $campings_map */
@@ -121,3 +120,6 @@ export const HIDDEN_CAMPERS_MAP: Dictionary<number> = {
     6: -20,
     7: -26
 };
+
+export const TDG_VALUES: number[] = [33, 38, 42, 46, 50, 54, 58, 63, 68, 71, 75, 79, 83, 88, 92, 96, 100];
+export const PLANIF_VALUES: number[] = [0, 4, 8, 13, 17, 21, 25, 29, 33, 46, 100];

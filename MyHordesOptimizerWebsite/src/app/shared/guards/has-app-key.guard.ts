@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
-import { TownDetails } from 'src/app/_abstract_model/types/town-details.class';
 import { getTown } from '../utilities/localstorage.util';
+import { TownDetails } from '../../_abstract_model/types/town-details.class';
 
 @Injectable()
 export class IsInTownGuard implements CanActivate {
@@ -21,12 +21,12 @@ export class IsInTownGuard implements CanActivate {
      */
     public canActivate(): boolean {
         const town: TownDetails | null = getTown();
-        let is_in_town: boolean = true;
+        let is_in_town: boolean;
         if (!town) {
-            is_in_town = false
+            is_in_town = false;
         } else {
-            is_in_town = town.town_id !== null && town.town_id !== undefined && town.town_id !== 0
-        };
+            is_in_town = town.town_id !== null && town.town_id !== undefined && town.town_id !== 0;
+        }
         if (!is_in_town) {
             this.router.navigate(['/wiki/items']);
         }

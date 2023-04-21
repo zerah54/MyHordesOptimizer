@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { HeaderComponent } from './header.component';
 import { Components } from '../../_abstract_model/types/_types';
 
-let components: Components = [HeaderComponent];
+const components: Components = [HeaderComponent];
 
 @NgModule({
     imports: [SharedModule],

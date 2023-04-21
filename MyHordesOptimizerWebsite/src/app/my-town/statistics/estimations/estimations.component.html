@@ -1,0 +1,44 @@
+<div class="mho-estimations">
+    <div class="header">
+        <mho-header-with-number-previous-next-filter class="previous-next" [(filterValue)]="selected_day" (filterValueChange)="getEstimations()"
+                                                     [min]="1" [max]="current_day">
+        </mho-header-with-number-previous-next-filter>
+        <button mat-raised-button [color]="'accent'" (click)="saveEstimations()" i18n>Enregistrer</button>
+    </div>
+    <div class="tables" *ngIf="estimations">
+        <table>
+            <caption i18n>Estimations du jour</caption>
+            <tr>
+                <th i18n>Qualité</th>
+                <th i18n>Min</th>
+                <th i18n>Max</th>
+            </tr>
+            <tr *ngFor="let percent of tdg_values">
+                <th>{{percent}}%</th>
+                <td>
+                    <input type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].min">
+                </td>
+                <td>
+                    <input type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].max">
+                </td>
+            </tr>
+        </table>
+        <table>
+            <caption i18n>Estimations du scrutateur</caption>
+            <tr>
+                <th i18n>Qualité</th>
+                <th i18n>Min</th>
+                <th i18n>Max</th>
+            </tr>
+            <tr *ngFor="let percent of planif_values">
+                <th>{{percent}}%</th>
+                <td>
+                    <input type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].min">
+                </td>
+                <td>
+                    <input type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].max">
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
