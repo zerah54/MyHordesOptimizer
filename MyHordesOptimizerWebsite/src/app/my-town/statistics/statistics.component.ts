@@ -9,5 +9,5 @@ import { environment } from '../../../environments/environment';
 export class StatisticsComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    public is_dev: boolean = !environment.production;
+    public readonly is_dev: boolean = !environment.production;
 }

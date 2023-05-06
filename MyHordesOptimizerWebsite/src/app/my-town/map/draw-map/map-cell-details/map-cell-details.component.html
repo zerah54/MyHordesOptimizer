@@ -19,8 +19,7 @@
         </div>
         <div class="coords-distance">
             <span class="cords">[{{cell.displayed_x}}&nbsp;;&nbsp;{{cell.displayed_y}}]</span>
-            <span class="distance-pa">{{cell.nb_pa}}<img
-                [ngSrc]="HORDES_IMG_REPO + 'icons/ap_small_' + locale + '.gif'" width="16" height="16"></span>
+            <span class="distance-pa">{{cell.nb_pa}}<img [ngSrc]="HORDES_IMG_REPO + 'icons/ap_small_' + locale + '.gif'" width="16" height="16"></span>
             <span class="distance-km">{{cell.nb_km}}km</span>
         </div>
         <mat-divider></mat-divider>
@@ -33,7 +32,7 @@
             </div>
             <div class="killed-zombies">
                 {{cell.nb_zombie_killed || 0}}
-                <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'" width="16" height="16">
+                <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'" width="23" height="17">
             </div>
         </div>
         <div class="pdc">

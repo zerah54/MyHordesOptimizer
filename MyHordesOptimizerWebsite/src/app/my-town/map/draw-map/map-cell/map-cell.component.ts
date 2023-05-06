@@ -10,12 +10,32 @@ import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { AutoDestroy } from '../../../../shared/decorators/autodestroy.decorator';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'mho-map-cell',
     templateUrl: './map-cell.component.html',
     styleUrls: ['./map-cell.component.scss', '../draw-map.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    animations: [
+        trigger('toggleCurrentCell',
+            [
+                transition(':enter',
+                    [
+                        style({opacity: 0, display: 'inline'}),
+                        animate('500ms ease-out', style({opacity: 1}))
+                    ]
+                ),
+                transition(':leave',
+                    [
+                        style({opacity: 1, display: 'inline'}),
+                        animate('500ms ease-in', style({opacity: 0}))
+                    ]
+                )
+            ]
+        )
+    ]
 })
 export class MapCellComponent {
     @HostBinding('style.display') display: string = 'contents';
@@ -33,6 +53,7 @@ export class MapCellComponent {
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
+    public readonly is_dev: boolean = !environment.production;
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 

@@ -23,10 +23,11 @@ import { ItemsGroupByCategory } from './pipes/items-group-by-category.pipe';
 import { InDevModeGuard } from './guards/in-dev-mode.guard';
 import { ApiServices } from '../_abstract_model/services/api.services';
 import { NgOptimizedImage } from '@angular/common';
+import { ImportServices } from '../_abstract_model/services/import.services';
 
 const custom_modules: Modules = [MaterialModule, ElementsModule];
 const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule, NgOptimizedImage];
-const services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService, WishlistServices];
+const services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService, WishlistServices, ImportServices];
 const guards: Components = [IsInTownGuard, InDevModeGuard];
 const pipes: Components = [ArrayItemDetailsPipe, CitizensFromShortPipe, ItemDetailsPipe, FilterRuinsByKmPipe, CustomKeyValuePipe, ItemsGroupByCategory];
 const external_modules: Modules = [TableVirtualScrollModule];

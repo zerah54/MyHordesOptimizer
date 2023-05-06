@@ -10,6 +10,8 @@ import { BREAKPOINTS } from '../../_abstract_model/const';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Dictionary } from '../../_abstract_model/types/_types';
+import { environment } from '../../../environments/environment';
+import { convertGHMapIntoMHOMap } from '../../shared/utilities/conversion/gh-map.util';
 
 @Component({
     selector: 'mho-map',
@@ -27,6 +29,7 @@ export class MapComponent implements OnInit {
     public all_citizens!: Citizen[];
 
     public options!: MapOptions;
+    public readonly is_dev: boolean = !environment.production;
 
     public new_distance_option: Distance = {
         value: 1,
@@ -38,6 +41,7 @@ export class MapComponent implements OnInit {
     private readonly default_options: MapOptions = {
         map_type: 'digs',
         dig_mode: 'average',
+        trash_mode: 'nb',
         displayed_scrut_zone: {},
         distances: []
     };
@@ -133,6 +137,10 @@ export class MapComponent implements OnInit {
         });
     }
 
+    public getGh(): void {
+        convertGHMapIntoMHOMap(this.map, this.all_items);
+    }
+
     private checkIfAllOptionsExist(): void {
         const options_keys: string[] = Object.keys(this.options);
         const default_options_keys: string[] = Object.keys(this.default_options);
@@ -147,8 +155,9 @@ export class MapComponent implements OnInit {
 }
 
 export interface MapOptions {
-    map_type: 'digs' | 'danger';
+    map_type: 'digs' | 'danger' | 'trash';
     dig_mode: 'max' | 'average';
+    trash_mode: 'nb' | 'def';
     displayed_scrut_zone: Dictionary<boolean>;
     distances: Distance[];
 }

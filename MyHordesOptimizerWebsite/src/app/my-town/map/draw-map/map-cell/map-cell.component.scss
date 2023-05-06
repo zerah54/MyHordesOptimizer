@@ -111,6 +111,24 @@ td.map-cell {
             }
         }
 
+        &.trash {
+            &.trash-0 {
+                background-color: $green;
+            }
+
+            &.trash-1 {
+                background-color: $yellow;
+            }
+
+            &.trash-2 {
+                background-color: $orange;
+            }
+
+            &.trash-3 {
+                background-color: $red;
+            }
+        }
+
         .content {
             width: 100%;
             height: 100%;

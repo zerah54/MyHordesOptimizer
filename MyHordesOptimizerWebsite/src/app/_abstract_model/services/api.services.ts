@@ -43,9 +43,6 @@ import {
     setTown,
     setUser
 } from '../../shared/utilities/localstorage.util';
-import { environment } from '../../../environments/environment';
-
-const API_URL: string = environment.api_url;
 
 @Injectable()
 export class ApiServices extends GlobalServices {
@@ -68,7 +65,7 @@ export class ApiServices extends GlobalServices {
             if (saved_items && saved_items.length > 0 && !force) {
                 sub.next(saved_items);
             } else {
-                super.get<ItemDTO[]>(API_URL + `/myhordesfetcher/items?${getTown()?.town_id ? 'townId=' + getTown()?.town_id : ''}`)
+                super.get<ItemDTO[]>(this.API_URL + `/myhordesfetcher/items?${getTown()?.town_id ? 'townId=' + getTown()?.town_id : ''}`)
                     .subscribe({
                         next: (response: HttpResponse<ItemDTO[]>) => {
                             const items: Item[] = dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302);
@@ -84,7 +81,7 @@ export class ApiServices extends GlobalServices {
     public getMe(): Observable<Me | null> {
         return new Observable((sub: Subscriber<Me | null>) => {
             if (getExternalAppId()) {
-                super.get<MeDTO>(API_URL + `/myhordesfetcher/me?userKey=${getExternalAppId()}`)
+                super.get<MeDTO>(this.API_URL + `/myhordesfetcher/me?userKey=${getExternalAppId()}`)
                     .subscribe((response: HttpResponse<MeDTO | null>) => {
                         const me: Me | null = response.body ? new Me(response.body) : null;
                         setUser(me);
@@ -106,7 +103,7 @@ export class ApiServices extends GlobalServices {
      */
     public getBank(): Observable<BankInfo> {
         return new Observable((sub: Subscriber<BankInfo>) => {
-            super.get<BankInfoDTO>(API_URL + `/myhordesfetcher/bank?userKey=${getExternalAppId()}`)
+            super.get<BankInfoDTO>(this.API_URL + `/myhordesfetcher/bank?userKey=${getExternalAppId()}`)
                 .subscribe({
                     next: (response: HttpResponse<BankInfoDTO>) => {
                         sub.next(new BankInfo(response.body));
@@ -136,7 +133,7 @@ export class ApiServices extends GlobalServices {
             townId: getTown()?.town_id || 0
         };
 
-        super.post<any>(API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`, JSON.stringify({
+        super.post<any>(this.API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`, JSON.stringify({
             map: {toolsToUpdate: tools_to_update},
             townDetails: town_details
         }))
@@ -155,7 +152,7 @@ export class ApiServices extends GlobalServices {
      */
     public estimateAttack(rows: Dictionary<string>, today: boolean, day: number): Observable<string> {
         return new Observable((sub: Subscriber<string>) => {
-            super.post<string>(API_URL + `:8080/${today ? 'attack' : 'planif'}.php?day=${day}&id=${getTown()?.town_id}&type=normal&debug=false`, JSON.stringify(rows))
+            super.post<string>(this.API_URL + `:8080/${today ? 'attack' : 'planif'}.php?day=${day}&id=${getTown()?.town_id}&type=normal&debug=false`, JSON.stringify(rows))
                 .subscribe({
                     next: (response: string) => {
                         sub.next(response);
@@ -175,7 +172,7 @@ export class ApiServices extends GlobalServices {
             if (saved_ruins && saved_ruins.length > 0 && !force) {
                 sub.next(saved_ruins);
             } else {
-                super.get<RuinDTO[]>(API_URL + '/myhordesfetcher/ruins')
+                super.get<RuinDTO[]>(this.API_URL + '/myhordesfetcher/ruins')
                     .subscribe({
                         next: (response: HttpResponse<RuinDTO[]>) => {
                             const ruins: Ruin[] = dtoToModelArray(Ruin, response.body).sort((a: Ruin, b: Ruin) => {
@@ -203,7 +200,7 @@ export class ApiServices extends GlobalServices {
      */
     public getHeroSkill(): Observable<HeroSkill[]> {
         return new Observable((sub: Subscriber<HeroSkill[]>) => {
-            super.get<HeroSkillDTO[]>(API_URL + '/myhordesfetcher/heroSkills')
+            super.get<HeroSkillDTO[]>(this.API_URL + '/myhordesfetcher/heroSkills')
                 .subscribe({
                     next: (response: HttpResponse<HeroSkillDTO[]>) => {
                         const skills: HeroSkill[] = dtoToModelArray(HeroSkill, response.body).sort((a: HeroSkill, b: HeroSkill) => {
@@ -228,7 +225,7 @@ export class ApiServices extends GlobalServices {
      */
     public getCitizens(): Observable<CitizenInfo> {
         return new Observable((sub: Subscriber<CitizenInfo>) => {
-            super.get<CitizenInfoDTO>(API_URL + `/myhordesfetcher/citizens?townId=${getTown()?.town_id}&userId=${getUserId()}`)
+            super.get<CitizenInfoDTO>(this.API_URL + `/myhordesfetcher/citizens?townId=${getTown()?.town_id}&userId=${getUserId()}`)
                 .subscribe({
                     next: (response: HttpResponse<CitizenInfoDTO>) => {
                         sub.next(new CitizenInfo(response.body));
@@ -244,7 +241,7 @@ export class ApiServices extends GlobalServices {
      */
     public getRecipes(): Observable<Recipe[]> {
         return new Observable((sub: Subscriber<Recipe[]>) => {
-            super.get<RecipeDTO[]>(API_URL + '/myhordesfetcher/recipes')
+            super.get<RecipeDTO[]>(this.API_URL + '/myhordesfetcher/recipes')
                 .subscribe({
                     next: (response: HttpResponse<RecipeDTO[]>) => {
                         sub.next(dtoToModelArray(Recipe, response.body));
@@ -255,7 +252,7 @@ export class ApiServices extends GlobalServices {
 
     public updateBag(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(API_URL + `/ExternalTools/Bag?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenBagDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Bag?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenBagDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -266,7 +263,7 @@ export class ApiServices extends GlobalServices {
 
     public updateStatus(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(API_URL + `/ExternalTools/Status?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenStatusDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Status?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenStatusDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -277,7 +274,7 @@ export class ApiServices extends GlobalServices {
 
     public updateHome(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(API_URL + `/ExternalTools/home?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenHomeDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/home?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenHomeDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -288,7 +285,7 @@ export class ApiServices extends GlobalServices {
 
     public updateHeroicActions(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(API_URL + `/ExternalTools/HeroicActions?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenHeroicActionsDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/HeroicActions?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenHeroicActionsDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -299,7 +296,7 @@ export class ApiServices extends GlobalServices {
 
     public getMap(): Observable<Town> {
         return new Observable((sub: Subscriber<Town>) => {
-            super.get<TownDTO>(API_URL + `/myhordesfetcher/map?townId=${getTown()?.town_id}`)
+            super.get<TownDTO>(this.API_URL + `/myhordesfetcher/map?townId=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<TownDTO>) => {
                         sub.next(new Town(response.body));
@@ -310,7 +307,7 @@ export class ApiServices extends GlobalServices {
 
     public getScrutList(): Observable<Regen[]> {
         return new Observable((sub: Subscriber<Regen[]>) => {
-            super.get<RegenDTO[]>(API_URL + `/myhordesfetcher/MapUpdates?townid=${getTown()?.town_id}`)
+            super.get<RegenDTO[]>(this.API_URL + `/myhordesfetcher/MapUpdates?townid=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<RegenDTO[]>) => {
                         sub.next(dtoToModelArray(Regen, response.body));
@@ -321,7 +318,7 @@ export class ApiServices extends GlobalServices {
 
     public saveCell(cell: Cell): Observable<Cell> {
         return new Observable((sub: Subscriber<Cell>) => {
-            super.post<CellDTO>(API_URL + `/MyHordesOptimizerMap/cell?townid=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(cell.toSaveCellDTO()))
+            super.post<CellDTO>(this.API_URL + `/MyHordesOptimizerMap/cell?townid=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(cell.toSaveCellDTO()))
                 .subscribe({
                     next: (response: CellDTO) => {
                         this._snackbar.successSnackbar($localize`La cellule a bien été modifiée`);
@@ -333,7 +330,7 @@ export class ApiServices extends GlobalServices {
 
     public getEstimations(day: number): Observable<Estimations> {
         return new Observable((sub: Subscriber<Estimations>) => {
-            super.get<EstimationsDTO>(API_URL + `/AttaqueEstimation/Estimations/${day}?townid=${getTown()?.town_id}`)
+            super.get<EstimationsDTO>(this.API_URL + `/AttaqueEstimation/Estimations/${day}?townid=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<EstimationsDTO>) => {
                         sub.next(new Estimations(response.body));
@@ -344,7 +341,7 @@ export class ApiServices extends GlobalServices {
 
     public saveEstimations(estimations: Estimations): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.post<EstimationsDTO>(API_URL + `/AttaqueEstimation/Estimations?townid=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(estimations.modelToDto()))
+            super.post<EstimationsDTO>(this.API_URL + `/AttaqueEstimation/Estimations?townid=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(estimations.modelToDto()))
                 .subscribe({
                     next: () => {
                         sub.next();

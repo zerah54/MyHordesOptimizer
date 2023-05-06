@@ -8,9 +8,6 @@ import { Item } from '../types/item.class';
 import { WishlistInfo } from '../types/wishlist-info.class';
 import { GlobalServices } from './global.services';
 import { getTown, getUserId } from '../../shared/utilities/localstorage.util';
-import { environment } from '../../../environments/environment';
-
-const API_URL: string = environment.api_url;
 
 @Injectable()
 export class WishlistServices extends GlobalServices {
@@ -29,7 +26,7 @@ export class WishlistServices extends GlobalServices {
      */
     public getWishlist(): Observable<WishlistInfo> {
         return new Observable((sub: Subscriber<WishlistInfo>) => {
-            super.get<WishlistInfoDTO>(API_URL + `/wishlist?townId=${getTown()?.town_id}`)
+            super.get<WishlistInfoDTO>(this.API_URL + `/wishlist?townId=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         const wishlist: WishlistInfo = new WishlistInfo(response.body);
@@ -51,7 +48,7 @@ export class WishlistServices extends GlobalServices {
      */
     public updateWishlist(wishlist_info: WishlistInfo): Observable<WishlistInfo> {
         return new Observable((sub: Subscriber<WishlistInfo>) => {
-            super.put<WishlistInfoDTO>(API_URL + `/wishlist?townId=${getTown()?.town_id}&userId=${getUserId()}`, wishlist_info.toListItem())
+            super.put<WishlistInfoDTO>(this.API_URL + `/wishlist?townId=${getTown()?.town_id}&userId=${getUserId()}`, wishlist_info.toListItem())
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         sub.next(new WishlistInfo(response.body));
@@ -68,7 +65,7 @@ export class WishlistServices extends GlobalServices {
      */
     public addItemToWishlist(item: Item, zone: string): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.post(API_URL + `/wishlist/add/${item.id}?townId=${getTown()?.town_id}&userId=${getUserId()}&zoneXPa=${zone}`, undefined)
+            super.post(this.API_URL + `/wishlist/add/${item.id}?townId=${getTown()?.town_id}&userId=${getUserId()}&zoneXPa=${zone}`, undefined)
                 .subscribe({
                     next: () => {
                         sub.next();

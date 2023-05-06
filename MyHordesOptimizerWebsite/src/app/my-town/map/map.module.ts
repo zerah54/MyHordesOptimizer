@@ -6,12 +6,12 @@ import { MapBorderComponent } from './draw-map/map-border/map-border.component';
 import { CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe } from './draw-map/map-cell-details/cell-details-position.pipe';
 import { MapCellDetailsComponent } from './draw-map/map-cell-details/map-cell-details.component';
 import { RuinInCell } from './draw-map/map-cell-details/ruin-in-cell.pipe';
-import { DigLevelPipe } from './draw-map/map-cell/dig-level.pipe';
-import { DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop } from './draw-map/map-cell/dist-borders.pipe';
-import { IsRuinPipe } from './draw-map/map-cell/is_ruin.pipe';
+import { DigLevelPipe } from './draw-map/map-cell/pipes/dig-level.pipe';
+import { DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop } from './draw-map/map-cell/pipes/dist-borders.pipe';
+import { IsRuinPipe } from './draw-map/map-cell/pipes/is_ruin.pipe';
 import { MapCellComponent } from './draw-map/map-cell/map-cell.component';
-import { MyCellPipe } from './draw-map/map-cell/my-cell.pipe';
-import { ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop } from './draw-map/map-cell/scrut-borders.pipe';
+import { MyCellPipe } from './draw-map/map-cell/pipes/my-cell.pipe';
+import { ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop } from './draw-map/map-cell/pipes/scrut-borders.pipe';
 import { ItemsInBagsPipe } from './draw-map/map-update/map-update-cell/items-in-bags.pipe';
 import { MapUpdateCellComponent } from './draw-map/map-update/map-update-cell/map-update-cell.component';
 import { HasStillHeroicPipe } from './draw-map/map-update/map-update-citizens/has-still-heroic.pipe';
@@ -25,6 +25,8 @@ import { MapUpdateComponent } from './draw-map/map-update/map-update.component';
 import { MapComponent } from './map.component';
 import { Components } from '../../_abstract_model/types/_types';
 import { SharedModule } from '../../shared/shared.module';
+import { TrashValuePipe } from './draw-map/map-cell/pipes/trash-value.pipe';
+import { TrashLevelPipe } from './draw-map/map-cell/pipes/trash-level.pipe';
 
 const components: Components = [MapComponent];
 const map_components: Components = [
@@ -32,9 +34,10 @@ const map_components: Components = [
     MapUpdateRuinComponent, MapUpdateCitizensComponent, MapUpdateDigsComponent
 ];
 const pipes: Components = [
-    IsRuinPipe, DigLevelPipe, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop, ScrutBorderBottom, MyCellPipe, AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe,
-    CellDetailsLeftPipe, CellDetailsBottomPipe, CellDetailsRightPipe, CellDetailsTopPipe, RuinInCell, HasStillHeroicPipe, ItemsInBagsPipe, DistBorderBottom, DistBorderLeft,
-    DistBorderRight, DistBorderTop, NotInListCitizenPipe, NotInListCitizenDigPipe, DigsPerDayPipe
+    IsRuinPipe, DigLevelPipe, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop, ScrutBorderBottom, MyCellPipe, AreAllScrutDirectionsSelectedPipe,
+    IsScrutDirectionSelectedPipe, CellDetailsLeftPipe, CellDetailsBottomPipe, CellDetailsRightPipe, CellDetailsTopPipe, RuinInCell, HasStillHeroicPipe,
+    ItemsInBagsPipe, DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop, NotInListCitizenPipe, NotInListCitizenDigPipe, DigsPerDayPipe,
+    TrashValuePipe, TrashLevelPipe
 ];
 
 @NgModule({

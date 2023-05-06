@@ -74,7 +74,7 @@ const HAS_ALARM_DATA: HomeEnumData = {label: $localize`Alarme rudimentaire`, img
 const CHEST_LEVEL_DATA: HomeEnumData = {
     label: $localize`Rangements`, img: 'home/chest.gif', max_lvl: 13, options: Array.from({length: 14}, (_: unknown, i: number) => i)
 };
-const HAS_CURTAIN_DATA: HomeEnumData = {label: $localize`Gros rideau `, img: 'home/curtain.gif', max_lvl: 1};
+const HAS_CURTAIN_DATA: HomeEnumData = {label: $localize`Gros rideau`, img: 'home/curtain.gif', max_lvl: 1};
 const HOUSE_DEFENSE_DATA: HomeEnumData = {
     label: $localize`Renforts`, img: 'home/defense.gif', max_lvl: 10, options: Array.from({length: 11}, (_: unknown, i: number) => i)
 };

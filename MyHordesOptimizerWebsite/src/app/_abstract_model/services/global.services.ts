@@ -1,8 +1,10 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
 import { SnackbarService } from '../../shared/services/snackbar.service';
+import { environment } from '../../../environments/environment';
 
 export class GlobalServices {
+    protected readonly API_URL: string = environment.api_url;
 
     constructor(private http: HttpClient, private snackbar: SnackbarService) {
 

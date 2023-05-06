@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Distance, MapOptions } from '../../map.component';
-import { Cell } from '../../../../_abstract_model/types/cell.class';
+import { Cell } from '../../../../../_abstract_model/types/cell.class';
+import { Distance, MapOptions } from '../../../map.component';
 
 
 @Pipe({
