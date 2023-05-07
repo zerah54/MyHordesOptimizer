@@ -17,7 +17,7 @@ export class WishlistInfo extends CommonModel<WishlistInfoDTO> {
     public modelToDto(): WishlistInfoDTO {
         const wishlist_items_dto: Map<string, WishlistItemDTO[]> = new Map();
         for (const key in this.wishlist_items) {
-            wishlist_items_dto[key] = modelToDtoArray(this.wishlist_items[key]);
+            wishlist_items_dto.set(key, modelToDtoArray(this.wishlist_items.get(key)));
         }
         return {
             wishList: wishlist_items_dto,
@@ -48,7 +48,7 @@ export class WishlistInfo extends CommonModel<WishlistInfoDTO> {
         if (dto) {
             this.wishlist_items = new Map();
             for (const key in dto.wishList) {
-                let list_items: WishlistItemDTO[] = dto.wishList[key];
+                let list_items: WishlistItemDTO[] = <WishlistItemDTO[]>dto.wishList.get(key);
                 list_items = list_items.sort((item_a: WishlistItemDTO, item_b: WishlistItemDTO) => item_b.priority - item_a.priority);
                 this.wishlist_items.set(key, dtoToModelArray(WishlistItem, list_items));
             }

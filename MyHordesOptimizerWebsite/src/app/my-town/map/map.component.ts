@@ -130,7 +130,7 @@ export class MapComponent implements OnInit {
     }
 
     public changeOptions<T>(key: string, value: T): void {
-        this.options[key] = value;
+        (<{ [key: string]: unknown }><unknown>this.options)[key] = value;
         setTimeout(() => {
             this.options = {...this.options};
             localStorage.setItem('MAP_OPTIONS', JSON.stringify(this.options));
@@ -148,7 +148,7 @@ export class MapComponent implements OnInit {
         default_options_keys.forEach((default_option_key: string) => {
             /** Si la liste des options ne contient pas une option par défaut, on l'ajoute */
             if (!options_keys.some((option_key: string) => option_key === default_option_key)) {
-                this.changeOptions(default_option_key, this.default_options[default_option_key]);
+                this.changeOptions(default_option_key, (<{ [key: string]: unknown }><unknown>this.default_options)[default_option_key]);
             }
         });
     }

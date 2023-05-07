@@ -82,7 +82,7 @@ export class BankComponent implements OnInit {
                 const item_has_action_or_property: boolean = item_actions_and_properties.some((action_or_property: Action | Property) => {
                     return this.select_value.some((selected: Action | Property) => selected.key === action_or_property.key);
                 });
-                const item_has_key: boolean = this.select_value.some((filter: Property | Action) => item[filter.key]);
+                const item_has_key: boolean = this.select_value.some((filter: Property | Action) => (<{ [key: string]: unknown }><unknown>item)[filter.key]);
                 return item_has_action_or_property || item_has_key;
             });
         }

@@ -327,12 +327,16 @@ export class WishlistComponent implements OnInit {
         const current_wishlist_items: WishlistItem[] = this.wishlist_info.wishlist_items.get(this.selected_tab_key) || this.wishlist_info.wishlist_items.get('0') || [];
         const previous_index_in_real_array: number = current_wishlist_items.findIndex((item: WishlistItem) => item.item.id === event.item.data.item.id);
         let current_index_in_real_array: number;
-        if (this.datasource.dataOfRange$['_buffer'][0][event.currentIndex - 1]) {
+        if ((<{ [key: string]: any }>this.datasource.dataOfRange$)['_buffer'][0][event.currentIndex - 1]) {
             current_index_in_real_array = current_wishlist_items
-                .findIndex((item: WishlistItem) => item.item.id === this.datasource.dataOfRange$['_buffer'][0][event.currentIndex - 1].item.id) + 1;
-        } else if (this.datasource.dataOfRange$['_buffer'][0][event.currentIndex + 1]) {
+                .findIndex((item: WishlistItem) => item.item.id === (<{
+                    [key: string]: any
+                }>this.datasource.dataOfRange$)['_buffer'][0][event.currentIndex - 1].item.id) + 1;
+        } else if ((<{ [key: string]: any }>this.datasource.dataOfRange$)['_buffer'][0][event.currentIndex + 1]) {
             current_index_in_real_array = current_wishlist_items
-                .findIndex((item: WishlistItem) => item.item.id === this.datasource.dataOfRange$['_buffer'][0][event.currentIndex + 1].item.id) - 1;
+                .findIndex((item: WishlistItem) => item.item.id === (<{
+                    [key: string]: any
+                }>this.datasource.dataOfRange$)['_buffer'][0][event.currentIndex + 1].item.id) - 1;
         } else {
             current_index_in_real_array = 0;
         }

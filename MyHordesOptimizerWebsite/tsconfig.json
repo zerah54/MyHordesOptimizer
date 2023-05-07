@@ -15,7 +15,6 @@
         "declaration": false,
         "downlevelIteration": true,
         "experimentalDecorators": true,
-        "suppressImplicitAnyIndexErrors": true,
         "moduleResolution": "node",
         "importHelpers": true,
         "preserveSymlinks": true,

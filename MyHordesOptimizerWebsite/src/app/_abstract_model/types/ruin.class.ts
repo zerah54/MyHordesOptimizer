@@ -4,7 +4,7 @@ import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { I18nLabels } from './_types';
 
 export class Ruin extends CommonModel<RuinDTO> {
-    public id!: number | string;
+    public id!: number;
     public camping!: number;
     public chance!: number;
     public label!: I18nLabels;
@@ -37,7 +37,7 @@ export class Ruin extends CommonModel<RuinDTO> {
 
     protected dtoToModel(dto?: RuinDTO): void {
         if (dto) {
-            this.id = dto.id;
+            this.id = +dto.id;
             this.camping = dto.camping;
             this.chance = dto.chance;
             this.label = dto.label;
