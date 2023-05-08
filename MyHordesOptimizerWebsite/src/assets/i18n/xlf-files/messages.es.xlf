@@ -619,50 +619,32 @@
       </trans-unit>
       <trans-unit id="5538525584308970360" datatype="html">
         <source>Les outils externes ont bien été mis à jour</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_abstract_model/services/api.services.ts</context>
-          <context context-type="linenumber">145</context>
-        </context-group>
+        
         <target state="needs-translation">Les outils externes ont bien été mis à jour</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/services/api.services.ts</context><context context-type="linenumber">142</context></context-group></trans-unit>
       <trans-unit id="5937107716887714291" datatype="html">
         <source>La cellule a bien été modifiée</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_abstract_model/services/api.services.ts</context>
-          <context context-type="linenumber">327</context>
-        </context-group>
+        
         <target state="needs-translation">La cellule a bien été modifiée</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/services/api.services.ts</context><context context-type="linenumber">324</context></context-group></trans-unit>
       <trans-unit id="1969912485869156963" datatype="html">
         <source>La fouille a bien été supprimée</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_abstract_model/services/digs.service.ts</context>
-          <context context-type="linenumber">43</context>
-        </context-group>
+        
         <target state="needs-translation">La fouille a bien été supprimée</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/services/digs.service.ts</context><context context-type="linenumber">41</context></context-group></trans-unit>
       <trans-unit id="5126997801267803550" datatype="html">
         <source>La fouille a bien été mise à jour</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_abstract_model/services/digs.service.ts</context>
-          <context context-type="linenumber">55</context>
-        </context-group>
+        
         <target state="needs-translation">La fouille a bien été mise à jour</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/services/digs.service.ts</context><context context-type="linenumber">53</context></context-group></trans-unit>
       <trans-unit id="4239682992533392472" datatype="html">
         <source>La liste de courses a bien été enregistrée</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_abstract_model/services/wishlist.service.ts</context>
-          <context context-type="linenumber">58</context>
-        </context-group>
+        
         <target state="needs-translation">La liste de courses a bien été enregistrée</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/services/wishlist.service.ts</context><context context-type="linenumber">55</context></context-group></trans-unit>
       <trans-unit id="5161390510505382530" datatype="html">
-        <source>L&apos;objet <x id="PH" equiv-text="item.label[this.locale]"/> a bien été ajouté à la liste de courses</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_abstract_model/services/wishlist.service.ts</context>
-          <context context-type="linenumber">75</context>
-        </context-group>
+        <source>L'objet <x id="PH" equiv-text="item.label[this.locale]"/> a bien été ajouté à la liste de courses</source>
+        
         <target state="needs-translation">L'objet <x id="PH" equiv-text="item.label[this.locale]"/> a bien été ajouté à la liste de courses</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/services/wishlist.service.ts</context><context context-type="linenumber">72</context></context-group></trans-unit>
       <trans-unit id="5382458688695417420" datatype="html">
@@ -676,36 +658,15 @@
         <target state="needs-translation">Banque</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/bank/bank.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">21</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">52</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">83</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">99</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">41</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tutorials/script/tuto-script-tools/tuto-script-tools.component.ts</context><context context-type="linenumber">16</context></context-group></trans-unit><trans-unit id="7491144287113751802" datatype="html">
         <source>Affichage condensé</source><target state="new">Affichage condensé</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/bank/bank.component.html</context>
-          <context context-type="linenumber">3</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context>
-          <context context-type="linenumber">21</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">52</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">83</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">99</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-          <context context-type="linenumber">41</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-tools/tuto-script-tools.component.ts</context>
-          <context context-type="linenumber">16</context>
-        </context-group>
+        
+        
+        
+        
+        
+        
+        
         <target state="needs-translation">Banque</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/bank/bank.component.html</context><context context-type="linenumber">3</context></context-group></trans-unit>
       <trans-unit id="7491144287113751802" datatype="html">
         <source>Affichage condensé</source>
         <context-group purpose="location">
@@ -1600,7 +1561,7 @@
         <target state="needs-translation">Ont joué</target>
       </trans-unit>
       <trans-unit id="6645156447857379979" datatype="html">
-        <source>N&apos;ont pas joué</source>
+        <source>N'ont pas joué</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
           <context context-type="linenumber">60</context>
@@ -1833,11 +1794,8 @@
         <target state="needs-translation">Toute la carte</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">60</context></context-group></trans-unit><trans-unit id="8142874177184348276" datatype="html">
         <source>Identifiant</source><target state="new">Identifiant</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">60</context>
-        </context-group>
-      </trans-unit><trans-unit id="347985381929507270" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">76</context></context-group></trans-unit><trans-unit id="347985381929507270" datatype="html">
         <source>Nom de l'objet</source><target state="new">Nom de l'objet</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
@@ -1853,7 +1811,7 @@
         <target state="needs-translation">Identifiant</target>
       </trans-unit>
       <trans-unit id="347985381929507270" datatype="html">
-        <source>Nom de l&apos;objet</source>
+        <source>Nom de l'objet</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">77</context>
@@ -1862,16 +1820,10 @@
       </trans-unit>
       <trans-unit id="7453572823482729445" datatype="html">
         <source>Haute</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">83</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">93</context>
-        </context-group>
+        
+        
         <target state="needs-translation">Haute</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">80</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">93</context></context-group></trans-unit>
       <trans-unit id="5559973343890533582" datatype="html">
         <source>Non définie</source>
 
@@ -1896,13 +1848,13 @@
         </context-group>
       </trans-unit><trans-unit id="267923422419323222" datatype="html">
         <source>Nombre d'objets</source><target state="new">Nombre d'objets</target>
+        
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">36</context></context-group></trans-unit><trans-unit id="8364958810283495875" datatype="html">
+        <source>Défense apportée</source><target state="new">Défense apportée</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">80</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
+          <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit><trans-unit id="2158441971311454300" datatype="html">
         <source>Récupérer les informations depuis GH</source><target state="new">Récupérer les informations depuis GH</target>
@@ -2049,11 +2001,8 @@
         <target state="needs-translation">La liste a bien été copiée au format forum</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">223</context></context-group></trans-unit><trans-unit id="7155393620333942058" datatype="html">
         <source>Liste de course</source><target state="new">Liste de course</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">223</context>
-        </context-group>
-      </trans-unit><trans-unit id="3401205854749832786" datatype="html">
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">231</context></context-group></trans-unit><trans-unit id="3401205854749832786" datatype="html">
         <source>Voulez-vous écraser la liste actuelle ? Elle sera perdue.</source><target state="new">Voulez-vous écraser la liste actuelle ? Elle sera perdue.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
@@ -2101,7 +2050,7 @@
         <target state="needs-translation">Cassé</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context><context context-type="linenumber">10</context></context-group></trans-unit>
       <trans-unit id="6906288566408280890" datatype="html">
-        <source>Taux d&apos;obtention en cas de fouille réussie sur une zone praf</source>
+        <source>Taux d'obtention en cas de fouille réussie sur une zone praf</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context>
           <context context-type="linenumber">28</context>
@@ -2109,7 +2058,7 @@
         <target state="needs-translation">Taux d'obtention en cas de fouille réussie sur une zone praf</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context><context context-type="linenumber">28</context></context-group></trans-unit>
       <trans-unit id="5983300914001148035" datatype="html">
-        <source>Taux d&apos;obtention en cas de fouille réussie sur une zone non-praf</source>
+        <source>Taux d'obtention en cas de fouille réussie sur une zone non-praf</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context>
           <context context-type="linenumber">32</context>
@@ -2162,7 +2111,7 @@
         <target state="needs-translation">Jamais mis à jour</target>
       </trans-unit>
       <trans-unit id="4090316153063202728" datatype="html">
-        <source>Mis à jour par <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo.update_time.fromNow()}}"/> (<x id="INTERPOLATION_2" equiv-text="{{lastUpdateInfo.update_time.toDate() | date:&apos;medium&apos;}}"/>)</source>
+        <source>Mis à jour par <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo.update_time.fromNow()}}"/> (<x id="INTERPOLATION_2" equiv-text="{{lastUpdateInfo.update_time.toDate() | date:'medium'}}"/>)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
           <context context-type="linenumber">39</context>
@@ -2186,12 +2135,12 @@
         <target state="needs-translation">Ce champ est obligatoire</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/select/select.component.ts</context><context context-type="linenumber">102</context></context-group></trans-unit>
       <trans-unit id="2974950606230121476" datatype="html">
-        <source>Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> et <x id="START_LINK_1" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
+        <source>Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;>"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> et <x id="START_LINK_1" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6173&quot;>"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> et <x id="START_LINK_1" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
+        <target state="needs-translation">Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;>"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> et <x id="START_LINK_1" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6173&quot;>"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></target>
       </trans-unit>
       <trans-unit id="3400027835914346369" datatype="html">
         <source>Discord</source>
@@ -2214,20 +2163,22 @@
         <target state="needs-translation">Remerciements</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/structure/footer/footer.component.html</context><context context-type="linenumber">9</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/thanks/thanks.component.html</context><context context-type="linenumber">4</context></context-group></trans-unit>
       <trans-unit id="5186837657495593523" datatype="html">
-        <source>Ce site n&apos;est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
+        <source>Ce site n'est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> ou à <x id="START_LINK_1" equiv-text="&lt;a
+                href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">16,17</context>
         </context-group>
-        <target state="needs-translation">Ce site n'est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
+        <target state="needs-translation">Ce site n'est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></target>
       </trans-unit>
       <trans-unit id="239352375316430833" datatype="html">
-        <source>Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
+        <source>Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> ou à <x id="START_LINK_1" equiv-text="&lt;a
+                href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">19,20</context>
         </context-group>
-        <target state="needs-translation">Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
+        <target state="needs-translation">Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/></target>
       </trans-unit>
       <trans-unit id="3984780497725315833" datatype="html">
         <source>Mettre à jour les outils externes</source>
@@ -2255,7 +2206,7 @@
         <target state="needs-translation">Utilisateur inconnu</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/structure/header/header.component.html</context><context context-type="linenumber">20</context></context-group></trans-unit>
       <trans-unit id="4322254668478976610" datatype="html">
-        <source>Identifiant d&apos;app externe</source>
+        <source>Identifiant d'app externe</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
           <context context-type="linenumber">28</context>
@@ -2831,7 +2782,7 @@
         <target state="needs-translation">Nombre de campeurs déjà cachés sur la case</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">107</context></context-group></trans-unit>
       <trans-unit id="1759876158817324985" datatype="html">
-        <source>Nombre d&apos;améliorations simples faites sur la case</source>
+        <source>Nombre d'améliorations simples faites sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">122</context>
@@ -2839,7 +2790,7 @@
         <target state="needs-translation">Nombre d'améliorations simples faites sur la case</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">122</context></context-group></trans-unit>
       <trans-unit id="1569331568164081073" datatype="html">
-        <source>Nombre d&apos;objets de défense installés sur la case</source>
+        <source>Nombre d'objets de défense installés sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">128</context>
@@ -2863,7 +2814,7 @@
         <target state="needs-translation">Ou</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">135</context></context-group></trans-unit>
       <trans-unit id="1176751937188269730" datatype="html">
-        <source>Nombre total d&apos;améliotations sur la case</source>
+        <source>Nombre total d'améliotations sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">139</context>
@@ -3105,19 +3056,10 @@
         <target state="needs-translation">Chances de survie</target>
       <context-group purpose="location"><context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context><context context-type="linenumber">40</context></context-group></trans-unit><trans-unit id="880920713849004233" datatype="html">
         <source>Choisir le mode de partage</source><target state="new">Choisir le mode de partage</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
-          <context context-type="linenumber">40</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-wiki/tuto-script-wiki.component.html</context>
-          <context context-type="linenumber">4</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.html</context>
-          <context context-type="linenumber">4</context>
-        </context-group>
-      </trans-unit>
+        
+        
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tutorials/script/tuto-script-alerts/tuto-script-alerts.component.html</context><context context-type="linenumber">4</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tutorials/script/tuto-script-display/tuto-script-display.component.html</context><context context-type="linenumber">4</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tutorials/script/tuto-script-external-tools/tuto-script-external-tools.component.html</context><context context-type="linenumber">4</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tutorials/script/tuto-script-installation/tuto-script-installation.component.html</context><context context-type="linenumber">4</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tutorials/script/tuto-script-tools/tuto-script-tools.component.html</context><context context-type="linenumber">4</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tutorials/script/tuto-script-wiki/tuto-script-wiki.component.html</context><context context-type="linenumber">4</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.html</context><context context-type="linenumber">4</context></context-group></trans-unit>
       <trans-unit id="880920713849004233" datatype="html">
         <source>Choisir le mode de partage</source>
         <context-group purpose="location">
@@ -3603,7 +3545,7 @@
         <target state="needs-translation">Ordinateur</target>
       </trans-unit>
       <trans-unit id="3328878747241354904" datatype="html">
-        <source>Il faut d&apos;abord installer l&apos;application de gestion des scripts de votre choix. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le <x id="PH" equiv-text="this.download_link"/>, qui lancera la procédure d&apos;installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.</source>
+        <source>Il faut d'abord installer l'application de gestion des scripts de votre choix. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le <x id="PH" equiv-text="this.download_link"/>, qui lancera la procédure d'installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">18</context>
@@ -3620,24 +3562,24 @@
         <target state="needs-translation">Android</target>
       </trans-unit>
       <trans-unit id="8779052767222867775" datatype="html">
-        <source>&lt;ul&gt;
-                &lt;li&gt;Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox Nightly ;&lt;/li&gt;
-                &lt;li&gt;Rechercher l&apos;extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li&gt;
-                &lt;li&gt;Installer l&apos;extension pour Chrome ;&lt;/li&gt;
-                &lt;li&gt;Cliquer sur le <x id="PH" equiv-text="this.download_link"/> ;&lt;/li&gt;
-                &lt;li&gt;Confirmer l&apos;installation dans la page qui se sera ouverte.&lt;/li&gt;
-            &lt;/ul&gt;</source>
+        <source>&lt;ul>
+                &lt;li>Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox Nightly ;&lt;/li>
+                &lt;li>Rechercher l'extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li>
+                &lt;li>Installer l'extension pour Chrome ;&lt;/li>
+                &lt;li>Cliquer sur le <x id="PH" equiv-text="this.download_link"/> ;&lt;/li>
+                &lt;li>Confirmer l'installation dans la page qui se sera ouverte.&lt;/li>
+            &lt;/ul></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">21,27</context>
         </context-group>
-        <target state="needs-translation">&lt;ul&gt;
-                &lt;li&gt;Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox Nightly ;&lt;/li&gt;
-                &lt;li&gt;Rechercher l'extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li&gt;
-                &lt;li&gt;Installer l'extension pour Chrome ;&lt;/li&gt;
-                &lt;li&gt;Cliquer sur le <x id="PH" equiv-text="this.download_link"/> ;&lt;/li&gt;
-                &lt;li&gt;Confirmer l'installation dans la page qui se sera ouverte.&lt;/li&gt;
-            &lt;/ul&gt;</target>
+        <target state="needs-translation">&lt;ul>
+                &lt;li>Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox Nightly ;&lt;/li>
+                &lt;li>Rechercher l'extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li>
+                &lt;li>Installer l'extension pour Chrome ;&lt;/li>
+                &lt;li>Cliquer sur le <x id="PH" equiv-text="this.download_link"/> ;&lt;/li>
+                &lt;li>Confirmer l'installation dans la page qui se sera ouverte.&lt;/li>
+            &lt;/ul></target>
       </trans-unit>
 
       <trans-unit id="6674940684074453217" datatype="html">
@@ -3670,26 +3612,26 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">30,46</context>
         </context-group>
-        <target state="needs-translation">&lt;ul&gt;
-                &lt;li&gt;Télécharger l’application "UserScripts" ;&lt;/li&gt;
-                &lt;li&gt;Aller dans "Fichiers" ;&lt;/li&gt;
-                &lt;li&gt;Créer un dossier que l’on appellera "UserScripts" (ou autre mais c’est pour mieux s’y retrouver) ;&lt;/li&gt;
-                &lt;li&gt;Ouvrir l’application "UserScripts" ;&lt;/li&gt;
-                &lt;li&gt;Appuyer sur "Set Userscripts Directory" ;&lt;/li&gt;
-                &lt;li&gt;Sélectionner le dossier précédemment créé et valider ;&lt;/li&gt;
-                &lt;li&gt;Enregistrer le fichier disponible sur le <x id="PH" equiv-text="this.download_link"/> (ou via un appui long sur le lien, peut être);&lt;/li&gt;
-                &lt;li&gt;Déplacer le fichier dans le dossier créé ;&lt;/li&gt;
-                &lt;li&gt;Aller sur Safari ;&lt;/li&gt;
-                &lt;li&gt;Appuyer sur le "Aa" dans la barre de recherche ;&lt;/li&gt;
-                &lt;li&gt;Cliquer sur "Gérer les extensions" ;&lt;/li&gt;
-                &lt;li&gt;Activer "Userscripts" ;&lt;/li&gt;
-                &lt;li&gt;Appuyer sur le "Aa" dans la barre de recherche ;&lt;/li&gt;
-                &lt;li&gt;Cliquer sur "Userscripts" ;&lt;/li&gt;
-                &lt;li&gt;Vérifier que "MyHordes Optimizer" est bien activé.&lt;/li&gt;
-            &lt;/ul&gt;</target>
+        <target state="needs-translation">&lt;ul>
+                &lt;li>Télécharger l’application "UserScripts" ;&lt;/li>
+                &lt;li>Aller dans "Fichiers" ;&lt;/li>
+                &lt;li>Créer un dossier que l’on appellera "UserScripts" (ou autre mais c’est pour mieux s’y retrouver) ;&lt;/li>
+                &lt;li>Ouvrir l’application "UserScripts" ;&lt;/li>
+                &lt;li>Appuyer sur "Set Userscripts Directory" ;&lt;/li>
+                &lt;li>Sélectionner le dossier précédemment créé et valider ;&lt;/li>
+                &lt;li>Enregistrer le fichier disponible sur le <x id="PH" equiv-text="this.download_link"/> (ou via un appui long sur le lien, peut être);&lt;/li>
+                &lt;li>Déplacer le fichier dans le dossier créé ;&lt;/li>
+                &lt;li>Aller sur Safari ;&lt;/li>
+                &lt;li>Appuyer sur le "Aa" dans la barre de recherche ;&lt;/li>
+                &lt;li>Cliquer sur "Gérer les extensions" ;&lt;/li>
+                &lt;li>Activer "Userscripts" ;&lt;/li>
+                &lt;li>Appuyer sur le "Aa" dans la barre de recherche ;&lt;/li>
+                &lt;li>Cliquer sur "Userscripts" ;&lt;/li>
+                &lt;li>Vérifier que "MyHordes Optimizer" est bien activé.&lt;/li>
+            &lt;/ul></target>
       </trans-unit>
       <trans-unit id="5960214076877261704" datatype="html">
-        <source>Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses fonctionnalités.</source>
+        <source>Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">49</context>

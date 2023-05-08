@@ -567,42 +567,42 @@
         <source>Les outils externes ont bien été mis à jour</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/services/api.services.ts</context>
-          <context context-type="linenumber">145</context>
+          <context context-type="linenumber">142</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5937107716887714291" datatype="html">
         <source>La cellule a bien été modifiée</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/services/api.services.ts</context>
-          <context context-type="linenumber">327</context>
+          <context context-type="linenumber">324</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1969912485869156963" datatype="html">
         <source>La fouille a bien été supprimée</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/services/digs.service.ts</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">41</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5126997801267803550" datatype="html">
         <source>La fouille a bien été mise à jour</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/services/digs.service.ts</context>
-          <context context-type="linenumber">55</context>
+          <context context-type="linenumber">53</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4239682992533392472" datatype="html">
         <source>La liste de courses a bien été enregistrée</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/services/wishlist.service.ts</context>
-          <context context-type="linenumber">58</context>
+          <context context-type="linenumber">55</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5161390510505382530" datatype="html">
         <source>L&apos;objet <x id="PH" equiv-text="item.label[this.locale]"/> a bien été ajouté à la liste de courses</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/services/wishlist.service.ts</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5382458688695417420" datatype="html">
@@ -934,6 +934,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context>
           <context context-type="linenumber">37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
+          <context context-type="linenumber">21</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
@@ -1737,28 +1741,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">93</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="8648912876673109537" datatype="html">
-        <source>Ne pas ramener</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">80</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">92</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">89</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="4209980706371465802" datatype="html">
-        <source>Quantité souhaitée</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">82</context>
         </context-group>
       </trans-unit>
       <trans-unit id="955710000640596255" datatype="html">
