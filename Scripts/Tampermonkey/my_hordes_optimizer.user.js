@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.49
+// @version      1.0.0-beta.50
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -20,7 +20,6 @@
 // @match        *://myhordes.eu/*
 // @match        *://myhord.es/*
 // @match        *://myhordes.localhost/*
-// @match        *://staging.myhordes.de/*
 //
 // @match        https://bbh.fred26.fr/*
 // @match        https://gest-hordes2.eragaming.fr/*
@@ -28,15 +27,15 @@
 //
 // @grant        GM.setValue
 // @grant        GM.getValue
-// @grant        GM.xmlHttpRequest
 // @grant        GM_notification
 //
 // ==/UserScript==
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Typo\n`
-    + `[correctif] Affichage du warning en cas de registre incomplet\n`;
+    + `[correctif] Correction de divers comportements \n\n`
+    + `[amélioration] Devrait désormais fonctionner avec Greasemonkey\n\n`
+    + `[nouveauté] Ajout d'une option pour ouvrir automatiquement le menu "Utiliser un objet de son sac"`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1244,10 +1243,10 @@ let params_categories = [
             {
                 id: `display_camping_predict`,
                 label: {
-                    en: `[Experimental] Camping predictions in area information`,
-                    fr: `[Expérimental] Prédictions de camping dans les informations sur le secteur`,
+                    en: `Camping predictions in area information`,
+                    fr: `Prédictions de camping dans les informations du secteur`,
                     de: `Campingvorhersagen in Gebietsinformationen`,
-                    es: `[Experimental] Predicciones para acampar en la información del área`
+                    es: `Predicciones para acampar en la información del área`
                 },
                 parent_id: null
             },
@@ -1277,16 +1276,26 @@ let params_categories = [
             //     },
             //     parent_id: null
             // },
-            // {
-            //     id: `display_anti_abuse`,
-            //     label: {
-            //         en: `TODO`,
-            //         fr: `Affiche un compteur pour gérer l'anti-abus`,
-            //         de: `TODO`,
-            //         es: `TODO`
-            //     },
-            //     parent_id: null
-            // }
+            {
+                id: `display_anti_abuse`,
+                label: {
+                    en: `TODO`,
+                    fr: `Affiche un compteur pour gérer l'anti-abus`,
+                    de: `TODO`,
+                    es: `TODO`
+                },
+                parent_id: null
+            },
+            {
+                id: `automatically_open_bag`,
+                label: {
+                    en: `Automatically opens the "Use an object from my rucksack" menu`,
+                    fr: `Ouvre automatiquement le menu "Utiliser un objet de mon sac"`,
+                    de: `Öffnet automatisch das Menü "Gegenstand verwenden"`,
+                    es: `Abre automáticamente el menú "Usar un objeto de mi mochila"`
+                },
+                parent_id: null
+            }
             // {
             //     id: `block_users`,
             //     label: {
@@ -1662,9 +1671,34 @@ function calculateDespairDeaths(nb_killed_zombies) {
     return Math.floor(Math.max(0, (nb_killed_zombies - 1) / 2));
 }
 
+function fixMhCompiledImg(img) {
+    return img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3')
+}
 
-function initOptions() {
+function getHoveredItem() {
+    let hovered = document.querySelectorAll(":hover");
+    let hovered_item;
+    let broken;
+    for (let item of hovered) {
+        let hovered_item_img;
+        if (item.classList.contains('item-icon')) {
+            hovered_item_img = item.firstElementChild.src;
+        } else if (item.tagName.toLowerCase() === 'SPAN'.toLowerCase() && item.previousElementSibling && item.previousElementSibling.classList.contains('item-icon')) {
+            hovered_item_img = item.previousElementSibling?.firstElementChild?.src;
+        } else if (item.tagName.toLowerCase() === 'LI'.toLowerCase()) {
+            hovered_item_img = item.firstElementChild?.firstElementChild?.src;
+        }
+        if (hovered_item_img) {
+            let index = hovered_item_img.indexOf(hordes_img_url);
+            hovered_item_img = hovered_item_img.slice(index).replace(hordes_img_url, '');
+            hovered_item = items.find((item) => item.img === fixMhCompiledImg(hovered_item_img));
+        }
+    }
 
+    return {item: hovered_item, broken: broken};
+}
+
+function initOptionsWithLoginNeeded() {
     /** Gère le bouton de mise à jour des outils externes) */
     if (!buttonOptimizerExists()) {
         createStyles();
@@ -1672,25 +1706,30 @@ function initOptions() {
         createWindow();
     }
 
-    preventFromLeaving();
     createDisplayMapButton();
+    displayWishlistInApp();
+    displayPriorityOnItems();
+    createUpdateExternalToolsButton();
+    displayCellDetailsOnPage();
+    // displayEstimationsOnWatchtower();
+}
+
+
+function initOptionsWithoutLoginNeeded() {
+    preventFromLeaving();
 
     displayWishlistInApp();
-    createUpdateExternalToolsButton();
     clickOnVotedToRedirect();
     displaySearchFieldOnBuildings();
     displaySearchFieldOnRecipientList();
     displayMinApOnBuildings();
-    displayPriorityOnItems();
     displayNbDeadZombies();
     displayTranslateTool();
     notifyOnNewMessage();
-    displayCellDetailsOnPage();
-    // displayEstimationsOnWatchtower();
-    // displayAntiAbuseCounter();
-
+    displayCampingPredict();
+    displayAntiAbuseCounter();
+    automaticallyOpenBag();
     // blockUsersPosts();
-
     count_pending_notifications = document.querySelector('#postbox-new-msg-counter')?.innerText;
 }
 
@@ -1950,7 +1989,8 @@ function createParams() {
                 }
 
                 // Quand on change une option, trigger à nouveau certaines vérifications pour ne pas avoir à les vérifier tout le temps (=> perf !)
-                initOptions();
+                initOptionsWithLoginNeeded();
+                initOptionsWithoutLoginNeeded();
             });
 
             let param_container = document.createElement('li');
@@ -3164,7 +3204,7 @@ function getRecipeElement(recipe) {
 
         let component_img = document.createElement('img');
         component_img.setAttribute('style', 'margin-right: 0.5em');
-        component_img.src = repo_img_hordes_url + compo.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
+        component_img.src = repo_img_hordes_url + fixMhCompiledImg(compo.img);
         compo_container.appendChild(component_img);
 
         let component_label = document.createElement('span');
@@ -3193,7 +3233,7 @@ function getRecipeElement(recipe) {
 
         let result_img = document.createElement('img');
         result_img.setAttribute('style', 'margin-right: 0.5em');
-        result_img.src = repo_img_hordes_url + result.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
+        result_img.src = repo_img_hordes_url + fixMhCompiledImg(result.item.img);
         result_container.appendChild(result_img);
 
         let result_label = document.createElement('span');
@@ -3705,7 +3745,7 @@ function displayPriorityOnItems() {
                 .filter((wishlist_item) => wishlist_item.priority !== 0)
                 .forEach((wishlist_item) => {
                     present_items
-                        .filter((present_item) => present_item.src.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3').indexOf(wishlist_item.item.img) > 0)
+                        .filter((present_item) => fixMhCompiledImg(present_item.src).indexOf(wishlist_item.item.img) > 0)
                         .forEach((present_item) => {
                             present_item.parentElement.parentElement.classList.add('priority_' + wishlist_item.priority_main);
                         });
@@ -3735,16 +3775,7 @@ function displayAdvancedTooltips() {
         let tooltip_container = document.getElementById('tooltip_container');
         let advanced_tooltip_container = document.getElementById('mho-advanced-tooltip');
         if (tooltip_container.innerHTML) {
-            let hovered = document.querySelectorAll(":hover");
-            let hovered_item;
-            for (let item of hovered) {
-                if (item.classList.contains('item-icon')) {
-                    let hovered_item_img = item.firstElementChild.src;
-                    let index = hovered_item_img.indexOf(hordes_img_url);
-                    hovered_item_img = hovered_item_img.slice(index).replace(hordes_img_url, '');
-                    hovered_item = items.find((item) => item.img === hovered_item_img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3'));
-                }
-            }
+            let hovered_item = getHoveredItem().item;
 
             if (hovered_item) {
                 let tooltip_content = tooltip_container.firstElementChild;
@@ -4794,7 +4825,7 @@ function notifyOnSearchEnd() {
                     }, timeout_counter);
                 }
             }
-        } else if (pageIsTown()) {
+        } else {
             clearInterval(interval);
             notifyOnSearchEnd();
         }
@@ -5095,7 +5126,7 @@ function displayAntiAbuseCounter() {
         if (pageIsBank()) {
             let forum_preview = document.querySelector('.forum-preview-wrapper-bank');
             if (!forum_preview) return;
-            forum_preview.parentElement.insertBefore(mho_anti_abuse_counter, forum_preview);
+            forum_preview.parentElement.insertBefore(mho_anti_abuse_counter, forum_preview.parentElement.firstElementChild);
         } else {
             let actions_box = document.querySelector('.actions-box');
             if (!actions_box) return;
@@ -5103,398 +5134,552 @@ function displayAntiAbuseCounter() {
         }
 
         let header = document.createElement('h5');
+        header.style.display = 'flex';
+        header.style.alignItems = 'center';
+        header.style.justifyContent = 'space-between';
         mho_anti_abuse_counter.appendChild(header);
-        header.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 30px !important; vertical-align: middle; margin-right: 0.5em;">${getI18N(texts.anti_abuse_title)}`;
+
+        let first_part = document.createElement('div');
+        first_part.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px !important; vertical-align: middle; margin-right: 0.5em;">${getI18N(texts.anti_abuse_title)}`;
+        header.appendChild(first_part);
+
+        let second_part = document.createElement('div');
+        header.appendChild(second_part);
 
         let content = document.createElement('div');
+        content.classList.add('content');
+        content.style.borderBottom = '1px solid #ddab76';
         mho_anti_abuse_counter.appendChild(content);
 
-        let old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+        /** Modifie le style du forum pour pouvoir l'afficher proprement malgré la présence du compteur */
+        let forum_preview_wrapper_bank = document.querySelector('.forum-preview-wrapper-bank');
+        if (forum_preview_wrapper_bank) {
+            forum_preview_wrapper_bank.style.minHeight = 'unset';
 
-        document.addEventListener('click', () => {
-            old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+            let forum_preview_container = forum_preview_wrapper_bank.querySelector('.forum-preview-container');
+            if (forum_preview_container) {
+                forum_preview_container.style.position = 'initial';
+                forum_preview_container.style.padding = '3px';
 
-            document.addEventListener('mh-navigation-complete', (event) => {
-                // console.log('event mh-navigation-complete', event);
-                let new_bag = document.querySelectorAll("#gma ul.rucksack li.item");
-                if (old_bag.length < new_bag.length) {
-
-                    GM.getValue(mho_anti_abuse_key).then((counter_values) => {
-                        if (!counter_values) {
-                            counter_values = [];
-                        }
-                        if (counter_values.length < 5) {
-                            counter_values.push({item: '', take_at: new Date()});
-                            GM.setValue(mho_anti_abuse_key, counter_values);
-                        }
-                    })
+                let forum_content = forum_preview_container.querySelector('#forum-content');
+                if (forum_content) {
+                    forum_content.style.position = 'initial';
                 }
-                old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
-            }, {once: true});
-        }, {signal: controller.signal})
+            }
+        }
+        /** Fin */
+
+        GM.getValue(mho_anti_abuse_key).then((counter_values) => {
+            // counter_values = undefined;
+            // GM.setValue(mho_anti_abuse_key, counter_values);
+
+            let add_counter_btn = document.createElement('button');
+            add_counter_btn.innerText = '+';
+            second_part.appendChild(add_counter_btn);
+            add_counter_btn.addEventListener('click', () => {
+                let fictive_item = {
+                    label: {
+                        de: `Benutzerdefinierter Zähler`,
+                        en: `Custom counter`,
+                        es: `Contador personalizado`,
+                        fr: `Compteur personnalisé`,
+                    },
+                    img: 'icons/small_warning.gif'
+                }
+                if (!counter_values) {
+                    counter_values = [];
+                }
+                let counter_value = {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000};
+                console.log('counter', {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000});
+                counter_values.push(counter_value);
+                GM.setValue(mho_anti_abuse_key, counter_values);
+                let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
+                if (new_mho_anti_abuse_counter) {
+                    let new_content = new_mho_anti_abuse_counter.querySelector('.content');
+                    define_row(counter_value, counter_values.length - 1, new_content);
+                }
+            })
+
+            let define_row = (counter_value, index, new_content) => {
+                let value_in_list = document.createElement('div');
+                value_in_list.style.display = 'flex';
+                value_in_list.style.gap = '0.5em';
+                new_content.appendChild(value_in_list);
+
+                let item_name = document.createElement('div');
+                item_name.style.flex = 1;
+                item_name.innerHTML = `<img src="${repo_img_hordes_url + counter_value.item?.item?.img}" style="margin-right: 0.5em" class="${counter_value.item?.item?.broken ? 'broken' : ''}">${counter_value.item?.item?.label[lang]}`;
+                value_in_list.appendChild(item_name);
+
+                let item_counter = document.createElement('div');
+                item_counter.style.width = '50px';
+                let interval = setInterval(() => {
+                    let since = (Date.now() - parseInt(counter_value.take_at))
+                    let time_left = new Date((15 * 60000) - since);
+                    if (time_left < 0) {
+                        counter_values.splice(index, 1);
+                        GM.setValue(mho_anti_abuse_key, counter_values);
+                        clearInterval(interval);
+                        value_in_list.remove();
+                    } else {
+                        let minute = time_left.getMinutes();
+                        let seconds = time_left.getSeconds();
+                        item_counter.innerText = minute + ':' + (seconds < 10 ? ('0' + seconds) : seconds);
+                    }
+                }, 250);
+                value_in_list.appendChild(item_counter);
+            }
+
+            if (!counter_values) {
+                counter_values = [];
+            }
+            counter_values.forEach((counter_value, index) => {
+                define_row(counter_value, index, content);
+            });
+
+            let old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+
+            document.addEventListener('click', (event) => {
+                if (pageIsBank()) {
+                    old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+
+                    let hovered_item = getHoveredItem();
+
+                    document.addEventListener('mh-navigation-complete', () => {
+                        let new_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+                        if (old_bag.length < new_bag.length) {
+                            GM.getValue(mho_anti_abuse_key).then((counter_values) => {
+                                if (!counter_values) {
+                                    counter_values = [];
+                                }
+                                let counter_value = {
+                                    item: {item: hovered_item.item, broken: hovered_item.broken},
+                                    take_at: Date.now() + 5000
+                                }
+                                counter_values.push(counter_value);
+                                GM.setValue(mho_anti_abuse_key, counter_values);
+                                console.log('counter_values', counter_values);
+                                let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
+                                if (new_mho_anti_abuse_counter) {
+                                    let new_content = new_mho_anti_abuse_counter.querySelector('.content');
+                                    define_row(counter_value, counter_values.length - 1, new_content);
+                                }
+                            })
+                        }
+                        old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+                    }, {once: true});
+                } else if (pageIsWell()) {
+                    let button;
+                    if (event.target.tagName.toLowerCase() === 'BUTTON'.toLowerCase()) {
+                        button = event.target;
+                    } else {
+                        button = event.target.parentElement;
+                    }
+                    if (button.getAttribute('x-well-confirm') === '1' && button.getAttribute('x-well-direction') === 'up') {
+                        document.addEventListener('mh-navigation-complete', () => {
+                            let well_item = {
+                                label: {
+                                    de: `Eine weitere Ration erhalten`,
+                                    en: `Extra ration`,
+                                    es: `Ración adicional`,
+                                    fr: `Ration supplémentaire`,
+                                },
+                                img: 'log/well.gif'
+                            }
+                            GM.getValue(mho_anti_abuse_key).then((counter_values) => {
+                                if (!counter_values) {
+                                    counter_values = [];
+                                }
+                                let counter_value = {item: {item: well_item, broken: false}, take_at: Date.now() + 5000}
+                                counter_values.push(counter_value);
+                                GM.setValue(mho_anti_abuse_key, counter_values);
+                                let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
+                                if (new_mho_anti_abuse_counter) {
+                                    let new_content = new_mho_anti_abuse_counter.querySelector('.content');
+                                    define_row(counter_value, counter_values.length - 1, new_content);
+                                }
+                            })
+                        }, {once: true});
+                    }
+                } else {
+                    controller.abort();
+                }
+            }, {signal: controller.signal})
+        });
 
     } else {
         controller.abort();
     }
 }
 
-function displayCampingPredict() {
-    let camping_predict_container = document.getElementById(mho_camping_predict_id);
-
-    let zone_camp = document.querySelector('.zone-camp');
-    if (mho_parameters.display_camping_predict && pageIsDesert() && zone_camp) {
-        if (camping_predict_container) return;
-
-        getRuins().then((ruins) => {
-            let all_ruins = [...added_ruins];
-            all_ruins = all_ruins.concat(ruins);
-
-            let zone_camp_info = zone_camp.querySelector('.zone-camp-info');
-            let zone_camp_label = zone_camp.querySelector('label');
-            zone_camp_label.addEventListener('click', () => {
-                camping_predict_container.style.display = camping_predict_container.style.display === 'none' ? 'block' : 'none'
-            });
-
-            camping_predict_container = document.createElement('div');
-            camping_predict_container.id = mho_camping_predict_id;
-            camping_predict_container.style.border = '1px solid';
-            camping_predict_container.style.padding = '0.5em';
-            camping_predict_container.style.margin = '0.5em 0';
-
-            camping_predict_container.style.display = window.getComputedStyle(zone_camp_info).getPropertyValue('max-height') === '0px' ? 'none' : 'block';
-            zone_camp.appendChild(camping_predict_container);
-
-            let updater_title = document.createElement('h5');
-            updater_title.style.marginTop = '0.5em';
-            let updater_title_mho_img = document.createElement('img');
-            updater_title_mho_img.src = mh_optimizer_icon;
-            updater_title_mho_img.style.height = '24px';
-            updater_title_mho_img.style.marginRight = '0.5em';
-            updater_title.appendChild(updater_title_mho_img);
-
-            let updater_title_text = document.createElement('text');
-            updater_title_text.innerHTML = GM_info.script.name;
-            updater_title_text.style.fontSize = '1.5em';
-            updater_title.appendChild(updater_title_text);
-
-            camping_predict_container.appendChild(updater_title);
-
-            let zone_ruin = document.querySelector('.ruin-info b');
-            let ruin = '';
-            if (zone_ruin) {
-                ruin = all_ruins.find((one_ruin) => getI18N(one_ruin.label).toLowerCase() === zone_ruin.innerText.toLowerCase()).id;
-            }
-            let conf = {
-                town: mh_user.townDetails.townType.toLowerCase(),
-                job: jobs.find((job) => mh_user.jobDetails.uid === job.img),
-                distance: document.querySelector('.zone-dist > div > b')?.innerText.replace('km', ''), // OK
-                campings: 0,
-                pro: false,
-                hidden_campers: 0,
-                objects: 0,
-                vest: false,
-                tomb: false,
-                zombies: document.querySelectorAll('.actor.zombie')?.length || 0,
-                night: !!document.querySelector('.map.night'),
-                devastated: mh_user.townDetails.isDevaste,
-                phare: false,
-                improve: 0,
-                object_improve: 0,
-                ruin: ruin
-            }
-            // console.log('conf', conf);
-
-            let my_info = document.createElement('div');
-            camping_predict_container.appendChild(my_info);
-
-            let my_info_title = document.createElement('h3');
-            my_info_title.innerText = getI18N(texts.camping_citizen);
-            my_info.appendChild(my_info_title);
-
-            let my_info_content = document.createElement('div');
-            my_info.appendChild(my_info_content);
-
-            let town_info = document.createElement('div');
-            camping_predict_container.appendChild(town_info);
-
-            let town_info_title = document.createElement('h3');
-            town_info_title.innerText = getI18N(texts.camping_town);
-            town_info.appendChild(town_info_title);
-
-            let town_info_content = document.createElement('div');
-            town_info.appendChild(town_info_content);
-
-            let cell_info = document.createElement('div');
-            camping_predict_container.appendChild(cell_info);
-
-            let cell_info_title = document.createElement('h3');
-            cell_info_title.innerText = getI18N(texts.camping_ruin);
-            cell_info.appendChild(cell_info_title);
-
-            let cell_info_content = document.createElement('div');
-            cell_info.appendChild(cell_info_content);
-
-            let result = document.createElement('div');
-            camping_predict_container.appendChild(result);
-
-            let result_title = document.createElement('h3');
-            result_title.innerText = getI18N(texts.result);
-            result.appendChild(result_title);
-
-            let result_content = document.createElement('div');
-            result_content.id = 'camping-result';
-            result.appendChild(result_content);
-
-            /** Capuche ? */
-            let vest_div = document.createElement('div');
-            vest_div.id = 'vest-field';
-            vest_div.style.display = 'none';
-            my_info_content.appendChild(vest_div);
-
-            let vest_label = document.createElement('label');
-            vest_label.htmlFor = 'vest';
-            vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
-            let vest = document.createElement('input');
-            vest.type = 'checkbox';
-            vest.id = 'vest';
-            vest.checked = conf.vest;
-            vest.addEventListener('change', ($event) => {
-                conf.vest = $event.srcElement.checked;
-                calculateCampingProbabilities(conf);
-            })
-            vest_div.appendChild(vest);
-            vest_div.appendChild(vest_label);
-
-            /** Campeur pro ? */
-            let pro_camper_div = document.createElement('div');
-            my_info_content.appendChild(pro_camper_div);
-
-            let pro_camper_label = document.createElement('label');
-            pro_camper_label.htmlFor = 'pro';
-            pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
-            let pro_camper = document.createElement('input');
-            pro_camper.type = 'checkbox';
-            pro_camper.id = 'pro';
-            pro_camper.checked = conf.pro;
-            pro_camper.addEventListener('change', ($event) => {
-                conf.pro = $event.srcElement.checked;
-                calculateCampingProbabilities(conf);
-            })
-            pro_camper_div.appendChild(pro_camper);
-            pro_camper_div.appendChild(pro_camper_label);
-
-            /** Tombe ? */
-            let tomb_div = document.createElement('div');
-            my_info_content.appendChild(tomb_div);
-
-            let tomb_label = document.createElement('label');
-            tomb_label.htmlFor = 'tomb';
-            tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
-            let tomb = document.createElement('input');
-            tomb.type = 'checkbox';
-            tomb.id = 'tomb';
-            tomb.checked = conf.tomb;
-            tomb.addEventListener('change', ($event) => {
-                conf.tomb = $event.srcElement.checked;
-                calculateCampingProbabilities(conf);
-            })
-            tomb_div.appendChild(tomb);
-            tomb_div.appendChild(tomb_label);
-
-            /** Nombre de nuits déjà campées */
-            let nb_campings_div = document.createElement('div');
-            my_info_content.appendChild(nb_campings_div);
-
-            let nb_campings_label = document.createElement('label');
-            nb_campings_label.htmlFor = 'nb-campings';
-            nb_campings_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
-            nb_campings_label.classList.add('spaced-label');
-            let nb_campings = document.createElement('input');
-            nb_campings.type = 'number';
-            nb_campings.id = 'nb-campings';
-            nb_campings.value = conf.campings;
-            nb_campings.classList.add('inline');
-            nb_campings.addEventListener('change', ($event) => {
-                conf.campings = +$event.srcElement.value;
-                calculateCampingProbabilities(conf);
-            })
-            nb_campings_div.appendChild(nb_campings_label);
-            nb_campings_div.appendChild(nb_campings);
-
-            /** Nombre de toiles de tente ou pelure de peau */
-            let objects_in_bag_div = document.createElement('div');
-            my_info_content.appendChild(objects_in_bag_div);
-
-            let objects_in_bag_label = document.createElement('label');
-            objects_in_bag_label.htmlFor = 'nb-objects';
-            objects_in_bag_label.innerText = getI18N(texts.objects_in_bag);
-            objects_in_bag_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
-            objects_in_bag_label.classList.add('spaced-label');
-            let objects_in_bag = document.createElement('input');
-            objects_in_bag.type = 'number';
-            objects_in_bag.id = 'nb-objects';
-            objects_in_bag.value = conf.objects;
-            objects_in_bag.classList.add('inline');
-            objects_in_bag.addEventListener('change', ($event) => {
-                conf.objects = +$event.srcElement.value;
-                calculateCampingProbabilities(conf);
-            })
-            objects_in_bag_div.appendChild(objects_in_bag_label);
-            objects_in_bag_div.appendChild(objects_in_bag);
-
-
-            /** Type de bâtiment */
-            let ruin_type_div = document.createElement('div');
-            cell_info_content.appendChild(ruin_type_div);
-
-            let select_ruin_label = document.createElement('label');
-            select_ruin_label.htmlFor = 'select-ruin';
-            select_ruin_label.innerText = getI18N(texts.ruin);
-            select_ruin_label.classList.add('spaced-label');
-            let select_ruin = document.createElement('select');
-            select_ruin.id = 'select-ruin';
-            select_ruin.value = conf.ruin;
-            select_ruin.classList.add('small');
-            all_ruins.forEach((ruin) => {
-                let ruin_option = document.createElement('option');
-                ruin_option.value = ruin.id;
-                ruin_option.label = getI18N(ruin.label);
-                if (ruin.id === conf.ruin) {
-                    ruin_option.setAttribute('selected', 'selected');
-                }
-                select_ruin.appendChild(ruin_option);
-            });
-            select_ruin.addEventListener('change', ($event) => {
-                conf.ruin = $event.srcElement.value;
-                calculateCampingProbabilities(conf);
-            })
-            ruin_type_div.appendChild(select_ruin_label);
-            ruin_type_div.appendChild(select_ruin);
-
-            /** Nombre de zombies sur la case */
-            let zombies_div = document.createElement('div');
-            cell_info_content.appendChild(zombies_div);
-
-            let zombies_label = document.createElement('label');
-            zombies_label.htmlFor = 'nb-zombies';
-            zombies_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
-            zombies_label.classList.add('spaced-label');
-            let zombies = document.createElement('input');
-            zombies.type = 'number';
-            zombies.id = 'nb-zombies';
-            zombies.value = conf.zombies;
-            zombies.classList.add('inline');
-            zombies.addEventListener('change', ($event) => {
-                conf.zombies = +$event.srcElement.value;
-                calculateCampingProbabilities(conf);
-            })
-            zombies_div.appendChild(zombies_label);
-            zombies_div.appendChild(zombies);
-
-            /** Nombre d'améliorations simples sur la case */
-            let improve_div = document.createElement('div');
-            cell_info_content.appendChild(improve_div);
-
-            let improve_label = document.createElement('label');
-            improve_label.htmlFor = 'nb-improve';
-            improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
-            improve_label.classList.add('spaced-label');
-            let improve = document.createElement('input');
-            improve.type = 'number';
-            improve.id = 'nb-improve';
-            improve.value = conf.improve;
-            improve.classList.add('inline');
-            improve.addEventListener('change', ($event) => {
-                conf.improve = +$event.srcElement.value;
-                calculateCampingProbabilities(conf);
-            })
-            improve_div.appendChild(improve_label);
-            improve_div.appendChild(improve);
-
-            /** Nombre d'objets de campement installés sur la case */
-            let object_improve_div = document.createElement('div');
-            cell_info_content.appendChild(object_improve_div);
-
-            let object_improve_label = document.createElement('label');
-            object_improve_label.htmlFor = 'nb-object-improve';
-            object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
-            object_improve_label.classList.add('spaced-label');
-            let object_improve = document.createElement('input');
-            object_improve.type = 'number';
-            object_improve.id = 'nb-object-improve';
-            object_improve.value = conf.object_improve;
-            object_improve.classList.add('inline');
-            object_improve.addEventListener('change', ($event) => {
-                conf.object_improve = +$event.srcElement.value;
-                calculateCampingProbabilities(conf);
-            })
-            object_improve_div.appendChild(object_improve_label);
-            object_improve_div.appendChild(object_improve);
-
-            /** Nombre de personnes déjà cachées */
-            let hidden_campers_div = document.createElement('div');
-            cell_info_content.appendChild(hidden_campers_div);
-
-            let hidden_campers_label = document.createElement('label');
-            hidden_campers_label.htmlFor = 'hidden-campers';
-            hidden_campers_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
-            hidden_campers_label.classList.add('spaced-label');
-            let hidden_campers = document.createElement('input');
-            hidden_campers.type = 'number';
-            hidden_campers.id = 'hidden-campers';
-            hidden_campers.value = conf.hidden_campers;
-            hidden_campers.classList.add('inline');
-            hidden_campers.addEventListener('change', ($event) => {
-                conf.hidden_campers = +$event.srcElement.value;
-                calculateCampingProbabilities(conf);
-            })
-            hidden_campers_div.appendChild(hidden_campers_label);
-            hidden_campers_div.appendChild(hidden_campers);
-
-            /** Nuit ? */
-            let night_div = document.createElement('div');
-            town_info_content.appendChild(night_div);
-
-            let night_label = document.createElement('label');
-            night_label.htmlFor = 'night';
-            night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
-            let night = document.createElement('input');
-            night.type = 'checkbox';
-            night.id = 'night';
-            night.checked = conf.night;
-            night.addEventListener('change', ($event) => {
-                conf.night = $event.srcElement.checked;
-                calculateCampingProbabilities(conf);
-            })
-            night_div.appendChild(night);
-            night_div.appendChild(night_label);
-
-            /** Phare construit ? */
-            let phare_div = document.createElement('div');
-            town_info_content.appendChild(phare_div);
-
-            let phare_label = document.createElement('label');
-            phare_label.htmlFor = 'phare';
-            phare_label.innerText = getI18N(texts.phare);
-            phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
-            let phare = document.createElement('input');
-            phare.type = 'checkbox';
-            phare.id = 'phare';
-            phare.checked = conf.phare;
-            phare.addEventListener('change', ($event) => {
-                conf.phare = $event.srcElement.checked;
-                calculateCampingProbabilities(conf);
-            })
-            phare_div.appendChild(phare);
-            phare_div.appendChild(phare_label);
-
-
-            calculateCampingProbabilities(conf);
-        });
-
-    } else if (camping_predict_container) {
-        camping_predict_container.remove();
+function automaticallyOpenBag() {
+    if (mho_parameters.automatically_open_bag) {
+        let button = document.querySelector('[x-item-action-toggle="1"]');
+        if (button && (!button.getAttribute('style') || button.getAttribute('style').indexOf('display: none') < 0)) {
+            button.click();
+        }
     }
+}
+
+function displayCampingPredict() {
+    setTimeout(() => {
+        let camping_predict_container = document.getElementById(mho_camping_predict_id);
+
+        let zone_camp = document.querySelector('.zone-camp');
+        if (mho_parameters.display_camping_predict && pageIsDesert() && zone_camp) {
+            if (camping_predict_container) return;
+
+            getRuins().then((ruins) => {
+                let all_ruins = [...added_ruins];
+                all_ruins = all_ruins.concat(ruins);
+
+                let zone_camp_info = zone_camp.querySelector('.zone-camp-info');
+                let zone_camp_label = zone_camp.querySelector('label');
+                zone_camp_label.addEventListener('click', () => {
+                    camping_predict_container.style.display = camping_predict_container.style.display === 'none' ? 'block' : 'none'
+                });
+
+                camping_predict_container = document.createElement('div');
+                camping_predict_container.id = mho_camping_predict_id;
+                camping_predict_container.style.border = '1px solid';
+                camping_predict_container.style.padding = '0.5em';
+                camping_predict_container.style.margin = '0.5em 0';
+
+                camping_predict_container.style.display = window.getComputedStyle(zone_camp_info).getPropertyValue('max-height') === '0px' ? 'none' : 'block';
+                zone_camp.appendChild(camping_predict_container);
+
+                let updater_title = document.createElement('h5');
+                updater_title.style.marginTop = '0.5em';
+                let updater_title_mho_img = document.createElement('img');
+                updater_title_mho_img.src = mh_optimizer_icon;
+                updater_title_mho_img.style.height = '24px';
+                updater_title_mho_img.style.marginRight = '0.5em';
+                updater_title.appendChild(updater_title_mho_img);
+
+                let updater_title_text = document.createElement('text');
+                updater_title_text.innerHTML = GM_info.script.name;
+                updater_title_text.style.fontSize = '1.5em';
+                updater_title.appendChild(updater_title_text);
+
+                camping_predict_container.appendChild(updater_title);
+
+                let zone_ruin = document.querySelector('.ruin-info b');
+                let ruin = '';
+                if (zone_ruin) {
+                    ruin = all_ruins.find((one_ruin) => getI18N(one_ruin.label).toLowerCase() === zone_ruin.innerText.toLowerCase()).id;
+                }
+                let conf = {
+                    town: mh_user.townDetails.townType.toLowerCase(),
+                    job: jobs.find((job) => mh_user.jobDetails.uid === job.img),
+                    distance: document.querySelector('.zone-dist > div > b')?.innerText.replace('km', ''), // OK
+                    campings: 0,
+                    pro: false,
+                    hidden_campers: 0,
+                    objects: 0,
+                    vest: false,
+                    tomb: false,
+                    zombies: document.querySelectorAll('.actor.zombie')?.length || 0,
+                    night: !!document.querySelector('.map.night'),
+                    devastated: mh_user.townDetails.isDevaste,
+                    phare: false,
+                    improve: 0,
+                    object_improve: 0,
+                    ruin: ruin
+                }
+                // console.log('conf', conf);
+
+                let my_info = document.createElement('div');
+                camping_predict_container.appendChild(my_info);
+
+                let my_info_title = document.createElement('h3');
+                my_info_title.innerText = getI18N(texts.camping_citizen);
+                my_info.appendChild(my_info_title);
+
+                let my_info_content = document.createElement('div');
+                my_info.appendChild(my_info_content);
+
+                let town_info = document.createElement('div');
+                camping_predict_container.appendChild(town_info);
+
+                let town_info_title = document.createElement('h3');
+                town_info_title.innerText = getI18N(texts.camping_town);
+                town_info.appendChild(town_info_title);
+
+                let town_info_content = document.createElement('div');
+                town_info.appendChild(town_info_content);
+
+                let cell_info = document.createElement('div');
+                camping_predict_container.appendChild(cell_info);
+
+                let cell_info_title = document.createElement('h3');
+                cell_info_title.innerText = getI18N(texts.camping_ruin);
+                cell_info.appendChild(cell_info_title);
+
+                let cell_info_content = document.createElement('div');
+                cell_info.appendChild(cell_info_content);
+
+                let result = document.createElement('div');
+                camping_predict_container.appendChild(result);
+
+                let result_title = document.createElement('h3');
+                result_title.innerText = getI18N(texts.result);
+                result.appendChild(result_title);
+
+                let result_content = document.createElement('div');
+                result_content.id = 'camping-result';
+                result.appendChild(result_content);
+
+                /** Capuche ? */
+                let vest_div = document.createElement('div');
+                vest_div.id = 'vest-field';
+                vest_div.style.display = 'none';
+                my_info_content.appendChild(vest_div);
+
+                let vest_label = document.createElement('label');
+                vest_label.htmlFor = 'vest';
+                vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
+                let vest = document.createElement('input');
+                vest.type = 'checkbox';
+                vest.id = 'vest';
+                vest.checked = conf.vest;
+                vest.addEventListener('change', ($event) => {
+                    conf.vest = $event.srcElement.checked;
+                    calculateCampingProbabilities(conf);
+                })
+                vest_div.appendChild(vest);
+                vest_div.appendChild(vest_label);
+
+                /** Campeur pro ? */
+                let pro_camper_div = document.createElement('div');
+                my_info_content.appendChild(pro_camper_div);
+
+                let pro_camper_label = document.createElement('label');
+                pro_camper_label.htmlFor = 'pro';
+                pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
+                let pro_camper = document.createElement('input');
+                pro_camper.type = 'checkbox';
+                pro_camper.id = 'pro';
+                pro_camper.checked = conf.pro;
+                pro_camper.addEventListener('change', ($event) => {
+                    conf.pro = $event.srcElement.checked;
+                    calculateCampingProbabilities(conf);
+                })
+                pro_camper_div.appendChild(pro_camper);
+                pro_camper_div.appendChild(pro_camper_label);
+
+                /** Tombe ? */
+                let tomb_div = document.createElement('div');
+                my_info_content.appendChild(tomb_div);
+
+                let tomb_label = document.createElement('label');
+                tomb_label.htmlFor = 'tomb';
+                tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
+                let tomb = document.createElement('input');
+                tomb.type = 'checkbox';
+                tomb.id = 'tomb';
+                tomb.checked = conf.tomb;
+                tomb.addEventListener('change', ($event) => {
+                    conf.tomb = $event.srcElement.checked;
+                    calculateCampingProbabilities(conf);
+                })
+                tomb_div.appendChild(tomb);
+                tomb_div.appendChild(tomb_label);
+
+                /** Nombre de nuits déjà campées */
+                let nb_campings_div = document.createElement('div');
+                my_info_content.appendChild(nb_campings_div);
+
+                let nb_campings_label = document.createElement('label');
+                nb_campings_label.htmlFor = 'nb-campings';
+                nb_campings_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/sleep.gif"> ${getI18N(texts.nb_campings)}`;
+                nb_campings_label.classList.add('spaced-label');
+                let nb_campings = document.createElement('input');
+                nb_campings.type = 'number';
+                nb_campings.id = 'nb-campings';
+                nb_campings.value = conf.campings;
+                nb_campings.classList.add('inline');
+                nb_campings.addEventListener('change', ($event) => {
+                    conf.campings = +$event.srcElement.value;
+                    calculateCampingProbabilities(conf);
+                })
+                nb_campings_div.appendChild(nb_campings_label);
+                nb_campings_div.appendChild(nb_campings);
+
+                /** Nombre de toiles de tente ou pelure de peau */
+                let objects_in_bag_div = document.createElement('div');
+                my_info_content.appendChild(objects_in_bag_div);
+
+                let objects_in_bag_label = document.createElement('label');
+                objects_in_bag_label.htmlFor = 'nb-objects';
+                objects_in_bag_label.innerText = getI18N(texts.objects_in_bag);
+                objects_in_bag_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/bag.gif"> ${getI18N(texts.objects_in_bag)}`;
+                objects_in_bag_label.classList.add('spaced-label');
+                let objects_in_bag = document.createElement('input');
+                objects_in_bag.type = 'number';
+                objects_in_bag.id = 'nb-objects';
+                objects_in_bag.value = conf.objects;
+                objects_in_bag.classList.add('inline');
+                objects_in_bag.addEventListener('change', ($event) => {
+                    conf.objects = +$event.srcElement.value;
+                    calculateCampingProbabilities(conf);
+                })
+                objects_in_bag_div.appendChild(objects_in_bag_label);
+                objects_in_bag_div.appendChild(objects_in_bag);
+
+
+                /** Type de bâtiment */
+                let ruin_type_div = document.createElement('div');
+                cell_info_content.appendChild(ruin_type_div);
+
+                let select_ruin_label = document.createElement('label');
+                select_ruin_label.htmlFor = 'select-ruin';
+                select_ruin_label.innerText = getI18N(texts.ruin);
+                select_ruin_label.classList.add('spaced-label');
+                let select_ruin = document.createElement('select');
+                select_ruin.id = 'select-ruin';
+                select_ruin.value = conf.ruin;
+                select_ruin.classList.add('small');
+                all_ruins.forEach((ruin) => {
+                    let ruin_option = document.createElement('option');
+                    ruin_option.value = ruin.id;
+                    ruin_option.label = getI18N(ruin.label);
+                    if (ruin.id === conf.ruin) {
+                        ruin_option.setAttribute('selected', 'selected');
+                    }
+                    select_ruin.appendChild(ruin_option);
+                });
+                select_ruin.addEventListener('change', ($event) => {
+                    conf.ruin = $event.srcElement.value;
+                    calculateCampingProbabilities(conf);
+                })
+                ruin_type_div.appendChild(select_ruin_label);
+                ruin_type_div.appendChild(select_ruin);
+
+                /** Nombre de zombies sur la case */
+                let zombies_div = document.createElement('div');
+                cell_info_content.appendChild(zombies_div);
+
+                let zombies_label = document.createElement('label');
+                zombies_label.htmlFor = 'nb-zombies';
+                zombies_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/zombie.gif"> ${getI18N(texts.zombies_on_cell)}`;
+                zombies_label.classList.add('spaced-label');
+                let zombies = document.createElement('input');
+                zombies.type = 'number';
+                zombies.id = 'nb-zombies';
+                zombies.value = conf.zombies;
+                zombies.classList.add('inline');
+                zombies.addEventListener('change', ($event) => {
+                    conf.zombies = +$event.srcElement.value;
+                    calculateCampingProbabilities(conf);
+                })
+                zombies_div.appendChild(zombies_label);
+                zombies_div.appendChild(zombies);
+
+                /** Nombre d'améliorations simples sur la case */
+                let improve_div = document.createElement('div');
+                cell_info_content.appendChild(improve_div);
+
+                let improve_label = document.createElement('label');
+                improve_label.htmlFor = 'nb-improve';
+                improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home_recycled.gif"> ${getI18N(texts.improve)}`;
+                improve_label.classList.add('spaced-label');
+                let improve = document.createElement('input');
+                improve.type = 'number';
+                improve.id = 'nb-improve';
+                improve.value = conf.improve;
+                improve.classList.add('inline');
+                improve.addEventListener('change', ($event) => {
+                    conf.improve = +$event.srcElement.value;
+                    calculateCampingProbabilities(conf);
+                })
+                improve_div.appendChild(improve_label);
+                improve_div.appendChild(improve);
+
+                /** Nombre d'objets de campement installés sur la case */
+                let object_improve_div = document.createElement('div');
+                cell_info_content.appendChild(object_improve_div);
+
+                let object_improve_label = document.createElement('label');
+                object_improve_label.htmlFor = 'nb-object-improve';
+                object_improve_label.innerHTML = `<img src="${repo_img_hordes_url}icons/home.gif"> ${getI18N(texts.object_improve)}`;
+                object_improve_label.classList.add('spaced-label');
+                let object_improve = document.createElement('input');
+                object_improve.type = 'number';
+                object_improve.id = 'nb-object-improve';
+                object_improve.value = conf.object_improve;
+                object_improve.classList.add('inline');
+                object_improve.addEventListener('change', ($event) => {
+                    conf.object_improve = +$event.srcElement.value;
+                    calculateCampingProbabilities(conf);
+                })
+                object_improve_div.appendChild(object_improve_label);
+                object_improve_div.appendChild(object_improve);
+
+                /** Nombre de personnes déjà cachées */
+                let hidden_campers_div = document.createElement('div');
+                cell_info_content.appendChild(hidden_campers_div);
+
+                let hidden_campers_label = document.createElement('label');
+                hidden_campers_label.htmlFor = 'hidden-campers';
+                hidden_campers_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/human.gif"> ${getI18N(texts.hidden_campers)}`;
+                hidden_campers_label.classList.add('spaced-label');
+                let hidden_campers = document.createElement('input');
+                hidden_campers.type = 'number';
+                hidden_campers.id = 'hidden-campers';
+                hidden_campers.value = conf.hidden_campers;
+                hidden_campers.classList.add('inline');
+                hidden_campers.addEventListener('change', ($event) => {
+                    conf.hidden_campers = +$event.srcElement.value;
+                    calculateCampingProbabilities(conf);
+                })
+                hidden_campers_div.appendChild(hidden_campers_label);
+                hidden_campers_div.appendChild(hidden_campers);
+
+                /** Nuit ? */
+                let night_div = document.createElement('div');
+                town_info_content.appendChild(night_div);
+
+                let night_label = document.createElement('label');
+                night_label.htmlFor = 'night';
+                night_label.innerHTML = `<img src="${repo_img_hordes_url}pictos/r_doutsd.gif"> ${getI18N(texts.night)}`;
+                let night = document.createElement('input');
+                night.type = 'checkbox';
+                night.id = 'night';
+                night.checked = conf.night;
+                night.addEventListener('change', ($event) => {
+                    conf.night = $event.srcElement.checked;
+                    calculateCampingProbabilities(conf);
+                })
+                night_div.appendChild(night);
+                night_div.appendChild(night_label);
+
+                /** Phare construit ? */
+                let phare_div = document.createElement('div');
+                town_info_content.appendChild(phare_div);
+
+                let phare_label = document.createElement('label');
+                phare_label.htmlFor = 'phare';
+                phare_label.innerText = getI18N(texts.phare);
+                phare_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_lighthouse.gif"> ${getI18N(texts.phare)}`;
+                let phare = document.createElement('input');
+                phare.type = 'checkbox';
+                phare.id = 'phare';
+                phare.checked = conf.phare;
+                phare.addEventListener('change', ($event) => {
+                    conf.phare = $event.srcElement.checked;
+                    calculateCampingProbabilities(conf);
+                })
+                phare_div.appendChild(phare);
+                phare_div.appendChild(phare_label);
+
+
+                calculateCampingProbabilities(conf);
+            });
+
+        } else if (camping_predict_container) {
+            camping_predict_container.remove();
+        }
+    }, 500);
 }
 
 /** Permet de bloquer / débloquer des utilisateurs et de masquer les posts des utilisateurs bloqués */
@@ -6446,62 +6631,59 @@ function getGHRuin() {
 function getBBHMap() {
     return new Promise((resolve, reject) => {
         startLoading();
-
-        GM.xmlHttpRequest({
-            method: 'GET',
-            url: `https://bbh.fred26.fr/?cid=5-${mh_user.townDetails.townId}&pg=map`,
-            responseType: 'document',
-            onload: function (response) {
+        fetch(`https://bbh.fred26.fr/?cid=5-${mh_user.townDetails.townId}&pg=map`)
+            .then((response) => {
                 if (response.status === 200) {
-                    let new_map = [];
-                    let map = response.response.querySelector('#carte');
-                    if (map) {
-                        let x_mapping = Array.from(Array.from(map.children)[0].querySelectorAll('td')).map((x) => x.innerText);
-                        x_mapping.push('');
-                        x_mapping.splice(0, 0, '');
-                        if (map.querySelector('#cases')) {
-                            Array.from(map.querySelector('#cases')?.querySelectorAll('tr') || [])
-                                .forEach((row, row_index) => {
-                                    let cells = [];
-                                    let y;
-                                    Array.from(row.children).forEach((cell, cell_index) => {
-                                        let cell_parts = Array.from(cell.querySelector('.divs')?.children);
-
-                                        let new_cell = {
-                                            horizontal: map.querySelector('.lgd_l')?.firstElementChild.children[row_index].firstElementChild.innerText,
-                                            vertical: x_mapping[cell_index],
-                                            town: cell.querySelector('.door'),
-                                            bat: cell.querySelector('.bat'),
-                                            my_pos: cell.querySelector('.me'),
-                                            expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& Array.from(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
-                                            expedition_arrows: [],
-                                            not_yet_visited: cell.querySelector('.nv'),
-                                            not_visited_today: cell.querySelector('.nvt'),
-                                            zombies: cell.querySelector('.zombies') ? Array.from(cell.querySelector('.zombies').classList).find((class_name) => class_name.startsWith('z_')).replace('z_', '') : undefined,
-                                            empty: cell.querySelector('.praf'),
-                                            empty_bat: cell.querySelector('.mark1'),
-                                            ruin: cell.querySelector('.tag_11')
-                                        };
-                                        cells.push(new_cell);
-                                    });
-                                    new_map.push(cells);
-                                });
-                            resolve({map: new_map, vertical_mapping: x_mapping});
-                        }
-                    }
-                    reject();
+                    return response.text();
                 } else {
                     addError(response);
                     reject(response);
                 }
-                endLoading();
-            },
-            onerror: function (error) {
+            })
+            .then((response) => {
+                let new_map = [];
+                let map = response.querySelector('#carte');
+                if (map) {
+                    let x_mapping = Array.from(Array.from(map.children)[0].querySelectorAll('td')).map((x) => x.innerText);
+                    x_mapping.push('');
+                    x_mapping.splice(0, 0, '');
+                    if (map.querySelector('#cases')) {
+                        Array.from(map.querySelector('#cases')?.querySelectorAll('tr') || [])
+                            .forEach((row, row_index) => {
+                                let cells = [];
+                                let y;
+                                Array.from(row.children).forEach((cell, cell_index) => {
+                                    let cell_parts = Array.from(cell.querySelector('.divs')?.children);
+
+                                    let new_cell = {
+                                        horizontal: map.querySelector('.lgd_l')?.firstElementChild.children[row_index].firstElementChild.innerText,
+                                        vertical: x_mapping[cell_index],
+                                        town: cell.querySelector('.door'),
+                                        bat: cell.querySelector('.bat'),
+                                        my_pos: cell.querySelector('.me'),
+                                        expedition_here: cell_parts.some((cell_part) => cell_part.classList.contains('expeditionVille') && cell_part.children.length > 0 /*&& Array.from(cell_part.children).some((expedition_arrow) => expedition_arrow.classList.contains('selected_expe'))*/),
+                                        expedition_arrows: [],
+                                        not_yet_visited: cell.querySelector('.nv'),
+                                        not_visited_today: cell.querySelector('.nvt'),
+                                        zombies: cell.querySelector('.zombies') ? Array.from(cell.querySelector('.zombies').classList).find((class_name) => class_name.startsWith('z_')).replace('z_', '') : undefined,
+                                        empty: cell.querySelector('.praf'),
+                                        empty_bat: cell.querySelector('.mark1'),
+                                        ruin: cell.querySelector('.tag_11')
+                                    };
+                                    cells.push(new_cell);
+                                });
+                                new_map.push(cells);
+                            });
+                        resolve({map: new_map, vertical_mapping: x_mapping});
+                    }
+                }
+                reject();
+            })
+            .catch((error) => {
                 endLoading();
                 addError(error);
                 reject(error);
-            }
-        });
+            });
     });
 }
 
@@ -6803,39 +6985,38 @@ function getFMRuin() {
 
 function getItems() {
     return new Promise((resolve, reject) => {
-        GM.xmlHttpRequest({
-            method: 'GET',
-            url: api_url + '/myhordesfetcher/items' + (mh_user && mh_user.townDetails ? ('?townId=' + mh_user.townDetails.townId) : ''),
-            responseType: 'json',
-            onload: function (response) {
+        fetch(api_url + '/myhordesfetcher/items' + (mh_user && mh_user.townDetails ? ('?townId=' + mh_user.townDetails.townId) : ''))
+            .then((response) => {
                 if (response.status === 200) {
-                    items = response.response
-                        .sort((item_a, item_b) => {
-                            if (item_a.category.ordering > item_b.category.ordering) {
-                                return 1;
-                            } else if (item_a.category.ordering === item_b.category.ordering) {
-                                return 0;
-                            } else {
-                                return -1;
-                            }
-                        })
-                        .filter((item) => is_mh_beta ? true : +item.id !== 302);
-                    let wiki_btn = document.getElementById(wiki_btn_id);
-                    if (wiki_btn) {
-                        wiki_btn.setAttribute('style', 'display: inherit');
-                    }
-                    resolve(items);
+                    return response.json();
                 } else {
                     addError(response);
                     reject(response);
                 }
-            },
-            onerror: function (error) {
+            })
+            .then((response) => {
+                items = response
+                    .sort((item_a, item_b) => {
+                        if (item_a.category.ordering > item_b.category.ordering) {
+                            return 1;
+                        } else if (item_a.category.ordering === item_b.category.ordering) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    })
+                    .filter((item) => is_mh_beta ? true : +item.id !== 302);
+                let wiki_btn = document.getElementById(wiki_btn_id);
+                if (wiki_btn) {
+                    wiki_btn.setAttribute('style', 'display: inherit');
+                }
+                resolve(items);
+            })
+            .catch((error) => {
                 endLoading();
                 addError(error);
                 reject(error);
-            }
-        });
+            });
     });
 }
 
@@ -6843,35 +7024,33 @@ function getRuins() {
     return new Promise((resolve, reject) => {
         if (!ruins) {
             startLoading();
-            GM.xmlHttpRequest({
-                method: 'GET',
-                url: api_url + '/myhordesfetcher/ruins?userKey=' + external_app_id,
-                responseType: 'json',
-                onload: function (response) {
+            fetch(api_url + '/myhordesfetcher/ruins?userKey=' + external_app_id)
+                .then((response) => {
                     if (response.status === 200) {
-                        ruins = response.response.sort((a, b) => {
-                            if (getI18N(a.label) < getI18N(b.label)) {
-                                return -1;
-                            }
-                            if (getI18N(a.label) > getI18N(b.label)) {
-                                return 1;
-                            }
-                            return 0;
-                        });
-                        resolve(ruins);
+                        return response.json();
                     } else {
-                        addError(response);
+                        endLoading();
                         reject(response);
                     }
+                })
+                .then((response) => {
+                    ruins = response.sort((a, b) => {
+                        if (getI18N(a.label) < getI18N(b.label)) {
+                            return -1;
+                        }
+                        if (getI18N(a.label) > getI18N(b.label)) {
+                            return 1;
+                        }
+                        return 0;
+                    });
                     endLoading();
-                },
-                onerror: function (error) {
+                    resolve(ruins);
+                })
+                .catch((error) => {
                     endLoading();
                     addError(error);
                     reject(error);
-                }
-            });
-            endLoading();
+                });
         } else {
             resolve(ruins);
             endLoading();
@@ -6883,36 +7062,35 @@ function getRuins() {
 function getMe() {
     return new Promise((resolve, reject) => {
         if (external_app_id) {
-            GM.xmlHttpRequest({
-                method: 'GET',
-                url: api_url + '/myhordesfetcher/me?userKey=' + external_app_id,
-                responseType: 'json',
-                onload: function (response) {
+            fetch(api_url + '/myhordesfetcher/me?userKey=' + external_app_id)
+                .then((response) => {
                     if (response.status === 200) {
-                        mh_user = response.response;
-                        if (!mh_user || mh_user.id === 0 && mh_user.townDetails.townId === 0) {
-                            mh_user = '';
-                        }
-                        GM.setValue(mh_user_key, mh_user);
-                        console.log('MHO - I am...', mh_user);
-                        getItems().then(() => {
-                            resolve();
-                        });
-
-                        if (mh_user !== '' && mh_user.townDetails.townId) {
-                            getWishlist().then();
-                            getMap().then();
-                        }
+                        return response.json();
                     } else {
                         addError(response);
                         reject(response);
                     }
-                },
-                onerror: function (error) {
+                })
+                .then((response) => {
+                    mh_user = response;
+                    if (!mh_user || mh_user.id === 0 && mh_user.townDetails.townId === 0) {
+                        mh_user = '';
+                    }
+                    GM.setValue(mh_user_key, mh_user);
+                    console.log('MHO - I am...', mh_user);
+                    getItems().then(() => {
+                        resolve();
+                    });
+
+                    if (mh_user !== '' && mh_user.townDetails.townId) {
+                        getWishlist().then();
+                        getMap().then();
+                    }
+                })
+                .catch((error) => {
                     addError(error);
                     reject(error);
-                }
-            });
+                });
         } else {
             resolve();
         }
@@ -6924,27 +7102,28 @@ function getCitizens() {
     return new Promise((resolve, reject) => {
         getHeroSkills().then((hero_skills) => {
             startLoading();
-            GM.xmlHttpRequest({
-                method: 'GET',
-                url: api_url + `/myhordesfetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails.townId}`,
-                responseType: 'json',
-                onload: function (response) {
+            fetch(api_url + `/myhordesfetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails.townId}`)
+                .then((response) => {
                     if (response.status === 200) {
-                        citizens = response.response;
-                        citizens.citizens = Object.keys(citizens.citizens).map((key) => citizens.citizens[key])
-                        resolve(citizens);
+                        endLoading();
+                        return response.json();
                     } else {
                         addError(response);
-                        reject(citizens);
+                        reject(response);
+                        endLoading();
                     }
-                    endLoading();
-                },
-                onerror: function (error) {
+                })
+                .then((response) => {
+                    citizens = response;
+                    citizens.citizens = Object.keys(citizens.citizens).map((key) => citizens.citizens[key])
+                    resolve(citizens);
+                })
+                .catch((error) => {
                     endLoading();
                     addError(error);
                     reject(error);
-                }
-            });
+                });
+
         });
     });
 }
@@ -6956,7 +7135,6 @@ function getBank() {
         fetch(api_url + '/myhordesfetcher/bank?userKey=' + external_app_id)
             .then((response) => {
                 if (response.status === 200) {
-
                     endLoading();
                     return response.json();
                 } else {
@@ -7024,7 +7202,7 @@ function getWishlist() {
                         })
                         .sort((item_a, item_b) => item_b.priority > item_a.priority);
                     wishlist_zone.forEach((item) => {
-                        item.item.img = item.item.img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3');
+                        item.item.img = fixMhCompiledImg(item.item.img);
                     });
                     response.wishList[key] = wishlist_zone;
                 }
@@ -7046,27 +7224,29 @@ function getWishlist() {
 function addItemToWishlist(item) {
     return new Promise((resolve, reject) => {
         startLoading();
-        GM.xmlHttpRequest({
-            method: 'POST',
-            url: api_url + '/wishlist/add/' + item.id + '?userId=' + mh_user.id + '&townId=' + mh_user.townDetails.townId,
-            responseType: 'json',
-            onload: function (response) {
+
+        fetch(api_url + '/wishlist/add/' + item.id + '?userId=' + mh_user.id + '&townId=' + mh_user.townDetails.townId, {
+            method: 'POST'
+        })
+            .then((response) => {
                 if (response.status === 200) {
-                    item.wishListCount = 1;
-                    resolve(item);
-                    addSuccess(getI18N(api_texts.add_to_wishlist_success));
+                    return response.json();
                 } else {
                     addError(response);
                     reject(response);
                 }
+            })
+            .then((response) => {
+                item.wishListCount = 1;
+                resolve(item);
+                addSuccess(getI18N(api_texts.add_to_wishlist_success));
                 endLoading();
-            },
-            onerror: function (error) {
+            })
+            .catch((error) => {
                 endLoading();
                 addError(error);
                 reject(error);
-            }
-        });
+            });
     });
 }
 
@@ -7405,52 +7585,55 @@ function updateExternalTools() {
         }
 
 
-        console.log('Voici ce que j\'envoie :', data);
+        console.log('MHO - Envoyé pour enregistrement :', data);
         let btn = document.getElementById(mh_update_external_tools_id);
-        GM.xmlHttpRequest({
+
+        fetch(api_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id, {
             method: 'POST',
-            url: api_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id,
-            data: JSON.stringify(data),
+            body: JSON.stringify(data),
             headers: {
                 'Content-Type': 'application/json'
-            },
-            responseType: 'json',
-            onload: function (response) {
+            }
+        })
+            .then((response) => {
                 if (response.status === 200) {
-                    if (response.response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_bbh_updated_key, true);
-                    if (response.response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
-                    if (response.response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
-
-                    let tools_fail = [];
-                    let response_items = Object.keys(response.response).map((key) => {
-                        return {key: key, value: response.response[key]}
-                    });
-                    response_items.forEach((response_item, index) => {
-                        let final = Object.keys(response_item.value).map((key) => {
-                            return {key: key, value: response_item.value[key]}
-                        });
-                        tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
-                        if (index >= response_items.length - 1) {
-                            btn.innerHTML = tools_fail.length === 0 ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
-                                : `<img src ="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ` : ${item.value}`)).join('<br>')}`;
-                        }
-                    });
-                    if (tools_fail.length > 0) {
-                        console.error(`Erreur lors de la mise à jour de l'un des outils`, response.response);
-                    }
-
-                    getMap();
+                    return response.json();
                 } else {
                     addError(response);
                     btn.innerHTML = `<img src="${repo_img_hordes_url}professions/death.gif">` + getI18N(texts.update_external_tools_fail_btn_label);
+                    endLoading();
                 }
+            })
+            .then((response) => {
+                if (response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_bbh_updated_key, true);
+                if (response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
+                if (response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
+
+                let tools_fail = [];
+                let response_items = Object.keys(response).map((key) => {
+                    return {key: key, value: response[key]}
+                });
+                response_items.forEach((response_item, index) => {
+                    let final = Object.keys(response_item.value).map((key) => {
+                        return {key: key, value: response_item.value[key]}
+                    });
+                    tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
+                    if (index >= response_items.length - 1) {
+                        btn.innerHTML = tools_fail.length === 0 ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
+                            : `<img src ="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ` : ${item.value}`)).join('<br>')}`;
+                    }
+                });
+                if (tools_fail.length > 0) {
+                    console.error(`Erreur lors de la mise à jour de l'un des outils`, response);
+                }
+
+                getMap();
                 endLoading();
-            },
-            onerror: function (error) {
+            })
+            .catch((error) => {
                 endLoading();
                 addError(error);
-            }
-        });
+            });
     });
 }
 
@@ -7459,34 +7642,32 @@ function getHeroSkills() {
     return new Promise((resolve, reject) => {
         if (!hero_skills) {
             startLoading();
-            GM.xmlHttpRequest({
-                method: 'GET',
-                url: api_url + '/myhordesfetcher/heroSkills',
-                responseType: 'json',
-                onload: function (response) {
+            fetch(api_url + '/myhordesfetcher/heroSkills')
+                .then((response) => {
                     if (response.status === 200) {
-                        hero_skills = response.response.sort((a, b) => {
-                            if (a.daysNeeded > b.daysNeeded) {
-                                return 1;
-                            } else if (a.daysNeeded === b.daysNeeded) {
-                                return 0;
-                            } else {
-                                return -1;
-                            }
-                        });
-                        resolve(hero_skills);
+                        return response.json();
                     } else {
                         addError(response);
                         reject(response);
                     }
+                })
+                .then((response) => {
+                    hero_skills = response.sort((a, b) => {
+                        if (a.daysNeeded > b.daysNeeded) {
+                            return 1;
+                        } else if (a.daysNeeded === b.daysNeeded) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    });
+                    resolve(hero_skills);
                     endLoading();
-                },
-                onerror: function (error) {
-                    endLoading();
+                })
+                .catch((error) => {
                     addError(error);
                     reject(error);
-                }
-            });
+                });
         } else {
             resolve(hero_skills);
         }
@@ -7500,26 +7681,25 @@ function getTranslation(string_to_translate, source_language) {
         if (string_to_translate && string_to_translate !== '') {
             let locale = 'locale=' + source_language;
             let sourceString = 'sourceString=' + string_to_translate;
-            startLoading();
-            GM.xmlHttpRequest({
-                method: 'GET',
-                url: api_url + '/myhordestranslation?' + locale + '&' + sourceString,
-                responseType: 'json',
-                onload: function (response) {
+            fetch(api_url + '/myhordestranslation?' + locale + '&' + sourceString)
+                .then((response) => {
                     if (response.status === 200) {
-                        resolve(response.response);
+                        return response.json();
                     } else {
+                        endLoading();
                         addError(response);
                         reject(response);
                     }
+                })
+                .then((response) => {
+                    resolve(response);
                     endLoading();
-                },
-                onerror: function (error) {
+                })
+                .catch((error) => {
                     endLoading();
                     addError(error);
                     reject(error);
-                }
-            });
+                });
         }
     });
 }
@@ -7529,38 +7709,37 @@ function getRecipes() {
     return new Promise((resolve, reject) => {
         if (!recipes) {
             startLoading();
-            GM.xmlHttpRequest({
-                method: 'GET',
-                url: api_url + '/myhordesfetcher/recipes',
-                responseType: 'json',
-                onload: function (response) {
+            fetch(api_url + '/myhordesfetcher/recipes')
+                .then((response) => {
                     if (response.status === 200) {
-                        recipes = response.response.map((recipe) => {
-                            recipe.type = action_types.find((type) => type.id === recipe.type);
-                            return recipe;
-                        })
-                            .sort((a, b) => {
-                                if (a.type.ordering > b.type.ordering) {
-                                    return 1;
-                                } else if (a.type.ordering === b.type.ordering) {
-                                    return 0;
-                                } else {
-                                    return -1;
-                                }
-                            });
-                        resolve(recipes);
+                        return response.json();
                     } else {
                         addError(response);
-                        reject(recipes);
+                        reject(response);
                     }
+                })
+                .then((response) => {
+                    recipes = response.map((recipe) => {
+                        recipe.type = action_types.find((type) => type.id === recipe.type);
+                        return recipe;
+                    })
+                        .sort((a, b) => {
+                            if (a.type.ordering > b.type.ordering) {
+                                return 1;
+                            } else if (a.type.ordering === b.type.ordering) {
+                                return 0;
+                            } else {
+                                return -1;
+                            }
+                        });
+                    resolve(recipes);
                     endLoading();
-                },
-                onerror: function (error) {
+                })
+                .catch((error) => {
                     endLoading();
                     addError(error);
                     reject(error);
-                }
-            });
+                });
         } else {
             resolve(recipes);
         }
@@ -7571,23 +7750,25 @@ function getRecipes() {
 function getParameters() {
     return new Promise((resolve, reject) => {
         startLoading();
-        GM.xmlHttpRequest({
-            method: 'GET',
-            url: api_url + '/parameters/parameters',
-            responseType: 'json',
-            onload: function (response) {
+        fetch(api_url + '/parameters/parameters')
+            .then((response) => {
                 if (response.status === 200) {
-                    parameters = response.response
+                    return response.json();
+                } else {
+                    addError(response);
+                    reject(response);
                 }
+            })
+            .then((response) => {
+                parameters = response
                 resolve();
                 endLoading();
-            },
-            onerror: function (error) {
+            })
+            .catch((error) => {
                 endLoading();
                 addError(error);
                 resolve(error);
-            }
-        });
+            });
     });
 }
 
@@ -7643,82 +7824,87 @@ function getOptimalPath(map, html, button) {
         map.doors = map.doors.slice(2);
         console.log('map before send', map);
         startLoading();
-        GM.xmlHttpRequest({
+
+        fetch(api_url + `/ruine/pathopti`, {
             method: 'POST',
-            data: JSON.stringify(map),
-            url: api_url + '/ruine/pathopti',
-            responseType: 'json',
+            body: JSON.stringify(map),
             headers: {
                 'Content-Type': 'application/json'
-            },
-            onload: function (response) {
+            }
+        })
+            .then((response) => {
                 if (response.status === 200) {
-                    resolve(response.reponse);
+                    return response.json();
                 } else {
                     addError(response);
                     reject(response);
                 }
+            })
+            .then((response) => {
+                resolve(response);
                 endLoading();
-            },
-            onerror: function (error) {
+            })
+            .catch((error) => {
                 console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
                 endLoading();
                 reject(error);
-            }
-        });
+            });
     });
 }
 
 function getApiKey() {
     return new Promise((resolve, reject) => {
         if (!external_app_id || external_app_id === '') {
-            GM.xmlHttpRequest({
+
+            fetch(location.origin + `/jx/soul/settings`, {
                 method: 'POST',
-                url: location.origin + '/jx/soul/settings',
-                responseType: 'document',
+                body: JSON.stringify({}),
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-Request-Intent': 'WebNavigation',
                     'X-Render-Target': 'content'
-                },
-                data: JSON.stringify({}),
-                onload: function (response) {
+                }
+            })
+                .then((response) => {
                     if (response.status === 200) {
-                        let manual = () => {
-                            let manual_app_id_key = prompt(getI18N(texts.manually_add_app_id_key));
-                            if (manual_app_id_key) {
-                                external_app_id = manual_app_id_key;
-                                GM.setValue(gm_mh_external_app_id_key, external_app_id);
-                                resolve(external_app_id);
-                            } else {
-                                reject(response);
-                            }
+                        return response.text();
+                    } else {
+                        addError(response);
+                        reject(response);
+                    }
+                })
+                .then((response) => {
+                    let manual = () => {
+                        let manual_app_id_key = prompt(getI18N(texts.manually_add_app_id_key));
+                        if (manual_app_id_key) {
+                            external_app_id = manual_app_id_key;
+                            GM.setValue(gm_mh_external_app_id_key, external_app_id);
+                            resolve(external_app_id);
+                        } else {
+                            reject(response);
                         }
+                    }
+                    let temp_body = document.createElement('body');
 
-                        let temp_body = document.createElement('body');
-                        if (response.response && response.response.body && response.response.body.innerHTML) {
-                            temp_body.innerHTML = response.response.body.innerHTML;
-                            let id = temp_body.querySelector('#app_ext');
-                            if (id && id !== '' && id !== 'not set') {
-                                external_app_id = id.value && id.value !== '' && id.value !== 'not set' ? id.value : undefined;
-                                GM.setValue(gm_mh_external_app_id_key, external_app_id);
-                                resolve(external_app_id);
-                            } else {
-                                manual();
-                            }
+                    if (response) {
+                        temp_body.innerHTML = response;
+                        let id = temp_body.querySelector('#app_ext');
+                        if (id && id !== '' && id !== 'not set') {
+                            external_app_id = id.value && id.value !== '' && id.value !== 'not set' ? id.value : undefined;
+                            GM.setValue(gm_mh_external_app_id_key, external_app_id);
+                            resolve(external_app_id);
                         } else {
                             manual();
                         }
                     } else {
-                        reject(response);
+                        manual();
                     }
-                },
-                onerror: function (error) {
+                })
+                .catch((error) => {
                     console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
                     reject(error);
-                }
-            });
+                });
         } else {
             resolve(external_app_id);
         }
@@ -7808,21 +7994,36 @@ function getApiKey() {
             }
 
 
+            notifyOnSearchEnd();
+
+            initOptionsWithoutLoginNeeded();
+            document.addEventListener('mh-navigation-complete', (event) => {
+                initOptionsWithoutLoginNeeded();
+                initOptionsWithLoginNeeded();
+
+                // let move_btns = document.querySelectorAll('div.action-move');
+                // Array.from(move_btns).forEach((move_btn) => {
+                //     move_btn.addEventListener('click', (event) => {
+                //         setTimeout(() => {
+                //             initOptionsWithLoginNeeded();
+                //             initOptionsWithoutLoginNeeded();
+                //         }, 250);
+                //     });
+                // })
+            });
+
             getParameters().then(() => {
 
                 getApiKey().then(() => {
                     getMe().then(() => {
-                        notifyOnSearchEnd();
 
-                        initOptions();
+                        initOptionsWithLoginNeeded();
+                        initOptionsWithoutLoginNeeded();
 
                         document.addEventListener('mh-navigation-complete', (event) => {
-                            initOptions();
-                        })
-
-                        setInterval(() => {
-                            displayCampingPredict();
-                        }, 500)
+                            initOptionsWithLoginNeeded();
+                            initOptionsWithoutLoginNeeded();
+                        });
 
                         setInterval(() => {
                             displayAdvancedTooltips();
