@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.50
+// @version      1.0.0-beta.51
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -34,8 +34,7 @@
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
     + `[correctif] Correction de divers comportements \n\n`
-    + `[amélioration] Devrait désormais fonctionner avec Greasemonkey\n\n`
-    + `[nouveauté] Ajout d'une option pour ouvrir automatiquement le menu "Utiliser un objet de son sac"`;
+    + `[nouveauté] Ajout d'une option pour afficher un compteur de prises en banque`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -5258,7 +5257,6 @@ function displayAntiAbuseCounter() {
                                 }
                                 counter_values.push(counter_value);
                                 GM.setValue(mho_anti_abuse_key, counter_values);
-                                console.log('counter_values', counter_values);
                                 let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
                                 if (new_mho_anti_abuse_counter) {
                                     let new_content = new_mho_anti_abuse_counter.querySelector('.content');
@@ -7997,20 +7995,20 @@ function getApiKey() {
             notifyOnSearchEnd();
 
             initOptionsWithoutLoginNeeded();
-            document.addEventListener('mh-navigation-complete', (event) => {
-                initOptionsWithoutLoginNeeded();
-                initOptionsWithLoginNeeded();
+//             document.addEventListener('mh-navigation-complete', (event) => {
+//                 initOptionsWithoutLoginNeeded();
+//                 initOptionsWithLoginNeeded();
 
-                // let move_btns = document.querySelectorAll('div.action-move');
-                // Array.from(move_btns).forEach((move_btn) => {
-                //     move_btn.addEventListener('click', (event) => {
-                //         setTimeout(() => {
-                //             initOptionsWithLoginNeeded();
-                //             initOptionsWithoutLoginNeeded();
-                //         }, 250);
-                //     });
-                // })
-            });
+//                 // let move_btns = document.querySelectorAll('div.action-move');
+//                 // Array.from(move_btns).forEach((move_btn) => {
+//                 //     move_btn.addEventListener('click', (event) => {
+//                 //         setTimeout(() => {
+//                 //             initOptionsWithLoginNeeded();
+//                 //             initOptionsWithoutLoginNeeded();
+//                 //         }, 250);
+//                 //     });
+//                 // })
+//             });
 
             getParameters().then(() => {
 
