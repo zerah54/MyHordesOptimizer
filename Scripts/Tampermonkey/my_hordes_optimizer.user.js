@@ -5189,7 +5189,6 @@ function displayAntiAbuseCounter() {
                     counter_values = [];
                 }
                 let counter_value = {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000};
-                console.log('counter', {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000});
                 counter_values.push(counter_value);
                 GM.setValue(mho_anti_abuse_key, counter_values);
                 let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
