@@ -36,7 +36,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/action.enum.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Rend un point d'action à toute personne en ville, dans la limite du nombre maximum de point d'action de chacun. Rend deux points d'action aux citoyens ayant l'état ivre ou l'état drogué</target>
+        <target state="translated">Devuelve un punto a los puntos de acción a cualquiera en la ciudad de su límite máximo de puntos de acción. Devuelve dos puntos de acción a los ciudadanos que hayan estado bajo los efectos del alcohol o de droga</target>
       </trans-unit>
       <trans-unit id="5265432085520184033" datatype="html">
         <source>Peut être rechargé avec une pile</source>
@@ -44,7 +44,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/action.enum.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Peut être rechargé avec une pile</target>
+        <target state="translated">Puede recargarse con una batería</target>
       </trans-unit>
       <trans-unit id="6770677036624635211" datatype="html">
         <source>Sauvetage</source>
@@ -52,7 +52,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Sauvetage</target>
+        <target state="translated">Seguridad</target>
       </trans-unit>
       <trans-unit id="3165188886740707100" datatype="html">
         <source>Appareil Photo d&apos;Avant-Guerre</source>
@@ -60,7 +60,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Appareil Photo d'Avant-Guerre</target>
+        <target state="translated">Cámara fotográfica de preguerra</target>
       </trans-unit>
       <trans-unit id="3396346845090842911" datatype="html">
         <source>Uppercut Sauvage</source>
@@ -104,7 +104,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Retour du Héro</target>
+        <target state="translated">Retorno del Héroe</target>
       </trans-unit>
       <trans-unit id="349574492903631397" datatype="html">
         <source>Passage en Force</source>
@@ -168,7 +168,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">Cuisine</target>
+        <target state="translated">Cocina</target>
       </trans-unit>
       <trans-unit id="7249755932437908154" datatype="html">
         <source>Cave laboratoire</source>
