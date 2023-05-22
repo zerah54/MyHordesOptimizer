@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.51
+// @version      1.0.0-beta.52
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -33,8 +33,9 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Correction de divers comportements \n\n`
-    + `[nouveauté] Ajout d'une option pour afficher un compteur de prises en banque`;
+    + `[correctif] Correction de l'affichage des tooltips améliorés suite à la mise à jour de MyHordes \n`
+    + `[correctif] Correction d'un bug de duplication des lignes des prises en banque dans l'outil de suivi de l'anti-abus\n\n`
+    + `[attention] Les améliorations de la maison ne sont plus envoyées à MHO et à GH suite à là mise à jour de MyHordes. J'essaierai de trouver une solution pour rétablir cette fonctionnalité mais sans certitudes.\n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -992,16 +993,16 @@ let params_categories = [
                 },
                 parent_id: `update_mho`
             },
-            {
-                id: `update_mho_house`,
-                label: {
-                    en: `Home upgrades`,
-                    fr: `Améliorations de la maison`,
-                    de: `Hausverbesserungen`,
-                    es: `Mejoras de la casa`
-                },
-                parent_id: `update_mho`
-            },
+            /*             {
+                            id: `update_mho_house`,
+                            label: {
+                                en: `Home upgrades`,
+                                fr: `Améliorations de la maison`,
+                                de: `Hausverbesserungen`,
+                                es: `Mejoras de la casa`
+                            },
+                            parent_id: `update_mho`
+                        }, */
             {
                 id: `update_mho_bags`,
                 label: {
@@ -1088,16 +1089,16 @@ let params_categories = [
                 },
                 parent_id: `update_gh`
             },
-            {
-                id: `update_gh_amelios`,
-                label: {
-                    en: `Home upgrades`,
-                    fr: `Améliorations de la maison`,
-                    de: `Hausverbesserungen`,
-                    es: `Mejoras de la casa`
-                },
-                parent_id: `update_gh`
-            },
+            /*             {
+                            id: `update_gh_amelios`,
+                            label: {
+                                en: `Home upgrades`,
+                                fr: `Améliorations de la maison`,
+                                de: `Hausverbesserungen`,
+                                es: `Mejoras de la casa`
+                            },
+                            parent_id: `update_gh`
+                        }, */
             {
                 id: `update_gh_status`,
                 label: {
@@ -2019,38 +2020,43 @@ function createParams() {
 
 /** Crée la fenêtre de wiki */
 function createWindow() {
-    let window_content = document.createElement('div');
-    window_content.id = mh_optimizer_window_id + '-content';
-    let window_overlay_img = document.createElement('img');
-    window_overlay_img.alt = '(X)';
-    window_overlay_img.src = repo_img_hordes_url + 'icons/b_close.png';
-    let window_overlay_li = document.createElement('li');
-    window_overlay_li.appendChild(window_overlay_img);
-    let window_overlay_ul = document.createElement('ul');
-    window_overlay_ul.appendChild(window_overlay_li);
+    let window = document.querySelector(`#${mh_optimizer_window_id}`);
 
-    let window_overlay = document.createElement('div');
-    window_overlay.id = mh_optimizer_window_id + '-overlay';
-    window_overlay.appendChild(window_overlay_ul);
+    if (!window) {
 
-    let window_box = document.createElement('div');
-    window_box.id = mh_optimizer_window_id + '-box';
-    window_box.appendChild(window_content);
-    window_box.appendChild(window_overlay);
+        let window_content = document.createElement('div');
+        window_content.id = mh_optimizer_window_id + '-content';
+        let window_overlay_img = document.createElement('img');
+        window_overlay_img.alt = '(X)';
+        window_overlay_img.src = repo_img_hordes_url + 'icons/b_close.png';
+        let window_overlay_li = document.createElement('li');
+        window_overlay_li.appendChild(window_overlay_img);
+        let window_overlay_ul = document.createElement('ul');
+        window_overlay_ul.appendChild(window_overlay_li);
 
-    let window = document.createElement('div');
-    window.id = mh_optimizer_window_id;
-    window.appendChild(window_box);
+        let window_overlay = document.createElement('div');
+        window_overlay.id = mh_optimizer_window_id + '-overlay';
+        window_overlay.appendChild(window_overlay_ul);
 
-    let post_office = document.getElementById('post-office');
-    if (post_office) {
-        post_office.parentNode.insertBefore(window, post_office.nextSibling);
+        let window_box = document.createElement('div');
+        window_box.id = mh_optimizer_window_id + '-box';
+        window_box.appendChild(window_content);
+        window_box.appendChild(window_overlay);
+
+        window = document.createElement('div');
+        window.id = mh_optimizer_window_id;
+        window.appendChild(window_box);
+
+        let post_office = document.getElementById('post-office');
+        if (post_office) {
+            post_office.parentNode.insertBefore(window, post_office.nextSibling);
+        }
+        window_overlay_img.addEventListener('click', () => {
+            window.classList.remove('visible');
+            let body = document.getElementsByTagName('body')[0];
+            body.removeAttribute('style', 'overflow: hidden');
+        });
     }
-    window_overlay_img.addEventListener('click', () => {
-        window.classList.remove('visible');
-        let body = document.getElementsByTagName('body')[0];
-        body.removeAttribute('style', 'overflow: hidden');
-    });
 }
 
 /**
@@ -3771,14 +3777,13 @@ function getWishlistForZone() {
 function displayAdvancedTooltips() {
     if (mho_parameters.enhanced_tooltips && items) {
 
-        let tooltip_container = document.getElementById('tooltip_container');
+        let tooltip_container = document.querySelector('.tooltip.item[style*="display: block"]');
         let advanced_tooltip_container = document.getElementById('mho-advanced-tooltip');
-        if (tooltip_container.innerHTML) {
+        if (tooltip_container) {
             let hovered_item = getHoveredItem().item;
 
             if (hovered_item) {
-                let tooltip_content = tooltip_container.firstElementChild;
-                let item_deco = tooltip_content.getElementsByClassName('item-tag-deco')[0];
+                let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
                 let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
 
                 if (should_display_advanced_tooltip) {
@@ -3788,7 +3793,7 @@ function displayAdvancedTooltips() {
                         advanced_tooltip_container.id = 'mho-advanced-tooltip';
                         advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
 
-                        tooltip_content.appendChild(advanced_tooltip_container);
+                        tooltip_container.appendChild(advanced_tooltip_container);
                     } else if (!advanced_tooltip_container.innerHTML) {
                         createAdvancedProperties(advanced_tooltip_container, hovered_item, tooltip_container);
                     }
@@ -3859,7 +3864,7 @@ function createAdvancedProperties(content, item, tooltip) {
 
     if (item.recipes.length > 0) {
         if (tooltip) {
-            tooltip.firstElementChild.classList.add('large-tooltip');
+            tooltip.classList.add('large-tooltip');
         }
         let item_recipes = document.createElement('div');
         item_recipes.classList.add('recipe');
@@ -5176,6 +5181,7 @@ function displayAntiAbuseCounter() {
             add_counter_btn.innerText = '+';
             second_part.appendChild(add_counter_btn);
             add_counter_btn.addEventListener('click', () => {
+                controller.abort();
                 let fictive_item = {
                     label: {
                         de: `Benutzerdefinierter Zähler`,
@@ -5189,6 +5195,7 @@ function displayAntiAbuseCounter() {
                     counter_values = [];
                 }
                 let counter_value = {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000};
+                console.log('counter', {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000});
                 counter_values.push(counter_value);
                 GM.setValue(mho_anti_abuse_key, counter_values);
                 let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
@@ -5244,6 +5251,7 @@ function displayAntiAbuseCounter() {
                     let hovered_item = getHoveredItem();
 
                     document.addEventListener('mh-navigation-complete', () => {
+                        controller.abort();
                         let new_bag = document.querySelectorAll("#gma ul.rucksack li.item");
                         if (old_bag.length < new_bag.length) {
                             GM.getValue(mho_anti_abuse_key).then((counter_values) => {
@@ -5274,6 +5282,8 @@ function displayAntiAbuseCounter() {
                     }
                     if (button.getAttribute('x-well-confirm') === '1' && button.getAttribute('x-well-direction') === 'up') {
                         document.addEventListener('mh-navigation-complete', () => {
+
+                            controller.abort();
                             let well_item = {
                                 label: {
                                     de: `Eine weitere Ration erhalten`,
@@ -7445,32 +7455,33 @@ function updateExternalTools() {
             }
         }
 
-        /** Récupération des améliorations de maison */
-        if (((mho_parameters.update_gh && mho_parameters.update_gh_amelios) || (mho_parameters.update_mho && mho_parameters.update_mho_house)) && pageIsHouse()) {
-            data.amelios = {}
-            data.amelios.values = {};
-            data.amelios.toolsToUpdate = {
-                isBigBrothHordes: false,
-                isFataMorgana: false,
-                isGestHordes: mho_parameters && mho_parameters.update_gh_amelios,
-                isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_house
-            };
-            let amelios = Array.from(document.querySelectorAll('[x-tab-group="home-main"][x-tab-id="build"] .row-table .row:not(.header)') || []);
-            if (amelios && amelios.length > 0) {
-                amelios.forEach((amelio) => {
-                    let amelio_img = amelio.querySelector('img');
-                    let name = amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1');
-                    if (name !== 'fence') {
-                        let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
-                        data.amelios.values[name] = amelio_value ? +amelio_value[0] : 0;
-                    } else {
-                        data.amelios.values[name] = !amelio.querySelector('button[x-upgrade-id]') ? 1 : 0;
-                    }
-                });
-            }
-            let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt;
-            data.amelios.values.house = house_level;
-        }
+        // /** Récupération des améliorations de maison */
+        // if (((mho_parameters.update_gh && mho_parameters.update_gh_amelios) || (mho_parameters.update_mho && mho_parameters.update_mho_house)) && pageIsHouse()) {
+        //     data.amelios = {}
+        //     data.amelios.values = {};
+        //     data.amelios.toolsToUpdate = {
+        //         isBigBrothHordes: false,
+        //         isFataMorgana: false,
+        //         isGestHordes: mho_parameters && mho_parameters.update_gh_amelios,
+        //         isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_house
+        //     };
+        //     let amelios = Array.from(document.querySelectorAll('[x-tab-group="home-main"][x-tab-id="build"] .row-table .row:not(.header)') || []);
+        //     console.log('amelios', amelios);
+        //     if (amelios && amelios.length > 0) {
+        //         amelios.forEach((amelio) => {
+        //             let amelio_img = amelio.querySelector('img');
+        //             let name = amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1');
+        //             if (name !== 'fence') {
+        //                 let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
+        //                 data.amelios.values[name] = amelio_value ? +amelio_value[0] : 0;
+        //             } else {
+        //                 data.amelios.values[name] = !amelio.querySelector('button[x-upgrade-id]') ? 1 : 0;
+        //             }
+        //         });
+        //     }
+        //     let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt || undefined;
+        //     data.amelios.values.house = house_level;
+        // }
 
         /** Récupération des status */
         if ((mho_parameters.update_mho && mho_parameters.update_mho_status) || (mho_parameters.update_gh && mho_parameters.update_gh_status)) {
