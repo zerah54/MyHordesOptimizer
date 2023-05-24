@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.52
+// @version      1.0.0-beta.53
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -33,9 +33,7 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Correction de l'affichage des tooltips améliorés suite à la mise à jour de MyHordes \n`
-    + `[correctif] Correction d'un bug de duplication des lignes des prises en banque dans l'outil de suivi de l'anti-abus\n\n`
-    + `[attention] Les améliorations de la maison ne sont plus envoyées à MHO et à GH suite à là mise à jour de MyHordes. J'essaierai de trouver une solution pour rétablir cette fonctionnalité mais sans certitudes.\n\n`;
+    + `[nouveauté] Ajout d'une option permettant d'activer un mode compact sur mobile pour le bouton de mise à jour des outils externes\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1116,6 +1114,22 @@ let params_categories = [
                     fr: `Mettre à jour Fata Morgana`,
                     de: `Fata Morgana aktualisieren`,
                     es: `Actualizar Fata Morgana`
+                },
+                parent_id: null
+            },
+            {
+                id: `show_compact`,
+                label: {
+                    en: `Enable compact mode out of town`,
+                    fr: `Activer le mode compact hors de la ville`,
+                    de: `Aktivieren Sie den Kompaktmodus außerhalb der Stadt`,
+                    es: `Habilitar el modo compacto fuera de la ciudad`
+                },
+                help: {
+                    en: `On small screen only, external tools update button will be displayed with compressed buttons`,
+                    fr: `Sur petit écran uniquement, le bouton de mise à jour des outils externes sera affiché avec les boutons compressés`,
+                    de: `Nur auf kleinen Bildschirmen wird die Aktualisierungsschaltfläche für externe Tools mit komprimierten Schaltflächen angezeigt`,
+                    es: `Solo en pantalla pequeña, el botón de actualización de herramientas externas se mostrará con botones comprimidos`
                 },
                 parent_id: null
             },
@@ -3306,65 +3320,193 @@ function createUpdateExternalToolsButton() {
     let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
 
     let update_external_tools_btn = document.getElementById(mh_update_external_tools_id);
-    const zone_marker = document.getElementById('zone-marker');
-    const chest = document.querySelector('.inventory.chest');
+    const external_display_zone = document.getElementById('zone-marker') ? (window.innerWidth >= 480 || !mho_parameters.show_compact ? document.querySelector('#zone-marker') : document.querySelector('.actions-box .mdg')) : undefined;
+    const chest = (window.innerWidth >= 480 || !mho_parameters.show_compact || pageIsHouse()) ? document.querySelector('.inventory.chest') : undefined;
 
-    /** Cette fonction ne doit s'exécuter que si on a un id d'app externe ET au moins l'une des options qui est cochée dans les paramètres ET qu'on est hors de la ville */
-    if (nb_tools_to_update > 0 && external_app_id && (zone_marker || (chest && pageIsHouse()))) {
+    /** Cette fonction ne doit s'exécuter que si on a un id d'app externe ET au moins l'une des options qui est cochée dans les paramètres ET qu'on est hors de la ville OU dans sa maison */
+    if (nb_tools_to_update > 0 && external_app_id && (external_display_zone || (chest && pageIsHouse()))) {
         if (!update_external_tools_btn) {
 
-            let el = zone_marker?.parentElement.parentElement.parentElement || chest.parentElement;
-
-            let updater_bloc = document.createElement('div');
-            updater_bloc.style.marginTop = '1em';
-            updater_bloc.style.padding = '0.25em';
-            updater_bloc.style.border = '1px solid #ddab76';
-            el.appendChild(updater_bloc);
-            let updater_title = document.createElement('h5');
-            updater_title.style.margin = '0 0 0.5em'
-            let updater_title_mho_img = document.createElement('img');
-            updater_title_mho_img.src = mh_optimizer_icon;
-            updater_title_mho_img.style.height = '24px';
-            updater_title_mho_img.style.marginRight = '0.5em';
-            updater_title.appendChild(updater_title_mho_img);
-
-            let updater_title_text = document.createElement('text');
-            updater_title_text.innerHTML = GM_info.script.name;
-            updater_title.appendChild(updater_title_text);
-
-            updater_bloc.appendChild(updater_title);
-
-            update_external_tools_btn = document.createElement('button');
-
-            update_external_tools_btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/arrowright.gif">' + getI18N(texts.update_external_tools_needed_btn_label);
-            update_external_tools_btn.id = mh_update_external_tools_id;
-
-            update_external_tools_btn.addEventListener('click', () => {
-                /** Au clic sur le bouton, on appelle la fonction de mise à jour */
-                update_external_tools_btn.innerHTML = '<img src ="' + repo_img_hordes_url + 'emotes/middot.gif">' + getI18N(texts.update_external_tools_pending_btn_label);
-                updateExternalTools().then();
-            })
-
-            updater_bloc.appendChild(update_external_tools_btn);
+            if (window.innerWidth >= 480 || !mho_parameters.show_compact || pageIsHouse()) {
+                let el = external_display_zone?.parentElement.parentElement.parentElement || chest.parentElement;
+                let updater_bloc = createLargeUpdateExternalToolsButton(update_external_tools_btn);
+                el.appendChild(updater_bloc);
+            } else {
+                let el = external_display_zone || chest.parentElement;
+                let updater_bloc = createSmallUpdateExternalToolsButton(update_external_tools_btn);
+                el.appendChild(updater_bloc);
+            }
         }
 
         let warn_missing_logs = document.getElementById(mho_warn_missing_logs_id);
 
-        if (!warn_missing_logs && document.querySelector('.log-complete-link') && zone_marker && update_external_tools_btn && mho_parameters.update_mho_digs) {
-            warn_missing_logs = document.createElement('div');
-            warn_missing_logs.id = mho_warn_missing_logs_id;
-            warn_missing_logs.classList.add('note', 'note-important');
-            warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title);
-            let warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
-            warn_missing_logs.appendChild(warn_help);
+        if (!warn_missing_logs && document.querySelector('.log-complete-link') && external_display_zone && update_external_tools_btn && mho_parameters.update_mho_digs) {
+            if (window.innerWidth >= 480 || !mho_parameters.show_compact) {
+                warn_missing_logs = document.createElement('div');
+                warn_missing_logs.id = mho_warn_missing_logs_id;
+                warn_missing_logs.classList.add('note', 'note-important');
+                warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title);
+                let warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
+                warn_missing_logs.appendChild(warn_help);
 
-            update_external_tools_btn.parentElement.appendChild(warn_missing_logs);
+                update_external_tools_btn.parentElement.appendChild(warn_missing_logs);
+            } else {
+                let external_tools_btn_tooltip = document.querySelector('#external-tools-btn-tooltip');
+                warn_missing_logs = document.createElement('div');
+                warn_missing_logs.id = mho_warn_missing_logs_id;
+                warn_missing_logs.classList.add('note', 'note-important');
+                warn_missing_logs.style.fontSize = '10px';
+                warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title) + '<br /><br />' + getI18N(texts.warn_missing_logs_help);
+
+                external_tools_btn_tooltip.appendChild(warn_missing_logs);
+            }
         } else if (warn_missing_logs && (!document.querySelector('.log-complete-link') || !mho_parameters.update_mho_digs)) {
             warn_missing_logs.remove();
         }
-    } else if (update_external_tools_btn && (nb_tools_to_update === 0 || !external_app_id || !(zone_marker && pageIsHouse()))) {
+    } else if (update_external_tools_btn && (nb_tools_to_update === 0 || !external_app_id || !(external_display_zone && pageIsHouse()))) {
         update_external_tools_btn.parentElement.remove();
     }
+}
+
+function createLargeUpdateExternalToolsButton(update_external_tools_btn) {
+    let updater_bloc = document.createElement('div');
+    updater_bloc.style.marginTop = '1em';
+    updater_bloc.style.padding = '0.25em';
+    updater_bloc.style.border = '1px solid #ddab76';
+    let updater_title = document.createElement('h5');
+    updater_title.style.margin = '0 0 0.5em'
+    let updater_title_mho_img = document.createElement('img');
+    updater_title_mho_img.src = mh_optimizer_icon;
+    updater_title_mho_img.style.height = '24px';
+    updater_title_mho_img.style.marginRight = '0.5em';
+    updater_title.appendChild(updater_title_mho_img);
+
+    let updater_title_text = document.createElement('text');
+    updater_title_text.innerHTML = GM_info.script.name;
+    updater_title.appendChild(updater_title_text);
+
+    updater_bloc.appendChild(updater_title);
+
+    update_external_tools_btn = document.createElement('button');
+
+    update_external_tools_btn.innerHTML = `<img src="${repo_img_hordes_url}emotes/arrowright.gif">` + getI18N(texts.update_external_tools_needed_btn_label);
+    update_external_tools_btn.id = mh_update_external_tools_id;
+
+    update_external_tools_btn.addEventListener('click', () => {
+        /** Au clic sur le bouton, on appelle la fonction de mise à jour */
+        update_external_tools_btn.innerHTML = `<img src="${repo_img_hordes_url}emotes/middot.gif">` + getI18N(texts.update_external_tools_pending_btn_label);
+        updateExternalTools()
+            .then((response) => {
+                if (response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_bbh_updated_key, true);
+                if (response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
+                if (response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
+
+                let tools_fail = [];
+                let response_items = Object.keys(response).map((key) => {
+                    return {key: key, value: response[key]}
+                });
+                response_items.forEach((response_item, index) => {
+                    let final = Object.keys(response_item.value).map((key) => {
+                        return {key: key, value: response_item.value[key]}
+                    });
+                    tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
+                    if (index >= response_items.length - 1) {
+                        update_external_tools_btn.innerHTML = tools_fail.length === 0
+                            ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
+                            : `<img src="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ` : ${item.value}`)).join('<br>')}`;
+                    }
+                });
+                if (tools_fail.length > 0) {
+                    console.error(`Erreur lors de la mise à jour de l'un des outils`, response);
+                }
+            })
+            .catch(() => {
+                update_external_tools_btn.innerHTML = `<img src="${repo_img_hordes_url}professions/death.gif">` + getI18N(texts.update_external_tools_fail_btn_label);
+            });
+    });
+
+    updater_bloc.appendChild(update_external_tools_btn);
+
+    return updater_bloc;
+}
+
+function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
+    update_external_tools_btn = document.createElement('button');
+
+    update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/arrowright.gif" height="16">`;
+    update_external_tools_btn.id = mh_update_external_tools_id;
+
+
+    let tooltips_container = document.querySelector('#tooltip_container');
+    let external_tools_btn_tooltip = tooltips_container.querySelector('#external-tools-btn-tooltip');
+    if (!external_tools_btn_tooltip) {
+        external_tools_btn_tooltip = document.createElement('div');
+        external_tools_btn_tooltip.id = 'external-tools-btn-tooltip';
+        external_tools_btn_tooltip.classList.add('tooltip', 'help');
+        tooltips_container.appendChild(external_tools_btn_tooltip);
+    } else {
+        external_tools_btn_tooltip.innerHTML = undefined;
+    }
+
+    let title = document.createElement('div');
+    title.classList.add('title')
+    title.innerHTML = `<h5 style="margin-top: 0; font-size: 10px;">${GM_info.script.name}</h5>`;
+    external_tools_btn_tooltip.appendChild(title);
+
+    let status = document.createElement('div');
+    status.classList.add('status');
+    status.innerText = getI18N(texts.update_external_tools_needed_btn_label);
+    external_tools_btn_tooltip.appendChild(status);
+
+    update_external_tools_btn.addEventListener('mouseenter', () => {
+        external_tools_btn_tooltip.style.display = 'block';
+        external_tools_btn_tooltip.style.top = update_external_tools_btn.getBoundingClientRect().bottom + 'px';
+        external_tools_btn_tooltip.style.right = (window.innerWidth - update_external_tools_btn.getBoundingClientRect().right) + 'px';
+    });
+
+    update_external_tools_btn.addEventListener('mouseleave', () => {
+        external_tools_btn_tooltip.style.display = 'none';
+    });
+
+    update_external_tools_btn.addEventListener('click', () => {
+        /** Au clic sur le bouton, on appelle la fonction de mise à jour */
+        update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/middot.gif" height="16">`;
+        status.innerHTML = getI18N(texts.update_external_tools_pending_btn_label);
+
+        updateExternalTools()
+            .then((response) => {
+                if (response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_bbh_updated_key, true);
+                if (response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
+                if (response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
+
+                let tools_fail = [];
+                let response_items = Object.keys(response).map((key) => {
+                    return {key: key, value: response[key]}
+                });
+                response_items.forEach((response_item, index) => {
+                    let final = Object.keys(response_item.value).map((key) => {
+                        return {key: key, value: response_item.value[key]}
+                    });
+                    tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
+                    if (index >= response_items.length - 1) {
+                        update_external_tools_btn.innerHTML = tools_fail.length === 0
+                            ? `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}icons/done.png" height="16">`
+                            : `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/warning.gif" height="16">`;
+                        status.innerHTML = tools_fail.length === 0 ? getI18N(texts.update_external_tools_success_btn_label)
+                            : `${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ` : ${item.value}`)).join('<br>')}`;
+                    }
+                });
+                if (tools_fail.length > 0) {
+                    console.error(`Erreur lors de la mise à jour de l'un des outils`, response);
+                }
+            })
+            .catch(() => {
+                update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}professions/death.gif" height="16">`;
+                status.innerHTML = getI18N(texts.update_external_tools_fail_btn_label);
+            });
+    });
+
+    return update_external_tools_btn;
 }
 
 /** Si l'option associée est activée, un clic sur le chantier recommandé permet de rediriger vers la ligne du chantier en question */
@@ -5195,7 +5337,6 @@ function displayAntiAbuseCounter() {
                     counter_values = [];
                 }
                 let counter_value = {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000};
-                console.log('counter', {item: {item: fictive_item, broken: false}, take_at: Date.now() + 5000});
                 counter_values.push(counter_value);
                 GM.setValue(mho_anti_abuse_key, counter_values);
                 let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
@@ -5251,6 +5392,7 @@ function displayAntiAbuseCounter() {
                     let hovered_item = getHoveredItem();
 
                     document.addEventListener('mh-navigation-complete', () => {
+
                         controller.abort();
                         let new_bag = document.querySelectorAll("#gma ul.rucksack li.item");
                         if (old_bag.length < new_bag.length) {
@@ -7594,7 +7736,6 @@ function updateExternalTools() {
 
 
         console.log('MHO - Envoyé pour enregistrement :', data);
-        let btn = document.getElementById(mh_update_external_tools_id);
 
         fetch(api_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id, {
             method: 'POST',
@@ -7608,32 +7749,12 @@ function updateExternalTools() {
                     return response.json();
                 } else {
                     addError(response);
-                    btn.innerHTML = `<img src="${repo_img_hordes_url}professions/death.gif">` + getI18N(texts.update_external_tools_fail_btn_label);
+                    reject();
                     endLoading();
                 }
             })
             .then((response) => {
-                if (response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') GM.setValue(gm_bbh_updated_key, true);
-                if (response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') GM.setValue(gm_gh_updated_key, true);
-                if (response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') GM.setValue(gm_fata_updated_key, true);
-
-                let tools_fail = [];
-                let response_items = Object.keys(response).map((key) => {
-                    return {key: key, value: response[key]}
-                });
-                response_items.forEach((response_item, index) => {
-                    let final = Object.keys(response_item.value).map((key) => {
-                        return {key: key, value: response_item.value[key]}
-                    });
-                    tools_fail = [...tools_fail, ...final.filter((final_item) => !final_item.value || (final_item.value.toLowerCase() !== 'ok' && final_item.value.toLowerCase() !== 'not activated'))];
-                    if (index >= response_items.length - 1) {
-                        btn.innerHTML = tools_fail.length === 0 ? `<img src="${repo_img_hordes_url}icons/done.png">` + getI18N(texts.update_external_tools_success_btn_label)
-                            : `<img src ="${repo_img_hordes_url}emotes/warning.gif">${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ` : ${item.value}`)).join('<br>')}`;
-                    }
-                });
-                if (tools_fail.length > 0) {
-                    console.error(`Erreur lors de la mise à jour de l'un des outils`, response);
-                }
+                resolve(response);
 
                 getMap();
                 endLoading();
