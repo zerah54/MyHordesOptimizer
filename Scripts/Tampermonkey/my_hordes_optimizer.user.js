@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.53
+// @version      1.0.0-beta.54
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -3458,13 +3458,13 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
     status.innerText = getI18N(texts.update_external_tools_needed_btn_label);
     external_tools_btn_tooltip.appendChild(status);
 
-    update_external_tools_btn.addEventListener('mouseenter', () => {
+    update_external_tools_btn.addEventListener('pointerover', () => {
         external_tools_btn_tooltip.style.display = 'block';
-        external_tools_btn_tooltip.style.top = update_external_tools_btn.getBoundingClientRect().bottom + 'px';
-        external_tools_btn_tooltip.style.right = (window.innerWidth - update_external_tools_btn.getBoundingClientRect().right) + 'px';
+        external_tools_btn_tooltip.style.top = update_external_tools_btn.getBoundingClientRect().bottom - 20 + 'px';
+        external_tools_btn_tooltip.style.right = (window.innerWidth - update_external_tools_btn.getBoundingClientRect().right - 20) + 'px';
     });
 
-    update_external_tools_btn.addEventListener('mouseleave', () => {
+    update_external_tools_btn.addEventListener('pointerout', () => {
         external_tools_btn_tooltip.style.display = 'none';
     });
 
