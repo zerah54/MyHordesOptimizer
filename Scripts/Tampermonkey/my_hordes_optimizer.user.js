@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.54
+// @version      1.0.0-beta.55
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -33,7 +33,7 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[nouveauté] Ajout d'une option permettant d'activer un mode compact sur mobile pour le bouton de mise à jour des outils externes\n`;
+    + `[correctif] Le nombre de charges d'APAG restantes était mal enregistré\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -7571,7 +7571,7 @@ function updateExternalTools() {
             if (apag) {
                 let action = {
                     locale: lang,
-                    label: apag.parentElement.nextElementSibling.querySelector('h1')?.innerText.replace('  ', ''),
+                    label: apag.alt,
                     value: +apag.src.replace(/.*item_photo_(\d).*/, '$1') || 0
                 }
                 data.heroicActions.actions.push(action);
