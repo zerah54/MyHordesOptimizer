@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.55
+// @version      1.0.0-beta.56
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -33,7 +33,7 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Le nombre de charges d'APAG restantes était mal enregistré\n`;
+    + `[correctif] Corrige l'affichage du nombre de zombies morts sur la case\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -4996,47 +4996,53 @@ function notifyOnNewMessage() {
 /** Affiche le nombre de zombies morts aujourd'hui */
 function displayNbDeadZombies() {
     if (mho_parameters.display_nb_dead_zombies && pageIsDesert()) {
-        let zone_dist = document.querySelectorAll(`.zone-dist:not(#${zone_info_zombies_id})`)[0];
-        if (zone_dist) {
-            let zone_info_zombies = document.getElementById(zone_info_zombies_id);
-            let nb_dead_zombies = document.querySelectorAll('.splatter').length;
-            let despair_deaths = calculateDespairDeaths(nb_dead_zombies);
+        if (document.querySelector('.map-load-container')) {
+            setTimeout(() => {
+                displayNbDeadZombies();
+            }, 100)
+        } else {
+            let zone_dist = document.querySelectorAll(`.zone-dist:not(#${zone_info_zombies_id})`)[0];
+            if (zone_dist) {
+                let zone_info_zombies = document.getElementById(zone_info_zombies_id);
+                let nb_dead_zombies = document.querySelectorAll('.splatter').length;
+                let despair_deaths = calculateDespairDeaths(nb_dead_zombies);
 
-            if (!zone_info_zombies) {
-                zone_info_zombies = document.createElement('div');
-                zone_info_zombies.id = zone_info_zombies_id;
-                zone_info_zombies.classList.add('row', 'zone-dist');
+                if (!zone_info_zombies) {
+                    zone_info_zombies = document.createElement('div');
+                    zone_info_zombies.id = zone_info_zombies_id;
+                    zone_info_zombies.classList.add('row', 'zone-dist');
 
-                let content_info_zombie = document.createElement('div');
-                content_info_zombie.style.display = 'flex';
-                content_info_zombie.classList.add('cell', 'rw-12', 'center');
-                zone_info_zombies.appendChild(content_info_zombie);
+                    let content_info_zombie = document.createElement('div');
+                    content_info_zombie.style.display = 'flex';
+                    content_info_zombie.classList.add('cell', 'rw-12', 'center');
+                    zone_info_zombies.appendChild(content_info_zombie);
 
-                let btn_mho_img = document.createElement('img');
-                btn_mho_img.src = mh_optimizer_icon;
-                btn_mho_img.style.height = '16px';
-                btn_mho_img.style.margin = 'auto 0.25em';
-                content_info_zombie.appendChild(btn_mho_img);
+                    let btn_mho_img = document.createElement('img');
+                    btn_mho_img.src = mh_optimizer_icon;
+                    btn_mho_img.style.height = '16px';
+                    btn_mho_img.style.margin = 'auto 0.25em';
+                    content_info_zombie.appendChild(btn_mho_img);
 
-                let rows_container_info_zombies = document.createElement('div');
-                rows_container_info_zombies.style.margin = 'auto 0.25em';
-                content_info_zombie.appendChild(rows_container_info_zombies);
+                    let rows_container_info_zombies = document.createElement('div');
+                    rows_container_info_zombies.style.margin = 'auto 0.25em';
+                    content_info_zombie.appendChild(rows_container_info_zombies);
 
-                let nb_dead_zombies_text = document.createElement('div');
-                nb_dead_zombies_text.innerHTML = `${getI18N(texts.nb_dead_zombies)} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`;
-                rows_container_info_zombies.appendChild(nb_dead_zombies_text);
+                    let nb_dead_zombies_text = document.createElement('div');
+                    nb_dead_zombies_text.innerHTML = `${getI18N(texts.nb_dead_zombies)} : <b id="${nb_dead_zombies_id}">${nb_dead_zombies}</span>`;
+                    rows_container_info_zombies.appendChild(nb_dead_zombies_text);
 
-                let despair_deaths_text = document.createElement('div');
-                despair_deaths_text.innerHTML = `${getI18N(texts.nb_despair_deaths)} : <b id="${despair_deaths_id}">${despair_deaths}</span>`;
-                rows_container_info_zombies.appendChild(despair_deaths_text);
+                    let despair_deaths_text = document.createElement('div');
+                    despair_deaths_text.innerHTML = `${getI18N(texts.nb_despair_deaths)} : <b id="${despair_deaths_id}">${despair_deaths}</span>`;
+                    rows_container_info_zombies.appendChild(despair_deaths_text);
 
-                zone_dist.parentNode.appendChild(zone_info_zombies);
-            } else {
-                let nb_dead_zombies_element = document.getElementById(nb_dead_zombies_id);
-                nb_dead_zombies.innerText = nb_dead_zombies;
+                    zone_dist.parentNode.appendChild(zone_info_zombies);
+                } else {
+                    let nb_dead_zombies_element = document.getElementById(nb_dead_zombies_id);
+                    nb_dead_zombies_element.innerText = nb_dead_zombies;
 
-                let despair_deaths_element = document.getElementById(despair_deaths_id);
-                nb_dead_zombies.innerText = despair_deaths;
+                    let despair_deaths_element = document.getElementById(despair_deaths_id);
+                    despair_deaths_element.innerText = despair_deaths;
+                }
             }
         }
     } else {
@@ -8126,20 +8132,6 @@ function getApiKey() {
             notifyOnSearchEnd();
 
             initOptionsWithoutLoginNeeded();
-//             document.addEventListener('mh-navigation-complete', (event) => {
-//                 initOptionsWithoutLoginNeeded();
-//                 initOptionsWithLoginNeeded();
-
-//                 // let move_btns = document.querySelectorAll('div.action-move');
-//                 // Array.from(move_btns).forEach((move_btn) => {
-//                 //     move_btn.addEventListener('click', (event) => {
-//                 //         setTimeout(() => {
-//                 //             initOptionsWithLoginNeeded();
-//                 //             initOptionsWithoutLoginNeeded();
-//                 //         }, 250);
-//                 //     });
-//                 // })
-//             });
 
             getParameters().then(() => {
 
