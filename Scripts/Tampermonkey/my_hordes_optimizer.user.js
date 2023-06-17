@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.56
+// @version      1.0.0-beta.57
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -33,7 +33,10 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Corrige l'affichage du nombre de zombies morts sur la case\n`;
+    + `[correctif] Corrige l'affichage du bouton de mise à jour sur petit écran si le mode compact n'est pas activé dans les options\n`
+    + `[correctif] Corrige certains comportements du compteur anti-abus\n`
+    + `[correctif] Devrait corriger l'affichage des images qui était parfois cassé\n\n`
+    + `[amélioration] Le bouton d'accès aux options du script est désormais aggrandi sur les petits écrans\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -77,7 +80,7 @@ const api_url_2 = 'https://myhordesoptimizerapi.azurewebsites.net';
 ///////////////////////////////////////////
 
 const hordes_img_url = '/build/images/';
-const repo_img_url = 'https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/';
+const repo_img_url = 'https://myhordes-optimizer.web.app/assets/img/';
 const repo_img_hordes_url = repo_img_url + 'hordes_img/';
 
 const mh_optimizer_icon = 'https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/logo/logo_mho_64x64_outlined.png';
@@ -493,6 +496,18 @@ const texts = {
         fr: `Ce message s'affiche parce que vous avez coché l'option <strong>"Enregistrer les fouilles réussies"</strong> et que toutes les entrées du registre de votre case ne sont pas affichées dans la page.<br /><br />Vous devez cliquer sur le bouton <strong>"Afficher toutes les entrées"</strong> en bas du registre pour que les informations soient complètes.`,
         de: `Diese Meldung wird angezeigt, weil Sie die Option <strong>"Erfolgreiche Ausgrabungen speichern"</strong> aktiviert haben und nicht alle Registrierungseinträge in Ihrer Box auf der Seite angezeigt werden.<br /><br />Sie müssen auf die Schaltfläche <strong >"Alle Einträge anzeigen"</strong> unten in der Registrierung, damit die Informationen vollständig sind.`,
         es: `Este mensaje aparece porque seleccionó la opción <strong>"Guardar excavaciones exitosas"</strong> y no todas las entradas de registro en su casilla se muestran en la página.<br /><br />Debe hacer clic en <strong >"Mostrar todas las entradas"</strong> en la parte inferior del registro para que la información esté completa.`,
+    },
+    estim_title: {
+        en: `Today's attack`,
+        fr: `Attaque du jour`,
+        de: `Heutiger Angriff`,
+        es: `Ataque del día`,
+    },
+    planif_title: {
+        en: `Tomorrow's attack`,
+        fr: `Attaque du lendemain`,
+        de: `Morgige Abschätzung`,
+        es: `Ataque de la noche siguiente`,
     }
 };
 
@@ -1696,20 +1711,37 @@ function getHoveredItem() {
     for (let item of hovered) {
         let hovered_item_img;
         if (item.classList.contains('item-icon')) {
-            hovered_item_img = item.firstElementChild.src;
+            hovered_item_img = item.firstElementChild;
         } else if (item.tagName.toLowerCase() === 'SPAN'.toLowerCase() && item.previousElementSibling && item.previousElementSibling.classList.contains('item-icon')) {
-            hovered_item_img = item.previousElementSibling?.firstElementChild?.src;
+            hovered_item_img = item.previousElementSibling?.firstElementChild;
         } else if (item.tagName.toLowerCase() === 'LI'.toLowerCase()) {
-            hovered_item_img = item.firstElementChild?.firstElementChild?.src;
+            hovered_item_img = item.firstElementChild?.firstElementChild;
         }
-        if (hovered_item_img) {
-            let index = hovered_item_img.indexOf(hordes_img_url);
-            hovered_item_img = hovered_item_img.slice(index).replace(hordes_img_url, '');
-            hovered_item = items.find((item) => item.img === fixMhCompiledImg(hovered_item_img));
+        if (hovered_item_img && hovered_item_img.src) {
+            hovered_item = getItemFromImg(hovered_item_img.src);
+            broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
         }
     }
 
     return {item: hovered_item, broken: broken};
+}
+
+function getClickedItem(target) {
+    // console.log('target', target);
+    let item_icon = event.target.closest('span.item-icon') || event.target.previousElementSibling?.closest('span.item-icon') || event.target.previousElementSibling?.querySelector('span.item-icon');
+    if (item_icon) {
+        let hovered_item = getItemFromImg(item_icon.querySelector('img').src);
+        let broken = item_icon.parentElement.classList.contains('broken');
+        return {item: hovered_item, broken: broken};
+    }
+}
+
+function getItemFromImg(img_src) {
+    if (img_src) {
+        let index = img_src.indexOf(hordes_img_url);
+        img_src = img_src.slice(index).replace(hordes_img_url, '');
+        return items.find((item) => item.img === fixMhCompiledImg(img_src));
+    }
 }
 
 function initOptionsWithLoginNeeded() {
@@ -1752,7 +1784,7 @@ function initOptionsWithoutLoginNeeded() {
  * @param {string} le texte à copier
  */
 function copyToClipboard(text) {
-    let input = document.createElement('input');
+    let input = document.createElement('textarea');
     input.value = text;
 
     document.body.appendChild(input);
@@ -1808,9 +1840,11 @@ function createOptimizerBtn() {
         let left_position = last_header_child ? last_header_child.offsetLeft + last_header_child.offsetWidth + 5 : (mhe_button ? mhe_button.offsetLeft + mhe_button.offsetWidth + 5 : document.querySelector('#apps')?.getBoundingClientRect().width + 16);
 
         let img = document.createElement('img');
+        let annuary = document.querySelector('#apps img');
         img.src = mh_optimizer_icon;
-        img.setAttribute('height', '16px');
-        img.setAttribute('width', '16px');
+        img.setAttribute('height', annuary && annuary.height ? annuary.height + 'px' : '16px');
+        img.setAttribute('width', annuary && annuary.width ? annuary.width + 'px' : '16px');
+        img.style.margin = '1px 0 2px';
 
         let title_hidden = document.createElement('span');
         title_hidden.classList.add('label_text');
@@ -1819,6 +1853,8 @@ function createOptimizerBtn() {
         let title = document.createElement('h1');
 
         let title_first_part = document.createElement('div');
+        title_first_part.style.display = 'flex';
+        title_first_part.style.alignItems = 'center';
         title.appendChild(title_first_part);
 
         let title_second_part = document.createElement('div');
@@ -3319,21 +3355,24 @@ function createUpdateExternalToolsButton() {
 
     let nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
 
+    let zone_marker = document.querySelector('#zone-marker');
+    let compact_actions_zone = document.querySelector('.actions-box .mdg');
+
     let update_external_tools_btn = document.getElementById(mh_update_external_tools_id);
-    const external_display_zone = document.getElementById('zone-marker') ? (window.innerWidth >= 480 || !mho_parameters.show_compact ? document.querySelector('#zone-marker') : document.querySelector('.actions-box .mdg')) : undefined;
-    const chest = (window.innerWidth >= 480 || !mho_parameters.show_compact || pageIsHouse()) ? document.querySelector('.inventory.chest') : undefined;
+    const external_display_zone = zone_marker ? (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone ? document.querySelector('.actions-box .mdg') : zone_marker) : undefined;
+    const chest = document.querySelector('.inventory.chest');
 
     /** Cette fonction ne doit s'exécuter que si on a un id d'app externe ET au moins l'une des options qui est cochée dans les paramètres ET qu'on est hors de la ville OU dans sa maison */
     if (nb_tools_to_update > 0 && external_app_id && (external_display_zone || (chest && pageIsHouse()))) {
         if (!update_external_tools_btn) {
 
-            if (window.innerWidth >= 480 || !mho_parameters.show_compact || pageIsHouse()) {
-                let el = external_display_zone?.parentElement.parentElement.parentElement || chest.parentElement;
-                let updater_bloc = createLargeUpdateExternalToolsButton(update_external_tools_btn);
-                el.appendChild(updater_bloc);
-            } else {
+            if (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone) {
                 let el = external_display_zone || chest.parentElement;
                 let updater_bloc = createSmallUpdateExternalToolsButton(update_external_tools_btn);
+                el.appendChild(updater_bloc);
+            } else {
+                let el = external_display_zone?.parentElement.parentElement.parentElement || chest.parentElement;
+                let updater_bloc = createLargeUpdateExternalToolsButton(update_external_tools_btn);
                 el.appendChild(updater_bloc);
             }
         }
@@ -3341,16 +3380,7 @@ function createUpdateExternalToolsButton() {
         let warn_missing_logs = document.getElementById(mho_warn_missing_logs_id);
 
         if (!warn_missing_logs && document.querySelector('.log-complete-link') && external_display_zone && update_external_tools_btn && mho_parameters.update_mho_digs) {
-            if (window.innerWidth >= 480 || !mho_parameters.show_compact) {
-                warn_missing_logs = document.createElement('div');
-                warn_missing_logs.id = mho_warn_missing_logs_id;
-                warn_missing_logs.classList.add('note', 'note-important');
-                warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title);
-                let warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
-                warn_missing_logs.appendChild(warn_help);
-
-                update_external_tools_btn.parentElement.appendChild(warn_missing_logs);
-            } else {
+            if (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone) {
                 let external_tools_btn_tooltip = document.querySelector('#external-tools-btn-tooltip');
                 warn_missing_logs = document.createElement('div');
                 warn_missing_logs.id = mho_warn_missing_logs_id;
@@ -3359,6 +3389,15 @@ function createUpdateExternalToolsButton() {
                 warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title) + '<br /><br />' + getI18N(texts.warn_missing_logs_help);
 
                 external_tools_btn_tooltip.appendChild(warn_missing_logs);
+            } else {
+                warn_missing_logs = document.createElement('div');
+                warn_missing_logs.id = mho_warn_missing_logs_id;
+                warn_missing_logs.classList.add('note', 'note-important');
+                warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title);
+                let warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
+                warn_missing_logs.appendChild(warn_help);
+
+                update_external_tools_btn.parentElement.appendChild(warn_missing_logs);
             }
         } else if (warn_missing_logs && (!document.querySelector('.log-complete-link') || !mho_parameters.update_mho_digs)) {
             warn_missing_logs.remove();
@@ -4412,15 +4451,19 @@ function createDisplayMapButton() {
                 btn_container.setAttribute('style', `right: ${position}px`);
             }, 500);
             let btn = document.createElement('div');
+            btn.style.display = 'flex';
+            btn.style.gap = '0.5em';
+
+            let postbox_img = document.querySelector('#postbox img');
 
             let btn_mho_img = document.createElement('img');
             btn_mho_img.src = mh_optimizer_icon;
-            btn_mho_img.style.height = '16px';
-            btn_mho_img.style.marginRight = '0.5em';
+            btn_mho_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
             btn.appendChild(btn_mho_img);
 
             let btn_img = document.createElement('img');
             btn_img.src = repo_img_hordes_url + 'emotes/explo.gif';
+            btn_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
             btn.appendChild(btn_img);
 
             btn.addEventListener('click', (event) => {
@@ -5253,17 +5296,193 @@ function displayEstimationsOnWatchtower() {
         let small_note = document.querySelector('.small-note');
         if (estim_block || !small_note) return;
 
-        estim_block = document.createElement('div');
-        estim_block.id = mho_watchtower_estim_id;
 
-        small_note.parentElement.insertBefore(estim_block, small_note);
+        const TDG_VALUES = [33, 38, 42, 46, 50, 54, 58, 63, 68, 71, 75, 79, 83, 88, 92, 96, 100];
+        const PLANIF_VALUES = [0, 4, 8, 13, 17, 21, 25, 29, 33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100];
 
-        getEstimations().then((estimations) => {
-            let saved_estimations = estimations;
-            let updated_estimations = estimations;
-            console.log('estimations', estimations);
-        })
+        const watchtower_estim_block = document.querySelector('.block.watchtower');
+        const watchtower_estim_block_prediction = watchtower_estim_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
 
+        if (watchtower_estim_block && watchtower_estim_block_prediction) {
+            getEstimations().then((estimations) => {
+                let saved_estimations = estimations;
+                let updated_estimations = estimations;
+                console.log('estimations', estimations);
+
+                estim_block = document.createElement('div');
+                estim_block.style.marginTop = '1em';
+                estim_block.style.padding = '0.25em';
+                estim_block.style.border = '1px solid #ddab76';
+                estim_block.id = mho_watchtower_estim_id;
+
+                let estim_block_title = document.createElement('h5');
+                estim_block_title.style.margin = '0 0 0.5em';
+                estim_block_title.style.display = 'flex';
+                estim_block_title.style.gap = '0.5em';
+                estim_block_title.style.alignItems = 'center';
+                estim_block.appendChild(estim_block_title);
+                let estim_block_title_mho_img = document.createElement('img');
+                estim_block_title_mho_img.src = mh_optimizer_icon;
+                estim_block_title_mho_img.style.height = '24px';
+                estim_block_title.appendChild(estim_block_title_mho_img);
+
+                let estim_block_title_text = document.createElement('text');
+                estim_block_title_text.style.flex = '1';
+                estim_block_title_text.innerHTML = GM_info.script.name;
+                estim_block_title.appendChild(estim_block_title_text);
+
+                let estim_block_title_save_button = document.createElement('button');
+                estim_block_title_save_button.style.flex = '0';
+                estim_block_title_save_button.style.margin = '0';
+                estim_block_title_save_button.innerText = '💾';
+                estim_block_title.appendChild(estim_block_title_save_button);
+
+                estim_block_title_save_button.addEventListener('click', () => {
+                    saveEstimations(updated_estimations);
+                });
+
+                let estim_block_title_share_button = document.createElement('button');
+                estim_block_title_share_button.style.flex = '0';
+                estim_block_title_share_button.style.margin = '0';
+                estim_block_title_share_button.innerText = '⧉';
+                estim_block_title.appendChild(estim_block_title_share_button);
+
+                estim_block_title_share_button.addEventListener('click', () => {
+                    let text = '';
+                    /** Ajout du titre **/
+                    text += `[big][b][bad]J${updated_estimations.day}[/bad][/b][/big]{hr}\n`;
+
+                    /** Ajout du titre "Attaque du jour" */
+                    text += `[i]${getI18N(texts.estim_title)} (J${updated_estimations.day})[/i]\n`;
+
+                    /** Ajout des valeurs du jour */
+                    TDG_VALUES.forEach((value_key) => {
+                        const value = updated_estimations.estim['_' + value_key];
+                        if (value) {
+                            text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
+                        }
+                    });
+
+                    text += '{hr}\n';
+
+                    /** Ajout du titre "Attaque du lendemain" */
+                    text += `[i]${getI18N(texts.planif_title)} (J${updated_estimations.day + 1})[/i]\n`;
+
+                    /** Ajout des valeurs du lendemain */
+                    PLANIF_VALUES.forEach((value_key) => {
+                        const value = updated_estimations.planif['_' + value_key];
+                        if (value) {
+                            text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
+                        }
+                    });
+
+                    text += '{hr}';
+
+                    copyToClipboard(text);
+                });
+
+                small_note.parentElement.insertBefore(estim_block, small_note);
+
+                let estim_block_content = document.createElement('div');
+                estim_block_content.style.display = 'flex';
+                estim_block_content.style.flexWrap = 'wrap';
+                estim_block_content.style.justifyContent = 'space-around';
+                estim_block.appendChild(estim_block_content);
+
+                let estim_values_block = document.createElement('div');
+                estim_block_content.appendChild(estim_values_block);
+
+                let estim_values_block_title = document.createElement('h5');
+                estim_values_block_title.style.marginTop = '0.25em';
+                estim_values_block_title.innerText = getI18N(texts.estim_title);
+                ;
+                estim_values_block.appendChild(estim_values_block_title);
+
+                TDG_VALUES.forEach((value) => {
+                    if (!updated_estimations.estim['_' + value]) {
+                        updated_estimations.estim['_' + value] = {min: null, max: null};
+                    }
+                    let value_block = document.createElement('div');
+                    value_block.style.display = 'flex';
+                    value_block.style.justifyContent = 'space-between';
+
+                    value_block.innerHTML = `<label for="estim_${value}"></label>${value}%<div id="estim_${value}"><input class="start" style="width: 100px"> - <input class="end" style="width: 100px"></div>`
+                    estim_values_block.appendChild(value_block);
+
+                    let value_start = document.querySelector(`div#estim_${value}>input.start`);
+                    let value_end = document.querySelector(`div#estim_${value}>input.end`);
+
+                    let updated_estimation = updated_estimations.estim['_' + value];
+                    let current_estimation_percent = +watchtower_estim_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || 100;
+
+                    if (current_estimation_percent === value) {
+                        let current_estimation_value = {
+                            min: watchtower_estim_block_prediction.split(' ')[0],
+                            max: watchtower_estim_block_prediction.split(' ')[2]
+                        };
+                        if (current_estimation_percent && current_estimation_value) {
+
+                            updated_estimation.min = current_estimation_value.min;
+                            updated_estimation.max = current_estimation_value.max;
+                        }
+                    }
+                    if (updated_estimation) {
+                        value_start.value = updated_estimation.min;
+                        value_end.value = updated_estimation.max;
+                    }
+                });
+
+
+                const watchtower_planif_block = watchtower_estim_block.nextElementSibling;
+                const watchtower_planif_block_prediction = watchtower_planif_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
+
+                if (watchtower_planif_block && watchtower_planif_block_prediction) {
+
+                    let planif_values_block = document.createElement('div');
+                    estim_block_content.appendChild(planif_values_block);
+
+                    let planif_values_block_title = document.createElement('h5');
+                    planif_values_block_title.style.marginTop = '0.25em';
+                    planif_values_block_title.innerText = getI18N(texts.planif_title);
+                    planif_values_block.appendChild(planif_values_block_title);
+
+                    PLANIF_VALUES.forEach((value) => {
+                        if (!updated_estimations.planif['_' + value]) {
+                            updated_estimations.planif['_' + value] = {min: null, max: null};
+                        }
+
+                        let value_block = document.createElement('div');
+                        value_block.style.display = 'flex';
+                        value_block.style.justifyContent = 'space-between';
+
+                        value_block.innerHTML = `<label for="planif_${value}">${value}%</label><div id="planif_${value}"><input class="start" style="width: 100px"> - <input class="end" style="width: 100px"></div>`
+                        planif_values_block.appendChild(value_block);
+
+                        let value_start = document.querySelector(`div#planif_${value}>input.start`);
+                        let value_end = document.querySelector(`div#planif_${value}>input.end`);
+
+                        let updated_estimation = updated_estimations.planif['_' + value];
+                        let current_estimation_percent = +watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || 100;
+
+                        if (current_estimation_percent === value) {
+                            let current_estimation_value = {
+                                min: watchtower_planif_block_prediction.split(' ')[0],
+                                max: watchtower_planif_block_prediction.split(' ')[2]
+                            };
+                            if (current_estimation_percent && current_estimation_value) {
+
+                                updated_estimation.min = current_estimation_value.min;
+                                updated_estimation.max = current_estimation_value.max;
+                            }
+                        }
+                        if (updated_estimation) {
+                            value_start.value = updated_estimation.min;
+                            value_end.value = updated_estimation.max;
+                        }
+                    });
+                }
+            });
+        }
     }
 }
 
@@ -5396,6 +5615,9 @@ function displayAntiAbuseCounter() {
                     old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
 
                     let hovered_item = getHoveredItem();
+                    if (!hovered_item.item) {
+                        hovered_item = getClickedItem(event.target);
+                    }
 
                     document.addEventListener('mh-navigation-complete', () => {
 
@@ -5409,7 +5631,8 @@ function displayAntiAbuseCounter() {
                                 let counter_value = {
                                     item: {item: hovered_item.item, broken: hovered_item.broken},
                                     take_at: Date.now() + 5000
-                                }
+                                };
+                                // console.log('counter_value', counter_value);
                                 counter_values.push(counter_value);
                                 GM.setValue(mho_anti_abuse_key, counter_values);
                                 let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
@@ -7952,6 +8175,35 @@ function getEstimations() {
     });
 }
 
+function saveEstimations(new_estimations) {
+    return new Promise((resolve, reject) => {
+        let estimations_to_save = new_estimations;
+        fetch(api_url + `AttaqueEstimation/Estimations?townId=${mh_user.townDetails.townId}`, {
+            method: 'POST',
+            body: JSON.stringify(estimations_to_save),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then((response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    addError(response);
+                    reject(response);
+                }
+            })
+            .then((response) => {
+                resolve(response);
+                endLoading();
+            })
+            .catch((error) => {
+                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
+                endLoading();
+                reject(error);
+            });
+    });
+}
 
 /** Récupère le chemin optimal à partir d'une carte */
 function getOptimalPath(map, html, button) {
@@ -8142,6 +8394,7 @@ function getApiKey() {
                         initOptionsWithoutLoginNeeded();
 
                         document.addEventListener('mh-navigation-complete', (event) => {
+                            // console.log('navigation');
                             initOptionsWithLoginNeeded();
                             initOptionsWithoutLoginNeeded();
                         });
