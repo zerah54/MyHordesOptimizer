@@ -51,7 +51,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations
         [JsonProperty("63")]
         public EstimationValueDto _63 { get; set; }
 
-        [JsonProperty("68")]
+        [JsonProperty("67")]
         public EstimationValueDto _68 { get; set; }
 
         [JsonProperty("71")]
