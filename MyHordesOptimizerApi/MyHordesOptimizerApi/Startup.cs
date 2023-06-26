@@ -57,7 +57,7 @@ namespace MyHordesOptimizerApi
 
             services.AddHttpContextAccessor();
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             services.AddHttpClient();
             services.AddHttpClient(nameof(GestHordesRepository)).ConfigurePrimaryHttpMessageHandler(() =>
             {
