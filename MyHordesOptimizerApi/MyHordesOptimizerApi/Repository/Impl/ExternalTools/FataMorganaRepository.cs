@@ -16,7 +16,7 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
         private string _parameterUserKey = "key";
 
         private string _endpointMap = "map";
-        private string _endpointUpdateMyZone = "updatemyzone";
+        private string _endpointUpdateMyZone = "update";
 
         public FataMorganaRepository(ILogger<FataMorganaRepository> logger,
             IHttpClientFactory httpClientFactory,
