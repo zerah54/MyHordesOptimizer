@@ -1,15 +1,18 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using MyHordesOptimizerApi.Attributes;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Estimations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 
 namespace MyHordesOptimizerApi.Controllers
@@ -65,8 +68,7 @@ namespace MyHordesOptimizerApi.Controllers
             }
 
             var estimations = EstimationService.GetEstimations(townId.Value, day.Value);
-
-            return Ok(estimations);
+            return Ok(estimations.ToJson());
         }
 
         [HttpPost]
