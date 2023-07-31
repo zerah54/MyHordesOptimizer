@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.57
+// @version      1.0.0-beta.58
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -33,10 +33,9 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Corrige l'affichage du bouton de mise à jour sur petit écran si le mode compact n'est pas activé dans les options\n`
     + `[correctif] Corrige certains comportements du compteur anti-abus\n`
-    + `[correctif] Devrait corriger l'affichage des images qui était parfois cassé\n\n`
-    + `[amélioration] Le bouton d'accès aux options du script est désormais aggrandi sur les petits écrans\n`;
+    + `[nouveauté] Ajoute un bouton de copie du registre\n`
+    + `[remise en place] Réintègre l'option d'envoi des améliorations de maison. Un nouveau bouton sera créé sur la page des améliorations`
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -107,6 +106,7 @@ const mho_search_recipient_field_id = 'mho-search-recipient-field';
 const mho_display_translate_input_id = 'mho-display-translate-input';
 const mho_watchtower_estim_id = 'mho-watchtower-estim';
 const mho_anti_abuse_counter_id = 'mho-anti-abuse-counter';
+const mho_copy_logs_id = 'mho-copy-logs';
 
 
 //////////////////////////////////////
@@ -1006,16 +1006,22 @@ let params_categories = [
                 },
                 parent_id: `update_mho`
             },
-            /*             {
-                            id: `update_mho_house`,
-                            label: {
-                                en: `Home upgrades`,
-                                fr: `Améliorations de la maison`,
-                                de: `Hausverbesserungen`,
-                                es: `Mejoras de la casa`
-                            },
-                            parent_id: `update_mho`
-                        }, */
+            {
+                id: `update_mho_house`,
+                label: {
+                    en: `Home upgrades`,
+                    fr: `Améliorations de la maison`,
+                    de: `Hausverbesserungen`,
+                    es: `Mejoras de la casa`
+                },
+                help: {
+                    en: `A new button will be placed on the improvements page`,
+                    fr: `Un nouveau bouton sera placé sur la page des améliorations`,
+                    de: `Auf der Verbesserungsseite wird eine neue Schaltfläche platziert`,
+                    es: `Se colocará un nuevo botón en la página de mejoras.`
+                },
+                parent_id: `update_mho`
+            },
             {
                 id: `update_mho_bags`,
                 label: {
@@ -1102,16 +1108,22 @@ let params_categories = [
                 },
                 parent_id: `update_gh`
             },
-            /*             {
-                            id: `update_gh_amelios`,
-                            label: {
-                                en: `Home upgrades`,
-                                fr: `Améliorations de la maison`,
-                                de: `Hausverbesserungen`,
-                                es: `Mejoras de la casa`
-                            },
-                            parent_id: `update_gh`
-                        }, */
+            {
+                id: `update_gh_amelios`,
+                label: {
+                    en: `Home upgrades`,
+                    fr: `Améliorations de la maison`,
+                    de: `Hausverbesserungen`,
+                    es: `Mejoras de la casa`
+                },
+                help: {
+                    en: `A new button will be placed on the improvements page`,
+                    fr: `Un nouveau bouton sera placé sur la page des améliorations`,
+                    de: `Auf der Verbesserungsseite wird eine neue Schaltfläche platziert`,
+                    es: `Se colocará un nuevo botón en la página de mejoras.`
+                },
+                parent_id: `update_gh`
+            },
             {
                 id: `update_gh_status`,
                 label: {
@@ -1305,6 +1317,16 @@ let params_categories = [
             //     },
             //     parent_id: null
             // },
+            {
+                id: `copy_registry`,
+                label: {
+                    en: `Adds a button to copy registry contents`,
+                    fr: `Ajoute un bouton permettant de copier le contenu du registre`,
+                    de: `Fügt eine Schaltfläche zum Kopieren von Registrierungsinhalten hinzu`,
+                    es: `Agrega un botón para copiar el contenido del registro`
+                },
+                parent_id: null
+            },
             {
                 id: `display_anti_abuse`,
                 label: {
@@ -1561,10 +1583,22 @@ function pageIsWorkshop() {
     return document.URL.endsWith('workshop');
 }
 
-/** @return {boolean}    true si la page de l'utilisateur est la page de sa maison */
+/** @return {boolean}    true si la page de l'utilisateur est la page principale de sa maison */
 function pageIsHouse() {
-    return document.URL.indexOf('town/house') > -1;
+    return document.URL.indexOf('town/house/dash') > -1;
 }
+
+/** @return {boolean}    true si la page de l'utilisateur est la page d'envoi de messages */
+function pageIsMsgReceived() {
+    return document.URL.indexOf('town/house/messages') > -1;
+}
+
+
+/** @return {boolean}    true si la page de l'utilisateur est la page des améliorations de sa maison */
+function pageIsAmelio() {
+    return document.URL.indexOf('town/house/build') > -1;
+}
+
 
 /** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
 function pageIsWatchtower() {
@@ -1672,26 +1706,28 @@ function addWarning(message) {
 
 /** Affiche une notification d'erreur */
 function addError(error) {
-    let notifications = document.getElementById('notifications');
-    let notification = document.createElement('div');
-    notification.classList.add('error', 'show');
-    notification.innerHTML = `
-    <div style="vertical_align: middle"><img src="${mh_optimizer_icon}" style="width: 24px; margin-right: 0.5em;">${GM_info.script.name} :</div>
-    <br />
-    <div>${getI18N(api_texts.error).replace('$error$', error.status)}</div>
-    <br />`
-    if (parameters?.find((param) => param.name === 'ScriptVersion')?.value !== GM_info.script.version) {
-        notification.innerHTML += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', GM_info.script.version).replace('$recent_version$', parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small><div>`
-    }
-    notification.innerHTML += `<div><small>${getI18N(api_texts.error_discord)}</small><div>`;
+    if (error.name !== 'AbortError' && error.name !== 'TypeError') {
+        let notifications = document.getElementById('notifications');
+        let notification = document.createElement('div');
+        notification.classList.add('error', 'show');
+        notification.innerHTML = `
+        <div style="vertical_align: middle"><img src="${mh_optimizer_icon}" style="width: 24px; margin-right: 0.5em;">${GM_info.script.name} :</div>
+        <br />
+        <div>${getI18N(api_texts.error).replace('$error$', error.status ? (error.status + ' ' + error.name + ' - ' + error.message) : (error.name + ' - ' + error.message))}</div>
+        <br />`
+        if (parameters?.find((param) => param.name === 'ScriptVersion')?.value !== GM_info.script.version) {
+            notification.innerHTML += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', GM_info.script.version).replace('$recent_version$', parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small><div>`
+        }
+        notification.innerHTML += `<div><small>${getI18N(api_texts.error_discord)}</small><div>`;
 
-    notifications.appendChild(notification);
-    notification.addEventListener('click', () => {
-        notification.remove();
-    });
-    setTimeout(() => {
-        notification.remove();
-    }, 10000);
+        notifications.appendChild(notification);
+        notification.addEventListener('click', () => {
+            notification.remove();
+        });
+        setTimeout(() => {
+            notification.remove();
+        }, 10000);
+    }
     console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
 }
 
@@ -1775,6 +1811,7 @@ function initOptionsWithoutLoginNeeded() {
     displayCampingPredict();
     displayAntiAbuseCounter();
     automaticallyOpenBag();
+    addCopyRegisterButton();
     // blockUsersPosts();
     count_pending_notifications = document.querySelector('#postbox-new-msg-counter')?.innerText;
 }
@@ -3361,19 +3398,28 @@ function createUpdateExternalToolsButton() {
     let update_external_tools_btn = document.getElementById(mh_update_external_tools_id);
     const external_display_zone = zone_marker ? (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone ? document.querySelector('.actions-box .mdg') : zone_marker) : undefined;
     const chest = document.querySelector('.inventory.chest');
+    const amelios = document.querySelector('#upgrade_home_level')?.parentElement?.parentElement;
 
     /** Cette fonction ne doit s'exécuter que si on a un id d'app externe ET au moins l'une des options qui est cochée dans les paramètres ET qu'on est hors de la ville OU dans sa maison */
-    if (nb_tools_to_update > 0 && external_app_id && (external_display_zone || (chest && pageIsHouse()))) {
+    if (nb_tools_to_update > 0 && external_app_id && (external_display_zone || (chest && pageIsHouse()) || (amelios && pageIsAmelio()))) {
         if (!update_external_tools_btn) {
 
             if (window.innerWidth < 480 && mho_parameters.show_compact && compact_actions_zone) {
-                let el = external_display_zone || chest.parentElement;
+                let el = external_display_zone || chest?.parentElement || amelios;
                 let updater_bloc = createSmallUpdateExternalToolsButton(update_external_tools_btn);
-                el.appendChild(updater_bloc);
+                if (amelios) {
+                    el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
+                } else {
+                    el.appendChild(updater_bloc);
+                }
             } else {
-                let el = external_display_zone?.parentElement.parentElement.parentElement || chest.parentElement;
+                let el = external_display_zone?.parentElement.parentElement.parentElement || chest?.parentElement || amelios;
                 let updater_bloc = createLargeUpdateExternalToolsButton(update_external_tools_btn);
-                el.appendChild(updater_bloc);
+                if (amelios) {
+                    el.parentElement.insertBefore(updater_bloc, el.nextElementSibling);
+                } else {
+                    el.appendChild(updater_bloc);
+                }
             }
         }
 
@@ -3402,7 +3448,7 @@ function createUpdateExternalToolsButton() {
         } else if (warn_missing_logs && (!document.querySelector('.log-complete-link') || !mho_parameters.update_mho_digs)) {
             warn_missing_logs.remove();
         }
-    } else if (update_external_tools_btn && (nb_tools_to_update === 0 || !external_app_id || !(external_display_zone && pageIsHouse()))) {
+    } else if (update_external_tools_btn && (nb_tools_to_update === 0 || !external_app_id || !(external_display_zone && pageIsHouse()) || !(amelios && pageIsAmelio()))) {
         update_external_tools_btn.parentElement.remove();
     }
 }
@@ -3623,7 +3669,7 @@ function displaySearchFieldOnBuildings() {
 /** Si l'option associée est activée, affiche un champ de recherche sur la liste des destinataires d'un message */
 function displaySearchFieldOnRecipientList() {
     let search_field = document.getElementById(mho_search_recipient_field_id);
-    if (mho_parameters.display_search_fields && pageIsHouse()) {
+    if (mho_parameters.display_search_fields && pageIsMsgReceived()) {
         if (search_field) return;
 
         let recipients = document.querySelector('#recipient_list');
@@ -4012,7 +4058,7 @@ function createAdvancedProperties(content, item, tooltip) {
     if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0) return;
 
     if (tooltip) {
-        console.log('hovered_item', item);
+        // console.log('hovered_item', item);
     }
     if (item_deco && item.deco > 0) {
         let text = item_deco.innerText.replace(/ \(.*\)*/, '');
@@ -5297,7 +5343,7 @@ function displayEstimationsOnWatchtower() {
         if (estim_block || !small_note) return;
 
 
-        const TDG_VALUES = [33, 38, 42, 46, 50, 54, 58, 63, 68, 71, 75, 79, 83, 88, 92, 96, 100];
+        const TDG_VALUES = [33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100];
         const PLANIF_VALUES = [0, 4, 8, 13, 17, 21, 25, 29, 33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100];
 
         const watchtower_estim_block = document.querySelector('.block.watchtower');
@@ -5307,7 +5353,6 @@ function displayEstimationsOnWatchtower() {
             getEstimations().then((estimations) => {
                 let saved_estimations = estimations;
                 let updated_estimations = estimations;
-                console.log('estimations', estimations);
 
                 estim_block = document.createElement('div');
                 estim_block.style.marginTop = '1em';
@@ -5402,6 +5447,7 @@ function displayEstimationsOnWatchtower() {
                     if (!updated_estimations.estim['_' + value]) {
                         updated_estimations.estim['_' + value] = {min: null, max: null};
                     }
+                    console.log('test', updated_estimations);
                     let value_block = document.createElement('div');
                     value_block.style.display = 'flex';
                     value_block.style.justifyContent = 'space-between';
@@ -5541,9 +5587,6 @@ function displayAntiAbuseCounter() {
         /** Fin */
 
         GM.getValue(mho_anti_abuse_key).then((counter_values) => {
-            // counter_values = undefined;
-            // GM.setValue(mho_anti_abuse_key, counter_values);
-
             let add_counter_btn = document.createElement('button');
             add_counter_btn.innerText = '+';
             second_part.appendChild(add_counter_btn);
@@ -5579,7 +5622,7 @@ function displayAntiAbuseCounter() {
 
                 let item_name = document.createElement('div');
                 item_name.style.flex = 1;
-                item_name.innerHTML = `<img src="${repo_img_hordes_url + counter_value.item?.item?.img}" style="margin-right: 0.5em" class="${counter_value.item?.item?.broken ? 'broken' : ''}">${counter_value.item?.item?.label[lang]}`;
+                item_name.innerHTML = `<img src="${repo_img_hordes_url + counter_value.item?.item?.img}" style="margin-right: 0.5em; ${counter_value.item?.broken ? 'border: 1px dotted red' : ''}">${counter_value.item?.item?.label[lang]}`;
                 value_in_list.appendChild(item_name);
 
                 let item_counter = document.createElement('div');
@@ -5608,81 +5651,75 @@ function displayAntiAbuseCounter() {
                 define_row(counter_value, index, content);
             });
 
-            let old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
-
-            document.addEventListener('click', (event) => {
-                if (pageIsBank()) {
-                    old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
-
-                    let hovered_item = getHoveredItem();
-                    if (!hovered_item.item) {
-                        hovered_item = getClickedItem(event.target);
-                    }
-
-                    document.addEventListener('mh-navigation-complete', () => {
-
-                        controller.abort();
-                        let new_bag = document.querySelectorAll("#gma ul.rucksack li.item");
-                        if (old_bag.length < new_bag.length) {
-                            GM.getValue(mho_anti_abuse_key).then((counter_values) => {
-                                if (!counter_values) {
-                                    counter_values = [];
-                                }
-                                let counter_value = {
-                                    item: {item: hovered_item.item, broken: hovered_item.broken},
-                                    take_at: Date.now() + 5000
-                                };
-                                // console.log('counter_value', counter_value);
-                                counter_values.push(counter_value);
-                                GM.setValue(mho_anti_abuse_key, counter_values);
-                                let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
-                                if (new_mho_anti_abuse_counter) {
-                                    let new_content = new_mho_anti_abuse_counter.querySelector('.content');
-                                    define_row(counter_value, counter_values.length - 1, new_content);
-                                }
-                            })
-                        }
+            if (pageIsBank()) {
+                let old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+                let bank = document.querySelector('#bank-inventory');
+                let bank_items = bank ? Array.from(bank.querySelectorAll('li.item') || []) : [];
+                bank_items.forEach((bank_item) => {
+                    bank_item.addEventListener('click', (event) => {
                         old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
-                    }, {once: true});
-                } else if (pageIsWell()) {
-                    let button;
-                    if (event.target.tagName.toLowerCase() === 'BUTTON'.toLowerCase()) {
-                        button = event.target;
-                    } else {
-                        button = event.target.parentElement;
-                    }
-                    if (button.getAttribute('x-well-confirm') === '1' && button.getAttribute('x-well-direction') === 'up') {
-                        document.addEventListener('mh-navigation-complete', () => {
 
+                        document.addEventListener('mh-navigation-complete', () => {
                             controller.abort();
-                            let well_item = {
-                                label: {
-                                    de: `Eine weitere Ration erhalten`,
-                                    en: `Extra ration`,
-                                    es: `Ración adicional`,
-                                    fr: `Ration supplémentaire`,
-                                },
-                                img: 'log/well.gif'
+                            let new_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+                            if (old_bag.length < new_bag.length) {
+                                GM.getValue(mho_anti_abuse_key).then((counter_values) => {
+                                    if (!counter_values) {
+                                        counter_values = [];
+                                    }
+                                    let counter_value = {
+                                        item: {
+                                            item: getItemFromImg(bank_item.querySelector('img').src),
+                                            broken: bank_item.classList.contains('broken')
+                                        },
+                                        take_at: Date.now() + 5000
+                                    };
+                                    counter_values.push(counter_value);
+                                    GM.setValue(mho_anti_abuse_key, counter_values);
+                                    let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
+                                    if (new_mho_anti_abuse_counter) {
+                                        let new_content = new_mho_anti_abuse_counter.querySelector('.content');
+                                        define_row(counter_value, counter_values.length - 1, new_content);
+                                    }
+                                })
                             }
-                            GM.getValue(mho_anti_abuse_key).then((counter_values) => {
-                                if (!counter_values) {
-                                    counter_values = [];
-                                }
-                                let counter_value = {item: {item: well_item, broken: false}, take_at: Date.now() + 5000}
-                                counter_values.push(counter_value);
-                                GM.setValue(mho_anti_abuse_key, counter_values);
-                                let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
-                                if (new_mho_anti_abuse_counter) {
-                                    let new_content = new_mho_anti_abuse_counter.querySelector('.content');
-                                    define_row(counter_value, counter_values.length - 1, new_content);
-                                }
-                            })
+                            old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
                         }, {once: true});
-                    }
-                } else {
-                    controller.abort();
-                }
-            }, {signal: controller.signal})
+                    }, {signal: controller.signal})
+                });
+
+            } else if (pageIsWell()) {
+                let btn = document.querySelector('button[x-well-confirm="1"][x-well-direction="up"]');
+                btn?.addEventListener('click', (event) => {
+                    document.addEventListener('mh-navigation-complete', () => {
+                        controller.abort();
+                        let well_item = {
+                            label: {
+                                de: `Eine weitere Ration erhalten`,
+                                en: `Extra ration`,
+                                es: `Ración adicional`,
+                                fr: `Ration supplémentaire`,
+                            },
+                            img: 'log/well.gif'
+                        }
+                        GM.getValue(mho_anti_abuse_key).then((counter_values) => {
+                            if (!counter_values) {
+                                counter_values = [];
+                            }
+                            let counter_value = {item: {item: well_item, broken: false}, take_at: Date.now() + 5000}
+                            counter_values.push(counter_value);
+                            GM.setValue(mho_anti_abuse_key, counter_values);
+                            let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
+                            if (new_mho_anti_abuse_counter) {
+                                let new_content = new_mho_anti_abuse_counter.querySelector('.content');
+                                define_row(counter_value, counter_values.length - 1, new_content);
+                            }
+                        })
+                    }, {once: true});
+                }, {signal: controller.signal})
+            } else {
+                controller.abort();
+            }
         });
 
     } else {
@@ -6058,6 +6095,58 @@ function displayCampingPredict() {
             camping_predict_container.remove();
         }
     }, 500);
+}
+
+function addCopyRegisterButton() {
+    if (mho_parameters.copy_registry) {
+        let logs = document.querySelector('hordes-log');
+        let logs_complete_links = document.querySelector('log-complete-link');
+        let copy_button = document.querySelector(`#${mho_copy_logs_id}`);
+        if (logs && !copy_button && !logs_complete_links) {
+            let title = logs.parentElement.previousElementSibling;
+            let copy_button = document.createElement('a');
+            title.appendChild(copy_button);
+
+            copy_button.innerHTML = `<div style="display: flex; gap: 0.5em; align-items: center;"><img src="${mh_optimizer_icon}" style="width: 16px !important;">⧉</div>`;
+            copy_button.id = mho_copy_logs_id;
+            copy_button.style.backgroundColor = 'rgba(62,36,23,.75)';
+            copy_button.style.borderRadius = '6px';
+            copy_button.style.padding = '3px 5px';
+            copy_button.style.cursor = 'pointer';
+
+            copy_button.addEventListener('click', () => {
+                let entries = logs.querySelectorAll('.log-entry');
+                let soft_entries = Array.from(entries).map((entry) => {
+                    let time = entry.querySelector('.log-part-time').innerText;
+                    let separator = ' [X] ';
+                    let content = entry.querySelector('.log-part-content').innerText;
+                    return time + separator + content;
+                });
+
+                let final_text = soft_entries.join('\n');
+                copyToClipboard(final_text);
+            });
+            if (title) {
+                if (title.tagName.toLowerCase() === 'H5'.toLowerCase()) {
+
+                    copy_button.style.marginRight = '1em';
+                    copy_button.style.float = 'right';
+                    copy_button.style.position = 'relative';
+                    copy_button.style.bottom = '7px';
+
+
+                    let first_link = title.querySelector('a');
+                    if (first_link) {
+                        first_link.style.marginLeft = 'auto';
+                    }
+                } else {
+                    copy_button.style.display = 'flex';
+                    copy_button.style.justifyContent = 'center';
+                }
+
+            }
+        }
+    }
 }
 
 /** Permet de bloquer / débloquer des utilisateurs et de masquer les posts des utilisateurs bloqués */
@@ -7765,7 +7854,7 @@ function updateExternalTools() {
 
 
         /** Récupération des pouvoirs héroïques */
-        if ((mho_parameters.update_gh && mho_parameters.update_gh_ah) || (mho_parameters.update_mho && mho_parameters.update_mho_actions)) {
+        if (((mho_parameters.update_gh && mho_parameters.update_gh_ah) || (mho_parameters.update_mho && mho_parameters.update_mho_actions)) && (pageIsDesert() || pageIsHouse())) {
 
             let no_interaction = document.querySelector('.no-interaction');
 
@@ -7826,33 +7915,32 @@ function updateExternalTools() {
             }
         }
 
-        // /** Récupération des améliorations de maison */
-        // if (((mho_parameters.update_gh && mho_parameters.update_gh_amelios) || (mho_parameters.update_mho && mho_parameters.update_mho_house)) && pageIsHouse()) {
-        //     data.amelios = {}
-        //     data.amelios.values = {};
-        //     data.amelios.toolsToUpdate = {
-        //         isBigBrothHordes: false,
-        //         isFataMorgana: false,
-        //         isGestHordes: mho_parameters && mho_parameters.update_gh_amelios,
-        //         isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_house
-        //     };
-        //     let amelios = Array.from(document.querySelectorAll('[x-tab-group="home-main"][x-tab-id="build"] .row-table .row:not(.header)') || []);
-        //     console.log('amelios', amelios);
-        //     if (amelios && amelios.length > 0) {
-        //         amelios.forEach((amelio) => {
-        //             let amelio_img = amelio.querySelector('img');
-        //             let name = amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1');
-        //             if (name !== 'fence') {
-        //                 let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
-        //                 data.amelios.values[name] = amelio_value ? +amelio_value[0] : 0;
-        //             } else {
-        //                 data.amelios.values[name] = !amelio.querySelector('button[x-upgrade-id]') ? 1 : 0;
-        //             }
-        //         });
-        //     }
-        //     let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt || undefined;
-        //     data.amelios.values.house = house_level;
-        // }
+        /** Récupération des améliorations de maison */
+        if (((mho_parameters.update_gh && mho_parameters.update_gh_amelios) || (mho_parameters.update_mho && mho_parameters.update_mho_house)) && pageIsAmelio()) {
+            data.amelios = {}
+            data.amelios.values = {};
+            data.amelios.toolsToUpdate = {
+                isBigBrothHordes: false,
+                isFataMorgana: false,
+                isGestHordes: mho_parameters && mho_parameters.update_gh_amelios,
+                isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho_house
+            };
+            let amelios = Array.from(document.querySelectorAll('.row-table .row:not(.header)') || []);
+            if (amelios && amelios.length > 0) {
+                amelios.forEach((amelio) => {
+                    let amelio_img = amelio.querySelector('img');
+                    let name = amelio_img.src.replace(/.*\/home\/(.*)\..*\..*/, '$1');
+                    if (name !== 'fence') {
+                        let amelio_value = amelio_img?.nextElementSibling.innerText.match(/\d+/);
+                        data.amelios.values[name] = amelio_value ? +amelio_value[0] : 0;
+                    } else {
+                        data.amelios.values[name] = !amelio.querySelector('button[x-upgrade-id]') ? 1 : 0;
+                    }
+                });
+            }
+            let house_level = +document.querySelector('[x-tab-group="home-main"][x-tab-id="values"] .town-summary')?.querySelector('.row-detail img')?.alt || undefined;
+            data.amelios.values.house = house_level;
+        }
 
         /** Récupération des status */
         if ((mho_parameters.update_mho && mho_parameters.update_mho_status) || (mho_parameters.update_gh && mho_parameters.update_gh_status)) {
@@ -8178,7 +8266,20 @@ function getEstimations() {
 function saveEstimations(new_estimations) {
     return new Promise((resolve, reject) => {
         let estimations_to_save = new_estimations;
-        fetch(api_url + `AttaqueEstimation/Estimations?townId=${mh_user.townDetails.townId}`, {
+        for (let estim_key in estimations_to_save.estim) {
+            let estim = estimations_to_save.estim[estim_key];
+            if (!estim || (!estim.min && !estim.max)) {
+                estimations_to_save.estim[estim_key] = null;
+            }
+        }
+        for (let planif_key in estimations_to_save.planif) {
+            let planif = estimations_to_save.planif[planif_key];
+            if (!planif || (!planif.min && !planif.max)) {
+                estimations_to_save.planif[planif_key] = null;
+            }
+        }
+
+        fetch(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails.townId}&userId=${mh_user.id}`, {
             method: 'POST',
             body: JSON.stringify(estimations_to_save),
             headers: {
@@ -8187,7 +8288,7 @@ function saveEstimations(new_estimations) {
         })
             .then((response) => {
                 if (response.status === 200) {
-                    return response.json();
+                    return response.text();
                 } else {
                     addError(response);
                     reject(response);
