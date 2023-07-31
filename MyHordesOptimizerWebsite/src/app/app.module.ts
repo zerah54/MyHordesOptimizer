@@ -18,6 +18,9 @@ import localeES from '@angular/common/locales/es';
 import localeFR from '@angular/common/locales/fr';
 import { Modules } from './_abstract_model/types/_types';
 import { MyTownModule } from './my-town/my-town.module';
+import { AngularFireModule } from '@angular/fire/compat';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { environment } from '../environments/environment';
 
 registerLocaleData(localeDE);
 registerLocaleData(localeEN);
@@ -25,15 +28,18 @@ registerLocaleData(localeES);
 registerLocaleData(localeFR);
 
 const app_modules: Modules = [StructureModule, WikiModule, ThanksModule, ToolsModule, TutorialsModule, MyTownModule];
+
 @NgModule({
     declarations: [AppComponent],
     imports: [
         SharedModule,
         ...app_modules,
         AppRoutingModule,
+        provideFirebaseApp(() => initializeApp(environment.firebase_config)),
     ],
     providers: [
-        { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
+        AngularFireModule,
+        {provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true},
         {
             provide: LOCALE_ID,
             useFactory: (): string | null => localStorage.getItem('mho-locale') || 'fr'

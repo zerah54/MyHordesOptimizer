@@ -18,7 +18,7 @@
                     "builder": "@angular-devkit/build-angular:browser",
                     "options": {
                         "preserveSymlinks": true,
-                        "outputPath": "dist/my-hordes-optimizer-website",
+                        "outputPath": "dist/MyHordesOptimizerWebsite/browser",
                         "index": "src/index.html",
                         "main": "src/main.ts",
                         "polyfills": [
@@ -39,7 +39,8 @@
                         "stylePreprocessorOptions": {
                             "includePaths": [
                                 "src/assets/scss",
-                                "src/assets/scss/**/"
+                                "src/assets/scss/material-theme",
+                                "src/assets/scss/noel"
                             ]
                         },
                         "scripts": []
@@ -115,11 +116,80 @@
                         "stylePreprocessorOptions": {
                             "includePaths": [
                                 "src/assets/scss",
-                                "src/assets/scss/**/"
+                                "src/assets/scss/material-theme",
+                                "src/assets/scss/noel"
                             ]
                         },
                         "scripts": []
                     }
+                },
+                "server": {
+                    "builder": "@angular-devkit/build-angular:server",
+                    "options": {
+                        "outputPath": "dist/MyHordesOptimizerWebsite/server",
+                        "main": "server.ts",
+                        "tsConfig": "tsconfig.server.json",
+                        "stylePreprocessorOptions": {
+                            "includePaths": [
+                                "src/assets/scss",
+                                "src/assets/scss/**/"
+                            ]
+                        },
+                        "preserveSymlinks": true,
+                        "inlineStyleLanguage": "scss"
+                    },
+                    "configurations": {
+                        "production": {
+                            "outputHashing": "media",
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.prod.ts"
+                                }
+                            ]
+                        },
+                        "development": {
+                            "buildOptimizer": false,
+                            "optimization": false,
+                            "sourceMap": true,
+                            "extractLicenses": false,
+                            "vendorChunk": true
+                        }
+                    },
+                    "defaultConfiguration": "production"
+                },
+                "serve-ssr": {
+                    "builder": "@nguniversal/builders:ssr-dev-server",
+                    "configurations": {
+                        "development": {
+                            "browserTarget": "MyHordesOptimizerWebsite:build:development",
+                            "serverTarget": "MyHordesOptimizerWebsite:server:development"
+                        },
+                        "production": {
+                            "browserTarget": "MyHordesOptimizerWebsite:build:production",
+                            "serverTarget": "MyHordesOptimizerWebsite:server:production"
+                        }
+                    },
+                    "defaultConfiguration": "development"
+                },
+                "prerender": {
+                    "builder": "@nguniversal/builders:prerender",
+                    "options": {
+                        "routes": [
+                            "/"
+                        ]
+                    },
+                    "configurations": {
+                        "production": {
+                            "browserTarget": "MyHordesOptimizerWebsite:build:production",
+                            "serverTarget": "MyHordesOptimizerWebsite:server:production"
+                        },
+                        "development": {
+                            "browserTarget": "MyHordesOptimizerWebsite:build:development",
+                            "serverTarget": "MyHordesOptimizerWebsite:server:development"
+                        }
+                    },
+                    "defaultConfiguration": "production"
                 }
             },
             "i18n": {

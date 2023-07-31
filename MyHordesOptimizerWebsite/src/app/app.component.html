@@ -5,9 +5,9 @@
         <li *ngFor="let i of [].constructor(50);"></li>
     </ul>
 
-    <mat-sidenav-container class="mho-container">
+    <mat-sidenav-container #sidenavContainer class="mho-container">
         <mat-sidenav #sidenav [mode]="is_gt_xs ? 'side' : 'over'" [opened]="is_gt_xs">
-            <mho-menu></mho-menu>
+            <mho-menu [sidenavContainer]="sidenavContainer"></mho-menu>
         </mat-sidenav>
         <mat-sidenav-content class="mho-content">
             <mat-card>

@@ -1,3 +1,5 @@
+import { TownType } from '../types/_types';
+
 export interface TownDetailsDTO {
     townId: number;
     townX: number;
@@ -6,5 +8,5 @@ export interface TownDetailsDTO {
     townMaxY: number;
     isDevaste: boolean;
     day: number;
-    townType: 'RE' | 'RNE' | 'PANDE';
+    townType: TownType;
 }

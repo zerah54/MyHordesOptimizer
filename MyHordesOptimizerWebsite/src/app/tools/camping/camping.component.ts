@@ -1,10 +1,10 @@
-import { Location } from '@angular/common';
-import { Component, HostBinding, OnInit, ViewEncapsulation } from '@angular/core';
+import { DOCUMENT, Location } from '@angular/common';
+import { Component, HostBinding, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { CAMPINGS_MAP, DISTANCE_MAP, HIDDEN_CAMPERS_MAP, HORDES_IMG_REPO, NO_RUIN } from '../../_abstract_model/const';
+import { CAMPING_BONUS, CAMPINGS_MAP, DISTANCE_MAP, HIDDEN_CAMPERS_MAP, HORDES_IMG_REPO, NO_RUIN } from '../../_abstract_model/const';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { Dictionary } from '../../_abstract_model/types/_types';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
@@ -26,14 +26,20 @@ export class CampingComponent implements OnInit {
     public and_amelio: boolean = true;
 
     public town_types: TownType[] = [
-        {id: 'rne', label: $localize`Petite carte`},
-        {id: 're', label: $localize`Région éloignée`},
-        {id: 'pande', label: $localize`Pandémonium`}
+        {id: 'rne', label: $localize`Petite carte`, bonus: 0},
+        {id: 're', label: $localize`Région éloignée`, bonus: 0},
+        {id: 'pande', label: $localize`Pandémonium`, bonus: -14}
     ];
+
+    public bonus: Record<string, number> = CAMPING_BONUS;
+    public distance: Dictionary<number> = DISTANCE_MAP;
+    public hidden_campers: Dictionary<number> = HIDDEN_CAMPERS_MAP;
+    public campings: Dictionary<Dictionary<Dictionary<number>>> = CAMPINGS_MAP;
 
     public configuration_form!: UntypedFormGroup;
     public camping_result: CampingResult = {
         label: '',
+        chances: 0,
         probability: 0
     };
     /** Le dossier dans lequel sont stockées les images */
@@ -85,6 +91,7 @@ export class CampingComponent implements OnInit {
         },
     ];
     public readonly jobs: JobEnum[] = JobEnum.getAllValues();
+    public readonly JOB_SCOUT: JobEnum = JobEnum.SCOUT;
 
     private readonly added_ruins: Ruin[] = dtoToModelArray(Ruin, [NO_RUIN]);
 
@@ -92,7 +99,7 @@ export class CampingComponent implements OnInit {
 
 
     constructor(private api: ApiServices, private fb: UntypedFormBuilder, private route: ActivatedRoute, private clipboard: ClipboardService, private router: Router,
-                private activated_route: ActivatedRoute, private location: Location) {
+                private activated_route: ActivatedRoute, private location: Location, @Inject(DOCUMENT) private document: Document) {
     }
 
     public ngOnInit(): void {
@@ -138,7 +145,7 @@ export class CampingComponent implements OnInit {
     }
 
     public shareCamping(): void {
-        let url: string = window.location.href;
+        let url: string = this.document.location.href;
         url += '?' + this.convertFormToEasyReadable();
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
@@ -147,39 +154,47 @@ export class CampingComponent implements OnInit {
         if (typeof ruin === 'string') {
             return ruin;
         } else {
-            return `<small">Bonus : ${ruin.camping}</small>`;
+            return `<small>Bonus : ${ruin.camping}</small>`;
+        }
+    }
+
+    public getMoreTownTypeInfo(town_type: string | TownType): string {
+        if (typeof town_type === 'string') {
+            return town_type;
+        } else {
+            return `<small>Bonus : ${town_type.bonus}</small>`;
         }
     }
 
     private calculateProbabilities(): void {
         let chances: number = 0;
         /** Type de ville */
-        chances += (<TownType>this.configuration_form.get('town')?.value)?.id === 'pande' ? -14 * 100 : 0;
+        chances += (<TownType>this.configuration_form.get('town')?.value)?.bonus * 100;
         /** Tombe creusée */
-        chances += this.configuration_form.get('tomb')?.value ? 1.6 * 100 : 0;
+        chances += this.configuration_form.get('tomb')?.value ? this.bonus['tomb'] * 100 : 0;
         /** Mode nuit */
-        chances += this.configuration_form.get('night')?.value ? 2 * 100 : 0;
+        chances += this.configuration_form.get('night')?.value ? this.bonus['night'] * 100 : 0;
         /** Ville devastée */
-        chances += this.configuration_form.get('devastated')?.value ? -10 * 100 : 0;
+        chances += this.configuration_form.get('devastated')?.value ? this.bonus['devastated'] * 100 : 0;
         /** Phare */
-        chances += this.configuration_form.get('phare')?.value ? 5 * 100 : 0;
+        chances += this.configuration_form.get('phare')?.value ? this.bonus['phare'] * 100 : 0;
         /** Zombies dans la zone */
-        const zombies_factor: number = this.configuration_form.get('vest')?.value ? -0.6 : -1.4;
+        const zombies_factor: number = this.configuration_form.get('vest')?.value ? this.bonus['zombie_with_vest'] : this.bonus['zombie_without_vest'];
         chances += zombies_factor * 100 * this.configuration_form.get('zombies')?.value;
 
         /** Nombre de campings */
-        const nb_camping_town_type_mapping: Dictionary<Dictionary<number>> = (<TownType>this.configuration_form.get('town')?.value)?.id === 'pande' ? CAMPINGS_MAP['pande'] : CAMPINGS_MAP['normal'];
+        const nb_camping_town_type_mapping: Dictionary<Dictionary<number>> = (<TownType>this.configuration_form.get('town')?.value)?.id === 'pande' ? this.campings['pande'] : this.campings['normal'];
         const nb_camping_mapping: Dictionary<number> = this.configuration_form.get('pro')?.value ? nb_camping_town_type_mapping['pro'] : nb_camping_town_type_mapping['nonpro'];
         chances += (this.configuration_form.get('campings')?.value > 9 ? nb_camping_mapping[9] : nb_camping_mapping[this.configuration_form.get('campings')?.value]) * 100;
 
         /** Distance de la ville */
-        chances += (this.configuration_form.get('distance')?.value > 16 ? DISTANCE_MAP[16] : DISTANCE_MAP[this.configuration_form.get('distance')?.value]) * 100;
+        chances += (this.configuration_form.get('distance')?.value > 16 ? this.distance[16] : this.distance[this.configuration_form.get('distance')?.value]) * 100;
 
         /** Nombre de personnes déjà cachées */
-        chances += (this.configuration_form.get('hidden_campers')?.value > 7 ? HIDDEN_CAMPERS_MAP[7] : HIDDEN_CAMPERS_MAP[this.configuration_form.get('hidden_campers')?.value]) * 100;
+        chances += (this.configuration_form.get('hidden_campers')?.value > 7 ? this.hidden_campers[7] : this.hidden_campers[this.configuration_form.get('hidden_campers')?.value]) * 100;
 
         /** Nombre d'objets de protection dans l'inventaire */
-        chances += +this.configuration_form.get('objects')?.value * 100;
+        chances += +this.configuration_form.get('objects')?.value * this.bonus['camping_objects_in_inventory'] * 100;
 
         if (this.and_amelio) {
             /** Nombre total d'améliorations sur la case */
@@ -189,13 +204,13 @@ export class CampingComponent implements OnInit {
              * Nombre d'améliorations simples sur la case
              * @see ActionDataService.php : 'improve'
              */
-            chances += +this.configuration_form.get('improve')?.value * 100;
+            chances += +this.configuration_form.get('improve')?.value * this.bonus['simple_amelio'] * 100;
 
             /**
              * Nombre d'objets de défense installés sur la case
              * @see ActionDataService.php ('cm_campsite_improve')
              */
-            chances += +this.configuration_form.get('object_improve')?.value * 1.8 * 100;
+            chances += +this.configuration_form.get('object_improve')?.value * this.bonus['OD_amelio'] * 100;
         } else {
             if (+this.configuration_form.get('complete_improve')?.value > 0) {
                 /** Nombre total d'améliorations sur la case */
@@ -205,13 +220,13 @@ export class CampingComponent implements OnInit {
                  * Nombre d'améliorations simples sur la case
                  * @see ActionDataService.php : 'improve'
                  */
-                chances += +this.configuration_form.get('improve')?.value * 100;
+                chances += +this.configuration_form.get('improve')?.value * this.bonus['simple_amelio'] * 100;
 
                 /**
                  * Nombre d'objets de défense installés sur la case
                  * @see ActionDataService.php : 'cm_campsite_improve'
                  */
-                chances += +this.configuration_form.get('object_improve')?.value * 1.8 * 100;
+                chances += +this.configuration_form.get('object_improve')?.value * this.bonus['OD_amelio'] * 100;
             }
         }
         /**
@@ -220,6 +235,7 @@ export class CampingComponent implements OnInit {
          */
         chances += (<Ruin>this.configuration_form.get('ruin')?.value)?.camping * 100 || 0;
 
+        this.camping_result.chances = chances;
         this.camping_result.probability = Math.min(Math.max((100 - (Math.abs(Math.min(0, chances)) * 5 / 100)) / 100, 0.1), ((<JobEnum>this.configuration_form.get('job')?.value)?.value.camping_factor));
         this.camping_result.label = <string>this.camping_results.find((camping_result: CampingResult) => {
             return camping_result.strict
@@ -284,10 +300,12 @@ export class CampingComponent implements OnInit {
 interface TownType {
     id: string;
     label: string;
+    bonus: number;
 }
 
 interface CampingResult {
     label: string;
     probability: number;
     strict?: boolean;
+    chances?: number
 }

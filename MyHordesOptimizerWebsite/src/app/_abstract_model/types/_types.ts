@@ -16,3 +16,5 @@ export type I18nLabels = Dictionary<string>;
 export interface Dictionary<T> {
     [key: string | number]: T;
 }
+
+export type TownType = 'RNE' | 'RE' | 'PANDE';

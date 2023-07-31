@@ -53,6 +53,18 @@ export const DISTANCE_MAP: Dictionary<number> = {
 };
 
 
+export const CAMPING_BONUS: Record<string, number> = {
+    tomb: 1.6,
+    night: 2,
+    devastated: -10,
+    phare: 5,
+    zombie_with_vest: -0.6,
+    zombie_without_vest: -1.4,
+    simple_amelio: 1,
+    OD_amelio: 1.8,
+    camping_objects_in_inventory: 1
+};
+
 /** @see CitizenHandler > getCampingValues > $campings_map */
 export const CAMPINGS_MAP: Dictionary<Dictionary<Dictionary<number>>> = {
     normal: {
@@ -121,5 +133,5 @@ export const HIDDEN_CAMPERS_MAP: Dictionary<number> = {
     7: -26
 };
 
-export const TDG_VALUES: number[] = [33, 38, 42, 46, 50, 54, 58, 63, 68, 71, 75, 79, 83, 88, 92, 96, 100];
-export const PLANIF_VALUES: number[] = [0, 4, 8, 13, 17, 21, 25, 29, 33, 46, 100];
+export const TDG_VALUES: number[] = [33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100];
+export const PLANIF_VALUES: number[] = [0, 4, 8, 13, 17, 21, 25, 29, 33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100];

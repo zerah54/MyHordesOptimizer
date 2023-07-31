@@ -1,35 +1,33 @@
 <div class="mho-registry">
     <mat-form-field appearance="outline" class="registry-paste">
         <mat-label i18n>Coller le contenu du registre à analyser</mat-label>
-        <textarea matInput [(ngModel)]="registry"></textarea>
+        <textarea matInput [(ngModel)]="registry" (ngModelChange)="readLogs(this.display_mode)"></textarea>
     </mat-form-field>
     <div class="actions" *ngIf="registry">
-        <button mat-icon-button [class.active]="display_mode === 'dice'" (click)="readLogs('dice')" matTooltip="Dés" i18n-matTooltip>
-            <img [ngSrc]="HORDES_IMG_REPO + 'item/item_dice.gif'" width="16" height="16">
+        <button mat-icon-button [class.active]="display_mode === 'plays'" (click)="readLogs('plays')"
+                matTooltip="Dés / Cartes" i18n-matTooltip>
+            <img [ngSrc]="HORDES_IMG_REPO + 'item/item_game_box.gif'" width="16" height="16">
         </button>
-        <button mat-icon-button [class.active]="display_mode === 'card'" (click)="readLogs('card')" matTooltip="Cartes" i18n-matTooltip>
-            <img [ngSrc]="HORDES_IMG_REPO + 'item/item_cards.gif'" width="16" height="16">
-        </button>
-        <button [class.active]="display_mode === 'bank_diff'" mat-icon-button (click)="readLogs('bank_diff')" matTooltip="Différenciel de la banque"
-                i18n-matTooltip>
+        <button [class.active]="display_mode === 'bank_diff'" mat-icon-button (click)="readLogs('bank_diff')"
+                matTooltip="Différenciel de la banque" i18n-matTooltip>
             <img [ngSrc]="HORDES_IMG_REPO + 'icons/home.gif'" width="16" height="16">
         </button>
-        <button [class.active]="display_mode === 'well'" mat-icon-button (click)="readLogs('well')" matTooltip="Prises dans le puits"
-                i18n-matTooltip>
+        <button [class.active]="display_mode === 'well'" mat-icon-button (click)="readLogs('well')"
+                matTooltip="Prises dans le puits" i18n-matTooltip>
             <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_well.gif'" width="16" height="16">
         </button>
-        <button *ngIf="dev_mode" [class.active]="display_mode === 'digs'" mat-icon-button (click)="readLogs('digs')" matTooltip="Fouilles"
-                i18n-matTooltip>
+        <button *ngIf="dev_mode" [class.active]="display_mode === 'digs'" mat-icon-button (click)="readLogs('digs')"
+                matTooltip="Fouilles" i18n-matTooltip>
             <img [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" width="16" height="16">
+        </button>
+        <button [class.active]="display_mode === 'doors'" mat-icon-button (click)="readLogs('doors')"
+                matTooltip="Entrées / Sorties" i18n-matTooltip>
+            <img [ngSrc]="HORDES_IMG_REPO + 'log/door_open.gif'" width="16" height="16">
         </button>
     </div>
     <div class="result">
         <ng-container [ngSwitch]="display_mode">
-            <ng-container *ngSwitchCase="'dice'">
-                <ng-container *ngTemplateOutlet="diceCards"></ng-container>
-            </ng-container>
-
-            <ng-container *ngSwitchCase="'card'">
+            <ng-container *ngSwitchCase="'plays'">
                 <ng-container *ngTemplateOutlet="diceCards"></ng-container>
             </ng-container>
 
@@ -44,25 +42,57 @@
             <ng-container *ngSwitchCase="'well'">
                 <ng-container *ngTemplateOutlet="well"></ng-container>
             </ng-container>
+
+            <ng-container *ngSwitchCase="'doors'">
+                <ng-container *ngTemplateOutlet="doors"></ng-container>
+            </ng-container>
         </ng-container>
     </div>
 </div>
 
 <ng-template #diceCards>
-    <div class="dice">
-        <div class="citizen-use-dice">
-            <h4 i18n>Ont joué</h4>
-            <div *ngFor="let citizen of entries | citizenUseDiceOrCards:complete_citizen_list">
-                {{citizen}}
+    <mat-tab-group (selectedTabChange)="changePlaysTab($event)">
+        <mat-tab labelClass="plays">
+            <ng-template mat-tab-label>
+                <img [ngSrc]="HORDES_IMG_REPO + 'item/item_game_box.gif'" width="16" height="16"
+                     style="margin-right: 0.5em">
+                <ng-container i18n>Dés / Cartes</ng-container>
+            </ng-template>
+            <ng-container *ngTemplateOutlet="template"></ng-container>
+        </mat-tab>
+        <mat-tab labelClass="dice">
+            <ng-template mat-tab-label>
+                <img [ngSrc]="HORDES_IMG_REPO + 'item/item_dice.gif'" width="16" height="16"
+                     style="margin-right: 0.5em">
+                <ng-container i18n>Dés</ng-container>
+            </ng-template>
+            <ng-container *ngTemplateOutlet="template"></ng-container>
+        </mat-tab>
+        <mat-tab labelClass="card">
+            <ng-template mat-tab-label>
+                <img [ngSrc]="HORDES_IMG_REPO + 'item/item_cards.gif'" width="16" height="16"
+                     style="margin-right: 0.5em">
+                <ng-container i18n>Cartes</ng-container>
+            </ng-template>
+            <ng-container *ngTemplateOutlet="template"></ng-container>
+        </mat-tab>
+    </mat-tab-group>
+    <ng-template #template>
+        <div class="plays-dices-cards">
+            <div class="citizen-plays">
+                <h4 i18n>Ont joué</h4>
+                <div *ngFor="let citizen of entries | citizenUseDiceOrCards:complete_citizen_list">
+                    {{citizen}}
+                </div>
+            </div>
+            <div class="citizen-doesnt-play">
+                <h4 i18n>N'ont pas joué</h4>
+                <div *ngFor="let citizen of entries | citizenUseDiceOrCards:complete_citizen_list: true">
+                    {{citizen}}
+                </div>
             </div>
         </div>
-        <div class="citizen-dont-use-dice">
-            <h4 i18n>N'ont pas joué</h4>
-            <div *ngFor="let citizen of entries | citizenUseDiceOrCards:complete_citizen_list: true">
-                {{citizen}}
-            </div>
-        </div>
-    </div>
+    </ng-template>
 </ng-template>
 
 <ng-template #digs>
@@ -79,7 +109,8 @@
                         <div *ngIf="entry.item" class="entry">
                             [{{entry.hour}}]
                             <img [ngSrc]="HORDES_IMG_REPO + entry.item.img" width="16" height="16">
-                            <div>{{entry.item.label[locale]}}<small *ngIf="entry.citizen">&nbsp;-&nbsp;{{entry.citizen.name}}</small></div>
+                            <div>{{entry.item.label[locale]}}<small
+                                    *ngIf="entry.citizen">&nbsp;-&nbsp;{{entry.citizen.name}}</small></div>
                         </div>
                     </div>
                 </ng-container>
@@ -90,7 +121,8 @@
                     <div *ngIf="entry.item" class="entry">
                         [{{entry.hour}}]
                         <img [ngSrc]="HORDES_IMG_REPO + entry.item.img" width="16" height="16">
-                        <div>{{entry.item.label[locale]}}<small *ngIf="entry.citizen">&nbsp;-&nbsp;{{entry.citizen.name}}</small></div>
+                        <div>{{entry.item.label[locale]}}<small
+                                *ngIf="entry.citizen">&nbsp;-&nbsp;{{entry.citizen.name}}</small></div>
                     </div>
                 </ng-container>
             </div>
@@ -103,5 +135,11 @@
         <h4 class="rations">{{rations.rations}} {rations.rations, plural, =0 {ration prise} =1 {ration prise} other {rations prises}}</h4>
         <div class="citizen">{{rations.citizen}}</div>
         <mat-divider></mat-divider>
+    </div>
+</ng-template>
+
+<ng-template #doors>
+    <div class="doors">
+        <canvas #doorsCanvas style="min-height: 800px"></canvas>
     </div>
 </ng-template>

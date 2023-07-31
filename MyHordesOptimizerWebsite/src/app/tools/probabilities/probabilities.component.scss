@@ -1,50 +1,70 @@
 @use "variables";
 
 .mho-probabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2em;
+  justify-content: space-between;
 
-    .header,
-    .chances {
+  > div {
+    flex: 1;
+  }
+
+  .header,
+  .chances {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  .header {
+    justify-content: space-between;
+
+    > div {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+
+      h3 {
+        margin: 0;
         display: flex;
         align-items: center;
-        gap: 0.5em;
-        flex-wrap: wrap;
+      }
     }
 
-    .header {
-        justify-content: space-between;
+  }
+
+  .content {
+    display: flex;
+    gap: 0.5em;
+    align-items: baseline;
+
+    .chances {
+      min-width: 100px;
+      justify-content: left;
+      flex: 1;
+      align-items: start;
+      flex-wrap: wrap;
     }
 
-    .content {
-        display: flex;
-        gap: 0.5em;
-        align-items: baseline;
+    .results {
+      border: 1px solid variables.$primary;
+      border-radius: 0.25em;
+      background-color: variables.$item_color;
+    }
+  }
 
+  table {
 
-        .chances {
-            min-width: 100px;
-            justify-content: left;
-            flex: 1;
-            align-items: start;
-        }
-
-        .results {
-            border: 1px solid variables.$primary;
-            border-radius: 0.25em;
-            background-color: variables.$item_color;
-        }
+    th,
+    td {
+      padding: 0.25em;
     }
 
-    table {
-
-        th,
-        td {
-            padding: 0.25em;
-        }
-
-        tbody {
-            td {
-                text-align: right;
-            }
-        }
+    tbody {
+      td {
+        text-align: right;
+      }
     }
+  }
 }

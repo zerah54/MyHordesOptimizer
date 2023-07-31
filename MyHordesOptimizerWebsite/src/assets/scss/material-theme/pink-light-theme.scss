@@ -11,8 +11,7 @@ $pink-theme: mat.define-light-theme(
                 primary: $theme-primary,
                 accent: $theme-accent,
                 warn: $theme-warn,
-            ),
-            density: -2
+            )
         )
 );
 

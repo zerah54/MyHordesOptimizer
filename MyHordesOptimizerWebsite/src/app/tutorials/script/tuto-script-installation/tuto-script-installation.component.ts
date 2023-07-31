@@ -1,6 +1,7 @@
-import { Component, HostBinding } from '@angular/core';
+import { Component, HostBinding, Inject } from '@angular/core';
 import { AccordionItem } from '../../../shared/elements/accordion/accordion.component';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
     selector: 'mho-tuto-script-installation',
@@ -48,12 +49,12 @@ export class TutoScriptInstallationComponent {
     ];
     public readonly final_text: string = '\n' + $localize`Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.`;
 
-    public constructor(private clipboard: ClipboardService) {
+    public constructor(private clipboard: ClipboardService, @Inject(DOCUMENT) private document: Document) {
 
     }
 
     public copyUrl(): void {
-        const url: string = window.location.href;
+        const url: string = this.document.location.href;
         this.clipboard.copy(url, $localize`Le lien a bien été copié`);
     }
 

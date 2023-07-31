@@ -29,8 +29,12 @@
     .actions {
         width: 50px;
 
-        .mat-mdc-icon-button.active {
-            background-color: variables.$item_color;
+        .mat-mdc-icon-button {
+            --mdc-icon-button-icon-size: 16;
+
+            &.active {
+                background-color: variables.$item_color;
+            }
         }
     }
 
@@ -38,13 +42,14 @@
         flex: 1;
         height: 100%;
         overflow: auto;
+        min-width: 400px;
 
-        .dice {
+        .plays-dices-cards {
             width: 100%;
             height: 100%;
             display: flex;
 
-            > div {
+            .citizen-doesnt-play, .citizen-plays {
                 padding: 1em;
                 flex: 1;
                 overflow: auto;

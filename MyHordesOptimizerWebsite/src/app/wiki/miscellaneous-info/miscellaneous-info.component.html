@@ -2,71 +2,44 @@
     <mat-card-title i18n>Informations diverses</mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-miscellaneous-info">
-    <!-- Morts par désespoir -->
-    <div class="mat-elevation-z8">
-        <table mat-table [dataSource]="despair_deaths" class="despair-deaths">
-            <ng-container *ngFor="let column of despair_death_columns" [matColumnDef]="column"
-                [sticky]="column === 'header'">
-                <th mat-header-cell *matHeaderCellDef class="title">
-                    <ng-container *ngIf="column === 'header'" i18n>Morts par désespoir</ng-container>
-                </th>
-                <td mat-cell *matCellDef="let row" [ngClass]="[column === 'header' ? 'header' : 'cell']">
-                    {{row[column]}}
-                </td>
-            </ng-container>
-            <tr mat-header-row *matHeaderRowDef="despair_death_columns; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: despair_death_columns;"></tr>
-        </table>
-    </div>
+    <div class="container">
+        <!-- Morts par désespoir -->
+        <ng-container *ngTemplateOutlet="card; context: {$implicit: despair_deaths.data, rows: despair_death_columns, header: 'Morts par désespoir'}">
+        </ng-container>
 
-    <!-- Chances de réussite du manuel -->
-    <div class="mat-elevation-z8">
-        <table mat-table [dataSource]="survivalist_book_chances" class="clean-points">
-            <ng-container *ngFor="let column of survivalist_book_chances_columns" [matColumnDef]="column"
-                [sticky]="column === 'header'">
-                <th mat-header-cell *matHeaderCellDef class="title">
-                    <ng-container *ngIf="column === 'header'" i18n>Manuel des ermites</ng-container>
-                </th>
-                <td mat-cell *matCellDef="let row" [ngClass]="[column === 'header' ? 'header' : 'cell']">
-                    {{row[column]}}
-                </td>
-            </ng-container>
-            <tr mat-header-row *matHeaderRowDef="survivalist_book_chances_columns; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: survivalist_book_chances_columns;"></tr>
-        </table>
-    </div>
+        <!-- Attaque théorique -->
+        <ng-container *ngTemplateOutlet="card; context: {$implicit: theorical_attack.data, rows: theorical_attack_columns, header: 'Attaque théorique'}">
+        </ng-container>
 
-    <!-- Points d'âme -->
-    <div class="mat-elevation-z8">
-        <table mat-table [dataSource]="soul_points" class="soul-points">
-            <ng-container *ngFor="let column of soul_points_columns" [matColumnDef]="column"
-                [sticky]="column === 'header'">
-                <th mat-header-cell *matHeaderCellDef class="title">
-                    <ng-container *ngIf="column === 'header'" i18n>Points d'âme</ng-container>
-                </th>
-                <td mat-cell *matCellDef="let row" [ngClass]="[column === 'header' ? 'header' : 'cell']">
-                    {{row[column]}}
-                </td>
-            </ng-container>
-            <tr mat-header-row *matHeaderRowDef="soul_points_columns; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: soul_points_columns;"></tr>
-        </table>
-    </div>
+        <!-- Chances de réussite du manuel -->
+        <ng-container
+            *ngTemplateOutlet="card; context: {$implicit: survivalist_book_chances.data, rows: survivalist_book_chances_columns, header: 'Manuel des ermites'}">
+        </ng-container>
 
-    <!-- Points clean -->
-    <div class="mat-elevation-z8">
-        <table mat-table [dataSource]="clean_points" class="clean-points">
-            <ng-container *ngFor="let column of clean_points_columns" [matColumnDef]="column"
-                [sticky]="column === 'header'">
-                <th mat-header-cell *matHeaderCellDef class="title">
-                    <ng-container *ngIf="column === 'header'" i18n>Points clean</ng-container>
-                </th>
-                <td mat-cell *matCellDef="let row" [ngClass]="[column === 'header' ? 'header' : 'cell']">
-                    {{row[column]}}
-                </td>
-            </ng-container>
-            <tr mat-header-row *matHeaderRowDef="clean_points_columns; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: clean_points_columns;"></tr>
-        </table>
+        <!-- Points d'âme -->
+        <ng-container *ngTemplateOutlet="card; context: {$implicit: soul_points.data, rows: soul_points_columns, header: 'Points d\'âme'}">
+        </ng-container>
+
+        <!-- Points clean -->
+        <ng-container *ngTemplateOutlet="card; context: {$implicit: clean_points.data, rows: clean_points_columns, header: 'Points clean'}">
+        </ng-container>
     </div>
 </mat-card-content>
+
+<ng-template #card let-data let-rows=rows let-header=header>
+    <mat-card class="card">
+        <mat-card-header class="card-header">
+            <h3>{{header}}</h3>
+        </mat-card-header>
+        <mat-card-content class="content">
+            <div class="title">
+                <h5 *ngFor="let column of data">{{column['header']}}</h5>
+            </div>
+            <div class="columns" style="display: flex;">
+                <div class="col" *ngFor="let col of data; let col_index = index" style="flex: 1; gap:0.5em; align-items: center;">
+                    <div class="cell" *ngFor="let row of rows; let row_index = index">{{data[col_index][row_index]}}</div>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</ng-template>

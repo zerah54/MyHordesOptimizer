@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, Inject, OnInit, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
@@ -19,6 +19,7 @@ import { SelectComponent } from '../../shared/elements/select/select.component';
 import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';
 import { ConfirmDialogComponent } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { DOCUMENT } from '@angular/common';
 
 
 @Component({
@@ -102,7 +103,8 @@ export class WishlistComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices, private wishlist_sercices: WishlistServices, private clipboard: ClipboardService, private dialog: MatDialog) {
+    constructor(private api: ApiServices, private wishlist_sercices: WishlistServices, private clipboard: ClipboardService, private dialog: MatDialog,
+                @Inject(DOCUMENT) private document: Document) {
 
     }
 
@@ -254,15 +256,15 @@ export class WishlistComponent implements OnInit {
         const u8: Uint8Array = write(workbook, {type: 'buffer', bookType: 'xlsx'});
         const blob: Blob = new Blob([u8], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 
-        const url: string = window.URL.createObjectURL(blob);
-        const hidden_link: HTMLAnchorElement = document.createElement('a');
-        document.body.appendChild(hidden_link);
+        const url: string = URL.createObjectURL(blob);
+        const hidden_link: HTMLAnchorElement = this.document.createElement('a');
+        this.document.body.appendChild(hidden_link);
         hidden_link.style.display = 'none';
         hidden_link.href = url;
         hidden_link.download = `MyHordes Optimizer - ${$localize`Liste de courses`}`;
         hidden_link.click();
         hidden_link.remove();
-        window.URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url);
     }
 
     public importExcel(event: Event): void {

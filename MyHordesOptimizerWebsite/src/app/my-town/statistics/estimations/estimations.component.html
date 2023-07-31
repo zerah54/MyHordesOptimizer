@@ -3,11 +3,13 @@
         <mho-header-with-number-previous-next-filter class="previous-next" [(filterValue)]="selected_day" (filterValueChange)="getEstimations()"
                                                      [min]="1" [max]="current_day">
         </mho-header-with-number-previous-next-filter>
-        <button mat-raised-button [color]="'accent'" (click)="saveEstimations()" i18n>Enregistrer</button>
+        <div class="actions">
+            <button mat-raised-button [color]="'accent'" (click)="saveEstimations()" i18n>Enregistrer</button>
+        </div>
     </div>
     <div class="tables" *ngIf="estimations">
         <table>
-            <caption i18n>Estimations du jour</caption>
+            <caption i18n>Attaque du jour</caption>
             <tr>
                 <th i18n>Qualité</th>
                 <th i18n>Min</th>
@@ -24,7 +26,7 @@
             </tr>
         </table>
         <table>
-            <caption i18n>Estimations du scrutateur</caption>
+            <caption i18n>Attaque du lendemain</caption>
             <tr>
                 <th i18n>Qualité</th>
                 <th i18n>Min</th>
@@ -40,5 +42,9 @@
                 </td>
             </tr>
         </table>
+        <div class="canvas">
+            <canvas #todayCanvas></canvas>
+            <canvas #tomorrowCanvas></canvas>
+        </div>
     </div>
 </div>

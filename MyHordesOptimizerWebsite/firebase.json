@@ -2,7 +2,7 @@
     "hosting": [
         {
             "target": "prod",
-            "public": "dist/my-hordes-optimizer-website",
+            "public": "dist/MyHordesOptimizerWebsite/browser",
             "ignore": [
                 "firebase.json",
                 "**/.*",
@@ -17,7 +17,7 @@
         },
         {
             "target": "dev",
-            "public": "dist/my-hordes-optimizer-website",
+            "public": "dist/MyHordesOptimizerWebsite/browser",
             "ignore": [
                 "firebase.json",
                 "**/.*",

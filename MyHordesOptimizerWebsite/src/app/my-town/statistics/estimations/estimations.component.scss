@@ -5,22 +5,32 @@
         flex-wrap: wrap;
         gap: 0.5em;
         justify-content: space-between;
+
+        .actions {
+            display: flex;
+            align-items: center;
+        }
     }
 
     .tables {
         display: flex;
-        justify-content: center;
+        justify-content: space-around;
         gap: 0.5em;
-
-        align-items: baseline;
+        flex-wrap: wrap;
+        align-items: flex-start;
 
         table {
-            width: 50%;
             margin: 0;
 
             td {
                 text-align: right;
             }
+        }
+
+        .canvas {
+            flex: 1;
+            display: flex;
+            flex-wrap: wrap;
         }
     }
 }

@@ -1,8 +1,10 @@
-import { Component, HostBinding, Inject, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
 import * as moment from 'moment';
 import { environment } from '../../../environments/environment';
 import { getTown } from '../../shared/utilities/localstorage.util';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { MatSidenavContainer } from '@angular/material/sidenav';
+import { DOCUMENT } from '@angular/common';
 
 @Component({
     selector: 'mho-menu',
@@ -12,6 +14,8 @@ import { TownDetails } from '../../_abstract_model/types/town-details.class';
 })
 export class MenuComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
+
+    @Input({required: true}) sidenavContainer!: MatSidenavContainer;
 
     public themes: Theme[] = [
         {label: $localize`Par défaut`, class: ''},
@@ -101,7 +105,7 @@ export class MenuComponent implements OnInit {
         }
     ];
 
-    constructor(@Inject(LOCALE_ID) private locale_id: string,) {
+    constructor(@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document) {
 
     }
 
@@ -132,7 +136,7 @@ export class MenuComponent implements OnInit {
             || this.themes.find((theme: Theme) => theme.class === '');
 
         setTimeout(() => {
-            window.dispatchEvent(new Event('resize'));
+            this.resizeSidenav();
         });
     }
 
@@ -145,7 +149,7 @@ export class MenuComponent implements OnInit {
                 }
                 this.toggleDisplayChildren(child);
             });
-            window.dispatchEvent(new Event('resize'));
+            this.resizeSidenav();
         }
     }
 
@@ -153,7 +157,7 @@ export class MenuComponent implements OnInit {
         this.selected_theme = new_theme;
         localStorage.setItem('theme', new_theme.class);
         setTimeout(() => {
-            location.reload();
+            this.document.location.reload();
         });
     }
 
@@ -166,7 +170,7 @@ export class MenuComponent implements OnInit {
         this.site_language = new_language;
         localStorage.setItem('mho-locale', new_language.code);
         setTimeout(() => {
-            location.reload();
+            this.document.location.reload();
         });
     }
 
@@ -174,6 +178,13 @@ export class MenuComponent implements OnInit {
         const town: TownDetails | null = getTown();
         if (!town) return false;
         return town.town_id !== null && town.town_id !== undefined && town.town_id !== 0;
+    }
+
+    private resizeSidenav(): void {
+        this.sidenavContainer.autosize = true;
+        setTimeout((): void => {
+            this.sidenavContainer.autosize = true;
+        });
     }
 }
 

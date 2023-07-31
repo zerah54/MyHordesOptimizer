@@ -1,5 +1,4 @@
-import { AfterViewInit, Component, HostBinding, QueryList, ViewChildren } from '@angular/core';
-import { MatInput } from '@angular/material/input';
+import {AfterViewInit, Component, HostBinding} from '@angular/core';
 import * as moment from 'moment';
 
 @Component({
@@ -10,40 +9,50 @@ import * as moment from 'moment';
 export class ProbabilitiesComponent implements AfterViewInit {
     @HostBinding('style.display') display: string = 'contents';
 
-    @ViewChildren('chances', {read: MatInput}) chances!: QueryList<MatInput>;
-
-    public nb_people: number = 1;
-    public current_chances: number[] = [];
-    public result_probabilities: number[] = [];
-    public result_average!: number;
+    public simulations: Simulation[] = [
+        {nb_people: 1, current_chances: [0], result_probabilities: [], title: $localize`Simulation 1`, editing_title: false, show_detail: true}
+    ];
 
     public readonly locale: string = moment.locale();
 
     public ngAfterViewInit(): void {
-        this.convertFieldsToChances();
-    }
-
-    updateValues(): void {
-        setTimeout(() => {
-            this.convertFieldsToChances();
+        this.simulations.forEach((simulation: Simulation) => {
+            this.convertFieldsToChances(simulation);
         });
     }
 
-    private convertFieldsToChances(): void {
-        this.current_chances = [...Array.from(this.chances || [])
-            .filter((chance: MatInput) => chance.value !== null && chance.value !== undefined && chance.value !== '')
-            .map((chance: MatInput) => +chance.value)];
-
-        this.calculateProbabilities();
+    public createSimulation(): void {
+        const new_simulation: Simulation = {
+            nb_people: 1,
+            current_chances: [0],
+            result_probabilities: [],
+            title: $localize`Simulation` + ' ' + (this.simulations.length + 1),
+            editing_title: false,
+            show_detail: true
+        };
+        this.simulations.push(new_simulation);
+        this.calculateProbabilities(new_simulation);
     }
 
-    private calculateProbabilities(): void {
+    public deleteSimulation(index: number): void {
+        this.simulations.splice(index, 1);
+    }
 
-        if (!this.current_chances) {
-            this.result_probabilities = [];
+    public convertFieldsToChances(simulation: Simulation): void {
+        if (simulation.current_chances.length > simulation.nb_people) {
+            simulation.current_chances = simulation.current_chances.slice(0, simulation.nb_people);
+        } else if (simulation.current_chances.length < simulation.nb_people) {
+            const add_chances: number[] = new Array(simulation.nb_people - simulation.current_chances.length).fill(0);
+            simulation.current_chances = simulation.current_chances.concat(add_chances);
+        }
+        this.calculateProbabilities(simulation);
+    }
+
+    public calculateProbabilities(simulation: Simulation): void {
+        if (!simulation.current_chances) {
+            simulation.result_probabilities = [];
         } else {
-
-            const death_probabilities: number[] = this.current_chances.map((value: number) => (100 - +value) / 100);
+            const death_probabilities: number[] = simulation.current_chances.map((value: number) => (100 - +value) / 100);
             const nb_watchers: number = death_probabilities.length;
             const result_map: number[][] = new Array(nb_watchers + 1);
             let nb_deaths: number = 0;
@@ -81,19 +90,30 @@ export class ProbabilitiesComponent implements AfterViewInit {
                 results[i] = result_map[i][nb_watchers];
             }
 
-            this.result_probabilities = results;
+            simulation.result_probabilities = results;
         }
-        this.calculateAverage();
+
+        this.calculateAverage(simulation);
     }
 
-    private calculateAverage(): void {
+    private calculateAverage(simulation: Simulation): void {
         let average: number;
-        const nb_watchers: number = this.result_probabilities.length;
+        const nb_watchers: number = simulation.result_probabilities.length;
 
         average = 0;
         for (let i: number = 0; i < nb_watchers; i++) {
-            average = average + i * this.result_probabilities[i];
+            average = average + i * simulation.result_probabilities[i];
         }
-        this.result_average = average * 100;
+        simulation.result_average = average;
     }
+}
+
+interface Simulation {
+    nb_people: number;
+    current_chances: number[];
+    result_probabilities: number[];
+    result_average?: number;
+    title: string;
+    editing_title: boolean;
+    show_detail: boolean;
 }
