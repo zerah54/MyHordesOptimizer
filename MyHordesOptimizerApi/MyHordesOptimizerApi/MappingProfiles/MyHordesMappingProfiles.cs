@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations;
 using MyHordesOptimizerApi.Models.Estimations;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
@@ -173,7 +174,13 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest._88, opt => { opt.MapFrom(src => new EstimationValueDto() { Min = src._88Min.Value, Max = src._88Max.Value }); opt.PreCondition(src => src._88Min.HasValue && src._88Max.HasValue); })
                 .ForMember(dest => dest._92, opt => { opt.MapFrom(src => new EstimationValueDto() { Min = src._92Min.Value, Max = src._92Max.Value }); opt.PreCondition(src => src._92Min.HasValue && src._92Max.HasValue); })
                 .ForMember(dest => dest._96, opt => { opt.MapFrom(src => new EstimationValueDto() { Min = src._96Min.Value, Max = src._96Max.Value }); opt.PreCondition(src => src._96Min.HasValue && src._96Max.HasValue); })
-                .ForMember(dest => dest._100, opt => { opt.MapFrom(src => new EstimationValueDto() { Min = src._100Min.Value, Max = src._100Max.Value }); opt.PreCondition(src => src._100Min.HasValue && src._100Max.HasValue); });   
+                .ForMember(dest => dest._100, opt => { opt.MapFrom(src => new EstimationValueDto() { Min = src._100Min.Value, Max = src._100Max.Value }); opt.PreCondition(src => src._100Min.HasValue && src._100Max.HasValue); });
+
+            CreateMap<MyHordesZoneItem, UpdateObjectDto>()
+                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.Broken))
+                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
+
         }
 
         private object GetNameIdFromImg(string img)

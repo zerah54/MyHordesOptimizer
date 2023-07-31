@@ -242,11 +242,26 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     try
                     {
                         var cell = updateRequestDto.Map.Cell;
+                        var realX = updateRequestDto.TownDetails.TownX + cell.X;
+                        var realY = updateRequestDto.TownDetails.TownY - cell.Y;
                         if (townDetails.IsDevaste || cell.DeadZombies > 0)
                         {
                             var request = Mapper.Map<GestHordesUpdateCaseRequest>(updateRequestDto);
                             var dictionnary = request.ToMhoDictionnary();
                             var count = 0;
+                            if(cell.Objects == null)
+                            {
+                                cell.Objects = new List<UpdateObjectDto>();
+                                var myHordeMe = MyHordesApiRepository.GetMe();
+                                var myHordeZone = myHordeMe.Map.Zones.First(zone => zone.X == realX && zone.Y == realY);
+                                if(myHordeZone.Items != null)
+                                {
+                                    foreach (var myHordesItem in myHordeZone.Items)
+                                    {
+                                        cell.Objects.Add(Mapper.Map<UpdateObjectDto>(myHordesItem));
+                                    }
+                                }               
+                            }
                             foreach (var item in cell.Objects)
                             {
                                 dictionnary.Add($"dataObjet[{count}][idObjet]", item.Id);
