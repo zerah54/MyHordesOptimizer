@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.58
+// @version      1.0.0-beta.59
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
-// @icon         https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/logo/logo_mho_16x16.png
-// @icon64       https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/logo/logo_mho_64x64.png
+// @icon         https://myhordes-optimizer.web.app/assets/img/logo/logo_mho_16x16.png
+// @icon64       https://myhordes-optimizer.web.app/assets/img/logo/logo_mho_64x64.png
 //
 // @downloadURL  https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
 // @updateURL    https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
@@ -33,9 +33,15 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Corrige certains comportements du compteur anti-abus\n`
-    + `[nouveauté] Ajoute un bouton de copie du registre\n`
-    + `[remise en place] Réintègre l'option d'envoi des améliorations de maison. Un nouveau bouton sera créé sur la page des améliorations`
+    + `Attention certains changements peuvent avoir impacté vos options sélectionnées, assurez-vous que tout est en ordre !\n\n`
+    + `[correctif] Corrige l'affichage de certaines images qui ne s'affichaient pas toujours\n`
+    + `[correctif] Corrige la prise en compte du métier dans l'outil intégré de calcul de camping\n\n`
+    + `[amélioration] Réorganisation du menu dans lequel les options commençaient à prendre trop de place\n`
+    + `[amélioration] Séparation de certaines options (mise à jour en ville dévastée et envoi du nombre de zombies tués / champs de recherches)\n\n`
+    + `[nouveauté] Ajout d'une option pour enregistrer les estimations de la TDG dans MHO, consulter les valeurs enregistrées et les copier pour le forum\n`
+    + `[nouveauté] Ajout d'une option pour afficher un champ de recherche sur le registre\n`
+    + `[nouveauté] Ajout d'une option pour choisir ses options d'escorte à appliquer à l'activation de l'attente d'escorte\n`
+    + `[nouveauté] Ajout d'une option pour notifier l'utilisateur en cas d'inactivité de plus de 5 minutes si il n'a pas relâché l'escorte ou qu'il ne s'est pas mis en attente d'escorte\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -82,7 +88,7 @@ const hordes_img_url = '/build/images/';
 const repo_img_url = 'https://myhordes-optimizer.web.app/assets/img/';
 const repo_img_hordes_url = repo_img_url + 'hordes_img/';
 
-const mh_optimizer_icon = 'https://github.com/zerah54/MyHordesOptimizer/raw/main/assets/img/logo/logo_mho_64x64_outlined.png';
+const mh_optimizer_icon = 'https://myhordes-optimizer.web.app/assets/img/logo/logo_mho_64x64_outlined.png';
 
 const mho_title = 'MH Optimizer';
 const mh_optimizer_window_id = 'optimizer-window';
@@ -103,6 +109,7 @@ const mho_opti_map_id = 'mho-opti-map';
 const mho_display_map_id = 'mho-display-map';
 const mho_search_building_field_id = 'mho-search-building-field';
 const mho_search_recipient_field_id = 'mho-search-recipient-field';
+const mho_search_registry_field_id = 'mho-search-registry-field';
 const mho_display_translate_input_id = 'mho-display-translate-input';
 const mho_watchtower_estim_id = 'mho-watchtower-estim';
 const mho_anti_abuse_counter_id = 'mho-anti-abuse-counter';
@@ -216,16 +223,16 @@ const texts = {
         es: `Ha pedido ser notificado antes de cerrar la página si sus opciones de escolta son incorrectas: `
     },
     prevent_not_in_ae: {
-        en: `you are not waiting for an escort.`,
-        fr: `vous n'êtes pas en attente d'escorte.`,
+        en: `You are not waiting for an escort.`,
+        fr: `Vous n'êtes pas en attente d'escorte.`,
         de: `Sie warten nicht auf eine Eskorte.`,
-        es: `su escolta no está activada.`
+        es: `Su escolta no está activada.`
     },
     escort_not_released: {
-        en: `you did not let go of your escort`,
-        fr: `vous n'avez pas relâché votre escorte.`,
+        en: `You did not let go of your escort`,
+        fr: `Vous n'avez pas relâché votre escorte.`,
         de: `Sie haben Ihre Eskorte nicht losgelassen`,
-        es: `no ha soltado a sus acompañantes en escolta.`
+        es: `No ha soltado a sus acompañantes en escolta.`
     },
     save: {
         en: `Save`,
@@ -281,17 +288,11 @@ const texts = {
         de: `Die vorherige Karte wurde ersetzt`,
         es: `El mapa anterior ha sido reemplazada`
     },
-    search_building: {
-        en: `Search for a construction site`,
-        fr: `Rechercher un chantier`,
-        de: `Baustelle suchen`,
-        es: `Buscar una construcción`
-    },
-    search_recipient: {
-        en: `Find a recipient`,
-        fr: `Rechercher un destinataire`,
-        de: `Finden Sie einen Empfänger`,
-        es: `Encuentra un destinatario`
+    copy_registry: {
+        en: `Copy visible town registry entries`,
+        fr: `Copier les entrées visibles du registre`,
+        de: `Kopieren Sie sichtbare Stadtregister`,
+        es: `Copiar entradas de registro del pueblo visibles`
     },
     translation_file_context: {
         en: `Context (translation file)`,
@@ -508,6 +509,18 @@ const texts = {
         fr: `Attaque du lendemain`,
         de: `Morgige Abschätzung`,
         es: `Ataque de la noche siguiente`,
+    },
+    copy_forum: {
+        en: `Copy to forum format`,
+        fr: `Copier au format forum`,
+        de: `In Forumformat kopieren`,
+        es: `Copiar al formato del foro`
+    },
+    copy_forum_watchtower_tooltip: {
+        en: `Make sure you save before copying`,
+        fr: `Assurez-vous d'avoir enregistré avant de copier`,
+        de: `Stellen Sie sicher, dass Sie vor dem Kopieren speichern`,
+        es: `Asegúrate de guardar antes de copiar`
     }
 };
 
@@ -994,73 +1007,86 @@ let params_categories = [
                     de: `MyHordes Optimiser Aktualisieren`,
                     es: `Actualizar MyHordes Optimiser`
                 },
-                parent_id: null
-            },
-            {
-                id: `update_mho_actions`,
-                label: {
-                    en: `Heroic Actions`,
-                    fr: `Actions héroïques`,
-                    de: `Heldentaten`,
-                    es: `Acciones heroicas`
-                },
-                parent_id: `update_mho`
-            },
-            {
-                id: `update_mho_house`,
-                label: {
-                    en: `Home upgrades`,
-                    fr: `Améliorations de la maison`,
-                    de: `Hausverbesserungen`,
-                    es: `Mejoras de la casa`
-                },
-                help: {
-                    en: `A new button will be placed on the improvements page`,
-                    fr: `Un nouveau bouton sera placé sur la page des améliorations`,
-                    de: `Auf der Verbesserungsseite wird eine neue Schaltfläche platziert`,
-                    es: `Se colocará un nuevo botón en la página de mejoras.`
-                },
-                parent_id: `update_mho`
-            },
-            {
-                id: `update_mho_bags`,
-                label: {
-                    en: `Details of my rucksack and those of my escort`,
-                    fr: `Détail de mon sac et de ceux de mon escorte`,
-                    de: `Details meines Inventars und des Inventars meiner Eskorte`,
-                    es: `Detalles de mi mochila y las de mi escolta`
-                },
-                parent_id: `update_mho`
-            },
-            // {
-            //     id: `update_mho_chest`,
-            //     label: {
-            //         en: `Items in my chest`,
-            //         fr: `Contenu de mon coffre`,
-            //         de: `Gegenstände in meiner Truhe`,
-            //         es: `Contenido de mi baúl`
-            //     },
-            //     parent_id: `update_mho`
-            // },
-            {
-                id: `update_mho_status`,
-                label: {
-                    en: `Status`,
-                    fr: `États`,
-                    de: `Status`,
-                    es: `Estatus`
-                },
-                parent_id: `update_mho`
-            },
-            {
-                id: `update_mho_digs`,
-                label: {
-                    en: `Record successful searches`,
-                    fr: `Enregistrer les fouilles réussies`,
-                    de: `Zeichnen Sie erfolgreiche Ausgrabungen auf`,
-                    es: `Grabar excavaciones exitosas`
-                },
-                parent_id: `update_mho`
+                children: [
+                    {
+                        id: `update_mho_killed_zombies`,
+                        label: {
+                            en: `Record the number of zombies killed`,
+                            fr: `Enregistrer le nombre de zombies tués`,
+                            de: `Notieren Sie die Anzahl der getöteten Zombies`,
+                            es: `Registrar el número de zombis asesinados`
+                        },
+                    },
+                    {
+                        id: `update_mho_devastated`,
+                        label: {
+                            en: `Zone update even after the town has been devastated`,
+                            fr: `Mise à jour en ville dévastée`,
+                            de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
+                            es: `Actualización en pueblo devastado`
+                        },
+                    },
+                    {
+                        id: `update_mho_actions`,
+                        label: {
+                            en: `Heroic Actions`,
+                            fr: `Actions héroïques`,
+                            de: `Heldentaten`,
+                            es: `Acciones heroicas`
+                        },
+                    },
+                    {
+                        id: `update_mho_house`,
+                        label: {
+                            en: `Home upgrades`,
+                            fr: `Améliorations de la maison`,
+                            de: `Hausverbesserungen`,
+                            es: `Mejoras de la casa`
+                        },
+                        help: {
+                            en: `A new button will be placed on the improvements page`,
+                            fr: `Un nouveau bouton sera placé sur la page des améliorations`,
+                            de: `Auf der Verbesserungsseite wird eine neue Schaltfläche platziert`,
+                            es: `Se colocará un nuevo botón en la página de mejoras.`
+                        },
+                    },
+                    {
+                        id: `update_mho_bags`,
+                        label: {
+                            en: `Details of my rucksack and those of my escort`,
+                            fr: `Détail de mon sac et de ceux de mon escorte`,
+                            de: `Details meines Inventars und des Inventars meiner Eskorte`,
+                            es: `Detalles de mi mochila y las de mi escolta`
+                        },
+                    },
+                    // {
+                    //     id: `update_mho_chest`,
+                    //     label: {
+                    //         en: `Items in my chest`,
+                    //         fr: `Contenu de mon coffre`,
+                    //         de: `Gegenstände in meiner Truhe`,
+                    //         es: `Contenido de mi baúl`
+                    //     },
+                    // },
+                    {
+                        id: `update_mho_status`,
+                        label: {
+                            en: `Status`,
+                            fr: `États`,
+                            de: `Status`,
+                            es: `Estatus`
+                        },
+                    },
+                    {
+                        id: `update_mho_digs`,
+                        label: {
+                            en: `Record successful searches`,
+                            fr: `Enregistrer les fouilles réussies`,
+                            de: `Zeichnen Sie erfolgreiche Ausgrabungen auf`,
+                            es: `Grabar excavaciones exitosas`
+                        },
+                    },
+                ]
             },
             {
                 id: `update_bbh`,
@@ -1070,7 +1096,6 @@ let params_categories = [
                     de: `BigBroth’Hordes Aktualisieren`,
                     es: `Actualizar BigBroth'Hordes`
                 },
-                parent_id: null
             },
             {
                 id: `update_gh`,
@@ -1080,59 +1105,59 @@ let params_categories = [
                     de: `Gest’Hordes aktualisieren`,
                     es: `Actualizar Gest'Hordes`
                 },
-                parent_id: null
-            },
-            {
-                id: `update_gh_without_api`,
-                label: {
-                    en: `Additional information on the map`,
-                    fr: `Informations complémentaires sur la carte`,
-                    de: `Zusätzliche Informationen auf der Karte`,
-                    es: `Información adicional sobre el mapa`
-                },
-                help: {
-                    en: `Amount of zombies killed in a zone; Zone update even after the town has been devastated`,
-                    fr: `Marqueurs zombies tués ; Mise à jour en ville dévastée`,
-                    de: `Anzahl getöteter Zombies; Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
-                    es: `Marcadores zombis matados; Actualización en pueblo devastado`
-                },
-                parent_id: `update_gh`
-            },
-            {
-                id: `update_gh_ah`,
-                label: {
-                    en: `Heroic Actions`,
-                    fr: `Actions héroïques`,
-                    de: `Heldentaten`,
-                    es: `Acciones heroicas`
-                },
-                parent_id: `update_gh`
-            },
-            {
-                id: `update_gh_amelios`,
-                label: {
-                    en: `Home upgrades`,
-                    fr: `Améliorations de la maison`,
-                    de: `Hausverbesserungen`,
-                    es: `Mejoras de la casa`
-                },
-                help: {
-                    en: `A new button will be placed on the improvements page`,
-                    fr: `Un nouveau bouton sera placé sur la page des améliorations`,
-                    de: `Auf der Verbesserungsseite wird eine neue Schaltfläche platziert`,
-                    es: `Se colocará un nuevo botón en la página de mejoras.`
-                },
-                parent_id: `update_gh`
-            },
-            {
-                id: `update_gh_status`,
-                label: {
-                    en: `Status`,
-                    fr: `États`,
-                    de: `Status`,
-                    es: `Estatus`
-                },
-                parent_id: `update_gh`
+                children: [
+                    {
+                        id: `update_gh_killed_zombies`,
+                        label: {
+                            en: `Record the number of zombies killed`,
+                            fr: `Enregistrer le nombre de zombies tués`,
+                            de: `Notieren Sie die Anzahl der getöteten Zombies`,
+                            es: `Registrar el número de zombis asesinados`
+                        },
+                    },
+                    {
+                        id: `update_gh_devastated`,
+                        label: {
+                            en: `Zone update even after the town has been devastated`,
+                            fr: `Mise à jour en ville dévastée`,
+                            de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
+                            es: `Actualización en pueblo devastado`
+                        },
+                    },
+                    {
+                        id: `update_gh_ah`,
+                        label: {
+                            en: `Heroic Actions`,
+                            fr: `Actions héroïques`,
+                            de: `Heldentaten`,
+                            es: `Acciones heroicas`
+                        },
+                    },
+                    {
+                        id: `update_gh_amelios`,
+                        label: {
+                            en: `Home upgrades`,
+                            fr: `Améliorations de la maison`,
+                            de: `Hausverbesserungen`,
+                            es: `Mejoras de la casa`
+                        },
+                        help: {
+                            en: `A new button will be placed on the improvements page`,
+                            fr: `Un nouveau bouton sera placé sur la page des améliorations`,
+                            de: `Auf der Verbesserungsseite wird eine neue Schaltfläche platziert`,
+                            es: `Se colocará un nuevo botón en la página de mejoras.`
+                        },
+                    },
+                    {
+                        id: `update_gh_status`,
+                        label: {
+                            en: `Status`,
+                            fr: `États`,
+                            de: `Status`,
+                            es: `Estatus`
+                        },
+                    },
+                ]
             },
             {
                 id: `update_fata`,
@@ -1142,7 +1167,6 @@ let params_categories = [
                     de: `Fata Morgana aktualisieren`,
                     es: `Actualizar Fata Morgana`
                 },
-                parent_id: null
             },
             {
                 id: `show_compact`,
@@ -1158,7 +1182,6 @@ let params_categories = [
                     de: `Nur auf kleinen Bildschirmen wird die Aktualisierungsschaltfläche für externe Tools mit komprimierten Schaltflächen angezeigt`,
                     es: `Solo en pantalla pequeña, el botón de actualización de herramientas externas se mostrará con botones comprimidos`
                 },
-                parent_id: null
             },
             {
                 id: `display_map`,
@@ -1174,7 +1197,6 @@ let params_categories = [
                     de: `In jedem externen Tool wird es möglich sein, die Stadt- oder Ruinenkarte zu kopieren und in MyHordes einzufügen`,
                     es: `En toda aplicación externa, es posible copiar el mapa del pueblo o de la ruina y pegarlo en MyHordes`
                 },
-                parent_id: null
             }
         ]
     },
@@ -1195,7 +1217,6 @@ let params_categories = [
                     de: `Detaillierte Tooltips`,
                     es: `Tooltips detallados`
                 },
-                parent_id: null
             },
             {
                 id: `click_on_voted`,
@@ -1205,7 +1226,6 @@ let params_categories = [
                     de: `Schnelle Navigation zur empfohlenen Baustelle`,
                     es: `Navegación rápida hacia la construcción recomendada`
                 },
-                parent_id: null
             },
             {
                 id: `display_search_fields`,
@@ -1215,13 +1235,41 @@ let params_categories = [
                     de: `Zusätzliche Suchfelder`,
                     es: `Campos de búsqueda adicionales`
                 },
-                help: {
-                    en: `Displays a search field in the list of construction sites, and a search field in the list of recipients of a message in his house.`,
-                    fr: `Affiche un champ de recherche dans la liste de chantiers, et un champ de recherche sur la liste des destinataires d'un message dans sa maison.`,
-                    de: `Zeigt ein Suchfeld in der Liste der Baustellen und ein Suchfeld in der Liste der Empfänger einer Nachricht in seinem Haus an.`,
-                    es: `Muestra un campo de búsqueda en la lista de sitios de construcción y un campo de búsqueda en la lista de destinatarios de un mensaje en su casa.`
-                },
-                parent_id: null
+                children: [
+                    {
+                        id: `display_search_field_buildings`,
+                        label: {
+                            en: `Search for a construction site`,
+                            fr: `Rechercher un chantier`,
+                            de: `Baustelle suchen`,
+                            es: `Buscar una construcción`
+                        },
+                    },
+                    {
+                        id: `display_search_field_recipients`,
+                        label: {
+                            en: `Find a recipient`,
+                            fr: `Rechercher un destinataire`,
+                            de: `Finden Sie einen Empfänger`,
+                            es: `Encuentra un destinatario`
+                        }
+                    },
+                    {
+                        id: `display_search_field_registry`,
+                        label: {
+                            en: `Search the registry`,
+                            fr: `Rechercher dans le registre`,
+                            de: `Durchsuchen Sie die Registrierung`,
+                            es: `Buscar en el registro`
+                        },
+                        help: {
+                            en: `The search will only be done in the displayed lines of the registry`,
+                            fr: `La recherche ne se fera que dans les lignes affichées du registre`,
+                            de: `Die Suche erfolgt nur in den angezeigten Zeilen des Registers`,
+                            es: `La búsqueda sólo se realizará en las líneas desplegadas del registro`
+                        }
+                    },
+                ]
             },
             {
                 id: `display_wishlist`,
@@ -1231,7 +1279,6 @@ let params_categories = [
                     de: `Wunschzettel in der Benutzeroberfläche`,
                     es: `Lista de deseos en la interfaz`
                 },
-                parent_id: null
             },
             {
                 id: `display_nb_dead_zombies`,
@@ -1247,7 +1294,6 @@ let params_categories = [
                     de: `Ermöglicht die Anzeige der Anzahl der Blutfleck auf der Karte`,
                     es: `Permite mostrar la cantidad de manchas de sangre en el mapa`
                 },
-                parent_id: null
             },
             {
                 id: `display_translate_tool`,
@@ -1263,7 +1309,6 @@ let params_categories = [
                     de: `Zeigt eine Übersetzungsleiste an. Sie müssen die Ausgangssprache auswählen, und dann die Zielelemente eingeben um die Übersetzungen zu generieren.`,
                     es: `Muestra una barra de traducción. Primero se debe escoger el idioma inicial, y luego ingresar el elemento buscado en la barra para obtener las distintas traducciones.`
                 },
-                parent_id: null
             },
             {
                 id: `display_missing_ap_for_buildings_to_be_safe`,
@@ -1279,7 +1324,6 @@ let params_categories = [
                     de: `In Pandämonium-Städten nehmen Gebäude während des nächtlichen Angriffs Schaden. Diese Schäden können bis zu 70% eines Gebäudes ausmachen (aufgerundet zur nächsten ganzen Zahl). Diese Einstellung zeigt oberhalb der Bau-AP an, wieviele AP benötigt werden, um das Gebäude für die Nacht zu schützen.`,
                     es: `En Pandemonio, las construcciones sufren daños durante el ataque. Estos daños equivalen a un máximo de 70% de los puntos de vida de la construcción (redondeados al entero superior). Esta opción muestra sobre las construcciones la cantidad de PA a invertir para evitar que puedan ser destruidas.`
                 },
-                parent_id: null
             },
             {
                 id: `display_camping_predict`,
@@ -1289,7 +1333,6 @@ let params_categories = [
                     de: `Campingvorhersagen in Gebietsinformationen`,
                     es: `Predicciones para acampar en la información del área`
                 },
-                parent_id: null
             },
             {
                 id: `display_more_informations_from_mho`,
@@ -1305,18 +1348,16 @@ let params_categories = [
                     de: `Zeigt die Notiz der Box an, falls vorhanden.`,
                     es: `Muestra la nota de la caja, si existe.`
                 },
-                parent_id: null
             },
-            // {
-            //     id: `display_estimations_on_watchtower`,
-            //     label: {
-            //         en: `TODO`,
-            //         fr: `Affiche les estimations enregistrées sur la page de la tour de guet`,
-            //         de: `TODO`,
-            //         es: `TODO`
-            //     },
-            //     parent_id: null
-            // },
+            {
+                id: `display_estimations_on_watchtower`,
+                label: {
+                    en: `TODO`,
+                    fr: `Affiche les estimations enregistrées sur la page de la tour de guet`,
+                    de: `TODO`,
+                    es: `TODO`
+                },
+            },
             {
                 id: `copy_registry`,
                 label: {
@@ -1325,7 +1366,6 @@ let params_categories = [
                     de: `Fügt eine Schaltfläche zum Kopieren von Registrierungsinhalten hinzu`,
                     es: `Agrega un botón para copiar el contenido del registro`
                 },
-                parent_id: null
             },
             {
                 id: `display_anti_abuse`,
@@ -1335,7 +1375,6 @@ let params_categories = [
                     de: `TODO`,
                     es: `TODO`
                 },
-                parent_id: null
             },
             {
                 id: `automatically_open_bag`,
@@ -1345,7 +1384,35 @@ let params_categories = [
                     de: `Öffnet automatisch das Menü "Gegenstand verwenden"`,
                     es: `Abre automáticamente el menú "Usar un objeto de mi mochila"`
                 },
-                parent_id: null
+            },
+            {
+                id: `default_escort_options`,
+                label: {
+                    en: `TODO`,
+                    fr: `Définir des options d'escorte par défaut`,
+                    de: `TODO`,
+                    es: `TODO`
+                },
+                children: [
+                    {
+                        id: `default_escort_force_return`,
+                        label: {
+                            en: `TODO`,
+                            fr: `Interdire au chef d'escorte de m'éloigner de la ville`,
+                            de: `TODO`,
+                            es: `TODO`
+                        },
+                    },
+                    {
+                        id: `default_escort_allow_rucksack`,
+                        label: {
+                            en: `TODO`,
+                            fr: `Permettre de voir et de manipuler les objets de mon sac`,
+                            de: `TODO`,
+                            es: `TODO`
+                        },
+                    }
+                ]
             }
             // {
             //     id: `block_users`,
@@ -1362,7 +1429,6 @@ let params_categories = [
             //         de: `TODO`,
             //         es: `Muestra un ícono junto a los nombres de usuario en el foro que permite bloquear / desbloquear a un usuario. Si un usuario ha sido bloqueado, sus mensajes serán ocultados (pero es posible volver a mostrar cualquier mensaje si se desea).`
             //     },
-            //     parent_id: null
             // }
         ]
     },
@@ -1376,14 +1442,33 @@ let params_categories = [
         },
         params: [
             {
-                id: `prevent_from_leaving`,
+                id: `alert_if_no_escort`,
                 label: {
-                    en: `Request confirmation before leaving without automatic escort`,
-                    fr: `Demander confirmation avant de quitter en l'absence d'escorte automatique`,
-                    de: `Bestätigung anfordern bevor Abreise ohne automatische Eskorte`,
-                    es: `Pedir confirmación antes de cerrar la página sin haber puesto la escolta automática`
+                    en: `Notify me when there is no escort or if you have not released your escort`,
+                    fr: `Me notifier en l'absence d'escorte ou si vous n'avez pas relâché votre escorte`,
+                    de: `Benachrichtigen Sie mich, wenn keine Begleitung da ist oder wenn Sie Ihre Begleitperson nicht freigegeben haben`,
+                    es: `Pavísame cuando no haya escolta o si no has soltado tu escolta`
                 },
-                parent_id: null
+                children: [
+                    {
+                        id: `prevent_from_leaving`,
+                        label: {
+                            en: `Ask for confirmation before leaving the page`,
+                            fr: `Demander confirmation avant de quitter la page`,
+                            de: `Bitten Sie um eine Bestätigung, bevor Sie die Seite verlassen`,
+                            es: `Pide confirmación antes de salir de la página`
+                        },
+                    },
+                    {
+                        id: `alert_if_inactive`,
+                        label: {
+                            en: `Notify me if I'm inactive for more than 5 minutes on the page`,
+                            fr: `Me notifier si je suis inactif depuis 5 minutes sur la page`,
+                            de: `Benachrichtigen Sie mich, wenn ich länger als 5 Minuten auf der Seite inaktiv bin`,
+                            es: `Notificarme si estoy inactivo por más de 5 minutos en la página`
+                        },
+                    }
+                ]
             },
             {
                 id: `notify_on_search_end`,
@@ -1399,7 +1484,6 @@ let params_categories = [
                     de: `Ermöglicht den Erhalt einer Benachrichtigung wann eine Grabungsaktion endet wenn die Seite in der Zwischenzeit nicht geschlossen wurde`,
                     es: `Permite recibir una notificación al terminar una búsqueda si la página no ha sido cerrada entre tanto`
                 },
-                parent_id: null
             },
             {
                 id: `notify_on_new_msg`,
@@ -1415,7 +1499,6 @@ let params_categories = [
                     de: `Ermöglicht den Erhalt einer Benachrichtigung im Falle des Empfangs einer neuen Benachrichtigung, die die Anzahl der Benachrichtigungen des Spiels ändert`,
                     es: `Permite recibir una notificación en caso de recibir una nueva notificación cambiando el conteo de notificaciones del juego`
                 },
-                parent_id: null
             }
         ]
     }
@@ -1763,7 +1846,6 @@ function getHoveredItem() {
 }
 
 function getClickedItem(target) {
-    // console.log('target', target);
     let item_icon = event.target.closest('span.item-icon') || event.target.previousElementSibling?.closest('span.item-icon') || event.target.previousElementSibling?.querySelector('span.item-icon');
     if (item_icon) {
         let hovered_item = getItemFromImg(item_icon.querySelector('img').src);
@@ -1793,17 +1875,16 @@ function initOptionsWithLoginNeeded() {
     displayPriorityOnItems();
     createUpdateExternalToolsButton();
     displayCellDetailsOnPage();
-    // displayEstimationsOnWatchtower();
+    displayEstimationsOnWatchtower();
 }
 
 
 function initOptionsWithoutLoginNeeded() {
     preventFromLeaving();
-
+    alertIfInactiveAndNoEscort();
     displayWishlistInApp();
     clickOnVotedToRedirect();
-    displaySearchFieldOnBuildings();
-    displaySearchFieldOnRecipientList();
+    displaySearchFields();
     displayMinApOnBuildings();
     displayNbDeadZombies();
     displayTranslateTool();
@@ -1812,6 +1893,7 @@ function initOptionsWithoutLoginNeeded() {
     displayAntiAbuseCounter();
     automaticallyOpenBag();
     addCopyRegisterButton();
+    changeDefaultEscortOptions();
     // blockUsersPosts();
     count_pending_notifications = document.querySelector('#postbox-new-msg-counter')?.innerText;
 }
@@ -1915,10 +1997,10 @@ function createOptimizerBtn() {
         optimizer_btn.addEventListener('click', (event) => {
             event.stopPropagation();
         });
+        content_zone.appendChild(optimizer_btn);
 
         let mho_content_zone = document.createElement('div');
         mho_content_zone.id = content_btn_id;
-        content_zone.appendChild(optimizer_btn);
         content_zone.appendChild(mho_content_zone);
 
         createOptimizerButtonContent();
@@ -1930,6 +2012,7 @@ function createOptimizerButtonContent() {
     let optimizer_btn = document.getElementById(btn_id);
     let content = document.getElementById(content_btn_id);
     content.innerHTML = '';
+    optimizer_btn.appendChild(content);
 
     if (external_app_id) {
         /////////////////////
@@ -1970,7 +2053,7 @@ function createOptimizerButtonContent() {
         // SECTION PARAMETRES //
         ////////////////////////
 
-        content.appendChild(createParams());
+        createParams(content);
 
         //////////////////////////
         // SECTION INFORMATIONS //
@@ -2014,42 +2097,150 @@ function createOptimizerButtonContent() {
         no_external_app_id.innerText = getI18N(texts.external_app_id_help);
         content.appendChild(no_external_app_id);
     }
-    optimizer_btn.appendChild(content);
 }
 
-function createParams() {
+function createParams(content) {
+    let categories_container = document.createElement('div');
+    categories_container.style.maxHeight = '75vh';
+    categories_container.style.overflow = 'auto';
+    categories_container.id = 'categories';
+    content.appendChild(categories_container);
+
     let params_title = document.createElement('h5');
     params_title.innerText = getI18N(texts.parameters_section_label);
+    categories_container.appendChild(params_title);
 
     let categories_list = document.createElement('ul');
-
-    let categories_container = document.createElement('div');
-    categories_container.id = 'categories';
-
-    categories_container.appendChild(params_title);
     categories_container.appendChild(categories_list);
 
     params_categories.forEach((category) => {
         let category_container = document.createElement('li');
+        categories_list.appendChild(category_container);
+
         let category_title = document.createElement('h1');
         category_title.innerText = getI18N(category.label);
-        categories_list.appendChild(category_container);
+        category_container.appendChild(category_title);
+
         let category_content = document.createElement('ul');
         category_content.classList.add('parameters');
-        category_container.appendChild(category_title);
         category_container.appendChild(category_content);
+
         category.params.forEach((param) => {
-            let param_children = category.params.filter((param_child) => param_child.parent_id === param.id);
+            let param_children = param.children;
+
+            let param_container = document.createElement('li');
+            param_container.id = param.id;
+            category_content.appendChild(param_container);
+
+            let param_with_help = document.createElement('div');
+            param_with_help.style.display = 'flex';
+            param_with_help.style.alignItems = 'center';
+            param_with_help.style.justifyContent = 'space-between';
+            param_container.appendChild(param_with_help);
+
+            let param_input_div = document.createElement('div');
+            param_input_div.style.display = 'flex';
+            param_input_div.style.alignItems = 'center';
+            param_with_help.appendChild(param_input_div);
+
             let param_input = document.createElement('input');
             param_input.type = 'checkbox';
-            param_input.id = param.id + '-intput';
+            param_input.id = param.id + '_input';
             param_input.checked = mho_parameters && mho_parameters[param.id] ? mho_parameters[param.id] : false;
+            param_input_div.appendChild(param_input);
 
             let param_label = document.createElement('label');
             param_label.classList.add('small');
-            param_label.htmlFor = param.id + '-input';
+            param_label.htmlFor = param.id + '_input';
             param_label.innerText = getI18N(param.label);
+            param_input_div.appendChild(param_label);
 
+
+            if (param.help) {
+                let param_help = createHelpButton(getI18N(param.help));
+                param_with_help.appendChild(param_help);
+            }
+
+            if (param_children && param_children.length > 0) {
+
+                if (param_input.checked) {
+                    param_container.classList.add('param-has-children');
+                }
+                let children_container = document.createElement('ul');
+                children_container.style.listStyle = 'none';
+                children_container.style.display = 'none';
+                param_container.appendChild(children_container);
+
+                if (window.innerWidth > 1000) {
+                    children_container.style.width = '300px';
+                    children_container.style.padding = '0.25em';
+                    children_container.style.position = 'absolute';
+                    children_container.style.backgroundColor = '#5c2b20';
+                    children_container.style.border = '1px solid #f0d79e';
+                    children_container.style.outline = '1px solid #000';
+
+                    param_container.addEventListener('mouseenter', () => {
+                        children_container.style.left = document.querySelector(`#${btn_id}`).getBoundingClientRect().width - 7 + 'px';
+                        children_container.style.top = param_container.getBoundingClientRect().top - 10 + 'px';
+                    });
+                } else {
+                    children_container.style.paddingLeft = '1em';
+                }
+
+                param_children.forEach((param_child) => {
+                    let child_container = document.createElement('li');
+                    child_container.id = param_child.id;
+                    children_container.appendChild(child_container);
+
+                    let child_with_help = document.createElement('div');
+                    child_with_help.style.display = 'flex';
+                    child_with_help.style.alignItems = 'center';
+                    child_with_help.style.justifyContent = 'space-between';
+                    child_container.appendChild(child_with_help);
+
+                    let child_input_div = document.createElement('div');
+                    child_input_div.style.display = 'flex';
+                    child_input_div.style.alignItems = 'center';
+                    child_with_help.appendChild(child_input_div);
+
+                    let child_param_input = document.createElement('input');
+                    child_param_input.type = 'checkbox';
+                    child_param_input.id = param_child.id + '_input';
+                    child_param_input.checked = mho_parameters && mho_parameters[param_child.id] ? mho_parameters[param_child.id] : false;
+                    child_input_div.appendChild(child_param_input);
+
+                    let child_param_label = document.createElement('label');
+                    child_param_label.classList.add('small');
+                    child_param_label.htmlFor = param_child.id + '_input';
+                    child_param_label.innerText = getI18N(param_child.label);
+                    child_input_div.appendChild(child_param_label);
+
+                    if (param_child.help) {
+                        let child_param_help = createHelpButton(getI18N(param_child.help));
+                        child_with_help.appendChild(child_param_help);
+                    }
+
+                    child_param_input.addEventListener('change', (event) => {
+                        let new_params;
+                        if (!mho_parameters) {
+                            new_params = {};
+                        } else {
+                            new_params = mho_parameters;
+                        }
+                        new_params[param_child.id] = event.target.checked;
+                        GM.setValue(gm_parameters_key, new_params);
+                        GM.getValue(gm_parameters_key).then((saved_params) => {
+                            mho_parameters = saved_params;
+                        });
+
+                        // Quand on change une option, trigger à nouveau certaines vérifications pour ne pas avoir à les vérifier tout le temps (=> perf !)
+                        initOptionsWithLoginNeeded();
+                        initOptionsWithoutLoginNeeded();
+
+                    });
+                })
+
+            }
             param_input.addEventListener('change', (event) => {
                 let new_params;
                 if (!mho_parameters) {
@@ -2058,51 +2249,32 @@ function createParams() {
                     new_params = mho_parameters;
                 }
                 new_params[param.id] = event.target.checked;
-                GM.setValue(gm_parameters_key, new_params);
-                GM.getValue(gm_parameters_key).then((params) => {
-                    mho_parameters = params
-                });
 
-                /** Si l'option a des "enfants" alors on les affiche uniquement si elle est cochée */
-                if (param_children.length > 0) {
+                /** Si l'option a des "enfants" alors on les affiche uniquement si elle est cochée et on coche / décoche les enfants en fonction de la coche du parent */
+                if (param_children && param_children.length > 0) {
                     param_children.forEach((param_child) => {
-                        let child = document.getElementById(param_child.id);
-                        if (event.target.checked) {
-                            child.classList.remove('hidden');
-                        } else {
-                            child.classList.add('hidden');
-                        }
+                        new_params[param_child.id] = event.target.checked;
+                        let child_input = document.querySelector(`#${param_child.id}_input`);
+                        child_input.checked = event.target.checked;
                     });
+                    if (event.target.checked) {
+                        param_container.classList.add('param-has-children');
+                    } else {
+                        param_container.classList.remove('param-has-children');
+                    }
                 }
+                GM.setValue(gm_parameters_key, new_params);
+                GM.getValue(gm_parameters_key).then((saved_params) => {
+                    mho_parameters = saved_params;
+                });
 
                 // Quand on change une option, trigger à nouveau certaines vérifications pour ne pas avoir à les vérifier tout le temps (=> perf !)
                 initOptionsWithLoginNeeded();
                 initOptionsWithoutLoginNeeded();
             });
-
-            let param_container = document.createElement('li');
-            param_container.id = param.id;
-            param_container.appendChild(param_input);
-            param_container.appendChild(param_label);
-
-            if (param.help) {
-                let param_help = createHelpButton(getI18N(param.help));
-                param_help.setAttribute('style', 'float: right; margin-top: 4px');
-                param_container.appendChild(param_help);
-            }
-
-            /** Si l'option a un parent, alors on ajoute une marge et on l'affiche uniquement si elle est cochée */
-            if (param.parent_id) {
-                param_container.setAttribute('style', 'margin-left: 1em;');
-                if (!mho_parameters || !mho_parameters[param.parent_id]) {
-                    param_container.classList.add('hidden');
-                }
-            }
-            category_content.appendChild(param_container);
         });
 
     });
-    return categories_container;
 }
 
 /** Crée la fenêtre de wiki */
@@ -3609,10 +3781,18 @@ function clickOnVotedToRedirect() {
     }
 }
 
+function displaySearchFields() {
+    if (mho_parameters.display_search_fields) {
+        displaySearchFieldOnBuildings();
+        displaySearchFieldOnRecipientList();
+        displaySearchFieldOnRegistry();
+    }
+}
+
 /** Si l'option associée est activée, affiche un champ de recherche sur la page de chantiers */
 function displaySearchFieldOnBuildings() {
     let search_field = document.getElementById(mho_search_building_field_id);
-    if (mho_parameters.display_search_fields && pageIsConstructions()) {
+    if (mho_parameters.display_search_field_buildings && pageIsConstructions()) {
         if (search_field) return;
 
         let tabs = document.querySelector('ul.buildings-tabs');
@@ -3624,16 +3804,16 @@ function displaySearchFieldOnBuildings() {
             search_field = document.createElement('input');
             search_field.type = 'text';
             search_field.id = mho_search_building_field_id;
-            search_field.placeholder = getI18N(texts.search_building);
+            search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
             search_field.classList.add('inline');
             search_field.setAttribute('style', 'min-width: 250px; margin-top: 1em; padding-left: 24px;');
 
             let buildings = Array.from(document.querySelectorAll('.buildings') || []);
-            let building_rows = [];
-            buildings.forEach((building) => {
-                building_rows.push(...Array.from(building.querySelectorAll('.row-flex')));
-            })
             search_field.addEventListener('keyup', (event) => {
+                let building_rows = [];
+                buildings.forEach((building) => {
+                    building_rows.push(...Array.from(building.querySelectorAll('.row-flex')));
+                });
                 building_rows.forEach((building_row) => {
                     if (building_row.getElementsByTagName('span')[0].innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {
                         building_row.classList.remove('hidden');
@@ -3658,6 +3838,7 @@ function displaySearchFieldOnBuildings() {
             header_mho_img.style.height = '24px';
             header_mho_img.style.position = 'relative';
             header_mho_img.style.left = '-250px';
+            header_mho_img.style.top = '-2px';
             search_field_container.appendChild(header_mho_img);
             tabs_block.insertBefore(search_field_container, tabs);
         }
@@ -3669,7 +3850,7 @@ function displaySearchFieldOnBuildings() {
 /** Si l'option associée est activée, affiche un champ de recherche sur la liste des destinataires d'un message */
 function displaySearchFieldOnRecipientList() {
     let search_field = document.getElementById(mho_search_recipient_field_id);
-    if (mho_parameters.display_search_fields && pageIsMsgReceived()) {
+    if (mho_parameters.display_search_field_recipients && pageIsMsgReceived()) {
         if (search_field) return;
 
         let recipients = document.querySelector('#recipient_list');
@@ -3679,13 +3860,12 @@ function displaySearchFieldOnRecipientList() {
             search_field = document.createElement('input');
             search_field.type = 'text';
             search_field.id = mho_search_recipient_field_id;
-            search_field.placeholder = getI18N(texts.search_recipient);
+            search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_recipients').label);
             search_field.classList.add('inline');
             search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
 
-            let recipients_list = Array.from(document.querySelectorAll('.recipient.link') || []);
-
             search_field.addEventListener('keyup', (event) => {
+                let recipients_list = Array.from(document.querySelectorAll('.recipient.link') || []);
                 recipients_list.forEach((recipient) => {
                     if (recipient.innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {
                         recipient.classList.remove('hidden');
@@ -3705,6 +3885,78 @@ function displaySearchFieldOnRecipientList() {
 
             search_field_container.appendChild(header_mho_img);
             recipients.insertBefore(search_field_container, recipients.firstElementChild);
+        }
+    } else if (search_field) {
+        search_field.parentElement.remove();
+    }
+}
+
+/** Si l'option associée est activée, affiche un champ de recherche sur le registre */
+function displaySearchFieldOnRegistry() {
+    let search_field = document.getElementById(mho_search_registry_field_id);
+    if (mho_parameters.display_search_field_registry) {
+
+        if (search_field) return;
+
+        let logs = document.querySelector('hordes-log');
+
+        if (logs) {
+            let search_field_container = document.createElement('div');
+            let logs_title = logs.parentElement.previousElementSibling;
+
+            search_field = document.createElement('input');
+            search_field.type = 'text';
+            search_field.id = mho_search_registry_field_id;
+            search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_registry').label);
+            search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
+
+            search_field_container.appendChild(search_field);
+
+            let header_mho_img = document.createElement('img');
+            header_mho_img.src = mh_optimizer_icon;
+            header_mho_img.style.height = '24px';
+            header_mho_img.style.position = 'absolute';
+
+            search_field_container.appendChild(header_mho_img);
+
+            if (logs_title) {
+                if (logs_title.tagName.toLowerCase() === 'H5'.toLowerCase()) {
+
+                    search_field_container.style.marginRight = '0.5em';
+                    search_field_container.style.float = 'right';
+                    search_field_container.style.position = 'relative';
+                    search_field_container.style.bottom = '7px';
+
+                    search_field.classList.add('inline');
+
+
+                    let first_link = logs_title.querySelector('a');
+                    if (first_link) {
+                        first_link.style.marginLeft = 'auto';
+                    }
+
+                    header_mho_img.style.left = 0;
+                } else {
+                    search_field_container.style.display = 'flex';
+                    search_field_container.style.justifyContent = 'center';
+
+                    header_mho_img.style.left = '4px';
+                }
+
+                logs_title.appendChild(search_field_container)
+
+
+                search_field.addEventListener('keyup', (event) => {
+                    let logs_list = Array.from(document.querySelectorAll('.log-entry .log-part-content') || []);
+                    logs_list.forEach((log) => {
+                        if (log.innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {
+                            log.parentElement.classList.remove('hidden');
+                        } else {
+                            log.parentElement.classList.add('hidden');
+                        }
+                    });
+                });
+            }
         }
     } else if (search_field) {
         search_field.parentElement.remove();
@@ -4673,7 +4925,7 @@ function displayMap() {
     let transformRuinMapping = (map) => {
         table = document.createElement('table');
         table.setAttribute('style', 'border-collapse: collapse;');
-        table.classList.add('mho-map');
+        table.classList.add('mho-ruin');
         let init_col_tr = document.createElement('tr');
         table.appendChild(init_col_tr);
 
@@ -4976,25 +5228,19 @@ function displayOptimalPath(html, response) {
 
 /** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
 function preventFromLeaving() {
-    if (mho_parameters.prevent_from_leaving && pageIsDesert()) {
+    if (mho_parameters.alert_if_no_escort && mho_parameters.prevent_from_leaving && pageIsDesert()) {
         let prevent_function = (event) => {
             let e = event || window.event;
 
-            let buttons = document.getElementsByTagName('button');
-            let ae_button;
-            for (let button of buttons) {
-                if (button.getAttribute('x-toggle-escort') && !button.classList.contains('inline') && button.getAttribute('x-toggle-escort') === '1') {
-                    ae_button = button;
-
-                    let mho_leaving_info = document.getElementById('mho-leaving-info');
-                    if (!mho_leaving_info) {
-                        mho_leaving_info = document.createElement('div');
-                        mho_leaving_info.id = 'mho-leaving-info';
-                        mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                        mho_leaving_info.innerHTML = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.prevent_not_in_ae);
-                        button.parentNode.insertBefore(mho_leaving_info, button.nextSibling);
-                    }
-
+            let ae_button = document.querySelector('button[x-toggle-escort="1"]');
+            if (ae_button) {
+                let mho_leaving_info = document.getElementById('mho-leaving-info');
+                if (!mho_leaving_info) {
+                    mho_leaving_info = document.createElement('div');
+                    mho_leaving_info.id = 'mho-leaving-info';
+                    mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
+                    mho_leaving_info.innerHTML = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.prevent_not_in_ae);
+                    ae_button.parentNode.insertBefore(mho_leaving_info, ae_button.nextSibling);
                 }
             }
 
@@ -5023,6 +5269,41 @@ function preventFromLeaving() {
         }
 
         window.addEventListener('beforeunload', prevent_function, false);
+    }
+}
+
+/** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
+function alertIfInactiveAndNoEscort() {
+    if (mho_parameters.alert_if_no_escort && mho_parameters.alert_if_inactive && pageIsDesert()) {
+
+        let ae_button = document.querySelector('button[x-toggle-escort="1"]');
+        let is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
+
+        let notify = () => {
+            GM_notification({
+                text: getI18N(ae_button ? texts.prevent_not_in_ae : texts.escort_not_released),
+                title: GM_info.script.name,
+                highlight: true,
+                timeout: 0
+            })
+        };
+
+        if (ae_button || is_escorting) {
+
+            const timer = 300000;
+
+            let timeout = setTimeout(notify, timer);
+
+            document.addEventListener('click', () => {
+                clearTimeout(timeout);
+                timeout = setTimeout(timeout, timer)
+            });
+
+            document.addEventListener('mousemove', () => {
+                clearTimeout(timeout);
+                timeout = setTimeout(timeout, timer)
+            });
+        }
     }
 }
 
@@ -5350,9 +5631,13 @@ function displayEstimationsOnWatchtower() {
         const watchtower_estim_block_prediction = watchtower_estim_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
 
         if (watchtower_estim_block && watchtower_estim_block_prediction) {
+            const current_estimation_percent = +watchtower_estim_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || 100;
+
+            const watchtower_planif_block = watchtower_estim_block.nextElementSibling;
+            const watchtower_planif_block_prediction = watchtower_planif_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
+            const current_planif_percent = +watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || 100;
+
             getEstimations().then((estimations) => {
-                let saved_estimations = estimations;
-                let updated_estimations = estimations;
 
                 estim_block = document.createElement('div');
                 estim_block.style.marginTop = '1em';
@@ -5379,51 +5664,73 @@ function displayEstimationsOnWatchtower() {
                 let estim_block_title_save_button = document.createElement('button');
                 estim_block_title_save_button.style.flex = '0';
                 estim_block_title_save_button.style.margin = '0';
-                estim_block_title_save_button.innerText = '💾';
+                estim_block_title_save_button.innerText = `💾`;
+                estim_block_title_save_button.title = getI18N(texts.save);
                 estim_block_title.appendChild(estim_block_title_save_button);
 
                 estim_block_title_save_button.addEventListener('click', () => {
-                    saveEstimations(updated_estimations);
+                    saveEstimations({
+                            percent: current_estimation_percent,
+                            value: {
+                                min: watchtower_estim_block_prediction?.split(' ')[0],
+                                max: watchtower_estim_block_prediction?.split(' ')[2]
+                            }
+                        },
+                        {
+                            percent: current_planif_percent,
+                            value: {
+                                min: watchtower_planif_block_prediction?.split(' ')[0],
+                                max: watchtower_planif_block_prediction?.split(' ')[2]
+                            }
+                        })
+                        .then(() => {
+                            estim_block_title_save_button.innerHTML = `<img src="${repo_img_hordes_url}icons/done.png">`;
+                        });
                 });
 
                 let estim_block_title_share_button = document.createElement('button');
                 estim_block_title_share_button.style.flex = '0';
                 estim_block_title_share_button.style.margin = '0';
-                estim_block_title_share_button.innerText = '⧉';
+                estim_block_title_share_button.style.whiteSpace = 'nowrap';
+                estim_block_title_share_button.innerText = `⧉ ${getI18N(texts.copy_forum)}`;
+                estim_block_title_share_button.title = `${getI18N(texts.copy_forum_watchtower_tooltip)}`;
                 estim_block_title.appendChild(estim_block_title_share_button);
 
                 estim_block_title_share_button.addEventListener('click', () => {
-                    let text = '';
-                    /** Ajout du titre **/
-                    text += `[big][b][bad]J${updated_estimations.day}[/bad][/b][/big]{hr}\n`;
+                    getEstimations().then((saved_estimations) => {
+                        let text = '';
+                        /** Ajout du titre **/
+                        text += `[big][b][bad]J${saved_estimations.day}[/bad][/b][/big]{hr}\n`;
 
-                    /** Ajout du titre "Attaque du jour" */
-                    text += `[i]${getI18N(texts.estim_title)} (J${updated_estimations.day})[/i]\n`;
+                        /** Ajout du titre "Attaque du jour" */
+                        text += `[i]${getI18N(texts.estim_title)} (J${saved_estimations.day})[/i]\n`;
 
-                    /** Ajout des valeurs du jour */
-                    TDG_VALUES.forEach((value_key) => {
-                        const value = updated_estimations.estim['_' + value_key];
-                        if (value) {
-                            text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
-                        }
+                        /** Ajout des valeurs du jour */
+                        TDG_VALUES.forEach((value_key) => {
+                            const value = saved_estimations.estim['_' + value_key];
+                            if (value && (value.min || value.max)) {
+                                text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
+                            }
+                        });
+
+                        text += '{hr}\n';
+
+                        /** Ajout du titre "Attaque du lendemain" */
+                        text += `[i]${getI18N(texts.planif_title)} (J${saved_estimations.day + 1})[/i]\n`;
+
+                        /** Ajout des valeurs du lendemain */
+                        PLANIF_VALUES.forEach((value_key) => {
+                            const value = saved_estimations.planif['_' + value_key];
+                            if (value && (value.min || value.max)) {
+                                text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
+                            }
+                        });
+
+                        text += '{hr}';
+
+                        copyToClipboard(text);
+                        estim_block_title_share_button.innerHTML = `<img src="${repo_img_hordes_url}icons/done.png">`;
                     });
-
-                    text += '{hr}\n';
-
-                    /** Ajout du titre "Attaque du lendemain" */
-                    text += `[i]${getI18N(texts.planif_title)} (J${updated_estimations.day + 1})[/i]\n`;
-
-                    /** Ajout des valeurs du lendemain */
-                    PLANIF_VALUES.forEach((value_key) => {
-                        const value = updated_estimations.planif['_' + value_key];
-                        if (value) {
-                            text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
-                        }
-                    });
-
-                    text += '{hr}';
-
-                    copyToClipboard(text);
                 });
 
                 small_note.parentElement.insertBefore(estim_block, small_note);
@@ -5444,22 +5751,16 @@ function displayEstimationsOnWatchtower() {
                 estim_values_block.appendChild(estim_values_block_title);
 
                 TDG_VALUES.forEach((value) => {
-                    if (!updated_estimations.estim['_' + value]) {
-                        updated_estimations.estim['_' + value] = {min: null, max: null};
+                    if (!estimations.estim['_' + value]) {
+                        estimations.estim['_' + value] = {min: null, max: null};
                     }
-                    console.log('test', updated_estimations);
                     let value_block = document.createElement('div');
                     value_block.style.display = 'flex';
                     value_block.style.justifyContent = 'space-between';
-
-                    value_block.innerHTML = `<label for="estim_${value}"></label>${value}%<div id="estim_${value}"><input class="start" style="width: 100px"> - <input class="end" style="width: 100px"></div>`
+                    value_block.style.gap = '1em';
                     estim_values_block.appendChild(value_block);
 
-                    let value_start = document.querySelector(`div#estim_${value}>input.start`);
-                    let value_end = document.querySelector(`div#estim_${value}>input.end`);
-
-                    let updated_estimation = updated_estimations.estim['_' + value];
-                    let current_estimation_percent = +watchtower_estim_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || 100;
+                    let estimation = estimations.estim['_' + value];
 
                     if (current_estimation_percent === value) {
                         let current_estimation_value = {
@@ -5467,20 +5768,12 @@ function displayEstimationsOnWatchtower() {
                             max: watchtower_estim_block_prediction.split(' ')[2]
                         };
                         if (current_estimation_percent && current_estimation_value) {
-
-                            updated_estimation.min = current_estimation_value.min;
-                            updated_estimation.max = current_estimation_value.max;
+                            estimation.min = current_estimation_value.min;
+                            estimation.max = current_estimation_value.max;
                         }
                     }
-                    if (updated_estimation) {
-                        value_start.value = updated_estimation.min;
-                        value_end.value = updated_estimation.max;
-                    }
+                    value_block.innerHTML = `<b style="color: #afb3cf; opacity: .8;">[${value}%]</b><div id="estim_${value}"><span class="start" style="width: 100px">${estimation?.min || ''}</span> - <span class="end" style="width: 100px">${estimation?.max || ''}</span><img src="${repo_img_hordes_url}emotes/zombie.gif"></div>`
                 });
-
-
-                const watchtower_planif_block = watchtower_estim_block.nextElementSibling;
-                const watchtower_planif_block_prediction = watchtower_planif_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
 
                 if (watchtower_planif_block && watchtower_planif_block_prediction) {
 
@@ -5493,38 +5786,29 @@ function displayEstimationsOnWatchtower() {
                     planif_values_block.appendChild(planif_values_block_title);
 
                     PLANIF_VALUES.forEach((value) => {
-                        if (!updated_estimations.planif['_' + value]) {
-                            updated_estimations.planif['_' + value] = {min: null, max: null};
+                        if (!estimations.planif['_' + value]) {
+                            estimations.planif['_' + value] = {min: null, max: null};
                         }
 
                         let value_block = document.createElement('div');
                         value_block.style.display = 'flex';
                         value_block.style.justifyContent = 'space-between';
-
-                        value_block.innerHTML = `<label for="planif_${value}">${value}%</label><div id="planif_${value}"><input class="start" style="width: 100px"> - <input class="end" style="width: 100px"></div>`
+                        value_block.style.gap = '1em';
                         planif_values_block.appendChild(value_block);
 
-                        let value_start = document.querySelector(`div#planif_${value}>input.start`);
-                        let value_end = document.querySelector(`div#planif_${value}>input.end`);
+                        let estimation = estimations.planif['_' + value];
 
-                        let updated_estimation = updated_estimations.planif['_' + value];
-                        let current_estimation_percent = +watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || 100;
-
-                        if (current_estimation_percent === value) {
+                        if (current_planif_percent === value) {
                             let current_estimation_value = {
                                 min: watchtower_planif_block_prediction.split(' ')[0],
                                 max: watchtower_planif_block_prediction.split(' ')[2]
                             };
-                            if (current_estimation_percent && current_estimation_value) {
-
-                                updated_estimation.min = current_estimation_value.min;
-                                updated_estimation.max = current_estimation_value.max;
+                            if (current_planif_percent && current_estimation_value) {
+                                estimation.min = current_estimation_value.min;
+                                estimation.max = current_estimation_value.max;
                             }
                         }
-                        if (updated_estimation) {
-                            value_start.value = updated_estimation.min;
-                            value_end.value = updated_estimation.max;
-                        }
+                        value_block.innerHTML = `<b style="color: #afb3cf; opacity: .8;">[${value}%]</b><div id="planif_${value}"><span class="start" style="width: 100px">${estimation?.min || ''}</span> - <span class="end" style="width: 100px">${estimation?.max || ''}</span><img src="${repo_img_hordes_url}emotes/zombie.gif"></div>`
                     });
                 }
             });
@@ -5785,7 +6069,7 @@ function displayCampingPredict() {
                 }
                 let conf = {
                     town: mh_user.townDetails.townType.toLowerCase(),
-                    job: jobs.find((job) => mh_user.jobDetails.uid === job.img),
+                    job: jobs.find((job) => mh_user.jobDetails.uid === job.img).id,
                     distance: document.querySelector('.zone-dist > div > b')?.innerText.replace('km', ''), // OK
                     campings: 0,
                     pro: false,
@@ -5801,7 +6085,6 @@ function displayCampingPredict() {
                     object_improve: 0,
                     ruin: ruin
                 }
-                // console.log('conf', conf);
 
                 let my_info = document.createElement('div');
                 camping_predict_container.appendChild(my_info);
@@ -6113,6 +6396,7 @@ function addCopyRegisterButton() {
             copy_button.style.borderRadius = '6px';
             copy_button.style.padding = '3px 5px';
             copy_button.style.cursor = 'pointer';
+            copy_button.title = getI18N(texts.copy_registry);
 
             copy_button.addEventListener('click', () => {
                 let entries = logs.querySelectorAll('.log-entry');
@@ -6129,7 +6413,7 @@ function addCopyRegisterButton() {
             if (title) {
                 if (title.tagName.toLowerCase() === 'H5'.toLowerCase()) {
 
-                    copy_button.style.marginRight = '1em';
+                    copy_button.style.marginRight = '0.5em';
                     copy_button.style.float = 'right';
                     copy_button.style.position = 'relative';
                     copy_button.style.bottom = '7px';
@@ -6146,6 +6430,26 @@ function addCopyRegisterButton() {
 
             }
         }
+    }
+}
+
+function changeDefaultEscortOptions() {
+    if (mho_parameters.default_escort_options && pageIsDesert()) {
+        const btn_activate_escort = document.querySelector('button[x-toggle-escort="1"]');
+        if (!btn_activate_escort) return;
+
+        btn_activate_escort.addEventListener('click', () => {
+            document.addEventListener('mh-navigation-complete', () => {
+                const escort_force_return = document.querySelector('#escort_force_return');
+                if (escort_force_return.checked !== mho_parameters.default_escort_force_return) {
+                    escort_force_return.click();
+                }
+                const escort_allow_rucksack = document.querySelector('#escort_allow_rucksack');
+                if (escort_allow_rucksack.checked !== mho_parameters.default_escort_allow_rucksack) {
+                    escort_allow_rucksack.click();
+                }
+            }, {once: true});
+        });
     }
 }
 
@@ -6285,6 +6589,15 @@ function createCopyButton(source, map, map_id, button_block_id) {
 
 /** Add styles to this page */
 function createStyles() {
+    const params_style = `.param-has-children > div::after {`
+        + `content: '▶︎';`
+        + `margin-left: auto;`
+        + `}`;
+
+    const params_style_children_hover = `.param-has-children:hover > ul {`
+        + `display: block !important;`
+        + `}`;
+
     const btn_style = `#${btn_id} {`
         + 'background-color: #5c2b20;'
         + 'border: 1px solid #f0d79e;'
@@ -6528,10 +6841,6 @@ function createStyles() {
         + 'margin: 1em 0 0.5em;'
         + '}';
 
-    const parameters_informations_style = '#categories, .parameters, #informations {'
-        + 'margin-top: 0.5em;'
-        + '}';
-
     const parameters_informations_ul_style = '#categories > ul, ul.parameters, #informations > ul {'
         + 'padding: 0;'
         + 'margin: 0;'
@@ -6725,6 +7034,16 @@ function createStyles() {
         + `vertical-align: middle;`
         + `}`;
 
+    const mho_ruin_td = `.mho-ruin tr td {`
+        + `border: 1px dotted;`
+        + `width: 30px;`
+        + `min-width: 30px;`
+        + `height: 30px;`
+        + `min-height: 30px;`
+        + `text-align: center;`
+        + `vertical-align: middle;`
+        + `}`;
+
     const dotted_background = '.dotted-background {'
         + `background-image: -moz-linear-gradient(45deg, #444 25%, transparent 25%),
                          -moz-linear-gradient(-45deg, #444 25%, transparent 25%),
@@ -6789,17 +7108,17 @@ function createStyles() {
         + `}`;
 
 
-    let css = btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
+    let css = params_style + params_style_children_hover + btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
         + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
         + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
         + tabs_style + tabs_ul_style + tabs_ul_li_style + tabs_ul_li_spacing_style + tabs_ul_li_div_style + tabs_ul_li_div_hover_style + tabs_ul_li_selected_style
         + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
-        + parameters_informations_style + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
+        + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
         + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style + label_text
         + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + item_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
         + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
         + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
-        + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
+        + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
         + citizen_list_more_info_header_content;
 
     let style = document.createElement('style');
@@ -7754,8 +8073,8 @@ function updateExternalTools() {
         data.map.toolsToUpdate = {
             isBigBrothHordes: mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : 'none',
             isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
-            isGestHordes: mho_parameters && mho_parameters.update_gh ? (mho_parameters.update_gh_without_api && pageIsDesert() && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none',
-            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? (pageIsDesert() && (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none'
+            isGestHordes: mho_parameters && mho_parameters.update_gh ? (pageIsDesert() && ((mho_parameters.update_gh_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_gh_devastated && mh_user.townDetails.isDevaste)) ? 'cell' : 'api') : 'none',
+            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? (pageIsDesert() && ((mho_parameters.update_mho_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_mho_devastated && mh_user.townDetails.isDevaste)) ? 'cell' : 'api') : 'none'
         };
 
         let position = getCurrentPosition();
@@ -7772,7 +8091,8 @@ function updateExternalTools() {
             citizen_list = [{id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid}];
         }
 
-        if ((mho_parameters.update_gh_without_api || mho_parameters.update_mho) && pageIsDesert()) {
+        // Mise à jour en ville dévastée
+        if (((mho_parameters.update_gh && mho_parameters.update_gh_devastated) || (mho_parameters.update_mho && mho_parameters.update_mho_devastated)) && pageIsDesert() && mh_user.townDetails.isDevaste) {
             let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
                 let item = convertImgToItem(desert_item.querySelector('img'));
                 return {id: item.id, isBroken: desert_item.classList.contains('broken')};
@@ -7782,16 +8102,38 @@ function updateExternalTools() {
                 x: +position[0],
                 y: +position[1],
                 zombies: +document.querySelectorAll('.actor.zombie').length,
-                deadZombies: nb_dead_zombies,
                 zoneEmpty: !!document.querySelector('#mgd-empty-zone-note'),
                 objects: convertListOfSingleObjectsIntoListOfCountedObjects(objects),
                 citizenId: citizen_list.map((citizen) => citizen.id)
             }
-            if (nb_dead_zombies > 0 || mh_user.townDetails.isDevaste) {
+            if (data.map.cell) {
+                data.map.cell.zombies = content.zombies;
+                data.map.cell.zoneEmpty = content.zoneEmpty;
+                data.map.cell.objects = content.objects;
+                data.map.cell.citizenId = content.citizenId;
+            } else {
                 data.map.cell = content;
             }
         }
 
+        // Mise à jour du nombre de zombies tués
+        if (((mho_parameters.update_gh && mho_parameters.update_gh_killed_zombies) || (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies)) && pageIsDesert() && nb_dead_zombies > 0) {
+            let content = {
+                x: +position[0],
+                y: +position[1],
+                deadZombies: nb_dead_zombies,
+                citizenId: citizen_list.map((citizen) => citizen.id)
+            }
+
+            if (data.map.cell) {
+                data.map.cell.deadZombies = nb_dead_zombies;
+                data.map.cell.citizenId = content.citizenId;
+            } else {
+                data.map.cell = content;
+            }
+        }
+
+        // Mise à jour du contenu des sacs
         if (mho_parameters.update_mho && mho_parameters.update_mho_bags) {
 
             data.bags = {}
@@ -7833,6 +8175,8 @@ function updateExternalTools() {
             data.bags.contents = rucksacks;
         }
 
+
+        // Mise à jour du contenu du coffre
         if (mho_parameters.update_mho && mho_parameters.update_mho_chest && pageIsHouse()) {
 
             data.chest = {}
@@ -8263,46 +8607,41 @@ function getEstimations() {
     });
 }
 
-function saveEstimations(new_estimations) {
+function saveEstimations(estim_value, planif_value) {
     return new Promise((resolve, reject) => {
-        let estimations_to_save = new_estimations;
-        for (let estim_key in estimations_to_save.estim) {
-            let estim = estimations_to_save.estim[estim_key];
-            if (!estim || (!estim.min && !estim.max)) {
-                estimations_to_save.estim[estim_key] = null;
+        getEstimations().then((estimations) => {
+            let new_estimations = estimations;
+            if (estim_value && estim_value.value && (estim_value.value.min || estim_value.value.max)) {
+                new_estimations.estim['_' + estim_value.percent] = estim_value.value;
             }
-        }
-        for (let planif_key in estimations_to_save.planif) {
-            let planif = estimations_to_save.planif[planif_key];
-            if (!planif || (!planif.min && !planif.max)) {
-                estimations_to_save.planif[planif_key] = null;
+            if (planif_value && planif_value.value && (planif_value.value.min || planif_value.value.max)) {
+                new_estimations.planif['_' + estim_value.percent] = estim_value.value;
             }
-        }
-
-        fetch(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails.townId}&userId=${mh_user.id}`, {
-            method: 'POST',
-            body: JSON.stringify(estimations_to_save),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response) => {
-                if (response.status === 200) {
-                    return response.text();
-                } else {
-                    addError(response);
-                    reject(response);
+            fetch(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails.townId}&userId=${mh_user.id}`, {
+                method: 'POST',
+                body: JSON.stringify(new_estimations),
+                headers: {
+                    'Content-Type': 'application/json'
                 }
             })
-            .then((response) => {
-                resolve(response);
-                endLoading();
-            })
-            .catch((error) => {
-                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
-                endLoading();
-                reject(error);
-            });
+                .then((response) => {
+                    if (response.status === 200) {
+                        return response.text();
+                    } else {
+                        addError(response);
+                        reject(response);
+                    }
+                })
+                .then((response) => {
+                    resolve(response);
+                    endLoading();
+                })
+                .catch((error) => {
+                    console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
+                    endLoading();
+                    reject(error);
+                });
+        });
     });
 }
 
