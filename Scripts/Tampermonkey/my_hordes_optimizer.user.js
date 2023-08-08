@@ -31,7 +31,6 @@
 //
 // ==/UserScript==
 
-
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
     + `[amélioration] Déplacement de la barre de traduction qui pouvait chevaucher des éléments du jeu\n`
     + `[amélioration] Amélioration de l'affichage des paramètres en particulier sur mobile ou sur un écran assez petit pour provoquer un défilement dans les paramètres\n\n`;
@@ -40,7 +39,6 @@ const lang = (document.documentElement.lang || navigator.language || navigator.u
 
 const is_mh_beta = document.URL.indexOf('staging') >= 0;
 const website = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
-
 
 const gm_bbh_updated_key = 'bbh_updated';
 const gm_gh_updated_key = 'gh_updated';
@@ -1990,14 +1988,10 @@ function createOptimizerBtn() {
         if (isTouchScreen()) {
             let close_link = document.createElement('img');
             close_link.src = `${repo_img_hordes_url}icons/b_close.png`;
-            close_link.classList.add('close')
             title_second_part.appendChild(close_link);
 
             close_link.addEventListener('click', () => {
-                optimizer_btn.classList.add('close');
-                setTimeout(() => {
-                    optimizer_btn.classList.remove('close');
-                }, 1000)
+                optimizer_btn.classList.remove('mho-btn-opened');
             });
         }
 
@@ -2010,6 +2004,13 @@ function createOptimizerBtn() {
         optimizer_btn.setAttribute('style', 'left: ' + left_position + 'px');
         optimizer_btn.addEventListener('click', (event) => {
             event.stopPropagation();
+        });
+        optimizer_btn.addEventListener('mouseenter', () => {
+            optimizer_btn.classList.add('mho-btn-opened');
+        });
+
+        optimizer_btn.addEventListener('mouseleave', () => {
+            optimizer_btn.classList.remove('mho-btn-opened');
         });
         content_zone.appendChild(optimizer_btn);
 
@@ -6652,11 +6653,11 @@ function createStyles() {
         + 'z-index: 997;'
         + '}';
 
-    const btn_hover_h1_span_style = `#${btn_id}:not(.close):hover h1 span, #${btn_id}:not(.close):hover h1 a, #${btn_id}:not(.close):hover h1 img.close {`
+    const btn_hover_h1_span_style = `#${btn_id}.mho-btn-opened h1 span, #${btn_id}.mho-btn-opened h1 a, #${btn_id}.mho-btn-opened h1 img.close {`
         + 'display: inline;'
         + '}';
 
-    const btn_hover_div_style = `#${btn_id}:not(.close):hover div {`
+    const btn_hover_div_style = `#${btn_id}.mho-btn-opened div {`
         + 'display: block;'
         + '}';
 
@@ -6680,7 +6681,7 @@ function createStyles() {
         + 'vertical-align: -9%;'
         + '}';
 
-    const btn_h1_hover_style = `#${btn_id}:hover h1 {`
+    const btn_h1_hover_style = `#${btn_id}.mho-btn-opened h1 {`
         + 'border-bottom: 1px solid #b37c4a;'
         + 'margin-bottom: 5px;'
         + '}'
