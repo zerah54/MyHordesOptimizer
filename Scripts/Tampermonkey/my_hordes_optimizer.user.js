@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.59
+// @version      1.0.0-beta.60
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -33,15 +33,8 @@
 
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `Attention certains changements peuvent avoir impacté vos options sélectionnées, assurez-vous que tout est en ordre !\n\n`
-    + `[correctif] Corrige l'affichage de certaines images qui ne s'affichaient pas toujours\n`
-    + `[correctif] Corrige la prise en compte du métier dans l'outil intégré de calcul de camping\n\n`
-    + `[amélioration] Réorganisation du menu dans lequel les options commençaient à prendre trop de place\n`
-    + `[amélioration] Séparation de certaines options (mise à jour en ville dévastée et envoi du nombre de zombies tués / champs de recherches)\n\n`
-    + `[nouveauté] Ajout d'une option pour enregistrer les estimations de la TDG dans MHO, consulter les valeurs enregistrées et les copier pour le forum\n`
-    + `[nouveauté] Ajout d'une option pour afficher un champ de recherche sur le registre\n`
-    + `[nouveauté] Ajout d'une option pour choisir ses options d'escorte à appliquer à l'activation de l'attente d'escorte\n`
-    + `[nouveauté] Ajout d'une option pour notifier l'utilisateur en cas d'inactivité de plus de 5 minutes si il n'a pas relâché l'escorte ou qu'il ne s'est pas mis en attente d'escorte\n`;
+    + `[amélioration] Déplacement de la barre de traduction qui pouvait chevaucher des éléments du jeu\n`
+    + `[amélioration] Amélioration de l'affichage des paramètres en particulier sur mobile ou sur un écran assez petit pour provoquer un défilement dans les paramètres\n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -106,6 +99,7 @@ const nb_dead_zombies_id = 'nb-dead-zombies';
 const despair_deaths_id = 'despair-deaths';
 const mho_copy_map_id = 'mho-copy-map';
 const mho_opti_map_id = 'mho-opti-map';
+const mho_header_space_id = 'mho-header-space'
 const mho_display_map_id = 'mho-display-map';
 const mho_search_building_field_id = 'mho-search-building-field';
 const mho_search_recipient_field_id = 'mho-search-recipient-field';
@@ -1814,6 +1808,10 @@ function addError(error) {
     console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
 }
 
+function isTouchScreen() {
+    return 'ontouchstart' in window || navigator.msMaxTouchPoints;
+}
+
 /** Calcule le nombre de zombies qui vont mourir par désespoir */
 function calculateDespairDeaths(nb_killed_zombies) {
     return Math.floor(Math.max(0, (nb_killed_zombies - 1) / 2));
@@ -1865,7 +1863,6 @@ function getItemFromImg(img_src) {
 function initOptionsWithLoginNeeded() {
     /** Gère le bouton de mise à jour des outils externes) */
     if (!buttonOptimizerExists()) {
-        createStyles();
         createOptimizerBtn();
         createWindow();
     }
@@ -1924,7 +1921,7 @@ function createSelectWithSearch() {
 
     let close = document.createElement('div');
     close.innerHTML = '&#128473';
-    close.setAttribute('style', 'position: relative; float: right; top: -25px; color: #5c2b20;');
+    close.setAttribute('style', 'position: relative; float: right; top: -23px; color: #5c2b20;');
 
     select.appendChild(input);
     select.appendChild(close);
@@ -1977,6 +1974,9 @@ function createOptimizerBtn() {
         title.appendChild(title_first_part);
 
         let title_second_part = document.createElement('div');
+        title_second_part.style.display = 'flex';
+        title_second_part.style.alignItems = 'center';
+        title_second_part.style.gap = '0.5em';
         title.appendChild(title_second_part);
 
         let website_link = document.createElement('a');
@@ -1986,6 +1986,20 @@ function createOptimizerBtn() {
         website_link.style.cursor = 'pointer';
 
         title_second_part.appendChild(website_link);
+
+        if (isTouchScreen()) {
+            let close_link = document.createElement('img');
+            close_link.src = `${repo_img_hordes_url}icons/b_close.png`;
+            close_link.classList.add('close')
+            title_second_part.appendChild(close_link);
+
+            close_link.addEventListener('click', () => {
+                optimizer_btn.classList.add('close');
+                setTimeout(() => {
+                    optimizer_btn.classList.remove('close');
+                }, 1000)
+            });
+        }
 
         title_first_part.appendChild(img);
         title_first_part.appendChild(title_hidden);
@@ -2151,7 +2165,7 @@ function createParams(content) {
 
             let param_label = document.createElement('label');
             param_label.classList.add('small');
-            param_label.htmlFor = param.id + '_input';
+            param_label.htmlFor = window.innerWidth > 1000 ? param.id + '_input' : '';
             param_label.innerText = getI18N(param.label);
             param_input_div.appendChild(param_label);
 
@@ -2186,6 +2200,18 @@ function createParams(content) {
                 } else {
                     children_container.style.paddingLeft = '1em';
                 }
+
+                param_container.addEventListener('mouseenter', () => {
+                    if (param_input.checked) {
+                        children_container.style.display = 'block';
+                    }
+                });
+
+                param_container.addEventListener('mouseleave', () => {
+                    setTimeout(() => {
+                        children_container.style.display = 'none';
+                    }, 250);
+                });
 
                 param_children.forEach((param_child) => {
                     let child_container = document.createElement('li');
@@ -2232,6 +2258,11 @@ function createParams(content) {
                         GM.getValue(gm_parameters_key).then((saved_params) => {
                             mho_parameters = saved_params;
                         });
+                        if (event.target.checked) {
+                            children_container.style.display = 'block';
+                        } else {
+                            children_container.style.display = 'none';
+                        }
 
                         // Quand on change une option, trigger à nouveau certaines vérifications pour ne pas avoir à les vérifier tout le temps (=> perf !)
                         initOptionsWithLoginNeeded();
@@ -2275,6 +2306,37 @@ function createParams(content) {
         });
 
     });
+}
+
+function createMhoHeaderSpace() {
+    let interval = setInterval(() => {
+        let header_space = document.querySelector(`#${mho_header_space_id}`);
+        if (!header_space) {
+            let postbox = document.getElementById('postbox');
+            if (postbox && postbox.clientWidth && postbox.clientWidth > 0) {
+                let header_space = document.querySelector(`#${mho_header_space_id}`);
+                let mh_header = document.querySelector('#header');
+
+                header_space = document.createElement('div');
+                header_space.id = mho_header_space_id;
+
+                header_space.style.position = 'absolute';
+                header_space.style.right = `calc(${postbox.clientWidth}px + 10px + 0.5em)`;
+                header_space.style.top = postbox.getBoundingClientRect().y + 'px';
+                header_space.style.display = 'flex';
+                header_space.style.gap = '0.5em';
+                header_space.style.alignItems = 'flex-start';
+                header_space.style.zIndex = '996';
+
+                mh_header.appendChild(header_space);
+            } else {
+                clearInterval(interval);
+                createMhoHeaderSpace();
+            }
+        } else {
+            clearInterval(interval);
+        }
+    }, 100);
 }
 
 /** Crée la fenêtre de wiki */
@@ -2359,8 +2421,9 @@ function createTabs(window_type) {
             dispatchContent(window_type, tab);
         }
 
+        const tab_content = document.getElementById('tab-content');
         tab_li.addEventListener('click', () => {
-            if (!tab_li.classList.contains('selected')) {
+            if (!tab_li.classList.contains('selected') && tab_content !== '' && tab_content !== undefined && tab_content !== null) {
                 for (let li of tabs_ul.children) {
                     li.classList.remove('selected');
                 }
@@ -4735,53 +4798,39 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
 }
 
 function createDisplayMapButton() {
-    let interval = setInterval(() => {
-        let display_map_btn = document.getElementById(mho_display_map_id);
+    let display_map_btn = document.getElementById(mho_display_map_id);
 
-        if (mho_parameters.display_map) {
-            if (display_map_btn) return;
+    if (mho_parameters.display_map) {
+        const mho_header_space = document.getElementById(mho_header_space_id);
+        if (display_map_btn || !mho_header_space) return;
 
-            let btn_container = document.createElement('div');
-            btn_container.id = mho_display_map_id;
-            setTimeout(() => {
-                let postbox = document.getElementById('postbox');
-                let position = postbox.getBoundingClientRect().width + 15;
-                btn_container.setAttribute('style', `right: ${position}px`);
-            }, 500);
-            let btn = document.createElement('div');
-            btn.style.display = 'flex';
-            btn.style.gap = '0.5em';
+        let btn_container = document.createElement('div');
+        btn_container.id = mho_display_map_id;
 
-            let postbox_img = document.querySelector('#postbox img');
+        let postbox_img = document.querySelector('#postbox img');
 
-            let btn_mho_img = document.createElement('img');
-            btn_mho_img.src = mh_optimizer_icon;
-            btn_mho_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
-            btn.appendChild(btn_mho_img);
+        let btn_mho_img = document.createElement('img');
+        btn_mho_img.src = mh_optimizer_icon;
+        btn_mho_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
+        btn_container.appendChild(btn_mho_img);
 
-            let btn_img = document.createElement('img');
-            btn_img.src = repo_img_hordes_url + 'emotes/explo.gif';
-            btn_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
-            btn.appendChild(btn_img);
+        let btn_img = document.createElement('img');
+        btn_img.src = repo_img_hordes_url + 'emotes/explo.gif';
+        btn_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
+        btn_container.appendChild(btn_img);
 
-            btn.addEventListener('click', (event) => {
-                event.stopPropagation();
-                event.preventDefault();
-                displayMapContent();
-            })
+        btn_container.addEventListener('click', (event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            displayMapContent();
+        });
 
-            btn_container.appendChild(btn);
+        mho_header_space.appendChild(btn_container);
 
-            const header = document.getElementById('header');
-            header.appendChild(btn_container);
-
-            createMapWindow();
-            clearInterval();
-        } else if (display_map_btn) {
-            display_map_btn.remove();
-            clearInterval(interval);
-        }
-    }, 3000);
+        createMapWindow();
+    } else if (display_map_btn) {
+        display_map_btn.remove();
+    }
 }
 
 function displayMapContent() {
@@ -5429,8 +5478,8 @@ function displayTranslateTool() {
     if (mho_parameters.display_translate_tool) {
         if (display_translate_input) return;
 
-        let gma = document.getElementById('gma');
-        if (!gma) return;
+        const mho_header_space = document.getElementById(mho_header_space_id);
+        if (!mho_header_space) return;
 
         let langs = [
             {value: 'de', img: '🇩🇪'},
@@ -5440,23 +5489,23 @@ function displayTranslateTool() {
         ]
         let mho_display_translate_input_div = createSelectWithSearch();
         mho_display_translate_input_div.id = mho_display_translate_input_id;
-        mho_display_translate_input_div.setAttribute('style', 'position: absolute; top: 45px; right: 8px; margin: 0; width: 250px; height: 25px;');
+        mho_display_translate_input_div.setAttribute('style', 'margin: 0; width: 200px; height: 22px;');
         let label = mho_display_translate_input_div.firstElementChild;
 
         let input = label.firstElementChild;
-        input.setAttribute('style', 'width: calc(100% - 35px); display: inline-block; padding-right: 40px');
+        input.setAttribute('style', 'width: calc(100% - 35px); display: inline-block; padding-right: 40px; height: 22px');
 
         let btn_mho_img = document.createElement('img');
         btn_mho_img.src = mh_optimizer_icon;
-        btn_mho_img.style.height = '24px';
+        btn_mho_img.style.height = '22px';
         btn_mho_img.style.float = 'right';
         btn_mho_img.style.position = 'relative';
-        btn_mho_img.style.top = '-25px';
+        btn_mho_img.style.top = '-22px';
         label.insertBefore(btn_mho_img, label.lastElementChild);
 
         let select = document.createElement('select');
         select.classList.add('small');
-        select.setAttribute('style', 'height: 25px; width: 35px; font-size: 12px');
+        select.setAttribute('style', 'height: 22px; width: 35px; font-size: 12px; outline: unset');
         select.value = lang;
 
         langs.forEach((lang_option) => {
@@ -5555,7 +5604,7 @@ function displayTranslateTool() {
                 });
             }
         });
-        gma.appendChild(mho_display_translate_input_div);
+        mho_header_space.insertBefore(mho_display_translate_input_div, mho_header_space.firstChild)
     } else if (display_translate_input) {
         display_translate_input.remove();
     }
@@ -6594,10 +6643,6 @@ function createStyles() {
         + `margin-left: auto;`
         + `}`;
 
-    const params_style_children_hover = `.param-has-children:hover > ul {`
-        + `display: block !important;`
-        + `}`;
-
     const btn_style = `#${btn_id} {`
         + 'background-color: #5c2b20;'
         + 'border: 1px solid #f0d79e;'
@@ -6607,11 +6652,11 @@ function createStyles() {
         + 'z-index: 997;'
         + '}';
 
-    const btn_hover_h1_span_style = `#${btn_id}:hover h1 span, #${btn_id}:hover h1 a {`
+    const btn_hover_h1_span_style = `#${btn_id}:not(.close):hover h1 span, #${btn_id}:not(.close):hover h1 a, #${btn_id}:not(.close):hover h1 img.close {`
         + 'display: inline;'
         + '}';
 
-    const btn_hover_div_style = `#${btn_id}:hover div {`
+    const btn_hover_div_style = `#${btn_id}:not(.close):hover div {`
         + 'display: block;'
         + '}';
 
@@ -6640,7 +6685,7 @@ function createStyles() {
         + 'margin-bottom: 5px;'
         + '}'
 
-    const btn_h1_span_style = `#${btn_id} h1 span, #${btn_id} h1 a {`
+    const btn_h1_span_style = `#${btn_id} h1 span, #${btn_id} h1 a, #${btn_id} h1 img.close {`
         + 'color: #f0d79e;'
         + 'cursor: help;'
         + 'font-family: Trebuchet MS,Arial,Verdana,sans-serif;'
@@ -7017,11 +7062,9 @@ function createStyles() {
         + 'cursor: pointer;'
         + 'font-size: 10px;'
         + 'padding: 3px 5px;'
-        + 'position: absolute;'
-        + 'right: 41px;'
-        + 'top: 100px;'
         + 'transition: background-color .5s ease-in-out;'
-        + 'z-index: 996;'
+        + 'display: flex;'
+        + 'gap: 0.5em;'
         + '}'
 
     const mho_map_td = `.mho-map tr td {`
@@ -7108,7 +7151,7 @@ function createStyles() {
         + `}`;
 
 
-    let css = params_style + params_style_children_hover + btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
+    let css = params_style + btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
         + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
         + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
         + tabs_style + tabs_ul_style + tabs_ul_li_style + tabs_ul_li_spacing_style + tabs_ul_li_div_style + tabs_ul_li_div_hover_style + tabs_ul_li_selected_style
@@ -8821,6 +8864,8 @@ function getApiKey() {
             }
 
 
+            createStyles();
+            createMhoHeaderSpace();
             notifyOnSearchEnd();
 
             initOptionsWithoutLoginNeeded();
