@@ -1985,17 +1985,6 @@ function createOptimizerBtn() {
 
         title_second_part.appendChild(website_link);
 
-        if (isTouchScreen()) {
-            let close_link = document.createElement('img');
-            close_link.src = `${repo_img_hordes_url}icons/b_close.png`;
-            close_link.classList.add('close');
-            title_second_part.appendChild(close_link);
-
-            close_link.addEventListener('click', () => {
-                optimizer_btn.classList.remove('mho-btn-opened');
-            });
-        }
-
         title_first_part.appendChild(img);
         title_first_part.appendChild(title_hidden);
 
@@ -2006,13 +1995,33 @@ function createOptimizerBtn() {
         optimizer_btn.addEventListener('click', (event) => {
             event.stopPropagation();
         });
-        optimizer_btn.addEventListener('mouseenter', () => {
-            optimizer_btn.classList.add('mho-btn-opened');
-        });
 
-        optimizer_btn.addEventListener('mouseleave', () => {
-            optimizer_btn.classList.remove('mho-btn-opened');
-        });
+        if (isTouchScreen()) {
+            let close_link = document.createElement('img');
+            close_link.src = `${repo_img_hordes_url}icons/b_close.png`;
+            close_link.classList.add('close');
+            title_second_part.appendChild(close_link);
+
+            close_link.addEventListener('click', () => {
+                optimizer_btn.classList.remove('mho-btn-opened');
+            });
+
+            optimizer_btn.addEventListener('mouseover', () => {
+                optimizer_btn.classList.add('mho-btn-opened');
+            });
+
+            optimizer_btn.addEventListener('mouseout', () => {
+                optimizer_btn.classList.remove('mho-btn-opened');
+            });
+        } else {
+            optimizer_btn.addEventListener('mouseenter', () => {
+                optimizer_btn.classList.add('mho-btn-opened');
+            });
+
+            optimizer_btn.addEventListener('mouseleave', () => {
+                optimizer_btn.classList.remove('mho-btn-opened');
+            });
+        }
         content_zone.appendChild(optimizer_btn);
 
         let mho_content_zone = document.createElement('div');
