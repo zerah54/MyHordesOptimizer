@@ -1988,6 +1988,7 @@ function createOptimizerBtn() {
         if (isTouchScreen()) {
             let close_link = document.createElement('img');
             close_link.src = `${repo_img_hordes_url}icons/b_close.png`;
+            close_link.classList.add('close');
             title_second_part.appendChild(close_link);
 
             close_link.addEventListener('click', () => {
