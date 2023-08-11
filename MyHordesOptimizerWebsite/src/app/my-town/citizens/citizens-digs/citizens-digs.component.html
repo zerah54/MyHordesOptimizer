@@ -18,7 +18,7 @@
             <td mat-cell *matCellDef="let row" [ngClass]="[column.id, column.class]">
                 <ng-container [ngSwitch]="column.id">
                     <ng-container *ngSwitchCase="'avatar_name'">
-                        <img *ngIf="row.citizen.avatar" [ngSrc]="row.citizen.avatar" width="16" height="16">
+                        <img *ngIf="row.citizen.avatar && row.citizen.avatar !== 'False'" [ngSrc]="row.citizen.avatar" width="16" height="16">
                         <div>{{row.citizen.name}}</div>
                     </ng-container>
                     <ng-container *ngSwitchCase="'today_digs'">

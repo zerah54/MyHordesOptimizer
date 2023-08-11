@@ -24,7 +24,7 @@
                 <td mat-cell *matCellDef="let row" [ngClass]="[column.id, column.class]">
                     <ng-container [ngSwitch]="column.id">
                         <ng-container *ngSwitchCase="'avatar_name'">
-                            <img *ngIf="row.avatar" [ngSrc]="row.avatar" width="16" height="16">
+                            <img *ngIf="row.avatar && row.avatar !== 'False'" [ngSrc]="row.avatar" width="16" height="16">
                             <div>{{row.name}}</div>
                         </ng-container>
                         <ng-container *ngSwitchCase="'more_status'">

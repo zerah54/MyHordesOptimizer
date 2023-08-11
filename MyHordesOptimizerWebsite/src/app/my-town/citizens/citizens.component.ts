@@ -3,6 +3,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ApiServices } from '../../_abstract_model/services/api.services';
+import { Citizen } from '../../_abstract_model/types/citizen.class';
 
 @Component({
     selector: 'mho-citizens',
@@ -28,6 +29,7 @@ export class CitizensComponent implements OnInit {
         this.api.getCitizens()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((citizen_info: CitizenInfo) => {
+                citizen_info.citizens = citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_ghost);
                 this.citizen_info = citizen_info;
             });
     }

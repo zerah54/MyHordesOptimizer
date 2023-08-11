@@ -252,6 +252,7 @@ export class CampingComponent implements OnInit {
                 if (typeof element === 'string' || typeof element === 'number' || typeof element === 'boolean') {
                     url_string += `&${key}=${element.toString()}`;
                 } else {
+                    console.log('element', element);
                     url_string += `&${key}=${(<{ [key: string]: unknown }><unknown>element)['id']
                         ? (<{ [key: string]: unknown }><unknown>element)['id']
                         : (<{ [key: string]: unknown }><unknown>(<{ [key: string]: unknown }><unknown>element)['value'])['id']}`;

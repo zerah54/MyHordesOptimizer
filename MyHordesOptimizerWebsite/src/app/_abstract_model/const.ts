@@ -27,7 +27,7 @@ export const BREAKPOINTS: Dictionary<string> = {
 
 
 export const NO_RUIN: RuinDTO = {
-    id: 'none', camping: 0, label: {en: 'None', fr: 'Aucun', de: 'Kein', es: 'TODO'}, chance: 0, description: {en: '', fr: '', de: '', es: ''},
+    id: -1, camping: 0, label: {en: 'None', fr: 'Aucun', de: 'Kein', es: 'Nada'}, chance: 0, description: {en: '', fr: '', de: '', es: ''},
     explorable: false, img: '', minDist: 1, maxDist: 1000, drops: []
 };
 
