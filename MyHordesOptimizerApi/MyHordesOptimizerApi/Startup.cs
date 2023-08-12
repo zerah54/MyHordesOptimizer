@@ -1,3 +1,4 @@
+using System.IO;
 using AutoMapper;
 using Common.Core.Repository.Impl;
 using Common.Core.Repository.Interfaces;
@@ -31,6 +32,9 @@ using MyHordesOptimizerApi.Services.Interfaces.Translations;
 using Serilog;
 using System.Net.Http;
 using System.Reflection;
+using MyHordesOptimizerApi.DiscordBot.Services;
+using Discord.Interactions;
+using Discord.WebSocket;
 
 namespace MyHordesOptimizerApi
 {
@@ -80,6 +84,7 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<IMyHordesTranslationsConfiguration, MyHordesTranslationsConfiguration>();
             services.AddSingleton<IMyHordesOptimizerSqlConfiguration, MyHordesOptimizerSqlConfiguration>();
             services.AddSingleton<IMyHordesScrutateurConfiguration, MyHordesScrutateurConfiguration>();
+            services.AddSingleton<IDiscordBotConfiguration, DiscordBotConfiguration>();
 
             services.AddSingleton<IMyHordesOptimizerFirebaseConfiguration, MyHordesOptimizerFirebaseConfiguration>();
 
@@ -106,6 +111,16 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
             services.AddScoped<IMyHordesOptimizerEstimationService, MyHordesOptimizerEstimationService>();
 
+            services.AddSingleton<DiscordSocketClient>();       // Add the discord client to services
+            services.AddSingleton<InteractionService>();        // Add the interaction service to services
+            var jsonLocalizationManager = new JsonLocalizationManager(
+                    basePath: Path.Combine("DiscordBot", "Assets"),
+                    fileName: "messages"
+                );
+            services.AddSingleton<ILocalizationManager>(jsonLocalizationManager);
+            services.AddHostedService<InteractionHandlingHostedService>();    // Add the slash command handler
+            services.AddHostedService<DiscordStartupHostedService>();         // Add the discord startup service
+            
             services.AddHttpLogging(logging =>
             {
                 logging.LoggingFields = HttpLoggingFields.All | HttpLoggingFields.RequestQuery;

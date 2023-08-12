@@ -20,6 +20,7 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="BouncyCastle" Version="1.8.9" />
     <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="Discord.Net" Version="3.11.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.20.0" />
