@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.Citizen;
+using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.MajCase;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
@@ -246,43 +247,19 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         var realY = updateRequestDto.TownDetails.TownY - cell.Y;
                         if (townDetails.IsDevaste || cell.DeadZombies > 0)
                         {
-                            var request = Mapper.Map<GestHordesUpdateCaseRequest>(updateRequestDto);
-                            var dictionnary = request.ToMhoDictionnary();
-                            var count = 0;
-                            if(cell.Objects == null)
+         
+                            if(cell.Objects != null)                        
                             {
-                                cell.Objects = new List<UpdateObjectDto>();
-                                var myHordeMe = MyHordesApiRepository.GetMe();
-                                var myHordeZone = myHordeMe.Map.Zones.First(zone => zone.X == realX && zone.Y == realY);
-                                if(myHordeZone.Items != null)
-                                {
-                                    foreach (var myHordesItem in myHordeZone.Items)
-                                    {
-                                        cell.Objects.Add(Mapper.Map<UpdateObjectDto>(myHordesItem));
-                                    }
-                                }               
+                                var request = Mapper.Map<GestHordesMajCaseRequestDto>(updateRequestDto);
+                                request.Items = Mapper.Map<List<GestHordesMajCaseItemDto>>(cell.Objects);
+                                GestHordesRepository.UpdateCellItem(request);
                             }
-                            foreach (var item in cell.Objects)
-                            {
-                                dictionnary.Add($"dataObjet[{count}][idObjet]", item.Id);
-                                dictionnary.Add($"dataObjet[{count}][nbr]", item.Count);
-                                if (!item.IsBroken)
-                                {
-                                    dictionnary.Add($"dataObjet[{count}][type]", 1);
-                                }
-                                else
-                                {
-                                    dictionnary.Add($"dataObjet[{count}][type]", 2);
-                                }
-                                count++;
-                            }
+
                             if (cell.DeadZombies > 0)
                             {
-                                dictionnary.Add($"dataObjet[{count}][idObjet]", 5004);
-                                dictionnary.Add($"dataObjet[{count}][nbr]", cell.DeadZombies);
-                                dictionnary.Add($"dataObjet[{count}][type]", 4);
+                                var request = Mapper.Map<GestHordesMajCaseZombiesDto>(updateRequestDto);
+                                GestHordesRepository.UpdateCellZombies(request);
                             }
-                            GestHordesRepository.UpdateCell(dictionnary);
                         }
                     }
                     catch (Exception e)

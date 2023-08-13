@@ -2,6 +2,7 @@
 using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.Citizen;
+using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.MajCase;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Abstract;
@@ -59,13 +60,6 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
         }
 
 
-        public void UpdateCell(IDictionary<string, object> dictionnary)
-        {
-            Dictionary<string, string> majHeaders = GetGHHeaders();
-            majHeaders.Add("X-Requested-With", "XMLHttpRequest");
-            var majResponse = base.Post<GestHordesUpdateCaseResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajCasePath}", body: dictionnary, customHeader: majHeaders, mediaTypeIn: "application/x-www-form-urlencoded");
-        }
-
         private Dictionary<string, string> GetGHHeaders()
         {
             var loginUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.LoginPath}";
@@ -102,12 +96,26 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
 
         public void UpdateCitizen(GestHordesMajCitizenRequest ghUpdateCitizenRequest)
         {
-            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajCitizen}", body: ghUpdateCitizenRequest);
+            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajCitizenPath}", body: ghUpdateCitizenRequest);
         }
 
         protected override void CustomizeHttpClient(HttpClient client)
         {
             base.CustomizeHttpClient(client);
+        }
+
+        public void UpdateCellItem(GestHordesMajCaseRequestDto request)
+        {
+            request.UserKey = UserKeyProvider.UserKey;
+            var majUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajCasePath}";
+            base.Post(url: majUrl, body: request);
+        }
+
+        public void UpdateCellZombies(GestHordesMajCaseZombiesDto request)
+        {
+            request.UserKey = UserKeyProvider.UserKey;
+            var majUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajZombieTuePath}";
+            base.Post(url: majUrl, body: request);
         }
     }
 }
