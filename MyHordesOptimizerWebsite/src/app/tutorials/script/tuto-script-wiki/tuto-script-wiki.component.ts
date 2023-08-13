@@ -14,10 +14,14 @@ export class TutoScriptWikiComponent {
     public readonly title: string = $localize`Wiki`;
     public readonly tuto_script_items: AccordionItem[] = [
         {
-            title: $localize`Objets`, content: $localize`Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur sujet).<br /><br />
+            title: $localize`Objets`,
+            content: $localize`Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur sujet).<br /><br />
                 Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d'un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.`
         },
-        {title: $localize`Recettes`, content: $localize`Affiche la liste de toutes les recettes de l'application.`},
+        {
+            title: $localize`Recettes`,
+            content: $localize`Affiche la liste de toutes les recettes de l'application.`
+        },
         {
             title: $localize`Pouvoirs`,
             content: $localize`Présente tout simplement la liste des pouvoirs héros, leur description et le nombre de jours avant obtention.`

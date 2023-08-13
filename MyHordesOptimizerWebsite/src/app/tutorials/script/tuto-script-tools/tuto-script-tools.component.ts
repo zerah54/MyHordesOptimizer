@@ -14,15 +14,13 @@ export class TutoScriptToolsComponent {
     public readonly title: string = $localize`Outils`;
     public readonly tuto_script_items: AccordionItem[] = [
         {
-            title: $localize`Banque`, content: $localize`Affiche la liste des objets de la banque et leur quantité.<br /><br />
+            title: $localize`Banque`,
+            content: $localize`Affiche la liste des objets de la banque et leur quantité.<br /><br />
                 Si vous êtes incarnés, les objets qui ne sont pas dans la liste de courses sont suivis d'un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.`
         },
         {
-            title: $localize`Camping`, content: $localize`Affiche un outil de prédiction des chances de survie en camping.`
-        },
-        {
-            title: $localize`Liste de courses`, content: $localize`Affiche une liste de courses contenant les objets ajoutés via les pages de liste d'objets et de banque.<br /><br />
-                Vous pouvez modifier la priorité de chaque objet, ainsi que la quantité requise.`
+            title: $localize`Camping`,
+            content: $localize`Affiche un outil de prédiction des chances de survie en camping.`
         }
     ];
 

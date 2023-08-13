@@ -53,10 +53,20 @@ const routes: Routes = [
                     {
                         path: 'first-use',
                         component: TutoSiteFirstUseComponent,
-                        title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Site` + ' - ' + $localize` diverses`
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Site` + ' - ' + $localize`Première utilisation`
                     },
                 ]
             },
+            /*            {path: 'discord-bot', redirectTo: 'discord-bot/installation'},
+                        {
+                            path: 'discord-bot', children: [
+                                {
+                                    path: 'installation',
+                                    component: TutoDiscordBotInstallationComponent,
+                                    title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Bot Discord` + ' - ' + $localize`Installation`
+                                },
+                            ]
+                        },*/
         ]
     }
 ];
