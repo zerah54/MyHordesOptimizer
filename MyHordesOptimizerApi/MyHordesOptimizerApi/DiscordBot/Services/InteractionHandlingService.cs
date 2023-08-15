@@ -1,12 +1,12 @@
-﻿using Discord;
+﻿using System;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.DiscordBot.Utility;
 
@@ -52,11 +52,11 @@ namespace MyHordesOptimizerApi.DiscordBot.Services
         {
             _discordSocketClient.Ready -= RegisterCommandsGloballyAsync;
             _discordSocketClient.InteractionCreated -= OnInteractionAsync;
-            
+
             _interactionService.Dispose();
             return Task.CompletedTask;
         }
-        
+
         private async Task RegisterCommandsGloballyAsync()
         {
             await _interactionService.RegisterCommandsGloballyAsync(true);

@@ -18,7 +18,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Epuise, opt => opt.MapFrom(src => src.Map.Cell.ZoneEmpty))
                 .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.TownDetails.TownY - src.Map.Cell.Y))
                 .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.TownDetails.TownX + src.Map.Cell.X))
-                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Map.Cell))
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Map.Cell.Objects))
                 .ForMember(dest => dest.UserKey, opt => opt.Ignore());
 
             CreateMap<UpdateRequestDto, GestHordesMajCaseZombiesDto>()

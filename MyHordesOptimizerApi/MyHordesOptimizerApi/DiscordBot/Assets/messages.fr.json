@@ -2,8 +2,88 @@
   "aa": {
     "name": "anti-abus",
     "description": "Lance un compteur de 15 minutes",
-    "privateMsg": {
-      "name": "message-prive",
+    "private-msg": {
+      "name": "message-privé",
+      "description": "Vrai si le message ne doit pas être vu de tous"
+    }
+  },
+  "timer": {
+    "name": "minuteur",
+    "description": "Lance un compteur d'une durée personnalisable (Exemple : 1h 25m 12s)",
+    "time": {
+      "name": "durée",
+      "description": "La durée du compteur (Exemple : 1h 25m 12s)"
+    },
+    "reason": {
+      "name": "raison",
+      "description": "La raison du compteur. C'est ce message qui sera envoyé à la fin du compteur"
+    },
+    "private-msg": {
+      "name": "message-privé",
+      "description": "Vrai si le message ne doit pas être vu de tous"
+    }
+  },
+  "faq": {
+    "name": "faq",
+    "description": "Foire aux questions",
+    "website": {
+      "name": "site-web",
+      "description": "L'adresse du site web",
+      "private-msg": {
+        "name": "message-privé",
+        "description": "Vrai si le message ne doit pas être vu de tous"
+      }
+    },
+    "script": {
+      "name": "script",
+      "description": "L'adresse du script",
+      "private-msg": {
+        "name": "message-privé",
+        "description": "Vrai si le message ne doit pas être vu de tous"
+      }
+    },
+    "become-ghoul": {
+      "name": "devenir-goule",
+      "description": "Différentes méthode pour se transformer en goule",
+      "private-msg": {
+        "name": "message-privé",
+        "description": "Vrai si le message ne doit pas être vu de tous"
+      }
+    }
+  },
+  "translate": {
+    "name": "traduire",
+    "description": "Trouve les correspondances des termes de MyHordes dans d'autres langues",
+    "language": {
+      "name": "langue",
+      "description": "La langue du texte source"
+    },
+    "text-to-translate": {
+      "name": "texte-à-traduire",
+      "description": "Le texte dont on veut la traduction"
+    },
+    "only-exact-match": {
+      "name": "résultats-exacts-uniquement",
+      "description": "Si vrai et si il existe des résultats exacts, seuls les résultats exacts sont renvoyés"
+    },
+    "private-msg": {
+      "name": "message-privé",
+      "description": "Vrai si le message ne doit pas être vu de tous"
+    }
+  },
+  "glossary": {
+    "name": "glossaire",
+    "description": "Définitions associées à un texte donné",
+    "text": {
+      "name": "texte",
+      "description": "Le texte recherché"
+    },
+    "language": {
+      "name": "langue",
+      "description": "La langue du texte recherché"
+    },
+    "private-msg": {
+      "name": "message-privé",
       "description": "Vrai si le message ne doit pas être vu de tous"
     }
   }

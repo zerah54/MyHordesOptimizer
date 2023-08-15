@@ -1,10 +1,9 @@
 ﻿using System;
-using System.ComponentModel;
-using Discord.Interactions;
 using System.Threading.Tasks;
 using Discord;
-using Discord.Commands;
+using Discord.Interactions;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.DiscordBot.Utility;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
@@ -17,9 +16,11 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             _logger = logger;
         }
 
-        [SlashCommand(name: "aa", description: "Lance un compteur de 15 minutes")]
-        [Name(text: "aa")]
-        public async Task AntiAbuseAsync(bool privateMsg = false)
+        [SlashCommand(name: "aa", description: "Starts a 15 minutes counter")]
+        public async Task AntiAbuseAsync(
+            [Summary(name:"private-msg", description: "True if the message should not be seen by all")]
+            bool privateMsg = false
+            )
         {
             try
             {
@@ -27,8 +28,19 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 msg += privateMsg ? "par message privé " : "";
                 msg += "dans 15 minutes";
 
-                await RespondAsync(msg, ephemeral: true);
-                await Task.Delay(15 * 60 * 1000);
+                var secondsLeft = 15 * 60;
+
+                var expirationFieldExpiration = new EmbedFieldBuilder();
+                expirationFieldExpiration.Name = "Expiration";
+                expirationFieldExpiration.Value = $"<t:{secondsLeft}:R>";
+                
+                var embedBuilder = new EmbedBuilder()
+                    .WithDescription(msg)
+                    .WithFields(expirationFieldExpiration)
+                    .WithColor(DiscordBotConsts.MhoColorPink);
+                
+                await RespondAsync(embed: embedBuilder.Build(), ephemeral: true);
+                await Task.Delay(secondsLeft * 1000);
                 if (privateMsg)
                 {
                     await Context.User.SendMessageAsync(
@@ -48,8 +60,15 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             }
         }
 
-        [SlashCommand(name: "timer", description: "Lance un compteur personnalisé. Exemple : 1h 25m 12s")]
-        public async Task CounterAsync(string time, string reason, bool privateMsg = false)
+        [SlashCommand(name: "timer", description: "Launches a custom counter. Example: 1h 25m 12s")]
+        public async Task CounterAsync(
+            [Summary(name:"time", description: "The duration of the counter (Example: 1h 25m 12s)")]
+            string time, 
+            [Summary(name:"reason", description: "The reason for the counter. It is this message that will be sent at the end of the counter")]
+            string reason, 
+            [Summary(name:"private-msg", description: "True if the message should not be seen by all")]
+            bool privateMsg = false
+            )
         {
             try
             {
@@ -80,8 +99,22 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
 
                 var msg = "Votre compteur a bien été programmé !";
                 msg += privateMsg ? " Vous serez notifié par message privé." : "";
+                
+                var expirationFieldReason = new EmbedFieldBuilder();
+                expirationFieldReason.Name = "Raison";
+                expirationFieldReason.Value = reason;
 
-                await RespondAsync(msg, ephemeral: true);
+                var expirationFieldExpiration = new EmbedFieldBuilder();
+                expirationFieldExpiration.Name = "Expiration";
+                expirationFieldExpiration.Value = $"<t:{Math.Floor((alert.ToUniversalTime() - DateTime.UnixEpoch.ToUniversalTime()).TotalSeconds)}:R>";
+
+                var embedBuilder = new EmbedBuilder()
+                    .WithDescription(msg)
+                    .WithFields(expirationFieldReason)
+                    .WithFields(expirationFieldExpiration)
+                    .WithColor(DiscordBotConsts.MhoColorPink);
+                
+                await RespondAsync(embed: embedBuilder.Build(), ephemeral: true);
                 await Task.Delay(alert - now);
 
                 if (privateMsg)

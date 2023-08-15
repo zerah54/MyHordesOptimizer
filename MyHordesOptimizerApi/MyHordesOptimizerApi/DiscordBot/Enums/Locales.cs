@@ -1,16 +1,16 @@
-﻿using System.ComponentModel;
+﻿using Discord.Interactions;
 
 namespace MyHordesOptimizerApi.DiscordBot.Enums
 {
     public enum Locales
     {
-        [Description("de")]
+        [ChoiceDisplay("Deutsch")]
         De,
-        [Description("en")]
+        [ChoiceDisplay("English")]
         En,
-        [Description("es")]
+        [ChoiceDisplay("Español")]
         Es,
-        [Description("fr")]
+        [ChoiceDisplay("Français")]
         Fr
     }
 }

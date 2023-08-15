@@ -99,6 +99,8 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IGestHordesRepository, GestHordesRepository>();
 
             services.AddScoped<IMyHordesOptimizerRepository, MyHordesOptimizerSqlRepository>();
+            
+            services.AddSingleton<IGlossaryRepository, GlossaryRepository>();
 
             // Services
             services.AddScoped<IMyHordesFetcherService, MyHordesFetcherService>();
@@ -107,6 +109,7 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IWishListService, WishListService>();
             services.AddSingleton<ITranslationService, TranslationService>();
             services.AddSingleton<IMyHordesRuineService, MyHordesRuineService>();
+            services.AddSingleton<IGlossaryService, GlossaryService>();
             services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimizerParametersService>();
             services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
             services.AddScoped<IMyHordesOptimizerEstimationService, MyHordesOptimizerEstimationService>();

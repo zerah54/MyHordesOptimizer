@@ -1,6 +1,6 @@
-﻿using Discord;
+﻿using System.Threading.Tasks;
+using Discord;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.DiscordBot.Utility
 {
@@ -30,6 +30,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Utility
                     logger.LogCritical(msg.ToString());
                     break;
             }
+
             return Task.CompletedTask;
         }
     }

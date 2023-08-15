@@ -248,10 +248,9 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         if (townDetails.IsDevaste || cell.DeadZombies > 0)
                         {
          
-                            if(cell.Objects != null)                        
+                            if (cell.Objects != null && townDetails.IsDevaste)                        
                             {
                                 var request = Mapper.Map<GestHordesMajCaseRequestDto>(updateRequestDto);
-                                request.Items = Mapper.Map<List<GestHordesMajCaseItemDto>>(cell.Objects);
                                 GestHordesRepository.UpdateCellItem(request);
                             }
 

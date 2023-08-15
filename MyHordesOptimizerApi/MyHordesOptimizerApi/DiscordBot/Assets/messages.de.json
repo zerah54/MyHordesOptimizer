@@ -1,10 +1,90 @@
 {
   "aa": {
-    "name": "anti-abus",
-    "description": "Lance un compteur de 15 minutes",
-    "privateMsg": {
-      "name": "message-prive",
-      "description": "Vrai si le message ne doit pas être vu de tous"
+    "name": "anti-missbrauch",
+    "description": "Startet einen 15-Minuten-Zähler",
+    "private-msg": {
+      "name": "private-nachricht",
+      "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+    }
+  },
+  "timer": {
+    "name": "timer",
+    "description": "Startet einen Zähler mit anpassbarer Dauer (Beispiel: 1h 25m 12s)",
+    "time": {
+      "name": "dauer",
+      "description": "Die Dauer des Timers (Beispiel: 1h 25m 12s)"
+    },
+    "reason": {
+      "name": "grund",
+      "description": "Der Grund für den Timer. Diese Nachricht wird am Ende des Zählers gesendet"
+    },
+    "private-msg": {
+      "name": "private-nachricht",
+      "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+    }
+  },
+  "faq": {
+    "name": "faq",
+    "description": "Häufig gestellte Fragen",
+    "website": {
+      "name": "website",
+      "description": "Die Website-Adresse",
+      "private-msg": {
+        "name": "private-nachricht",
+        "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+      }
+    },
+    "script": {
+      "name": "script",
+      "description": "Die Skriptadresse",
+      "private-msg": {
+        "name": "private-nachricht",
+        "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+      }
+    },
+    "become-ghoul": {
+      "name": "werde-ghul",
+      "description": "Verschiedene Möglichkeiten, sich in einen Ghul zu verwandeln",
+      "private-msg": {
+        "name": "private-nachricht",
+        "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+      }
+    }
+  },
+  "translate": {
+    "name": "übersetzen",
+    "description": "Finden Sie Übereinstimmungen für MyHordes-Begriffe in anderen Sprachen",
+    "language": {
+      "name": "sprache",
+      "description": "Die Sprache des Quelltextes"
+    },
+    "text-to-translate": {
+      "name": "text-zum-übersetzen",
+      "description": "Der zu übersetzende Text"
+    },
+    "only-exact-match": {
+      "name": "nur-genaue-ergebnisse",
+      "description": "Wenn „true“ und es exakte Ergebnisse gibt, werden nur exakte Ergebnisse zurückgegeben"
+    },
+    "private-msg": {
+      "name": "private-nachricht",
+      "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+    }
+  },
+  "glossary": {
+    "name": "glossar",
+    "description": "Definitionen, die einem bestimmten Text zugeordnet sind",
+    "text": {
+      "name": "text",
+      "description": "Der gesuchte Text"
+    },
+    "language": {
+      "name": "sprache",
+      "description": "Die Sprache des gesuchten Textes"
+    },
+    "private-msg": {
+      "name": "private-nachricht",
+      "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
     }
   }
 }

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Discord.Interactions;
 using System.Threading.Tasks;
 using Discord;
+using Discord.Interactions;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.DiscordBot.Enums;
+using MyHordesOptimizerApi.DiscordBot.Utility;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Translations;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
 
@@ -21,34 +22,39 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             _translationService = translationService;
         }
 
-        [SlashCommand(name: "translate", description: "Trouve les correspondances des termes de MyHordes dans d'autres langues")]
-        public async Task TranslateAsync(string locale, string searchValue, bool privateMsg = false,
-            bool onlyExactMatchIfPossible = true)
+        [SlashCommand(name: "translate", description: "Find matches for MyHordes terms in other languages")]
+        public async Task TranslateAsync(
+            [Summary(name:"language", description: "The language of the source text")]
+            Locales locale,
+            [Summary(name:"text-to-translate", description: "The text to be translated")]
+            string searchValue,
+            [Summary(name:"only-exact-match", description: "If true and there are exact results, only exact results are returned")]
+            bool onlyExactMatch = true,
+            [Summary(name:"private-msg", description: "True if the message should not be seen by all")]
+            bool privateMsg = false)
         {
-            _logger.LogWarning($"locale {locale}");
             try
             {
-                var completeTranslation = _translationService.GetTranslation(locale.ToString(), searchValue);
-
+                var completeTranslation = _translationService.GetTranslation(locale.ToString().ToLower(), searchValue);
 
                 var hasExactResponse = completeTranslation.Translations
                     .Exists((translation) => translation.Key.IsExactMatch);
-                var shouldAddInexactMatch = (hasExactResponse && !onlyExactMatchIfPossible) || !hasExactResponse;
+                var shouldAddInexactMatch = (hasExactResponse && !onlyExactMatch) || !hasExactResponse;
 
                 var searchValueResponse = "";
 
                 switch (locale)
                 {
-                    case "de":
+                    case Locales.De:
                         searchValueResponse += ":flag_de:";
                         break;
-                    case "en":
+                    case Locales.En:
                         searchValueResponse += ":flag_gb:";
                         break;
-                    case "es":
+                    case Locales.Es:
                         searchValueResponse += ":flag_es:";
                         break;
-                    case "fr":
+                    case Locales.Fr:
                         searchValueResponse += ":flag_fr:";
                         break;
                     default:
@@ -61,43 +67,46 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 if (privateMsg)
                 {
                     await RespondAsync("Les traductions seront envoyées par message privé", ephemeral: true);
-                    await Context.User.SendMessageAsync(searchValueResponse);
-                    await Context.User.SendMessageAsync("\n``` ```\n");
-                }
-                else
-                {
-                    await RespondAsync(searchValueResponse);
-                    await Context.Channel.SendMessageAsync("\n``` ```\n");
                 }
 
+                var count = 1;
 
-                foreach (KeyValuePair<TranslationKeyDto, TranslationDto> result in completeTranslation.Translations)
+                var translations = completeTranslation.Translations
+                    .FindAll((translation) => translation.Key.IsExactMatch || shouldAddInexactMatch);
+
+                foreach (KeyValuePair<TranslationKeyDto, TranslationDto> translation in translations)
                 {
-                    if (result.Key.IsExactMatch || shouldAddInexactMatch)
+                    var notExactResponse = "";
+                    // Ajoute toutes les traductions
+                    notExactResponse +=
+                        $":flag_de: {translation.Value.De[0].Replace("<strong>", "**").Replace("</strong>", "**").Replace("{hr}", "\n")}\n";
+                    notExactResponse +=
+                        $":flag_gb: {translation.Value.En[0].Replace("<strong>", "**").Replace("</strong>", "**").Replace("{hr}", "\n")}\n";
+                    notExactResponse +=
+                        $":flag_es: {translation.Value.Es[0].Replace("<strong>", "**").Replace("</strong>", "**").Replace("{hr}", "\n")}\n";
+                    notExactResponse +=
+                        $":flag_fr: {translation.Value.Fr[0].Replace("<strong>", "**").Replace("</strong>", "**").Replace("{hr}", "\n")}\n";
+
+                    var embedBuilder = new EmbedBuilder()
+                        .WithTitle($"{searchValueResponse} ({count} / {translations.Count})")
+                        .WithDescription(notExactResponse)
+                        .WithColor(DiscordBotConsts.MhoColorPink);
+
+                    if (privateMsg)
                     {
-                        var notExactResponse = "";
-                        // Ajoute toutes les traductions
-                        notExactResponse +=
-                            $":flag_de: {result.Value.De[0].Replace("<strong>", "**").Replace("</strong>", "**").Replace("{hr}", "\n")}\n";
-                        notExactResponse +=
-                            $":flag_gb: {result.Value.En[0].Replace("<strong>", "**").Replace("</strong>", "**").Replace("{hr}", "\n")}\n";
-                        notExactResponse +=
-                            $":flag_es: {result.Value.Es[0].Replace("<strong>", "**").Replace("</strong>", "**").Replace("{hr}", "\n")}\n";
-                        notExactResponse +=
-                            $":flag_fr: {result.Value.Fr[0].Replace("<strong>", "**").Replace("</strong>", "**").Replace("{hr}", "\n")}\n";
-
-
-                        if (privateMsg)
+                        await Context.User.SendMessageAsync(embed: embedBuilder.Build());
+                    }
+                    else
+                    {
+                        if (count == 1)
                         {
-                            await Context.User.SendMessageAsync(notExactResponse);
-                            await Context.User.SendMessageAsync("\n``` ```\n");
-                        }
-                        else
-                        {
-                            await Context.Channel.SendMessageAsync(notExactResponse);
-                            await Context.Channel.SendMessageAsync("\n``` ```\n");
+                            await RespondAsync(embed: embedBuilder.Build());
+                        } else {
+                            await Context.Channel.SendMessageAsync(embed: embedBuilder.Build());
                         }
                     }
+
+                    count++;
                 }
             }
             catch (Exception e)

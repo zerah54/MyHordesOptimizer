@@ -1,11 +1,6 @@
-﻿using System;
-using Discord.Interactions;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-
-namespace MyHordesOptimizerApi.DiscordBot.Modules
+﻿namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
-    public class RecipesModule : InteractionModuleBase<SocketInteractionContext>
+    /*public class RecipesModule : InteractionModuleBase<SocketInteractionContext>
     {
         private readonly ILogger<RecipesModule> _logger;
 
@@ -28,5 +23,5 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                     ephemeral: true);
             }
         }
-    }
+    }*/
 }

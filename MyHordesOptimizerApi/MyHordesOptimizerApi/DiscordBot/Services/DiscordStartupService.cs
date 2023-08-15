@@ -1,9 +1,9 @@
-﻿using Discord;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Threading;
-using System.Threading.Tasks;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.DiscordBot.Utility;
 
