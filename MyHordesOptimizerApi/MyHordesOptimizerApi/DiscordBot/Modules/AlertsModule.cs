@@ -28,11 +28,14 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 msg += privateMsg ? "par message privé " : "";
                 msg += "dans 15 minutes";
 
-                var secondsLeft = 15 * 60;
+                var now = DateTime.Now;
+                var alert = DateTime.Now
+                    .AddMinutes(15);
+
 
                 var expirationFieldExpiration = new EmbedFieldBuilder();
                 expirationFieldExpiration.Name = "Expiration";
-                expirationFieldExpiration.Value = $"<t:{secondsLeft}:R>";
+                expirationFieldExpiration.Value = $"<t:{Math.Floor((alert.ToUniversalTime() - DateTime.UnixEpoch.ToUniversalTime()).TotalSeconds)}:R>";
                 
                 var embedBuilder = new EmbedBuilder()
                     .WithDescription(msg)
@@ -40,7 +43,8 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                     .WithColor(DiscordBotConsts.MhoColorPink);
                 
                 await RespondAsync(embed: embedBuilder.Build(), ephemeral: true);
-                await Task.Delay(secondsLeft * 1000);
+                await Task.Delay(alert - now);
+
                 if (privateMsg)
                 {
                     await Context.User.SendMessageAsync(

@@ -7,6 +7,7 @@ import { TutoScriptInstallationComponent } from './script/tuto-script-installati
 import { TutoScriptToolsComponent } from './script/tuto-script-tools/tuto-script-tools.component';
 import { TutoScriptWikiComponent } from './script/tuto-script-wiki/tuto-script-wiki.component';
 import { TutoSiteFirstUseComponent } from './site/tuto-site-first-use/tuto-site-first-use.component';
+import { TutoDiscordBotInstallationComponent } from './discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component';
 
 const routes: Routes = [
     {path: 'tutorials', redirectTo: 'tutorials/script/installation'},
@@ -57,16 +58,16 @@ const routes: Routes = [
                     },
                 ]
             },
-            /*            {path: 'discord-bot', redirectTo: 'discord-bot/installation'},
-                        {
-                            path: 'discord-bot', children: [
-                                {
-                                    path: 'installation',
-                                    component: TutoDiscordBotInstallationComponent,
-                                    title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Bot Discord` + ' - ' + $localize`Installation`
-                                },
-                            ]
-                        },*/
+            {path: 'discord-bot', redirectTo: 'discord-bot/installation'},
+            {
+                path: 'discord-bot', children: [
+                    {
+                        path: 'installation',
+                        component: TutoDiscordBotInstallationComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Tutoriels` + ' - ' + $localize`Bot Discord` + ' - ' + $localize`Installation`
+                    },
+                ]
+            },
         ]
     }
 ];

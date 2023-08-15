@@ -101,6 +101,11 @@ export class MenuComponent implements OnInit {
                         {label: $localize`Première utilisation`, path: 'tutorials/site/first-use', displayed: false, lvl: 2, authorized: (): boolean => true},
                     ]
                 },
+                {
+                    label: $localize`Bot Discord`, displayed: false, lvl: 1, authorized: (): boolean => true, expanded: false, children: [
+                        {label: $localize`Installation`, path: 'tutorials/discord-bot/installation', displayed: false, lvl: 2, authorized: (): boolean => true},
+                    ]
+                },
             ]
         }
     ];

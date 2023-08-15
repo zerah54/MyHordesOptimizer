@@ -29,9 +29,9 @@ export class TutoDiscordBotInstallationComponent {
 
         text += `[b][big]${this.title}[/big][/b]`;
         text += '\n\n';
-        text += this.text_1;
+        text += this.text_1.replace(/<a .* href="(.*)" .*>(.*)<\/a>/g, '[link=$1]$2[/link]');
         text += '\n\n';
-        text += this.text_2;
+        text += this.text_2.replace(/<a .* href="(.*)" .*>(.*)<\/a>/g, '[link=$1]$2[/link]');
 
         this.clipboard.copy(text, $localize`Le texte a bien été copié`);
     }
