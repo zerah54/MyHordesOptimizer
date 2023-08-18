@@ -1,4 +1,5 @@
 import { Component, HostBinding } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'mho-statistics',
@@ -22,6 +23,9 @@ export class StatisticsComponent {
             link: '/my-town/stats/registry'
         }
     ];
+
+    constructor(protected router: Router) {
+    }
 
 }
 

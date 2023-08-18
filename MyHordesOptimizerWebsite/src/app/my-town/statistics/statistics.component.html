@@ -3,8 +3,7 @@
 </mat-card-header>
 <mat-card-content class="mho-stats">
     <nav mat-tab-nav-bar mat-stretch-tabs="false" mat-align-tabs="start" [tabPanel]="panel">
-        <a mat-tab-link *ngFor="let link of links" [routerLink]="[link.link]" routerLinkActive="mdc-tab--active mdc-tab-indicator--active"
-           [routerLinkActiveOptions]="{exact : true}">
+        <a mat-tab-link *ngFor="let link of links" [routerLink]="[link.link]" [active]="router.url === link.link">
             {{link.label}}
         </a>
     </nav>

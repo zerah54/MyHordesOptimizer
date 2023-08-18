@@ -1,4 +1,5 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { ApiServices } from '../../_abstract_model/services/api.services';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
@@ -13,9 +14,9 @@ import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 export class CitizensComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
-    public citizen_info!: CitizenInfo;
+    protected citizen_info!: CitizenInfo;
 
-    public links: Link[] = [
+    protected links: Link[] = [
         {
             label: $localize`Citoyens`,
             link: '/my-town/citizens/list'
@@ -28,12 +29,13 @@ export class CitizensComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices) {
+    constructor(protected router: Router, private api: ApiServices) {
 
     }
 
     public ngOnInit(): void {
         this.getCitizens();
+        this.router.url;
     }
 
     public getCitizens(): void {
