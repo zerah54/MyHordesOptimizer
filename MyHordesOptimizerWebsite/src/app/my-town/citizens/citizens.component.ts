@@ -1,9 +1,9 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ApiServices } from '../../_abstract_model/services/api.services';
+import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 
 @Component({
     selector: 'mho-citizens',
@@ -14,6 +14,17 @@ export class CitizensComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     public citizen_info!: CitizenInfo;
+
+    public links: Link[] = [
+        {
+            label: $localize`Citoyens`,
+            link: '/my-town/citizens/list'
+        },
+        {
+            label: $localize`Fouilles`,
+            link: '/my-town/citizens/digs'
+        }
+    ];
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
@@ -35,4 +46,7 @@ export class CitizensComponent implements OnInit {
     }
 }
 
-
+interface Link {
+    label: string;
+    link: string;
+}

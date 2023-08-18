@@ -9,6 +9,9 @@ import { CitizensListComponent } from './citizens/citizens-list/citizens-list.co
 import { CitizensComponent } from './citizens/citizens.component';
 import { MapComponent } from './map/map.component';
 import { NightwatchComponent } from './nightwatch/nightwatch.component';
+import { EstimationsComponent } from './statistics/estimations/estimations.component';
+import { RegistryComponent } from './statistics/registry/registry.component';
+import { ScrutateurComponent } from './statistics/scrutateur/scrutateur.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { WishlistComponent } from './wishlist/wishlist.component';
 
@@ -16,6 +19,7 @@ const routes: Routes = [
     { path: '', redirectTo: 'my-town/citizens/list', pathMatch: 'full' },
     { path: 'my-town', redirectTo: 'my-town/citizens/list', pathMatch: 'full' },
     { path: 'my-town/citizens', redirectTo: 'my-town/citizens/list', pathMatch: 'full' },
+    { path: 'my-town/stats', redirectTo: 'my-town/stats/estimations', pathMatch: 'full' },
     {
         path: 'my-town', children: [
             {
@@ -71,7 +75,27 @@ const routes: Routes = [
                 path: 'stats',
                 component: StatisticsComponent,
                 title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Statistiques`,
-                canActivate: [IsInTownGuard]
+                canActivate: [IsInTownGuard],
+                children: [
+                    {
+                        path: 'estimations',
+                        component: EstimationsComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Statistiques`,
+                        canActivate: [IsInTownGuard],
+                    },
+                    {
+                        path: 'scrutateur',
+                        component: ScrutateurComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Statistiques`,
+                        canActivate: [IsInTownGuard],
+                    },
+                    {
+                        path: 'registry',
+                        component: RegistryComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Statistiques`,
+                        canActivate: [IsInTownGuard],
+                    }
+                ]
             },
             {
                 path: 'wishlist',
