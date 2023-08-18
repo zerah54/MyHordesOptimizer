@@ -23,7 +23,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         private List<GlossaryModel> GetGlossaryByLocale(Locales locale)
         {
-            var path = $"Data/Glossary/glossary.{locale}.json";
+            var path = $"Data/Glossary/glossary.{locale.ToString().ToLower()}.json";
             var json = File.ReadAllText(path);
             var list = json.FromJson<List<GlossaryModel>>();
             return list;

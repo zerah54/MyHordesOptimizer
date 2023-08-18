@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using MyHordesOptimizerApi.Data.Glossary;
 using MyHordesOptimizerApi.DiscordBot.Enums;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -49,7 +50,12 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var allGlossaryEntriesLocale = GlossaryRepository.GetGlossary()[locale];
 
-            return allGlossaryEntriesLocale.FindAll((glossaryEntry) => glossaryEntry.Word == sourceString);
+            return allGlossaryEntriesLocale.FindAll((glossaryEntry) => String.Compare(
+                glossaryEntry.Word,
+                sourceString,
+                CultureInfo.CurrentCulture,
+                CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase
+            ) == 0);
         }
     }
 }
