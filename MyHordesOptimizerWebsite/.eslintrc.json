@@ -24,6 +24,7 @@
                 "plugin:@angular-eslint/template/process-inline-templates"
             ],
             "rules": {
+                "@angular-eslint/use-lifecycle-interface": "error",
                 "@angular-eslint/component-selector": [
                     "error",
                     {
@@ -40,9 +41,22 @@
                         "type": "attribute"
                     }
                 ],
-                "semi": ["warn", "always"],
-                "quotes": ["warn", "single"],
-                "eqeqeq": ["error", "always"],
+                "semi": [
+                    "warn",
+                    "always"
+                ],
+                "quotes": [
+                    "warn",
+                    "single"
+                ],
+                "object-curly-spacing": [
+                    "warn",
+                    "always"
+                ],
+                "eqeqeq": [
+                    "error",
+                    "always"
+                ],
                 "@typescript-eslint/no-inferrable-types": "off",
                 "@typescript-eslint/explicit-function-return-type": "error",
                 "@typescript-eslint/typedef": [

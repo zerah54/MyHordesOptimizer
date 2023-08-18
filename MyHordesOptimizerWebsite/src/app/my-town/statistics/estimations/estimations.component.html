@@ -4,6 +4,9 @@
                                                      [min]="1" [max]="current_day">
         </mho-header-with-number-previous-next-filter>
         <div class="actions">
+            <button mat-icon-button matTooltip="Copier au format forum" i18n-matTooltip (click)="shareEstimsForum()">
+                <mat-icon>share</mat-icon>
+            </button>
             <button mat-raised-button [color]="'accent'" (click)="saveEstimations()" i18n>Enregistrer</button>
         </div>
     </div>
@@ -18,10 +21,10 @@
             <tr *ngFor="let percent of tdg_values">
                 <th>{{percent}}%</th>
                 <td>
-                    <input type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].min">
+                    <input #min type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].min" (paste)="pasteFromMH(min, max, $event)">
                 </td>
                 <td>
-                    <input type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].max">
+                    <input #max type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].max" (paste)="pasteFromMH(min, max, $event)">
                 </td>
             </tr>
         </table>

@@ -1,17 +1,15 @@
 import { Component, ElementRef, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
-import { Dig } from '../../../_abstract_model/types/dig.class';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { getTown } from '../../../shared/utilities/localstorage.util';
-import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { DigsServices } from '../../../_abstract_model/services/digs.service';
-import { ConfirmDialogComponent } from '../../../shared/elements/confirm-dialog/confirm-dialog.component';
+import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { Dig } from '../../../_abstract_model/types/dig.class';
+import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
+import { getTown } from '../../../shared/utilities/localstorage.util';
 
 
 @Component({
@@ -49,8 +47,8 @@ export class CitizensDigsComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: CitizenColumn[] = [
-        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center'},
-        {id: 'today_digs', header: $localize`Fouilles du jour`, class: ''},
+        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center' },
+        { id: 'today_digs', header: $localize`Fouilles du jour`, class: '' },
     ];
     public readonly current_day: number = getTown()?.day || 1;
     public filters: DigFilter = {
@@ -65,7 +63,7 @@ export class CitizensDigsComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private digs_api: DigsServices, private dialog: MatDialog) {
+    constructor(private digs_api: DigsServices) {
 
     }
 
@@ -83,33 +81,6 @@ export class CitizensDigsComponent implements OnInit {
 
         this.datasource.filterPredicate = (data: DigsByCitizen, filter: string): boolean => this.customFilter(data, filter);
         this.getDigs();
-    }
-
-    public deleteDig(dig_to_delete: Dig): void {
-        this.dialog
-            .open(ConfirmDialogComponent, {
-                data: {
-                    title: $localize`Confirmer`,
-                    text: $localize`Êtes-vous sûr de vouloir supprimer cette fouille ?`
-                }
-            })
-            .afterClosed()
-            .pipe(takeUntil(this.destroy_sub))
-            .subscribe((confirm: boolean) => {
-                if (confirm) {
-                    this.digs_api.deleteDig(dig_to_delete)
-                        .pipe(takeUntil(this.destroy_sub))
-                        .subscribe(() => {
-                            const delete_dig: number = this.digs.findIndex((dig: Dig) => {
-                                return dig.cell_id === dig_to_delete?.cell_id
-                                    && dig.digger_id === dig_to_delete?.digger_id
-                                    && dig.day === dig_to_delete?.day;
-                            });
-                            this.digs.splice(delete_dig, 1);
-                            this.createDigsByCitizenAndDay();
-                        });
-                }
-            });
     }
 
     public updateDig(): void {
@@ -157,6 +128,32 @@ export class CitizensDigsComponent implements OnInit {
         return column.id;
     }
 
+    protected deletedDig(dig_to_delete: Dig): void {
+        const delete_dig: number = this.digs.findIndex((dig: Dig) => {
+            return dig.cell_id === dig_to_delete?.cell_id
+                && dig.digger_id === dig_to_delete?.digger_id
+                && dig.day === dig_to_delete?.day;
+        });
+        this.digs.splice(delete_dig, 1);
+        this.createDigsByCitizenAndDay();
+    }
+
+    protected updatedDig(new_digs: Dig[]): void {
+        const replace_dig: number = this.digs.findIndex((dig: Dig) => {
+            return dig.cell_id === new_digs[0].cell_id
+                && dig.digger_id === new_digs[0].digger_id
+                && dig.day === new_digs[0].day;
+        });
+
+        if (replace_dig > -1) {
+            this.digs[replace_dig] = new_digs[0];
+        } else {
+            this.digs.push(new_digs[0]);
+        }
+
+        this.dig_to_update = undefined;
+        this.createDigsByCitizenAndDay();
+    }
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: DigsByCitizen, filter: string): boolean {

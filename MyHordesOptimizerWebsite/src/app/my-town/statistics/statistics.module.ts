@@ -1,20 +1,18 @@
 import { NgModule } from '@angular/core';
-import { ScrutateurComponent } from './scrutateur/scrutateur.component';
-import { StatisticsComponent } from './statistics.component';
+import { Components, Modules } from '../../_abstract_model/types/_types';
+import { SharedModule } from '../../shared/shared.module';
 import { EstimationsComponent } from './estimations/estimations.component';
 import { SelectedDayEstimationPipe } from './estimations/selected-day-estimations.pipe';
-import { RegistryComponent } from './registry/registry.component';
-import { Components } from '../../_abstract_model/types/_types';
-import { SharedModule } from '../../shared/shared.module';
-import { CitizenUseDiceOrCardsPipe } from './registry/dice-cards.pipe';
-import { BankCleanEntriesPipe, BankDiffPipe } from './registry/bank-gift.pipe';
-import { WellPipe } from './registry/well.pipe';
+import { RegistryModule } from './registry/registry.module';
+import { ScrutateurComponent } from './scrutateur/scrutateur.component';
+import { StatisticsComponent } from './statistics.component';
 
-const components: Components = [StatisticsComponent, ScrutateurComponent, EstimationsComponent, RegistryComponent];
-const pipes: Components = [SelectedDayEstimationPipe, CitizenUseDiceOrCardsPipe, BankDiffPipe, BankCleanEntriesPipe, WellPipe];
+const components: Components = [StatisticsComponent, ScrutateurComponent, EstimationsComponent];
+const pipes: Components = [SelectedDayEstimationPipe];
+const submodules: Modules = [RegistryModule];
 
 @NgModule({
-    imports: [SharedModule],
+    imports: [SharedModule, ...submodules],
     declarations: [...components, ...pipes],
     exports: [...components]
 })

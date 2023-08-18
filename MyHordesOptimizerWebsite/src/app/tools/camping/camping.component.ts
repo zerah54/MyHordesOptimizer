@@ -5,12 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { CAMPING_BONUS, CAMPINGS_MAP, DISTANCE_MAP, HIDDEN_CAMPERS_MAP, HORDES_IMG_REPO, NO_RUIN } from '../../_abstract_model/const';
-import { Ruin } from '../../_abstract_model/types/ruin.class';
-import { Dictionary } from '../../_abstract_model/types/_types';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { dtoToModelArray } from '../../_abstract_model/types/_common.class';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { ApiServices } from '../../_abstract_model/services/api.services';
+import { dtoToModelArray } from '../../_abstract_model/types/_common.class';
+import { Dictionary } from '../../_abstract_model/types/_types';
+import { Ruin } from '../../_abstract_model/types/ruin.class';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ClipboardService } from '../../shared/services/clipboard.service';
 
 @Component({
@@ -26,9 +26,9 @@ export class CampingComponent implements OnInit {
     public and_amelio: boolean = true;
 
     public town_types: TownType[] = [
-        {id: 'rne', label: $localize`Petite carte`, bonus: 0},
-        {id: 're', label: $localize`Région éloignée`, bonus: 0},
-        {id: 'pande', label: $localize`Pandémonium`, bonus: -14}
+        { id: 'rne', label: $localize`Petite carte`, bonus: 0 },
+        { id: 're', label: $localize`Région éloignée`, bonus: 0 },
+        { id: 'pande', label: $localize`Pandémonium`, bonus: -14 }
     ];
 
     public bonus: Record<string, number> = CAMPING_BONUS;
@@ -138,7 +138,7 @@ export class CampingComponent implements OnInit {
                             .pipe(takeUntil(this.destroy_sub))
                             .subscribe(() => this.calculateProbabilities());
 
-                        const url: string = this.router.createUrlTree([], {relativeTo: this.activated_route}).toString();
+                        const url: string = this.router.createUrlTree([], { relativeTo: this.activated_route }).toString();
                         this.location.go(url);
                     });
             });
@@ -252,7 +252,6 @@ export class CampingComponent implements OnInit {
                 if (typeof element === 'string' || typeof element === 'number' || typeof element === 'boolean') {
                     url_string += `&${key}=${element.toString()}`;
                 } else {
-                    console.log('element', element);
                     url_string += `&${key}=${(<{ [key: string]: unknown }><unknown>element)['id']
                         ? (<{ [key: string]: unknown }><unknown>element)['id']
                         : (<{ [key: string]: unknown }><unknown>(<{ [key: string]: unknown }><unknown>element)['value'])['id']}`;

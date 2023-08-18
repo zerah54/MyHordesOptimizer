@@ -1,0 +1,41 @@
+<mat-tab-group (selectedTabChange)="changePlaysTab($event)">
+    <mat-tab labelClass="plays">
+        <ng-template mat-tab-label>
+            <img [ngSrc]="HORDES_IMG_REPO + 'item/item_game_box.gif'" width="16" height="16" style="margin-right: 0.5em">
+            <ng-container i18n>Dés / Cartes</ng-container>
+        </ng-template>
+        <ng-container *ngTemplateOutlet="template"></ng-container>
+    </mat-tab>
+    <mat-tab labelClass="dice">
+        <ng-template mat-tab-label>
+            <img [ngSrc]="HORDES_IMG_REPO + 'item/item_dice.gif'" width="16" height="16"
+                 style="margin-right: 0.5em">
+            <ng-container i18n>Dés</ng-container>
+        </ng-template>
+        <ng-container *ngTemplateOutlet="template"></ng-container>
+    </mat-tab>
+    <mat-tab labelClass="card">
+        <ng-template mat-tab-label>
+            <img [ngSrc]="HORDES_IMG_REPO + 'item/item_cards.gif'" width="16" height="16"
+                 style="margin-right: 0.5em">
+            <ng-container i18n>Cartes</ng-container>
+        </ng-template>
+        <ng-container *ngTemplateOutlet="template"></ng-container>
+    </mat-tab>
+</mat-tab-group>
+<ng-template #template>
+    <div class="plays-dices-cards">
+        <div class="citizen-plays">
+            <h4 i18n>Ont joué</h4>
+            <div *ngFor="let citizen of entries_by_type | citizenUseDiceOrCards:completeCitizenList">
+                {{citizen}}
+            </div>
+        </div>
+        <div class="citizen-doesnt-play">
+            <h4 i18n>N'ont pas joué</h4>
+            <div *ngFor="let citizen of entries_by_type | citizenUseDiceOrCards:completeCitizenList: true">
+                {{citizen}}
+            </div>
+        </div>
+    </div>
+</ng-template>

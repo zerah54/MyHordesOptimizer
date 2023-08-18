@@ -57,6 +57,10 @@
                     vertical-align: middle;
                 }
             }
+
+            .mat-mdc-icon-button {
+                --mdc-icon-button-icon-size: 16;
+            }
         }
 
         .advanced-part {

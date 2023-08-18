@@ -1,12 +1,14 @@
 import { Component, ElementRef, HostBinding, OnInit, ViewChild } from '@angular/core';
-import { getTown } from '../../../shared/utilities/localstorage.util';
+import { MatTableDataSource } from '@angular/material/table';
+import Chart from 'chart.js/auto';
+import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
+import { MinMax } from '../../../_abstract_model/interfaces';
 import { ApiServices } from '../../../_abstract_model/services/api.services';
 import { Estimations } from '../../../_abstract_model/types/estimations.class';
-import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
-import { MatTableDataSource } from '@angular/material/table';
 import { Regen } from '../../../_abstract_model/types/regen.class';
-import Chart from 'chart.js/auto';
+import { ClipboardService } from '../../../shared/services/clipboard.service';
 import { getMaxAttack, getMinAttack } from '../../../shared/utilities/estimations.util';
+import { getTown } from '../../../shared/utilities/localstorage.util';
 
 @Component({
     selector: 'mho-estimations',
@@ -31,7 +33,7 @@ export class EstimationsComponent implements OnInit {
     public today_chart!: Chart<'line'>;
     public tomorrow_chart!: Chart<'line'>;
 
-    constructor(private api: ApiServices) {
+    constructor(private clipboard: ClipboardService, private api: ApiServices) {
     }
 
     public ngOnInit(): void {
@@ -153,5 +155,54 @@ export class EstimationsComponent implements OnInit {
                 }
             });
         }
+    }
+
+    public pasteFromMH(min_input: HTMLInputElement, max_input: HTMLInputElement, paste_event: ClipboardEvent): void {
+        paste_event.preventDefault();
+        const value: string | undefined = paste_event.clipboardData?.getData('Text');
+        const split: string[] | undefined = value?.split('-');
+        if (split && split.length > 1) {
+            min_input.value = (+split[0]).toString();
+            max_input.value = (+split[1]).toString();
+        }
+    }
+
+    public shareEstimsForum(): void {
+        const today_attack_title: string = $localize`Attaque du jour`;
+        const tomorrow_attack_title: string = $localize`Attaque du lendemain`;
+        let text: string = '';
+
+        /** Ajout du titre **/
+        text += `[big][b][bad]J${this.current_day}[/bad][/b][/big]{hr}\n`;
+
+        /** Ajout du titre "Attaque du jour" */
+        text += `[i]${today_attack_title} (J${this.current_day})[/i]\n`;
+
+        /** Ajout des valeurs du jour */
+        TDG_VALUES.forEach((value_key: number) => {
+            const value: MinMax = this.estimations.estim['_' + value_key];
+            if (value && (value.min || value.max)) {
+                text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
+            }
+        });
+
+        text += '{hr}\n';
+
+        /** Ajout du titre "Attaque du lendemain" */
+        text += `[i]${tomorrow_attack_title} (J${this.current_day + 1})[/i]\n`;
+
+        /** Ajout des valeurs du lendemain */
+        PLANIF_VALUES.forEach((value_key: number) => {
+            const value: MinMax = this.estimations.planif['_' + value_key];
+            if (value && (value.min || value.max)) {
+                text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
+            }
+        });
+
+        text += '{hr}';
+
+
+        this.clipboard.copy(text, $localize`La liste a bien été copiée au format forum`);
+
     }
 }

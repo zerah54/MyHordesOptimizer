@@ -1,0 +1,62 @@
+@use 'variables';
+
+.dig {
+    background-color: variables.$item_color;
+    max-width: 150px;
+    border-radius: 0.25em;
+    padding: 0.5em;
+
+    .actions {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.5em;
+        align-items: center;
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    div img {
+        vertical-align: middle;
+
+    }
+
+    .card-header {
+        text-align: center;
+        margin-bottom: 0.5em;
+
+        .mat-divider {
+            margin: 0.5em 0;
+        }
+    }
+
+    .positions {
+        margin-bottom: 0.5em;
+        white-space: nowrap;
+
+        > img {
+            margin-right: 0.5em;
+        }
+    }
+
+    .values {
+        margin-bottom: 0.5em;
+
+        .success > img {
+            margin-right: 0.5em;
+        }
+
+        .total > img {
+            margin-left: 0.5em;
+        }
+    }
+
+    .positions, .values {
+        input {
+            width: 1.5em;
+        }
+    }
+
+    .mat-mdc-icon-button {
+        --mdc-icon-button-icon-size: 16;
+    }
+}

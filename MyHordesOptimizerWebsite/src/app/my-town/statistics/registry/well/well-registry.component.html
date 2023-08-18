@@ -1,0 +1,6 @@
+<div class="well" *ngFor="let rations of entries | well:completeCitizenList">
+    <h4 class="rations">{{rations.rations}} {rations.rations, plural, =0 {ration prise} =1 {ration prise} other {rations prises}}</h4>
+    <div class="citizen">{{rations.citizen}}</div>
+    <mat-divider></mat-divider>
+</div>
+
