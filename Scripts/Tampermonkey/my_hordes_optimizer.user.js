@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.60
+// @version      1.0.0-beta.61
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -10,7 +10,7 @@
 // @downloadURL  https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
 // @updateURL    https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js
 // @homepageURL  https://myhordes-optimizer.web.app/tutorials/script/installation
-// @supportURL   lenoune38@gmail.com
+// @supportURL   https://discord.gg/ZQH7ZPWcCm
 //
 // @connect      https://myhordesoptimizerapi.azurewebsites.net/
 // @connect      https://api.myhordesoptimizer.fr/
@@ -32,8 +32,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[amélioration] Déplacement de la barre de traduction qui pouvait chevaucher des éléments du jeu\n`
-    + `[amélioration] Amélioration de l'affichage des paramètres en particulier sur mobile ou sur un écran assez petit pour provoquer un défilement dans les paramètres\n\n`;
+    + `[correctif] Divers correctifs d'affichage des paramètres en particulier sur mobile ou sur petit écran\n\n`;
++`[correctif] Correction d'un problème qui provoquait des notifications d'absence d'escorte alors qu'on était bien en attente d'escorte\n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -70,6 +70,7 @@ GM.getValue(gm_mh_external_app_id_key).then((app_id) => {
 
 const api_url = 'https://api.myhordesoptimizer.fr' + (is_mh_beta ? '/beta' : '');
 const api_url_2 = 'https://myhordesoptimizerapi.azurewebsites.net';
+
 
 ///////////////////////////////////////////
 // Listes de constantes / Constants list //
@@ -2212,15 +2213,21 @@ function createParams(content) {
                     children_container.style.paddingLeft = '1em';
                 }
 
+                let mousein = false;
+
                 param_container.addEventListener('mouseenter', () => {
+                    mousein = true;
                     if (param_input.checked) {
                         children_container.style.display = 'block';
                     }
                 });
 
                 param_container.addEventListener('mouseleave', () => {
+                    mousein = false;
                     setTimeout(() => {
-                        children_container.style.display = 'none';
+                        if (!mousein) {
+                            children_container.style.display = 'none';
+                        }
                     }, 250);
                 });
 
@@ -2269,11 +2276,6 @@ function createParams(content) {
                         GM.getValue(gm_parameters_key).then((saved_params) => {
                             mho_parameters = saved_params;
                         });
-                        if (event.target.checked) {
-                            children_container.style.display = 'block';
-                        } else {
-                            children_container.style.display = 'none';
-                        }
 
                         // Quand on change une option, trigger à nouveau certaines vérifications pour ne pas avoir à les vérifier tout le temps (=> perf !)
                         initOptionsWithLoginNeeded();
@@ -2294,6 +2296,7 @@ function createParams(content) {
 
                 /** Si l'option a des "enfants" alors on les affiche uniquement si elle est cochée et on coche / décoche les enfants en fonction de la coche du parent */
                 if (param_children && param_children.length > 0) {
+                    let children_container = param_container.querySelector('ul');
                     param_children.forEach((param_child) => {
                         new_params[param_child.id] = event.target.checked;
                         let child_input = document.querySelector(`#${param_child.id}_input`);
@@ -2301,10 +2304,13 @@ function createParams(content) {
                     });
                     if (event.target.checked) {
                         param_container.classList.add('param-has-children');
+                        children_container.style.display = 'block';
                     } else {
                         param_container.classList.remove('param-has-children');
+                        children_container.style.display = 'none';
                     }
                 }
+
                 GM.setValue(gm_parameters_key, new_params);
                 GM.getValue(gm_parameters_key).then((saved_params) => {
                     mho_parameters = saved_params;
@@ -5292,7 +5298,7 @@ function preventFromLeaving() {
         let prevent_function = (event) => {
             let e = event || window.event;
 
-            let ae_button = document.querySelector('button[x-toggle-escort="1"]');
+            let ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
             if (ae_button) {
                 let mho_leaving_info = document.getElementById('mho-leaving-info');
                 if (!mho_leaving_info) {
@@ -5336,7 +5342,7 @@ function preventFromLeaving() {
 function alertIfInactiveAndNoEscort() {
     if (mho_parameters.alert_if_no_escort && mho_parameters.alert_if_inactive && pageIsDesert()) {
 
-        let ae_button = document.querySelector('button[x-toggle-escort="1"]');
+        let ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
         let is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
 
         let notify = () => {
@@ -5691,11 +5697,19 @@ function displayEstimationsOnWatchtower() {
         const watchtower_estim_block_prediction = watchtower_estim_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
 
         if (watchtower_estim_block && watchtower_estim_block_prediction) {
-            const current_estimation_percent = +watchtower_estim_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || 100;
+            const current_estimation_percent = +watchtower_estim_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || (watchtower_estim_block_prediction ? 100 : undefined);
+
+            // console.log('watchtower_estim_block', watchtower_estim_block);
+            // console.log('watchtower_estim_block_prediction', watchtower_estim_block_prediction);
+            // console.log('current_estimation_percent', current_estimation_percent);
 
             const watchtower_planif_block = watchtower_estim_block.nextElementSibling;
             const watchtower_planif_block_prediction = watchtower_planif_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
-            const current_planif_percent = +watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || 100;
+            const current_planif_percent = +watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || (watchtower_planif_block_prediction ? 100 : undefined);
+
+            // console.log('watchtower_planif_block', watchtower_planif_block);
+            // console.log('watchtower_planif_block_prediction', watchtower_planif_block_prediction);
+            // console.log('current_planif_percent', current_planif_percent);
 
             getEstimations().then((estimations) => {
 
@@ -6495,17 +6509,17 @@ function addCopyRegisterButton() {
 
 function changeDefaultEscortOptions() {
     if (mho_parameters.default_escort_options && pageIsDesert()) {
-        const btn_activate_escort = document.querySelector('button[x-toggle-escort="1"]');
+        const btn_activate_escort = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
         if (!btn_activate_escort) return;
 
         btn_activate_escort.addEventListener('click', () => {
             document.addEventListener('mh-navigation-complete', () => {
                 const escort_force_return = document.querySelector('#escort_force_return');
-                if (escort_force_return.checked !== mho_parameters.default_escort_force_return) {
+                if (escort_force_return && escort_force_return.checked !== mho_parameters.default_escort_force_return) {
                     escort_force_return.click();
                 }
                 const escort_allow_rucksack = document.querySelector('#escort_allow_rucksack');
-                if (escort_allow_rucksack.checked !== mho_parameters.default_escort_allow_rucksack) {
+                if (escort_allow_rucksack && escort_allow_rucksack.checked !== mho_parameters.default_escort_allow_rucksack) {
                     escort_allow_rucksack.click();
                 }
             }, {once: true});
