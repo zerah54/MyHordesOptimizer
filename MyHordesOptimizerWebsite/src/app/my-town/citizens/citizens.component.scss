@@ -1,5 +1,9 @@
 .mho-citizens {
-    .mat-mdc-tab-group {
-        height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    .mat-mdc-tab-nav-panel {
+        flex: 1;
     }
 }

@@ -1,4 +1,4 @@
-<div class="mat-elevation-z8 mho-citizens-digs" *ngIf="citizen_info">
+<div class="mho-citizens-digs" *ngIf="citizen_info">
     <table mat-table [dataSource]="datasource" matSort>
 
         <ng-container *ngFor="let column of columns; trackBy: trackByColumnId" [matColumnDef]="column.id"

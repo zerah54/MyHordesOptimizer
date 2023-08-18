@@ -1,10 +1,12 @@
 .mho-citizens-list {
+    height: 100%;
+
     table {
         width: 100%;
 
         tr {
 
-            >td {
+            > td {
                 padding: 0 0.5em;
 
                 &.center {
@@ -12,24 +14,24 @@
                 }
 
                 &.avatar_name {
-                    >img {
+                    > img {
                         width: 100px;
                         height: 100px;
                     }
 
-                    >div {
+                    > div {
                         text-align: center;
                         margin: auto;
                     }
                 }
 
                 &.more_status {
-                    >div {
+                    > div {
                         display: flex;
                         flex-direction: column;
                         gap: 0.5em;
 
-                        >div {
+                        > div {
                             display: flex;
                             flex-direction: row;
                             align-items: center;
@@ -68,6 +70,7 @@
                         .mat-mdc-form-field {
                             width: 95%;
                             max-width: 95%;
+
                             .mat-form-field-infix {
                                 width: 125px;
                             }

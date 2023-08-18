@@ -47,6 +47,8 @@ $snow-3: url('/assets/img/noel/s3.png');
                 overflow: hidden;
                 margin: 0.5em;
                 height: calc(100% - 1em);
+                display: flex;
+                flex-direction: column;
 
                 .mat-mdc-card-header {
                     height: 40px;
@@ -54,8 +56,8 @@ $snow-3: url('/assets/img/noel/s3.png');
                 }
 
                 .mat-mdc-card-content {
+                    flex: 1;
                     overflow: auto;
-                    height: 100%;
 
                     .mat-mdc-tab-group {
                         height: 100%;

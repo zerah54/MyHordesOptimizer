@@ -1,9 +1,10 @@
-import { Component, ElementRef, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
+import { ApiServices } from '../../../_abstract_model/services/api.services';
 import { DigsServices } from '../../../_abstract_model/services/digs.service';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -24,14 +25,6 @@ export class CitizensDigsComponent implements OnInit {
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
     @ViewChild('filterInput') filterInput!: ElementRef;
-
-
-    @Input() set citizenInfo(citizen_info: CitizenInfo) {
-        this.citizen_info = citizen_info;
-        this.createDigsByCitizenAndDay();
-    }
-
-    @Output() citizenInfoChange: EventEmitter<void> = new EventEmitter();
 
     /** La liste des citoyens */
     public citizen_info!: CitizenInfo;
@@ -63,9 +56,10 @@ export class CitizensDigsComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private digs_api: DigsServices) {
+    constructor(private api: ApiServices, private digs_api: DigsServices) {
 
     }
+
 
     public ngOnInit(): void {
         this.datasource = new MatTableDataSource();
@@ -81,47 +75,8 @@ export class CitizensDigsComponent implements OnInit {
 
         this.datasource.filterPredicate = (data: DigsByCitizen, filter: string): boolean => this.customFilter(data, filter);
         this.getDigs();
-    }
 
-    public updateDig(): void {
-        if (this.dig_to_update) {
-            this.digs_api.updateDig([this.dig_to_update])
-                .pipe(takeUntil(this.destroy_sub))
-                .subscribe((new_digs: Dig[]) => {
-                    const replace_dig: number = this.digs.findIndex((dig: Dig) => {
-                        return dig.cell_id === new_digs[0].cell_id
-                            && dig.digger_id === new_digs[0].digger_id
-                            && dig.day === new_digs[0].day;
-                    });
-
-                    if (replace_dig > -1) {
-                        this.digs[replace_dig] = new_digs[0];
-                    } else {
-                        this.digs.push(new_digs[0]);
-                    }
-
-                    this.dig_to_update = undefined;
-                    this.createDigsByCitizenAndDay();
-                });
-        }
-    }
-
-    public changeDigToUpdate(citizen: Citizen, dig?: Dig): void {
-        this.dig_to_update = undefined;
-        if (dig) {
-            this.dig_to_update = new Dig(dig.modelToDto());
-        } else {
-            this.dig_to_update = new Dig({
-                cellId: undefined,
-                day: this.filters.selected_day,
-                diggerId: citizen.id,
-                diggerName: citizen.name,
-                nbSucces: 0,
-                nbTotalDig: 0,
-                x: getTown()?.town_x || 0,
-                y: getTown()?.town_y || 0
-            });
-        }
+        this.getCitizens();
     }
 
     public trackByColumnId(_index: number, column: CitizenColumn): string {
@@ -182,6 +137,16 @@ export class CitizensDigsComponent implements OnInit {
                 };
             })];
         }
+    }
+
+    private getCitizens(): void {
+        this.api.getCitizens()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((citizen_info: CitizenInfo) => {
+                citizen_info.citizens = citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_ghost);
+                this.citizen_info = citizen_info;
+                this.createDigsByCitizenAndDay();
+            });
     }
 }
 

@@ -1,20 +1,20 @@
-import { Component, ElementRef, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import * as moment from 'moment';
 import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
 import { Subject, takeUntil } from 'rxjs';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
-import { Item } from '../../../_abstract_model/types/item.class';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
-import { ApiServices } from '../../../_abstract_model/services/api.services';
-import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
-import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
-import { getUser } from '../../../shared/utilities/localstorage.util';
 import { HeroicActionEnum } from '../../../_abstract_model/enum/heroic-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
+import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
+import { ApiServices } from '../../../_abstract_model/services/api.services';
+import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { Item } from '../../../_abstract_model/types/item.class';
+import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
+import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
+import { getUser } from '../../../shared/utilities/localstorage.util';
 
 @Component({
     selector: 'mho-citizens-list',
@@ -31,15 +31,6 @@ export class CitizensListComponent implements OnInit {
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
     @ViewChild('filterInput') filterInput!: ElementRef;
-
-    @Input() set citizenInfo(citizen_info: CitizenInfo) {
-        if (citizen_info) {
-            this.citizen_info = citizen_info;
-            this.datasource.data = [...citizen_info.citizens];
-        }
-    }
-
-    @Output() citizenInfoChange: EventEmitter<void> = new EventEmitter();
 
     /** La liste des citoyens */
     public citizen_info!: CitizenInfo;
@@ -58,10 +49,10 @@ export class CitizensListComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: CitizenColumn[] = [
-        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center'},
-        {id: 'more_status', header: $localize`États`, class: ''},
-        {id: 'heroic_actions', header: $localize`Actions héroïques`, class: ''},
-        {id: 'home', header: $localize`Améliorations`, class: ''},
+        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center' },
+        { id: 'more_status', header: $localize`États`, class: '' },
+        { id: 'heroic_actions', header: $localize`Actions héroïques`, class: '' },
+        { id: 'home', header: $localize`Améliorations`, class: '' },
         // { id: 'chest', header: $localize`Coffre` },
     ];
 
@@ -89,6 +80,8 @@ export class CitizensListComponent implements OnInit {
         this.api.getItems()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((items: Item[]) => this.all_items = items);
+
+        this.getCitizens();
     }
 
     /**
@@ -281,6 +274,15 @@ export class CitizensListComponent implements OnInit {
         return false;
     }
 
+    public getCitizens(): void {
+        this.api.getCitizens()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((citizen_info: CitizenInfo) => {
+                citizen_info.citizens = citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_ghost);
+                this.citizen_info = citizen_info;
+                this.datasource.data = [...citizen_info.citizens];
+            });
+    }
 }
 
 

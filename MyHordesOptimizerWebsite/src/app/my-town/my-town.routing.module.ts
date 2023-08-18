@@ -3,16 +3,19 @@ import { RouterModule, Routes } from '@angular/router';
 import { IsInTownGuard } from '../shared/guards/has-app-key.guard';
 import { BankComponent } from './bank/bank.component';
 import { BuildingsComponent } from './buildings/buildings.component';
+import { CampingsComponent } from './campings/campings.component';
+import { CitizensDigsComponent } from './citizens/citizens-digs/citizens-digs.component';
+import { CitizensListComponent } from './citizens/citizens-list/citizens-list.component';
 import { CitizensComponent } from './citizens/citizens.component';
 import { MapComponent } from './map/map.component';
 import { NightwatchComponent } from './nightwatch/nightwatch.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { WishlistComponent } from './wishlist/wishlist.component';
-import { CampingsComponent } from './campings/campings.component';
 
 const routes: Routes = [
-    {path: '', redirectTo: 'my-town/citizens', pathMatch: 'full'},
-    {path: 'my-town', redirectTo: 'my-town/citizens'},
+    { path: '', redirectTo: 'my-town/citizens/list', pathMatch: 'full' },
+    { path: 'my-town', redirectTo: 'my-town/citizens/list', pathMatch: 'full' },
+    { path: 'my-town/citizens', redirectTo: 'my-town/citizens/list', pathMatch: 'full' },
     {
         path: 'my-town', children: [
             {
@@ -37,7 +40,20 @@ const routes: Routes = [
                 path: 'citizens',
                 component: CitizensComponent,
                 title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Citoyens`,
-                canActivate: [IsInTownGuard]
+                canActivate: [IsInTownGuard],
+                children: [
+                    {
+                        path: 'list',
+                        component: CitizensListComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Citoyens`,
+                        canActivate: [IsInTownGuard],
+                    }, {
+                        path: 'digs',
+                        component: CitizensDigsComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Citoyens`,
+                        canActivate: [IsInTownGuard],
+                    }
+                ]
             },
             {
                 path: 'map',
