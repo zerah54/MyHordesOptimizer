@@ -1,17 +1,17 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
+import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
+import { Cell } from '../../../../_abstract_model/types/cell.class';
+import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { Item } from '../../../../_abstract_model/types/item.class';
+import { Ruin } from '../../../../_abstract_model/types/ruin.class';
+import { AutoDestroy } from '../../../../shared/decorators/autodestroy.decorator';
 import { MapOptions } from '../../map.component';
 import { MapUpdateComponent, MapUpdateData } from '../map-update/map-update.component';
-import { Ruin } from '../../../../_abstract_model/types/ruin.class';
-import { Citizen } from '../../../../_abstract_model/types/citizen.class';
-import { Cell } from '../../../../_abstract_model/types/cell.class';
-import { Item } from '../../../../_abstract_model/types/item.class';
-import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
-import { AutoDestroy } from '../../../../shared/decorators/autodestroy.decorator';
-import { animate, style, transition, trigger } from '@angular/animations';
-import { environment } from '../../../../../environments/environment';
 
 @Component({
     selector: 'mho-map-cell',
@@ -23,14 +23,14 @@ import { environment } from '../../../../../environments/environment';
             [
                 transition(':enter',
                     [
-                        style({opacity: 0, display: 'inline'}),
-                        animate('500ms ease-out', style({opacity: 1}))
+                        style({ opacity: 0, display: 'inline' }),
+                        animate('500ms ease-out', style({ opacity: 1 }))
                     ]
                 ),
                 transition(':leave',
                     [
-                        style({opacity: 1, display: 'inline'}),
-                        animate('500ms ease-in', style({opacity: 0}))
+                        style({ opacity: 1, display: 'inline' }),
+                        animate('500ms ease-in', style({ opacity: 0 }))
                     ]
                 )
             ]
@@ -75,8 +75,10 @@ export class MapCellComponent {
             .afterClosed()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((new_cell: Cell) => {
-                this.cell = new_cell;
-                this.cellChange.next(new_cell);
+                if (new_cell) {
+                    this.cell = new_cell;
+                    this.cellChange.next(new_cell);
+                }
             });
     }
 }

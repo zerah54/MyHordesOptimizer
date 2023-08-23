@@ -1,11 +1,11 @@
 import { Component, HostBinding, Input } from '@angular/core';
-import { MapOptions } from '../map.component';
 import { Cell } from '../../../_abstract_model/types/cell.class';
-import { groupBy } from '../../../shared/utilities/array.util';
-import { Ruin } from '../../../_abstract_model/types/ruin.class';
-import { Item } from '../../../_abstract_model/types/item.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { Item } from '../../../_abstract_model/types/item.class';
+import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../_abstract_model/types/town.class';
+import { groupBy } from '../../../shared/utilities/array.util';
+import { MapOptions } from '../map.component';
 
 @Component({
     selector: 'mho-draw-map',
@@ -23,7 +23,7 @@ export class DrawMapComponent {
     @Input() set map(map: Town) {
         if (map) {
             this.complete_map = map;
-            this.x_row = Array.from({length: map?.map_width}, (_: unknown, i: number) => i - +map.town_x);
+            this.x_row = Array.from({ length: map?.map_width }, (_: unknown, i: number) => i - +map.town_x);
 
             const rows: Cell[][] = groupBy(map?.cells || [], (cell: Cell) => cell.y);
 
@@ -51,6 +51,6 @@ export class DrawMapComponent {
     public drawed_map: Cell[][] = [];
 
     public trackByCellId(_index: number, column: Cell): number {
-        return column.cell_id;
+        return column && column.cell_id;
     }
 }
