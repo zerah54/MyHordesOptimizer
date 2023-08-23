@@ -50,7 +50,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var allGlossaryEntriesLocale = GlossaryRepository.GetGlossary()[locale];
 
-            return allGlossaryEntriesLocale.FindAll((glossaryEntry) => String.Compare(
+            return allGlossaryEntriesLocale.FindAll(glossaryEntry => String.Compare(
                 glossaryEntry.Word,
                 sourceString,
                 CultureInfo.CurrentCulture,

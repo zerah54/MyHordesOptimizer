@@ -86,5 +86,21 @@
       "name": "message-privé",
       "description": "Vrai si le message ne doit pas être vu de tous"
     }
+  },
+  "recipe": {
+    "name": "recette",
+    "description": "Trouve la recette d'un objet et les recettes qui y amènent",
+    "text": {
+      "name": "texte",
+      "description": "Le texte recherché"
+    },
+    "language": {
+      "name": "langue",
+      "description": "La langue du texte recherché"
+    },
+    "private-msg": {
+      "name": "message-privé",
+      "description": "Vrai si le message ne doit pas être vu de tous"
+    }
   }
 }

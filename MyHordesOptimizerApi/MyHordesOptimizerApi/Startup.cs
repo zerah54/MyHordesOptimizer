@@ -98,7 +98,7 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IFataMorganaRepository, FataMorganaRepository>();
             services.AddScoped<IGestHordesRepository, GestHordesRepository>();
 
-            services.AddScoped<IMyHordesOptimizerRepository, MyHordesOptimizerSqlRepository>();
+            services.AddSingleton<IMyHordesOptimizerRepository, MyHordesOptimizerSqlRepository>();
             
             services.AddSingleton<IGlossaryRepository, GlossaryRepository>();
 

@@ -86,5 +86,21 @@
       "name": "private-nachricht",
       "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
     }
+  },
+  "recipe": {
+    "name": "rezepte",
+    "description": "Finden Sie das Rezept für einen Artikel und die Rezepte, die dazu führen",
+    "text": {
+      "name": "text",
+      "description": "Der gesuchte Text"
+    },
+    "language": {
+      "name": "sprache",
+      "description": "Die Sprache des gesuchten Textes"
+    },
+    "private-msg": {
+      "name": "private-nachricht",
+      "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+    }
   }
 }
