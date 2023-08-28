@@ -166,6 +166,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.JobUID, opt => opt.MapFrom(src => src.JobUid))
                 .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.JobName))
                 .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.IsGhost))
+                .ForMember(dest => dest.Dead, opt => opt.MapFrom(src => src.Dead))
                 .ForMember(dest => dest.IdBag, opt => opt.Ignore());
 
             CreateMap<TownCitizenBagItemCompletModel, Citizen>()
@@ -175,6 +176,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.HomeMessage, opt => opt.MapFrom(src => src.CitizenHomeMessage))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CitizenId))
                 .ForMember(dest => dest.IsGhost, opt => opt.MapFrom(src => src.CitizenIsGhost))
+                .ForMember(dest => dest.Dead, opt => opt.MapFrom(src => src.CitizenIsDead))
                 .ForMember(dest => dest.JobName, opt => opt.MapFrom(src => src.CitizenJobName))
                 .ForMember(dest => dest.JobUid, opt => opt.MapFrom(src => src.CitizenJobUID))
                 .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.CitizenPositionX))

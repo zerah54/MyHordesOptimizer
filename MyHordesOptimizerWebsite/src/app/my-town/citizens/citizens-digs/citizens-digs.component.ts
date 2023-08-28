@@ -143,7 +143,7 @@ export class CitizensDigsComponent implements OnInit {
         this.api.getCitizens()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((citizen_info: CitizenInfo) => {
-                citizen_info.citizens = citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_ghost);
+                citizen_info.citizens = citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_dead);
                 this.citizen_info = citizen_info;
                 this.createDigsByCitizenAndDay();
             });

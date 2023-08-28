@@ -3,18 +3,19 @@ import { ItemCountDTO } from '../dto/item-count.dto';
 import { ShortItemCountDTO } from '../dto/short-item-count.dto';
 import { JobEnum } from '../enum/job.enum';
 import { StatusEnum } from '../enum/status.enum';
+import { CommonModel } from './_common.class';
+import { Dictionary } from './_types';
 import { Bag } from './bag.class';
 import { HeroicActions, HeroicActionsWithValue } from './heroic-actions.class';
 import { Home, HomeWithValue } from './home.class';
 import { Status } from './status.class';
-import { CommonModel } from './_common.class';
-import { Dictionary } from './_types';
 
 export class Citizen extends CommonModel<CitizenDTO> {
     public avatar?: string;
     public home_message?: string;
     public id!: number;
     public is_ghost?: boolean;
+    public is_dead?: boolean;
     public job?: JobEnum;
     public name!: string;
     public nombre_jour_hero?: number;
@@ -37,6 +38,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             homeMessage: this.home_message,
             id: this.id,
             isGhost: this.is_ghost,
+            dead: this.is_dead,
             jobName: '',
             jobUid: this.job?.key,
             nombreJourHero: this.nombre_jour_hero,
@@ -75,7 +77,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
         return {
             userId: this.id,
             heroicActions: this.heroic_actions?.content.reduce((accumulator: Dictionary<number | boolean>, content: HeroicActionsWithValue) => {
-                return {...accumulator, [content.element.key]: content.value};
+                return { ...accumulator, [content.element.key]: content.value };
             }, {}) || {}
         };
     }
@@ -84,7 +86,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
         return {
             userId: this.id,
             home: this.home?.content.reduce((accumulator: Dictionary<number | boolean>, content: HomeWithValue) => {
-                return {...accumulator, [content.element.key]: content.value};
+                return { ...accumulator, [content.element.key]: content.value };
             }, {}) || {}
         };
     }
@@ -95,6 +97,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.home_message = dto.homeMessage;
             this.id = dto.id;
             this.is_ghost = dto.isGhost;
+            this.is_dead = dto.dead;
             this.job = dto.jobUid ? <JobEnum>JobEnum.getByKey(dto.jobUid) : undefined;
             this.nombre_jour_hero = dto.nombreJourHero;
             this.x = dto.x;

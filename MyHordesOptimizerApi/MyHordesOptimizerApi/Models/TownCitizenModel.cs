@@ -14,6 +14,7 @@ namespace MyHordesOptimizerApi.Models
 		public int PositionX { get; set; }
 		public int PositionY { get; set; }
 		public bool IsGhost { get; set; }
+		public bool Dead { get; set; }
 		public int IdLastUpdateInfo { get; set; }
 		public int? IdBag { get; set; }
 

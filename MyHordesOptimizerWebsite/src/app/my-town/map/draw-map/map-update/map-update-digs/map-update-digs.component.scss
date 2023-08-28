@@ -1,3 +1,16 @@
 .mho-map-update-digs {
 
 }
+
+
+.mho-add-citizen-list {
+    max-height: 300px;
+
+    > * {
+        cursor: pointer;
+
+        img {
+            margin-right: 0.5em;
+        }
+    }
+}

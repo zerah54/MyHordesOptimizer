@@ -599,8 +599,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
             {
                 citizenToUpdate.IdBag = existings.Single(existing => existing.idUser == citizenToUpdate.IdUser).idBag;
                 connection.Execute(@"UPDATE TownCitizen 
-                                     SET HomeMessage = @HomeMessage, JobName = @JobName, JobUID = @JobUID, Avatar = @Avatar, PositionX = @PositionX, PositionY = @PositionY, IsGhost = @IsGhost, IdLastUpdateInfo = @IdLastUpdateInfo 
-                                     WHERE IdTown = @IdTown AND IdUser = @IdUser", new { HomeMessage = citizenToUpdate.HomeMessage, JobName = citizenToUpdate.JobName, JobUID = citizenToUpdate.JobUID, Avatar = citizenToUpdate.Avatar, PositionX = citizenToUpdate.PositionX, PositionY = citizenToUpdate.PositionY, IsGhost = citizenToUpdate.IsGhost, IdLastUpdateInfo = citizenToUpdate.IdLastUpdateInfo, IdTown = townId, IdUser = citizenToUpdate.IdUser });
+                                     SET HomeMessage = @HomeMessage, JobName = @JobName, JobUID = @JobUID, Avatar = @Avatar, PositionX = @PositionX, PositionY = @PositionY, IsGhost = @IsGhost, Dead = @Dead, IdLastUpdateInfo = @IdLastUpdateInfo 
+                                     WHERE IdTown = @IdTown AND IdUser = @IdUser", new { HomeMessage = citizenToUpdate.HomeMessage, JobName = citizenToUpdate.JobName, JobUID = citizenToUpdate.JobUID, Avatar = citizenToUpdate.Avatar, PositionX = citizenToUpdate.PositionX, PositionY = citizenToUpdate.PositionY, IsGhost = citizenToUpdate.IsGhost, Dead = citizenToUpdate.Dead, IdLastUpdateInfo = citizenToUpdate.IdLastUpdateInfo, IdTown = townId, IdUser = citizenToUpdate.IdUser });
             }
             connection.Close();
         }
@@ -625,6 +625,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                   ,positionX AS CitizenPositionX
                                   ,positionY AS CitizenPositionY
                                   ,isGhost AS CitizenIsGhost
+                                  ,dead AS CitizenIsDead
                                   ,tc.idLastUpdateInfo AS LastUpdateInfoId
                                   ,tc.avatar
                                   ,tc.hasRescue

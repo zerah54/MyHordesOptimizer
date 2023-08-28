@@ -39,6 +39,7 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Citizen
         public int CitizenPositionX { get; set; }
         public int CitizenPositionY { get; set; }
         public bool CitizenIsGhost { get; set; }
+        public bool CitizenIsDead { get; set; }
         public int LastUpdateInfoId { get; set; }
         public int LastUpdateInfoUserId { get; set; }
         public DateTime LastUpdateDateUpdate { get; set; }

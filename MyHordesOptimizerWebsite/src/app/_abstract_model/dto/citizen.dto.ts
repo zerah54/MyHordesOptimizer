@@ -8,6 +8,7 @@ export interface CitizenDTO {
     homeMessage?: string;
     id: number;
     isGhost?: boolean;
+    dead?: boolean;
     jobName?: string;
     jobUid?: string;
     name: string;

@@ -43,7 +43,7 @@
             <img *ngIf="cell.note" [ngSrc]="HORDES_IMG_REPO + 'icons/small_talk.gif'" width="12" height="12">
         </span>
         <span class="corner-top-right corner">
-            <div *ngIf="cell.citizens.length > 0">
+            <div *ngIf="(cell.citizens && cell.citizens.length > 0) || cell.nb_hero > 0">
                 <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" width="12" height="12">
                 <span class="detail-value">{{cell.nb_hero}}</span>
             </div>
