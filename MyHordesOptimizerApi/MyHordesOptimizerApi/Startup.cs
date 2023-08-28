@@ -1,7 +1,8 @@
-using System.IO;
 using AutoMapper;
 using Common.Core.Repository.Impl;
 using Common.Core.Repository.Interfaces;
+using Discord.Interactions;
+using Discord.WebSocket;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpLogging;
@@ -12,6 +13,7 @@ using MyHordesOptimizerApi.Configuration.Impl;
 using MyHordesOptimizerApi.Configuration.Impl.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
+using MyHordesOptimizerApi.DiscordBot.Services;
 using MyHordesOptimizerApi.MappingProfiles;
 using MyHordesOptimizerApi.Providers.Impl;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -30,11 +32,9 @@ using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
 using Serilog;
+using System.IO;
 using System.Net.Http;
 using System.Reflection;
-using MyHordesOptimizerApi.DiscordBot.Services;
-using Discord.Interactions;
-using Discord.WebSocket;
 
 namespace MyHordesOptimizerApi
 {
@@ -99,7 +99,7 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IGestHordesRepository, GestHordesRepository>();
 
             services.AddSingleton<IMyHordesOptimizerRepository, MyHordesOptimizerSqlRepository>();
-            
+
             services.AddSingleton<IGlossaryRepository, GlossaryRepository>();
 
             // Services
@@ -123,11 +123,11 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<ILocalizationManager>(jsonLocalizationManager);
             services.AddHostedService<InteractionHandlingHostedService>();    // Add the slash command handler
             services.AddHostedService<DiscordStartupHostedService>();         // Add the discord startup service
-            
+
             services.AddHttpLogging(logging =>
             {
                 logging.LoggingFields = HttpLoggingFields.All | HttpLoggingFields.RequestQuery;
-            });  
+            });
         }
 
         protected IMapper BuildAutoMapper()
