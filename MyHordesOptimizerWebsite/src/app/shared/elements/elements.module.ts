@@ -7,7 +7,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { Components, Modules } from '../../_abstract_model/types/_types';
 import { MaterialModule } from '../material-modules.module';
+import { PipesModule } from '../pipes/pipes.module';
 import { AccordionComponent } from './accordion/accordion.component';
+import { AvatarComponent } from './avatar/avatar.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import { DigComponent } from './dig/dig.component';
 import { FilterFieldComponent } from './filter-field/filter-field.component';
@@ -26,11 +28,11 @@ import { SelectComponent } from './select/select.component';
 
 const components: Components = [
     ItemComponent, SelectComponent, RecipeComponent, FilterFieldComponent, LastUpdateComponent, AccordionComponent, ListElementAddRemoveComponent, MenuAddComponent,
-    MenuRemoveComponent, ConfirmDialogComponent, DigComponent
+    MenuRemoveComponent, ConfirmDialogComponent, DigComponent, AvatarComponent
 ];
 const list_headers: Components = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent];
 const local_components: Components = [LabelPipe];
-const custom_modules: Modules = [MaterialModule];
+const custom_modules: Modules = [MaterialModule, PipesModule];
 const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, NgOptimizedImage];
 const pipes: Components = [DecimalPipe];
 

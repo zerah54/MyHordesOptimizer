@@ -1,0 +1,7 @@
+<ng-container *ngIf="src && src !== '' && src !== 'False'">
+    <ng-container [ngSwitch]="src | imageType">
+        <source *ngSwitchCase="'avif'" [src]="src" type="image/avif"/>
+        <source *ngSwitchCase="'webp'" [src]="src" type="image/webp"/>
+        <img *ngSwitchDefault [ngSrc]="src">
+    </ng-container>
+</ng-container>
