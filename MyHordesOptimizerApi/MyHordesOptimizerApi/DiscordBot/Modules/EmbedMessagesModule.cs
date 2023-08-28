@@ -173,7 +173,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
 
             components.WithButton(addSectionBtn);
 
-            if ((embed.Fields != null && embed.Fields.Length > 0) || (embed.Title != null && embed.Description != null))
+            if ((embed.Fields != null && embed.Fields.Length > 0) || embed.Description != null)
             {
                 components.WithButton(publishBtn);
             }
