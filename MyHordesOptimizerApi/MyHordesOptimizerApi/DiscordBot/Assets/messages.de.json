@@ -49,6 +49,14 @@
         "name": "private-nachricht",
         "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
       }
+    },
+    "discord-cheat-sheet": {
+      "name": "discord-gestaltung",
+      "description": "Liste der Discord-Shaping-Verknüpfungen",
+      "private-msg": {
+        "name": "private-nachricht",
+        "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+      }
     }
   },
   "translate": {
@@ -102,5 +110,17 @@
       "name": "private-nachricht",
       "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
     }
+  },
+  "play": {
+    "name": "spielen",
+    "description": "Die gleichen Spiele wie auf MyHordes, aber auf Discord",
+    "text": {
+      "name": "text",
+      "description": "Verwenden Sie dieselben Schlüsselwörter wie in MyHordes. (Beispiel: {d100}{d20})"
+    }
+  },
+  "instructions": {
+    "name": "anweisungen",
+    "description": "Machen Sie Ihre Anweisungen deutlich sichtbar und länger"
   }
 }

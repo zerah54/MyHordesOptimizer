@@ -49,6 +49,14 @@
         "name": "message-privé",
         "description": "Vrai si le message ne doit pas être vu de tous"
       }
+    },
+    "discord-cheat-sheet": {
+      "name": "mise-en-forme-discord",
+      "description": "Liste des raccourcis de mise en forme Discord",
+      "private-msg": {
+        "name": "message-privé",
+        "description": "Vrai si le message ne doit pas être vu de tous"
+      }
     }
   },
   "translate": {
@@ -102,5 +110,17 @@
       "name": "message-privé",
       "description": "Vrai si le message ne doit pas être vu de tous"
     }
+  },
+  "play": {
+    "name": "jouer",
+    "description": "Les mêmes jeux que sur MyHordes, mais sur Discord",
+    "text": {
+      "name": "texte",
+      "description": "Utilisez les mêmes mots clés que dans MyHordes. (Exemple: {d100}{d20})"
+    }
+  },
+  "instructions": {
+    "name": "instructions",
+    "description": "Rendez vos instructions clairement visibles et plus longues"
   }
 }
