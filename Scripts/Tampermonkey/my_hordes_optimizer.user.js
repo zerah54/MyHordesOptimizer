@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.61
+// @version      1.0.0-beta.62
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,8 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Divers correctifs d'affichage des paramètres en particulier sur mobile ou sur petit écran\n\n`;
-+`[correctif] Correction d'un problème qui provoquait des notifications d'absence d'escorte alors qu'on était bien en attente d'escorte\n\n`;
+    + `[correctif] Bug de recherche dans le nom d'un chantier\n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -3892,10 +3891,10 @@ function displaySearchFieldOnBuildings() {
             search_field.addEventListener('keyup', (event) => {
                 let building_rows = [];
                 buildings.forEach((building) => {
-                    building_rows.push(...Array.from(building.querySelectorAll('.row-flex')));
+                    building_rows.push(...Array.from(building.querySelectorAll('.building')));
                 });
                 building_rows.forEach((building_row) => {
-                    if (building_row.getElementsByTagName('span')[0].innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {
+                    if (building_row.querySelector('.building_name').innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {
                         building_row.classList.remove('hidden');
                     } else {
                         building_row.classList.add('hidden');
@@ -8404,7 +8403,7 @@ function updateExternalTools() {
             let arrivals = logs.filter((log) => log.innerText.toLowerCase().indexOf(getI18N(arrivals_texts).toLowerCase()) > -1).map((log) => {
                 return {
                     time: log.querySelector('.log-part-time')?.innerText,
-                    citizen: log.querySelector('.log-part-content span')?.innerText
+                    citizen: log.querySelector('.log-part-content .container span')?.innerText
                 };
             });
 
