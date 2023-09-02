@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.62
+// @version      1.0.0-beta.63
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Bug de recherche dans le nom d'un chantier\n\n`;
+    + `[correctif] Correction d'un bug sur les options d'escorte qui n'étaient pas forcément les bonnes après une actualisation`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -6514,12 +6514,22 @@ function changeDefaultEscortOptions() {
         btn_activate_escort.addEventListener('click', () => {
             document.addEventListener('mh-navigation-complete', () => {
                 const escort_force_return = document.querySelector('#escort_force_return');
-                if (escort_force_return && escort_force_return.checked !== mho_parameters.default_escort_force_return) {
-                    escort_force_return.click();
-                }
                 const escort_allow_rucksack = document.querySelector('#escort_allow_rucksack');
-                if (escort_allow_rucksack && escort_allow_rucksack.checked !== mho_parameters.default_escort_allow_rucksack) {
+
+                if (!escort_force_return || !escort_allow_rucksack) return;
+
+                const escort_force_return_correct = escort_force_return.checked === mho_parameters.default_escort_force_return;
+                const escort_allow_rucksack_correct = escort_allow_rucksack.checked === mho_parameters.default_escort_allow_rucksack;
+                if (!escort_force_return_correct && !escort_allow_rucksack_correct) {
+                    escort_force_return.checked = !escort_force_return.checked;
                     escort_allow_rucksack.click();
+                } else if (!escort_force_return_correct || !escort_allow_rucksack_correct) {
+                    if (!escort_force_return_correct) {
+                        escort_force_return.click();
+                    }
+                    if (!escort_allow_rucksack_correct) {
+                        escort_allow_rucksack.click();
+                    }
                 }
             }, {once: true});
         });

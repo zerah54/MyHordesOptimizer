@@ -18,9 +18,9 @@ export class RegistryComponent implements OnInit {
 
     public dev_mode: boolean = !environment.production;
 
-    public registry!: string;
-    public registry_entries!: Entry[];
-    public display_mode!: RegistryMode;
+    public registry: string | undefined;
+    public registry_entries: Entry[] | undefined;
+    public display_mode: RegistryMode;
 
     public complete_citizen_list!: CitizenInfo;
     public complete_items_list!: Item[];
@@ -63,4 +63,4 @@ export class RegistryComponent implements OnInit {
 
 }
 
-type RegistryMode = 'dice' | 'card' | 'digs' | 'bank_diff' | 'well' | 'plays' | 'doors';
+type RegistryMode = 'dice' | 'card' | 'digs' | 'bank_diff' | 'well' | 'plays' | 'doors' | undefined;

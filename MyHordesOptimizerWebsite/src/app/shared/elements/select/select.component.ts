@@ -6,8 +6,9 @@ import { MatFormField, MatFormFieldControl } from '@angular/material/form-field'
 import { MatInput } from '@angular/material/input';
 import { MatSelect } from '@angular/material/select';
 import { Subject } from 'rxjs';
-import { LabelPipe } from './label.pipe';
+import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { normalizeString } from '../../utilities/string.utils';
+import { LabelPipe } from './label.pipe';
 
 @Component({
     selector: 'mho-select',
@@ -94,6 +95,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     public stateChanges: Subject<void> = new Subject<void>();
     public controlType?: string | undefined;
     public autofilled?: boolean | undefined;
+
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
     private complete_options: (T | string)[] = [];
     //The internal data model for form control value access

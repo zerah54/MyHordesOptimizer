@@ -13,10 +13,14 @@ export class WellRegistryComponent {
 
     @Input({ required: true }) completeCitizenList!: CitizenInfo;
 
-    @Input({ required: true }) set registry(registry: Entry[]) {
-        this.entries = registry.filter((entry: Entry) => {
-            return this.well_keywords.some((well_keywords: string): boolean => entry.entry?.indexOf(' ' + well_keywords + ' ') > -1);
-        });
+    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+        if (registry) {
+            this.entries = registry.filter((entry: Entry) => {
+                return this.well_keywords.some((well_keywords: string): boolean => entry.entry?.indexOf(' ' + well_keywords + ' ') > -1);
+            });
+        } else {
+            this.entries = [];
+        }
     }
 
     protected entries: Entry[] = [];

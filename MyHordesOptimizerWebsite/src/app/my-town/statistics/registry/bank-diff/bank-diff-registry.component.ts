@@ -17,11 +17,15 @@ export class BankDiffRegistryComponent {
     @Input({ required: true }) completeCitizenList!: CitizenInfo;
     @Input({ required: true }) completeItemsList!: Item[];
 
-    @Input({ required: true }) set registry(registry: Entry[]) {
-        this.entries = registry.filter((entry: Entry) => {
-            return this.give_keywords.some((give_keyword: string): boolean => entry.entry?.indexOf(' ' + give_keyword + ' ') > -1 || entry.entry?.indexOf(' ' + give_keyword + ':') > -1)
-                || this.take_keywords.some((take_keyword: string): boolean => entry.entry?.indexOf(' ' + take_keyword + ' ') > -1 || entry.entry?.indexOf(' ' + take_keyword + ':') > -1);
-        });
+    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+        if (registry) {
+            this.entries = registry.filter((entry: Entry) => {
+                return this.give_keywords.some((give_keyword: string): boolean => entry.entry?.indexOf(' ' + give_keyword + ' ') > -1 || entry.entry?.indexOf(' ' + give_keyword + ':') > -1)
+                    || this.take_keywords.some((take_keyword: string): boolean => entry.entry?.indexOf(' ' + take_keyword + ' ') > -1 || entry.entry?.indexOf(' ' + take_keyword + ':') > -1);
+            });
+        } else {
+            this.entries = [];
+        }
     }
 
     protected entries: Entry[] = [];

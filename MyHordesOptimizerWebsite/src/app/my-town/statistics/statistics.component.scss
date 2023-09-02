@@ -1,3 +1,10 @@
 .mho-stats {
 
+    display: flex;
+    flex-direction: column;
+
+    .mat-mdc-tab-nav-panel {
+        flex: 1;
+        overflow: auto;
+    }
 }

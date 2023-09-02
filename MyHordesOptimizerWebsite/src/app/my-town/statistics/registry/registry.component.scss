@@ -3,13 +3,13 @@
 .mho-registry {
     display: flex;
     flex-wrap: wrap;
-    height: calc(100% - 12px);
+    height: 100%;
 
     .registry-paste {
         margin-top: 1em;
         min-width: 400px;
         max-width: 500px;
-        height: 100%;
+        height: calc(100% - 1em);
         font-size: 12px;
 
         .mat-mdc-form-field-flex {
@@ -27,6 +27,9 @@
     }
 
     .actions {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         width: 50px;
 
         .mat-mdc-icon-button {

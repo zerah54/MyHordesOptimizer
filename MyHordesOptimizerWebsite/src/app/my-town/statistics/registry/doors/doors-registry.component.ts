@@ -19,14 +19,18 @@ export class DoorsRegistryComponent {
 
     @Input({ required: true }) completeCitizenList!: CitizenInfo;
 
-    @Input({ required: true }) set registry(registry: Entry[]) {
-        this.entries = registry.filter((entry: Entry) => {
-            return this.doors_entering_keywords.some((doors_entering: string): boolean => entry.entry?.indexOf(' ' + doors_entering) > -1)
-                || this.doors_leaving_keywords.some((doors_leaving: string): boolean => entry.entry?.indexOf(' ' + doors_leaving) > -1);
-        });
-        setTimeout(() => {
-            this.createDoorsCanvas();
-        });
+    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+        if (registry) {
+            this.entries = registry.filter((entry: Entry) => {
+                return this.doors_entering_keywords.some((doors_entering: string): boolean => entry.entry?.indexOf(' ' + doors_entering) > -1)
+                    || this.doors_leaving_keywords.some((doors_leaving: string): boolean => entry.entry?.indexOf(' ' + doors_leaving) > -1);
+            });
+            setTimeout(() => {
+                this.createDoorsCanvas();
+            });
+        } else {
+            this.entries = [];
+        }
     }
 
     protected entries: Entry[] = [];

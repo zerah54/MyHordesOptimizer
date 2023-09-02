@@ -43,6 +43,7 @@
                                                             placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
                                                             (ngModelChange)="addItemToWishlist($any($event))"
                                                             [options]="items | isItemDisplayed:datasource.data"
+                                                            [bindIcon]="'img'"
                                                             [bindLabel]="'label.' + locale"></mho-select>
                                             </mat-form-field>
                                         </div>

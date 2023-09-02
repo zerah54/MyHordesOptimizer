@@ -16,9 +16,13 @@ export class DiceCardsRegistryComponent {
 
     @Input({ required: true }) completeCitizenList!: CitizenInfo;
 
-    @Input({ required: true }) set registry(registry: Entry[]) {
-        this.entries = registry;
-        this.filterEntriesByType(registry);
+    @Input({ required: true }) set registry(registry: Entry[] | undefined) {
+        if (registry) {
+            this.entries = registry;
+            this.filterEntriesByType(registry);
+        } else {
+            this.entries = [];
+        }
     }
 
     protected entries_by_type: Entry[] = [];
