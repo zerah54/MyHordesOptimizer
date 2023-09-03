@@ -33,9 +33,10 @@
                                    cdkDropList
                                    cdkDropListLockAxis="y"
                                    [cdkDropListData]="datasource"
-                                   (cdkDropListDropped)="sortWishlist($event)">
-                                <ng-container matColumnDef="filters">
-                                    <td mat-header-cell *matHeaderCellDef colspan="9">
+                                   (cdkDropListDropped)="sortWishlist($event)"
+                                   [cdkDropListDisabled]="drag_disabled">
+                                <ng-container matColumnDef="filters" [sticky]="true">
+                                    <td mat-header-cell *matHeaderCellDef colspan="2">
                                         <div class="table-filters">
                                             <mat-form-field class="no-bottom">
                                                 <mat-label i18n>Ajouter un objet à la liste</mat-label>
@@ -47,6 +48,10 @@
                                                             [bindLabel]="'label.' + locale"></mho-select>
                                             </mat-form-field>
                                         </div>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="empty">
+                                    <td mat-header-cell *matHeaderCellDef colspan="7">
                                     </td>
                                 </ng-container>
 
@@ -88,7 +93,10 @@
                                     <td mat-cell *matCellDef="let row" [ngClass]="[column.id || '']">
                                         <ng-container [ngSwitch]="column.id">
                                             <ng-container *ngSwitchCase="'sort'">
-                                                <div cdkDragHandle class="dragdrop-indicator">
+                                                <div cdkDragHandle
+                                                     (mousedown)="drag_disabled = false"
+                                                     (mouseup)="drag_disabled = true"
+                                                     class="dragdrop-indicator">
                                                     <mat-icon>drag_indicator</mat-icon>
                                                 </div>
                                             </ng-container>
@@ -151,7 +159,7 @@
                                 </ng-container>
 
 
-                                <tr mat-header-row *matHeaderRowDef="['filters']; sticky: true"></tr>
+                                <tr mat-header-row *matHeaderRowDef="['filters', 'empty']; sticky: true"></tr>
                                 <tr mat-header-row *matHeaderRowDef="columns_ids; sticky: true"></tr>
                                 <tr mat-row *matRowDef="let row; columns: columns_ids;" cdkDrag [cdkDragData]="row"></tr>
 

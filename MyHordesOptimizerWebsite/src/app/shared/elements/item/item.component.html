@@ -3,7 +3,7 @@
         <div class="title-part" (click)="toggleAdvancedMode()">
             <div class="item_title">
                 <div class="item_img">
-                    <img [ngSrc]="HORDES_IMG_REPO + item.img" width="16" height="16">
+                    <img [src]="HORDES_IMG_REPO + item.img">
                     <span class="item_count" *ngIf="item.bank_count && item.bank_count > 1">{{item.bank_count}}</span>
                 </div>
                 <span class="item_label">{{item.label[locale]}}

@@ -3,16 +3,20 @@
 
     margin-top: 1em;
     margin-bottom: 1em;
+    align-items: baseline;
 
     small {
         font-style: italic;
     }
+
     img {
         vertical-align: middle;
     }
+
     > ul {
         list-style: none;
         padding: 0;
+
         li {
             img {
                 margin-right: 0.5em;

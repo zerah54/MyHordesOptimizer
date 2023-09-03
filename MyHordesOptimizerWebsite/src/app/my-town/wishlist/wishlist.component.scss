@@ -13,6 +13,13 @@
 
         tr {
             > td {
+
+                .table-filters {
+                    .mat-mdc-form-field {
+                        width: 100%;
+                    }
+                }
+
                 &.name {
                     > div {
                         display: flex;
@@ -28,6 +35,7 @@
 
                 .dragdrop-indicator {
                     display: flex;
+                    cursor: move;
 
                     .mat-icon {
                         margin: auto;

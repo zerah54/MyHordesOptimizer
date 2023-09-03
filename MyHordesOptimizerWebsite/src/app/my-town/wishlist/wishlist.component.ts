@@ -1,25 +1,25 @@
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { DOCUMENT } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, Inject, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
 import * as moment from 'moment';
 import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
 import { Subject, takeUntil } from 'rxjs';
+import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';
+import { environment } from '../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { ApiServices } from '../../_abstract_model/services/api.services';
+import { WishlistServices } from '../../_abstract_model/services/wishlist.service';
 import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { WishlistServices } from '../../_abstract_model/services/wishlist.service';
-import { ClipboardService } from '../../shared/services/clipboard.service';
-import { environment } from '../../../environments/environment';
-import { SelectComponent } from '../../shared/elements/select/select.component';
-import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';
 import { ConfirmDialogComponent } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
-import { DOCUMENT } from '@angular/common';
+import { SelectComponent } from '../../shared/elements/select/select.component';
+import { ClipboardService } from '../../shared/services/clipboard.service';
 
 
 @Component({
@@ -46,15 +46,15 @@ export class WishlistComponent implements OnInit {
     public readonly locale: string = moment.locale();
     /** La liste des colonnes */
     public readonly columns: WishlistColumns[] = [
-        {id: 'sort', header: ''},
-        {id: 'name', header: $localize`Objet`},
-        {id: 'priority', header: $localize`Priorité`},
-        {id: 'depot', header: $localize`Dépôt`},
-        {id: 'bank_count', header: $localize`Banque`},
-        {id: 'bag_count', header: $localize`Sacs`},
-        {id: 'count', header: $localize`Stock souhaité`},
-        {id: 'needed', header: $localize`Quantité manquante`},
-        {id: 'delete', header: ''},
+        { id: 'sort', header: '' },
+        { id: 'name', header: $localize`Objet` },
+        { id: 'priority', header: $localize`Priorité` },
+        { id: 'depot', header: $localize`Dépôt` },
+        { id: 'bank_count', header: $localize`Banque` },
+        { id: 'bag_count', header: $localize`Sacs` },
+        { id: 'count', header: $localize`Stock souhaité` },
+        { id: 'needed', header: $localize`Quantité manquante` },
+        { id: 'delete', header: '' },
     ];
     /** La liste des colonnes */
     public readonly columns_ids: string[] = this.columns.map((column: WishlistColumns) => column.id);
@@ -71,34 +71,36 @@ export class WishlistComponent implements OnInit {
         depot: []
     };
 
+    public drag_disabled: boolean = true;
+
     public wishlist_filters_change: EventEmitter<void> = new EventEmitter();
 
     private readonly excel_headers: { [key: string]: { label: string, comment?: string } } = {
-        id: {label: $localize`Identifiant`},
-        name: {label: $localize`Nom de l'objet`},
+        id: { label: $localize`Identifiant` },
+        name: { label: $localize`Nom de l'objet` },
         priority: {
             label: $localize`Priorité`,
             comment: `(3 : ${$localize`Haute`}, 2 : ${$localize`Moyenne`}, 1 : ${$localize`Basse`}, 0 : ${$localize`Non définie`}, -1 : ${$localize`Ne pas ramener`})`
         },
-        count: {label: $localize`Quantité souhaitée`},
-        depot: {label: $localize`Zone de dépôt`, comment: `(0 : ${$localize`Banque`}, 1 : ${$localize`Zone de rappatriement`}, 2 : ${$localize`Non définie`})`},
+        count: { label: $localize`Quantité souhaitée` },
+        depot: { label: $localize`Zone de dépôt`, comment: `(0 : ${$localize`Banque`}, 1 : ${$localize`Zone de rappatriement`}, 2 : ${$localize`Non définie`})` },
     };
 
 
     /** La liste des priorités */
     public readonly priorities: PriorityOrDepot[] = [
-        {count: -1, label: $localize`Ne pas ramener`},
-        {count: 0, label: $localize`Non définie`},
-        {count: 1, label: $localize`Basse`},
-        {count: 2, label: $localize`Moyenne`},
-        {count: 3, label: $localize`Haute`}
+        { count: -1, label: $localize`Ne pas ramener` },
+        { count: 0, label: $localize`Non définie` },
+        { count: 1, label: $localize`Basse` },
+        { count: 2, label: $localize`Moyenne` },
+        { count: 3, label: $localize`Haute` }
     ];
 
     /** La liste des dépôts */
     public readonly depots: PriorityOrDepot[] = [
-        {count: -1, label: $localize`Non définie`},
-        {count: 0, label: $localize`Banque`},
-        {count: 1, label: $localize`Zone de rapatriement`},
+        { count: -1, label: $localize`Non définie` },
+        { count: 0, label: $localize`Banque` },
+        { count: 1, label: $localize`Zone de rapatriement` },
     ];
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
@@ -248,13 +250,13 @@ export class WishlistComponent implements OnInit {
                 final_item[this.excel_headers['depot'].label] = item.depot;
                 return final_item;
             });
-            const data: WorkSheet = utils.json_to_sheet(simplify_item, {cellStyles: true});
+            const data: WorkSheet = utils.json_to_sheet(simplify_item, { cellStyles: true });
             workbook.SheetNames.push(zone_items_key);
             workbook.Sheets[zone_items_key] = data;
         }
 
-        const u8: Uint8Array = write(workbook, {type: 'buffer', bookType: 'xlsx'});
-        const blob: Blob = new Blob([u8], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        const u8: Uint8Array = write(workbook, { type: 'buffer', bookType: 'xlsx' });
+        const blob: Blob = new Blob([u8], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
         const url: string = URL.createObjectURL(blob);
         const hidden_link: HTMLAnchorElement = this.document.createElement('a');
@@ -326,6 +328,8 @@ export class WishlistComponent implements OnInit {
     }
 
     public sortWishlist(event: CdkDragDrop<TableVirtualScrollDataSource<WishlistItem>>): void {
+        this.drag_disabled = true;
+
         const current_wishlist_items: WishlistItem[] = this.wishlist_info.wishlist_items.get(this.selected_tab_key) || this.wishlist_info.wishlist_items.get('0') || [];
         const previous_index_in_real_array: number = current_wishlist_items.findIndex((item: WishlistItem) => item.item.id === event.item.data.item.id);
         let current_index_in_real_array: number;

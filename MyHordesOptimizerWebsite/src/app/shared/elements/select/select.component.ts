@@ -172,7 +172,6 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     }
 
     public setDescribedByIds(ids: string[]): void {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const controlElement: HTMLElement = this._elementRef.nativeElement.querySelector('.mho-select-input-container')!;
         if (controlElement) {
             controlElement.setAttribute('aria-describedby', ids.join(' '));
