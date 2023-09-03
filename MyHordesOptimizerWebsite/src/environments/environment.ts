@@ -6,17 +6,10 @@ import { FirebaseOptions } from '@firebase/app';
 
 export const environment: Environment = {
     production: false,
-    api_url: 'https://api.myhordesoptimizer.fr',
-    // api_url: 'https://myhordesoptimizerapi.azurewebsites.net',
+    // api_url: 'https://api.myhordesoptimizer.fr',
+    api_url: 'https://myhordesoptimizerapi.azurewebsites.net',
     website_url: 'http://localhost:4200/',
-    firebase_config: {
-        apiKey: 'AIzaSyB3H--KamQP_FZfFgFgrGXHpaa9msDqp50',
-        authDomain: 'myhordes-optimizer-dev.firebaseapp.com',
-        projectId: 'myhordes-optimizer-dev',
-        storageBucket: 'myhordes-optimizer-dev.appspot.com',
-        messagingSenderId: '711281495109',
-        appId: '1:711281495109:web:eb6a5d2e2b110a2b12672c'
-    }
+    firebase_config: {}
 };
 
 interface Environment {

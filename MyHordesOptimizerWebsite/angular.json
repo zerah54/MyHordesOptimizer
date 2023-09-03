@@ -74,6 +74,27 @@
                             "extractLicenses": false,
                             "sourceMap": true,
                             "namedChunks": true
+                        },
+                        "test": {
+                            "budgets": [
+                                {
+                                    "type": "initial",
+                                    "maximumWarning": "100mb",
+                                    "maximumError": "500mb"
+                                },
+                                {
+                                    "type": "anyComponentStyle",
+                                    "maximumWarning": "500kb",
+                                    "maximumError": "1mb"
+                                }
+                            ],
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.dev.ts"
+                                }
+                            ],
+                            "outputHashing": "all"
                         }
                     },
                     "defaultConfiguration": "production"
@@ -86,6 +107,9 @@
                         },
                         "development": {
                             "browserTarget": "MyHordesOptimizerWebsite:build:development"
+                        },
+                        "test": {
+                            "browserTarget": "MyHordesOptimizerWebsite:build:test"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -154,6 +178,15 @@
                             "sourceMap": true,
                             "extractLicenses": false,
                             "vendorChunk": true
+                        },
+                        "test": {
+                            "outputHashing": "media",
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.test.ts"
+                                }
+                            ]
                         }
                     },
                     "defaultConfiguration": "production"
@@ -161,13 +194,17 @@
                 "serve-ssr": {
                     "builder": "@nguniversal/builders:ssr-dev-server",
                     "configurations": {
+                        "production": {
+                            "browserTarget": "MyHordesOptimizerWebsite:build:production",
+                            "serverTarget": "MyHordesOptimizerWebsite:server:production"
+                        },
                         "development": {
                             "browserTarget": "MyHordesOptimizerWebsite:build:development",
                             "serverTarget": "MyHordesOptimizerWebsite:server:development"
                         },
-                        "production": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:production",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:production"
+                        "test": {
+                            "browserTarget": "MyHordesOptimizerWebsite:build:test",
+                            "serverTarget": "MyHordesOptimizerWebsite:server:test"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -187,6 +224,10 @@
                         "development": {
                             "browserTarget": "MyHordesOptimizerWebsite:build:development",
                             "serverTarget": "MyHordesOptimizerWebsite:server:development"
+                        },
+                        "test": {
+                            "browserTarget": "MyHordesOptimizerWebsite:build:test",
+                            "serverTarget": "MyHordesOptimizerWebsite:server:test"
                         }
                     },
                     "defaultConfiguration": "production"
