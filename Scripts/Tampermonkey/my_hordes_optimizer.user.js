@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.63
+// @version      1.0.0-beta.64
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,10 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Correction d'un bug sur les options d'escorte qui n'étaient pas forcément les bonnes après une actualisation`;
+    + `[correctif] Correction d'un bug l'enregistrement des valeurs de la tdg\n\n`
+    + `[amélioration] Tentative d'amélioration des tooltips pour afficher un scroll en cas de recettes\n`
+    + `[amélioration] Le tooltip amélioré affiche désormais le lieu de dépose d'un objet de la liste de courses\n`
+    + `[amélioration] La liste de course embarquée dans la page est désormais triée par priorité et n'affiche que les objets présents sur la case`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1710,6 +1713,13 @@ function pageIsForum() {
     return document.URL.indexOf('forum') > -1;
 }
 
+/** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */
+function shouldRefreshMe() {
+    let current_town_name = document.querySelector('.town-name');
+    if (!current_town_name) return false;
+    return +current_town_name.nextElementSibling.innerText.replace(/(\D)*/, '') !== +mh_user.townDetails.day;
+}
+
 function getI18N(item) {
     if (!item) return;
     return item[lang] !== 'TODO' ? item[lang] : (item['en'] === 'TODO' ? item['fr'] : item['en']);
@@ -1820,25 +1830,40 @@ function fixMhCompiledImg(img) {
 }
 
 function getHoveredItem() {
-    let hovered = document.querySelectorAll(":hover");
+    let hovered = document.querySelectorAll(':hover');
+    let hovered_item_icon = Array.from(hovered).find((hovered_element) => hovered_element.classList.contains('item-icon'));
+
+    let hovered_item_img = hovered_item_icon?.firstElementChild;
+    let hovered_item_li = hovered_item_icon?.parentElement;
+
     let hovered_item;
     let broken;
-    for (let item of hovered) {
-        let hovered_item_img;
-        if (item.classList.contains('item-icon')) {
-            hovered_item_img = item.firstElementChild;
-        } else if (item.tagName.toLowerCase() === 'SPAN'.toLowerCase() && item.previousElementSibling && item.previousElementSibling.classList.contains('item-icon')) {
-            hovered_item_img = item.previousElementSibling?.firstElementChild;
-        } else if (item.tagName.toLowerCase() === 'LI'.toLowerCase()) {
-            hovered_item_img = item.firstElementChild?.firstElementChild;
-        }
-        if (hovered_item_img && hovered_item_img.src) {
-            hovered_item = getItemFromImg(hovered_item_img.src);
-            broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
-        }
+
+    if (hovered_item_img && hovered_item_img.src) {
+        hovered_item = getItemFromImg(hovered_item_img.src);
+        broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
     }
 
-    return {item: hovered_item, broken: broken};
+
+//     for (let item of hovered) {
+//         let hovered_item_img;
+//         if (item.classList.contains('item-icon')) {
+//             hovered_item_img = item.firstElementChild;
+//             hovered_item_li = item.parentElement;
+//         } else if (item.tagName.toLowerCase() === 'SPAN'.toLowerCase() && item.previousElementSibling && item.previousElementSibling.classList.contains('item-icon')) {
+//             hovered_item_img = item.previousElementSibling?.firstElementChild;
+//             hovered_item_li = item.parentElement;
+//         } else if (item.tagName.toLowerCase() === 'LI'.toLowerCase()) {
+//             hovered_item_img = item.firstElementChild?.firstElementChild;
+//             hovered_item_li = item;
+//         }
+//         if (hovered_item_img && hovered_item_img.src) {
+//             hovered_item = getItemFromImg(hovered_item_img.src);
+//             broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
+//         }
+//     }
+
+    return {item: hovered_item, broken: broken, li: hovered_item_li};
 }
 
 function getClickedItem(target) {
@@ -4108,7 +4133,7 @@ function displayWishlistInApp() {
         if (wishlist_section) return;
 
         let zone_to_insert;
-        if (pageIsWorkshop()) {
+        if (is_workshop) {
             zone_to_insert = document.getElementsByClassName('row-table')[0];
         } else {
             zone_to_insert = document.getElementsByClassName('actions-box')[0];
@@ -4116,18 +4141,23 @@ function displayWishlistInApp() {
 
         if (!zone_to_insert) return;
 
-        let used_wishlist = is_workshop ? wishlist.wishList['0'] : getWishlistForZone();
+        let used_wishlist = getWishlistForZone();
 
         if (!used_wishlist) return;
 
         let list_to_display = used_wishlist.filter((item) => {
-            if (pageIsWorkshop()) {
+            if (is_workshop) {
                 return item.isWorkshop;
             } else {
-                return true;
+                let items_in_cell = Array.from(document.querySelectorAll('.inventory li.item img')).map((item_element) => getItemFromImg(item_element.src));
+                return items_in_cell.some((item_in_cell) => item_in_cell?.id === item.item.id);
             }
         });
-        if (pageIsWorkshop() && list_to_display.length === 0) return;
+
+        list_to_display = list_to_display.sort((item_a, item_b) => {
+            return item_b.priority - item_a.priority;
+        });
+        if (is_workshop && list_to_display.length === 0) return;
 
         let refreshWishlist = () => {
             let update_section = document.createElement('div');
@@ -4320,6 +4350,7 @@ function displayPriorityOnItems() {
 function getWishlistForZone() {
 
     if (!wishlist || !wishlist.wishList) return undefined;
+    if (!pageIsDesert()) return wishlist.wishList[0];
 
     let position = getCurrentPosition() || 0;
     let current_zone = (Math.abs(position[0]) + Math.abs(position[1])) * 2 - 3;
@@ -4331,38 +4362,103 @@ function getWishlistForZone() {
     return zones.length === 0 ? wishlist.wishList[0] : wishlist.wishList[zones[0]];
 }
 
+let hovered_tooltip_x_item_id;
+
 /** Affiche les tooltips avancés */
 function displayAdvancedTooltips() {
     if (mho_parameters.enhanced_tooltips && items) {
 
-        let tooltip_container = document.querySelector('.tooltip.item[style*="display: block"]');
-        let advanced_tooltip_container = document.getElementById('mho-advanced-tooltip');
-        if (tooltip_container) {
-            let hovered_item = getHoveredItem().item;
+        let tooltip_containers = document.querySelectorAll(`.tooltip.item[style*="display: block"]`);
+        if (!tooltip_containers || tooltip_containers.length === 0) return;
 
-            if (hovered_item) {
-                let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
-                let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
+        let hovered = getHoveredItem();
+        let hovered_item = hovered.item;
 
-                if (should_display_advanced_tooltip) {
+        if (!hovered_item) return;
 
-                    if (!advanced_tooltip_container) {
-                        advanced_tooltip_container = document.createElement('div');
-                        advanced_tooltip_container.id = 'mho-advanced-tooltip';
-                        advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
+        let tooltip_container = Array.from(tooltip_containers).find((container) => getItemFromImg(container.querySelector('h1 img').src).id === hovered_item.id);
+        if (!tooltip_container) return;
 
-                        tooltip_container.appendChild(advanced_tooltip_container);
-                    } else if (!advanced_tooltip_container.innerHTML) {
-                        createAdvancedProperties(advanced_tooltip_container, hovered_item, tooltip_container);
-                    }
-                } else if (advanced_tooltip_container) {
-                    advanced_tooltip_container.remove();
-                }
+        let advanced_tooltip_container = tooltip_container.querySelector('#mho-advanced-tooltip');
+
+        let hovered_item_x_item_id = hovered.li.getAttribute('x-item-id');
+        if (!hovered_tooltip_x_item_id && hovered_item?.recipes?.length > 0) {
+            let tooltip_loading = tooltip_container.querySelector('.mho-tooltip-loading');
+            if (!tooltip_loading) {
+                tooltip_loading = document.createElement('img');
+                tooltip_loading.classList.add('mho-tooltip-loading');
+                tooltip_loading.style.position = 'absolute';
+                tooltip_loading.style.left = '8px';
+                tooltip_loading.style.top = '0';
+                tooltip_container.querySelector('h1').appendChild(tooltip_loading);
+                tooltip_loading.src = `${repo_img_hordes_url}anims/loading.gif`;
+            } else {
+                tooltip_loading.style.display = 'inline';
             }
-        } else if (advanced_tooltip_container) {
-            advanced_tooltip_container.remove();
+            let timeout = setTimeout(() => {
+                if (hovered_tooltip_x_item_id && hovered_tooltip_x_item_id === hovered_item_x_item_id) return;
+                tooltip_loading.style.display = 'none';
+
+                // Remove opened tooltips
+                let current_tooltips_containers = document.querySelectorAll('.tooltip.item[style*="display: block"]');
+                Array.from(tooltip_containers).forEach((container) => {
+                    if (getItemFromImg(container.querySelector('h1 img').src).id !== hovered_item.id) {
+                        container.style.display = 'none';
+                    }
+                });
+
+                const controller = new AbortController();
+                hovered_tooltip_x_item_id = hovered_item_x_item_id;
+                tooltip_container.style.pointerEvents = 'all';
+                hovered.li.addEventListener('mouseleave', function (event) {
+                    event.stopImmediatePropagation();
+                }, true, {signal: controller.signal});
+                hovered.li.addEventListener('pointerleave', function (event) {
+                    event.stopImmediatePropagation();
+                }, true, {signal: controller.signal});
+
+                let cancelHover = () => {
+                    hovered_tooltip_x_item_id = undefined;
+                    controller.abort();
+                    tooltip_container.style.display = 'none';
+                    tooltip_container.style.pointerEvents = 'none';
+                    clearTimeout(timeout);
+                }
+                hovered.li.addEventListener('mouseout', (event) => {
+                    setTimeout(() => {
+                        if (!hovered_tooltip_x_item_id) return;
+                        let all_hovered = document.querySelectorAll(':hover');
+                        if (!Array.from(all_hovered).some((hovered_element) => hovered_element.classList.contains('tooltip') || hovered_element.getAttribute('x-item-id') === hovered_tooltip_x_item_id)) {
+                            cancelHover();
+                        }
+                    }, 1000)
+                }, true, {signal: controller.signal});
+                tooltip_container.addEventListener('mouseleave', (event) => {
+                    cancelHover();
+                }, {signal: controller.signal});
+                tooltip_container.addEventListener('pointerleave', (event) => {
+                    cancelHover();
+                }, {signal: controller.signal});
+            }, 1000);
+        }
+
+        let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
+        let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
+
+        if (should_display_advanced_tooltip) {
+
+            if (!advanced_tooltip_container) {
+                advanced_tooltip_container = document.createElement('div');
+                advanced_tooltip_container.id = 'mho-advanced-tooltip';
+                advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
+
+                tooltip_container.appendChild(advanced_tooltip_container);
+            } else if (!advanced_tooltip_container.innerHTML) {
+                createAdvancedProperties(advanced_tooltip_container, hovered_item, tooltip_container);
+            }
         }
     }
+
 }
 
 function createAdvancedProperties(content, item, tooltip) {
@@ -4374,16 +4470,30 @@ function createAdvancedProperties(content, item, tooltip) {
     if (tooltip) {
         let stock_div = document.createElement('div');
         content.appendChild(stock_div);
+        stock_div.style.display = 'flex';
+        stock_div.style.flexWrap = 'wrap';
+        stock_div.style.justifyContent = 'space-between';
+        stock_div.style.columnGap = '1em';
         stock_div.style.borderBottom = '1px solid white';
 
         let bank_div = document.createElement('div');
+        bank_div.style.width = 'calc(50% - 0.5em)';
         bank_div.innerText = getI18N(wishlist_headers[3].label) + ' : ' + item.bankCount;
         stock_div.appendChild(bank_div);
 
-        if (item.wishListCount && item.wishListCount > 0) {
+        let wishlist_for_zone = getWishlistForZone();
+        let item_in_wishlist = wishlist_for_zone.find((item_in_wishlist_for_zone) => item.id === item_in_wishlist_for_zone.item.id);
+
+        if (item_in_wishlist && item_in_wishlist.item.wishListCount && item_in_wishlist.item.wishListCount > 0) {
             let wishlist_wanted_div = document.createElement('div');
+            wishlist_wanted_div.style.width = 'calc(50% - 0.5em)';
             stock_div.appendChild(wishlist_wanted_div);
-            wishlist_wanted_div.innerText = getI18N(wishlist_headers[5].label) + ' : ' + item.wishListCount;
+            wishlist_wanted_div.innerText = getI18N(wishlist_headers[5].label) + ' : ' + item_in_wishlist.item.wishListCount;
+
+            let wishlist_depot_div = document.createElement('div');
+            wishlist_depot_div.style.width = 'calc(50% - 0.5em)';
+            stock_div.appendChild(wishlist_depot_div);
+            wishlist_depot_div.innerText = getI18N(wishlist_headers[2].label) + ' : ' + getI18N(wishlist_depot.find((depot) => item_in_wishlist.depot === depot.value).label);
         }
     }
     if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0) return;
@@ -4426,6 +4536,9 @@ function createAdvancedProperties(content, item, tooltip) {
         }
         let item_recipes = document.createElement('div');
         item_recipes.classList.add('recipe');
+        item_recipes.style.maxHeight = '250px';
+        item_recipes.style.overflowY = 'auto';
+        item_recipes.style.pointerEvents = 'all';
         content.appendChild(item_recipes);
 
         item.recipes.forEach((recipe) => {
@@ -5706,9 +5819,9 @@ function displayEstimationsOnWatchtower() {
             const watchtower_planif_block_prediction = watchtower_planif_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
             const current_planif_percent = +watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || (watchtower_planif_block_prediction ? 100 : undefined);
 
-            // console.log('watchtower_planif_block', watchtower_planif_block);
-            // console.log('watchtower_planif_block_prediction', watchtower_planif_block_prediction);
-            // console.log('current_planif_percent', current_planif_percent);
+//             console.log('watchtower_planif_block', watchtower_planif_block);
+//             console.log('watchtower_planif_block_prediction', watchtower_planif_block_prediction);
+//             console.log('current_planif_percent', current_planif_percent);
 
             getEstimations().then((estimations) => {
 
@@ -5745,15 +5858,15 @@ function displayEstimationsOnWatchtower() {
                     saveEstimations({
                             percent: current_estimation_percent,
                             value: {
-                                min: watchtower_estim_block_prediction?.split(' ')[0],
-                                max: watchtower_estim_block_prediction?.split(' ')[2]
+                                min: +watchtower_estim_block_prediction?.split(' ')[0],
+                                max: +watchtower_estim_block_prediction?.split(' ')[2]
                             }
                         },
                         {
                             percent: current_planif_percent,
                             value: {
-                                min: watchtower_planif_block_prediction?.split(' ')[0],
-                                max: watchtower_planif_block_prediction?.split(' ')[2]
+                                min: +watchtower_planif_block_prediction?.split(' ')[0],
+                                max: +watchtower_planif_block_prediction?.split(' ')[2]
                             }
                         })
                         .then(() => {
@@ -6018,6 +6131,7 @@ function displayAntiAbuseCounter() {
 
                         document.addEventListener('mh-navigation-complete', () => {
                             controller.abort();
+                            if (!pageIsBank()) return;
                             let new_bag = document.querySelectorAll("#gma ul.rucksack li.item");
                             if (old_bag.length < new_bag.length) {
                                 GM.getValue(mho_anti_abuse_key).then((counter_values) => {
@@ -6050,6 +6164,7 @@ function displayAntiAbuseCounter() {
                 btn?.addEventListener('click', (event) => {
                     document.addEventListener('mh-navigation-complete', () => {
                         controller.abort();
+                        if (!pageIsWell()) return;
                         let well_item = {
                             label: {
                                 de: `Eine weitere Ration erhalten`,
@@ -7049,7 +7164,7 @@ function createStyles() {
 
     const large_tooltip = 'div.large-tooltip {'
         + 'width: 400px !important;'
-        + 'max-width: 400px; !important'
+        + 'max-width: 400px !important'
         + '}';
 
     const item_priority_30 = `li.item[class^='priority_3'], li.item[class*=' priority_3'], img[class^='priority_3'], img[class*=' priority_3'] {`
@@ -8692,7 +8807,7 @@ function saveEstimations(estim_value, planif_value) {
                 new_estimations.estim['_' + estim_value.percent] = estim_value.value;
             }
             if (planif_value && planif_value.value && (planif_value.value.min || planif_value.value.max)) {
-                new_estimations.planif['_' + estim_value.percent] = estim_value.value;
+                new_estimations.planif['_' + planif_value.percent] = planif_value.value;
             }
             fetch(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails.townId}&userId=${mh_user.id}`, {
                 method: 'POST',
@@ -8914,8 +9029,15 @@ function getApiKey() {
 
                         document.addEventListener('mh-navigation-complete', (event) => {
                             // console.log('navigation');
-                            initOptionsWithLoginNeeded();
-                            initOptionsWithoutLoginNeeded();
+                            if (shouldRefreshMe()) {
+                                getMe().then(() => {
+                                    initOptionsWithLoginNeeded();
+                                    initOptionsWithoutLoginNeeded();
+                                });
+                            } else {
+                                initOptionsWithLoginNeeded();
+                                initOptionsWithoutLoginNeeded();
+                            }
                         });
 
                         setInterval(() => {
