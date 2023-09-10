@@ -25,5 +25,6 @@ jobs:
       uses: w9jds/firebase-action@master
       with:
         args: deploy --only hosting:dev
+        working-directory: ./MyHordesOptimizerWebsite/
       env:
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
