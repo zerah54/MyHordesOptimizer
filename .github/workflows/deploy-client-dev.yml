@@ -18,8 +18,10 @@ jobs:
         node-version: '18.17.0'
         
     - run: npm install
+    - run: npm install -g firebase-tools
     
     - run: npm run build
+    - run: firebase use dev
 
     - name: Deploy to Firebase
       uses: w9jds/firebase-action@master
