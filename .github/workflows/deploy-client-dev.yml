@@ -16,11 +16,17 @@ jobs:
     - uses: actions/setup-node@main
       with: 
         node-version: '18.17.0'
+
+    - name: Build app
+      run: |
+        npm install
+        npm run build
+
+    - name: Install firebase tools
+      run: |
+        npm install -g firebase-tools
+        firebase use dev --token ${{secrets.FIREBASE_TOKEN}}
         
-    - run: npm install
-    - run: npm install -g firebase-tools
+    - name: Deploy
+      run:  firebase deploy --only hosting:dev --token ${{secrets.FIREBASE_TOKEN}}
     
-    - run: npm run build
-    
-    - run: firebase use dev --token FIREBASE_TOKEN
-    - run: firebase deploy --only hosting:dev --token FIREBASE_TOKEN
