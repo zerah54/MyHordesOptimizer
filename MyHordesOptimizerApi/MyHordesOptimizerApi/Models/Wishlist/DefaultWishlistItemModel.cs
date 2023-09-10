@@ -20,5 +20,9 @@ namespace MyHordesOptimizerApi.Models.Wishlist
         public int Count { get; set; }
         public int Priority { get; set; }
         public int ZoneXPa { get; set; }
+        [Column("depot")]
+        public int Depot { get; set; }
+        [Column("shouldSignal")]
+        public int ShouldSignal { get; set; }
     }
 }

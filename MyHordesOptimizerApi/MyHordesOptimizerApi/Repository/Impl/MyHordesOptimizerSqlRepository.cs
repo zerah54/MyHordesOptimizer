@@ -287,9 +287,11 @@ namespace MyHordesOptimizerApi.Repository.Impl
             foreach (var recipe in recipes)
             {
                 IEnumerable<RecipeCompletModel> matchingComplet = recipeCompletModels.Where(r => r.RecipeName == recipe.Name);
-                recipe.Components = items.Aggregate(new List<Item>(), (acc, item) => {
+                recipe.Components = items.Aggregate(new List<Item>(), (acc, item) =>
+                {
                     var originalRecipeItemModels = matchingComplet.Where(x => x.ComponentItemId == item.Id);
-                    if (originalRecipeItemModels != null && originalRecipeItemModels.Any()) {
+                    if (originalRecipeItemModels != null && originalRecipeItemModels.Any())
+                    {
                         var originalRecipeItemModel = originalRecipeItemModels.First();
                         for (int i = 0; i < originalRecipeItemModel.ComponentCount; i++)
                         {
@@ -299,7 +301,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
                     return acc;
                 });
-                
+
                 var resultsAsItems = items.Where(i => matchingComplet.Any(x => x.ResultItemId == i.Id)).Distinct();
                 var itemResults = matchingComplet.Where(x => resultsAsItems.Any(i => i.Id == x.ResultItemId)).Distinct(new RecipeCompletModel_ResultItemEqualityComparer()).Select(x => new ItemResult()
                 {
@@ -464,6 +466,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 				                 ,twi.priority AS WishlistPriority
                                  ,twi.zoneXPa AS WishlistZoneXPa
                                  ,twi.depot AS WishlistDepot
+                                 ,twi.shouldSignal AS WishlistShouldSignal
 	                             ,t.idUserWishListUpdater AS LastUpdateInfoUserId
 	                             ,t.wishlistDateUpdate AS LastUpdateDateUpdate
 	                             ,userUpdater.name AS LastUpdateInfoUserName
@@ -563,6 +566,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                                                             ,idItem
                                                                             ,count
                                                                             ,priority
+                                                                            ,depot
+                                                                            ,shouldSignal
                                                                             ,zoneXPa
                                                                             FROM DefaultWishlistItem");
             connection.Close();
@@ -797,7 +802,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             param.Add($"@lastUpdateInfoId", lastUpdateInfoId);
             var inParamList = new List<string>();
             var idUserWhereClause = string.Empty;
-            if(citizenId.Any())
+            if (citizenId.Any())
             {
                 foreach (var id in citizenId)
                 {
@@ -1445,7 +1450,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var estimations = connection.Query<TownEstimationModel>("SELECT * FROM TownEstimation WHERE idTown = @idTown AND day = @day", new { idTown = townId, day = day});
+            var estimations = connection.Query<TownEstimationModel>("SELECT * FROM TownEstimation WHERE idTown = @idTown AND day = @day", new { idTown = townId, day = day });
             connection.Close();
             return estimations;
         }

@@ -32,6 +32,7 @@ namespace MyHordesOptimizerApi.Models.Views.Items.Wishlist
         public int WishlistPriority { get; set; }
         public int WishlistZoneXPa { get; set; }
         public int WishlistDepot { get; set; }
+        public bool WishlistShouldSignal { get; set; }
         public int LastUpdateInfoId { get; set; }
         public int LastUpdateInfoUserId { get; set; }
         public DateTime LastUpdateDateUpdate { get; set; }

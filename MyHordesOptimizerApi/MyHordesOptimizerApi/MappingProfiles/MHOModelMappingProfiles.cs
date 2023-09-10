@@ -238,6 +238,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IdTown, opt => opt.Ignore())
                 .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.Depot))
+                .ForMember(dest => dest.ShouldSignal, opt => opt.MapFrom(src => src.ShouldSignal))
                 .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
                 .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.ZoneXPa))
                 .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count));
@@ -245,6 +246,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<IGrouping<TownWishlistItemCompletKeyModel, TownWishlistItemCompletModel>, WishListItem>()
                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.First().WishlistCount))
                .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.First().WishlistDepot))
+               .ForMember(dest => dest.ShouldSignal, opt => opt.MapFrom(src => src.First().WishlistShouldSignal))
                .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.First().WishlistPriority))
                .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.First().WishlistZoneXPa))
                .ForMember(dest => dest.BankCount, opt => opt.Ignore())
@@ -279,12 +281,13 @@ namespace MyHordesOptimizerApi.MappingProfiles
                  .ForMember(dest => dest.IdUserAuthor, opt => opt.MapFrom(src => src.First().IdUserAuthor))
                  .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.First().Name))
                  .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.First().LabelFr }, { "en", src.First().LabelEn }, { "es", src.First().LabelEs }, { "de", src.First().LabelDe } }))
-                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.ToList().Select(x => x.IdItem).ToList() ));
+                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.ToList().Select(x => x.IdItem).ToList()));
 
             CreateMap<DefaultWishlistItemModel, TownWishlistItemModel>()
               .ForMember(dest => dest.IdTown, opt => opt.Ignore())
               .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.IdItem))
-              .ForMember(dest => dest.Depot, opt => opt.Ignore())
+              .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.Depot))
+              .ForMember(dest => dest.ShouldSignal, opt => opt.MapFrom(src => src.ShouldSignal))
               .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
               .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.ZoneXPa))
               .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count));
@@ -299,12 +302,13 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<DefaultWishlistItemModel, WishListItem>()
                 .ForMember(dest => dest.Item, opt => opt.MapFrom(src => new Item() { Id = src.IdItem }))
                 .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
-                .ForMember(dest => dest.Depot, opt => opt.Ignore())
+                .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.Depot))
+                .ForMember(dest => dest.ShouldSignal, opt => opt.MapFrom(src => src.ShouldSignal))
                 .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
                 .ForMember(dest => dest.BankCount, opt => opt.Ignore())
                 .ForMember(dest => dest.IsWorkshop, opt => opt.Ignore())
                 .ForMember(dest => dest.BagCount, opt => opt.Ignore())
-                .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.Count));            
+                .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.ZoneXPa));
 
             CreateMap<HomeUpgradeDetailsDto, TownCitizenDetailModel>()
                 .ForMember(dest => dest.ApagCharges, opt => opt.Ignore())

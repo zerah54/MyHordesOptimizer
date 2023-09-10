@@ -332,9 +332,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var categories = Mapper.Map<List<WishlistCategorieModel>>(wishlistCategories);
 
             var itemsCategorie = new List<WishlistCategorieItemModel>();
-            foreach(var category in wishlistCategories)
+            foreach (var category in wishlistCategories)
             {
-                foreach(var item in category.Items)
+                foreach (var item in category.Items)
                 {
                     itemsCategorie.Add(new WishlistCategorieItemModel()
                     {
@@ -354,9 +354,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var defaultWishlists = MyHordesCodeRepository.GetDefaultWishlists();
 
             var modeles = new List<DefaultWishlistItemModel>();
-            foreach(var wishlist in defaultWishlists)
+            foreach (var wishlist in defaultWishlists)
             {
-                foreach(var item in wishlist.Items)
+                foreach (var item in wishlist.Items)
                 {
                     modeles.Add(new DefaultWishlistItemModel()
                     {
@@ -368,14 +368,16 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                         LabelEs = wishlist.Name["es"],
                         LabelDe = wishlist.Name["de"],
                         Count = item.Count,
+                        Depot = item.Depot,
+                        ShouldSignal = item.ShouldSignal,
                         Priority = item.Priority,
                         ZoneXPa = item.ZoneXPa
                     });
                 }
-                foreach(var categorie in wishlist.Categories)
+                foreach (var categorie in wishlist.Categories)
                 {
                     var wishlistCategorie = wishlistCategories.Single(x => x.Id == categorie.CategorieId);
-                    foreach(var itemId in wishlistCategorie.Items)
+                    foreach (var itemId in wishlistCategorie.Items)
                     {
                         modeles.Add(new DefaultWishlistItemModel()
                         {
