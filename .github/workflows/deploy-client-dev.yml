@@ -19,6 +19,6 @@ jobs:
         
     - run: npm install
     
-    - run: build-deploy:dev
+    - run: npm run build-deploy:dev
       env:
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
