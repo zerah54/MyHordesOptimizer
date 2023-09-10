@@ -1,0 +1,32 @@
+name: (Client) Deploy Dev
+
+on:
+  workflow_dispatch
+
+jobs:
+  firebase-deploy-dev:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./MyHordesOptimizerWebsite/
+
+    steps:
+    - uses: actions/checkout@main
+    - uses: actions/setup-node@main
+      with: 
+        node-version: '18.17.0'
+
+    - name: Build app
+      run: |
+        npm install
+        npm run build
+
+    - name: Install firebase tools
+      run: |
+        npm install -g firebase-tools
+        firebase use dev --token ${{secrets.FIREBASE_TOKEN}}
+        
+    - name: Deploy
+      run:  firebase deploy --only hosting:dev --token ${{secrets.FIREBASE_TOKEN}}
+    
