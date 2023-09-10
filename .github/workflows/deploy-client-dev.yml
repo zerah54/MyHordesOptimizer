@@ -11,8 +11,9 @@ jobs:
     steps:
     - uses: actions/checkout@main
     - uses: actions/setup-node@main
-      with:
+      with: 
         node-version: '18.17.0'
+        working-directory: './MyHordesOptimizerWebsite/'
     - run: npm install
     - run: build-deploy:dev
       env:
