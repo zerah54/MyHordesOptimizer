@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyHordesOptimizerApi.Models.Wishlist
 {
@@ -23,6 +24,6 @@ namespace MyHordesOptimizerApi.Models.Wishlist
         [Column("depot")]
         public int Depot { get; set; }
         [Column("shouldSignal")]
-        public int ShouldSignal { get; set; }
+        public bool ShouldSignal { get; set; }
     }
 }

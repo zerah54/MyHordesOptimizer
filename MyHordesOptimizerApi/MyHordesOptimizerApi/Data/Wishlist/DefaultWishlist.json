@@ -13,252 +13,252 @@
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 143,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 161,
         "count": 1,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 136,
         "count": 13,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 137,
         "count": 1,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 162,
         "count": 4,
         "priority": 1000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 41,
         "count": 1000,
         "priority": 1000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 144,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 65,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 35,
         "count": 2,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 279,
         "count": 2,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 13,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 280,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 79,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 76,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 232,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 284,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 79,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 67,
         "count": 3,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 82,
         "count": 4,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 282,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 54,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 100,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 16,
         "count": 4,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 32,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 130,
         "count": 1,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 295,
         "count": 2,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 105,
         "count": 1000,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 116,
         "count": 1000,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 151,
         "count": 1000,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 49,
         "count": 1000,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 50,
         "count": 1000,
         "priority": 2000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 58,
         "count": 5,
         "priority": 1000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 59,
         "count": 2,
         "priority": 1000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 178,
         "count": 2,
         "priority": 1000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "itemId": 36,
         "count": 2,
         "priority": 1000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       }
     ],
     "categories": [
@@ -267,21 +267,21 @@
         "count": 0,
         "priority": -1000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "categorieId": 4,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       },
       {
         "categorieId": 6,
         "count": 1000,
         "priority": 3000,
         "depot": 0,
-        "shouldSignal": 0
+        "shouldSignal": false
       }
     ]
   }
