@@ -1,6 +1,6 @@
 import { WishlistItemDTO } from '../dto/wishlist-item.dto';
-import { Item } from './item.class';
 import { CommonModel } from './_common.class';
+import { Item } from './item.class';
 
 export class WishlistItem extends CommonModel<WishlistItemDTO> {
     public item!: Item;
@@ -10,6 +10,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
     public priority!: number;
     public priority_main!: number;
     public depot!: number;
+    public should_signal!: boolean;
     public zone_x_pa!: number;
 
     constructor(dto?: WishlistItemDTO) {
@@ -25,7 +26,8 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             priority: this.priority,
             depot: this.depot,
             bagCount: this.bag_count,
-            zoneXPa: this.zone_x_pa
+            zoneXPa: this.zone_x_pa,
+            shouldSignal: this.should_signal
         };
     }
 
@@ -47,6 +49,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
                 this.priority_main = 3;
             }
             this.depot = dto.depot;
+            this.should_signal = dto.shouldSignal;
             this.bag_count = dto.bagCount;
             this.zone_x_pa = dto.zoneXPa;
         }

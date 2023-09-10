@@ -7,5 +7,6 @@ export interface WishlistItemDTO {
     item: ItemDTO;
     priority: number;
     depot: number;
+    shouldSignal: boolean;
     zoneXPa: number;
 }

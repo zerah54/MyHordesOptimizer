@@ -36,7 +36,7 @@
                                    (cdkDropListDropped)="sortWishlist($event)"
                                    [cdkDropListDisabled]="drag_disabled">
                                 <ng-container matColumnDef="filters" [sticky]="true">
-                                    <td mat-header-cell *matHeaderCellDef colspan="2">
+                                    <th mat-header-cell *matHeaderCellDef colspan="2">
                                         <div class="table-filters">
                                             <mat-form-field class="no-bottom">
                                                 <mat-label i18n>Ajouter un objet à la liste</mat-label>
@@ -48,11 +48,11 @@
                                                             [bindLabel]="'label.' + locale"></mho-select>
                                             </mat-form-field>
                                         </div>
-                                    </td>
+                                    </th>
                                 </ng-container>
                                 <ng-container matColumnDef="empty">
-                                    <td mat-header-cell *matHeaderCellDef colspan="7">
-                                    </td>
+                                    <th mat-header-cell *matHeaderCellDef colspan="8">
+                                    </th>
                                 </ng-container>
 
                                 <ng-container *ngFor="let column of columns; trackBy: trackByColumnId"
@@ -66,25 +66,7 @@
                                                                            [header]="column.header" [(filterValue)]="wishlist_filters.items"
                                                                            (filterValueChange)="wishlist_filters_change.next()">
                                             </mho-header-with-string-filter>
-                                            <ng-container *ngSwitchCase="'priority'">
-                                                {{column.header}}
-                                            </ng-container>
-                                            <ng-container *ngSwitchCase="'depot'">
-                                                {{column.header}}
-                                            </ng-container>
-                                            <ng-container *ngSwitchCase="'bank_count'">
-                                                {{column.header}}
-                                            </ng-container>
-                                            <ng-container *ngSwitchCase="'bag_count'">
-                                                {{column.header}}
-                                            </ng-container>
-                                            <ng-container *ngSwitchCase="'count'">
-                                                {{column.header}}
-                                            </ng-container>
-                                            <ng-container *ngSwitchCase="'needed'">
-                                                {{column.header}}
-                                            </ng-container>
-                                            <ng-container *ngSwitchCase="'delete'">
+                                            <ng-container *ngSwitchDefault>
                                                 {{column.header}}
                                             </ng-container>
                                         </ng-container>
@@ -104,6 +86,8 @@
                                                 <div>
                                                     <img [ngSrc]="HORDES_IMG_REPO + row.item.img" width="16" height="16">
                                                     <span>{{row.item.label[locale]}}</span>
+                                                    <img [ngSrc]="HORDES_IMG_REPO + 'item/cat_heavy.gif'" *ngIf="row.item.is_heaver"
+                                                         matTooltip="Objet encombrant" i18n-matTooltip width="16" height="16">
                                                 </div>
                                             </ng-container>
 
@@ -147,6 +131,10 @@
                                                            [ngModel]="row.count - row.bank_count - row.bag_count"
                                                            (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
                                                 </mat-form-field>
+                                            </ng-container>
+
+                                            <ng-container *ngSwitchCase="'should_signal'">
+                                                <mat-checkbox [(ngModel)]="row.should_signal"></mat-checkbox>
                                             </ng-container>
 
                                             <ng-container *ngSwitchCase="'delete'">

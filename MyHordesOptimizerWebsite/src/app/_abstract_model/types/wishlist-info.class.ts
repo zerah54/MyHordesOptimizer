@@ -1,9 +1,9 @@
 import { ShortWishlistItemDTO } from '../dto/short-wishlist-item.dto';
-import { WishlistItemDTO } from '../dto/wishlist-item.dto';
 import { WishlistInfoDTO } from '../dto/wishlist-info.dto';
+import { WishlistItemDTO } from '../dto/wishlist-item.dto';
+import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { UpdateInfo } from './update-info.class';
 import { WishlistItem } from './wishlist-item.class';
-import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 
 export class WishlistInfo extends CommonModel<WishlistInfoDTO> {
     public wishlist_items!: Map<string, WishlistItem[]>;
@@ -39,7 +39,8 @@ export class WishlistInfo extends CommonModel<WishlistInfoDTO> {
                     priority: wishlist_item.priority,
                     count: wishlist_item.count,
                     depot: wishlist_item.depot,
-                    zoneXPa: wishlist_item.zone_x_pa
+                    zoneXPa: wishlist_item.zone_x_pa,
+                    shouldSignal: wishlist_item.should_signal
                 };
             });
     }
