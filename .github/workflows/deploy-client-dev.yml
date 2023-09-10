@@ -1,0 +1,19 @@
+name: Deploy-Client-Dev
+
+on:
+  workflow_dispatch
+
+jobs:
+  firebase-deploy-dev:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@main
+    - uses: actions/setup-node@main
+      with:
+        node-version: '18.17.0'
+    - run: npm install
+    - run: build-deploy:dev
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
