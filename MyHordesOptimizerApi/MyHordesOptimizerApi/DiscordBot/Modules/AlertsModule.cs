@@ -74,6 +74,8 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             bool privateMsg = false
             )
         {
+            
+            await DeferAsync(ephemeral: true);
             try
             {
                 var splittedTime = time.Split(" ");
@@ -118,7 +120,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                     .WithFields(expirationFieldExpiration)
                     .WithColor(DiscordBotConsts.MhoColorPink);
                 
-                await RespondAsync(embed: embedBuilder.Build(), ephemeral: true);
+                await ModifyOriginalResponseAsync(props => props.Embed = embedBuilder.Build());
                 await Task.Delay(alert - now);
 
                 if (privateMsg)

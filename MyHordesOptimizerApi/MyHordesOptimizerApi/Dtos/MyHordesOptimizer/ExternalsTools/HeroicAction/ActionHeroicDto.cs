@@ -22,7 +22,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
         Rescue,
         [Fr("Uppercut sauvage"), En("Vicious Uppercut"), De("Wildstyle Uppercut"), Es("Puñetazo salvaje")]
         Uppercut,
-        [Fr("Second souffle"), En("Second Lease of Life"), De("Zweite Lunge"), Es("Segundo Aliento")]
+        [Fr("Second souffle"), En("Second wind"), De("Zweite Lunge"), Es("Segundo Aliento")]
         SecondWind,
         [Fr("Trouvaille (améliorée)"), En("Lucky Find"), De("Schönes Fundstück"), Es("Hallazgo")]
         LuckyFind,   
