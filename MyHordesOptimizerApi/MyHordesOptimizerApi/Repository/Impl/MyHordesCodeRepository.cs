@@ -1,4 +1,5 @@
-﻿using MyHordesOptimizerApi.Data.Heroes;
+﻿using MyHordesOptimizerApi.Data.CauseOfDeath;
+using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Ruins;
 using MyHordesOptimizerApi.Data.Wishlist;
@@ -47,7 +48,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             var path = "Data/Items/find.json";
             var json = File.ReadAllText(path);
-            var dico = json.FromJson< Dictionary<string, Dictionary<string, int>>>();
+            var dico = json.FromJson<Dictionary<string, Dictionary<string, int>>>();
             return dico;
         }
 
@@ -56,6 +57,22 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var path = "Data/Heroes/capacities.json";
             var json = File.ReadAllText(path);
             var list = json.FromJson<List<MyHordesHerosCapacitiesCodeModel>>();
+            return list;
+        }
+
+        public List<MyHordesCauseOfDeathModel> GetCausesOfDeath()
+        {
+            var path = "Data/CauseOfDeath/cause-of-death.json";
+            var json = File.ReadAllText(path);
+            var list = json.FromJson<List<MyHordesCauseOfDeathModel>>();
+            return list;
+        }
+
+        public List<MyHordesCleanUpTypeModel> GetCleanUpTypes()
+        {
+            var path = "Data/CauseOfDeath/clean-up-type.json";
+            var json = File.ReadAllText(path);
+            var list = json.FromJson<List<MyHordesCleanUpTypeModel>>();
             return list;
         }
 

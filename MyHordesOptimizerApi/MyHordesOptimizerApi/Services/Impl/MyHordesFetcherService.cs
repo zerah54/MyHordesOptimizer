@@ -125,6 +125,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
                 MyHordesOptimizerRepository.PatchTown(townModel);
                 MyHordesOptimizerRepository.PatchCitizen(town.Id, town.Citizens);
+                MyHordesOptimizerRepository.PatchCadaver(town.Id, town.Cadavers);
                 MyHordesOptimizerRepository.PutBank(town.Id, town.Bank);
 
                 if (existingTownModel == null) // Si la ville est null, il faut créer toutes les cells
@@ -236,7 +237,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     if (dynamicNews.GetType() == typeof(JObject))
                     {
                         var jObject = dynamicNews as JObject;
-                        if(jObject != null)
+                        if (jObject != null)
                         {
                             news = jObject.ToObject<MyHordesNews>();
                         }
@@ -284,7 +285,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                                     {
                                         itemToAdd = Convert.ToInt32(Math.Ceiling(((float)itemToAdd - 1.0) / 2.0));
                                     }
-                                    if(regen == RegenDirectionEnum.All)
+                                    if (regen == RegenDirectionEnum.All)
                                     {
                                         itemToAdd = 0;
                                     }
@@ -298,7 +299,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                                     {
                                         averageItemAdd = ((float)regenChance / (float)100) * Math.Ceiling((averageNbOfItemAdded - 1.0) / 2.0);
                                     }
-                                    if(regen == RegenDirectionEnum.All)
+                                    if (regen == RegenDirectionEnum.All)
                                     {
                                         averageItemAdd = averageItemAdd / (float)8;
                                     }
@@ -383,6 +384,18 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var heroSkills = MyHordesOptimizerRepository.GetHeroSkills();
             return heroSkills;
+        }
+
+        public IEnumerable<CauseOfDeath> GetCausesOfDeath()
+        {
+            var causesOfDeath = MyHordesOptimizerRepository.GetCausesOfDeath();
+            return causesOfDeath;
+        }
+
+        public IEnumerable<CleanUpType> GetCleanUpTypes()
+        {
+            var cleanUpTypes = MyHordesOptimizerRepository.GetCleanUpTypes();
+            return cleanUpTypes;
         }
 
         public IEnumerable<ItemRecipe> GetRecipes()
@@ -471,7 +484,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             var idLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
             var models = new List<MapCellDigModel>();
-            foreach(var request in requests)
+            foreach (var request in requests)
             {
                 var model = Mapper.Map<MapCellDigModel>(request);
                 model.IdLastUpdateInfo = idLastUpdateInfo;
@@ -487,7 +500,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             foreach (var model in models)
             {
                 results.Add(MyHordesOptimizerRepository.GetCellDigs(model.IdCell, model.IdUser, model.Day));
-            }    
+            }
             var dtos = Mapper.Map<List<MyHordesOptimizerMapDigDto>>(results);
             return dtos;
         }

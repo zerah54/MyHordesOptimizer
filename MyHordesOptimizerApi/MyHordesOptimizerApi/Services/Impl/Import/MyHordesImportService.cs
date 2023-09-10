@@ -52,6 +52,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             await ImportHeroSkill();
             await ImportCategoriesAsync();
             await ImportItemsAsync();
+            await ImportCauseOfDeath();
+            ImportCleanUpTypes();
             ImportRuins();
             ImportWishlistCategorie();
             ImportDefaultWishlists();
@@ -86,6 +88,51 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             }
 
             MyHordesOptimizerRepository.PatchHeroSkill(capacities);
+        }
+
+        #endregion
+
+        #region CauseOfDeath
+
+        public async Task ImportCauseOfDeath()
+        {
+            var codeResult = MyHordesCodeRepository.GetCausesOfDeath();
+
+            var causesOfDeaths = Mapper.Map<List<CauseOfDeathModel>>(codeResult);
+
+            // Traductions
+            var ymlDeserializer = new DeserializerBuilder().Build();
+            var ymlFr = await WebApiRepository.Get(url: TranslationsConfiguration.GameFrUrl).Content.ReadAsStringAsync();
+            var ymlEn = await WebApiRepository.Get(url: TranslationsConfiguration.GameEnUrl).Content.ReadAsStringAsync();
+            var ymlEs = await WebApiRepository.Get(url: TranslationsConfiguration.GameEsUrl).Content.ReadAsStringAsync();
+
+            var frenchTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlFr);
+            var englishTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlEn);
+            var spanishTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlEs);
+            foreach (var causeOfDeath in causesOfDeaths)
+            {
+                causeOfDeath.LabelFr = frenchTrads[causeOfDeath.LabelDe];
+                causeOfDeath.LabelEn = englishTrads[causeOfDeath.LabelDe];
+                causeOfDeath.LabelEs = spanishTrads[causeOfDeath.LabelDe];
+                causeOfDeath.DescriptionFr = frenchTrads[causeOfDeath.DescriptionDe];
+                causeOfDeath.DescriptionEn = englishTrads[causeOfDeath.DescriptionDe];
+                causeOfDeath.DescriptionEs = spanishTrads[causeOfDeath.DescriptionDe];
+            }
+
+            MyHordesOptimizerRepository.PatchCauseOfDeath(causesOfDeaths);
+        }
+
+        #endregion
+
+        #region CleanUpTypes
+
+        public void ImportCleanUpTypes()
+        {
+            var codeResult = MyHordesCodeRepository.GetCleanUpTypes();
+
+            var cleanUpTypes = Mapper.Map<List<CleanUpTypeModel>>(codeResult);
+
+            MyHordesOptimizerRepository.PatchCleanUpType(cleanUpTypes);
         }
 
         #endregion

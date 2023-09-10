@@ -30,6 +30,22 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpPost]
+        [Route("CauseOfDeath")]
+        public async Task<ActionResult> ImportCauseOfDeath()
+        {
+            await MyHordesImportService.ImportCauseOfDeath();
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("CleanUpType")]
+        public ActionResult ImportCleanUpType()
+        {
+            MyHordesImportService.ImportCleanUpTypes();
+            return Ok();
+        }
+
+        [HttpPost]
         [Route("Items")]
         public ActionResult ImportItems(string userKey)
         {

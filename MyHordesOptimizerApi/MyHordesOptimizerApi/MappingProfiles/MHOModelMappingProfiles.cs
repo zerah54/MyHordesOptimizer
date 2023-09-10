@@ -135,6 +135,26 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.DescriptionFr }, { "en", src.DescriptionEn }, { "es", src.DescriptionEs }, { "de", src.DescriptionDe } }))
                 .ForMember(dest => dest.Label, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.LabelFr }, { "en", src.LabelEn }, { "es", src.LabelEs }, { "de", src.LabelDe } }));
 
+            //CauseOfDeath
+            CreateMap<CauseOfDeathModel, CauseOfDeath>()
+                .ForMember(dest => dest.Dtype, opt => opt.MapFrom(src => src.Dtype))
+                .ForMember(dest => dest.Ref, opt => opt.MapFrom(src => src.Ref))
+                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.Icon))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.DescriptionFr }, { "en", src.DescriptionEn }, { "es", src.DescriptionEs }, { "de", src.DescriptionDe } }))
+                .ForMember(dest => dest.Label, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.LabelFr }, { "en", src.LabelEn }, { "es", src.LabelEs }, { "de", src.LabelDe } }));
+
+            //CleanUpType
+            CreateMap<CleanUpTypeModel, CleanUpType>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IdType))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.TypeName))
+                .ForMember(dest => dest.MyHordesApiName, opt => opt.MapFrom(src => src.MyHordesApiName));
+
+            //CleanUp
+            CreateMap<CleanUpModel, CleanUp>()
+                .ForMember(dest => dest.IdCleanUp, opt => opt.MapFrom(src => src.IdCleanUp))
+                .ForMember(dest => dest.CitizenCleanUp, opt => opt.Ignore())
+                .ForMember(dest => dest.Type, opt => opt.Ignore());
+
             //Recipes
             CreateMap<RecipeCompletModel, ItemRecipe>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.RecipeName))
@@ -183,6 +203,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.CitizenPositionY))
                 .ForMember(dest => dest.Home, opt => opt.MapFrom(src => src))
                 .ForMember(dest => dest.ActionsHeroic, opt => opt.MapFrom(src => src))
+                .ForMember(dest => dest.Cadaver, opt => opt.Ignore())
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src))
                 .ForMember(dest => dest.Bag, opt => opt.Ignore());
 
@@ -204,6 +225,46 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
                 .ForMember(dest => dest.IdTown, opt => opt.Ignore())
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore());
+
+            //TownCadaver
+            CreateMap<Cadaver, TownCadaverModel>()
+                .ForMember(dest => dest.IdCadaver, opt => opt.Ignore())
+                .ForMember(dest => dest.IdCitizen, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Avatar, opt => opt.MapFrom(src => src.Avatar))
+                .ForMember(dest => dest.CauseOfDeath, opt => opt.Ignore())
+                .ForMember(dest => dest.Msg, opt => opt.MapFrom(src => src.Msg))
+                .ForMember(dest => dest.TownMsg, opt => opt.MapFrom(src => src.TownMsg))
+                .ForMember(dest => dest.Survival, opt => opt.MapFrom(src => src.Survival))
+                .ForMember(dest => dest.Score, opt => opt.MapFrom(src => src.Score))
+                .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
+                .ForMember(dest => dest.CleanUp, opt => opt.Ignore());
+
+            // CauseOfDeath
+            CreateMap<CauseOfDeath, CauseOfDeathModel>()
+                .ForMember(dest => dest.Ref, opt => opt.MapFrom(src => src.Ref))
+                .ForMember(dest => dest.Dtype, opt => opt.MapFrom(src => src.Dtype))
+                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.Icon))
+                .ForMember(dest => dest.DescriptionDe, opt => opt.MapFrom(src => src.Description.GetValueOrDefault("de")))
+                .ForMember(dest => dest.DescriptionFr, opt => opt.MapFrom(src => src.Description.GetValueOrDefault("fr")))
+                .ForMember(dest => dest.DescriptionEs, opt => opt.MapFrom(src => src.Description.GetValueOrDefault("es")))
+                .ForMember(dest => dest.DescriptionEn, opt => opt.MapFrom(src => src.Description.GetValueOrDefault("en")))
+                .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Label.GetValueOrDefault("de")))
+                .ForMember(dest => dest.LabelFr, opt => opt.MapFrom(src => src.Label.GetValueOrDefault("fr")))
+                .ForMember(dest => dest.LabelEs, opt => opt.MapFrom(src => src.Label.GetValueOrDefault("es")))
+                .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Label.GetValueOrDefault("en")));
+
+            // CleanUpType
+            CreateMap<CleanUpType, CleanUpTypeModel>()
+                .ForMember(dest => dest.IdType, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.TypeName, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.MyHordesApiName, opt => opt.MapFrom(src => src.MyHordesApiName));
+
+            // CleanUp
+            CreateMap<CleanUp, CleanUpModel>()
+                .ForMember(dest => dest.IdCleanUp, opt => opt.MapFrom(src => src.IdCleanUp))
+                .ForMember(dest => dest.IdCleanUpType, opt => opt.MapFrom(src => src.Type.Id))
+                .ForMember(dest => dest.IdUserCleanUp, opt => opt.MapFrom(src => src.CitizenCleanUp.Id));
 
             CreateMap<IGrouping<BankItemCompletKeyModel, BankItemCompletModel>, BankItem>()
                 .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.First().BankCount))
@@ -308,7 +369,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.BankCount, opt => opt.Ignore())
                 .ForMember(dest => dest.IsWorkshop, opt => opt.Ignore())
                 .ForMember(dest => dest.BagCount, opt => opt.Ignore())
-                .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.ZoneXPa));
+                .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.Count));
 
             CreateMap<HomeUpgradeDetailsDto, TownCitizenDetailModel>()
                 .ForMember(dest => dest.ApagCharges, opt => opt.Ignore())

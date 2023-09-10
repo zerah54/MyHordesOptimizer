@@ -11,7 +11,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
         public string Name { get; set; }
 
         [JsonProperty("avatar")]
-        public object Avatar { get; set; }
+        public string Avatar { get; set; }
 
         [JsonProperty("survival")]
         public int Survival { get; set; }
@@ -24,6 +24,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes
 
         [JsonProperty("msg")]
         public string Msg { get; set; }
+
+        [JsonProperty("comment")]
+        public string Comment { get; set; }
 
         [JsonProperty("cleanup")]
         public MyHordesCleanup Cleanup { get; set; }
