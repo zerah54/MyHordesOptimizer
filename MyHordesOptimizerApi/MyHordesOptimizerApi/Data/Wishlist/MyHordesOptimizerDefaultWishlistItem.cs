@@ -16,6 +16,9 @@ namespace MyHordesOptimizerApi.Data.Wishlist
         [JsonProperty("depot")]
         public int Depot { get; set; }
 
+        [JsonProperty("shouldSignal")]
+        public bool ShouldSignal { get; set; }
+
         public int ZoneXPa { get; set; }
     }
 }
