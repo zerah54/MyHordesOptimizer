@@ -8,7 +8,7 @@ export const environment: Environment = {
     production: false,
     // api_url: 'https://api.myhordesoptimizer.fr',
     // api_url: 'https://myhordesoptimizerapi.azurewebsites.net',
-    api_url: 'http://localhost:5001',
+    api_url: '/api',
     website_url: 'http://localhost:4200/',
     firebase_config: {}
 };
