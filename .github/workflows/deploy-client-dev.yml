@@ -7,14 +7,18 @@ jobs:
   firebase-deploy-dev:
 
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./MyHordesOptimizerWebsite/
 
     steps:
     - uses: actions/checkout@main
     - uses: actions/setup-node@main
       with: 
         node-version: '18.17.0'
-        working-directory: './MyHordesOptimizerWebsite/'
+        
     - run: npm install
+    
     - run: build-deploy:dev
       env:
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
