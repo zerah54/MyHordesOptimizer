@@ -54,6 +54,7 @@ export class WishlistComponent implements OnInit {
         { id: 'bag_count', header: $localize`Sacs` },
         { id: 'count', header: $localize`Stock souhaité` },
         { id: 'needed', header: $localize`Quantité manquante` },
+        { id: 'should_signal', header: $localize`Signaler` },
         { id: 'delete', header: '' },
     ];
     /** La liste des colonnes */
@@ -200,14 +201,18 @@ export class WishlistComponent implements OnInit {
             if (heavy.length > 0) {
                 text += `\n[collapse=${$localize`Encombrants`}]\n`;
                 heavy.forEach((item: WishlistItem): void => {
-                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '') + '\n';
+                    text += item.should_signal ? '[bad]' : '';
+                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
+                    text += item.should_signal ? '[/bad]:warning:\n' : '\n';
                 });
                 text += '[/collapse]\n';
             }
             if (light.length > 0) {
                 text += `\n[collapse=${$localize`Non-Encombrants`}]\n`;
                 light.forEach((item: WishlistItem): void => {
-                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '') + '\n';
+                    text += item.should_signal ? '[bad]' : '';
+                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
+                    text += item.should_signal ? '[/bad]:warning:\n' : '\n';
                 });
                 text += '[/collapse]\n';
             }
