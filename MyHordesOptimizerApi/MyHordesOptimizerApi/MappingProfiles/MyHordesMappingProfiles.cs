@@ -103,7 +103,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest._13Max, opt => { opt.MapFrom(src => src._13.Max); opt.Condition(src => src._13 != null); })
                 .ForMember(dest => dest._17Min, opt => { opt.MapFrom(src => src._17.Min); opt.Condition(src => src._17 != null); })
                 .ForMember(dest => dest._17Max, opt => { opt.MapFrom(src => src._17.Max); opt.Condition(src => src._17 != null); })
-                .ForMember(dest => dest._21Max, opt => { opt.MapFrom(src => src._21.Min); opt.Condition(src => src._21 != null); })
+                .ForMember(dest => dest._21Min, opt => { opt.MapFrom(src => src._21.Min); opt.Condition(src => src._21 != null); })
                 .ForMember(dest => dest._21Max, opt => { opt.MapFrom(src => src._21.Max); opt.Condition(src => src._21 != null); })
                 .ForMember(dest => dest._25Min, opt => { opt.MapFrom(src => src._25.Min); opt.Condition(src => src._25 != null); })
                 .ForMember(dest => dest._25Max, opt => { opt.MapFrom(src => src._25.Max); opt.Condition(src => src._25 != null); })
