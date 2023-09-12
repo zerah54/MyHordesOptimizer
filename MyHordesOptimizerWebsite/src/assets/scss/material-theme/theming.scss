@@ -10,19 +10,16 @@
 .cdk-overlay-container,
 .mho-main {
 
-    &:not(.pink):not(.noel),
-    &.brown {
-        @include mat.all-component-themes(brown-light-theme.$default-theme);
-        @include brown-light-theme.brown-light-theme(brown-light-theme.$default-theme);
-    }
+    @include mat.all-component-themes(brown-light-theme.$default-theme);
+    @include brown-light-theme.brown-light-theme(brown-light-theme.$default-theme);
 
     &.pink {
-        @include mat.all-component-themes(pink-light-theme.$pink-theme);
+        @include mat.all-component-colors(pink-light-theme.$pink-theme);
         @include pink-light-theme.pink-light-theme(pink-light-theme.$pink-theme);
     }
 
     &.noel {
-        @include mat.all-component-themes(noel-theme.$noel-theme);
+        @include mat.all-component-colors(noel-theme.$noel-theme);
         @include noel-theme.noel-theme(noel-theme.$noel-theme);
     }
 

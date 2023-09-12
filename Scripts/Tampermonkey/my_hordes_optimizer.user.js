@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.64
+// @version      1.0.0-beta.65
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,10 +32,8 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Correction d'un bug l'enregistrement des valeurs de la tdg\n\n`
-    + `[amélioration] Tentative d'amélioration des tooltips pour afficher un scroll en cas de recettes\n`
-    + `[amélioration] Le tooltip amélioré affiche désormais le lieu de dépose d'un objet de la liste de courses\n`
-    + `[amélioration] La liste de course embarquée dans la page est désormais triée par priorité et n'affiche que les objets présents sur la case`;
+    + `[correctif] Correction d'un bug l'enregistrement de la valeur du 0 de la tdg\n\n`
+    + `[nouveauté] Un message sera désormais affiché au chargement du script si celui-ci n'est pas à sa version la plus récentes.\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -516,6 +514,24 @@ const texts = {
         fr: `Assurez-vous d'avoir enregistré avant de copier`,
         de: `Stellen Sie sicher, dass Sie vor dem Kopieren speichern`,
         es: `Asegúrate de guardar antes de copiar`
+    },
+    digs_state_header: {
+        en: `Digs state`,
+        fr: `État des fouilles`,
+        de: `Stand der Ausgrabungen`,
+        es: `Estado de las excavaciones`
+    },
+    digs_average: {
+        en: `Average remaining digs`,
+        fr: `Fouilles moyennes restantes`,
+        de: `Verbleibende mittlere Ausgrabungen`,
+        es: `Restos de excavaciones medianas`
+    },
+    digs_max: {
+        en: `Maximum remaining digs`,
+        fr: `Fouilles maximum restantes`,
+        de: `Maximal verbleibende Ausgrabungen`,
+        es: `Máximas excavaciones restantes`
     }
 };
 
@@ -694,6 +710,12 @@ const api_texts = {
         fr: `Votre script n'est pas à jour (votre version : $your_version$ / version la plus récente : $recent_version$). Mettez le script à jour, puis réessayez.`,
         de: `Ihr Skript ist nicht aktuell (Ihre Version: $your_version$ / neueste Version: $recent_version$). Aktualisieren Sie das Skript und versuchen Sie es erneut.`,
         es: `Tu script no está actualizado (tu versión: $your_version$ / versión más reciente: $recent_version$). Actualice el script y vuelva a intentarlo.`
+    },
+    error_version_startup: {
+        en: `Your script is not up to date (your version: $your_version$ / most recent version: $recent_version$).<br /><br />Some features may not work.<br /><br />Update the script to no longer see this error.`,
+        fr: `Votre script n'est pas à jour (votre version : $your_version$ / version la plus récente : $recent_version$).<br /><br />Certaines fonctionnalités risquent de ne pas fonctionner.<br /><br />Mettez le script à jour pour ne plus voir cette erreur.`,
+        de: `Ihr Skript ist nicht aktuell (Ihre Version: $your_version$ / aktuellste Version: $recent_version$).<br /><br />Einige Funktionen funktionieren möglicherweise nicht.<br /><br />Aktualisieren Sie das Skript, damit dieser Fehler nicht mehr angezeigt wird.`,
+        es: `Tu script no está actualizado (su versión: $your_version$ / versión más reciente: $recent_version$).<br /><br />Es posible que algunas funciones no funcionen.<br /><br />Actualice el script para que ya no vea este error.`
     },
     error_discord: {
         en: `If the error persists, please let us know on <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.`,
@@ -1791,20 +1813,11 @@ function addWarning(message) {
 
 /** Affiche une notification d'erreur */
 function addError(error) {
-    if (error.name !== 'AbortError' && error.name !== 'TypeError') {
+    if (typeof error === 'string' || (error.name !== 'AbortError' && error.name !== 'TypeError')) {
         let notifications = document.getElementById('notifications');
         let notification = document.createElement('div');
         notification.classList.add('error', 'show');
-        notification.innerHTML = `
-        <div style="vertical_align: middle"><img src="${mh_optimizer_icon}" style="width: 24px; margin-right: 0.5em;">${GM_info.script.name} :</div>
-        <br />
-        <div>${getI18N(api_texts.error).replace('$error$', error.status ? (error.status + ' ' + error.name + ' - ' + error.message) : (error.name + ' - ' + error.message))}</div>
-        <br />`
-        if (parameters?.find((param) => param.name === 'ScriptVersion')?.value !== GM_info.script.version) {
-            notification.innerHTML += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', GM_info.script.version).replace('$recent_version$', parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small><div>`
-        }
-        notification.innerHTML += `<div><small>${getI18N(api_texts.error_discord)}</small><div>`;
-
+        notification.innerHTML = typeof error === 'string' ? error : getErrorFromApi(error);
         notifications.appendChild(notification);
         notification.addEventListener('click', () => {
             notification.remove();
@@ -1814,6 +1827,39 @@ function addError(error) {
         }, 10000);
     }
     console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
+}
+
+function getErrorFromApi(error) {
+    if (error.name !== 'AbortError' && error.name !== 'TypeError') {
+        let error = '';
+        error += `
+            <div style="vertical_align: middle"><img src="${mh_optimizer_icon}" style="width: 24px; margin-right: 0.5em;">${GM_info.script.name} :</div>
+            <br />
+            <div>${getI18N(api_texts.error).replace('$error$', error.status ? (error.status + ' ' + error.name + ' - ' + error.message) : (error.name + ' - ' + error.message))}</div>
+            <br />`
+        if (!isScriptVersionLastVersion()) {
+            error += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', GM_info.script.version).replace('$recent_version$', parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small><div>`
+        }
+        error += `<div><small>${getI18N(api_texts.error_discord)}</small><div>`;
+        return error;
+    }
+}
+
+function isScriptVersionLastVersion(display_error) {
+    const current_script_version = GM_info.script.version;
+    const base_script_version = parameters?.find((param) => param.name === 'ScriptVersion')?.value;
+
+    const comparison_regex = /(\d+)/g;
+    const splitted_current = current_script_version.match(comparison_regex);
+    const splitted_base = base_script_version.match(comparison_regex);
+
+    return splitted_base.every((part, index) => {
+        const is_ok = !splitted_current[index] || splitted_current[index] >= part;
+        if (display_error && !is_ok) {
+            addError(getI18N(api_texts.error_version_startup).replace('$your_version$', current_script_version).replace('$recent_version$', base_script_version));
+        }
+        return is_ok;
+    });
 }
 
 function isTouchScreen() {
@@ -1886,7 +1932,9 @@ function getItemFromImg(img_src) {
 function initOptionsWithLoginNeeded() {
     /** Gère le bouton de mise à jour des outils externes) */
     if (!buttonOptimizerExists()) {
-        createOptimizerBtn();
+        setTimeout(() => {
+            createOptimizerBtn();
+        }, 100)
         createWindow();
     }
 
@@ -1916,6 +1964,20 @@ function initOptionsWithoutLoginNeeded() {
     changeDefaultEscortOptions();
     // blockUsersPosts();
     count_pending_notifications = document.querySelector('#postbox-new-msg-counter')?.innerText;
+}
+
+function updateFetchRequestOptions(options) {
+    const update = {...options};
+    update.headers = {
+        ...update.headers,
+        'Mho-Origin': 'script',
+        'Mho-Script-Version': GM_info.script.version
+    };
+    return update;
+}
+
+function fetcher(url, options) {
+    return fetch(url, updateFetchRequestOptions(options));
 }
 
 /**
@@ -4376,7 +4438,7 @@ function displayAdvancedTooltips() {
 
         if (!hovered_item) return;
 
-        let tooltip_container = Array.from(tooltip_containers).find((container) => getItemFromImg(container.querySelector('h1 img').src).id === hovered_item.id);
+        let tooltip_container = Array.from(tooltip_containers).find((container) => getItemFromImg(container.querySelector('h1 img')?.src)?.id === hovered_item.id);
         if (!tooltip_container) return;
 
         let advanced_tooltip_container = tooltip_container.querySelector('#mho-advanced-tooltip');
@@ -5780,6 +5842,8 @@ function displayCellDetailsOnPage() {
                     });
                 });
 
+                // console.log('cell', cell);
+
                 let cell_note_content = document.createElement('div');
                 cell_note_content.id = 'cell-note-content';
                 cell_note_div.appendChild(cell_note_content);
@@ -5787,8 +5851,26 @@ function displayCellDetailsOnPage() {
                 let map_box = document.querySelector('.map-box');
 
                 map_box.parentElement.parentElement.appendChild(cell_note);
+
+                let cell_digs_header = document.createElement('h5');
+                cell_digs_header.style.marginTop = '0';
+                cell_digs_header.style.display = 'flex';
+                cell_digs_header.style.justifyContent = 'space-between';
+                cell_digs_header.style.alignItems = 'center';
+                cell_note_div.appendChild(cell_digs_header);
+
+                let cell_dig_header_left = document.createElement('div');
+                cell_dig_header_left.innerHTML = getI18N(texts.digs_state_header);
+                cell_digs_header.appendChild(cell_dig_header_left);
+
+                let cell_digs_content = document.createElement('div');
+                cell_digs_content.id = 'cell-digs-content';
+                cell_note_div.appendChild(cell_digs_content);
             }
             cell_note.querySelector('#cell-note-content').innerText = cell.note;
+            cell_note.querySelector('#cell-digs-content').innerHTML = `
+            <div>${getI18N(texts.digs_max)} : ${cell.totalSucces - cell.maxPotentialRemainingDig}</div>
+            <div>${getI18N(texts.digs_average)} : ${cell.totalSucces - cell.averagePotentialRemainingDig}</div>`;
         }
     } else {
         current_cell = undefined;
@@ -5809,7 +5891,8 @@ function displayEstimationsOnWatchtower() {
         const watchtower_estim_block_prediction = watchtower_estim_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
 
         if (watchtower_estim_block && watchtower_estim_block_prediction) {
-            const current_estimation_percent = +watchtower_estim_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || (watchtower_estim_block_prediction ? 100 : undefined);
+            const current_estimation_percent_read = watchtower_estim_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '');
+            const current_estimation_percent = current_estimation_percent_read !== undefined && current_estimation_percent_read !== null ? +current_estimation_percent : (watchtower_estim_block_prediction ? 100 : undefined);
 
             // console.log('watchtower_estim_block', watchtower_estim_block);
             // console.log('watchtower_estim_block_prediction', watchtower_estim_block_prediction);
@@ -5817,11 +5900,12 @@ function displayEstimationsOnWatchtower() {
 
             const watchtower_planif_block = watchtower_estim_block.nextElementSibling;
             const watchtower_planif_block_prediction = watchtower_planif_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
-            const current_planif_percent = +watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '') || (watchtower_planif_block_prediction ? 100 : undefined);
+            const current_planif_percent_read = watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '')
+            const current_planif_percent = current_planif_percent_read !== undefined && current_planif_percent_read !== null ? +current_planif_percent_read : (watchtower_planif_block_prediction ? 100 : undefined);
 
-//             console.log('watchtower_planif_block', watchtower_planif_block);
-//             console.log('watchtower_planif_block_prediction', watchtower_planif_block_prediction);
-//             console.log('current_planif_percent', current_planif_percent);
+            // console.log('watchtower_planif_block', watchtower_planif_block);
+            // console.log('watchtower_planif_block_prediction', watchtower_planif_block_prediction);
+            // console.log('current_planif_percent', current_planif_percent);
 
             getEstimations().then((estimations) => {
 
@@ -5937,6 +6021,11 @@ function displayEstimationsOnWatchtower() {
                 estim_values_block.appendChild(estim_values_block_title);
 
                 TDG_VALUES.forEach((value) => {
+                    let saved_estimation = estimations.estim['_' + value] ? {
+                        min: estimations.estim['_' + value].min,
+                        max: estimations.estim['_' + value].max
+                    } : undefined;
+
                     if (!estimations.estim['_' + value]) {
                         estimations.estim['_' + value] = {min: null, max: null};
                     }
@@ -5953,12 +6042,17 @@ function displayEstimationsOnWatchtower() {
                             min: watchtower_estim_block_prediction.split(' ')[0],
                             max: watchtower_estim_block_prediction.split(' ')[2]
                         };
-                        if (current_estimation_percent && current_estimation_value) {
+                        if (current_estimation_percent !== null && current_estimation_percent !== undefined && current_estimation_value) {
                             estimation.min = current_estimation_value.min;
                             estimation.max = current_estimation_value.max;
                         }
                     }
-                    value_block.innerHTML = `<b style="color: #afb3cf; opacity: .8;">[${value}%]</b><div id="estim_${value}"><span class="start" style="width: 100px">${estimation?.min || ''}</span> - <span class="end" style="width: 100px">${estimation?.max || ''}</span><img src="${repo_img_hordes_url}emotes/zombie.gif"></div>`
+                    const is_new_estimation = current_planif_percent === value && (+saved_estimation?.min !== +estimation?.min || +saved_estimation?.max !== +estimation?.max);
+                    value_block.innerHTML = `
+                    <b style="color: #afb3cf; opacity: .8;">[${value}%]</b>
+                    <div id="estim_${value}" style="font-weight: ${is_new_estimation ? 'bold' : 'normal'}; color: ${is_new_estimation ? 'lightgreen' : 'unset'}">
+                        <span class="start" style="width: 100px">${estimation?.min || ''}</span> - <span class="end" style="width: 100px">${estimation?.max || ''}</span><img src="${repo_img_hordes_url}emotes/zombie.gif">
+                    </div>`;
                 });
 
                 if (watchtower_planif_block && watchtower_planif_block_prediction) {
@@ -5972,6 +6066,11 @@ function displayEstimationsOnWatchtower() {
                     planif_values_block.appendChild(planif_values_block_title);
 
                     PLANIF_VALUES.forEach((value) => {
+                        let saved_estimation = estimations.planif['_' + value] ? {
+                            min: estimations.planif['_' + value].min,
+                            max: estimations.planif['_' + value].max
+                        } : undefined;
+
                         if (!estimations.planif['_' + value]) {
                             estimations.planif['_' + value] = {min: null, max: null};
                         }
@@ -5989,12 +6088,17 @@ function displayEstimationsOnWatchtower() {
                                 min: watchtower_planif_block_prediction.split(' ')[0],
                                 max: watchtower_planif_block_prediction.split(' ')[2]
                             };
-                            if (current_planif_percent && current_estimation_value) {
+                            if (current_planif_percent !== null && current_planif_percent !== undefined && current_estimation_value) {
                                 estimation.min = current_estimation_value.min;
                                 estimation.max = current_estimation_value.max;
                             }
                         }
-                        value_block.innerHTML = `<b style="color: #afb3cf; opacity: .8;">[${value}%]</b><div id="planif_${value}"><span class="start" style="width: 100px">${estimation?.min || ''}</span> - <span class="end" style="width: 100px">${estimation?.max || ''}</span><img src="${repo_img_hordes_url}emotes/zombie.gif"></div>`
+                        const is_new_estimation = current_planif_percent === value && (+saved_estimation?.min !== +estimation?.min || +saved_estimation?.max !== +estimation?.max);
+                        value_block.innerHTML = `
+                        <b style="color: #afb3cf; opacity: .8;">[${value}%]</b>
+                        <div id="planif_${value}" style="font-weight: ${is_new_estimation ? 'bold' : 'normal'}; color: ${is_new_estimation ? 'lightgreen' : 'unset'}">
+                            <span class="start" style="width: 100px">${estimation?.min || ''}</span> - <span class="end" style="width: 100px">${estimation?.max || ''}</span><img src="${repo_img_hordes_url}emotes/zombie.gif">
+                        </div>`
                     });
                 }
             });
@@ -7609,7 +7713,7 @@ function getGHRuin() {
 function getBBHMap() {
     return new Promise((resolve, reject) => {
         startLoading();
-        fetch(`https://bbh.fred26.fr/?cid=5-${mh_user.townDetails.townId}&pg=map`)
+        fetcher(`https://bbh.fred26.fr/?cid=5-${mh_user.townDetails.townId}&pg=map`)
             .then((response) => {
                 if (response.status === 200) {
                     return response.text();
@@ -7963,7 +8067,7 @@ function getFMRuin() {
 
 function getItems() {
     return new Promise((resolve, reject) => {
-        fetch(api_url + '/myhordesfetcher/items' + (mh_user && mh_user.townDetails ? ('?townId=' + mh_user.townDetails.townId) : ''))
+        fetcher(api_url + '/myhordesfetcher/items' + (mh_user && mh_user.townDetails ? ('?townId=' + mh_user.townDetails.townId) : ''))
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -8002,7 +8106,7 @@ function getRuins() {
     return new Promise((resolve, reject) => {
         if (!ruins) {
             startLoading();
-            fetch(api_url + '/myhordesfetcher/ruins?userKey=' + external_app_id)
+            fetcher(api_url + '/myhordesfetcher/ruins?userKey=' + external_app_id)
                 .then((response) => {
                     if (response.status === 200) {
                         return response.json();
@@ -8040,7 +8144,7 @@ function getRuins() {
 function getMe() {
     return new Promise((resolve, reject) => {
         if (external_app_id) {
-            fetch(api_url + '/myhordesfetcher/me?userKey=' + external_app_id)
+            fetcher(api_url + '/myhordesfetcher/me?userKey=' + external_app_id)
                 .then((response) => {
                     if (response.status === 200) {
                         return response.json();
@@ -8080,7 +8184,7 @@ function getCitizens() {
     return new Promise((resolve, reject) => {
         getHeroSkills().then((hero_skills) => {
             startLoading();
-            fetch(api_url + `/myhordesfetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails.townId}`)
+            fetcher(api_url + `/myhordesfetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails.townId}`)
                 .then((response) => {
                     if (response.status === 200) {
                         endLoading();
@@ -8110,7 +8214,7 @@ function getCitizens() {
 function getBank() {
     return new Promise((resolve, reject) => {
         startLoading();
-        fetch(api_url + '/myhordesfetcher/bank?userKey=' + external_app_id)
+        fetcher(api_url + '/myhordesfetcher/bank?userKey=' + external_app_id)
             .then((response) => {
                 if (response.status === 200) {
                     endLoading();
@@ -8149,7 +8253,7 @@ function getBank() {
 /** Récupère les informations de liste de course */
 function getWishlist() {
     return new Promise((resolve, reject) => {
-        fetch(api_url + '/wishlist?townId=' + mh_user.townDetails.townId)
+        fetcher(api_url + '/wishlist?townId=' + mh_user.townDetails.townId)
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -8203,7 +8307,7 @@ function addItemToWishlist(item) {
     return new Promise((resolve, reject) => {
         startLoading();
 
-        fetch(api_url + '/wishlist/add/' + item.id + '?userId=' + mh_user.id + '&townId=' + mh_user.townDetails.townId, {
+        fetcher(api_url + '/wishlist/add/' + item.id + '?userId=' + mh_user.id + '&townId=' + mh_user.townDetails.townId, {
             method: 'POST'
         })
             .then((response) => {
@@ -8590,7 +8694,7 @@ function updateExternalTools() {
 
         console.log('MHO - Envoyé pour enregistrement :', data);
 
-        fetch(api_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id, {
+        fetcher(api_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id, {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {
@@ -8624,7 +8728,7 @@ function getHeroSkills() {
     return new Promise((resolve, reject) => {
         if (!hero_skills) {
             startLoading();
-            fetch(api_url + '/myhordesfetcher/heroSkills')
+            fetcher(api_url + '/myhordesfetcher/heroSkills')
                 .then((response) => {
                     if (response.status === 200) {
                         return response.json();
@@ -8663,7 +8767,7 @@ function getTranslation(string_to_translate, source_language) {
         if (string_to_translate && string_to_translate !== '') {
             let locale = 'locale=' + source_language;
             let sourceString = 'sourceString=' + string_to_translate;
-            fetch(api_url + '/myhordestranslation?' + locale + '&' + sourceString)
+            fetcher(api_url + '/myhordestranslation?' + locale + '&' + sourceString)
                 .then((response) => {
                     if (response.status === 200) {
                         return response.json();
@@ -8691,7 +8795,7 @@ function getRecipes() {
     return new Promise((resolve, reject) => {
         if (!recipes) {
             startLoading();
-            fetch(api_url + '/myhordesfetcher/recipes')
+            fetcher(api_url + '/myhordesfetcher/recipes')
                 .then((response) => {
                     if (response.status === 200) {
                         return response.json();
@@ -8732,7 +8836,7 @@ function getRecipes() {
 function getParameters() {
     return new Promise((resolve, reject) => {
         startLoading();
-        fetch(api_url + '/parameters/parameters')
+        fetcher(api_url + '/parameters/parameters')
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -8742,7 +8846,8 @@ function getParameters() {
                 }
             })
             .then((response) => {
-                parameters = response
+                parameters = response;
+                isScriptVersionLastVersion(true);
                 resolve();
                 endLoading();
             })
@@ -8756,7 +8861,7 @@ function getParameters() {
 
 function getMap() {
     return new Promise((resolve, reject) => {
-        fetch(api_url + '/myhordesfetcher/map?townId=' + mh_user.townDetails.townId)
+        fetcher(api_url + '/myhordesfetcher/map?townId=' + mh_user.townDetails.townId)
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -8779,7 +8884,7 @@ function getMap() {
 
 function getEstimations() {
     return new Promise((resolve, reject) => {
-        fetch(api_url + `/AttaqueEstimation/Estimations/${mh_user.townDetails.day}?townId=${mh_user.townDetails.townId}`)
+        fetcher(api_url + `/AttaqueEstimation/Estimations/${mh_user.townDetails.day}?townId=${mh_user.townDetails.townId}`)
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -8809,7 +8914,7 @@ function saveEstimations(estim_value, planif_value) {
             if (planif_value && planif_value.value && (planif_value.value.min || planif_value.value.max)) {
                 new_estimations.planif['_' + planif_value.percent] = planif_value.value;
             }
-            fetch(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails.townId}&userId=${mh_user.id}`, {
+            fetcher(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails.townId}&userId=${mh_user.id}`, {
                 method: 'POST',
                 body: JSON.stringify(new_estimations),
                 headers: {
@@ -8844,7 +8949,7 @@ function getOptimalPath(map, html, button) {
         console.log('map before send', map);
         startLoading();
 
-        fetch(api_url + `/ruine/pathopti`, {
+        fetcher(api_url + `/ruine/pathopti`, {
             method: 'POST',
             body: JSON.stringify(map),
             headers: {
@@ -8875,7 +8980,7 @@ function getApiKey() {
     return new Promise((resolve, reject) => {
         if (!external_app_id || external_app_id === '') {
 
-            fetch(location.origin + `/jx/soul/settings`, {
+            fetcher(location.origin + `/jx/soul/settings`, {
                 method: 'POST',
                 body: JSON.stringify({}),
                 headers: {

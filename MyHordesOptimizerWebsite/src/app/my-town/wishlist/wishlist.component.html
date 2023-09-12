@@ -155,7 +155,9 @@
                                                     <ng-container *ngIf="row.priority_main.value.count > -1">
                                                         <mat-checkbox [(ngModel)]="row.should_signal" *ngIf="edition_mode; else readMode"></mat-checkbox>
                                                         <ng-template #readMode>
-                                                            <ng-container *ngIf="row.should_signal" i18n>Oui</ng-container>
+                                                            <mat-icon *ngIf="row.should_signal" matTooltip="Objet à signaler" i18n-matTooltip>
+                                                                speaker_notes
+                                                            </mat-icon>
                                                         </ng-template>
                                                     </ng-container>
                                                 </ng-container>

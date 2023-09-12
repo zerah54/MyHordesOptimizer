@@ -1,19 +1,19 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
-import { DigDTO } from '../dto/dig.dto';
-import { Dig } from '../types/dig.class';
-import { dtoToModelArray, modelToDtoArray } from '../types/_common.class';
-import { GlobalServices } from './global.services';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { getTown, getUserId } from '../../shared/utilities/localstorage.util';
+import { DigDTO } from '../dto/dig.dto';
+import { dtoToModelArray, modelToDtoArray } from '../types/_common.class';
+import { Dig } from '../types/dig.class';
+import { GlobalServices } from './global.services';
 
 
 @Injectable()
 export class DigsServices extends GlobalServices {
 
-    constructor(_http: HttpClient, private _snackbar: SnackbarService) {
-        super(_http, _snackbar);
+    constructor(_http: HttpClient, private snackbar: SnackbarService) {
+        super(_http);
     }
 
     public getDigs(): Observable<Dig[]> {
@@ -38,7 +38,7 @@ export class DigsServices extends GlobalServices {
             super.delete<void>(this.API_URL + `/myhordesfetcher/MapDigs?idCell=${dig.cell_id}&diggerId=${dig.digger_id}&day=${dig.day}`)
                 .subscribe({
                     next: () => {
-                        this._snackbar.successSnackbar($localize`La fouille a bien été supprimée`);
+                        this.snackbar.successSnackbar($localize`La fouille a bien été supprimée`);
                         sub.next();
                     }
                 });
@@ -50,7 +50,7 @@ export class DigsServices extends GlobalServices {
             super.post<DigDTO[]>(this.API_URL + `/myhordesfetcher/MapDigs?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(modelToDtoArray(digs)))
                 .subscribe({
                     next: (response: DigDTO[]) => {
-                        this._snackbar.successSnackbar($localize`La fouille a bien été mise à jour`);
+                        this.snackbar.successSnackbar($localize`La fouille a bien été mise à jour`);
                         sub.next(dtoToModelArray(Dig, response));
                     }
                 });

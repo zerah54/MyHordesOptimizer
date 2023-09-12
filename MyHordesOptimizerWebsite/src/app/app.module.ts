@@ -14,6 +14,8 @@ import { Modules } from './_abstract_model/types/_types';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MyTownModule } from './my-town/my-town.module';
+import { ErrorsInterceptor } from './shared/services/errors-interceptor.service';
+import { HeadersInterceptor } from './shared/services/headers-interceptor.service';
 import { LoadingInterceptor } from './shared/services/loading-interceptor.service';
 import { SharedModule } from './shared/shared.module';
 import { StructureModule } from './structure/structure.module';
@@ -40,6 +42,8 @@ const app_modules: Modules = [StructureModule, WikiModule, ThanksModule, ToolsMo
     providers: [
         AngularFireModule,
         { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: HeadersInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorsInterceptor, multi: true },
         {
             provide: LOCALE_ID,
             useFactory: (): string | null => localStorage.getItem('mho-locale') || 'fr'
