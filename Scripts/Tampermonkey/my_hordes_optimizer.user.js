@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.66
+// @version      1.0.0-beta.67
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -6047,7 +6047,7 @@ function displayEstimationsOnWatchtower() {
                             estimation.max = current_estimation_value.max;
                         }
                     }
-                    const is_new_estimation = current_planif_percent === value && (+saved_estimation?.min !== +estimation?.min || +saved_estimation?.max !== +estimation?.max);
+                    const is_new_estimation = current_estimation_percent === value && (+saved_estimation?.min !== +estimation?.min || +saved_estimation?.max !== +estimation?.max);
                     value_block.innerHTML = `
                     <b style="color: #afb3cf; opacity: .8;">[${value}%]</b>
                     <div id="estim_${value}" style="font-weight: ${is_new_estimation ? 'bold' : 'normal'}; color: ${is_new_estimation ? 'lightgreen' : 'unset'}">
