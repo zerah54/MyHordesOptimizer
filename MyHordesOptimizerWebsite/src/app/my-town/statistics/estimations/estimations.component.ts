@@ -44,7 +44,6 @@ export class EstimationsComponent implements OnInit {
 
     /** Enregistre les estimations saisies */
     public saveEstimations(): void {
-        console.log(this.estimations);
         this.api.saveEstimations(this.estimations).subscribe();
     }
 
