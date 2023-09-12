@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.65
+// @version      1.0.0-beta.66
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -5892,7 +5892,7 @@ function displayEstimationsOnWatchtower() {
 
         if (watchtower_estim_block && watchtower_estim_block_prediction) {
             const current_estimation_percent_read = watchtower_estim_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '');
-            const current_estimation_percent = current_estimation_percent_read !== undefined && current_estimation_percent_read !== null ? +current_estimation_percent : (watchtower_estim_block_prediction ? 100 : undefined);
+            const current_estimation_percent = current_estimation_percent_read !== undefined && current_estimation_percent_read !== null ? +current_estimation_percent_read : (watchtower_estim_block_prediction ? 100 : undefined);
 
             // console.log('watchtower_estim_block', watchtower_estim_block);
             // console.log('watchtower_estim_block_prediction', watchtower_estim_block_prediction);
