@@ -36,7 +36,6 @@
                     <mat-chip (click)="changeOptions('trash_mode', 'nb')" [highlighted]="options.trash_mode === 'nb'" i18n>Nombre d'objets</mat-chip>
                     <mat-chip (click)="changeOptions('trash_mode', 'def')" [highlighted]="options.trash_mode === 'def'" i18n>Défense apportée</mat-chip>
                 </mat-chip-listbox>
-                <button mat-button *ngIf="is_dev" i18n (click)="getGh()">Récupérer les informations depuis GH</button>
             </div>
             <div>
                 <h2 i18n>Afficher les zones du scrutateur</h2>

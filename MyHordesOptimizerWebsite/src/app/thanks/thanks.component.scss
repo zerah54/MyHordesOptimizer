@@ -1,16 +1,22 @@
 .mho-thanks {
     .mat-mdc-dialog-title {
+        display: flex;
+
         > div {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             position: relative;
+            width: 100%;
+
             h2 {
                 display: inline-block;
+                margin: 0;
             }
+
             .close-button {
                 position: absolute;
-                top: -2em;
-                right: -1em;
+                right: -24px;
             }
         }
     }

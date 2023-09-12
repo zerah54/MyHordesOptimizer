@@ -134,12 +134,14 @@ td.map-cell {
             height: 100%;
             z-index: 2;
 
-            > span {
+            > div {
                 position: absolute;
                 line-height: 10px;
                 font-size: 10px;
 
                 &.corner {
+                    display: inline;
+
                     img {
                         width: 12px;
                     }

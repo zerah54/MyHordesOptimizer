@@ -1,5 +1,11 @@
 .mho-wishlist-header {
     justify-content: space-between;
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
 }
 
 .mho-wishlist {
@@ -8,41 +14,65 @@
         display: none;
     }
 
-    table {
-        width: 100%;
+    .add-tab {
+        min-width: unset;
+        padding-left: 0;
+        padding-right: 0;
+    }
 
-        tr {
-            > td, > th {
+    .table-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
 
-                .table-filters {
-                    .mat-mdc-form-field {
-                        width: 100%;
+        .table-headers {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        table {
+            width: 100%;
+
+            tr {
+                --mat-table-header-container-height: 40px;
+                --mat-table-row-item-container-height: 40px;
+
+                > td, > th {
+
+                    .mat-mdc-form-field-infix {
+                        padding-top: 8px !important;
+                        padding-bottom: 8px !important;
+                        min-height: unset !important;
                     }
-                }
 
-                &.name {
-                    > div {
+                    &.mat-column-name {
+                        > div {
+                            flex-wrap: nowrap;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5em;
+
+                        }
+                    }
+
+                    .mat-column-count {
+                        max-width: 100px;
+                    }
+
+                    .dragdrop-indicator {
                         display: flex;
-                        align-items: center;
-                        gap: 0.5em;
+                        cursor: move;
 
-                    }
-                }
-
-                .count {
-                    width: 100px;
-                }
-
-                .dragdrop-indicator {
-                    display: flex;
-                    cursor: move;
-
-                    .mat-icon {
-                        margin: auto;
+                        .mat-icon {
+                            margin: auto;
+                        }
                     }
                 }
             }
         }
+
     }
 
     .cdk-drag-preview {
@@ -73,11 +103,8 @@
         table {
             tr {
                 > td {
-                    &.name {
-                        > div {
-                            white-space: nowrap;
-                            flex-wrap: nowrap;
-                        }
+                    &.mat-column-name {
+                        max-width: 250px;
                     }
                 }
             }

@@ -1,10 +1,9 @@
-.cell {
-    display: inline-block;
-    vertical-align: middle;
-    text-align: center;
-}
-
-table {
+table.mho-draw-map {
+    .cell {
+        display: inline-block;
+        vertical-align: middle;
+        text-align: center;
+    }
 
     border-spacing: 0;
     margin: auto;

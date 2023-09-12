@@ -38,7 +38,7 @@ export class WishlistInfo extends CommonModel<WishlistInfoDTO> {
                     id: wishlist_item.item.id,
                     priority: wishlist_item.priority,
                     count: wishlist_item.count,
-                    depot: wishlist_item.depot,
+                    depot: wishlist_item.depot.value.count,
                     zoneXPa: wishlist_item.zone_x_pa,
                     shouldSignal: wishlist_item.should_signal
                 };

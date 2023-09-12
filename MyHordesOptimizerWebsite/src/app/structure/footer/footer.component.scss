@@ -10,7 +10,11 @@
         height: 24px !important;
         font-size: 12px !important;
         font-weight: normal !important;
-        overflow-x: hidden !important;
+
+        > div {
+            width: 100%;
+            text-align: center;
+        }
 
         &:first-child {
             margin-top: auto;

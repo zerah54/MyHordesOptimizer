@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
-import { EstimationComponent } from './estimation.component';
 import { Components } from '../../_abstract_model/types/_types';
 import { SharedModule } from '../../shared/shared.module';
+import { ExpeditionsComponent } from './expeditions.component';
 
-const components: Components = [EstimationComponent];
+const components: Components = [ExpeditionsComponent];
 
 @NgModule({
     imports: [SharedModule],
@@ -11,6 +11,6 @@ const components: Components = [EstimationComponent];
     exports: [...components]
 })
 
-export class EstimationModule {
+export class ExpeditionsModule {
 }
 

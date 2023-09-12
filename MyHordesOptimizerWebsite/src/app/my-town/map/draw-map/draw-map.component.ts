@@ -5,6 +5,7 @@ import { Item } from '../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../_abstract_model/types/town.class';
 import { groupBy } from '../../../shared/utilities/array.util';
+import { getUserId } from '../../../shared/utilities/localstorage.util';
 import { MapOptions } from '../map.component';
 
 @Component({
@@ -41,6 +42,8 @@ export class DrawMapComponent {
                 return 0;
             });
 
+            this.my_cell = map.cells.find((cell: Cell) => cell.citizens.some((citizen: Citizen) => citizen.id === getUserId()));
+
             this.drawed_map = rows;
         }
     }
@@ -48,6 +51,8 @@ export class DrawMapComponent {
     public x_row: number[] = [];
 
     public complete_map!: Town;
+    public my_cell: Cell | undefined;
+    public hovered_cell: Cell | undefined;
     public drawed_map: Cell[][] = [];
 
     public trackByCellId(_index: number, column: Cell): number {

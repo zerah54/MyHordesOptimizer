@@ -1,4 +1,6 @@
 import { WishlistItemDTO } from '../dto/wishlist-item.dto';
+import { WishlistDepot } from '../enum/wishlist-depot.enum';
+import { WishlistPriority } from '../enum/wishlist-priority.enum';
 import { CommonModel } from './_common.class';
 import { Item } from './item.class';
 
@@ -8,8 +10,8 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
     public bank_count!: number;
     public bag_count!: number;
     public priority!: number;
-    public priority_main!: number;
-    public depot!: number;
+    public priority_main!: WishlistPriority;
+    public depot!: WishlistDepot;
     public should_signal!: boolean;
     public zone_x_pa!: number;
 
@@ -24,7 +26,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             bankCount: this.bank_count,
             item: this.item.modelToDto(),
             priority: this.priority,
-            depot: this.depot,
+            depot: this.depot.value.count,
             bagCount: this.bag_count,
             zoneXPa: this.zone_x_pa,
             shouldSignal: this.should_signal
@@ -37,18 +39,8 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             this.bank_count = dto.bankCount;
             this.item = new Item(dto.item);
             this.priority = dto.priority;
-            if (dto.priority < 0) {
-                this.priority_main = -1;
-            } else if (dto.priority < 1000) {
-                this.priority_main = 0;
-            } else if (dto.priority < 2000) {
-                this.priority_main = 1;
-            } else if (dto.priority < 3000) {
-                this.priority_main = 2;
-            } else {
-                this.priority_main = 3;
-            }
-            this.depot = dto.depot;
+            this.priority_main = WishlistPriority.getPriorityMainFromPriority(dto.priority);
+            this.depot = WishlistDepot.getDepotFromCount(dto.depot);
             this.should_signal = dto.shouldSignal;
             this.bag_count = dto.bagCount;
             this.zone_x_pa = dto.zoneXPa;

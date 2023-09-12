@@ -6,9 +6,16 @@
     <div class="title">{{is_gt_xs ? 'MyHordes Optimizer' : 'MHO'}}</div>
     <!-- <span *ngIf="!external_app_id_field_value"> -->
     <span class="spacer"></span>
-    <button mat-button *ngIf="saved_external_app_id && is_in_town" (click)="updateExternalTools()">
-        <ng-container i18n>Mettre à jour les outils externes</ng-container>
-    </button>
+    <ng-container *ngIf="saved_external_app_id && is_in_town">
+        <button mat-button *ngIf="is_gt_xs" [color]="'accent'" (click)="updateExternalTools()">
+            <mat-icon>send</mat-icon>
+            <ng-container i18n>Mettre à jour les outils externes</ng-container>
+        </button>
+        <button mat-icon-button *ngIf="!is_gt_xs" [color]="'accent'" (click)="updateExternalTools()" matTooltip="Mettre à jour les outils externes"
+                i18n-matTooltip>
+            <mat-icon>send</mat-icon>
+        </button>
+    </ng-container>
     <button mat-button class="profil-button" [matMenuTriggerFor]="userMenu">
         <ng-container
             *ngIf="saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === ''; else noAppId"

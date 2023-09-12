@@ -7,7 +7,7 @@
         <div class="mat-elevation-z8">
             <table mat-table [dataSource]="datasource" matSort matSortActive="label" matSortDisableClear matSortDirection="asc">
 
-                <ng-container *ngFor="let column of columns" [matColumnDef]="column.id" [sticky]="column.id === 'label'">
+                <ng-container *ngFor="let column of columns" [matColumnDef]="column.id" [sticky]="column.sticky || false">
                     <ng-container *ngIf="column.sortable">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>
                             <ng-container [ngSwitch]="column.id">
@@ -72,8 +72,8 @@
                     </td>
                 </ng-container>
 
-                <tr mat-header-row *matHeaderRowDef="columns_ids; sticky: true"></tr>
-                <tr mat-row *matRowDef="let row; columns: columns_ids;"></tr>
+                <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
             </table>
         </div>
 

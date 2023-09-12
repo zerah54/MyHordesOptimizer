@@ -3,6 +3,7 @@ import { Dictionary } from './types/_types';
 
 export const EXTERNAL_APP_ID_KEY: string = 'external_app_id';
 export const BANK_CONDENSED_DISPLAY_KEY: string = 'bank_condensed_display';
+export const WISHLIST_EDITION_MODE_KEY: string = 'wishlist_edition_mode';
 export const USER_KEY: string = 'user';
 export const TOWN_KEY: string = 'town';
 export const ITEMS_KEY: string = 'all_items';
@@ -27,7 +28,7 @@ export const BREAKPOINTS: Dictionary<string> = {
 
 
 export const NO_RUIN: RuinDTO = {
-    id: -1, camping: 0, label: {en: 'None', fr: 'Aucun', de: 'Kein', es: 'Nada'}, chance: 0, description: {en: '', fr: '', de: '', es: ''},
+    id: -1, camping: 0, label: { en: 'None', fr: 'Aucun', de: 'Kein', es: 'Nada' }, chance: 0, description: { en: '', fr: '', de: '', es: '' },
     explorable: false, img: '', minDist: 1, maxDist: 1000, drops: []
 };
 
