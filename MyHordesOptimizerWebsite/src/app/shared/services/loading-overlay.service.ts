@@ -20,7 +20,7 @@ export class LoadingOverlayService {
         if (is_loading) {
             this.loading_counter++;
         } else {
-            this.loading_counter--;
+            this.loading_counter = Math.max(this.loading_counter - 1, 0);
         }
         if ((previous_counter > 0) !== (this.loading_counter > 0)) {
             this.is_loading.next(this.loading_counter > 0);

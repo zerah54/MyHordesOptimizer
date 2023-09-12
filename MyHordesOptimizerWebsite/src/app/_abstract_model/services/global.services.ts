@@ -1,12 +1,11 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
-import { SnackbarService } from '../../shared/services/snackbar.service';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export class GlobalServices {
     protected readonly API_URL: string = environment.api_url;
 
-    constructor(private http: HttpClient, private snackbar: SnackbarService) {
+    constructor(private http: HttpClient) {
 
     }
 
@@ -14,65 +13,30 @@ export class GlobalServices {
         return this.http.get<T>(url, {
             responseType: 'json',
             observe: 'response'
-        }).pipe(
-            // retry(3),
-            catchError(this.handleError)
-        );
+        });
     }
 
     protected post<T>(url: string, params?: string): Observable<T> {
         const headers: HttpHeaders = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
-        return this.http.post<T>(url, params, {responseType: 'json', headers: headers}).pipe(
-            // retry(3),
-            catchError(this.handleError)
-        );
+        return this.http.post<T>(url, params, { responseType: 'json', headers: headers });
     }
 
     protected put<T>(url: string, body: unknown): Observable<HttpResponse<T>> {
+        const headers: HttpHeaders = new HttpHeaders().set('Content-Type', 'application/json');
         return this.http.put<T>(
             url,
             body,
             {
                 responseType: 'json',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: headers,
                 observe: 'response'
-            }).pipe(
-            // retry(3),
-            catchError(this.handleError)
-        );
+            });
     }
 
     protected delete<T>(url: string): Observable<HttpResponse<T>> {
         return this.http.delete<T>(url, {
             responseType: 'json',
             observe: 'response'
-        }).pipe(
-            // retry(3),
-            catchError(this.handleError)
-        );
-    }
-
-    /**
-     * Gère les erreurs suite aux appels
-     *
-     * @param {HttpErrorResponse} error
-     *
-     * @return {Observable<never>}
-     */
-    private handleError(error: HttpErrorResponse): Observable<never> {
-        if (error.status === 0) {
-            // A client-side or network error occurred. Handle it accordingly.
-            console.error(`Erreur ${error.status} du client ou de réseau : `, error.error);
-        } else {
-            // The backend returned an unsuccessful response code.
-            // The response body may contain clues as to what went wrong.
-            console.error(`Erreur ${error.status} retournée par le backend : `, error.error);
-        }
-        // Return an observable with a user-facing error message.
-        return throwError(() => {
-            this.snackbar.errorSnackbar(`Une erreur s'est produite lors de l'appel (Erreur ${error.status})`);
         });
     }
 }

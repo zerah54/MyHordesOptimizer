@@ -3,11 +3,11 @@ import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
 import { SnackbarService } from '../../shared/services/snackbar.service';
+import { getTown, getUserId } from '../../shared/utilities/localstorage.util';
 import { WishlistInfoDTO } from '../dto/wishlist-info.dto';
 import { Item } from '../types/item.class';
 import { WishlistInfo } from '../types/wishlist-info.class';
 import { GlobalServices } from './global.services';
-import { getTown, getUserId } from '../../shared/utilities/localstorage.util';
 
 @Injectable()
 export class WishlistServices extends GlobalServices {
@@ -15,8 +15,8 @@ export class WishlistServices extends GlobalServices {
     /** La locale */
     private readonly locale: string = moment.locale();
 
-    constructor(_http: HttpClient, private _snackbar: SnackbarService) {
-        super(_http, _snackbar);
+    constructor(_http: HttpClient, private snackbar: SnackbarService) {
+        super(_http);
     }
 
     /**
@@ -52,7 +52,7 @@ export class WishlistServices extends GlobalServices {
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         sub.next(new WishlistInfo(response.body));
-                        this._snackbar.successSnackbar($localize`La liste de courses a bien été enregistrée`);
+                        this.snackbar.successSnackbar($localize`La liste de courses a bien été enregistrée`);
                     }
                 });
         });
@@ -69,7 +69,7 @@ export class WishlistServices extends GlobalServices {
                 .subscribe({
                     next: () => {
                         sub.next();
-                        this._snackbar.successSnackbar($localize`L'objet ${item.label[this.locale]} a bien été ajouté à la liste de courses`);
+                        this.snackbar.successSnackbar($localize`L'objet ${item.label[this.locale]} a bien été ajouté à la liste de courses`);
                     }
                 });
         });

@@ -2,36 +2,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
-import { CellDTO } from '../dto/cell.dto';
-import { HeroSkillDTO } from '../dto/hero-skill.dto';
-import { ItemDTO } from '../dto/item.dto';
-import { MeDTO } from '../dto/me.dto';
-import { RecipeDTO } from '../dto/recipe.dto';
-import { RegenDTO } from '../dto/regen.dto';
-import { TownDTO } from '../dto/town.dto';
-import { UpdateInfoDTO } from '../dto/update-info.dto';
-import { Cell } from '../types/cell.class';
-import { Citizen } from '../types/citizen.class';
-import { HeroSkill } from '../types/hero-skill.class';
-import { Me } from '../types/me.class';
-import { Recipe } from '../types/recipe.class';
-import { Regen } from '../types/regen.class';
-import { Ruin } from '../types/ruin.class';
-import { TownDetails } from '../types/town-details.class';
-import { Town } from '../types/town.class';
-import { UpdateInfo } from '../types/update-info.class';
-import { dtoToModelArray } from '../types/_common.class';
-import { Dictionary, ToolsToUpdate } from '../types/_types';
-import { GlobalServices } from './global.services';
 import { SnackbarService } from '../../shared/services/snackbar.service';
-import { Item } from '../types/item.class';
-import { BankInfo } from '../types/bank-info.class';
-import { BankInfoDTO } from '../dto/bank-info.dto';
-import { RuinDTO } from '../dto/ruin.dto';
-import { CitizenInfo } from '../types/citizen-info.class';
-import { CitizenInfoDTO } from '../dto/citizen-info.dto';
-import { Estimations } from '../types/estimations.class';
-import { EstimationsDTO } from '../dto/estimations.dto';
 import {
     getExternalAppId,
     getItemsWithExpirationDate,
@@ -43,6 +14,35 @@ import {
     setTown,
     setUser
 } from '../../shared/utilities/localstorage.util';
+import { BankInfoDTO } from '../dto/bank-info.dto';
+import { CellDTO } from '../dto/cell.dto';
+import { CitizenInfoDTO } from '../dto/citizen-info.dto';
+import { EstimationsDTO } from '../dto/estimations.dto';
+import { HeroSkillDTO } from '../dto/hero-skill.dto';
+import { ItemDTO } from '../dto/item.dto';
+import { MeDTO } from '../dto/me.dto';
+import { RecipeDTO } from '../dto/recipe.dto';
+import { RegenDTO } from '../dto/regen.dto';
+import { RuinDTO } from '../dto/ruin.dto';
+import { TownDTO } from '../dto/town.dto';
+import { UpdateInfoDTO } from '../dto/update-info.dto';
+import { dtoToModelArray } from '../types/_common.class';
+import { Dictionary, ToolsToUpdate } from '../types/_types';
+import { BankInfo } from '../types/bank-info.class';
+import { Cell } from '../types/cell.class';
+import { CitizenInfo } from '../types/citizen-info.class';
+import { Citizen } from '../types/citizen.class';
+import { Estimations } from '../types/estimations.class';
+import { HeroSkill } from '../types/hero-skill.class';
+import { Item } from '../types/item.class';
+import { Me } from '../types/me.class';
+import { Recipe } from '../types/recipe.class';
+import { Regen } from '../types/regen.class';
+import { Ruin } from '../types/ruin.class';
+import { TownDetails } from '../types/town-details.class';
+import { Town } from '../types/town.class';
+import { UpdateInfo } from '../types/update-info.class';
+import { GlobalServices } from './global.services';
 
 @Injectable()
 export class ApiServices extends GlobalServices {
@@ -50,8 +50,8 @@ export class ApiServices extends GlobalServices {
     /** La locale */
     private readonly locale: string = moment.locale();
 
-    constructor(_http: HttpClient, private _snackbar: SnackbarService) {
-        super(_http, _snackbar);
+    constructor(_http: HttpClient, private snackbar: SnackbarService) {
+        super(_http);
     }
 
     /**
@@ -133,26 +133,36 @@ export class ApiServices extends GlobalServices {
             townId: getTown()?.town_id || 0
         };
 
-        super.post<any>(this.API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`, JSON.stringify({
-            map: {toolsToUpdate: tools_to_update},
+        super.post(this.API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`, JSON.stringify({
+            map: { toolsToUpdate: tools_to_update },
             townDetails: town_details
         }))
             .subscribe({
                 next: () => {
-                    this._snackbar.successSnackbar($localize`Les outils externes ont bien été mis à jour`);
+                    this.snackbar.successSnackbar($localize`Les outils externes ont bien été mis à jour`);
                 }
             });
     }
 
     /**
      * Demande l'estimation à partir des données du tableau
-     * @param {Dictionary<string>} rows Les données pour l'estimation
      * @param {boolean} today
      * @param {number} day
      */
     public estimateAttack(rows: Dictionary<string>, today: boolean, day: number): Observable<string> {
         return new Observable((sub: Subscriber<string>) => {
             super.post<string>(this.API_URL + `:8080/${today ? 'attack' : 'planif'}.php?day=${day}&id=${getTown()?.town_id}&type=normal&debug=false`, JSON.stringify(rows))
+                .subscribe({
+                    next: (response: string) => {
+                        sub.next(response);
+                    }
+                });
+        });
+    }
+
+    public testAttackCalculation(today: boolean, day: number): Observable<string> {
+        return new Observable((sub: Subscriber<string>) => {
+            super.post<string>(this.API_URL + `attaqueEstimation/testAttackCalculation/${today ? 'attack' : 'planif'}?day=${day}&id=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: string) => {
                         sub.next(response);
@@ -321,7 +331,7 @@ export class ApiServices extends GlobalServices {
             super.post<CellDTO>(this.API_URL + `/MyHordesOptimizerMap/cell?townid=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(cell.toSaveCellDTO()))
                 .subscribe({
                     next: (response: CellDTO) => {
-                        this._snackbar.successSnackbar($localize`La cellule a bien été modifiée`);
+                        this.snackbar.successSnackbar($localize`La cellule a bien été modifiée`);
                         sub.next(new Cell(response));
                     }
                 });

@@ -3,10 +3,10 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { Event, NavigationCancel, NavigationEnd, NavigationSkipped, NavigationStart, Router } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from './shared/decorators/autodestroy.decorator';
-import { LoadingOverlayService } from './shared/services/loading-overlay.service';
 import { BREAKPOINTS } from './_abstract_model/const';
 import { ApiServices } from './_abstract_model/services/api.services';
+import { AutoDestroy } from './shared/decorators/autodestroy.decorator';
+import { LoadingOverlayService } from './shared/services/loading-overlay.service';
 
 @Component({
     selector: 'mho-root',
