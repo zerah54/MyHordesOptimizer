@@ -12,11 +12,11 @@ namespace MyHordesOptimizerApi.Controllers.Abstract
         protected readonly ILogger<AbstractMyHordesOptimizerControllerBase> Logger;
 
         public AbstractMyHordesOptimizerControllerBase(ILogger<AbstractMyHordesOptimizerControllerBase> logger,
-            IUserInfoProvider userKeyProvider
-            )
+            IUserInfoProvider userKeyProvider)
         {
             UserKeyProvider = userKeyProvider;
             Logger = logger;
         }
+
     }
 }

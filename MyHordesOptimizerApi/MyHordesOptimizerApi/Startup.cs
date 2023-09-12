@@ -13,6 +13,7 @@ using MyHordesOptimizerApi.Configuration.Impl;
 using MyHordesOptimizerApi.Configuration.Impl.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
+using MyHordesOptimizerApi.Controllers.ActionFillters;
 using MyHordesOptimizerApi.DiscordBot.Services;
 using MyHordesOptimizerApi.MappingProfiles;
 using MyHordesOptimizerApi.Providers.Impl;
@@ -61,7 +62,6 @@ namespace MyHordesOptimizerApi
 
             services.AddHttpContextAccessor();
 
-            services.AddControllers();
             services.AddHttpClient();
             services.AddHttpClient(nameof(GestHordesRepository)).ConfigurePrimaryHttpMessageHandler(() =>
             {
@@ -70,11 +70,20 @@ namespace MyHordesOptimizerApi
                     UseCookies = true,
                 };
             });
-            // services.AddSingleton(BuildAutoMapper());
+            services.AddAuthorization();
+            services.AddControllers(config =>
+            {
+                config.Filters.Add<GlobalActionFilter>();
+            });
+
             services.AddAutoMapper(Assembly.GetAssembly(this.GetType()));
 
             // Providers
             services.AddScoped<IUserInfoProvider, UserInfoProvider>();
+            services.AddScoped<IMhoHeadersProvider, MhoHeadersProvider>();
+
+            // Action filters
+            services.AddScoped<GlobalActionFilter>();
 
             // Configuration
             services.AddSingleton<IMyHordesApiConfiguration, MyHordesApiConfiguration>();
