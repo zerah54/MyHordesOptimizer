@@ -61,6 +61,13 @@
                         max-width: 100px;
                     }
 
+                    &.mat-column-should_signal {
+                        .mat-icon {
+                            vertical-align: bottom;
+                            color: rgba(0, 0, 0, 0.65);
+                        }
+                    }
+
                     .dragdrop-indicator {
                         display: flex;
                         cursor: move;
