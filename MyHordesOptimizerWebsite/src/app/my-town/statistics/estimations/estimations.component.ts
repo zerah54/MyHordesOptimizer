@@ -159,7 +159,7 @@ export class EstimationsComponent implements OnInit {
         }
     }
 
-    public pasteFromMH(min_input: HTMLInputElement, max_input: HTMLInputElement, paste_event: ClipboardEvent): void {
+    public pasteFromMH(paste_event: ClipboardEvent, min_max: MinMax): void {
         paste_event.preventDefault();
         const value: string | undefined = paste_event.clipboardData?.getData('Text');
         let split: string[] | undefined;
@@ -171,8 +171,8 @@ export class EstimationsComponent implements OnInit {
         });
 
         if (split && split.length > 1) {
-            min_input.value = (+split[0]).toString();
-            max_input.value = (+split[1]).toString();
+            min_max.min = +split[0];
+            min_max.max = +split[1];
         }
     }
 
