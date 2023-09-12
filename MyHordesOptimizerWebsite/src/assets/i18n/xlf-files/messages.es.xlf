@@ -563,6 +563,12 @@
           <context context-type="linenumber">43</context>
         </context-group>
         <target state="needs-translation">Enclos</target>
+      </trans-unit><trans-unit id="4324278734280268890" datatype="html">
+        <source>Non défini</source><target state="new">Non défini</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-depot.enum.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="2789207481544807989" datatype="html">
         <source>Nord</source>
@@ -638,12 +644,9 @@
       </trans-unit>
       <trans-unit id="5937107716887714291" datatype="html">
         <source>La cellule a bien été modifiée</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/_abstract_model/services/api.services.ts</context>
-          <context context-type="linenumber">324</context>
-        </context-group>
+        
         <target state="needs-translation">La cellule a bien été modifiée</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/services/api.services.ts</context><context context-type="linenumber">334</context></context-group></trans-unit>
       <trans-unit id="1969912485869156963" datatype="html">
         <source>La fouille a bien été supprimée</source>
         <context-group purpose="location">
@@ -686,7 +689,7 @@
         
         
         <target state="needs-translation">Banque</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/bank/bank.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">29</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">53</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">87</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">103</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">45</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tutorials/script/tuto-script-tools/tuto-script-tools.component.ts</context><context context-type="linenumber">17</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-depot.enum.ts</context><context context-type="linenumber">8</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/bank/bank.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">30</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">57</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">102</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">45</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tutorials/script/tuto-script-tools/tuto-script-tools.component.ts</context><context context-type="linenumber">17</context></context-group></trans-unit>
       <trans-unit id="7491144287113751802" datatype="html">
         <source>Affichage condensé</source>
         <context-group purpose="location">
@@ -713,24 +716,18 @@
         
         
         <target state="needs-translation">Chantiers</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/buildings/buildings.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">35</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">57</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/buildings/buildings.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">36</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">57</context></context-group></trans-unit>
       <trans-unit id="4273156925314176058" datatype="html">
         <source>Campings</source>
         
         
         
         <target state="needs-translation">Campings</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/campings/campings.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">41</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">71</context></context-group></trans-unit><trans-unit id="2263659396368488813" datatype="html">
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/campings/campings.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">42</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">71</context></context-group></trans-unit><trans-unit id="2263659396368488813" datatype="html">
         <source>Aucun objet ne correspond au filtre "<x id="INTERPOLATION" equiv-text="{{filterInput.nativeElement.value}}"/>" </source><target state="new">Aucun objet ne correspond au filtre "<x id="INTERPOLATION" equiv-text="{{filterInput.nativeElement.value}}"/>" </target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.html</context>
-          <context context-type="linenumber">52,53</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
-          <context context-type="linenumber">148,149</context>
-        </context-group>
-      </trans-unit>
+        
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.html</context><context context-type="linenumber">51</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-dispo/citizens-dispo.component.html</context><context context-type="linenumber">44</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">147</context></context-group></trans-unit>
       <trans-unit id="1172866303261737245" datatype="html">
         <source>Position</source>
         
@@ -744,7 +741,7 @@
         
         
         <target state="needs-translation">Enregistrer</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">10</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">175</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context><context context-type="linenumber">32</context></context-group></trans-unit><trans-unit id="5556258391635461081" datatype="html">
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">10</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">199</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context><context context-type="linenumber">32</context></context-group></trans-unit><trans-unit id="5556258391635461081" datatype="html">
         <source>Attaque du jour</source><target state="new">Attaque du jour</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
@@ -771,7 +768,7 @@
         
         
         <target state="needs-translation">Ajouter</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">71</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context><context context-type="linenumber">67</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">70</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context><context context-type="linenumber">67</context></context-group></trans-unit>
       <trans-unit id="1785052497460968940" datatype="html">
         <source>Modifier</source>
         
@@ -788,31 +785,37 @@
         
         
         <target state="needs-translation">Aucun objet ne correspond au filtre "<x id="INTERPOLATION" equiv-text="{{filterInput.nativeElement.value}}"/>"</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">159</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">183</context></context-group></trans-unit>
       <trans-unit id="8265078634979801865" datatype="html">
         <source>La liste est vide</source>
         
         
         
         <target state="needs-translation">La liste est vide</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.html</context><context context-type="linenumber">56</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">152</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">162</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.html</context><context context-type="linenumber">55</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-dispo/citizens-dispo.component.html</context><context context-type="linenumber">48</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">151</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">186</context></context-group></trans-unit>
       <trans-unit id="8297073205000664921" datatype="html">
         <source>Citoyen</source>
         
         
         <target state="needs-translation">Citoyen</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.ts</context><context context-type="linenumber">43</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context><context context-type="linenumber">52</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.ts</context><context context-type="linenumber">44</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-dispo/citizens-dispo.component.ts</context><context context-type="linenumber">41</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context><context context-type="linenumber">53</context></context-group></trans-unit>
       <trans-unit id="7060072837623661429" datatype="html">
         <source>Fouilles du jour</source>
         
         <target state="needs-translation">Fouilles du jour</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.ts</context><context context-type="linenumber">44</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.ts</context><context context-type="linenumber">45</context></context-group></trans-unit><trans-unit id="6779466566977517049" datatype="html">
+        <source>Disponibilités du jour</source><target state="new">Disponibilités du jour</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/citizens/citizens-dispo/citizens-dispo.component.ts</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="4247263368529700262" datatype="html">
         <source>Confirmer</source>
         
         
         <target state="needs-translation">Confirmer</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">281</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/dig/dig.component.ts</context><context context-type="linenumber">59</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">287</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/dig/dig.component.ts</context><context context-type="linenumber">59</context></context-group></trans-unit>
       <trans-unit id="6457668329789527274" datatype="html">
         <source>Êtes-vous sûr de vouloir supprimer cette fouille ?</source>
         
@@ -823,54 +826,54 @@
         
         
         <target state="needs-translation">États</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">34</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context><context context-type="linenumber">53</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">33</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context><context context-type="linenumber">54</context></context-group></trans-unit>
       <trans-unit id="4739884131356753082" datatype="html">
         <source>Ajouter aux états</source>
         
         <target state="needs-translation">Ajouter aux états</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">36</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">35</context></context-group></trans-unit>
       <trans-unit id="6864416921116271532" datatype="html">
         <source>Retirer des états</source>
         
         <target state="needs-translation">Retirer des états</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">38</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">37</context></context-group></trans-unit>
       <trans-unit id="7332767872103966167" datatype="html">
         <source>Vider les états</source>
         
         <target state="needs-translation">Vider les états</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">40</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">39</context></context-group></trans-unit>
       <trans-unit id="7287080792595569200" datatype="html">
         <source>Sac</source>
         
         
         <target state="needs-translation">Sac</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">48</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-citizens/map-update-citizens.component.html</context><context context-type="linenumber">10</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">47</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-citizens/map-update-citizens.component.html</context><context context-type="linenumber">11</context></context-group></trans-unit>
       <trans-unit id="6019139638926667991" datatype="html">
         <source>Ajouter au sac</source>
         
         <target state="needs-translation">Ajouter au sac</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">49</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">48</context></context-group></trans-unit>
       <trans-unit id="6402922979065903259" datatype="html">
         <source>Retirer du sac</source>
         
         <target state="needs-translation">Retirer du sac</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">52</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">51</context></context-group></trans-unit>
       <trans-unit id="6195148584287059509" datatype="html">
         <source>Vider le sac</source>
         
         <target state="needs-translation">Vider le sac</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">54</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context><context context-type="linenumber">53</context></context-group></trans-unit>
       <trans-unit id="713605071826573828" datatype="html">
         <source>Actions héroïques</source>
         
         <target state="needs-translation">Actions héroïques</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context><context context-type="linenumber">54</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context><context context-type="linenumber">55</context></context-group></trans-unit>
       <trans-unit id="165011294537677821" datatype="html">
         <source>Améliorations</source>
         
         
         <target state="needs-translation">Améliorations</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context><context context-type="linenumber">55</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">135</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context><context context-type="linenumber">56</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">135</context></context-group></trans-unit>
       <trans-unit id="6373263061828099513" datatype="html">
         <source>Citoyens</source>
         
@@ -879,7 +882,7 @@
         
         
         <target state="needs-translation">Citoyens</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens.component.ts</context><context context-type="linenumber">14</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context><context context-type="linenumber">27</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">47</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">53</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">58</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">46</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens.component.ts</context><context context-type="linenumber">15</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context><context context-type="linenumber">27</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">48</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">54</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">59</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">64</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">46</context></context-group></trans-unit>
       <trans-unit id="8895761088455718364" datatype="html">
         <source>Fouilles</source>
         
@@ -887,21 +890,18 @@
         
         
         <target state="needs-translation">Fouilles</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens.component.ts</context><context context-type="linenumber">18</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context><context context-type="linenumber">37</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">21</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context><context context-type="linenumber">23</context></context-group></trans-unit><trans-unit id="5977326848564608050" datatype="html">
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/citizens/citizens.component.ts</context><context context-type="linenumber">20</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context><context context-type="linenumber">37</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">21</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context><context context-type="linenumber">23</context></context-group></trans-unit><trans-unit id="6351937635910938762" datatype="html">
+        <source>Disponibilités</source><target state="new">Disponibilités</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/citizens/citizens.component.ts</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit><trans-unit id="5977326848564608050" datatype="html">
         <source>Expéditions</source><target state="new">Expéditions</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
-          <context context-type="linenumber">2</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context>
-          <context context-type="linenumber">66</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-          <context context-type="linenumber">50</context>
-        </context-group>
-      </trans-unit>
+        
+        
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">72</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">50</context></context-group></trans-unit>
       <trans-unit id="2986159287834234807" datatype="html">
         <source>N</source>
         <context-group purpose="location">
@@ -999,7 +999,7 @@
         
         
         <target state="needs-translation">Ajouter un objet</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context><context context-type="linenumber">72</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">44</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context><context context-type="linenumber">72</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">34</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">36</context></context-group></trans-unit>
       <trans-unit id="8620934575209945498" datatype="html">
         <source>Supprimer un objet</source>
         <context-group purpose="location">
@@ -1018,16 +1018,10 @@
       </trans-unit>
       <trans-unit id="5050216151704196655" datatype="html">
         <source>Ajouter un citoyen </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-citizens/map-update-citizens.component.html</context>
-          <context context-type="linenumber">7,8</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-digs/map-update-digs.component.html</context>
-          <context context-type="linenumber">9,10</context>
-        </context-group>
+        
+        
         <target state="needs-translation">Ajouter un citoyen </target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-citizens/map-update-citizens.component.html</context><context context-type="linenumber">8</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-digs/map-update-digs.component.html</context><context context-type="linenumber">9</context></context-group></trans-unit>
       <trans-unit id="3420757244733292611" datatype="html">
         <source>Fouilles réussies</source>
         
@@ -1040,20 +1034,11 @@
       <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-digs/map-update-digs.component.html</context><context context-type="linenumber">13</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context><context context-type="linenumber">49</context></context-group></trans-unit>
       <trans-unit id="3182705520281939075" datatype="html">
         <source>Bonus en camping</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
-          <context context-type="linenumber">6</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
-          <context context-type="linenumber">59</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
-          <context context-type="linenumber">43</context>
-        </context-group>
+        
+        
+        
         <target state="needs-translation">Bonus en camping</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context><context context-type="linenumber">6</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context><context context-type="linenumber">59</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context><context context-type="linenumber">44</context></context-group></trans-unit>
       <trans-unit id="2698599537427262917" datatype="html">
         <source>Bâtiment vide</source>
         <context-group purpose="location">
@@ -1122,7 +1107,7 @@
         
         
         <target state="needs-translation">Carte des fouilles</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">72</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">44</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">78</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">44</context></context-group></trans-unit>
       <trans-unit id="5460349843625378822" datatype="html">
         <source>Paramètres</source>
         <context-group purpose="location">
@@ -1176,7 +1161,7 @@
         
         
         <target state="needs-translation">Moyenne</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">30</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">84</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">96</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context><context context-type="linenumber">58</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-priority.enum.ts</context><context context-type="linenumber">12</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">30</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">95</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context><context context-type="linenumber">58</context></context-group></trans-unit>
       <trans-unit id="392591506297072679" datatype="html">
         <source>Mode d'affichage</source>
         <context-group purpose="location">
@@ -1201,90 +1186,53 @@
         </context-group>
         <target state="needs-translation">Défense apportée</target>
       </trans-unit>
-      <trans-unit id="2158441971311454300" datatype="html">
-        <source>Récupérer les informations depuis GH</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
-          <context context-type="linenumber">39</context>
-        </context-group>
-        <target state="needs-translation">Récupérer les informations depuis GH</target>
-      </trans-unit>
+      
       <trans-unit id="9122415907873847234" datatype="html">
         <source>Afficher les zones du scrutateur</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
+        
         <target state="needs-translation">Afficher les zones du scrutateur</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">41</context></context-group></trans-unit>
       <trans-unit id="2046490270137592735" datatype="html">
         <source>Afficher les zones en distance</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
-          <context context-type="linenumber">49</context>
-        </context-group>
+        
         <target state="needs-translation">Afficher les zones en distance</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">48</context></context-group></trans-unit>
       <trans-unit id="6117782295216095698" datatype="html">
         <source>Ajouter une zone</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
-          <context context-type="linenumber">53</context>
-        </context-group>
+        
         <target state="needs-translation">Ajouter une zone</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">52</context></context-group></trans-unit>
       <trans-unit id="1779552786277618671" datatype="html">
         <source>Distance</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
-          <context context-type="linenumber">59</context>
-        </context-group>
+        
         <target state="needs-translation">Distance</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">58</context></context-group></trans-unit>
       <trans-unit id="4998616682175982835" datatype="html">
         <source>Unité</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
-          <context context-type="linenumber">62</context>
-        </context-group>
+        
         <target state="needs-translation">Unité</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">61</context></context-group></trans-unit>
       <trans-unit id="6044256456943348938" datatype="html">
         <source>km</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
-          <context context-type="linenumber">63</context>
-        </context-group>
+        
         <target state="needs-translation">km</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">62</context></context-group></trans-unit>
       <trans-unit id="4330356559988217596" datatype="html">
         <source>pa</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
-          <context context-type="linenumber">64</context>
-        </context-group>
+        
         <target state="needs-translation">pa</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">63</context></context-group></trans-unit>
       <trans-unit id="7649141370266521403" datatype="html">
         <source>Aller / Retour</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
-          <context context-type="linenumber">69</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
-          <context context-type="linenumber">81</context>
-        </context-group>
+        
+        
         <target state="needs-translation">Aller / Retour</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">68</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">80</context></context-group></trans-unit>
       <trans-unit id="6713347271514219101" datatype="html">
         <source>Aller simple</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
-          <context context-type="linenumber">82</context>
-        </context-group>
+        
         <target state="needs-translation">Aller simple</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/map/map.component.html</context><context context-type="linenumber">81</context></context-group></trans-unit>
       <trans-unit id="2881179225572512277" datatype="html">
         <source>Ma ville</source>
         
@@ -1297,21 +1245,21 @@
         
         
         <target state="needs-translation">Ma ville</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">29</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">35</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">41</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">47</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">53</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">58</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">66</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">72</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">78</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">84</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">90</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">96</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">102</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">110</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">43</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">30</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">36</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">42</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">48</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">54</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">59</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">64</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">72</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">78</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">84</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">90</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">96</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">102</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">108</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">116</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">43</context></context-group></trans-unit>
       <trans-unit id="268108544779646824" datatype="html">
         <source>Veilles</source>
         
         
         
         <target state="needs-translation">Veilles</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">78</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/nightwatch/nightwatch.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">64</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">84</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/nightwatch/nightwatch.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">64</context></context-group></trans-unit>
       <trans-unit id="5909537349952143751" datatype="html">
         <source>Statistiques</source>
         
         
         
         <target state="needs-translation">Statistiques</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">84</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">90</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">96</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">102</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/statistics.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">48</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">90</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">96</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">102</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">108</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/statistics.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">48</context></context-group></trans-unit>
       <trans-unit id="8100821574049291929" datatype="html">
         <source>Liste de courses</source>
         
@@ -1321,40 +1269,31 @@
         
         
         <target state="needs-translation">Liste de courses</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">110</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">3</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">186</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">271</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">47</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/my-town.routing.module.ts</context><context context-type="linenumber">116</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">3</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">192</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">277</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">47</context></context-group></trans-unit>
       
       <trans-unit id="2806568446192626314" datatype="html">
         <source>Qualité</source>
         
         
         <target state="needs-translation">Qualité</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">17</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">34</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">17</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">36</context></context-group></trans-unit>
       <trans-unit id="4912803901980915876" datatype="html">
         <source>Min</source>
         
         
         <target state="needs-translation">Min</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">18</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">35</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">18</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">37</context></context-group></trans-unit>
       <trans-unit id="3667949571823271511" datatype="html">
         <source>Max</source>
         
         
         <target state="needs-translation">Max</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">19</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">36</context></context-group></trans-unit><trans-unit id="7684105598309210468" datatype="html">
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">19</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">38</context></context-group></trans-unit><trans-unit id="7684105598309210468" datatype="html">
         <source>Attaque du lendemain</source><target state="new">Attaque du lendemain</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
-          <context context-type="linenumber">32</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
-          <context context-type="linenumber">151</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
-          <context context-type="linenumber">181</context>
-        </context-group>
-      </trans-unit>
+        
+        
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context><context context-type="linenumber">34</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context><context context-type="linenumber">151</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context><context context-type="linenumber">181</context></context-group></trans-unit>
       
       <trans-unit id="868416859251656813" datatype="html">
         <source>Coller le contenu du registre à analyser</source>
@@ -1452,63 +1391,42 @@
         <source>Jour</source>
         
         <target state="needs-translation">Jour</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context><context context-type="linenumber">28</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context><context context-type="linenumber">42</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context><context context-type="linenumber">69</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context><context context-type="linenumber">29</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context><context context-type="linenumber">42</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context><context context-type="linenumber">69</context></context-group></trans-unit>
       <trans-unit id="4328738626502194147" datatype="html">
         <source>Direction</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">29</context>
-        </context-group>
+        
         <target state="needs-translation">Direction</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context><context context-type="linenumber">30</context></context-group></trans-unit>
       <trans-unit id="1163439985107240214" datatype="html">
         <source>Niveau</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">30</context>
-        </context-group>
+        
         <target state="needs-translation">Niveau</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context><context context-type="linenumber">31</context></context-group></trans-unit>
       <trans-unit id="3877095303685712752" datatype="html">
         <source>Taux</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">31</context>
-        </context-group>
+        
         <target state="needs-translation">Taux</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context><context context-type="linenumber">32</context></context-group></trans-unit>
       <trans-unit id="9104606150638849284" datatype="html">
         <source>Direction des regénérations</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">78</context>
-        </context-group>
+        
         <target state="needs-translation">Direction des regénérations</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context><context context-type="linenumber">76</context></context-group></trans-unit>
       <trans-unit id="9119183608655124664" datatype="html">
         <source>Droite</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">114</context>
-        </context-group>
+        
         <target state="needs-translation">Droite</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context><context context-type="linenumber">112</context></context-group></trans-unit>
       <trans-unit id="1575744069418173844" datatype="html">
         <source>Diagonale</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">114</context>
-        </context-group>
+        
         <target state="needs-translation">Diagonale</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context><context context-type="linenumber">112</context></context-group></trans-unit>
       <trans-unit id="6355589699962619386" datatype="html">
         <source>Axe des regénérations</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
-          <context context-type="linenumber">124</context>
-        </context-group>
+        
         <target state="needs-translation">Axe des regénérations</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context><context context-type="linenumber">122</context></context-group></trans-unit>
       <trans-unit id="866656223631702865" datatype="html">
         <source>Estimations</source>
         
@@ -1536,97 +1454,90 @@
           <context context-type="linenumber">10</context>
         </context-group>
         <target state="needs-translation">Import / Export</target>
+      </trans-unit><trans-unit id="1130012359476776162" datatype="html">
+        <source>Mode édition</source><target state="new">Mode édition</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="5956461158010502750" datatype="html">
         <source>Enregistrer dans un fichier Excel</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
-          <context context-type="linenumber">15</context>
-        </context-group>
+        
         <target state="needs-translation">Enregistrer dans un fichier Excel</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">16</context></context-group></trans-unit>
       <trans-unit id="6569703909800181758" datatype="html">
         <source>Importer depuis un fichier Excel</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
-          <context context-type="linenumber">16</context>
-        </context-group>
-        <target state="needs-translation">Importer depuis un fichier Excel</target>
-      </trans-unit>
-      <trans-unit id="5014510891223273930" datatype="html">
-        <source>Ajouter un objet à la liste</source>
         
-        <target state="needs-translation">Ajouter un objet à la liste</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">42</context></context-group></trans-unit>
+        <target state="needs-translation">Importer depuis un fichier Excel</target>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">17</context></context-group></trans-unit>
+      
       <trans-unit id="515657175878356073" datatype="html">
         <source>Zone de ramassage</source>
         
         <target state="needs-translation">Zone de ramassage</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">190</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">214</context></context-group></trans-unit>
       <trans-unit id="291877573183684359" datatype="html">
         <source>Objet</source>
         
         <target state="needs-translation">Objet</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">50</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">53</context></context-group></trans-unit>
       <trans-unit id="4434386636143018239" datatype="html">
         <source>Priorité</source>
         
         
         <target state="needs-translation">Priorité</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">51</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">83</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">55</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">94</context></context-group></trans-unit>
       <trans-unit id="8217045774850995170" datatype="html">
         <source>Dépôt</source>
         
         <target state="needs-translation">Dépôt</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">52</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">56</context></context-group></trans-unit>
       <trans-unit id="8141956022659606503" datatype="html">
         <source>Sacs</source>
         
         <target state="needs-translation">Sacs</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">54</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">58</context></context-group></trans-unit>
       <trans-unit id="3891399276441992819" datatype="html">
         <source>Stock souhaité</source>
         
         <target state="needs-translation">Stock souhaité</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">55</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">59</context></context-group></trans-unit>
       <trans-unit id="5281938868222344363" datatype="html">
         <source>Quantité manquante</source>
         
         <target state="needs-translation">Quantité manquante</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">56</context></context-group></trans-unit><trans-unit id="542725519312506171" datatype="html">
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">60</context></context-group></trans-unit><trans-unit id="542725519312506171" datatype="html">
         <source>Signaler</source><target state="new">Signaler</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
-          <context context-type="linenumber">57</context>
-        </context-group>
-      </trans-unit>
+        
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">61</context></context-group></trans-unit>
       <trans-unit id="3467467788247438312" datatype="html">
         <source>Toute la carte</source>
         
         <target state="needs-translation">Toute la carte</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">62</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">65</context></context-group></trans-unit>
       <trans-unit id="8142874177184348276" datatype="html">
         <source>Identifiant</source>
         
         <target state="needs-translation">Identifiant</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">80</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">88</context></context-group></trans-unit>
       <trans-unit id="347985381929507270" datatype="html">
         <source>Nom de l'objet</source>
         
         <target state="needs-translation">Nom de l'objet</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">81</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">91</context></context-group></trans-unit>
       <trans-unit id="7453572823482729445" datatype="html">
         <source>Haute</source>
         
         
         <target state="needs-translation">Haute</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">84</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">97</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-priority.enum.ts</context><context context-type="linenumber">13</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">95</context></context-group></trans-unit>
       <trans-unit id="955710000640596255" datatype="html">
         <source>Basse</source>
         
         
         <target state="needs-translation">Basse</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">84</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">95</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-priority.enum.ts</context><context context-type="linenumber">11</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">95</context></context-group></trans-unit>
       <trans-unit id="5559973343890533582" datatype="html">
         <source>Non définie</source>
         
@@ -1634,80 +1545,80 @@
         
         
         <target state="needs-translation">Non définie</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">84</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">87</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">94</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">102</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-priority.enum.ts</context><context context-type="linenumber">10</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">95</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">102</context></context-group></trans-unit>
       <trans-unit id="8648912876673109537" datatype="html">
         <source>Ne pas ramener</source>
         
         
         <target state="needs-translation">Ne pas ramener</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">84</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">93</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-priority.enum.ts</context><context context-type="linenumber">9</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">95</context></context-group></trans-unit>
       <trans-unit id="4209980706371465802" datatype="html">
         <source>Quantité souhaitée</source>
         
         <target state="needs-translation">Quantité souhaitée</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">86</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">98</context></context-group></trans-unit>
       <trans-unit id="7486819521897416285" datatype="html">
         <source>Zone de dépôt</source>
         
         <target state="needs-translation">Zone de dépôt</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">87</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">101</context></context-group></trans-unit>
       <trans-unit id="6188037361891823447" datatype="html">
         <source>Zone de rappatriement</source>
         
         
         
         <target state="needs-translation">Zone de rappatriement</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">87</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">205</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">214</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">102</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">211</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">220</context></context-group></trans-unit>
       <trans-unit id="4169579143978188553" datatype="html">
         <source>Zone de rapatriement</source>
         
         <target state="needs-translation">Zone de rapatriement</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">104</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-depot.enum.ts</context><context context-type="linenumber">9</context></context-group></trans-unit>
       <trans-unit id="6373560123262851639" datatype="html">
         <source>Encombrants</source>
         
         <target state="needs-translation">Encombrants</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">202</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">208</context></context-group></trans-unit>
       <trans-unit id="604478767521887364" datatype="html">
         <source>Non-Encombrants</source>
         
         <target state="needs-translation">Non-Encombrants</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">211</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">217</context></context-group></trans-unit>
       <trans-unit id="3837919746131358209" datatype="html">
         <source>Ne pas rapporter</source>
         
         <target state="needs-translation">Ne pas rapporter</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">220</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">226</context></context-group></trans-unit>
       <trans-unit id="713428125328247599" datatype="html">
         <source>Dernière mise à jour</source>
         
         <target state="needs-translation">Dernière mise à jour</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">229</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">235</context></context-group></trans-unit>
       <trans-unit id="7323484701723320483" datatype="html">
         <source>par</source>
         
         <target state="needs-translation">par</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">229</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">235</context></context-group></trans-unit>
       <trans-unit id="1610201751434297017" datatype="html">
         <source>Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=<x id="PH" equiv-text="environment.website_url"/>my-town/wishlist]ce lien[/link]</source>
         
         <target state="needs-translation">Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=<x id="PH" equiv-text="environment.website_url"/>my-town/wishlist]ce lien[/link]</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">230</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">236</context></context-group></trans-unit>
       <trans-unit id="6649866923258777823" datatype="html">
         <source>La liste a bien été copiée au format forum</source>
         
         <target state="needs-translation">La liste a bien été copiée au format forum</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context><context context-type="linenumber">214</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">232</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context><context context-type="linenumber">214</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">238</context></context-group></trans-unit>
       <trans-unit id="7155393620333942058" datatype="html">
         <source>Liste de course</source>
         
         <target state="needs-translation">Liste de course</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">240</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">246</context></context-group></trans-unit>
       <trans-unit id="3401205854749832786" datatype="html">
         <source>Voulez-vous écraser la liste actuelle ? Elle sera perdue.</source>
         
         <target state="needs-translation">Voulez-vous écraser la liste actuelle ? Elle sera perdue.</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">282</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context><context context-type="linenumber">288</context></context-group></trans-unit>
       <trans-unit id="4003387801369922138" datatype="html">
         <source>Valider</source>
         <context-group purpose="location">
@@ -1768,7 +1679,13 @@
         <source>Objet encombrant</source>
         
         <target state="needs-translation">Objet encombrant</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">90</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context><context context-type="linenumber">56</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context><context context-type="linenumber">90</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context><context context-type="linenumber">56</context></context-group></trans-unit><trans-unit id="1852619184802693518" datatype="html">
+        <source>Objet à signaler</source><target state="new">Objet à signaler</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
+          <context context-type="linenumber">158</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8559558498834606319" datatype="html">
         <source>Mis à jour par <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo.update_time.fromNow()}}"/></source>
         <context-group purpose="location">
@@ -1844,52 +1761,34 @@
       <context-group purpose="location"><context context-type="sourcefile">src/app/structure/footer/footer.component.html</context><context context-type="linenumber">20</context></context-group></trans-unit>
       <trans-unit id="3984780497725315833" datatype="html">
         <source>Mettre à jour les outils externes</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-          <context context-type="linenumber">10</context>
-        </context-group>
+        
         <target state="needs-translation">Mettre à jour les outils externes</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/structure/header/header.component.html</context><context context-type="linenumber">12</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/structure/header/header.component.html</context><context context-type="linenumber">14</context></context-group></trans-unit>
       <trans-unit id="7350343149622529345" datatype="html">
         <source>Se connecter </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-          <context context-type="linenumber">15,16</context>
-        </context-group>
+        
         <target state="needs-translation">Se connecter </target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/structure/header/header.component.html</context><context context-type="linenumber">22</context></context-group></trans-unit>
       <trans-unit id="6636912229609448537" datatype="html">
         <source>Utilisateur inconnu</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-          <context context-type="linenumber">20</context>
-        </context-group>
+        
         <target state="needs-translation">Utilisateur inconnu</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/structure/header/header.component.html</context><context context-type="linenumber">27</context></context-group></trans-unit>
       <trans-unit id="4322254668478976610" datatype="html">
         <source>Identifiant d'app externe</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-          <context context-type="linenumber">28</context>
-        </context-group>
+        
         <target state="needs-translation">Identifiant d'app externe</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/structure/header/header.component.html</context><context context-type="linenumber">35</context></context-group></trans-unit>
       <trans-unit id="5925476828699666766" datatype="html">
         <source>Identifiant externe pour les app</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-          <context context-type="linenumber">29</context>
-        </context-group>
+        
         <target state="needs-translation">Identifiant externe pour les app</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/structure/header/header.component.html</context><context context-type="linenumber">36</context></context-group></trans-unit>
       <trans-unit id="6446192435648820310" datatype="html">
         <source>Déconnexion</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-          <context context-type="linenumber">37</context>
-        </context-group>
+        
         <target state="needs-translation">Déconnexion</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/structure/header/header.component.html</context><context context-type="linenumber">44</context></context-group></trans-unit>
       <trans-unit id="1687689412386216543" datatype="html">
         <source>Par défaut</source>
         
@@ -1945,7 +1844,7 @@
         
         
         <target state="needs-translation">Objets</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">87</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tutorials/script/tuto-script-wiki/tuto-script-wiki.component.ts</context><context context-type="linenumber">17</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/items/items.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context><context context-type="linenumber">44</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/wiki.routing.module.ts</context><context context-type="linenumber">15</context></context-group></trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context><context context-type="linenumber">87</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/tutorials/script/tuto-script-wiki/tuto-script-wiki.component.ts</context><context context-type="linenumber">17</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/items/items.component.html</context><context context-type="linenumber">2</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context><context context-type="linenumber">45</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/wiki.routing.module.ts</context><context context-type="linenumber">15</context></context-group></trans-unit>
       <trans-unit id="530325689928281558" datatype="html">
         <source>Recettes</source>
         
@@ -2058,39 +1957,41 @@
           <context context-type="linenumber">12,13</context>
         </context-group>
         <target state="needs-translation">Un grand merci à Renack, sans qui ni le script ni le site n'existeraient puisqu'il a fait tout le backend !</target>
-      </trans-unit>
-      <trans-unit id="7380936142402612213" datatype="html">
-        <source>Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l'ergonomie du site. </source>
+      </trans-unit><trans-unit id="3079822284604019418" datatype="html">
+        <source>Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.</source><target state="new">Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-          <context context-type="linenumber">16,17</context>
+          <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l'ergonomie du site. </target>
-      </trans-unit>
-      <trans-unit id="775283245772645406" datatype="html">
-        <source>Merci également aux traducteurs qui ont rendu l'internationalisation possible : Katt pour l'allemand, Nekomine pour l'espagnol et Shokolaw pour l'anglais.</source>
+      </trans-unit><trans-unit id="7508106374158857656" datatype="html">
+        <source>Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l'ergonomie du site.</source><target state="new">Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l'ergonomie du site.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-          <context context-type="linenumber">20,22</context>
+          <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Merci également aux traducteurs qui ont rendu l'internationalisation possible : Katt pour l'allemand, Nekomine pour l'espagnol et Shokolaw pour l'anglais.</target>
-      </trans-unit>
-      <trans-unit id="8552805315338940549" datatype="html">
-        <source>Merci à Argo qui assure à la perfection - assistée de Katt - le rôle de responsable des relations avec l'équipe de développement du jeu, et sans qui l'idée de faire du script un site ne serait pas née.</source>
+      </trans-unit><trans-unit id="9186323945331905549" datatype="html">
+        <source>Merci également aux traducteurs qui rendent l'internationalisation possible.</source><target state="new">Merci également aux traducteurs qui rendent l'internationalisation possible.</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-          <context context-type="linenumber">25,28</context>
+          <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Merci à Argo qui assure à la perfection - assistée de Katt - le rôle de responsable des relations avec l'équipe de développement du jeu, et sans qui l'idée de faire du script un site ne serait pas née.</target>
-      </trans-unit>
-      <trans-unit id="9175648759449725798" datatype="html">
-        <source>Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.</source>
+      </trans-unit><trans-unit id="4780379749037907519" datatype="html">
+        <source>Merci à Argo qui a assuré à la perfection - assistée de Katt - le rôle de responsable des relations avec l'équipe de développement du jeu, et sans qui l'idée de faire du script un site ne serait pas née. </source><target state="new">Merci à Argo qui a assuré à la perfection - assistée de Katt - le rôle de responsable des relations avec l'équipe de développement du jeu, et sans qui l'idée de faire du script un site ne serait pas née. </target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-          <context context-type="linenumber">31,34</context>
+          <context context-type="linenumber">24,27</context>
         </context-group>
-        <target state="needs-translation">Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités.</target>
+      </trans-unit><trans-unit id="1639188178441316344" datatype="html">
+        <source>Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités. </source><target state="new">Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités. </target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
+          <context context-type="linenumber">30,32</context>
+        </context-group>
       </trans-unit>
+      
+      
+      
+      
       <trans-unit id="611594206241884293" datatype="html">
         <source>Copier le lien de la simulation</source>
         <context-group purpose="location">
@@ -2306,7 +2207,7 @@
         
         
         <target state="needs-translation">Résultat</target>
-      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">176</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context><context context-type="linenumber">35</context></context-group></trans-unit><trans-unit id="5285740383990103899" datatype="html">
+      <context-group purpose="location"><context context-type="sourcefile">src/app/tools/camping/camping.component.html</context><context context-type="linenumber">176</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context><context context-type="linenumber">36</context></context-group></trans-unit><trans-unit id="5285740383990103899" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{camping_result.probability * 100 | number:'1.0-2':locale }}"/>% de chances de survie (<x id="INTERPOLATION_1" equiv-text="{{(camping_result.chances || 0) / 100}}"/> points) </source><target state="new"><x id="INTERPOLATION" equiv-text="{{camping_result.probability * 100 | number:'1.0-2':locale }}"/>% de chances de survie (<x id="INTERPOLATION_1" equiv-text="{{(camping_result.chances || 0) / 100}}"/> points) </target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
@@ -3029,32 +2930,20 @@
       
       <trans-unit id="814524093468498547" datatype="html">
         <source>Pouvoir</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context>
-          <context context-type="linenumber">30</context>
-        </context-group>
+        
         <target state="needs-translation">Pouvoir</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context><context context-type="linenumber">31</context></context-group></trans-unit>
       <trans-unit id="7031255060364978694" datatype="html">
         <source>Jours héros nécessaires</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context>
-          <context context-type="linenumber">31</context>
-        </context-group>
+        
         <target state="needs-translation">Jours héros nécessaires</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context><context context-type="linenumber">32</context></context-group></trans-unit>
       <trans-unit id="4902817035128594900" datatype="html">
         <source>Description</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context>
-          <context context-type="linenumber">32</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
-          <context context-type="linenumber">40</context>
-        </context-group>
+        
+        
         <target state="needs-translation">Description</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context><context context-type="linenumber">33</context></context-group><context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context><context context-type="linenumber">41</context></context-group></trans-unit>
       
       
       
@@ -3137,44 +3026,29 @@
       </trans-unit>
       <trans-unit id="8924763758161915362" datatype="html">
         <source>Type de recette</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context>
-          <context context-type="linenumber">32</context>
-        </context-group>
+        
         <target state="needs-translation">Type de recette</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context><context context-type="linenumber">33</context></context-group></trans-unit>
       <trans-unit id="227324654937703789" datatype="html">
         <source>Composants</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context>
-          <context context-type="linenumber">33</context>
-        </context-group>
+        
         <target state="needs-translation">Composants</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context><context context-type="linenumber">34</context></context-group></trans-unit>
       <trans-unit id="4280305830543989718" datatype="html">
         <source>Nom du bâtiment</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
-          <context context-type="linenumber">39</context>
-        </context-group>
+        
         <target state="needs-translation">Nom du bâtiment</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context><context context-type="linenumber">40</context></context-group></trans-unit>
       <trans-unit id="7533053521139949104" datatype="html">
         <source>Distance minimum</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
-          <context context-type="linenumber">41</context>
-        </context-group>
+        
         <target state="needs-translation">Distance minimum</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context><context context-type="linenumber">42</context></context-group></trans-unit>
       <trans-unit id="3656199934377633082" datatype="html">
         <source>Distance maximum</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
+        
         <target state="needs-translation">Distance maximum</target>
-      </trans-unit>
+      <context-group purpose="location"><context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context><context context-type="linenumber">43</context></context-group></trans-unit>
     </body>
   </file>
 </xliff>

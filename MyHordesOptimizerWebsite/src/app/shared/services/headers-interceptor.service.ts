@@ -11,7 +11,7 @@ export class HeadersInterceptor implements HttpInterceptor {
     /** Intercepte les appels REST pour afficher un loader */
     intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
 
-        request = request.clone({ headers: request.headers.set('Mho-Origin', 'Website') });
+        request = request.clone({ headers: request.headers.set('Mho-Origin', 'website') });
         return next.handle(request);
     }
 }
