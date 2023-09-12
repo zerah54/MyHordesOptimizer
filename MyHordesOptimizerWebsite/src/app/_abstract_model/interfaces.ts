@@ -7,3 +7,11 @@ export interface Entry {
     hour: string;
     entry: string;
 }
+
+export interface StandardColumn {
+    header: string;
+    id: string;
+    class?: string;
+    sticky?: boolean;
+    displayed?: () => boolean;
+}

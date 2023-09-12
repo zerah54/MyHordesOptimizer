@@ -1,12 +1,13 @@
 import { Component, ElementRef, HostBinding, OnInit, ViewChild } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
-import { ApiServices } from '../../../_abstract_model/services/api.services';
-import { ZoneRegen } from '../../../_abstract_model/enum/zone-regen.enum';
 import { MatTableDataSource } from '@angular/material/table';
-import { groupBy } from '../../../shared/utilities/array.util';
 import Chart from 'chart.js/auto';
+import { Subject, takeUntil } from 'rxjs';
+import { ZoneRegen } from '../../../_abstract_model/enum/zone-regen.enum';
+import { StandardColumn } from '../../../_abstract_model/interfaces';
+import { ApiServices } from '../../../_abstract_model/services/api.services';
 import { Regen } from '../../../_abstract_model/types/regen.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
+import { groupBy } from '../../../shared/utilities/array.util';
 
 // import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 
@@ -24,18 +25,15 @@ export class ScrutateurComponent implements OnInit {
     /** La datasource pour le tableau */
     public datasource: MatTableDataSource<Regen> = new MatTableDataSource();
     /** La liste des colonnes */
-    public columns: RegenColumn[] = [
-        {id: 'day', label: $localize`Jour`, class: ''},
-        {id: 'direction_regen', label: $localize`Direction`, class: ''},
-        {id: 'level_regen', label: $localize`Niveau`, class: ''},
-        {id: 'taux_regen', label: $localize`Taux`, class: ''}
+    public columns: StandardColumn[] = [
+        { id: 'day', header: $localize`Jour`, sticky: true },
+        { id: 'direction_regen', header: $localize`Direction`, class: '' },
+        { id: 'level_regen', header: $localize`Niveau`, class: '' },
+        { id: 'taux_regen', header: $localize`Taux`, class: '' }
     ];
 
     public polar_chart!: Chart<'polarArea'>;
     public pie_chart!: Chart<'pie'>;
-
-    /** La liste des id des colonnes */
-    public readonly columns_ids: string[] = this.columns.map((column: RegenColumn) => column.id);
 
     private all_zones_regen: ZoneRegen[] = (<ZoneRegen[]>ZoneRegen.getAllValues()).sort((zone_a: ZoneRegen, zone_b: ZoneRegen) => {
         return zone_a.value.order_by - zone_b.value.order_by;
@@ -140,17 +138,11 @@ export class ScrutateurComponent implements OnInit {
             });
     }
 
-    public trackByColumnId(_index: number, column: RegenColumn): string {
+    public trackByColumnId(_index: number, column: StandardColumn): string {
         return column.id;
     }
 
     public groupByDiago(item: Regen): string {
         return (<ZoneRegen>item.direction_regen).value.diag + '';
     }
-}
-
-interface RegenColumn {
-    id: string;
-    label: string;
-    class: string;
 }

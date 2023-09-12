@@ -1,6 +1,6 @@
 <mat-card-header class="mho-bank-header">
     <mat-card-title i18n>Banque</mat-card-title>
-    <mat-slide-toggle i18n [(ngModel)]="condensed_display" (ngModelChange)="changeCondensedDisplay()">Affichage condensé</mat-slide-toggle>
+    <mat-slide-toggle [(ngModel)]="condensed_display" (ngModelChange)="changeCondensedDisplay()" i18n>Affichage condensé</mat-slide-toggle>
 </mat-card-header>
 <mat-card-content class="mho-bank">
     <ng-container *ngIf="displayed_bank_items">

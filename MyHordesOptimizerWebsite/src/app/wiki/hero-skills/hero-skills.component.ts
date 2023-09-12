@@ -3,9 +3,10 @@ import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { StandardColumn } from '../../_abstract_model/interfaces';
+import { ApiServices } from '../../_abstract_model/services/api.services';
 import { HeroSkill } from '../../_abstract_model/types/hero-skill.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { ApiServices } from '../../_abstract_model/services/api.services';
 
 @Component({
     selector: 'mho-hero-skills',
@@ -25,14 +26,12 @@ export class HeroSkillsComponent implements OnInit {
     /** La datasource pour le tableau */
     public datasource: MatTableDataSource<HeroSkill> = new MatTableDataSource();
     /** La liste des colonnes */
-    public readonly columns: HeroSkillColumns[] = [
-        {id: 'icon', header: ''},
-        {id: 'label', header: $localize`Pouvoir`},
-        {id: 'days_needed', header: $localize`Jours héros nécessaires`},
-        {id: 'description', header: $localize`Description`}
+    public readonly columns: StandardColumn[] = [
+        { id: 'icon', header: '' },
+        { id: 'label', header: $localize`Pouvoir`, sticky: true },
+        { id: 'days_needed', header: $localize`Jours héros nécessaires` },
+        { id: 'description', header: $localize`Description` }
     ];
-    /** La liste des colonnes */
-    public readonly columns_ids: string[] = this.columns.map((column: HeroSkillColumns) => column.id);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
@@ -50,7 +49,3 @@ export class HeroSkillsComponent implements OnInit {
     }
 }
 
-interface HeroSkillColumns {
-    header: string;
-    id: string;
-}

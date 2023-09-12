@@ -14,7 +14,6 @@ const routes: Routes = [
                 component: ProbabilitiesComponent,
                 title: 'MyHordes Optimizer' + ' - ' + $localize`Outils` + ' - ' + $localize`Chances de survie`
             },
-            // { path: 'estimation', component: EstimationComponent, title: 'MyHordes Optimizer' + ' - ' + $localize`Outils` + ' - ' + $localize`Estimations` },
         ]
     }
 ];

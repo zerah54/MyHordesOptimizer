@@ -2,13 +2,14 @@ import { Component, HostBinding, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { normalizeString } from '../../shared/utilities/string.utils';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiServices } from '../../_abstract_model/services/api.services';
-import { Recipe } from '../../_abstract_model/types/recipe.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item.class';
-import { HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { Recipe } from '../../_abstract_model/types/recipe.class';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { normalizeString } from '../../shared/utilities/string.utils';
 
 @Component({
     selector: 'mho-recipes',
@@ -28,14 +29,12 @@ export class RecipesComponent implements OnInit {
     public readonly locale: string = moment.locale();
 
     /** La liste des colonnes */
-    public readonly columns: RecipeColumns[] = [
-        {id: 'type', header: $localize`Type de recette`},
-        {id: 'components', header: $localize`Composants`},
-        {id: 'transformation', header: ''},
-        {id: 'result', header: $localize`Résultat`},
+    public readonly columns: StandardColumn[] = [
+        { id: 'type', header: $localize`Type de recette` },
+        { id: 'components', header: $localize`Composants` },
+        { id: 'transformation', header: '' },
+        { id: 'result', header: $localize`Résultat` },
     ];
-    /** La liste des colonnes */
-    public readonly columns_ids: string[] = this.columns.map((column: RecipeColumns) => column.id);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
@@ -64,7 +63,3 @@ export class RecipesComponent implements OnInit {
     }
 }
 
-interface RecipeColumns {
-    header: string;
-    id: string;
-}

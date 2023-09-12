@@ -11,7 +11,7 @@
     [class.scrut-border-top]="cell|scrutBorderTop:options:drawedMap"
     [class.scrut-border-right]="cell|scrutBorderRight:options:drawedMap"
     [class.scrut-border-bottom]="cell|scrutBorderBottom:options:drawedMap"
-    (click)="openCellUpdate()" (mouseenter)="is_dev ? current_cell = cell : undefined" (mouseleave)="is_dev ? current_cell = undefined : undefined">
+    (click)="openCellUpdate()" (mouseenter)="is_dev ? changeCurrentCell(cell) : undefined" (mouseleave)="is_dev ? changeCurrentCell(undefined) : undefined">
 
     <div *ngIf="cell.ruin_id" [class]="'ruin'">
         <span [class.empty-ruin]="cell.is_ruin_dryed">
@@ -39,22 +39,22 @@
          [class.dist-border-bottom]="cell|distBorderBottom:options:drawedMap"></div>
 
     <div class="content" *ngIf="!cell.is_town">
-        <span class="corner-top-left corner">
+        <div class="corner-top-left corner">
             <img *ngIf="cell.note" [ngSrc]="HORDES_IMG_REPO + 'icons/small_talk.gif'" width="12" height="12">
-        </span>
-        <span class="corner-top-right corner">
+        </div>
+        <div class="corner-top-right corner">
             <div *ngIf="(cell.citizens && cell.citizens.length > 0) || cell.nb_hero > 0">
                 <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" width="12" height="12">
                 <span class="detail-value">{{cell.nb_hero}}</span>
             </div>
-        </span>
-        <span class="corner-bottom-left corner">
+        </div>
+        <div class="corner-bottom-left corner">
             <div *ngIf="options.map_type === 'danger'">
                 <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'" width="12" height="9">
                 <span class="detail-value">{{cell.nb_zombie_killed || 0}}</span>
             </div>
-        </span>
-        <span class="corner-bottom-right corner">
+        </div>
+        <div class="corner-bottom-right corner">
             <div *ngIf="options.map_type === 'danger'">
                 <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="12" height="12">
                 <span class="detail-value">{{cell.nb_zombie || 0}}</span>
@@ -66,7 +66,7 @@
             <div *ngIf="options.map_type === 'trash'">
                 {{cell | trashValue:options:allItems}}
             </div>
-        </span>
+        </div>
     </div>
 </td>
 

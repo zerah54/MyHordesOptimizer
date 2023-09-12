@@ -4,12 +4,13 @@ import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { StandardColumn } from '../../_abstract_model/interfaces';
+import { ApiServices } from '../../_abstract_model/services/api.services';
 import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
-import { getTown } from '../../shared/utilities/localstorage.util';
-import { normalizeString } from '../../shared/utilities/string.utils';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { ApiServices } from '../../_abstract_model/services/api.services';
+import { getTown } from '../../shared/utilities/localstorage.util';
+import { normalizeString } from '../../shared/utilities/string.utils';
 
 @Component({
     selector: 'mho-ruins',
@@ -36,12 +37,12 @@ export class RuinsComponent implements OnInit {
     public datasource: MatTableDataSource<Ruin> = new MatTableDataSource();
     /** La liste des colonnes */
     public readonly columns: RuinColumns[] = [
-        {id: 'label', header: $localize`Nom du bâtiment`, sortable: true},
-        {id: 'description', header: $localize`Description`, sortable: false},
-        {id: 'min_dist', header: $localize`Distance minimum`, sortable: true},
-        {id: 'max_dist', header: $localize`Distance maximum`, sortable: true},
-        {id: 'camping', header: $localize`Bonus en camping`, sortable: true},
-        {id: 'drops', header: $localize`Objets`, sortable: false}
+        { id: 'label', header: $localize`Nom du bâtiment`, sortable: true, sticky: true },
+        { id: 'description', header: $localize`Description`, sortable: false },
+        { id: 'min_dist', header: $localize`Distance minimum`, sortable: true },
+        { id: 'max_dist', header: $localize`Distance maximum`, sortable: true },
+        { id: 'camping', header: $localize`Bonus en camping`, sortable: true },
+        { id: 'drops', header: $localize`Objets`, sortable: false }
     ];
 
     public ruins_filters: RuinFilters = {
@@ -53,9 +54,6 @@ export class RuinsComponent implements OnInit {
     };
 
     public ruins_filters_change: EventEmitter<void> = new EventEmitter();
-
-    /** La liste des colonnes */
-    public readonly columns_ids: string[] = this.columns.map((column: RuinColumns) => column.id);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
@@ -116,9 +114,7 @@ export class RuinsComponent implements OnInit {
     }
 }
 
-interface RuinColumns {
-    header: string;
-    id: string;
+interface RuinColumns extends StandardColumn {
     sortable: boolean;
 }
 

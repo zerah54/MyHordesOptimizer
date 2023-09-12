@@ -47,6 +47,13 @@ export class MenuComponent implements OnInit {
                 { label: $localize`Liste de courses`, path: 'my-town/wishlist', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown() },
                 { label: $localize`Statistiques`, path: 'my-town/stats', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown() },
                 {
+                    label: $localize`Expéditions`,
+                    path: 'my-town/expeditions',
+                    displayed: true,
+                    lvl: 1,
+                    authorized: (): boolean => this.isInTown() && !environment.production
+                },
+                {
                     label: $localize`Chantiers`,
                     path: 'my-town/buildings',
                     displayed: true,

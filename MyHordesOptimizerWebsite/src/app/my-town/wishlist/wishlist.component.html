@@ -6,10 +6,11 @@
         </button>
     </mat-card-title>
 
-    <div class="import-export">
+    <div class="actions">
         <button mat-icon-button [matMenuTriggerFor]="shareMenu" matTooltip="Import / Export" i18n-matTooltip>
             <mat-icon>import_export</mat-icon>
         </button>
+        <mat-slide-toggle [(ngModel)]="edition_mode" (ngModelChange)="changeEditionMode()" i18n>Mode édition</mat-slide-toggle>
 
         <mat-menu #shareMenu="matMenu">
             <div mat-menu-item (click)="shareExcel()" i18n>Enregistrer dans un fichier Excel</div>
@@ -27,160 +28,181 @@
             <mat-tab *ngFor="let item of (wishlist_info.wishlist_items | customKeyValue)"
                      [label]="!item.key || item.key === '0' ? basic_list_label : 'Z' + item.key">
                 <ng-template matTabContent>
-                    <div class="mat-elevation-z8" style="overflow: hidden">
-                        <cdk-virtual-scroll-viewport [tvsItemSize]="49" [headerHeight]="98" style="height: calc(100% - 48px); width: 100%;">
-                            <table mat-table [dataSource]="datasource"
-                                   cdkDropList
-                                   cdkDropListLockAxis="y"
-                                   [cdkDropListData]="datasource"
-                                   (cdkDropListDropped)="sortWishlist($event)"
-                                   [cdkDropListDisabled]="drag_disabled">
-                                <ng-container matColumnDef="filters" [sticky]="true">
-                                    <th mat-header-cell *matHeaderCellDef colspan="2">
-                                        <div class="table-filters">
-                                            <mat-form-field class="no-bottom">
-                                                <mat-label i18n>Ajouter un objet à la liste</mat-label>
-                                                <mho-select #addItemSelect [emptyOption]="true"
-                                                            placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
-                                                            (ngModelChange)="addItemToWishlist($any($event))"
-                                                            [options]="items | isItemDisplayed:datasource.data"
-                                                            [bindIcon]="'img'"
-                                                            [bindLabel]="'label.' + locale"></mho-select>
-                                            </mat-form-field>
-                                        </div>
-                                    </th>
-                                </ng-container>
-                                <ng-container matColumnDef="empty">
-                                    <th mat-header-cell *matHeaderCellDef colspan="8">
-                                    </th>
-                                </ng-container>
+                    <div class="table-container">
+                        <div class="table-headers">
+                            <mat-form-field class="no-bottom" *ngIf="edition_mode">
+                                <mat-label i18n>Ajouter un objet</mat-label>
+                                <mho-select #addItemSelect [emptyOption]="true"
+                                            placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
+                                            (ngModelChange)="addItemToWishlist($any($event))"
+                                            [options]="items | isItemDisplayed:datasource.data"
+                                            [bindIcon]="'img'"
+                                            [bindLabel]="'label.' + locale"></mho-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="mat-elevation-z8" style="flex: 1">
+                            <cdk-virtual-scroll-viewport [tvsItemSize]="edition_mode ? 49 : 40"
+                                                         [headerHeight]="wishlist_filters.items.length > 0 ? 75 : 45" [headerEnabled]="true"
+                                                         style="height: 100%; width: 100%;">
+                                <table mat-table [dataSource]="datasource"
+                                       cdkDropList
+                                       cdkDropListLockAxis="y"
+                                       [cdkDropListData]="datasource"
+                                       (cdkDropListDropped)="sortWishlist($event)"
+                                       [cdkDropListDisabled]="drag_disabled">
 
-                                <ng-container *ngFor="let column of columns; trackBy: trackByColumnId"
-                                              [matColumnDef]="column.id" [sticky]="column.id === 'name' || column.id === 'sort'">
-                                    <th mat-header-cell *matHeaderCellDef>
-                                        <ng-container [ngSwitch]="column.id">
+                                    <ng-container *ngFor="let column of columns; trackBy: trackByColumnId"
+                                                  [matColumnDef]="column.id" [sticky]="column.sticky || false">
+                                        <th mat-header-cell *matHeaderCellDef>
+                                            <ng-container [ngSwitch]="column.id">
 
-                                            <ng-container *ngSwitchCase="'sort'">
+                                                <ng-container *ngSwitchCase="'sort'">
+                                                </ng-container>
+                                                <mho-header-with-string-filter *ngSwitchCase="'name'"
+                                                                               [header]="column.header" [(filterValue)]="wishlist_filters.items"
+                                                                               (filterValueChange)="wishlist_filters_change.next()">
+                                                </mho-header-with-string-filter>
+                                                <ng-container *ngSwitchDefault>
+                                                    {{column.header}}
+                                                </ng-container>
                                             </ng-container>
-                                            <mho-header-with-string-filter *ngSwitchCase="'name'"
-                                                                           [header]="column.header" [(filterValue)]="wishlist_filters.items"
-                                                                           (filterValueChange)="wishlist_filters_change.next()">
-                                            </mho-header-with-string-filter>
-                                            <ng-container *ngSwitchDefault>
-                                                {{column.header}}
-                                            </ng-container>
-                                        </ng-container>
-                                    </th>
+                                        </th>
 
-                                    <td mat-cell *matCellDef="let row" [ngClass]="[column.id || '']">
-                                        <ng-container [ngSwitch]="column.id">
-                                            <ng-container *ngSwitchCase="'sort'">
-                                                <div cdkDragHandle
-                                                     (mousedown)="drag_disabled = false"
-                                                     (mouseup)="drag_disabled = true"
-                                                     class="dragdrop-indicator">
-                                                    <mat-icon>drag_indicator</mat-icon>
-                                                </div>
-                                            </ng-container>
-                                            <ng-container *ngSwitchCase="'name'">
-                                                <div>
-                                                    <img [ngSrc]="HORDES_IMG_REPO + row.item.img" width="16" height="16">
-                                                    <span>{{row.item.label[locale]}}</span>
+                                        <td mat-cell *matCellDef="let row">
+                                            <ng-container [ngSwitch]="column.id">
+                                                <ng-container *ngSwitchCase="'sort'">
+                                                    <div cdkDragHandle
+                                                         (mousedown)="drag_disabled = false"
+                                                         (mouseup)="drag_disabled = true"
+                                                         class="dragdrop-indicator">
+                                                        <mat-icon>drag_indicator</mat-icon>
+                                                    </div>
+                                                </ng-container>
+                                                <ng-container *ngSwitchCase="'name'">
+                                                    <div>
+                                                        <img [ngSrc]="HORDES_IMG_REPO + row.item.img" width="16" height="16">
+                                                        <span>{{row.item.label[locale]}}</span>
+                                                    </div>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'heaver'">
                                                     <img [ngSrc]="HORDES_IMG_REPO + 'item/cat_heavy.gif'" *ngIf="row.item.is_heaver"
                                                          matTooltip="Objet encombrant" i18n-matTooltip width="16" height="16">
-                                                </div>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'priority'">
+                                                    <mat-form-field class="no-bottom" appearance="outline" *ngIf="edition_mode; else readMode">
+                                                        <mat-select [(ngModel)]="row.priority_main" [compareWith]="compareWith"
+                                                                    (ngModelChange)="resetPriorities(this.datasource.data)">
+                                                            <mat-option *ngFor="let priority of priorities" [value]="priority">
+                                                                {{priority.value.label}}
+                                                            </mat-option>
+                                                        </mat-select>
+                                                    </mat-form-field>
+                                                    <ng-template #readMode>
+                                                        {{row.priority_main.value.label}}
+                                                    </ng-template>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'depot'">
+                                                    <ng-container *ngIf="row.priority_main.value.count > -1">
+                                                        <mat-form-field class="no-bottom" appearance="outline" *ngIf="edition_mode; else readMode">
+                                                            <mat-select [(ngModel)]="row.depot" [compareWith]="compareWith">
+                                                                <mat-option *ngFor="let depot of depots" [value]="depot">
+                                                                    {{depot.value.label}}
+                                                                </mat-option>
+                                                            </mat-select>
+                                                        </mat-form-field>
+                                                        <ng-template #readMode>
+                                                            {{row.depot.value.label}}
+                                                        </ng-template>
+                                                    </ng-container>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'bank_count'">
+                                                    {{row.bank_count}}
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'bag_count'">
+                                                    {{row.bag_count}}
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'count'">
+                                                    <ng-container *ngIf="row.priority_main.value.count > -1">
+                                                        <mat-form-field class="no-bottom count" appearance="outline" *ngIf="edition_mode; else readMode">
+                                                            <input matInput type="number" [(ngModel)]="row.count">
+                                                        </mat-form-field>
+                                                        <ng-template #readMode>
+                                                            {{row.count}}
+                                                        </ng-template>
+                                                    </ng-container>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'needed'">
+                                                    <ng-container *ngIf="row.priority_main.value.count > -1">
+                                                        <mat-form-field class="no-bottom count" appearance="outline" *ngIf="edition_mode; else readMode">
+                                                            <input matInput type="number"
+                                                                   [ngModel]="row.count - row.bank_count - row.bag_count"
+                                                                   (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
+                                                        </mat-form-field>
+                                                        <ng-template #readMode>
+                                                            {{row.count - row.bank_count - row.bag_count}}
+                                                        </ng-template>
+                                                    </ng-container>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'should_signal'">
+                                                    <ng-container *ngIf="row.priority_main.value.count > -1">
+                                                        <mat-checkbox [(ngModel)]="row.should_signal" *ngIf="edition_mode; else readMode"></mat-checkbox>
+                                                        <ng-template #readMode>
+                                                            <ng-container *ngIf="row.should_signal" i18n>Oui</ng-container>
+                                                        </ng-template>
+                                                    </ng-container>
+                                                </ng-container>
+
+                                                <ng-container *ngSwitchCase="'delete'">
+                                                    <button mat-icon-button type="button" (click)="remove(row)">
+                                                        <mat-icon>close</mat-icon>
+                                                    </button>
+                                                </ng-container>
                                             </ng-container>
+                                        </td>
+                                    </ng-container>
 
-                                            <ng-container *ngSwitchCase="'priority'">
-                                                <mat-form-field class="no-bottom">
-                                                    <mat-select [(ngModel)]="row.priority_main" (ngModelChange)="resetPriorities(this.datasource.data)">
-                                                        <mat-option *ngFor="let priority of priorities" [value]="priority.count">
-                                                            {{priority.label}}
-                                                        </mat-option>
-                                                    </mat-select>
-                                                </mat-form-field>
+                                    <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: columns | ids;"
+                                        cdkDrag [cdkDragData]="row"></tr>
+
+                                    <!-- Row shown when there is no matching data. -->
+                                    <tr class="mat-row" *matNoDataRow>
+                                        <td class="mat-cell" colspan="9">
+                                            <ng-container
+                                                *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
+                                                <ng-container i18n>Aucun objet ne correspond au filtre "{{filterInput.nativeElement.value}}"</ng-container>
                                             </ng-container>
-
-                                            <ng-container *ngSwitchCase="'depot'">
-                                                <mat-form-field class="no-bottom">
-                                                    <mat-select [(value)]="row.depot">
-                                                        <mat-option *ngFor="let depot of depots" [value]="depot.count">
-                                                            {{depot.label}}
-                                                        </mat-option>
-                                                    </mat-select>
-                                                </mat-form-field>
-                                            </ng-container>
-
-                                            <ng-container *ngSwitchCase="'bank_count'">
-                                                {{row.bank_count}}
-                                            </ng-container>
-
-                                            <ng-container *ngSwitchCase="'bag_count'">
-                                                {{row.bag_count}}
-                                            </ng-container>
-
-                                            <ng-container *ngSwitchCase="'count'">
-                                                <mat-form-field class="no-bottom count">
-                                                    <input matInput type="number" [(ngModel)]="row.count">
-                                                </mat-form-field>
-                                            </ng-container>
-
-                                            <ng-container *ngSwitchCase="'needed'">
-                                                <mat-form-field class="no-bottom count">
-                                                    <input matInput type="number"
-                                                           [ngModel]="row.count - row.bank_count - row.bag_count"
-                                                           (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
-                                                </mat-form-field>
-                                            </ng-container>
-
-                                            <ng-container *ngSwitchCase="'should_signal'">
-                                                <mat-checkbox [(ngModel)]="row.should_signal"></mat-checkbox>
-                                            </ng-container>
-
-                                            <ng-container *ngSwitchCase="'delete'">
-                                                <button mat-icon-button type="button" (click)="remove(row)">
-                                                    <mat-icon>close</mat-icon>
-                                                </button>
-                                            </ng-container>
-                                        </ng-container>
-                                    </td>
-                                </ng-container>
-
-
-                                <tr mat-header-row *matHeaderRowDef="['filters', 'empty']; sticky: true"></tr>
-                                <tr mat-header-row *matHeaderRowDef="columns_ids; sticky: true"></tr>
-                                <tr mat-row *matRowDef="let row; columns: columns_ids;" cdkDrag [cdkDragData]="row"></tr>
-
-                                <!-- Row shown when there is no matching data. -->
-                                <tr class="mat-row" *matNoDataRow>
-                                    <td class="mat-cell" colspan="9">
-                                        <ng-container
-                                            *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
-                                            <ng-container i18n>Aucun objet ne correspond au filtre "{{filterInput.nativeElement.value}}"</ng-container>
-                                        </ng-container>
-                                        <ng-template #emptyTable>
-                                            <ng-container i18n>La liste est vide</ng-container>
-                                        </ng-template>
-                                    </td>
-                                </tr>
-                            </table>
-                        </cdk-virtual-scroll-viewport>
+                                            <ng-template #emptyTable>
+                                                <ng-container i18n>La liste est vide</ng-container>
+                                            </ng-template>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </cdk-virtual-scroll-viewport>
+                        </div>
                         <!-- Footer -->
-                        <div #cell
-                             style="width: 100%; height: 48px; display: flex; justify-content: right; align-items: center;">
+                        <div #cell style="width: 100%; height: 48px; display: flex; justify-content: right; align-items: center;">
                             <div
                                 style="display: flex; flex-direction: row; justify-content: end; align-content: center; align-items: center; padding-right: 1em">
                                 <mho-last-update [lastUpdateInfo]="wishlist_info.update_info"
                                                  [thresholds]="[24*60, 24*2*60, 24*3*60, 24*4]"></mho-last-update>
-                                <button mat-button [color]="'accent'" (click)="updateWishlist()" i18n>Enregistrer</button>
+                                <button mat-button [color]="'accent'" (click)="updateWishlist()" *ngIf="edition_mode" i18n>Enregistrer</button>
                             </div>
                         </div>
                     </div>
                 </ng-template>
             </mat-tab>
-            <mat-tab disabled>
+            <mat-tab (click)="$event.preventDefault(); $event.stopPropagation()" *ngIf="edition_mode" labelClass="add-tab">
                 <ng-template mat-tab-label>
-                    <button mat-icon-button [matMenuTriggerFor]="addItem">
+                    <button mat-icon-button (click)="$event.preventDefault(); $event.stopPropagation()" [matMenuTriggerFor]="addItem">
                         <mat-icon>add</mat-icon>
                     </button>
                 </ng-template>

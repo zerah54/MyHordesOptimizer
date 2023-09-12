@@ -33,6 +33,8 @@ export class EstimationsComponent implements OnInit {
     public today_chart!: Chart<'line'>;
     public tomorrow_chart!: Chart<'line'>;
 
+    public separators: string[] = [' à ', ' - '];
+
     constructor(private clipboard: ClipboardService, private api: ApiServices) {
     }
 
@@ -160,7 +162,14 @@ export class EstimationsComponent implements OnInit {
     public pasteFromMH(min_input: HTMLInputElement, max_input: HTMLInputElement, paste_event: ClipboardEvent): void {
         paste_event.preventDefault();
         const value: string | undefined = paste_event.clipboardData?.getData('Text');
-        const split: string[] | undefined = value?.split('-');
+        let split: string[] | undefined;
+        this.separators.forEach((separator: string) => {
+            const splitted: string[] | undefined = value?.split(separator);
+            if (splitted && splitted.length > 1) {
+                split = splitted;
+            }
+        });
+
         if (split && split.length > 1) {
             min_input.value = (+split[0]).toString();
             max_input.value = (+split[1]).toString();

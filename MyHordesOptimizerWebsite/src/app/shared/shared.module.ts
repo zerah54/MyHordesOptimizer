@@ -8,7 +8,6 @@ import { RouterModule } from '@angular/router';
 import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { ApiServices } from '../_abstract_model/services/api.services';
 import { DigsServices } from '../_abstract_model/services/digs.service';
-import { ImportServices } from '../_abstract_model/services/import.services';
 import { WishlistServices } from '../_abstract_model/services/wishlist.service';
 import { Components, Modules } from '../_abstract_model/types/_types';
 import { ElementsModule } from './elements/elements.module';
@@ -22,7 +21,7 @@ import { SnackbarService } from './services/snackbar.service';
 
 const custom_modules: Modules = [MaterialModule, ElementsModule, PipesModule];
 const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule, NgOptimizedImage];
-const services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService, WishlistServices, ImportServices];
+const services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService, WishlistServices];
 const guards: Components = [IsInTownGuard, InDevModeGuard];
 const external_modules: Modules = [TableVirtualScrollModule];
 

@@ -22,7 +22,8 @@
     }
 
     .options-container {
-        max-height: calc(100% - 48px);
+        max-height: 202px;
+        overflow: auto;
 
         .cdk-overlay-pane {
             height: 100%;

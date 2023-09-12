@@ -1,17 +1,16 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import { ApiServices } from '../../_abstract_model/services/api.services';
-import { Town } from '../../_abstract_model/types/town.class';
-import { Ruin } from '../../_abstract_model/types/ruin.class';
-import { Item } from '../../_abstract_model/types/item.class';
-import { Citizen } from '../../_abstract_model/types/citizen.class';
-import { BREAKPOINTS } from '../../_abstract_model/const';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
-import { Dictionary } from '../../_abstract_model/types/_types';
 import { environment } from '../../../environments/environment';
-import { convertGHMapIntoMHOMap } from '../../shared/utilities/conversion/gh-map.util';
+import { BREAKPOINTS } from '../../_abstract_model/const';
+import { ApiServices } from '../../_abstract_model/services/api.services';
+import { Dictionary } from '../../_abstract_model/types/_types';
+import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { Item } from '../../_abstract_model/types/item.class';
+import { Ruin } from '../../_abstract_model/types/ruin.class';
+import { Town } from '../../_abstract_model/types/town.class';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 
 @Component({
     selector: 'mho-map',
@@ -104,7 +103,7 @@ export class MapComponent implements OnInit {
         if (already_exists && current_distances.length > 0) return;
 
         /** Sinon, on ajoute à la liste */
-        current_distances.push({...this.new_distance_option});
+        current_distances.push({ ...this.new_distance_option });
 
         this.changeOptions('distances', [...current_distances]);
     }
@@ -132,13 +131,9 @@ export class MapComponent implements OnInit {
     public changeOptions<T>(key: string, value: T): void {
         (<{ [key: string]: unknown }><unknown>this.options)[key] = value;
         setTimeout(() => {
-            this.options = {...this.options};
+            this.options = { ...this.options };
             localStorage.setItem('MAP_OPTIONS', JSON.stringify(this.options));
         });
-    }
-
-    public getGh(): void {
-        convertGHMapIntoMHOMap(this.map, this.all_items);
     }
 
     private checkIfAllOptionsExist(): void {

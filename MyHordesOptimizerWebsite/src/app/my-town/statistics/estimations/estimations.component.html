@@ -38,10 +38,10 @@
             <tr *ngFor="let percent of planif_values">
                 <th>{{percent}}%</th>
                 <td>
-                    <input type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].min">
+                    <input #min type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].min" (paste)="pasteFromMH(min, max, $event)">
                 </td>
                 <td>
-                    <input type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].max">
+                    <input #max type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].max" (paste)="pasteFromMH(min, max, $event)">
                 </td>
             </tr>
         </table>

@@ -48,6 +48,7 @@ export class MapCellComponent {
     @Input() options!: MapOptions;
 
     @Output() cellChange: EventEmitter<Cell> = new EventEmitter();
+    @Output() currentHoveredCellChange: EventEmitter<Cell | undefined> = new EventEmitter();
 
     public current_cell?: Cell;
 
@@ -80,5 +81,10 @@ export class MapCellComponent {
                     this.cellChange.next(new_cell);
                 }
             });
+    }
+
+    public changeCurrentCell(cell?: Cell): void {
+        this.current_cell = cell;
+        this.currentHoveredCellChange.next(cell);
     }
 }

@@ -1,5 +1,6 @@
 import { Component, HostBinding } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'mho-citizens',
@@ -12,11 +13,18 @@ export class CitizensComponent {
     protected links: Link[] = [
         {
             label: $localize`Citoyens`,
-            link: '/my-town/citizens/list'
+            path: '/my-town/citizens/list',
+            displayed: true
         },
         {
             label: $localize`Fouilles`,
-            link: '/my-town/citizens/digs'
+            path: '/my-town/citizens/digs',
+            displayed: true
+        },
+        {
+            label: $localize`Disponibilités`,
+            path: '/my-town/citizens/dispo',
+            displayed: !environment.production
         }
     ];
 
@@ -27,5 +35,6 @@ export class CitizensComponent {
 
 interface Link {
     label: string;
-    link: string;
+    path: string;
+    displayed: boolean;
 }

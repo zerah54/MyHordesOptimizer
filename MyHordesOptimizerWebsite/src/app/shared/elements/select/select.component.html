@@ -5,7 +5,7 @@
         <mat-chip-listbox>
             <mat-chip *ngFor="let single_value of $any(value); let i = index" (removed)="remove(single_value)"
                       class="mho-select-chip">
-                <button type="cancel" matChipRemove>
+                <button type="reset" matChipRemove>
                     <mat-icon>cancel</mat-icon>
                 </button>
                 <ng-container *ngIf="single_value">

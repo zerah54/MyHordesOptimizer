@@ -5,8 +5,10 @@ import { BankComponent } from './bank/bank.component';
 import { BuildingsComponent } from './buildings/buildings.component';
 import { CampingsComponent } from './campings/campings.component';
 import { CitizensDigsComponent } from './citizens/citizens-digs/citizens-digs.component';
+import { CitizensDispoComponent } from './citizens/citizens-dispo/citizens-dispo.component';
 import { CitizensListComponent } from './citizens/citizens-list/citizens-list.component';
 import { CitizensComponent } from './citizens/citizens.component';
+import { ExpeditionsComponent } from './expeditions/expeditions.component';
 import { MapComponent } from './map/map.component';
 import { NightwatchComponent } from './nightwatch/nightwatch.component';
 import { EstimationsComponent } from './statistics/estimations/estimations.component';
@@ -56,8 +58,19 @@ const routes: Routes = [
                         component: CitizensDigsComponent,
                         title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Citoyens`,
                         canActivate: [IsInTownGuard],
+                    }, {
+                        path: 'dispo',
+                        component: CitizensDispoComponent,
+                        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Citoyens`,
+                        canActivate: [IsInTownGuard],
                     }
                 ]
+            },
+            {
+                path: 'expeditions',
+                component: ExpeditionsComponent,
+                title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Expéditions`,
+                canActivate: []
             },
             {
                 path: 'map',

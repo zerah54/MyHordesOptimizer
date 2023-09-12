@@ -1,6 +1,6 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DOCUMENT } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostBinding, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
@@ -10,7 +10,10 @@ import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
 import { Subject, takeUntil } from 'rxjs';
 import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';
 import { environment } from '../../../environments/environment';
-import { HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { HORDES_IMG_REPO, WISHLIST_EDITION_MODE_KEY } from '../../_abstract_model/const';
+import { WishlistDepot } from '../../_abstract_model/enum/wishlist-depot.enum';
+import { WishlistPriority } from '../../_abstract_model/enum/wishlist-priority.enum';
+import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiServices } from '../../_abstract_model/services/api.services';
 import { WishlistServices } from '../../_abstract_model/services/wishlist.service';
 import { Item } from '../../_abstract_model/types/item.class';
@@ -21,11 +24,11 @@ import { ConfirmDialogComponent } from '../../shared/elements/confirm-dialog/con
 import { SelectComponent } from '../../shared/elements/select/select.component';
 import { ClipboardService } from '../../shared/services/clipboard.service';
 
-
 @Component({
     selector: 'mho-wishlist',
     templateUrl: './wishlist.component.html',
-    styleUrls: ['./wishlist.component.scss']
+    styleUrls: ['./wishlist.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 export class WishlistComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -45,9 +48,10 @@ export class WishlistComponent implements OnInit {
     /** La locale */
     public readonly locale: string = moment.locale();
     /** La liste des colonnes */
-    public readonly columns: WishlistColumns[] = [
-        { id: 'sort', header: '' },
-        { id: 'name', header: $localize`Objet` },
+    public readonly columns: StandardColumn[] = [
+        { id: 'sort', header: '', displayed: (): boolean => this.edition_mode },
+        { id: 'name', header: $localize`Objet`, sticky: true },
+        { id: 'heaver', header: '' },
         { id: 'priority', header: $localize`Priorité` },
         { id: 'depot', header: $localize`Dépôt` },
         { id: 'bank_count', header: $localize`Banque` },
@@ -55,16 +59,18 @@ export class WishlistComponent implements OnInit {
         { id: 'count', header: $localize`Stock souhaité` },
         { id: 'needed', header: $localize`Quantité manquante` },
         { id: 'should_signal', header: $localize`Signaler` },
-        { id: 'delete', header: '' },
+        { id: 'delete', header: '', displayed: (): boolean => this.edition_mode },
     ];
-    /** La liste des colonnes */
-    public readonly columns_ids: string[] = this.columns.map((column: WishlistColumns) => column.id);
+
     public readonly basic_list_label: string = $localize`Toute la carte`;
 
     public selected_tab_key: string = '0';
     public selected_tab_index: number = 0;
 
+    public edition_mode: boolean = JSON.parse(localStorage.getItem(WISHLIST_EDITION_MODE_KEY) || 'false');
+
     public items: Item[] = [];
+
     /** Les filtres de la liste de courses */
     public wishlist_filters: WishlistFilters = {
         items: '',
@@ -76,33 +82,33 @@ export class WishlistComponent implements OnInit {
 
     public wishlist_filters_change: EventEmitter<void> = new EventEmitter();
 
+    /** La liste des en-têtes pour le fichier Excel */
     private readonly excel_headers: { [key: string]: { label: string, comment?: string } } = {
-        id: { label: $localize`Identifiant` },
-        name: { label: $localize`Nom de l'objet` },
+        id: {
+            label: $localize`Identifiant`
+        },
+        name: {
+            label: $localize`Nom de l'objet`
+        },
         priority: {
             label: $localize`Priorité`,
             comment: `(3 : ${$localize`Haute`}, 2 : ${$localize`Moyenne`}, 1 : ${$localize`Basse`}, 0 : ${$localize`Non définie`}, -1 : ${$localize`Ne pas ramener`})`
         },
-        count: { label: $localize`Quantité souhaitée` },
-        depot: { label: $localize`Zone de dépôt`, comment: `(0 : ${$localize`Banque`}, 1 : ${$localize`Zone de rappatriement`}, 2 : ${$localize`Non définie`})` },
+        count: {
+            label: $localize`Quantité souhaitée`
+        },
+        depot: {
+            label: $localize`Zone de dépôt`,
+            comment: `(0 : ${$localize`Banque`}, 1 : ${$localize`Zone de rappatriement`}, 2 : ${$localize`Non définie`})`
+        },
     };
 
 
     /** La liste des priorités */
-    public readonly priorities: PriorityOrDepot[] = [
-        { count: -1, label: $localize`Ne pas ramener` },
-        { count: 0, label: $localize`Non définie` },
-        { count: 1, label: $localize`Basse` },
-        { count: 2, label: $localize`Moyenne` },
-        { count: 3, label: $localize`Haute` }
-    ];
+    public readonly priorities: WishlistPriority[] = WishlistPriority.getAllValues();
 
     /** La liste des dépôts */
-    public readonly depots: PriorityOrDepot[] = [
-        { count: -1, label: $localize`Non définie` },
-        { count: 0, label: $localize`Banque` },
-        { count: 1, label: $localize`Zone de rapatriement` },
-    ];
+    public readonly depots: WishlistDepot[] = WishlistDepot.getAllValues();
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
@@ -164,7 +170,7 @@ export class WishlistComponent implements OnInit {
         }
     }
 
-    public trackByColumnId(_index: number, column: WishlistColumns): string {
+    public trackByColumnId(_index: number, column: StandardColumn): string {
         return column.id;
     }
 
@@ -202,7 +208,7 @@ export class WishlistComponent implements OnInit {
                 text += `\n[collapse=${$localize`Encombrants`}]\n`;
                 heavy.forEach((item: WishlistItem): void => {
                     text += item.should_signal ? '[bad]' : '';
-                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
+                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
                     text += item.should_signal ? '[/bad]:warning:\n' : '\n';
                 });
                 text += '[/collapse]\n';
@@ -211,7 +217,7 @@ export class WishlistComponent implements OnInit {
                 text += `\n[collapse=${$localize`Non-Encombrants`}]\n`;
                 light.forEach((item: WishlistItem): void => {
                     text += item.should_signal ? '[bad]' : '';
-                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
+                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
                     text += item.should_signal ? '[/bad]:warning:\n' : '\n';
                 });
                 text += '[/collapse]\n';
@@ -250,9 +256,9 @@ export class WishlistComponent implements OnInit {
                 const final_item: { [key: string]: string | number } = {};
                 final_item[this.excel_headers['id'].label] = item.item.id;
                 final_item[this.excel_headers['name'].label] = item.item.label[this.locale];
-                final_item[this.excel_headers['priority'].label] = item.priority_main;
+                final_item[this.excel_headers['priority'].label] = item.priority_main.value.count;
                 final_item[this.excel_headers['count'].label] = item.item.wishlist_count;
-                final_item[this.excel_headers['depot'].label] = item.depot;
+                final_item[this.excel_headers['depot'].label] = item.depot.value.count;
                 return final_item;
             });
             const data: WorkSheet = utils.json_to_sheet(simplify_item, { cellStyles: true });
@@ -309,9 +315,9 @@ export class WishlistComponent implements OnInit {
                                         .find((item_in_all: Item): boolean => item_in_all.id === item[this.excel_headers['id'].label]);
                                     if (complete_item) {
                                         new_item.zone_x_pa = +sheet_key;
-                                        new_item.depot = <number>item[this.excel_headers['depot'].label];
+                                        new_item.depot = WishlistDepot.getDepotFromCount(<number>item[this.excel_headers['depot'].label]);
                                         new_item.count = <number>item[this.excel_headers['count'].label];
-                                        new_item.priority_main = <number>item[this.excel_headers['priority'].label];
+                                        new_item.priority_main = WishlistPriority.getPriorityFromCount(<number>item[this.excel_headers['priority'].label]);
                                         new_item.item = complete_item;
                                         new_item.bank_count = complete_item.bank_count;
                                     }
@@ -334,7 +340,6 @@ export class WishlistComponent implements OnInit {
 
     public sortWishlist(event: CdkDragDrop<TableVirtualScrollDataSource<WishlistItem>>): void {
         this.drag_disabled = true;
-
         const current_wishlist_items: WishlistItem[] = this.wishlist_info.wishlist_items.get(this.selected_tab_key) || this.wishlist_info.wishlist_items.get('0') || [];
         const previous_index_in_real_array: number = current_wishlist_items.findIndex((item: WishlistItem) => item.item.id === event.item.data.item.id);
         let current_index_in_real_array: number;
@@ -352,13 +357,17 @@ export class WishlistComponent implements OnInit {
             current_index_in_real_array = 0;
         }
         moveItemInArray(current_wishlist_items, previous_index_in_real_array, current_index_in_real_array);
+        let new_pos: number;
         if (current_wishlist_items[current_index_in_real_array - 1]) {
-            current_wishlist_items[current_index_in_real_array].priority_main = current_wishlist_items[current_index_in_real_array - 1].priority_main;
-            current_wishlist_items[current_index_in_real_array].priority = current_wishlist_items[current_index_in_real_array - 1].priority;
+            new_pos = current_index_in_real_array - 1;
         } else if (current_wishlist_items[current_index_in_real_array + 1]) {
-            current_wishlist_items[current_index_in_real_array].priority_main = current_wishlist_items[current_index_in_real_array + 1].priority_main;
-            current_wishlist_items[current_index_in_real_array].priority = current_wishlist_items[current_index_in_real_array + 1].priority;
+            new_pos = current_index_in_real_array + 1;
+        } else {
+            new_pos = current_index_in_real_array;
         }
+
+        current_wishlist_items[current_index_in_real_array].priority_main = current_wishlist_items[new_pos].priority_main;
+        current_wishlist_items[current_index_in_real_array].priority = current_wishlist_items[new_pos].priority;
 
         this.datasource.data = [...this.resetPriorities(current_wishlist_items)];
     }
@@ -367,11 +376,22 @@ export class WishlistComponent implements OnInit {
 
         let priority_factor: number = 999;
         array.forEach((item: WishlistItem) => {
-            item.priority = parseInt(item.priority_main.toString() + (item.priority_main > 0 ? priority_factor.toString() : (1000 - priority_factor).toString()));
+            item.priority = parseInt(item.priority_main.value.count.toString() + (item.priority_main.value.count > 0 ? priority_factor.toString() : (1000 - priority_factor).toString()));
             priority_factor--;
         });
         array = array.sort((item_a: WishlistItem, item_b: WishlistItem) => item_b.priority - item_a.priority);
         return array;
+    }
+
+    /**
+     * Enregistre le mode d'affichage de la liste de courses
+     */
+    public changeEditionMode(): void {
+        localStorage.setItem(WISHLIST_EDITION_MODE_KEY, JSON.stringify(this.edition_mode));
+    }
+
+    public compareWith(option: WishlistDepot | WishlistPriority, selected: WishlistDepot | WishlistPriority): boolean {
+        return option.value.count === selected.value.count;
     }
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
@@ -392,18 +412,8 @@ export class WishlistComponent implements OnInit {
     }
 }
 
-interface PriorityOrDepot {
-    count: number;
-    label: string;
-}
-
-interface WishlistColumns {
-    header: string;
-    id: string;
-}
-
 interface WishlistFilters {
     items: string;
-    priority: PriorityOrDepot[];
-    depot: PriorityOrDepot[];
+    priority: WishlistPriority[];
+    depot: WishlistDepot[];
 }

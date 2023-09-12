@@ -8,6 +8,7 @@ import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { HeroicActionEnum } from '../../../_abstract_model/enum/heroic-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
+import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiServices } from '../../../_abstract_model/services/api.services';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -48,8 +49,8 @@ export class CitizensListComponent implements OnInit {
     /** La liste des citoyens a été mise à jour */
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
-    public readonly columns: CitizenColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center' },
+    public readonly columns: StandardColumn[] = [
+        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
         { id: 'more_status', header: $localize`États`, class: '' },
         { id: 'heroic_actions', header: $localize`Actions héroïques`, class: '' },
         { id: 'home', header: $localize`Améliorations`, class: '' },
@@ -57,8 +58,6 @@ export class CitizensListComponent implements OnInit {
     ];
 
     public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
-    /** La liste des colonnes */
-    public readonly columns_ids: string[] = this.columns.map((column: CitizenColumn) => column.id);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
@@ -256,7 +255,7 @@ export class CitizensListComponent implements OnInit {
         }
     }
 
-    public trackByColumnId(_index: number, column: CitizenColumn): string {
+    public trackByColumnId(_index: number, column: StandardColumn): string {
         return column.id;
     }
 
@@ -283,12 +282,5 @@ export class CitizensListComponent implements OnInit {
                 this.datasource.data = [...citizen_info.citizens];
             });
     }
-}
-
-
-interface CitizenColumn {
-    header: string;
-    id: string;
-    class?: string;
 }
 
