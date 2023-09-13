@@ -19,7 +19,7 @@ jobs:
 
       - name: Read Script 2
         run: |
-          test=$sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js >> $GITHUB_ENV
+          test=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js) >> $GITHUB_ENV
 
       - name: Read Script 3
         id: script-test
