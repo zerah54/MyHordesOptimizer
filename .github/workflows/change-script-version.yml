@@ -18,12 +18,11 @@ jobs:
           path: ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
 
       - name: Write Script
-        run: echo "${{ steps.script.outputs.content[100] }}"
+        run: echo "${{ steps.script.outputs }}"
 
       - name: Test Save Script In Variable
         run: |
-          file_content=${{ steps.script.outputs.content[100] }} >> $GITHUB_ENV
-          echo "${{ env.file_content }}
+          file_content=${{ steps.script.outputs.content }} >> $GITHUB_ENV
 
       - name: Test Read Variable
         run: |
