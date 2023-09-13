@@ -21,7 +21,7 @@ jobs:
         uses: actions-ecosystem/action-regex-match@v2
         id: regex-match
         with:
-          text: ${{ steps.script.outputs }}
+          text: "${{ steps.script.outputs }}"
           regex: '@version *(.+)'
           flags: gm
           
