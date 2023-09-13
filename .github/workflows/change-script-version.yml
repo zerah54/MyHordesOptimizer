@@ -23,6 +23,7 @@ jobs:
         with:
           text: ${{ steps.script.outputs }}
           regex: '@Version *(\w+)'
+          flags: gm
           
       - name: Write Script
         run: echo "${{ steps.regex-match.outputs }}"
