@@ -16,11 +16,19 @@ jobs:
         uses: juliangruber/read-file-action@v1
         with:
           path: ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
+          
+      - name: Read Script 2
+        id: script-test-2
+        run: |
+          echo "test2=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> "$GITHUB_OUTPUT"
 
       - name: Read Script 3
-        id: script-test
         run: |
           sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
+          
+      - name: Read Script 4
+        run: |
+          echo "test4=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> "$GITHUB_OUTPUT"
 
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
@@ -32,11 +40,14 @@ jobs:
 
       - name: Test Read Variable
         run: |
-          echo "Read Script 3. ${{ steps.script-test[0] }}"
-          echo "Read Script 3. ${{ steps.script-test.outputs[0] }}"
+          echo "Read Script 2. ${{ steps.script-test }}"
+          echo "Read Script 2.1 ${{ steps.script-test.outputs }}"
+          echo "Read Script 3. ${{ steps.script-test }}"
           echo "Read Script 3.1 ${{ steps.script-test.outputs }}"
-          echo "Read Script 4. ${{ steps.regex-match-test2 }}"
-          echo "Read Script 4.1 ${{ steps.regex-match-test2.outputs }}"
+          echo "Read Script 4. ${{ steps.script-test }}"
+          echo "Read Script 4.1 ${{ steps.script-test.outputs }}"
+          echo "Read Script F ${{ steps.regex-match-test2 }}"
+          echo "Read Script F.1 ${{ steps.regex-match-test2.outputs }}"
           
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
