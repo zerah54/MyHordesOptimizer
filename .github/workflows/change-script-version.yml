@@ -38,14 +38,6 @@ jobs:
           regex:     '@version *(.+)'
           flags:     gm
 
-      - name: Match Version
-        uses: actions-ecosystem/action-regex-match@v2
-        id: regex-match-test
-        with:
-          text:     ${{ sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js }}
-          regex:     '@version *(.+)'
-          flags:     gm
-
       - name: Test Read Variable
         run: |
           echo "Read Script 2. ${{ env.test2 }}"
@@ -57,9 +49,6 @@ jobs:
           echo "Read Script F ${{ steps.regex-match-test2 }}"
           echo "Read Script F.1 ${{ steps.regex-match-test2.outputs }}"
           echo "Read Script F.2 ${{ steps.regex-match-test2.outputs.group1 }}"
-          echo "Read Script F2 ${{ steps.regex-match-test }}"
-          echo "Read Script F2.1 ${{ steps.regex-match-test.outputs }}"
-          echo "Read Script F2.2 ${{ steps.regex-match-test.outputs.group1 }}"
 
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
