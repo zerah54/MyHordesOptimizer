@@ -19,11 +19,19 @@ jobs:
 
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
+        id: regex-match-test
+        with:
+          text:     "// @version    1.0.0-beta.60"
+          regex:     '@version *(.+)'
+          flags:     gm
+
+      - name: Match Version
+        uses: actions-ecosystem/action-regex-match@v2
         id: regex-match
         with:
-          text: "${{ steps.script.outputs }}"
-          regex: '@version *(.+)'
-          flags: gm
+          text:     "${{ steps.script.outputs }}"
+          regex:     '@version *(.+)'
+          flags:     gm
           
       - name: Write Script
         run: echo "${{ steps.regex-match.outputs }}"
