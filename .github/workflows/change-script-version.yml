@@ -17,8 +17,14 @@ jobs:
         with:
           path: ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
 
+      - uses: actions-ecosystem/action-regex-match@v2
+        id: regex-match
+        with:
+          text: ${{ steps.script.outputs }}
+          regex: '^/label\s*(.*?)\s*$'
+          
       - name: Write Script
-        run: echo "${{ steps.script.outputs }}"
+        run: echo "${{ steps.regex-match.outputs }}"
 
       - name: Test Save Script In Variable
         run: |
