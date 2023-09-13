@@ -27,4 +27,3 @@ jobs:
         run: |
           file_content=${{ steps.script.outputs.content[100] }} >> $GITHUB_ENV
           echo "${{ env.file_content }}
-          echo "${{ file_content }}
