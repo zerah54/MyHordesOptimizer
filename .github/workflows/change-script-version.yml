@@ -22,7 +22,7 @@ jobs:
         id: regex-match
         with:
           text: ${{ steps.script.outputs }}
-          regex: '@Version *(\w+)'
+          regex: '@version *(.+)'
           flags: gm
           
       - name: Write Script
