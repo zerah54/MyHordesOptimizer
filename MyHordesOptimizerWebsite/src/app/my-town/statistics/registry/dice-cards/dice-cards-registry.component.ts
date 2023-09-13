@@ -37,7 +37,7 @@ export class DiceCardsRegistryComponent {
 
 
     public entryHasPlayKeyword(entry: Entry, keyword: string): boolean {
-        return entry.entry?.indexOf(' ' + keyword + ' ') > -1;
+        return entry.entry?.indexOf(' ' + keyword + ' ') > -1 || entry.entry?.indexOf(' ' + keyword + '.') > -1;
     }
 
     public changePlaysTab(event: MatTabChangeEvent): void {

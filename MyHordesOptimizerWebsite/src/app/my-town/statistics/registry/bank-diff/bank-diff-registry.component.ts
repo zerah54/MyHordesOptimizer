@@ -35,14 +35,8 @@ export class BankDiffRegistryComponent {
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
-    protected readonly give_keywords: string[] = [
-        'a donné', 'folgendes gespendet', 'has given', 'ha donado',
-        'a déposé', 'folgenden Gegenstand', 'has dropped', 'ha dejado'
-    ];
-    protected readonly take_keywords: string[] = [
-        'a pris', 'Gegenstand aus der Bank genommen', 'has taken', 'ha cogito',
-        'a ramassé', 'Gegenstand mitgenommen', 'picked up', 'ha recogido'
-    ];
+    protected readonly give_keywords: string[] = ['a donné', 'folgendes gespendet', 'has given', 'ha donado',];
+    protected readonly take_keywords: string[] = ['a pris', 'Gegenstand aus der Bank genommen', 'has taken', 'ha cogito',];
 }
 
 
