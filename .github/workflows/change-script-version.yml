@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./Scripts/Tampermonkey
+        working-directory: ./Scripts/Tampermonkey/
     
     steps:
       - uses: actions/checkout@main
@@ -26,4 +26,8 @@ jobs:
       - name: Test Save Script In Variable
         run: |
           file_content=${{ steps.script.outputs.content[100] }} >> $GITHUB_ENV
+          echo "${{ env.file_content }}
+
+      - name: Test Read Variable
+        run: |
           echo "${{ env.file_content }}
