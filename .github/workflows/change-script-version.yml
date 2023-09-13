@@ -18,11 +18,11 @@ jobs:
           path: ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
           
       - name: Read Script 2
-        id: script-test-2
         run: |
           echo "test2=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> "$GITHUB_OUTPUT"
 
       - name: Read Script 3
+        id: script-test-3
         run: |
           sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
           
@@ -34,28 +34,32 @@ jobs:
         uses: actions-ecosystem/action-regex-match@v2
         id: regex-match-test2
         with:
-          text:     sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
+          text:     $sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
+          regex:     '@version *(.+)'
+          flags:     gm
+
+      - name: Match Version
+        uses: actions-ecosystem/action-regex-match@v2
+        id: regex-match-test
+        with:
+          text:     ${{ sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js }}
           regex:     '@version *(.+)'
           flags:     gm
 
       - name: Test Read Variable
         run: |
-          echo "Read Script 2. ${{ steps.script-test }}"
-          echo "Read Script 2.1 ${{ steps.script-test.outputs }}"
-          echo "Read Script 3. ${{ steps.script-test }}"
-          echo "Read Script 3.1 ${{ steps.script-test.outputs }}"
-          echo "Read Script 4. ${{ steps.script-test }}"
-          echo "Read Script 4.1 ${{ steps.script-test.outputs }}"
+          echo "Read Script 2. ${{ env.test2 }}"
+          echo "Read Script 2.1 ${{ env.test2.outputs }}"
+          echo "Read Script 3. ${{ steps.script-test3 }}"
+          echo "Read Script 3.1 ${{ steps.script-test3.outputs }}"
+          echo "Read Script 4. ${{ env.test4 }}"
+          echo "Read Script 4.1 ${{ env.test4.outputs }}"
           echo "Read Script F ${{ steps.regex-match-test2 }}"
           echo "Read Script F.1 ${{ steps.regex-match-test2.outputs }}"
-          
-      - name: Match Version
-        uses: actions-ecosystem/action-regex-match@v2
-        id: regex-match-test
-        with:
-          text:     sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
-          regex:     '@version *(.+)'
-          flags:     gm
+          echo "Read Script F.2 ${{ steps.regex-match-test2.outputs.group1 }}"
+          echo "Read Script F2 ${{ steps.regex-match-test }}"
+          echo "Read Script F2.1 ${{ steps.regex-match-test.outputs }}"
+          echo "Read Script F2.2 ${{ steps.regex-match-test.outputs.group1 }}"
 
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
