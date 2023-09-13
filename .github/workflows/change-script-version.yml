@@ -19,7 +19,7 @@ jobs:
 
       - name: Read Script 2
         run: |
-          sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
+          test=sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js >> $GITHUB_ENV
 
       - name: Read Script 3
         id: script-test
@@ -28,7 +28,8 @@ jobs:
 
       - name: Test Read Variable
         run: |
-          echo "${{ steps.script-test.outputs }}
+          echo "${{ steps.script-test.outputs }}"
+          echo "${{ env.test }}"
           
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
