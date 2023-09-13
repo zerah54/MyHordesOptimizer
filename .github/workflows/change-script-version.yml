@@ -1,0 +1,30 @@
+name: (Script) Update Version
+
+on:
+  workflow_dispatch
+
+jobs:
+  script-change-version:    
+  
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Scripts/Tampermonkey
+    
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Read Script
+        id: script
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./my_hordes_optimizer.user.js
+
+      - name: Write Script
+        run: echo "${{ steps.script.outputs.content[100] }}"
+
+      - name: Test Save Script In Variable
+        run: |
+          file_content=${{ steps.script.outputs.content[100] }} >> $GITHUB_ENV
+          echo "${{ env.file_content }}
+          echo "${{ file_content }}
