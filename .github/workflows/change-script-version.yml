@@ -26,16 +26,27 @@ jobs:
         run: |
           sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
 
+      - name: Match Version
+        uses: actions-ecosystem/action-regex-match@v2
+        id: regex-match-test2
+        with:
+          text:     sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
+          regex:     '@version *(.+)'
+          flags:     gm
+
       - name: Test Read Variable
         run: |
           echo "Read Script 2. ${{ env.test }}"
           echo "Read Script 3. ${{ steps.script-test }}"
+          echo "Read Script 3.1 ${{ steps.script-test.outputs }}"
+          echo "Read Script 4. ${{ steps.regex-match-test2 }}"
+          echo "Read Script 4.1 ${{ steps.regex-match-test2.outputs }}"
           
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
         id: regex-match-test
         with:
-          text:     "// @version    1.0.0-beta.60"
+          text:     sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
           regex:     '@version *(.+)'
           flags:     gm
 
