@@ -7,9 +7,6 @@ jobs:
   script-change-version:    
   
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./Scripts/Tampermonkey/
     
     steps:
       - uses: actions/checkout@main
@@ -18,7 +15,7 @@ jobs:
         id: script
         uses: juliangruber/read-file-action@v1
         with:
-          path: my_hordes_optimizer.user.js
+          path: ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
 
       - name: Write Script
         run: echo "${{ steps.script.outputs.content[100] }}"
