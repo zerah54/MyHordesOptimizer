@@ -19,7 +19,15 @@ jobs:
 
       - name: Read Script 2
         run: |
-          sed -n 2p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
+          sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
+
+      - name: Read Script 3
+        run: |
+          file_content=sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js >> $GITHUB_ENV
+
+      - name: Test Read Variable
+        run: |
+          echo "${{ env.file_content }}
           
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
@@ -28,9 +36,6 @@ jobs:
           text:     "// @version    1.0.0-beta.60"
           regex:     '@version *(.+)'
           flags:     gm
-          
-      - name: Write Script Test
-        run: echo "${{ steps.regex-match-test.outputs }}"
 
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
@@ -42,11 +47,3 @@ jobs:
           
       - name: Write Script
         run: echo "${{ steps.regex-match.outputs }}"
-
-      - name: Test Save Script In Variable
-        run: |
-          file_content=${{ steps.script.outputs.content }} >> $GITHUB_ENV
-
-      - name: Test Read Variable
-        run: |
-          echo "${{ env.file_content }}
