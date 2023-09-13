@@ -48,7 +48,8 @@ jobs:
           echo "Read Script 4.1 ${{ env.test4.outputs }}"
           echo "Read Script F ${{ steps.regex-match-test2 }}"
           echo "Read Script F.1 ${{ steps.regex-match-test2.outputs }}"
-          echo "Read Script F.2 ${{ steps.regex-match-test2.outputs.group1 }}"
+          echo "Read Script F.2 ${{ steps.regex-match-test2.outputs.match }}"
+          echo "Read Script F.3 ${{ steps.regex-match-test2.outputs.group1 }}"
 
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
