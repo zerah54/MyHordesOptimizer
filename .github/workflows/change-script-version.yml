@@ -22,12 +22,13 @@ jobs:
           sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
 
       - name: Read Script 3
+        id: script-test
         run: |
-          file_content=sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js >> $GITHUB_ENV
+          sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
 
       - name: Test Read Variable
         run: |
-          echo "${{ env.file_content }}
+          echo "${{ steps.script-test.outputs }}
           
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
