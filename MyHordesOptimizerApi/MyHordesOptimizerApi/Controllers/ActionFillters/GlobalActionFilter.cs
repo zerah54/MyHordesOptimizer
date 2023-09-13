@@ -36,6 +36,10 @@ namespace MyHordesOptimizerApi.Controllers.ActionFillters
                 {
                     context.Result = new BadRequestObjectResult("No MhoOrigin Or MhoScripOrigin without version");
                     return;
+                }                
+                if (MhoHeaderProvider.MhoOrigin == IMhoHeadersProvider.Mho_Site_Origin)
+                {
+                    return;
                 }
                 try
                 {
