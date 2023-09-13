@@ -17,6 +17,10 @@ jobs:
         with:
           path: ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
 
+          
+      - name: Write Complete Script
+        run: echo "${{ steps.script.outputs.content }}"
+        
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
         id: regex-match-test
