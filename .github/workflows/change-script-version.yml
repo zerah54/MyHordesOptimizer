@@ -16,7 +16,11 @@ jobs:
         uses: juliangruber/read-file-action@v1
         with:
           path: ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
-        
+
+      - name: Read Script 2
+        run: |
+          sed -n 2p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
+          
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
         id: regex-match-test
