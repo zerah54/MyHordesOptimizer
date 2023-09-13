@@ -12,21 +12,21 @@ jobs:
         working-directory: ./MyHordesOptimizerWebsite/
 
     steps:
-    - uses: actions/checkout@main
-    - uses: actions/setup-node@main
-      with: 
-        node-version: '18.17.0'
+      - uses: actions/checkout@main
+      - uses: actions/setup-node@main
+        with:
+          node-version: '18.17.0'
 
-    - name: Build app
-      run: |
-        npm install
-        npm run build --test
+      - name: Build app
+        run: |
+          npm install
+          npm run build:staging
 
-    - name: Install firebase tools
-      run: |
-        npm install -g firebase-tools
-        firebase use dev --token ${{secrets.FIREBASE_TOKEN}}
-        
-    - name: Deploy
-      run:  firebase deploy --only hosting:dev --token ${{secrets.FIREBASE_TOKEN}}
-    
+      - name: Install firebase tools
+        run: |
+          npm install -g firebase-tools
+          firebase use dev --token ${{secrets.FIREBASE_TOKEN}}
+
+      - name: Deploy
+        run: firebase deploy --only hosting:dev --token ${{secrets.FIREBASE_TOKEN}}
+

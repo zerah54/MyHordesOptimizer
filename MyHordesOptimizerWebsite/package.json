@@ -5,12 +5,13 @@
         "ng": "ng",
         "start": "ng serve",
         "build": "ng build",
+        "build:staging": "ng build --configuration staging",
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
         "xlftojson": "node src/i18n/scripts/xlf_to_json.js",
         "extract-i18n": "ng extract-i18n MyHordesOptimizerWebsite --format xlf --output-path src/i18n && xliffmerge --profile xliffmerge-options.json",
         "build-deploy": "node src/i18n/scripts/xlf_to_json.js && ng build && firebase use prod && firebase deploy --only hosting:prod",
-        "build-deploy:dev": "node src/i18n/scripts/xlf_to_json.js && ng build --configuration test && firebase use dev && firebase deploy --only hosting:dev"
+        "build-deploy:dev": "node src/i18n/scripts/xlf_to_json.js && ng build --configuration staging && firebase use dev && firebase deploy --only hosting:dev"
     },
     "private": true,
     "dependencies": {
