@@ -24,6 +24,9 @@ jobs:
           text:     "// @version    1.0.0-beta.60"
           regex:     '@version *(.+)'
           flags:     gm
+          
+      - name: Write Script Test
+        run: echo "${{ steps.regex-match-test.outputs }}"
 
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
