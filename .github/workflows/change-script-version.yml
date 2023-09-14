@@ -11,11 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name: Read Script
-        id: script
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
+#      - name: Read Script
+#        id: script
+#        uses: juliangruber/read-file-action@v1
+#        with:
+#          path: ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
 
       - name: Read Script 1
         id: read-script-1
@@ -58,13 +58,13 @@ jobs:
           echo "$SCRIPTTEST2"
           echo "$SCRIPTTEST3"
 
-      - name: Match Version
-        uses: actions-ecosystem/action-regex-match@v2
-        id: regex-match
-        with:
-          text:     ${{ steps.script.outputs.content }}
-          regex:     '@version *(.+)'
-          flags:     gm
+#      - name: Match Version
+#        uses: actions-ecosystem/action-regex-match@v2
+#        id: regex-match
+#        with:
+#          text:     ${{ steps.script.outputs.content }}
+#          regex:     '@version *(.+)'
+#          flags:     gm
           
-      - name: Write Script
-        run: echo "${{ steps.regex-match.outputs }}"
+#      - name: Write Script
+#        run: echo "${{ steps.regex-match.outputs }}"
