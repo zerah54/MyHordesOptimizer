@@ -31,7 +31,7 @@ jobs:
       - name: Save version
         env:
           VERSION: "${{ steps.regex-match.outputs.group1 }}"
-          DATA: '{"name": "ScriptVersion", "value": $VERSION}'
+          DATA: '{"name": "ScriptVersion", "value": ${{ $VERSION }}}'
         run: |
           echo "$VERSION"
           echo "$DATA"
