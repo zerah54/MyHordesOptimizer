@@ -37,4 +37,4 @@ jobs:
             --url "https://api.myhordesoptimizer.fr/Parameters/Parameters" \
             --header "Content-Type: application/json" \
             --data "$DATA"
-#            --user "<YOUR_CLIENT_ID>:<YOUR_CLIENT_SECRET>" \
+            --user "${{secrets.CLIENT_ID}}:${{secrets.CLIENT_SECRET}}" \
