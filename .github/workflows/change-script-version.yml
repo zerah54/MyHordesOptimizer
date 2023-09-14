@@ -16,10 +16,6 @@ jobs:
         uses: juliangruber/read-file-action@v1
         with:
           path: ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
-          
-      - name: Read Script 2
-        run: |
-          test2=$(echo ${ steps.script.outputs.content:0:150 } | sed '@version *.+') >> $GITHUB_OUTPUT
 
       - name: Read Script 3
         id: script-test-3
@@ -32,10 +28,8 @@ jobs:
 
       - name: Test Read Variable
         run: |
-          echo "Read Script 2. ${{ env.test2 }}"
-          echo "Read Script 2.1 ${{ env.test2.outputs }}"
-          echo "Read Script 3. ${{ steps.script-test3 }}"
-          echo "Read Script 3.1 ${{ steps.script-test3.outputs }}"
+          echo "Read Script 3. ${{ steps.script-test-3 }}"
+          echo "Read Script 3.1 ${{ steps.script-test-3.outputs }}"
           echo "Read Script 4. ${{ env.test4 }}"
           echo "Read Script 4.1 ${{ env.test4.outputs }}"
 
