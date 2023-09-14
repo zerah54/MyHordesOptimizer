@@ -29,9 +29,9 @@ jobs:
         id: script-test-2
         run: head -n 3 ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
 
-      - name: Read Script 3
-        id: read-script-3
-        run: echo "test=$(head -n 3 ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> $GITHUB_OUTPUT
+#      - name: Read Script 3
+#        id: read-script-3
+#        run: echo "test=$(head -n 3 ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> $GITHUB_OUTPUT
         
       - name: Test Read Variable
         run: |
@@ -40,6 +40,7 @@ jobs:
           echo "Read Script 1 ${{ steps.read-script-1a }}"
           echo "Read Script 1a ${{ steps.read-script-1a.outputs.test }}"
           echo "Read Script 2 ${{ steps.script-test-2 }}"
+#          echo "Read Script 3 ${{ steps.script-test-3 }}"
 
       - name: Test Read Variable 2        
         env:
@@ -47,7 +48,7 @@ jobs:
           SCRIPTTEST1: ${{ toJSON(steps.read-script-1) }}
           SCRIPTTEST1a: ${{ toJSON(steps.read-script-1a) }}
           SCRIPTTEST2: ${{ toJSON(steps.script-test-2) }}
-          SCRIPTTEST3: ${{ toJSON(steps.script-test-3) }}
+  #        SCRIPTTEST3: ${{ toJSON(steps.script-test-3) }}
         run: |
           echo "$STEPS"
           echo "$SCRIPTTEST1"
