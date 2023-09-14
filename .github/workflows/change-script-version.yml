@@ -40,9 +40,11 @@ jobs:
           text:     ${{ steps.read-script.outputs.test }}
           regex:     '@version *(.+)'
           
-      - name: Write Script
+      - name: Get Script Version
         env:
           MATCH: ${{ toJSON(steps.regex-match.outputs) }}
+          VERSION: "${{ steps.regex-match.outputs.group1 }}"
         run: |
-          echo "${{ steps.regex-match.outputs }}"
+          echo "${{ steps.regex-match.outputs.group1 }}"
+          echo "$VERSION"
           echo "$MATCH"
