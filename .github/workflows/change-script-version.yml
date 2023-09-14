@@ -36,5 +36,5 @@ jobs:
           curl --request POST \
             --url "https://api.myhordesoptimizer.fr/Parameters/Parameters" \
             --header "Content-Type: application/json" \
-            --header "Authorization: ${{secrets.AUTHENTICATION_BASIC}}" \
+            --header "Authorization: Basic ${{secrets.AUTHENTICATION_BASIC}}" \
             --data '{"name": "ScriptVersion", "value": "${{ steps.get-version.outputs.version }}"}'
