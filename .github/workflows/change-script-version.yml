@@ -19,7 +19,7 @@ jobs:
           
       - name: Read Script 2
         run: |
-          test2=$(echo ${{ steps.script.outputs.content }} | sed '@version *(.+)')" >> $GITHUB_OUTPUT
+          test2=$(echo ${{ steps.script.outputs.content }} | sed '@version *(.+)' >> $GITHUB_OUTPUT
 
       - name: Read Script 3
         id: script-test-3
