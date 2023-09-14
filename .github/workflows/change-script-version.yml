@@ -44,11 +44,15 @@ jobs:
 
       - name: Test Read Variable 2        
         env:
+          STEPS: ${{ toJSON(steps) }}
+          ENV: ${{ toJSON(env) }}
           SCRIPTTEST1: ${{ toJSON(steps.read-script-1) }}
           SCRIPTTEST1a: ${{ toJSON(steps.read-script-1a) }}
           SCRIPTTEST2: ${{ toJSON(env.test2) }}
           SCRIPTTEST3: ${{ toJSON(steps.script-test-3) }}
         run: |
+          echo "$STEPS"
+          echo "$ENV"
           echo "$SCRIPTTEST1"
           echo "$SCRIPTTEST1a"
           echo "$SCRIPTTEST2"
