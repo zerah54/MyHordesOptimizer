@@ -19,7 +19,7 @@ jobs:
           
       - name: Read Script 2
         run: |
-          echo "test2=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> "$GITHUB_OUTPUT"
+          test2=$(echo ${{ steps.script.outputs.content }} | sed '@version *(.+)')" >> $GITHUB_OUTPUT
 
       - name: Read Script 3
         id: script-test-3
@@ -28,15 +28,7 @@ jobs:
           
       - name: Read Script 4
         run: |
-          echo "test4=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> "$GITHUB_OUTPUT"
-
-      - name: Match Version
-        uses: actions-ecosystem/action-regex-match@v2
-        id: regex-match-test2
-        with:
-          text:     $sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
-          regex:     '@version *(.+)'
-          flags:     gm
+          "test4=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> "$GITHUB_OUTPUT"
 
       - name: Test Read Variable
         run: |
@@ -46,10 +38,6 @@ jobs:
           echo "Read Script 3.1 ${{ steps.script-test3.outputs }}"
           echo "Read Script 4. ${{ env.test4 }}"
           echo "Read Script 4.1 ${{ env.test4.outputs }}"
-          echo "Read Script F ${{ steps.regex-match-test2 }}"
-          echo "Read Script F.1 ${{ steps.regex-match-test2.outputs }}"
-          echo "Read Script F.2 ${{ steps.regex-match-test2.outputs.match }}"
-          echo "Read Script F.3 ${{ steps.regex-match-test2.outputs.group1 }}"
 
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
