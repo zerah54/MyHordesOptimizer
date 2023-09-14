@@ -41,14 +41,18 @@ jobs:
           echo "Read Script 2 ${{ env.test2 }}"
           echo "Read Script 2a ${{ env.test2.outputs }}"
           echo "Read Script 3 ${{ steps.script-test-3 }}"
-          echo "Read Script 3a ${{ steps.script-test-3 }}"
 
       - name: Test Read Variable 2        
         env:
-          TEST: ${{ toJSON(steps.script-test-3) }}
+          SCRIPT-TEST-1: ${{ toJSON(steps.read-script-1) }}
+          SCRIPT-TEST-1a: ${{ toJSON(steps.read-script-1a) }}
+          SCRIPT-TEST-2: ${{ toJSON(env.test2) }}
+          SCRIPT-TEST-3: ${{ toJSON(steps.script-test-3) }}
         run: |
-          echo ${{ steps.script-test-3 }}
-          echo "$TEST"
+          echo "$SCRIPT-TEST-1"
+          echo "$SCRIPT-TEST-1a"
+          echo "$SCRIPT-TEST-2"
+          echo "$SCRIPT-TEST-3"
 
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
