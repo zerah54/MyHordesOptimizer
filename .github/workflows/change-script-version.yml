@@ -31,7 +31,7 @@ jobs:
           # The regex pattern you want to use as a string
           regex_pattern: '@version *(.+)'
           # The path to the file as a string
-          path: './Scripts/Tampermonkey/my_hordes_optimizer.user.js)'
+          path: './Scripts/Tampermonkey/my_hordes_optimizer.user.js'
         
       - name: Test Read Variable
         run: |
