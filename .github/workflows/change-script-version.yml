@@ -37,4 +37,4 @@ jobs:
             --url "https://api.myhordesoptimizer.fr/Parameters/Parameters" \
             --header "Content-Type: application/json" \
             --header "Authorization: ${{secrets.AUTHENTICATION_BASIC}}" \
-            --data "$DATA"
+            --data $DATA
