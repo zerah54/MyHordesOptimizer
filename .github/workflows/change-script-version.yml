@@ -17,52 +17,28 @@ jobs:
 #        with:
 #          path: ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
 
-      - name: Read Script 1
-        id: read-script-1
-        run: sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
-
-      - name: Read Script 1a
-        id: read-script-1a
+      - name: Read Script
+        id: read-script
         run: echo "test=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> $GITHUB_OUTPUT
-
-      - name: Read Script 2
-        id: script-test-2
-        run: head -n 3 ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
-
-#      - name: Read Script 3
-#        id: read-script-3
-#        run: echo "test=$(head -n 3 ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> $GITHUB_OUTPUT
         
       - name: Test Read Variable
         run: |
-          echo "Read Script 1 ${{ steps.read-script-1 }}"
-          echo "Read Script 1a ${{ steps.read-script-1.outputs }}"
-          echo "Read Script 1 ${{ steps.read-script-1a }}"
-          echo "Read Script 1a ${{ steps.read-script-1a.outputs.test }}"
-          echo "Read Script 2 ${{ steps.script-test-2 }}"
-#          echo "Read Script 3 ${{ steps.script-test-3 }}"
+          echo "Read Script 1a ${{ steps.read-script.outputs }}"
 
       - name: Test Read Variable 2        
         env:
           STEPS: ${{ toJSON(steps) }}
-          SCRIPTTEST1: ${{ toJSON(steps.read-script-1) }}
-          SCRIPTTEST1a: ${{ toJSON(steps.read-script-1a) }}
-          SCRIPTTEST2: ${{ toJSON(steps.script-test-2) }}
-  #        SCRIPTTEST3: ${{ toJSON(steps.script-test-3) }}
+          SCRIPT: ${{ toJSON(steps.read-script) }}
         run: |
           echo "$STEPS"
-          echo "$SCRIPTTEST1"
-          echo "$SCRIPTTEST1a"
-          echo "$SCRIPTTEST2"
-          echo "$SCRIPTTEST3"
+          echo "$SCRIPT"
 
-#      - name: Match Version
-#        uses: actions-ecosystem/action-regex-match@v2
-#        id: regex-match
-#        with:
-#          text:     ${{ steps.script.outputs.content }}
-#          regex:     '@version *(.+)'
-#          flags:     gm
+      - name: Match Version
+        uses: actions-ecosystem/action-regex-match@v2
+        id: regex-match
+        with:
+          text:     ${{ steps.read-script.outputs }}
+          regex:     '@version *(.+)'
           
-#      - name: Write Script
-#        run: echo "${{ steps.regex-match.outputs }}"
+      - name: Write Script
+        run: echo "${{ steps.regex-match.outputs }}"
