@@ -1,7 +1,10 @@
 name: (Script) Update Version
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
+  push:
+    paths: 
+      - 'Scripts/Tampermonkey/my_hordes_optimizer.user.js'
 
 jobs:
   script-change-version:    
@@ -29,10 +32,7 @@ jobs:
         run: echo "version=$VERSION" >> $GITHUB_OUTPUT
           
       - name: Save version
-        env:
-          DATA: '{"name": "ScriptVersion", "value": "${{ steps.get-version.outputs.version }}"}'
         run: |
-          echo "$DATA"
           curl --request POST \
             --url "https://api.myhordesoptimizer.fr/Parameters/Parameters" \
             --header "Content-Type: application/json" \
