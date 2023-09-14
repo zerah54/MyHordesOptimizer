@@ -33,9 +33,9 @@ jobs:
           DATA: '{"name": "ScriptVersion", "value": "${{ steps.get-version.outputs.version }}"}'
         run: |
           echo "$DATA"
-          echo ${{ toJSON($DATA) }}
+          echo "${{ toJSON($DATA) }}"
           curl --request POST \
             --url 'https://api.myhordesoptimizer.fr/Parameters/Parameters' \
             --header 'Content-Type: application/json' \
-            --data ${{ toJSON($DATA) }}
+            --data "${{ toJSON($DATA) }}"
 #            --user "<YOUR_CLIENT_ID>:<YOUR_CLIENT_SECRET>" \
