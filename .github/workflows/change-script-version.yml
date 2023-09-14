@@ -31,8 +31,12 @@ jobs:
       - name: Save version
         env:
           VERSION: "${{ steps.regex-match.outputs.group1 }}"
-          DATA: '{"name": "ScriptVersion", "value": "$VERSION"}'
+          DATA: '{"name": "ScriptVersion", "value": $VERSION}'
         run: |
           echo "$VERSION"
           echo "$DATA"
-          curl -X POST --location 'https://api.myhordesoptimizer.fr/Parameters/Parameters' --header 'Content-Type: application/json' --data $DATA
+          curl --request POST \
+            --url 'https://api.myhordesoptimizer.fr/Parameters/Parameters' \
+            --header 'Content-Type: application/json' \
+            --data $DATA
+#            --user "<YOUR_CLIENT_ID>:<YOUR_CLIENT_SECRET>" \
