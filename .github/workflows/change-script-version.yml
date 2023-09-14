@@ -22,16 +22,16 @@ jobs:
         run: |
           sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
           
-#      - name: Read Script 4
-#        run: |
-#          "test4=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> "$GITHUB_OUTPUT"
+      - name: Read Script 4
+        run: |
+          test4=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js) >> $GITHUB_OUTPUT
 
       - name: Test Read Variable
         run: |
           echo "Read Script 3. ${{ steps.script-test-3 }}"
           echo "Read Script 3.1 ${{ steps.script-test-3.outputs }}"
-#          echo "Read Script 4. ${{ env.test4 }}"
-#          echo "Read Script 4.1 ${{ env.test4.outputs }}"
+          echo "Read Script 4. ${{ env.test4 }}"
+          echo "Read Script 4.1 ${{ env.test4.outputs }}"
 
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
