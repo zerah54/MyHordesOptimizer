@@ -30,7 +30,7 @@ jobs:
 
       - name: Read Script 4
         id: script-test-4
-        run: head -n 3 ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)
+        run: head -n 3 ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
         
       - name: Read Script 3
         run: echo "test3=$(head -n 3 ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> $GITHUB_OUTPUT
