@@ -31,7 +31,7 @@ jobs:
       - name: Save version
         env:
           VERSION: "${{ steps.get-version.outputs.version }}"
-          DATA: '{"name": "ScriptVersion", "value": ${{ steps.get-version.outputs.version }}, "value2": "${{ VERSION }}"}'
+          DATA: '{"name": "ScriptVersion", "value": ${{ steps.get-version.outputs.version }}}'
         run: |
           echo "$VERSION"
           echo "$DATA"
