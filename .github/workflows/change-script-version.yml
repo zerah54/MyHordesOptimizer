@@ -30,13 +30,12 @@ jobs:
           
       - name: Save version
         env:
-          VERSION: "${{ steps.get-version.outputs.version }}"
           DATA: '{"name": "ScriptVersion", "value": "${{ steps.get-version.outputs.version }}"}'
         run: |
-          echo "$VERSION"
-          echo "$DATA"
+          echo $DATA
+          echo ${{ toJSON($DATA) }}
           curl --request POST \
             --url 'https://api.myhordesoptimizer.fr/Parameters/Parameters' \
             --header 'Content-Type: application/json' \
-            --data $DATA
+            --data ${{ toJSON($DATA) }}
 #            --user "<YOUR_CLIENT_ID>:<YOUR_CLIENT_SECRET>" \
