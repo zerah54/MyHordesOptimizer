@@ -11,40 +11,28 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-#      - name: Read Script
-#        id: script
-#        uses: juliangruber/read-file-action@v1
-#        with:
-#          path: ./Scripts/Tampermonkey/my_hordes_optimizer.user.js
-
       - name: Read Script
         id: read-script
-        run: echo "test=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> $GITHUB_OUTPUT
-        
-      - name: Test Read Variable
-        run: |
-          echo "Read Script 1a ${{ steps.read-script.outputs.test }}"
-
-      - name: Test Read Variable 2        
-        env:
-          STEPS: ${{ toJSON(steps) }}
-          SCRIPT: ${{ toJSON(steps.read-script) }}
-        run: |
-          echo "$STEPS"
-          echo "$SCRIPT"
+        run: echo "version=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> $GITHUB_OUTPUT
 
       - name: Match Version
         uses: actions-ecosystem/action-regex-match@v2
         id: regex-match
         with:
-          text:     ${{ steps.read-script.outputs.test }}
+          text:     ${{ steps.read-script.outputs.version }}
           regex:     '@version *(.+)'
           
       - name: Get Script Version
         env:
-          MATCH: ${{ toJSON(steps.regex-match.outputs) }}
           VERSION: "${{ steps.regex-match.outputs.group1 }}"
         run: |
-          echo "${{ steps.regex-match.outputs.group1 }}"
           echo "$VERSION"
-          echo "$MATCH"
+          
+      - name: Save version
+        env:
+          VERSION: "${{ steps.regex-match.outputs.group1 }}"
+          DATA: '{"name": "ScriptVersion", "value": "$VERSION"}'
+        run: |
+          echo "$VERSION"
+          echo "$DATA"
+          curl -X POST --location 'https://api.myhordesoptimizer.fr/Parameters/Parameters' --header 'Content-Type: application/json' --data $DATA
