@@ -1442,7 +1442,30 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            connection.InsertOrUpdate("TownEstimation", estimation);
+
+            var dico = typeof(TownEstimationModel).GetPropertiesInvoker<TownEstimationModel>();
+            List<string> columns = new();
+            List<string> values = new();
+            List<string> listUpdate = new();
+
+            foreach (var kvp in dico)
+            {
+                string column = kvp.Key;
+                var value = kvp.Value.Invoke(estimation);
+
+                if (value.ToString() != "-1")
+                {
+                    columns.Add(column);
+                    values.Add(value.ToString());
+                    listUpdate.Add(column + " = " + value);
+                }
+            }
+
+            var sb = new StringBuilder($"INSERT INTO TownEstimation ({string.Join(",", columns)}) VALUES ({string.Join(",", values)})");
+            sb.Append($" ON DUPLICATE KEY UPDATE {string.Join(",", listUpdate)} ");
+
+            connection.ExecuteScalar<string>(sb.ToString());
+
             connection.Close();
         }
 
