@@ -1,49 +1,54 @@
 name: (Server) Deploy Dev
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ main ]
-    paths: 
-      - 'MyHordesOptimizerApi/**'
-
-env:
-  AZURE_WEBAPP_NAME: MyHordesOptimizerApi
-  AZURE_WEBAPP_PACKAGE_PATH: '.' # Set this to the path to your web app project, defaults to the repository root:
-  PROJECT_FILE_PATH: '/MyHordesOptimizerApiMyHordesOptimizerApi.csproj'
-  DOTNET_VERSION: '6.0.401' # The .NET SDK version to use
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  azure-deploy-dev:
-
-    runs-on: ubuntu-latest    
-    defaults:
-      run:
-        working-directory: ./MyHordesOptimizerApi
+  build:
+    runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+      - uses: actions/checkout@v2
 
-    - name: Install dependencies
-      run: dotnet restore
-      
-    - name: Build
-      run: |
-        dotnet build --configuration Release --no-restore
-        dotnet publish -c Release -o ./MyHordesOptimizerApi -r linux-x64 --self-contained true /p:UseAppHost=true
-    
-#    - name: Test
-#      run: |
-#        cd DotNet.WebApp.Tests
-#        dotnet test --no-restore --verbosity normal
-      
-    - uses: azure/webapps-deploy@v2
-      name: Deploy
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-        package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1'
+          include-prerelease: true
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v2
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: .net-app
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'MyHordesOptimizerApi'
+          slot-name: 'production'
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile_46612d33e3fc456283a3700e421f4a93 }}
+          package: .
