@@ -4,10 +4,7 @@ on:
   workflow_dispatch:
   
 env:
-  AZURE_WEBAPP_NAME: MyHordesOptimizerApi
-  DOTNET_ROOT: '.' # Set this to the path to your web app project, defaults to the repository root:
-  PROJECT_FILE_PATH: '/MyHordesOptimizerApi/MyHordesOptimizerApi.csproj'
-  
+  DOTNET_ROOT: '.'
 jobs:
 
   build:
