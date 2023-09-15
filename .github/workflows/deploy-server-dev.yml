@@ -5,10 +5,16 @@ on:
     branches:
       - main
   workflow_dispatch:
-
+  
+env:
+  AZURE_WEBAPP_NAME: MyHordesOptimizerApi
+  DOTNET_ROOT: './MyHordesOptimizerApi' # Set this to the path to your web app project, defaults to the repository root:
+  PROJECT_FILE_PATH: '/MyHordesOptimizerApi/MyHordesOptimizerApi.csproj'
+  
 jobs:
+
   build:
-    runs-on: windows-latest
+    runs-on: windows-latest    
 
     steps:
       - uses: actions/checkout@v2
@@ -23,13 +29,13 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
 
   deploy:
     runs-on: windows-latest
