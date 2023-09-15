@@ -9,14 +9,17 @@ on:
 
 env:
   AZURE_WEBAPP_NAME: MyHordesOptimizerApi
-  AZURE_WEBAPP_PACKAGE_PATH: './MyHordesOptimizerApi/MyHordesOptimizerApi/' # Set this to the path to your web app project, defaults to the repository root:
+  AZURE_WEBAPP_PACKAGE_PATH: '.' # Set this to the path to your web app project, defaults to the repository root:
   PROJECT_FILE_NAME: 'MyHordesOptimizerApi.csproj'
   DOTNET_VERSION: '6.0.401' # The .NET SDK version to use
 
 jobs:
   azure-deploy-dev:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest    
+    defaults:
+      run:
+        working-directory: ./MyHordesOptimizerApi/MyHordesOptimizerApi
 
     steps:
     - uses: actions/checkout@v3
@@ -26,7 +29,7 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Install dependencies
-      run: dotnet restore ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}${{ env.PROJECT_FILE_NAME }}
+      run: dotnet restore
       
     - name: Build
       run: |
