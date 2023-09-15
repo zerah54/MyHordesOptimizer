@@ -10,6 +10,7 @@ on:
 env:
   AZURE_WEBAPP_NAME: MyHordesOptimizerApi
   AZURE_WEBAPP_PACKAGE_PATH: './MyHordesOptimizerApi/MyHordesOptimizerApi/' # Set this to the path to your web app project, defaults to the repository root:
+  PROJECT_FILE_NAME: 'MyHordesOptimizerApi.csproj'
   DOTNET_VERSION: '6.0.401' # The .NET SDK version to use
 
 jobs:
@@ -25,7 +26,7 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Install dependencies
-      run: dotnet restore ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}.MyHordesOptimizerApi.csproj
+      run: dotnet restore ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}${{ env.PROJECT_FILE_NAME }}
       
     - name: Build
       run: |
