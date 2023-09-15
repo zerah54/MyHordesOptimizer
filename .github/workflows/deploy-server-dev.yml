@@ -8,13 +8,16 @@ on:
   
 env:
   AZURE_WEBAPP_NAME: MyHordesOptimizerApi
-  DOTNET_ROOT: './MyHordesOptimizerApi' # Set this to the path to your web app project, defaults to the repository root:
+  DOTNET_ROOT: '.' # Set this to the path to your web app project, defaults to the repository root:
   PROJECT_FILE_PATH: '/MyHordesOptimizerApi/MyHordesOptimizerApi.csproj'
   
 jobs:
 
   build:
-    runs-on: windows-latest    
+    runs-on: windows-latest        
+    defaults:
+      run:
+        working-directory: ./MyHordesOptimizerApi
 
     steps:
       - uses: actions/checkout@v2
