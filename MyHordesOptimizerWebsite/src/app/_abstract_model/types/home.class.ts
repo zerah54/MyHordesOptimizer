@@ -27,9 +27,15 @@ export class Home extends CommonModel<HomeDTO> {
             this.content = dto.content ? Object.keys(dto.content)
                 .map((key: string) => {
                     const element: HomeEnum = <HomeEnum>HomeEnum.getByKey(key);
+                    let value: number | boolean;
+                    if (element.value.max_lvl === 1) {
+                        value = !!dto.content[key];
+                    } else {
+                        value = dto.content[key] || 0;
+                    }
                     return <HomeWithValue>{
                         element: element,
-                        value: dto.content[key]
+                        value: value
                     };
                 })
                 .filter((content: HomeWithValue) => content.element)
