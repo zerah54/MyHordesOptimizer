@@ -1,8 +1,8 @@
 import { HomeDTO } from '../dto/home.dto';
 import { HomeEnum } from '../enum/home.enum';
-import { UpdateInfo } from './update-info.class';
 import { CommonModel } from './_common.class';
 import { Dictionary } from './_types';
+import { UpdateInfo } from './update-info.class';
 
 export class Home extends CommonModel<HomeDTO> {
     public content!: HomeWithValue[];
@@ -15,8 +15,8 @@ export class Home extends CommonModel<HomeDTO> {
 
     public modelToDto(): HomeDTO {
         return {
-            content: this.content?.reduce((accumulator: Dictionary<number>, key: HomeWithValue) => {
-                return {...accumulator, [key.element.getLabel()]: key.value};
+            content: this.content?.reduce((accumulator: Dictionary<number | boolean>, key: HomeWithValue) => {
+                return { ...accumulator, [key.element.getLabel()]: key.value };
             }, {}),
             lastUpdateInfo: this.update_info?.modelToDto()
         };
@@ -29,7 +29,7 @@ export class Home extends CommonModel<HomeDTO> {
                     const element: HomeEnum = <HomeEnum>HomeEnum.getByKey(key);
                     return <HomeWithValue>{
                         element: element,
-                        value: dto.content[key] || 0
+                        value: dto.content[key]
                     };
                 })
                 .filter((content: HomeWithValue) => content.element)
@@ -49,5 +49,5 @@ export class Home extends CommonModel<HomeDTO> {
 
 export interface HomeWithValue {
     element: HomeEnum;
-    value: number
+    value: number | boolean;
 }
