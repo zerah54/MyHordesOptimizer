@@ -1,4 +1,4 @@
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
@@ -71,6 +71,9 @@ export class ApiServices extends GlobalServices {
                             const items: Item[] = dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302);
                             setItemsWithExpirationDate(items);
                             sub.next(items);
+                        },
+                        error: (error: HttpErrorResponse) => {
+                            sub.error(error);
                         }
                     });
             }
@@ -107,6 +110,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: HttpResponse<BankInfoDTO>) => {
                         sub.next(new BankInfo(response.body));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -133,10 +139,12 @@ export class ApiServices extends GlobalServices {
             townId: getTown()?.town_id || 0
         };
 
-        super.post(this.API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`, JSON.stringify({
-            map: { toolsToUpdate: tools_to_update },
-            townDetails: town_details
-        }))
+        super.post(this.API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`,
+            JSON.stringify({
+                map: { toolsToUpdate: tools_to_update },
+                townDetails: town_details
+            })
+        )
             .subscribe({
                 next: () => {
                     this.snackbar.successSnackbar($localize`Les outils externes ont bien été mis à jour`);
@@ -155,6 +163,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: string) => {
                         sub.next(response);
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -166,6 +177,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: string) => {
                         sub.next(response);
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -197,6 +211,9 @@ export class ApiServices extends GlobalServices {
                             setRuinsWithExpirationDate(ruins);
 
                             sub.next(ruins);
+                        },
+                        error: (error: HttpErrorResponse) => {
+                            sub.error(error);
                         }
                     });
             }
@@ -223,6 +240,9 @@ export class ApiServices extends GlobalServices {
                             return 0;
                         });
                         sub.next(skills);
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -239,6 +259,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: HttpResponse<CitizenInfoDTO>) => {
                         sub.next(new CitizenInfo(response.body));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -255,6 +278,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: HttpResponse<RecipeDTO[]>) => {
                         sub.next(dtoToModelArray(Recipe, response.body));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -266,6 +292,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -277,6 +306,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -288,6 +320,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -299,6 +334,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -310,6 +348,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: HttpResponse<TownDTO>) => {
                         sub.next(new Town(response.body));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -321,6 +362,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: HttpResponse<RegenDTO[]>) => {
                         sub.next(dtoToModelArray(Regen, response.body));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -333,6 +377,9 @@ export class ApiServices extends GlobalServices {
                     next: (response: CellDTO) => {
                         this.snackbar.successSnackbar($localize`La cellule a bien été modifiée`);
                         sub.next(new Cell(response));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -344,6 +391,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: (response: HttpResponse<EstimationsDTO>) => {
                         sub.next(new Estimations(response.body));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -355,6 +405,9 @@ export class ApiServices extends GlobalServices {
                 .subscribe({
                     next: () => {
                         sub.next();
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });

@@ -5,7 +5,8 @@
         <tr>
             <th>
                 <button mat-button [matMenuTriggerFor]="addCitizenMenu"
-                        *ngIf="(allCitizens | notInListCitizen:citizens).length > 0" i18n>Ajouter un citoyen
+                        *ngIf="(allCitizens | notInListCitizen:citizens).length > 0">
+                    <ng-container i18n>Ajouter un citoyen</ng-container>
                 </button>
             </th>
             <th i18n>Sac</th>
@@ -24,7 +25,7 @@
                      [class.broken]="item.is_broken" [title]="item.label[locale]" width="16" height="16">
             </td>
             <td *ngFor="let action of heroics">
-                <ng-container *ngIf="(citizen.heroic_actions | hasStillHeroic:action) as value_left">
+                <ng-container *ngIf="(citizen.heroic_actions | remainingHeroicAction:action) as value_left">
                     <ng-container *ngIf="action.value.max_lvl > 1; else onlyOne">
                         {{value_left}}
                     </ng-container>

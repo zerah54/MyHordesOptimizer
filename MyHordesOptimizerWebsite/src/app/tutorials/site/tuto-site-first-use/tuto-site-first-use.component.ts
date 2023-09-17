@@ -1,6 +1,6 @@
+import { DOCUMENT } from '@angular/common';
 import { Component, HostBinding, Inject, ViewEncapsulation } from '@angular/core';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
-import { DOCUMENT } from '@angular/common';
 
 @Component({
     selector: 'mho-tuto-site-first-use',
@@ -13,7 +13,7 @@ export class TutoSiteFirstUseComponent {
 
     public readonly title: string = $localize`Première utilisation du site`;
 
-    public readonly text_1: string = $localize`Lors de votre première utilisation du site vous n'aurez pas accès aux pages sous le menu "Outils". En effet, il faut au préalable renseigner son identifiant externe pour les applications, en haut à droite de la page.`;
+    public readonly text_1: string = $localize`Lors de votre première utilisation du site vous n'aurez pas accès aux pages sous le menu "Ma ville". En effet, il faut au préalable renseigner son identifiant externe pour les applications, en haut à droite de la page.`;
     public readonly text_2: string = $localize`L'identifiant externe pour les applications se trouve sur le site de MyHordes, dans la page de votre âme, onglet "Avancé". Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.`;
 
     public constructor(private clipboard: ClipboardService, @Inject(DOCUMENT) private document: Document) {

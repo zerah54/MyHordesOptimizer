@@ -1,4 +1,6 @@
 import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatSelectChange } from '@angular/material/select';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import * as moment from 'moment';
@@ -12,6 +14,8 @@ import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiServices } from '../../../_abstract_model/services/api.services';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
+import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
@@ -220,17 +224,31 @@ export class CitizensListComponent implements OnInit {
     /**
      * On met à jour la liste des améliorations
      *
+     * @param {HomeWithValue} element
+     * @param {MatCheckboxChange | MatSelectChange} event
      * @param {number} citizen_id
      */
-    public updateHome(citizen_id: number): void {
+    public updateHome(element: HomeWithValue, event: MatCheckboxChange | MatSelectChange, citizen_id: number): void {
+        const old_element_value: boolean | number = element.value;
+        if (event instanceof MatCheckboxChange) {
+            element.value = event.checked;
+        } else {
+            element.value = event.value;
+        }
+
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.home !== undefined) {
             this.api.updateHome(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo) => {
-                    if (citizen.home) {
-                        citizen.home.update_info.username = getUser().username;
-                        citizen.home.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.home) {
+                            citizen.home.update_info.username = getUser().username;
+                            citizen.home.update_info.update_time = update_info.update_time;
+                        }
+                    },
+                    error: () => {
+                        element.value = old_element_value;
                     }
                 });
         }
@@ -241,15 +259,27 @@ export class CitizensListComponent implements OnInit {
      *
      * @param {number} citizen_id
      */
-    public updateActions(citizen_id: number): void {
+    public updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | MatSelectChange, citizen_id: number): void {
+        const old_element_value: boolean | number = element.value;
+        if (event instanceof MatCheckboxChange) {
+            element.value = event.checked;
+        } else {
+            element.value = event.value;
+        }
+
         const citizen: Citizen | undefined = this.datasource.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.heroic_actions) {
             this.api.updateHeroicActions(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo) => {
-                    if (citizen.heroic_actions) {
-                        citizen.heroic_actions.update_info.username = getUser().username;
-                        citizen.heroic_actions.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.heroic_actions) {
+                            citizen.heroic_actions.update_info.username = getUser().username;
+                            citizen.heroic_actions.update_info.update_time = update_info.update_time;
+                        }
+                    },
+                    error: () => {
+                        element.value = old_element_value;
                     }
                 });
         }
@@ -259,7 +289,7 @@ export class CitizensListComponent implements OnInit {
         return column.id;
     }
 
-    public trackByKey(_index: number, enum_item: HeroicActionEnum | HomeEnum): string {
+    public trackByKey(_index: number, enum_item: (HeroicActionEnum | HomeEnum)): string {
         return enum_item.key;
     }
 
