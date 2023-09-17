@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "name": "Thrown",
+        "myHordesApiName": "garbage"
+    },
+    {
+        "id": 2,
+        "name": "Watered",
+        "myHordesApiName": "water"
+    },
+    {
+        "id": 3,
+        "name": "Cooked",
+        "myHordesApiName": "cook"
+    },
+    {
+        "id": 4,
+        "name": "Ghoul",
+        "myHordesApiName": "ghoul"
+    }
+]

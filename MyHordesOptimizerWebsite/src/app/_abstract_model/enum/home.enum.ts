@@ -69,26 +69,62 @@ const HOUSE_LABELS: I18nLabels[] = [
     }
 ];
 
-const HOUSE_LEVEL_DATA: HomeEnumData = {label: $localize`Habitation`, img: '', max_lvl: 8, house_options: HOUSE_LABELS};
-const HAS_ALARM_DATA: HomeEnumData = {label: $localize`Alarme rudimentaire`, img: 'home/alarm.gif', max_lvl: 1};
-const CHEST_LEVEL_DATA: HomeEnumData = {
-    label: $localize`Rangements`, img: 'home/chest.gif', max_lvl: 13, options: Array.from({length: 14}, (_: unknown, i: number) => i)
+const HOUSE_LEVEL_DATA: HomeEnumData = {
+    label: $localize`Habitation`,
+    img: '',
+    max_lvl: 8,
+    house_options: HOUSE_LABELS
 };
-const HAS_CURTAIN_DATA: HomeEnumData = {label: $localize`Gros rideau`, img: 'home/curtain.gif', max_lvl: 1};
+const HAS_ALARM_DATA: HomeEnumData = {
+    label: $localize`Alarme rudimentaire`,
+    img: 'home/alarm.gif',
+    max_lvl: 1
+};
+const CHEST_LEVEL_DATA: HomeEnumData = {
+    label: $localize`Rangements`,
+    img: 'home/chest.gif',
+    max_lvl: 13,
+    options: Array.from({ length: 14 }, (_: unknown, i: number) => i)
+};
+const HAS_CURTAIN_DATA: HomeEnumData = {
+    label: $localize`Gros rideau`,
+    img: 'home/curtain.gif',
+    max_lvl: 1
+};
 const HOUSE_DEFENSE_DATA: HomeEnumData = {
-    label: $localize`Renforts`, img: 'home/defense.gif', max_lvl: 10, options: Array.from({length: 11}, (_: unknown, i: number) => i)
+    label: $localize`Renforts`,
+    img: 'home/defense.gif',
+    max_lvl: 10,
+    options: Array.from({ length: 11 }, (_: unknown, i: number) => i)
 };
 const KITCHEN_LEVEL_DATA: HomeEnumData = {
-    label: $localize`Cuisine`, img: 'home/kitchen.gif', max_lvl: 4, options: Array.from({length: 5}, (_: unknown, i: number) => i)
+    label: $localize`Cuisine`,
+    img: 'home/kitchen.gif',
+    max_lvl: 4,
+    options: Array.from({ length: 5 }, (_: unknown, i: number) => i)
 };
 const LAB_LEVEL_DATA: HomeEnumData = {
-    label: $localize`Cave laboratoire`, img: 'home/lab.gif', max_lvl: 4, options: Array.from({length: 5}, (_: unknown, i: number) => i)
+    label: $localize`Cave laboratoire`,
+    img: 'home/lab.gif',
+    max_lvl: 4,
+    options: Array.from({ length: 5 }, (_: unknown, i: number) => i)
 };
 const REST_LEVEL_DATA: HomeEnumData = {
-    label: $localize`Coin sieste`, img: 'home/rest.gif', max_lvl: 3, options: Array.from({length: 4}, (_: unknown, i: number) => i)
+    label: $localize`Coin sieste`,
+    img: 'home/rest.gif',
+    max_lvl: 3,
+    options: Array.from({ length: 4 }, (_: unknown, i: number) => i)
 };
-const HAS_LOCK_DATA: HomeEnumData = {label: $localize`Verrou`, img: 'home/lock.gif', max_lvl: 1};
-const HAS_FENCE_DATA: HomeEnumData = {label: $localize`Clôture`, img: 'home/fence.gif', max_lvl: 1};
+const HAS_LOCK_DATA: HomeEnumData = {
+    label: $localize`Verrou`,
+    img: 'home/lock.gif',
+    max_lvl: 1
+};
+const HAS_FENCE_DATA: HomeEnumData = {
+    label: $localize`Clôture`,
+    img: 'home/fence.gif',
+    max_lvl: 1
+};
 
 
 /** Type de champs de propriétés existants */
@@ -108,7 +144,7 @@ export class HomeEnum extends CommonEnum {
      * Le constructeur privé empêche la création d'autres instances de cette classe.
      *
      * @param {string} key
-     * @param {StatusEnumData} value
+     * @param {HomeEnumData} value
      */
     protected constructor(public override key: string, public override value: HomeEnumData) {
         super(key, value);

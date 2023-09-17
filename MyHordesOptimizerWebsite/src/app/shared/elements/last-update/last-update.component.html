@@ -1,5 +1,5 @@
 <div class="mho-last-update">
-    <small *ngIf="lastUpdateInfo.update_time; else neverUpdated">
+    <small *ngIf="lastUpdateInfo && lastUpdateInfo.update_time; else neverUpdated">
         <ng-container *ngIf="thresholds">
             <ng-container *ngFor="let diff of [moment.diff(lastUpdateInfo.update_time, 'minutes')]">
                 <ng-container *ngIf="diff <= thresholds[0]; else threshold2">
@@ -36,9 +36,9 @@
 
     <ng-template #img let-img_to_use>
         <img *ngIf="hideDetails" [ngSrc]="'assets/img/time-ago/time_ago_' + img_to_use + '.svg'"
-             matTooltip="Mis à jour par&nbsp;{{lastUpdateInfo.username}}&nbsp;{{lastUpdateInfo.update_time.fromNow()}}&nbsp;({{lastUpdateInfo.update_time.toDate() | date:'medium'}})"
+             matTooltip="Mis à jour par&nbsp;{{lastUpdateInfo?.username}}&nbsp;{{lastUpdateInfo?.update_time?.fromNow()}}&nbsp;({{lastUpdateInfo?.update_time?.toDate() | date:'medium'}})"
              i18n-matTooltip width="24" height="24">
         <img *ngIf="!hideDetails" [ngSrc]="'assets/img/time-ago/time_ago_' + img_to_use + '.svg'"
-             [matTooltip]="(lastUpdateInfo.update_time.toDate() | date:'medium') || ''" width="24" height="24">
+             [matTooltip]="(lastUpdateInfo?.update_time?.toDate() | date:'medium') || ''" width="24" height="24">
     </ng-template>
 </div>

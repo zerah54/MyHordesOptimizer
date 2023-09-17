@@ -3,8 +3,8 @@
 namespace MyHordesOptimizerApi.Models
 {
 	[Table("TownCitizen")]
-    public class TownCitizenModel
-    {
+	public class TownCitizenModel
+	{
 		public int IdTown { get; set; }
 		public int IdUser { get; set; }
 		public string HomeMessage { get; set; }
@@ -15,6 +15,7 @@ namespace MyHordesOptimizerApi.Models
 		public int PositionY { get; set; }
 		public bool IsGhost { get; set; }
 		public bool Dead { get; set; }
+		public int IdCadaver { get; set; }
 		public int IdLastUpdateInfo { get; set; }
 		public int? IdBag { get; set; }
 

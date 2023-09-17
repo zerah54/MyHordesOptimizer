@@ -1,6 +1,7 @@
-import { Component, ElementRef, HostBinding, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import Chart from 'chart.js/auto';
+import { environment } from '../../../../environments/environment';
 import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
 import { MinMax } from '../../../_abstract_model/interfaces';
 import { ApiServices } from '../../../_abstract_model/services/api.services';
@@ -13,7 +14,8 @@ import { getTown } from '../../../shared/utilities/localstorage.util';
 @Component({
     selector: 'mho-estimations',
     templateUrl: './estimations.component.html',
-    styleUrls: ['./estimations.component.scss']
+    styleUrls: ['./estimations.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 export class EstimationsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -34,6 +36,8 @@ export class EstimationsComponent implements OnInit {
     public tomorrow_chart!: Chart<'line'>;
 
     public separators: string[] = [' à ', ' - '];
+
+    public is_dev: boolean = environment.production;
 
     constructor(private clipboard: ClipboardService, private api: ApiServices) {
     }

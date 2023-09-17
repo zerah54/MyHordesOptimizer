@@ -1,4 +1,5 @@
-﻿using MyHordesOptimizerApi.Data.Heroes;
+﻿using MyHordesOptimizerApi.Data.CauseOfDeath;
+using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Ruins;
 using MyHordesOptimizerApi.Data.Wishlist;
@@ -14,6 +15,8 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         Dictionary<string, List<string>> GetItemsActions();
         Dictionary<string, Dictionary<string, int>> GetItemsDropRates();
         List<MyHordesHerosCapacitiesCodeModel> GetHeroCapacities();
+        List<MyHordesCauseOfDeathModel> GetCausesOfDeath();
+        List<MyHordesCleanUpTypeModel> GetCleanUpTypes();
         Dictionary<string, MyHordesRecipeCodeModel> GetRecipes();
         List<MyHordesOptimizerWishlistItemCategorie> GetWishlistItemCategories();
         List<MyHordesOptimizerDefaultWishlist> GetDefaultWishlists();

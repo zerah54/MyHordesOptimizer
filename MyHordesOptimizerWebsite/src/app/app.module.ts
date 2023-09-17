@@ -17,6 +17,7 @@ import { MyTownModule } from './my-town/my-town.module';
 import { ErrorsInterceptor } from './shared/services/errors-interceptor.service';
 import { HeadersInterceptor } from './shared/services/headers-interceptor.service';
 import { LoadingInterceptor } from './shared/services/loading-interceptor.service';
+import { SnackbarService } from './shared/services/snackbar.service';
 import { SharedModule } from './shared/shared.module';
 import { StructureModule } from './structure/structure.module';
 import { ThanksModule } from './thanks/thanks.module';
@@ -43,7 +44,7 @@ const app_modules: Modules = [StructureModule, WikiModule, ThanksModule, ToolsMo
         AngularFireModule,
         { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: HeadersInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: ErrorsInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorsInterceptor, multi: true, deps: [SnackbarService] },
         {
             provide: LOCALE_ID,
             useFactory: (): string | null => localStorage.getItem('mho-locale') || 'fr'

@@ -1,7 +1,7 @@
-import { Component, HostBinding, Inject, ViewEncapsulation } from '@angular/core';
-import { ClipboardService } from '../../../shared/services/clipboard.service';
-import { AccordionItem } from '../../../shared/elements/accordion/accordion.component';
 import { DOCUMENT } from '@angular/common';
+import { Component, HostBinding, Inject, ViewEncapsulation } from '@angular/core';
+import { AccordionItem } from '../../../shared/elements/accordion/accordion.component';
+import { ClipboardService } from '../../../shared/services/clipboard.service';
 
 @Component({
     selector: 'mho-tuto-script-external-tools',
@@ -20,7 +20,7 @@ export class TutoScriptExternalToolsComponent {
     public readonly tuto_script_items: AccordionItem[] = [
         {
             title: $localize`MyHordes Optimizer`, content: $localize`
-            En cochant l'option "Mettre à jour MyHordesOptimizer", quand vous cliquerez sur le boutton "Mettre à jour les outils externes", la mise à jour de MyHordes Optimizer se fera automatiquement.
+            En cochant l'option "Mettre à jour MyHordesOptimizer", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de MyHordes Optimizer se fera automatiquement.
             Vous rendez également accessibles d'autres options de mise à jour avancées.
             <ul>
                 <li><strong>Nombre de zombies tués :</strong> Enregistre le nombre de zombies tués sur la case</li>
@@ -34,7 +34,7 @@ export class TutoScriptExternalToolsComponent {
         `
         },
         {
-            title: $localize`Gest'Hordes`, content: $localize`En cochant l'option "Mettre à jour Gest'Hordes", quand vous cliquerez sur le boutton "Mettre à jour les outils externes", la mise à jour de Gest'Hordes se fera automatiquement.
+            title: $localize`Gest'Hordes`, content: $localize`En cochant l'option "Mettre à jour Gest'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de Gest'Hordes se fera automatiquement.
             Vous rendez également accessibles d'autres options de mise à jour avancées.
             <ul>
                 <li><strong>Nombre de zombies tués :</strong> Enregistre le nombre de zombies tués sur la case</li>
@@ -47,11 +47,11 @@ export class TutoScriptExternalToolsComponent {
         },
         {
             title: $localize`BigBroth'Hordes`,
-            content: $localize`En cochant l'option "Mettre à jour BigBroth'Hordes", quand vous cliquerez sur le boutton "Mettre à jour les outils externes", la mise à jour de BigBroth'Hordes se fera automatiquement.`
+            content: $localize`En cochant l'option "Mettre à jour BigBroth'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de BigBroth'Hordes se fera automatiquement.`
         },
         {
             title: $localize`Fata Morgana`,
-            content: $localize`En cochant l'option "Mettre à jour Fata Morgana", quand vous cliquerez sur le boutton "Mettre à jour les outils externes", la mise à jour de Fata Morgana se fera automatiquement.`
+            content: $localize`En cochant l'option "Mettre à jour Fata Morgana", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de Fata Morgana se fera automatiquement.`
         },
         {
             title: $localize`Affichage des cartes issues des outils externes`, content: $localize`
