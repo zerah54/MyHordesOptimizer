@@ -15,13 +15,14 @@ import { IsInTownGuard } from './guards/has-app-key.guard';
 import { InDevModeGuard } from './guards/in-dev-mode.guard';
 import { MaterialModule } from './material-modules.module';
 import { PipesModule } from './pipes/pipes.module';
+import { ChartsThemingService } from './services/charts-theming.service';
 import { ClipboardService } from './services/clipboard.service';
 import { LoadingOverlayService } from './services/loading-overlay.service';
 import { SnackbarService } from './services/snackbar.service';
 
 const custom_modules: Modules = [MaterialModule, ElementsModule, PipesModule];
 const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule, NgOptimizedImage];
-const services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService, WishlistServices];
+const services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService, WishlistServices, ChartsThemingService];
 const guards: Components = [IsInTownGuard, InDevModeGuard];
 const external_modules: Modules = [TableVirtualScrollModule];
 

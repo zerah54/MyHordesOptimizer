@@ -25,6 +25,7 @@ $noel-theme: mat.define-light-theme(
     $sidenav-bg-color: mat.get-color-from-palette(map.get($color-config, "primary"), "lighter");
     $item-color: rgba($accent, 0.25);
     $map-details-color: mat.get-color-from-palette(map.get($color-config, "accent"), "lighter");
+    $card-background-color: white;
 
     --primary: #{$primary};
     --accent: #{$accent};
@@ -33,4 +34,11 @@ $noel-theme: mat.define-light-theme(
     --sidenav-bg-color: #{$sidenav-bg-color};
     --item-color: #{$item-color};
     --map-details-color: #{$map-details-color};
+    --card-background-color: #{$card-background-color};
+
+    --scrollbar-base-color: rgba(0, 0, 0, 0.3);
+    --scrollbar-hover-color: rgba(0, 0, 0, 0.4);
+    --scrollbar-active-color: rgba(0, 0, 0, 0.5);
+
+    --inactive-chip-base-color: rgba(0, 0, 0, 0.15);
 }

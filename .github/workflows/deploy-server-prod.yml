@@ -2,13 +2,13 @@ name: (Server) Deploy Prod
 
 on:
   workflow_dispatch:
-  
+
 env:
   DOTNET_ROOT: '.'
-jobs:
 
+jobs:
   build:
-    runs-on: windows-latest        
+    runs-on: windows-latest
     defaults:
       run:
         working-directory: ./MyHordesOptimizerApi
@@ -34,9 +34,9 @@ jobs:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
 
-  deploy:
-    runs-on: windows-latest
-    needs: build
-
-    steps:
-      - name: Login SSH
+#  deploy:
+#    runs-on: windows-latest
+#    needs: build
+#
+#    steps:
+#      - name: Login SSH

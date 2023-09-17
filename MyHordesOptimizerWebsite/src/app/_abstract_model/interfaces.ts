@@ -15,3 +15,8 @@ export interface StandardColumn {
     sticky?: boolean;
     displayed?: () => boolean;
 }
+
+export interface Theme {
+    label: string;
+    class: string;
+}

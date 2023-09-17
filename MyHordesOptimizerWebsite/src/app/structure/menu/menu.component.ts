@@ -3,7 +3,9 @@ import { Component, HostBinding, Inject, Input, LOCALE_ID, OnInit, ViewEncapsula
 import { MatSidenavContainer } from '@angular/material/sidenav';
 import * as moment from 'moment';
 import { environment } from '../../../environments/environment';
+import { Theme } from '../../_abstract_model/interfaces';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { ChartsThemingService } from '../../shared/services/charts-theming.service';
 import { getTown } from '../../shared/utilities/localstorage.util';
 
 @Component({
@@ -24,7 +26,6 @@ export class MenuComponent implements OnInit {
     ];
 
     public selected_theme: Theme | undefined = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
-
 
     /** La liste des langues disponibles */
     public language_list: Language[] = [
@@ -117,7 +118,8 @@ export class MenuComponent implements OnInit {
         }
     ];
 
-    constructor(@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document) {
+    constructor(@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document,
+                private charts_theming_service: ChartsThemingService) {
 
     }
 
@@ -129,23 +131,7 @@ export class MenuComponent implements OnInit {
             ? this.language_list.find((language: Language) => used_locale === language.code)
             : this.language_list.find((language: Language) => language.default);
 
-        if (moment().isSameOrAfter(moment(`01-12-${moment().year()} 00:00:00`, 'DD-MM-YYYY HH:mm:ss'))
-            && moment().isSameOrBefore(moment(`25-12-${moment().year()} 23:59:59`, 'DD-MM-YYYY HH:mm:ss'))) {
-            this.themes.push({ label: $localize`Noël`, class: 'noel' });
-            this.themes.splice(0, 1);
-            if (this.selected_theme?.class === '' || !this.selected_theme) {
-                setTimeout(() => {
-                    this.changeTheme(this.themes[this.themes.length - 1]);
-                });
-            }
-        } else if (this.selected_theme?.class === 'noel' || !this.selected_theme) {
-            setTimeout(() => {
-                this.changeTheme(this.themes[0]);
-            });
-        }
-
-        this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'))
-            || this.themes.find((theme: Theme) => theme.class === '');
+        this.defineThemes();
 
         setTimeout(() => {
             this.resizeSidenav();
@@ -198,6 +184,29 @@ export class MenuComponent implements OnInit {
             this.sidenavContainer.autosize = true;
         });
     }
+
+    private defineThemes(): void {
+        if (moment().isSameOrAfter(moment(`01-12-${moment().year()} 00:00:00`, 'DD-MM-YYYY HH:mm:ss'))
+            && moment().isSameOrBefore(moment(`25-12-${moment().year()} 23:59:59`, 'DD-MM-YYYY HH:mm:ss'))) {
+            this.themes.push({ label: $localize`Noël`, class: 'noel' });
+            this.themes.splice(0, 1);
+            if (this.selected_theme?.class === '' || !this.selected_theme) {
+                setTimeout(() => {
+                    this.changeTheme(this.themes[this.themes.length - 1]);
+                });
+            }
+        } else if (this.selected_theme?.class === 'noel' || !this.selected_theme) {
+            setTimeout(() => {
+                this.changeTheme(this.themes[0]);
+            });
+        }
+
+        this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'))
+            || this.themes.find((theme: Theme) => theme.class === '');
+
+
+        this.charts_theming_service.defineColorsWithTheme(this.selected_theme);
+    }
 }
 
 interface SidenavLinks {
@@ -208,11 +217,6 @@ interface SidenavLinks {
     displayed: boolean;
     authorized: () => boolean;
     expanded?: boolean;
-}
-
-interface Theme {
-    label: string;
-    class: string;
 }
 
 interface Language {

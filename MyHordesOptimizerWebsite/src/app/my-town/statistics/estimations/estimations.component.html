@@ -21,12 +21,16 @@
             <tr *ngFor="let percent of tdg_values">
                 <th>{{percent}}%</th>
                 <td>
-                    <input type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].min"
-                           (paste)="pasteFromMH($event, estimations.estim['_' + percent])">
+                    <mat-form-field appearance="outline" class="no-bottom">
+                        <input matInput type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].min"
+                               (paste)="pasteFromMH($event, estimations.estim['_' + percent])">
+                    </mat-form-field>
                 </td>
                 <td>
-                    <input type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].max"
-                           (paste)="pasteFromMH($event, estimations.estim['_' + percent])">
+                    <mat-form-field appearance="outline" class="no-bottom">
+                        <input matInput type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].max"
+                               (paste)="pasteFromMH($event, estimations.estim['_' + percent])">
+                    </mat-form-field>
                 </td>
             </tr>
         </table>
@@ -40,12 +44,16 @@
             <tr *ngFor="let percent of planif_values">
                 <th>{{percent}}%</th>
                 <td>
-                    <input type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].min"
-                           (paste)="pasteFromMH($event, estimations.planif['_' + percent])">
+                    <mat-form-field appearance="outline" class="no-bottom">
+                        <input matInput type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].min"
+                               (paste)="pasteFromMH($event, estimations.planif['_' + percent])">
+                    </mat-form-field>
                 </td>
                 <td>
-                    <input type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].max"
-                           (paste)="pasteFromMH($event, estimations.planif['_' + percent])">
+                    <mat-form-field appearance="outline" class="no-bottom">
+                        <input matInput type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].max"
+                               (paste)="pasteFromMH($event, estimations.planif['_' + percent])">
+                    </mat-form-field>
                 </td>
             </tr>
         </table>

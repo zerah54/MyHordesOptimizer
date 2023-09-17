@@ -1,8 +1,10 @@
 @use "@angular/material" as mat;
 
-@use "brown-light-theme";
+@use "brown-dark-theme";
 @use "noel-theme";
 @use "pink-light-theme";
+
+@use "variables";
 
 @include mat.all-component-typographies();
 @include mat.core();
@@ -10,8 +12,8 @@
 .cdk-overlay-container,
 .mho-main {
 
-    @include mat.all-component-themes(brown-light-theme.$default-theme);
-    @include brown-light-theme.brown-light-theme(brown-light-theme.$default-theme);
+    @include mat.all-component-themes(brown-dark-theme.$default-theme);
+    @include brown-dark-theme.brown-dark-theme(brown-dark-theme.$default-theme);
 
     &.pink {
         @include mat.all-component-colors(pink-light-theme.$pink-theme);
@@ -35,5 +37,14 @@
 
     .mat-mdc-tab-header {
         --mdc-secondary-navigation-tab-container-height: 40px !important;
+    }
+
+
+    .mat-mdc-dialog-container {
+        --mdc-dialog-container-color: #{variables.$card-background-color} !important;
+    }
+
+    .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled):not(.mat-mdc-chip-highlighted) {
+        --mdc-chip-elevated-container-color: #{variables.$inactive-chip-base-color} !important;
     }
 }

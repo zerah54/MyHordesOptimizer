@@ -1,3 +1,5 @@
+@use 'variables';
+
 .mho-map-header {
     &.mat-mdc-card-header {
         justify-content: space-between;
@@ -8,10 +10,12 @@
 .mho-map-sidenav-container {
 
     height: 100%;
+    background-color: transparent;
 
     .mat-sidenav {
         max-width: 250px;
         padding: 0.5em;
+        background-color: transparent;
 
         h1 {
         }
@@ -33,7 +37,7 @@
     }
 
     .map-container {
-        --mat-sidenav-content-background-color: rgba(0, 0, 0, 0);
+        --mat-sidenav-content-background-color: transparent;
     }
 
     .mat-drawer-inner-container {

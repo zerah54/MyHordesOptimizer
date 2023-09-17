@@ -6,7 +6,7 @@ $footer-color: var(--footer-color);
 $sidenav_bg_color: var(--sidenav-bg-color);
 $item_color: var(--item-color);
 $map-details-color: var(--map-details-color);
-
+$card-background-color: var(--card-background-color);
 
 $compass-center-color: #444;
 $compass-cardinals-color: #DDD;
@@ -15,3 +15,9 @@ $compass-ordinals-color: #AAA;
 $compass-selected-center-color: var(--accent);
 $compass-selected-cardinals-color: var(--sidenav-bg-color);
 $compass-selected-ordinals-color: var(--primary);
+
+$scrollbar-base-color: var(--scrollbar-base-color);
+$scrollbar-hover-color: var(--scrollbar-hover-color);
+$scrollbar-active-color: var(--scrollbar-active-color);
+
+$inactive-chip-base-color: var(--inactive-chip-base-color);

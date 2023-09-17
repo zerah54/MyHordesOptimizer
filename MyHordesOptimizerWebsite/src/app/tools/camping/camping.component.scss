@@ -44,11 +44,8 @@
                 margin-bottom: 1em;
 
                 .mat-button-toggle-group {
-                    border-color: variables.$primary;
-
-                    .mat-button-toggle {
-                        border-color: variables.$primary;
-                    }
+                    --mat-standard-button-toggle-divider-color: #{variables.$primary};
+                    --mat-standard-button-toggle-background-color: variables.$card-background-color;
 
                     .mat-button-toggle-label-content {
                         line-height: 42px !important;
