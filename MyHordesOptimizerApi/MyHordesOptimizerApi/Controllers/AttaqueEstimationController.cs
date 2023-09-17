@@ -28,9 +28,9 @@ namespace MyHordesOptimizerApi.Controllers
             EstimationService = estimationService;
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("Estimations")]
-        public ActionResult PostEstimations([FromBody] EstimationRequestDto request, [FromQuery] int? townId, [FromQuery] int? userId)
+        public ActionResult<EstimationRequestDto> PostEstimations([FromBody] EstimationRequestDto request, [FromQuery] int? townId, [FromQuery] int? userId)
         {
             if (!townId.HasValue)
             {
@@ -51,7 +51,8 @@ namespace MyHordesOptimizerApi.Controllers
             UserKeyProvider.UserId = userId.Value;
 
             EstimationService.UpdateEstimations(townId.Value, request);
-            return Ok();
+            var estimations = EstimationService.GetEstimations(townId.Value, request.Day.Value);
+            return Ok(estimations);
         }
 
         [HttpGet]
@@ -68,7 +69,7 @@ namespace MyHordesOptimizerApi.Controllers
             }
 
             var estimations = EstimationService.GetEstimations(townId.Value, day.Value);
-            return Ok(estimations.ToJson());
+            return Ok(estimations);
         }
 
         [HttpPost]
