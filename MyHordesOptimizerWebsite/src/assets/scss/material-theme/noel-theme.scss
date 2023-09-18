@@ -26,6 +26,7 @@ $noel-theme: mat.define-light-theme(
     $item-color: rgba($accent, 0.25);
     $map-details-color: mat.get-color-from-palette(map.get($color-config, "accent"), "lighter");
     $card-background-color: white;
+    $switch-selected-accent-icon-color: mat.get-contrast-color-from-palette(map.get($color-config, "accent"), 900);
 
     --primary: #{$primary};
     --accent: #{$accent};
@@ -35,6 +36,7 @@ $noel-theme: mat.define-light-theme(
     --item-color: #{$item-color};
     --map-details-color: #{$map-details-color};
     --card-background-color: #{$card-background-color};
+    --switch-selected-accent-icon-color: #{$switch-selected-accent-icon-color};
 
     --scrollbar-base-color: rgba(0, 0, 0, 0.3);
     --scrollbar-hover-color: rgba(0, 0, 0, 0.4);

@@ -59,4 +59,8 @@
     .mat-mdc-select-panel {
         --mat-select-panel-background-color: #{variables.$card-background-color};
     }
+
+    .mat-mdc-slide-toggle.mat-accent {
+        --mdc-switch-selected-icon-color: #{variables.$switch-selected-accent-icon-color};
+    }
 }

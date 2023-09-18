@@ -27,10 +27,10 @@ $mh-palette: (
         700: #f0d79e,
         800: #f0d79e,
         900: #f0d79e,
-        A100: #000000,
-        A200: #000000,
-        A400: #000000,
-        A700: #000000,
+        A100: #ffffff,
+        A200: #ffffff,
+        A400: #ffffff,
+        A700: #ffffff,
     )
 );
 
@@ -59,7 +59,8 @@ $default-theme: mat.define-dark-theme(
     $sidenav-bg-color: mat.get-color-from-palette(map.get($color-config, "primary"), 500);
     $item-color: rgba($primary, 0.25);
     $map-details-color: mat.get-color-from-palette(map.get($color-config, "primary"), 50);
-    $card-background-color: mat.get-color-from-palette($theme-primary, 100);
+    $card-background-color: mat.get-color-from-palette(map.get($color-config, "primary"), 100);
+    $switch-selected-accent-icon-color: mat.get-contrast-color-from-palette(map.get($color-config, "accent"), 900);
 
     --primary: #{$primary};
     --accent: #{$accent};
@@ -69,6 +70,7 @@ $default-theme: mat.define-dark-theme(
     --item-color: #{$item-color};
     --map-details-color: #{$map-details-color};
     --card-background-color: #{$card-background-color};
+    --switch-selected-accent-icon-color: #{$switch-selected-accent-icon-color};
 
     --scrollbar-base-color: rgba(255, 255, 255, 0.15);
     --scrollbar-hover-color: rgba(255, 255, 255, 0.25);
