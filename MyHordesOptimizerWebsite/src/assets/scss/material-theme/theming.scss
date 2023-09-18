@@ -44,7 +44,19 @@
         --mdc-dialog-container-color: #{variables.$card-background-color} !important;
     }
 
+    .mat-mdc-menu-panel {
+        --mat-menu-container-color: #{variables.$card-background-color} !important;
+    }
+
     .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled):not(.mat-mdc-chip-highlighted) {
         --mdc-chip-elevated-container-color: #{variables.$inactive-chip-base-color} !important;
+    }
+
+    .mat-toolbar.mho-footer {
+        --mat-toolbar-container-background-color: #{variables.$footer-color} !important;
+    }
+
+    .mat-mdc-select-panel {
+        --mat-select-panel-background-color: #{variables.$card-background-color};
     }
 }
