@@ -75,4 +75,11 @@ $default-theme: mat.define-dark-theme(
     --scrollbar-active-color: rgba(255, 255, 255, 0.5);
 
     --inactive-chip-base-color: rgba(0, 0, 0, 0.15);
+    --img-shadow-color: rgba(255, 255, 255, 0.15);
+
+    .mho-last-update {
+        img {
+            filter: brightness(50%);
+        }
+    }
 }

@@ -1,3 +1,5 @@
+@use "variables";
+
 .mho-ruins {
     table {
         width: 100%;
@@ -13,19 +15,23 @@
         td {
             &.label {
                 text-align: center;
+
+                img {
+                    filter: drop-shadow(1px 1px 2px #{variables.$img-shadow-color});
+                }
             }
 
-            >.drops-list {
+            > .drops-list {
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: space-between;
                 min-width: 250px;
 
-                >div {
+                > div {
                     margin: 0.5em;
                     text-align: center;
 
-                    >* {
+                    > * {
                         text-align: center;
                         margin: auto;
                     }
