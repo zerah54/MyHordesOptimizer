@@ -27,27 +27,30 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
             var cleanUpTypes = MhoRepository.GetCleanUpTypes();
             var citizens = MhoRepository.GetCitizens(destination.Id);
 
-            foreach (var cadaver in source.Cadavers)
+            if (citizens.Citizens.Count != 0)
             {
-                var cadaverCod = cod.FirstOrDefault(x => x.Dtype == cadaver.Dtype);
-
-                var destinationCadaver = new Cadaver()
+                foreach (var cadaver in source.Cadavers)
                 {
-                    CauseOfDeath = cadaverCod,
-                    Avatar = cadaver.Avatar,
-                    Id = cadaver.Id,
-                    Msg = cadaver.Msg,
-                    TownMsg = cadaver.Comment,
-                    Name = cadaver.Name,
-                    Score = cadaver.Score,
-                    Survival = cadaver.Survival,
-                };
+                    var cadaverCod = cod.FirstOrDefault(x => x.Dtype == cadaver.Dtype);
 
-                destinationCadaver.CleanUp.IdCleanUp = citizens.Citizens.Where(x => x.Id == cadaver.Id).FirstOrDefault().Cadaver.CleanUp.IdCleanUp;
-                destinationCadaver.CleanUp.CitizenCleanUp = citizens.Citizens.Where(x => x.Name == cadaver.Cleanup.User).FirstOrDefault();
-                destinationCadaver.CleanUp.Type = cleanUpTypes.Where(x => x.MyHordesApiName == cadaver.Cleanup.Type).FirstOrDefault();
+                    var destinationCadaver = new Cadaver()
+                    {
+                        CauseOfDeath = cadaverCod,
+                        Avatar = cadaver.Avatar,
+                        Id = cadaver.Id,
+                        Msg = cadaver.Msg,
+                        TownMsg = cadaver.Comment,
+                        Name = cadaver.Name,
+                        Score = cadaver.Score,
+                        Survival = cadaver.Survival,
+                    };
 
-                wrapper.Cadavers.Add(destinationCadaver);
+                    destinationCadaver.CleanUp.IdCleanUp = citizens.Citizens.Where(x => x.Id == cadaver.Id).FirstOrDefault().Cadaver.CleanUp.IdCleanUp;
+                    destinationCadaver.CleanUp.CitizenCleanUp = citizens.Citizens.Where(x => x.Name == cadaver.Cleanup.User).FirstOrDefault();
+                    destinationCadaver.CleanUp.Type = cleanUpTypes.Where(x => x.MyHordesApiName == cadaver.Cleanup.Type).FirstOrDefault();
+
+                    wrapper.Cadavers.Add(destinationCadaver);
+                }
             }
 
             wrapper.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();

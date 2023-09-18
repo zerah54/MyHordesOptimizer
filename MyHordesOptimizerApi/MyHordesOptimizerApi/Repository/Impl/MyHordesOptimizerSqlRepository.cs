@@ -865,7 +865,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
             var citizenWrapper = new CitizensWrapper()
             {
-                LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.First()),
+                LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.FirstOrDefault()),
                 Citizens = Mapper.Map<IEnumerable<Citizen>>(citizens.Distinct(new CitizenIdComparer())).ToList()
             };
             citizenWrapper.Citizens.ForEach(citizen =>
