@@ -11,6 +11,8 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         Town GetTown();
         SimpleMe GetSimpleMe();
         IEnumerable<HeroSkill> GetHeroSkills();
+        IEnumerable<CauseOfDeath> GetCausesOfDeath();
+        IEnumerable<CleanUpType> GetCleanUpTypes();
         IEnumerable<ItemRecipe> GetRecipes();
         BankWrapper GetBank();
         CitizensWrapper GetCitizens(int townId);

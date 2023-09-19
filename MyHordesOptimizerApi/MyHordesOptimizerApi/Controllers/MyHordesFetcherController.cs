@@ -64,6 +64,22 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpGet]
+        [Route("CausesOfDeath")]
+        public ActionResult<IEnumerable<CauseOfDeath>> GetCausesOfDeath()
+        {
+            var causesOfDeath = _myHordesFetcherService.GetCausesOfDeath().ToList();
+            return causesOfDeath;
+        }
+
+        [HttpGet]
+        [Route("CleanUpTypes")]
+        public ActionResult<IEnumerable<CleanUpType>> GetCleanUpTypes()
+        {
+            var cleanUpTypes = _myHordesFetcherService.GetCleanUpTypes().ToList();
+            return cleanUpTypes;
+        }
+
+        [HttpGet]
         [Route("Recipes")]
         public ActionResult<IEnumerable<ItemRecipe>> GetRecipes()
         {

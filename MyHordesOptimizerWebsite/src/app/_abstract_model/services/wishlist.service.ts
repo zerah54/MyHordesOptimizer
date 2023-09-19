@@ -1,4 +1,4 @@
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
@@ -34,6 +34,9 @@ export class WishlistServices extends GlobalServices {
                             wishlist.wishlist_items.set('0', []);
                         }
                         sub.next(wishlist);
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -53,6 +56,9 @@ export class WishlistServices extends GlobalServices {
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         sub.next(new WishlistInfo(response.body));
                         this.snackbar.successSnackbar($localize`La liste de courses a bien été enregistrée`);
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -70,6 +76,9 @@ export class WishlistServices extends GlobalServices {
                     next: () => {
                         sub.next();
                         this.snackbar.successSnackbar($localize`L'objet ${item.label[this.locale]} a bien été ajouté à la liste de courses`);
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });

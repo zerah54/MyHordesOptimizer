@@ -1,0 +1,62 @@
+name: (Server) Deploy Dev
+
+on:
+  workflow_dispatch:
+  
+env:
+  DOTNET_ROOT: '.'
+jobs:
+
+  build:
+    runs-on: windows-latest        
+    defaults:
+      run:
+        working-directory: ./MyHordesOptimizerApi
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0'
+          include-prerelease: true
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v2
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    environment:
+      name: 'production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: .net-app
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'MyHordesOptimizerApi'
+          slot-name: 'production'
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile_46612d33e3fc456283a3700e421f4a93 }}
+          package: .

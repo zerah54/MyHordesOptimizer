@@ -11,7 +11,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public string Name { get; set; }
 
         public bool IsGhost { get; set; }
-        
+
         public bool Dead { get; set; }
 
         public string HomeMessage { get; set; }
@@ -33,10 +33,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public CitizenHome Home { get; set; }
         public CitizenStatus Status { get; set; }
         public CitizenActionsHeroic ActionsHeroic { get; set; }
+        public Cadaver Cadaver { get; set; }
 
         public Citizen()
         {
             Bag = new CitizenBag();
+            Cadaver = new Cadaver();
         }
     }
 }

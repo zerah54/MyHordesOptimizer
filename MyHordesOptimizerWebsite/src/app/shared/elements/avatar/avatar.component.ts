@@ -8,6 +8,6 @@ import { Component, HostBinding, Input } from '@angular/core';
 export class AvatarComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @Input() src!: string;
+    @Input() src: string | undefined;
 
 }

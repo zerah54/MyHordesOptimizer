@@ -12,6 +12,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 
         public BankWrapper Bank { get; set; }
 
+        public CadaversWrapper Cadavers { get; set; }
+
         public WishListWrapper WishList { get; set; }
     }
 }

@@ -12,7 +12,7 @@ export class ErrorsInterceptor implements HttpInterceptor {
     /** Intercepte les appels REST pour afficher un loader */
     intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
         return next.handle(request).pipe(
-            catchError(this.handleError)
+            catchError(this.handleError.bind(this))
         );
     }
 

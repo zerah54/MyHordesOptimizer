@@ -122,6 +122,100 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #endregion
 
+        #region CauseOfDeath
+
+        public void PatchCauseOfDeath(IEnumerable<CauseOfDeathModel> causesOfDeath)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var existings = connection.Query<CauseOfDeathModel>("SELECT * FROM CauseOfDeath");
+            foreach (var cause in causesOfDeath)
+            {
+                if (existings.Any(s => s.Dtype == cause.Dtype))
+                {
+                    connection.Update(cause);
+                }
+                else
+                {
+                    connection.Insert(cause);
+                }
+            }
+            connection.Close();
+        }
+
+        public IEnumerable<CauseOfDeath> GetCausesOfDeath()
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var models = connection.Query<CauseOfDeathModel>(@"SELECT dtype
+                                                              ,ref
+                                                              ,description_fr AS DescriptionFr
+                                                              ,description_en AS DescriptionEn
+                                                              ,description_es AS DescriptionEs
+                                                              ,description_de AS DescriptionDe
+                                                              ,icon
+                                                              ,label_fr AS LabelFr
+                                                              ,label_en AS LabelEn
+                                                              ,label_es AS LabelEs
+                                                              ,label_de AS LabelDe
+                                                          FROM CauseOfDeath");
+            connection.Close();
+            var causesOfDeath = Mapper.Map<IEnumerable<CauseOfDeath>>(models);
+            return causesOfDeath;
+        }
+
+
+        #endregion
+
+        #region CleanUp
+
+        public void PatchCleanUpType(IEnumerable<CleanUpTypeModel> cleanUpTypes)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var existings = connection.Query<CleanUpTypeModel>("SELECT * FROM TownCadaverCleanUpType");
+            foreach (var type in cleanUpTypes)
+            {
+                if (existings.Any(s => s.IdType == type.IdType))
+                {
+                    connection.Update(type);
+                }
+                else
+                {
+                    connection.Insert(type);
+                }
+            }
+            connection.Close();
+        }
+
+        public IEnumerable<CleanUpType> GetCleanUpTypes()
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var models = connection.Query<CleanUpTypeModel>(@"SELECT idType
+                                                              ,typeName
+                                                              ,myHordesApiName
+                                                          FROM TownCadaverCleanUpType");
+            connection.Close();
+            var cleanUpTypes = Mapper.Map<IEnumerable<CleanUpType>>(models);
+            return cleanUpTypes;
+        }
+
+        public IEnumerable<CleanUp> GetCleanUps()
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var models = connection.Query<CleanUpTypeModel>(@"SELECT idCleanUp
+                                                              ,idCleanUpType
+                                                              ,idUserCleanUp
+                                                          FROM TownCadaverCleanUp");
+            connection.Close();
+            var cleanUps = Mapper.Map<IEnumerable<CleanUp>>(models);
+            return cleanUps;
+        }
+
+        #endregion
+
         #region Items
 
         public void PatchItems(IEnumerable<ItemModel> items)
@@ -619,6 +713,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                      SET HomeMessage = @HomeMessage, JobName = @JobName, JobUID = @JobUID, Avatar = @Avatar, PositionX = @PositionX, PositionY = @PositionY, IsGhost = @IsGhost, Dead = @Dead, IdLastUpdateInfo = @IdLastUpdateInfo 
                                      WHERE IdTown = @IdTown AND IdUser = @IdUser", new { HomeMessage = citizenToUpdate.HomeMessage, JobName = citizenToUpdate.JobName, JobUID = citizenToUpdate.JobUID, Avatar = citizenToUpdate.Avatar, PositionX = citizenToUpdate.PositionX, PositionY = citizenToUpdate.PositionY, IsGhost = citizenToUpdate.IsGhost, Dead = citizenToUpdate.Dead, IdLastUpdateInfo = citizenToUpdate.IdLastUpdateInfo, IdTown = townId, IdUser = citizenToUpdate.IdUser });
             }
+
             connection.Close();
         }
 
@@ -643,6 +738,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                   ,positionY AS CitizenPositionY
                                   ,isGhost AS CitizenIsGhost
                                   ,dead AS CitizenIsDead
+                                  ,cleanUp.idCleanUp AS CitizenIdCleanUp
                                   ,tc.idLastUpdateInfo AS LastUpdateInfoId
                                   ,tc.avatar
                                   ,tc.hasRescue
@@ -748,6 +844,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
                               LEFT JOIN Users statusLuiUser ON statusLuiUser.idUser = statusLui.idUser
                               LEFT JOIN LastUpdateInfo ghoulLui ON ghoulLui.idLastUpdateInfo = tc.idLastUpdateInfoGhoulStatus 
                               LEFT JOIN Users ghoulLuiUser ON ghoulLuiUser.idUser = ghoulLui.idUser
+                              LEFT JOIN TownCadaver tca ON tca.idCadaver = tc.idCadaver
+                              LEFT JOIN TownCadaverCleanUp cleanUp ON cleanUp.idCleanUp = tca.cleanUp
                               WHERE tc.idTown = @idTown";
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             var citizens = connection.Query<TownCitizenBagItemCompletModel>(query, new { idTown = townId });
@@ -767,11 +865,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
             var citizenWrapper = new CitizensWrapper()
             {
-                LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.First()),
+                LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.FirstOrDefault()),
                 Citizens = Mapper.Map<IEnumerable<Citizen>>(citizens.Distinct(new CitizenIdComparer())).ToList()
             };
             citizenWrapper.Citizens.ForEach(citizen =>
             {
+                citizen.Cadaver.CleanUp.IdCleanUp = citizens.Where(x => x.CitizenId == citizen.Id).First().CitizenIdCleanUp;
                 var citizenItems = distinctCitizenItem.Where(x => x.CitizenId == citizen.Id);
                 citizen.Bag = Mapper.Map<CitizenBag>(citizenItems);
                 if (!citizenItems.Any()) // Si y'a pas d'item dans le sac, il faut aller chercher l'info du last update dans la liste sans le distinct !
@@ -788,6 +887,135 @@ namespace MyHordesOptimizerApi.Repository.Impl
                     citizen.Bag.IdBag = c.BagId;
                 }
             });
+            return citizenWrapper;
+        }
+
+        public void PatchCadaver(int townId, CadaversWrapper wrapper)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+
+            var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(wrapper.LastUpdateInfo);
+            var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
+                                                                   VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
+
+            var existings = connection.Query(@"SELECT tca.idCadaver,
+                                                      tca.idCitizen,
+                                                      tca.cleanUp
+                                                 FROM TownCadaver tca,
+                                                      TownCitizen tci
+                                                WHERE tca.idCitizen = tci.idUser
+                                                  AND tci.idTown = @IdTown", new { IdTown = townId });
+
+            var townCadaverModels = Mapper.Map<IEnumerable<TownCadaverModel>>(wrapper.Cadavers).ToList();
+            townCadaverModels.ForEach(x =>
+            {
+                var existingCadaver = existings.Where(existing => existing.idCitizen == x.IdCitizen).FirstOrDefault();
+                x.IdCadaver = existingCadaver != null ? existingCadaver.idCadaver : 0;
+                x.IdLastUpdateInfo = idLastUpdateInfo;
+                x.CauseOfDeath = Mapper.Map<CauseOfDeathModel>(wrapper.Cadavers.Where(y => y.Id == x.IdCitizen).First().CauseOfDeath);
+                x.CleanUp = Mapper.Map<CleanUpModel>(wrapper.Cadavers.Where(y => y.Id == x.IdCitizen).First().CleanUp);
+            });
+
+            var townCadaversModelsToInsert = townCadaverModels.Where(x => !existings.Any(existing => existing.idCitizen == x.IdCitizen)).ToList();
+            var townCadaversModelsToUpdate = townCadaverModels.Where(x => existings.Any(existing => existing.idCitizen == x.IdCitizen)).ToList();
+
+            foreach (var cadaver in townCadaversModelsToInsert)
+            {
+                var idCleanUp = connection.ExecuteScalar<int>(@"INSERT INTO TownCadaverCleanUp( idUserCleanUp,
+                                                                                                idCleanUpType )
+                                                                                       VALUES ( @IdUserCleanUp,
+                                                                                                @IdCleanUpType );
+                                                                SELECT LAST_INSERT_ID()",
+                                                            new
+                                                            {
+                                                                IdUserCleanUp = cadaver.CleanUp.IdUserCleanUp,
+                                                                IdCleanUpType = cadaver.CleanUp.IdCleanUpType
+                                                            });
+
+                var idInsert = connection.ExecuteScalar<int>(@"INSERT INTO TownCadaver( idCitizen,
+                                                                                        idLastUpdateInfo,
+                                                                                        cadaverName,
+                                                                                        avatar,
+                                                                                        survivalDay,
+                                                                                        score,
+                                                                                        deathMessage,
+                                                                                        townMessage,
+                                                                                        causeOfDeath,
+                                                                                        cleanUp )
+                                                                               VALUES ( @IdCitizen,
+                                                                                        @IdLastUpdateInfo,
+                                                                                        @CadaverName,
+                                                                                        @Avatar,
+                                                                                        @SurvivalDay,
+                                                                                        @Score,
+                                                                                        @DeathMessage,
+                                                                                        @TownMessage,
+                                                                                        @Cod,
+                                                                                        @CleanUp ); SELECT LAST_INSERT_ID()",
+                                                            new
+                                                            {
+                                                                IdCitizen = cadaver.IdCitizen,
+                                                                IdLastUpdateInfo = idLastUpdateInfo,
+                                                                CadaverName = cadaver.Name,
+                                                                Avatar = cadaver.Avatar,
+                                                                SurvivalDay = cadaver.Survival,
+                                                                Score = cadaver.Score,
+                                                                DeathMessage = cadaver.Msg,
+                                                                TownMessage = cadaver.TownMsg,
+                                                                Cod = cadaver.CauseOfDeath.Dtype,
+                                                                CleanUp = idCleanUp
+                                                            });
+                cadaver.IdCadaver = idInsert;
+
+                connection.Execute(@"UPDATE TownCitizen
+                                        SET dead = @Dead,
+                                            idCadaver = @IdCadaver
+                                      WHERE idUser = @IdUser
+                                        AND idTown = @IdTown",
+                                    new
+                                    {
+                                        Dead = 1,
+                                        IdCadaver = idInsert,
+                                        IdUser = cadaver.IdCitizen,
+                                        IdTown = townId
+                                    });
+            }
+
+            foreach (var cadaver in townCadaversModelsToUpdate)
+            {
+                connection.Execute(@"UPDATE TownCadaverCleanUp 
+                                            SET idUserCleanUp = @IdUserCleanUp,
+                                                idCleanUpType = @IdCleanUpType
+                                          WHERE idCleanUp = @IdCleanUp",
+                                        new
+                                        {
+                                            IdUserCleanUp = cadaver.CleanUp.IdUserCleanUp,
+                                            IdCleanUpType = cadaver.CleanUp.IdCleanUpType,
+                                            IdCleanUp = cadaver.CleanUp.IdCleanUp
+                                        });
+
+                connection.Execute(@"UPDATE TownCadaver
+                                        SET idLastUpdateInfo = @IdLastUpdateInfo,
+                                            deathMessage = @DeathMessage,
+                                            townMessage = @TownMessage
+                                      WHERE idCadaver = @IdCadaver",
+                                new
+                                {
+                                    IdCadaver = cadaver.IdCadaver,
+                                    idLastUpdateInfo = idLastUpdateInfo,
+                                    DeathMessage = cadaver.Msg,
+                                    TownMessage = cadaver.TownMsg
+                                });
+            }
+
+            connection.Close();
+        }
+
+        public CadaversWrapper GetCadavers(int townId)
+        {
+            var citizenWrapper = new CadaversWrapper();
+
             return citizenWrapper;
         }
 

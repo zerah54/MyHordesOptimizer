@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MyHordesOptimizerApi.Data.CauseOfDeath;
 using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Wishlist;
@@ -23,18 +24,36 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
 
             CreateMap<MyHordesHerosCapacitiesCodeModel, HeroSkillsModel>()
-              .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-              .ForMember(dest => dest.DaysNeeded, opt => opt.MapFrom(src => src.DaysNeeded))
-              .ForMember(dest => dest.NbUses, opt => opt.Ignore())
-              .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.Icon))
-              .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Title))
-              .ForMember(dest => dest.LabelFr, opt => opt.Ignore())
-              .ForMember(dest => dest.LabelEn, opt => opt.Ignore())
-              .ForMember(dest => dest.LabelEs, opt => opt.Ignore())
-              .ForMember(dest => dest.DescriptionDe, opt => opt.MapFrom(src => src.Description))
-              .ForMember(dest => dest.DescriptionFr, opt => opt.Ignore())
-              .ForMember(dest => dest.DescriptionEn, opt => opt.Ignore())
-              .ForMember(dest => dest.DescriptionEs, opt => opt.Ignore());
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.DaysNeeded, opt => opt.MapFrom(src => src.DaysNeeded))
+                .ForMember(dest => dest.NbUses, opt => opt.Ignore())
+                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.Icon))
+                .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Title))
+                .ForMember(dest => dest.LabelFr, opt => opt.Ignore())
+                .ForMember(dest => dest.LabelEn, opt => opt.Ignore())
+                .ForMember(dest => dest.LabelEs, opt => opt.Ignore())
+                .ForMember(dest => dest.DescriptionDe, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.DescriptionFr, opt => opt.Ignore())
+                .ForMember(dest => dest.DescriptionEn, opt => opt.Ignore())
+                .ForMember(dest => dest.DescriptionEs, opt => opt.Ignore());
+
+            CreateMap<MyHordesCauseOfDeathModel, CauseOfDeathModel>()
+                .ForMember(dest => dest.Dtype, opt => opt.MapFrom(src => src.Dtype))
+                .ForMember(dest => dest.Ref, opt => opt.MapFrom(src => src.Ref))
+                .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.Icon))
+                .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Label))
+                .ForMember(dest => dest.LabelFr, opt => opt.Ignore())
+                .ForMember(dest => dest.LabelEn, opt => opt.Ignore())
+                .ForMember(dest => dest.LabelEs, opt => opt.Ignore())
+                .ForMember(dest => dest.DescriptionDe, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.DescriptionFr, opt => opt.Ignore())
+                .ForMember(dest => dest.DescriptionEn, opt => opt.Ignore())
+                .ForMember(dest => dest.DescriptionEs, opt => opt.Ignore());
+
+            CreateMap<MyHordesCleanUpTypeModel, CleanUpTypeModel>()
+                .ForMember(dest => dest.IdType, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.TypeName, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.MyHordesApiName, opt => opt.MapFrom(src => src.MyHordesApiName));
 
             CreateMap<KeyValuePair<string, MyHordesRecipeCodeModel>, RecipeModel>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Key))

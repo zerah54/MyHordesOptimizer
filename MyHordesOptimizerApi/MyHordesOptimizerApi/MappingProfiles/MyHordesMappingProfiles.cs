@@ -22,7 +22,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.MyHordesMap, opt => opt.MapFrom(src => src))
                 .ForMember(dest => dest.Citizens, opt => opt.MapFrom<TownCitizensResolver>())
-                .ForMember(dest => dest.Bank, opt => opt.MapFrom<TownBankResolver>());
+                .ForMember(dest => dest.Bank, opt => opt.MapFrom<TownBankResolver>())
+                .ForMember(dest => dest.Cadavers, opt => opt.MapFrom<TownCadaversResolver>());
 
             CreateMap<MyHordesMeResponseDto, TownModel>()
                 .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => src.MapId))

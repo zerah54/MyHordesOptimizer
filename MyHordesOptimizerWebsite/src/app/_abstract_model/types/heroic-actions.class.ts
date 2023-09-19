@@ -1,8 +1,8 @@
 import { HeroicActionsDTO } from '../dto/heroic-actions.dto';
 import { HeroicActionEnum } from '../enum/heroic-action.enum';
-import { UpdateInfo } from './update-info.class';
 import { CommonModel } from './_common.class';
 import { Dictionary } from './_types';
+import { UpdateInfo } from './update-info.class';
 
 export class HeroicActions extends CommonModel<HeroicActionsDTO> {
     public content!: HeroicActionsWithValue[];
@@ -16,7 +16,7 @@ export class HeroicActions extends CommonModel<HeroicActionsDTO> {
     public modelToDto(): HeroicActionsDTO {
         return {
             content: this.content?.reduce((accumulator: Dictionary<number | boolean>, key: HeroicActionsWithValue) => {
-                return {...accumulator, [key.element.getLabel()]: key.value};
+                return { ...accumulator, [key.element.getLabel()]: key.value };
             }, {}),
             lastUpdateInfo: this.update_info?.modelToDto()
         };
@@ -49,5 +49,5 @@ export class HeroicActions extends CommonModel<HeroicActionsDTO> {
 
 export interface HeroicActionsWithValue {
     element: HeroicActionEnum;
-    value: number;
+    value: number | boolean;
 }

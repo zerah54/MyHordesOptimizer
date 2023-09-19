@@ -1,4 +1,4 @@
-import { HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { SnackbarService } from '../../shared/services/snackbar.service';
@@ -28,6 +28,9 @@ export class DigsServices extends GlobalServices {
                             return 0;
                         });
                         sub.next(digs);
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -40,6 +43,9 @@ export class DigsServices extends GlobalServices {
                     next: () => {
                         this.snackbar.successSnackbar($localize`La fouille a bien été supprimée`);
                         sub.next();
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });
@@ -52,6 +58,9 @@ export class DigsServices extends GlobalServices {
                     next: (response: DigDTO[]) => {
                         this.snackbar.successSnackbar($localize`La fouille a bien été mise à jour`);
                         sub.next(dtoToModelArray(Dig, response));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
                     }
                 });
         });

@@ -19,6 +19,15 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PatchHeroSkill(IEnumerable<HeroSkillsModel> heroSkills);
         IEnumerable<HeroSkill> GetHeroSkills();
 
+        void PatchCauseOfDeath(IEnumerable<CauseOfDeathModel> causesOfDeath);
+        IEnumerable<CauseOfDeath> GetCausesOfDeath();
+
+        void PatchCleanUpType(IEnumerable<CleanUpTypeModel> causesOfDeath);
+        IEnumerable<CleanUpType> GetCleanUpTypes();
+
+        IEnumerable<CleanUp> GetCleanUps();
+
+
         void PatchItems(IEnumerable<ItemModel> items);
         IEnumerable<Item> GetItems();
 
@@ -34,10 +43,11 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
 
         void PatchCitizen(int townId, CitizensWrapper citizens);
         void PatchCitizenDetail(TownCitizenDetailModel citizenDetail);
-
         CitizensWrapper GetCitizens(int townId);
         void UpdateCitizenLocation(int townId, int x, int y, IEnumerable<int> citizenId, int lastUpdateInfoId);
 
+        void PatchCadaver(int townId, CadaversWrapper cadavers);
+        CadaversWrapper GetCadavers(int townId);
 
         void AddItemToWishlist(int townId, int itemId, int userId, int zoneXPa);
         void PutWishList(int townId, int userId, IEnumerable<TownWishlistItemModel> items);
@@ -64,7 +74,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PatchActionsItem(string itemUid, IEnumerable<string> actions);
 
         void PatchCitizenBags(int townId, LastUpdateInfo lastUpdateInfo, IEnumerable<Citizen> citizens);
-        IDictionary<int,int> GetCitizenBagsId(int townId, IEnumerable<int> userIds);
+        IDictionary<int, int> GetCitizenBagsId(int townId, IEnumerable<int> userIds);
         int GetCitizenBagId(int townId, int userId);
         IEnumerable<BagItem> GetAllBagItems(int townId);
 

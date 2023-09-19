@@ -47,10 +47,11 @@ export class RegistryComponent implements OnInit {
         if (this.registry) {
             this.registry_entries = this.registry.split('\n')
                 .map((entry: string): Entry => {
-                    const entry_split: string[] = entry.split('[X] ');
+                    const hour_match: RegExpMatchArray | null = entry.match(/\d\d?:\d\d/);
+                    const hour: string = hour_match && hour_match?.length > 0 ? hour_match[0] : '';
                     return {
-                        hour: entry_split[0],
-                        entry: entry_split[1]
+                        hour: hour,
+                        entry: entry.replace(hour, '').replace(' [X] ', '').replace('[X]', '')
                     };
                 })
                 .filter((entry: Entry) => entry.entry !== undefined && entry.entry !== null && entry.entry !== '');

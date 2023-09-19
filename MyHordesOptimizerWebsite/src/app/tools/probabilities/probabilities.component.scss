@@ -1,70 +1,69 @@
 @use "variables";
 
 .mho-probabilities {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2em;
-  justify-content: space-between;
-
-  > div {
-    flex: 1;
-  }
-
-  .header,
-  .chances {
     display: flex;
-    align-items: center;
-    gap: 0.5em;
-  }
-
-  .header {
+    flex-wrap: wrap;
+    gap: 2em;
     justify-content: space-between;
 
     > div {
-      display: flex;
-      align-items: center;
-      gap: 1em;
+        flex: 1;
+    }
 
-      h3 {
-        margin: 0;
+    .header,
+    .chances {
         display: flex;
         align-items: center;
-      }
+        gap: 0.5em;
     }
 
-  }
+    .header {
 
-  .content {
-    display: flex;
-    gap: 0.5em;
-    align-items: baseline;
+        > div {
+            display: flex;
+            align-items: center;
+            gap: 1em;
 
-    .chances {
-      min-width: 100px;
-      justify-content: left;
-      flex: 1;
-      align-items: start;
-      flex-wrap: wrap;
+            h3 {
+                margin: 0;
+                display: flex;
+                align-items: center;
+            }
+        }
+
     }
 
-    .results {
-      border: 1px solid variables.$primary;
-      border-radius: 0.25em;
-      background-color: variables.$item_color;
-    }
-  }
+    .content {
+        display: flex;
+        gap: 0.5em;
+        align-items: baseline;
 
-  table {
+        .chances {
+            min-width: 100px;
+            justify-content: left;
+            flex: 1;
+            align-items: start;
+            flex-wrap: wrap;
+        }
 
-    th,
-    td {
-      padding: 0.25em;
+        .results {
+            border: 1px solid variables.$primary;
+            border-radius: 0.25em;
+            background-color: variables.$item_color;
+        }
     }
 
-    tbody {
-      td {
-        text-align: right;
-      }
+    table {
+
+        th,
+        td {
+            padding: 0.25em;
+        }
+
+        tbody {
+            td {
+                text-align: right;
+            }
+        }
     }
-  }
 }
