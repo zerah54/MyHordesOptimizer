@@ -10,12 +10,12 @@
 .mho-map-sidenav-container {
 
     height: 100%;
-    background-color: transparent;
+    background-color: variables.$card-background-color;
 
     .mat-sidenav {
         max-width: 250px;
         padding: 0.5em;
-        background-color: transparent;
+        background-color: variables.$card-background-color;
 
         h1 {
         }

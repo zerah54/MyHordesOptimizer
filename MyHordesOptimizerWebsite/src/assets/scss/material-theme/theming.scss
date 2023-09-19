@@ -1,10 +1,11 @@
-@use "@angular/material" as mat;
+@use '@angular/material' as mat;
 
-@use "brown-dark-theme";
-@use "noel-theme";
-@use "pink-light-theme";
+@use 'brown-dark-theme';
+@use 'noel-theme';
+@use 'halloween-theme';
+@use 'pink-light-theme';
 
-@use "variables";
+@use 'variables';
 
 @include mat.all-component-typographies();
 @include mat.core();
@@ -23,6 +24,11 @@
     &.noel {
         @include mat.all-component-colors(noel-theme.$noel-theme);
         @include noel-theme.noel-theme(noel-theme.$noel-theme);
+    }
+
+    &.halloween {
+        @include mat.all-component-colors(halloween-theme.$halloween-theme);
+        @include halloween-theme.halloween-theme(halloween-theme.$halloween-theme);
     }
 
 

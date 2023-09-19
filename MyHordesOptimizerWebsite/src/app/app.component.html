@@ -5,6 +5,22 @@
         <li *ngFor="let i of [].constructor(50);"></li>
     </ul>
 
+    <div *ngIf="theme === 'halloween'" class="web-spider">
+        <img [ngSrc]="'assets/img/halloween/spider-web.png'" height="1000" width="1000">
+        <div class="spider">
+            <span class="eye left"></span>
+            <span class="eye right"></span>
+            <span class="leg left"></span>
+            <span class="leg left"></span>
+            <span class="leg left"></span>
+            <span class="leg left"></span>
+            <span class="leg right"></span>
+            <span class="leg right"></span>
+            <span class="leg right"></span>
+            <span class="leg right"></span>
+        </div>
+    </div>
+
     <mat-sidenav-container #sidenavContainer class="mho-container">
         <mat-sidenav #sidenav [mode]="is_gt_xs ? 'side' : 'over'" [opened]="is_gt_xs">
             <mho-menu [sidenavContainer]="sidenavContainer"></mho-menu>
@@ -17,9 +33,31 @@
     </mat-sidenav-container>
 
     <mho-footer #footer></mho-footer>
-    <ng-container *ngIf="is_loading">
-        <div class="mho-loading">
-            <mat-spinner [color]="'accent'"></mat-spinner>
-        </div>
-    </ng-container>
+
+    <div class="mho-loading" *ngIf="is_loading">
+        <ng-container [ngSwitch]="theme">
+            <ng-container *ngSwitchCase="'halloween'">
+                <div class="ghost-container">
+                    <div class="ghost animate-hover">
+                        <div class="face">
+                            <div class="eye eye-left"></div>
+                            <div class="eye eye-right"></div>
+                            <div class="mouth animate-smile"></div>
+                        </div>
+                        <div class="bottom-container-left">
+                            <div class="wave">
+                            </div>
+                        </div>
+                        <div class="bottom-container-right">
+                            <div class="wave">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+                <mat-spinner [color]="'accent'"></mat-spinner>
+            </ng-container>
+        </ng-container>
+    </div>
 </div>

@@ -17,7 +17,6 @@ namespace MyHordesOptimizerApi.DiscordBot.Services
         private readonly DiscordSocketClient _discordSocketClient;
         private readonly InteractionService _interactionService;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IDiscordBotConfiguration _configuration;
         private readonly ILogger<InteractionHandlingHostedService> _logger;
         private readonly ILocalizationManager _localizationManager;
 
@@ -32,7 +31,6 @@ namespace MyHordesOptimizerApi.DiscordBot.Services
             _discordSocketClient = discord;
             _interactionService = interactions;
             _serviceProvider = services;
-            _configuration = configuration;
             _logger = logger;
             _localizationManager = localizationManager;
 

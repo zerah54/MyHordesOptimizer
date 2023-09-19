@@ -1,6 +1,8 @@
 .mho-navbar {
 
+    z-index: 3;
     height: 52px !important;
+
     .title {
         margin-right: 1em;
     }
@@ -13,6 +15,7 @@
         width: 250px;
         font-size: 12px;
         margin-top: 8px;
+
         button {
             font-size: 24px;
         }
