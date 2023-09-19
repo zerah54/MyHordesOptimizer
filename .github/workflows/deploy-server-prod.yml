@@ -41,9 +41,20 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name Start Testing
-        - run |
-        echo "Starting test"
+      - name: Start Testing
+        run: |
+          echo "Starting test"
+
+      - name: Test
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            whoami
+            ls -al
 
       - name: Login SSH
         run: |
