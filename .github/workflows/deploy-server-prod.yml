@@ -42,6 +42,10 @@ jobs:
       - uses: actions/checkout@main
 
       - name: Send to Server
+        run: |
+          ls
+
+      - name: Send to Server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
