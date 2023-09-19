@@ -34,9 +34,13 @@ jobs:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
 
-#  deploy:
-#    runs-on: windows-latest
-#    needs: build
-#
-#    steps:
-#      - name: Login SSH
+  deploy:
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+      - name: Login SSH
+        run: |
+          echo "Starting test"
+          ssh -i ~/.ssh/authorized_keys -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "ls"
+          echo "Test completed"
