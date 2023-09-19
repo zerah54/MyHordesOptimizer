@@ -14,7 +14,7 @@ jobs:
         working-directory: ./MyHordesOptimizerApi
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@main
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
