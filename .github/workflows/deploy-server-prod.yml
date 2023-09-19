@@ -41,11 +41,17 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name: Start Testing
-        run: |
-          echo "Starting test"
+      - name: Send to Server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "./dist/*"
+          target: "/home/renack/livraison_mho"
 
-      - name: Test
+      - name: Restart Server
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -54,9 +60,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             whoami
-            ls -al
-
-      - name: Login SSH
-        run: |
-          ssh -i ~/.ssh/authorized_keys -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "ls"
-          echo "Test completed"
+            ls
