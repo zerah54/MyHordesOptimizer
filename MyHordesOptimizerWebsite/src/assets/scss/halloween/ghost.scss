@@ -1,0 +1,192 @@
+@use 'variables';
+
+.ghost-container {
+
+    $ghostWhite: #f8f8ff;
+    $bodyColor: #212121;
+
+    padding: 30px 30px 50px 30px;
+    width: 250px;
+    transform: scale(.75);
+    transition: 1s all ease-in-out;
+    opacity: .8;
+
+    &:hover {
+        opacity: .4;
+        transform: translate(10%) rotate(2deg) scale(1);
+
+        .mouth {
+            &.animate-smile {
+                -webkit-animation: 0;
+                background: $bodyColor;
+                transform: scale(.5) translateY(5%);
+            }
+
+            &:before {
+                display: none;
+            }
+        }
+    }
+
+    .ghost {
+
+        width: 250px;
+        aspect-ratio: 5/6;
+        background: $ghostWhite;
+        border-radius: 50% 50% 0 0;
+        box-shadow: 0 5px 40px 0px rgba(255, 255, 255, 0.7);
+        position: relative;
+        opacity: .8;
+
+        &:before, &:after {
+            content: "";
+            background: $ghostWhite;
+            position: absolute;
+            z-index: 10;
+            bottom: -6%;
+            width: 64%;
+            height: 64%;
+            border-radius: 18%;
+        }
+
+        &:before {
+            left: 3px;
+            transform: skew(-34deg) rotate(-23deg);
+        }
+
+        &:after {
+            right: 3px;
+            transform: skew(34deg) rotate(24deg);
+        }
+
+        .bottom-container-left,
+        .bottom-container-right {
+            width: 64%;
+            aspect-ratio: 8/5;
+            overflow: hidden;
+            bottom: -30%;
+            position: absolute;
+            z-index: 20;
+
+            .wave {
+                display: block;
+                position: relative;
+                height: 40%;
+                background: $ghostWhite;
+            }
+
+            .wave:before {
+                content: "";
+                display: block;
+                position: absolute;
+                border-radius: 100%;
+                width: 100%;
+                aspect-ratio: 8/15;
+                background-color: $bodyColor;
+                right: -25%;
+                top: 50%;
+            }
+
+            .wave:after {
+                content: "";
+                display: block;
+                position: absolute;
+                border-radius: 100%;
+                width: 100%;
+                aspect-ratio: 8/15;
+                background-color: $ghostWhite;
+                left: -25%;
+                top: -600%;
+            }
+        }
+
+        .bottom-container-left {
+            transform: rotate(180deg) scaleY(-1);
+        }
+
+        .bottom-container-right {
+            right: 0;
+        }
+
+        .face {
+            position: absolute;
+            z-index: 20;
+            top: 27%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            aspect-ratio: 10/7;
+
+            .eye {
+                background: $bodyColor;
+                width: 30%;
+                aspect-ratio: 1;
+                border-radius: 50%;
+                position: absolute;
+
+                &:before {
+                    content: '';
+                    width: 17%;
+                    aspect-ratio: 1;
+                    border-radius: 50%;
+                    background: $ghostWhite;
+                    position: absolute;
+                    right: 25%;
+                    top: 20%;
+                }
+
+                &.eye-left {
+                    left: 0;
+                }
+
+                &.eye-right {
+                    right: 0;
+                }
+            }
+
+            .mouth {
+                background: $bodyColor;
+                width: 42%;
+                aspect-ratio: 21/20;
+                border-radius: 50%;
+                position: absolute;
+                left: 30%;
+                z-index: -1;
+                bottom: 0;
+
+                &:before {
+                    content: '';
+                    background: $ghostWhite;
+                    width: 115%;
+                    aspect-ratio: 6/5;
+                    border-radius: 50%;
+                    position: absolute;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    bottom: 6px;
+                    transition: all .3s ease;
+                }
+            }
+        }
+    }
+
+    .animate-hover {
+        animation: animate-hover 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes animate-hover {
+        0% {
+            transform: translatey(0px);
+            opacity: .8;
+        }
+        50% {
+            transform: translatey(-33px);
+            opacity: 1;
+            box-shadow: 0 5px 50px 0px rgba(255, 255, 255, 1);
+        }
+        100% {
+            transform: translatey(0px);
+            opacity: .8;
+        }
+    }
+}

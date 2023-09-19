@@ -2,19 +2,19 @@ name: (Server) Deploy Dev
 
 on:
   workflow_dispatch:
-  
+
 env:
   DOTNET_ROOT: '.'
-jobs:
 
+jobs:
   build:
-    runs-on: windows-latest        
+    runs-on: windows-latest
     defaults:
       run:
         working-directory: ./MyHordesOptimizerApi
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@main
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
@@ -46,7 +46,7 @@ jobs:
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
+
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:

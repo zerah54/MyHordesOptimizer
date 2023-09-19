@@ -30,6 +30,7 @@
         "@nguniversal/express-engine": "^16.2.0",
         "chart.js": "^4.4.0",
         "chartjs-plugin-datalabels": "^2.2.0",
+        "compass-mixins": "^0.12.12",
         "express": "^4.18.2",
         "localstorage-polyfill": "^1.0.1",
         "moment": "^2.29.4",

@@ -376,7 +376,7 @@ export class WishlistComponent implements OnInit {
 
         let priority_factor: number = 999;
         array.forEach((item: WishlistItem) => {
-            item.priority = parseInt(item.priority_main.value.count.toString() + (item.priority_main.value.count > 0 ? priority_factor.toString() : (1000 - priority_factor).toString()));
+            item.priority = parseInt(item.priority_main.value.count.toString() + (item.priority_main.value.count >= 0 ? priority_factor.toString() : (1000 - priority_factor).toString()));
             priority_factor--;
         });
         array = array.sort((item_a: WishlistItem, item_b: WishlistItem) => item_b.priority - item_a.priority);

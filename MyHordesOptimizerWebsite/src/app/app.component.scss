@@ -1,8 +1,7 @@
-@use "variables";
+@use 'variables';
 
 @use 'noel/snow';
 @use 'noel/guirlande';
-
 
 $snow-1: url('/assets/img/noel/s1.png');
 $snow-2: url('/assets/img/noel/s2.png');
@@ -17,6 +16,8 @@ $snow-3: url('/assets/img/noel/s3.png');
     background-color: rgba(0, 0, 0, 0.50);
     z-index: 9999;
     display: flex;
+    align-items: center;
+    justify-content: center;
 
     .mat-mdc-progress-spinner {
         margin: auto;

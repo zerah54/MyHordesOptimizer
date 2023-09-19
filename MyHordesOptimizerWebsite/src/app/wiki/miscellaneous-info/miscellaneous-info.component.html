@@ -29,13 +29,13 @@
 <ng-template #card let-data let-rows=rows let-header=header>
     <mat-card class="card">
         <mat-card-header class="card-header">
-            <h3>{{header}}</h3>
+            <mat-card-title>{{header}}</mat-card-title>
         </mat-card-header>
         <mat-card-content class="content">
             <div class="title">
                 <h5 *ngFor="let column of data">{{column['header']}}</h5>
             </div>
-            <div class="columns" style="display: flex;">
+            <div class="columns">
                 <div class="col" *ngFor="let col of data; let col_index = index" style="flex: 1; gap:0.5em; align-items: center;">
                     <div class="cell" *ngFor="let row of rows; let row_index = index">{{data[col_index][row_index]}}</div>
                 </div>

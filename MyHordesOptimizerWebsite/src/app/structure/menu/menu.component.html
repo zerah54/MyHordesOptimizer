@@ -7,6 +7,19 @@
 
     </mat-list>
     <div class="actions">
+        <div class="pumpkin-container" *ngIf="selected_theme?.class === 'halloween'">
+            <div class="pumpkin">
+                <div class="texture"></div>
+                <div class="root"></div>
+                <div class="eye left"></div>
+                <div class="eye right"></div>
+                <div class="mouth left"></div>
+                <div class="mouth right"></div>
+                <div class="teeth"></div>
+            </div>
+
+            <div class="shadow"></div>
+        </div>
         <ng-container *ngIf="site_language">
             <button mat-button [matMenuTriggerFor]="languageMenu">
                 <mat-icon>language</mat-icon>
@@ -16,7 +29,7 @@
             <mat-menu #languageMenu="matMenu">
                 <ng-container *ngFor="let language of language_list">
                     <div mat-menu-item [disabled]="language.code === site_language.code"
-                        [class.warn-color]="language.code === site_language.code" (click)="changeLanguage(language)">
+                         [class.warn-color]="language.code === site_language.code" (click)="changeLanguage(language)">
                         {{language.label}}
                     </div>
                 </ng-container>
@@ -32,7 +45,7 @@
             <mat-menu #themeMenu="matMenu">
                 <ng-container *ngFor="let theme of themes">
                     <div mat-menu-item [disabled]="theme.class === selected_theme?.class"
-                        [class.warn-color]="theme.class === selected_theme?.class" (click)="changeTheme(theme)">
+                         [class.warn-color]="theme.class === selected_theme?.class" (click)="changeTheme(theme)">
                         {{theme.label}}
                     </div>
                 </ng-container>
@@ -52,8 +65,8 @@
 
 <ng-template #routeLink let-route>
     <a mat-list-item *ngIf="route.displayed && route.authorized()" routerLinkActive="link-selected"
-        [routerLinkActiveOptions]="{exact : true}" [routerLink]="route.path"
-        (click)="route.expanded = !route.expanded; toggleDisplayChildren(route)" [ngClass]="['lvl-' + route.lvl]">
+       [routerLinkActiveOptions]="{exact : true}" [routerLink]="route.path"
+       (click)="route.expanded = !route.expanded; toggleDisplayChildren(route)" [ngClass]="['lvl-' + route.lvl]">
         <mat-icon *ngIf="route.children && route.children.length > 0">
             {{route.expanded ? 'expand_more' : 'chevron_right'}}</mat-icon>
         {{route.label}}

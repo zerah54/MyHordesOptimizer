@@ -60,6 +60,11 @@
                         &.full-width {
                             width: 100%;
                         }
+
+                        /** Ajoute une marge au-dessus du premier select pour l'éloigner des checkboxes */
+                        &:nth-child(1 of .full-width) {
+                            margin-top: 0.5em;
+                        }
                     }
                 }
 
@@ -79,6 +84,11 @@
 
                         &.third-width {
                             width: calc(100% / 3);
+                        }
+
+                        /** Ajoute une marge au-dessus du premier select pour l'éloigner des checkboxes */
+                        &:nth-child(1 of .third-width) {
+                            margin-top: 0.5em;
                         }
                     }
                 }
