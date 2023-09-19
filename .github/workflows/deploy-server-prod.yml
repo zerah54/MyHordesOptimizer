@@ -41,8 +41,11 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
+      - name Start Testing
+        - run |
+        echo "Starting test"
+
       - name: Login SSH
         run: |
-          echo "Starting test"
           ssh -i ~/.ssh/authorized_keys -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "ls"
           echo "Test completed"
