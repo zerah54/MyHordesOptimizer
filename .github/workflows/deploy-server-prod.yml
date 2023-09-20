@@ -43,9 +43,13 @@ jobs:
 
       - name: Send to Server
         run: |
+          echo ls
           ls
-          cd ../MyHordesOptimizer/MyHordesOptimizerApi
+          echo ls cd..
+          cd ..
           ls
+          echo ls cd.. cd..
+          ls cd ..
 
       - name: Send to Server
         uses: appleboy/scp-action@v0.1.4
