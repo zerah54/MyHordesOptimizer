@@ -41,11 +41,18 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: .net-app
+
       - name: Send to Server
         run: |
           echo _____________________________________
-          cd ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
           ls
+          echo _____________________________________
+          cd ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
+          ls -a
 
       - name: Send to Server
         uses: appleboy/scp-action@v0.1.4
