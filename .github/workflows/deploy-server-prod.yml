@@ -50,12 +50,6 @@ jobs:
           name: .net-app
 
       - name: Send to Server
-        run: |
-          echo _____________________________________
-          cd ${{env.DOTNET_ROOT}}
-          ls -a
-
-      - name: Send to Server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -74,4 +68,5 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             whoami
+            cd livraison_mho
             ls
