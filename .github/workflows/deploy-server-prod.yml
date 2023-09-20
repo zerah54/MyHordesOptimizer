@@ -62,7 +62,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: '.'
+          source: './publish'
           target: "/home/renack/livraison_mho"
 
       - name: Restart Server
