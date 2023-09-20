@@ -52,7 +52,7 @@ jobs:
       - name: Send to Server
         run: |
           echo _____________________________________
-          cd ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
+          cd ${{env.DOTNET_ROOT}}
           ls -a
 
       - name: Send to Server
