@@ -32,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi/publish
+          path: ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
 
   deploy:
     runs-on: ubuntu-latest
