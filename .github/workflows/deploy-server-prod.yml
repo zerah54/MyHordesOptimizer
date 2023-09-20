@@ -43,8 +43,7 @@ jobs:
 
       - name: Send to Server
         run: |
-          ls
-          cd ..
+          cd ./MyHordesOptimizer
           ls
 
       - name: Send to Server
