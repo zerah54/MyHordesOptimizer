@@ -52,7 +52,6 @@ jobs:
       - name: Send to Server
         run: |
           echo _____________________________________
-          cd ${{env.DOTNET_ROOT}}/publish
           ls -a
 
       - name: Send to Server
