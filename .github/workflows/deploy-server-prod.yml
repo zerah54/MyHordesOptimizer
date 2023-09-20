@@ -51,6 +51,13 @@ jobs:
           echo _____________________________________
           cd ..
           ls
+          echo _____________________________________
+          cd _temp
+          ls
+          echo _____________________________________
+          cd ..
+          cd ..
+          ls
 
       - name: Send to Server
         uses: appleboy/scp-action@v0.1.4
