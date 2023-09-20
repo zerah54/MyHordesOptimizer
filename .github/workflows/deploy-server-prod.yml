@@ -46,21 +46,8 @@ jobs:
           echo _____________________________________
           ls
           echo _____________________________________
-          cd ..
-          ls
-          echo _____________________________________
-          cd ..
-          ls
-          echo _____________________________________
-          cd _temp
-          ls
-          echo _____________________________________
-          cd ..
-          cd ..
-          ls
-          echo _____________________________________
-          cd /dist
-          ls
+          cd ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
+          ls -al
 
       - name: Send to Server
         uses: appleboy/scp-action@v0.1.4
