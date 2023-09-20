@@ -52,6 +52,7 @@ jobs:
       - name: Send to Server
         run: |
           echo _____________________________________
+          cd publish
           ls -a
 
       - name: Send to Server
@@ -63,6 +64,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           source: './publish/*'
           target: "/home/renack/livraison_mho"
+          strip_components: 1
 
       - name: Restart Server
         uses: appleboy/ssh-action@v1.0.0
