@@ -43,13 +43,14 @@ jobs:
 
       - name: Send to Server
         run: |
-          echo ls
+          echo _____________________________________
           ls
-          echo ls cd..
+          echo _____________________________________
           cd ..
           ls
-          echo ls cd.. cd..
-          ls cd ..
+          echo _____________________________________
+          cd ..
+          ls
 
       - name: Send to Server
         uses: appleboy/scp-action@v0.1.4
