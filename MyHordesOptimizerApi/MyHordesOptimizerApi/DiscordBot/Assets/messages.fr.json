@@ -122,5 +122,13 @@
   "instructions": {
     "name": "instructions",
     "description": "Rendez vos instructions clairement visibles et plus longues"
+  },
+  "suggestion": {
+    "name": "suggestion",
+    "description": "Poster une suggestion dans notre boîte à idées"
+  },
+  "bug": {
+    "name": "bug",
+    "description": "Signaler un bug"
   }
 }

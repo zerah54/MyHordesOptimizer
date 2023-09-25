@@ -111,7 +111,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             }
             catch (Exception e)
             {
-                _logger.LogWarning(e.ToString(), e);
+                _logger.LogError(e.ToString(), e);
                 await RespondAsync(
                     $"Une erreur s'est produite lors de la récupération des traductions\n```{e.Message}```",
                     ephemeral: true);

@@ -38,7 +38,6 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             try
             {
                 var filteredRecipes = GetRecipesFromResultItemName(searchValue, locale);
-                // _logger.LogWarning(filteredRecipes.ToJson().ToString());
 
                 var embedBuilders = new List<Embed>();
                 foreach (var filteredRecipe in filteredRecipes)
@@ -67,7 +66,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             }
             catch (Exception e)
             {
-                _logger.LogWarning(e.ToString(), e);
+                _logger.LogError(e.ToString(), e);
                 await ModifyOriginalResponseAsync(response =>
                 {
                     response.Content =
@@ -139,7 +138,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 var childrenRecipes =
                     GetRecipesFromResultItemName(component.Label[locale.ToString().ToLower()], locale);
 
-                childrenRecipes.ForEach((child_recipe) =>
+                childrenRecipes.ForEach(child_recipe =>
                 {
                     CreateFieldFromRecipe(child_recipe, locale, embedBuilder);
                     CreateFieldsForChildren(child_recipe, locale, embedBuilder);
