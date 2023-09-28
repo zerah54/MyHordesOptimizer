@@ -1,5 +1,8 @@
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { ClipboardModule } from '@angular/cdk/clipboard';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { NgModule } from '@angular/core';
 
@@ -10,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -19,6 +23,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
@@ -26,16 +31,12 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { ScrollingModule } from '@angular/cdk/scrolling';
-
 import { Modules } from '../_abstract_model/types/_types';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 
 const material_modules: Modules = [
     MatButtonModule, MatButtonToggleModule, MatCardModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatProgressSpinnerModule,
     MatSelectModule, MatSidenavModule, MatSnackBarModule, MatTableModule, MatToolbarModule, MatRadioModule, MatCheckboxModule, ClipboardModule, CdkAccordionModule, MatChipsModule,
-    MatTooltipModule, MatSortModule, MatTabsModule, MatBadgeModule, ScrollingModule, MatSlideToggleModule, DragDropModule
+    MatTooltipModule, MatSortModule, MatTabsModule, MatBadgeModule, ScrollingModule, MatSlideToggleModule, DragDropModule, MatExpansionModule
 ];
 
 @NgModule({

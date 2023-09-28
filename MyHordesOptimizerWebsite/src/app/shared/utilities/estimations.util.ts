@@ -19,11 +19,11 @@ function getMaxRatio(day: number, town_type: TownType): number {
 }
 
 export function getMinAttack(day: number, town_type: TownType): number {
-    town_type;
-    return Math.floor(getMinRatio(day, 'RE') * Math.pow(Math.max(1, day - 1) * 0.75 + 2.5, 3));
+    town_type = 'RE';
+    return Math.floor(getMinRatio(day, town_type) * Math.pow(Math.max(1, day - 1) * 0.75 + 2.5, 3));
 }
 
 export function getMaxAttack(day: number, town_type: TownType): number {
-    town_type;
-    return Math.ceil(getMaxRatio(day, 'RE') * Math.pow(day * 0.75 + 3.5, 3));
+    town_type = 'RE';
+    return Math.ceil(getMaxRatio(day, town_type) * Math.pow(day * 0.75 + 3.5, 3));
 }

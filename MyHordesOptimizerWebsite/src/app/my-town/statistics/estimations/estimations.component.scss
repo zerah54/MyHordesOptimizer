@@ -1,4 +1,8 @@
 .mho-estimations {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
     .header {
         display: flex;
         align-items: center;
@@ -13,11 +17,13 @@
     }
 
     .tables {
+        flex: 1;
         display: flex;
         justify-content: space-around;
         gap: 0.5em;
         flex-wrap: wrap;
         align-items: flex-start;
+        overflow: auto;
 
         table {
             margin: 0;
@@ -42,8 +48,6 @@
 
         .canvas {
             flex: 1;
-            display: flex;
-            flex-wrap: wrap;
         }
     }
 }
