@@ -69,4 +69,12 @@
     .mat-mdc-slide-toggle.mat-accent {
         --mdc-switch-selected-icon-color: #{variables.$switch-selected-accent-icon-color};
     }
+
+    .mat-mdc-table {
+        --mat-table-background-color: #{variables.$card-background-color};
+    }
+
+    .mat-expansion-panel {
+        --mat-expansion-container-background-color: #{variables.$card-background-color};
+    }
 }

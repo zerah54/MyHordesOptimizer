@@ -26,8 +26,9 @@ import { RegenDTO } from '../dto/regen.dto';
 import { RuinDTO } from '../dto/ruin.dto';
 import { TownDTO } from '../dto/town.dto';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
+import { MinMax } from '../interfaces';
 import { dtoToModelArray } from '../types/_common.class';
-import { Dictionary, ToolsToUpdate } from '../types/_types';
+import { ToolsToUpdate } from '../types/_types';
 import { BankInfo } from '../types/bank-info.class';
 import { Cell } from '../types/cell.class';
 import { CitizenInfo } from '../types/citizen-info.class';
@@ -152,31 +153,12 @@ export class ApiServices extends GlobalServices {
             });
     }
 
-    /**
-     * Demande l'estimation à partir des données du tableau
-     * @param {boolean} today
-     * @param {number} day
-     */
-    public estimateAttack(rows: Dictionary<string>, today: boolean, day: number): Observable<string> {
-        return new Observable((sub: Subscriber<string>) => {
-            super.post<string>(this.API_URL + `:8080/${today ? 'attack' : 'planif'}.php?day=${day}&id=${getTown()?.town_id}&type=normal&debug=false`, JSON.stringify(rows))
+    public getApofooAttackCalculation(today: boolean, day: number): Observable<MinMax | null> {
+        return new Observable((sub: Subscriber<MinMax | null>) => {
+            super.get<MinMax>(this.API_URL + `/attaqueEstimation/apofooAttackCalculation/${today ? 'attack' : 'planif'}?day=${day}&townId=${getTown()?.town_id}`)
                 .subscribe({
-                    next: (response: string) => {
-                        sub.next(response);
-                    },
-                    error: (error: HttpErrorResponse) => {
-                        sub.error(error);
-                    }
-                });
-        });
-    }
-
-    public testAttackCalculation(today: boolean, day: number): Observable<string> {
-        return new Observable((sub: Subscriber<string>) => {
-            super.post<string>(this.API_URL + `attaqueEstimation/testAttackCalculation/${today ? 'attack' : 'planif'}?day=${day}&id=${getTown()?.town_id}`)
-                .subscribe({
-                    next: (response: string) => {
-                        sub.next(response);
+                    next: (response: HttpResponse<MinMax>) => {
+                        sub.next(response.body);
                     },
                     error: (error: HttpErrorResponse) => {
                         sub.error(error);

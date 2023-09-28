@@ -1,3 +1,5 @@
+@use 'variables';
+
 .mho-map-update-citizens {
     table {
         th, td {
@@ -5,7 +7,8 @@
 
             &.name {
                 text-align: left;
-                >img {
+
+                > img {
                     margin-right: 0.5em;
                     vertical-align: middle;
                 }
@@ -19,7 +22,7 @@
         thead {
             position: sticky;
             top: 0;
-            background-color: white;
+            background-color: variables.$card-background-color;
         }
     }
 
@@ -28,6 +31,7 @@
 
 .mho-add-citizen-list {
     max-height: 300px;
+
     > * {
         cursor: pointer;
 

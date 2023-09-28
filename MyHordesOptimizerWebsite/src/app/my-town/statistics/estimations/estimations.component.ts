@@ -1,7 +1,6 @@
-import { Component, ElementRef, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, HostBinding, HostListener, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import Chart from 'chart.js/auto';
-import { environment } from '../../../../environments/environment';
 import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
 import { MinMax } from '../../../_abstract_model/interfaces';
 import { ApiServices } from '../../../_abstract_model/services/api.services';
@@ -20,6 +19,16 @@ import { getTown } from '../../../shared/utilities/localstorage.util';
 export class EstimationsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
+    @HostListener('window:resize', ['$event'])
+    onResize(): void {
+        if (this.today_chart) {
+            this.today_chart.resize();
+        }
+        if (this.tomorrow_chart) {
+            this.tomorrow_chart.resize();
+        }
+    }
+
     @ViewChild('todayCanvas') today_canvas!: ElementRef;
     @ViewChild('tomorrowCanvas') tomorrow_canvas!: ElementRef;
 
@@ -37,8 +46,6 @@ export class EstimationsComponent implements OnInit {
 
     public separators: string[] = [' à ', ' - '];
 
-    public is_dev: boolean = environment.production;
-
     constructor(private clipboard: ClipboardService, private api: ApiServices) {
     }
 
@@ -48,7 +55,9 @@ export class EstimationsComponent implements OnInit {
 
     /** Enregistre les estimations saisies */
     public saveEstimations(): void {
-        this.api.saveEstimations(this.estimations).subscribe();
+        this.api.saveEstimations(this.estimations).subscribe(() => {
+            this.getEstimations();
+        });
     }
 
     public getEstimations(): void {
@@ -163,7 +172,7 @@ export class EstimationsComponent implements OnInit {
         }
     }
 
-    public pasteFromMH(paste_event: ClipboardEvent, min_max: MinMax): void {
+    public pasteFromMH(paste_event: ClipboardEvent, min_max: MinMax, min: boolean): void {
         paste_event.preventDefault();
         const value: string | undefined = paste_event.clipboardData?.getData('Text');
         let split: string[] | undefined;
@@ -177,6 +186,10 @@ export class EstimationsComponent implements OnInit {
         if (split && split.length > 1) {
             min_max.min = +split[0];
             min_max.max = +split[1];
+        } else if (split?.length === 1) {
+            min_max[min ? 'min' : 'max'] = +split[0];
+        } else {
+            min_max[min ? 'min' : 'max'] = value ? +value : undefined;
         }
     }
 
