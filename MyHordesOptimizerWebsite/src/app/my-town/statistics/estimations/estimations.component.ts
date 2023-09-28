@@ -1,13 +1,9 @@
 import { Component, ElementRef, HostBinding, HostListener, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { ChartConfiguration, ChartEvent, LegendElement } from 'chart.js';
 import Chart from 'chart.js/auto';
-import { ChartDataset, LegendItem } from 'chart.js/dist/types';
-import { Color } from 'chartjs-plugin-datalabels/types/options';
 import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
 import { MinMax } from '../../../_abstract_model/interfaces';
 import { ApiServices } from '../../../_abstract_model/services/api.services';
-import { Dictionary } from '../../../_abstract_model/types/_types';
 import { Estimations } from '../../../_abstract_model/types/estimations.class';
 import { Regen } from '../../../_abstract_model/types/regen.class';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
@@ -49,8 +45,6 @@ export class EstimationsComponent implements OnInit {
     public tomorrow_chart!: Chart<'line'>;
 
     public separators: string[] = [' à ', ' - '];
-
-    public is_dev: boolean = environment.production;
 
     constructor(private clipboard: ClipboardService, private api: ApiServices) {
     }
