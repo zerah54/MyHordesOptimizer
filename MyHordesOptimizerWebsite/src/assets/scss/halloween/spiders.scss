@@ -1,0 +1,198 @@
+@import 'compass-mixins';
+@import 'compass-mixins/lib/animation/core';
+
+.web-spider {
+    display: contents;
+
+    > img {
+        position: absolute;
+        width: 1000px;
+        height: 1000px;
+        z-index: 2;
+        top: -375px;
+        right: -500px;
+        filter: brightness(10);
+        opacity: 0.25;
+        pointer-events: none;
+    }
+
+    /******************** Les araignées ********************/
+    .spider {
+        z-index: 2;
+        position: absolute;
+        height: 40px;
+        width: 50px;
+        @include border-radius(50%);
+        margin: 210px 0 0 0;
+        background: #110D04;
+        right: 5%;
+        @include animation(spider-move 5s infinite);
+        pointer-events: none;
+
+        *, &:before, &:after, :after, :before {
+            position: absolute;
+            content: "";
+        }
+
+        &:before {
+            width: 1px;
+            background: #AAAAAA;
+            left: 50%;
+            top: -320px;
+            height: 320px;
+        }
+
+        .eye {
+            top: 16px;
+            height: 14px;
+            width: 12px;
+            background: #FFFFFF;
+            @include border-radius(50%);
+
+            &:after {
+                top: 6px;
+                height: 5px;
+                width: 5px;
+                @include border-radius(50%);
+                background: black;
+            }
+
+            &.left {
+                left: 14px;
+
+                &:after {
+                    right: 3px;
+                }
+            }
+
+            &.right {
+                right: 14px;
+
+                &:after {
+                    left: 3px;
+                }
+            }
+        }
+
+        .leg {
+            top: 6px;
+            height: 12px;
+            width: 14px;
+            border-top: 2px solid #110D04;
+            border-left: 1px solid transparent;
+            border-right: 1px solid transparent;
+            border-bottom: 1px solid transparent;
+            z-index: -1;
+
+            &.left {
+                left: -8px;
+                @include transform-origin(top, right);
+                @include transform(rotate(36deg) skewX(-20deg));
+                border-left: 2px solid #110D04;
+                @include border-radius(60% 0 0 0);
+                @include animation(legs-wriggle-left 1s 0s infinite);
+            }
+
+            &.right {
+                right: -8px;
+                @include transform-origin(top, left);
+                @include transform(rotate(-36deg) skewX(20deg));
+                border-right: 2px solid #110D04;
+                @include border-radius(0 60% 0 0);
+                @include animation(legs-wriggle-right 1s 0.2s infinite);
+            }
+
+            &:nth-of-type(2) {
+                top: 14px;
+                left: -11px;
+                @include animation(legs-wriggle-left 1s 0.8s infinite);
+            }
+
+            &:nth-of-type(3) {
+                top: 22px;
+                left: -12px;
+                @include animation(legs-wriggle-left 1s 0.2s infinite);
+            }
+
+            &:nth-of-type(4) {
+                top: 31px;
+                left: -10px;
+                @include animation(legs-wriggle-left 1s 0.4s infinite);
+            }
+
+            &:nth-of-type(6) {
+                top: 14px;
+                right: -11px;
+                @include animation(legs-wriggle-right 1s 0.4s infinite);
+            }
+
+            &:nth-of-type(7) {
+                top: 22px;
+                right: -12px;
+                @include animation(legs-wriggle-right 1s 0.7s infinite);
+            }
+
+            &:nth-of-type(8) {
+                top: 31px;
+                right: -10px;
+                @include animation(legs-wriggle-right 1s 0.3s infinite);
+            }
+        }
+    }
+
+    .web-right {
+        position: absolute;
+        height: 200px;
+        width: auto;
+        right: -10px;
+        top: -10px;
+        z-index: -1;
+        opacity: 0.2;
+    }
+
+    .web-left {
+        position: absolute;
+        left: -10px;
+        top: -10px;
+        @include transform(rotate(-90deg));
+        z-index: -1;
+        opacity: 0.2;
+    }
+
+    @include keyframes(legs-wriggle-left) {
+        0%, 100% {
+            @include transform(rotate(36deg) skewX(-20deg));
+        }
+        25%, 75% {
+            @include transform(rotate(15deg) skewX(-20deg));
+        }
+        50% {
+            @include transform(rotate(45deg) skewX(-20deg));
+        }
+    }
+
+    @include keyframes(legs-wriggle-right) {
+        0%, 100% {
+            @include transform(rotate(-36deg) skewX(20deg));
+        }
+        25%, 75% {
+            @include transform(rotate(-15deg) skewX(20deg));
+        }
+        50% {
+            @include transform(rotate(-45deg) skewX(20deg));
+        }
+    }
+
+    $height: random(190) + 40 + "px";
+    $movement: random(100) + 20 + "px";
+    $random-percentage: random(40) + 30 + "%";
+
+    @include keyframes(spider-move) {
+        0%, 100% {
+            margin-top: #{$height};
+        }
+        #{$random-percentage} {
+            margin-top: calc(#{$height} + #{$movement});
+        }
+    }
+}

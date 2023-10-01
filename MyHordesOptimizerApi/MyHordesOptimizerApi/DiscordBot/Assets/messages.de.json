@@ -122,5 +122,13 @@
   "instructions": {
     "name": "anweisungen",
     "description": "Machen Sie Ihre Anweisungen deutlich sichtbar und länger"
+  },
+  "suggestion": {
+    "name": "anweisungen",
+    "description": "Posten Sie einen Vorschlag in unserem Vorschlagsfeld"
+  },
+  "bug": {
+    "name": "bug",
+    "description": "Melde einen Fehler"
   }
 }

@@ -1,10 +1,7 @@
+@use 'variables';
+
 .mat-elevation-z8 {
     height: 100%;
     width: 100%;
     overflow: auto;
-
-    .mat-mdc-table-sticky {
-        background-color: white;
-        opacity: 1;
-      }
 }

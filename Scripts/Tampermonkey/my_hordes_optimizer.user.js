@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.67
+// @version      1.0.0-beta.68
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,8 +32,10 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[correctif] Correction d'un bug l'enregistrement de la valeur du 0 de la tdg\n\n`
-    + `[nouveauté] Un message sera désormais affiché au chargement du script si celui-ci n'est pas à sa version la plus récentes.\n`;
+    + `[nouveauté] Ajout d'un filtre pour masquer les chantiers terminés\n\n`
+    + `[amélioration] Les différents filtres ne tiennent désormais plus compte des accents\n`
+    + `[amélioration] Amélioration visuelle du bloc d'informations complémentaires\n\n`
+    + `[correctif] La copie du registre retire désormais les espaces en trop en début de ligne\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -472,6 +474,18 @@ const texts = {
         fr: `Note de la case`,
         de: `Box-Hinweis`,
         es: `Nota de caja`
+    },
+    no_note: {
+        en: `No note for this box`,
+        fr: `Pas de note pour cette case`,
+        de: `Keine Hinweis für diese Box`,
+        es: `No hay nota para esta caja`
+    },
+    additional_informations: {
+        en: `Further information`,
+        fr: `Informations complémentaires`,
+        de: `Weitere Informationen`,
+        es: `Informaciones complementarias`
     },
     anti_abuse_title: {
         en: `Anti-abuse counter`,
@@ -1247,12 +1261,21 @@ let params_categories = [
             {
                 id: `display_search_fields`,
                 label: {
-                    en: `Additional search fields`,
-                    fr: `Champs de recherches supplémentaires`,
-                    de: `Zusätzliche Suchfelder`,
-                    es: `Campos de búsqueda adicionales`
+                    en: `Additional filters`,
+                    fr: `Filtres supplémentaires`,
+                    de: `Zusätzliche Filter`,
+                    es: `Filtros adicionales`
                 },
                 children: [
+                    {
+                        id: `hide_completed_buildings_field`,
+                        label: {
+                            en: `Hide completed projects`,
+                            fr: `Masquer les chantiers terminés`,
+                            de: `Abgeschlossene Bauprojekte ausblenden`,
+                            es: `Ocultar obras completados`
+                        },
+                    },
                     {
                         id: `display_search_field_buildings`,
                         label: {
@@ -1739,7 +1762,7 @@ function pageIsForum() {
 function shouldRefreshMe() {
     let current_town_name = document.querySelector('.town-name');
     if (!current_town_name) return false;
-    return +current_town_name.nextElementSibling.innerText.replace(/(\D)*/, '') !== +mh_user.townDetails.day;
+    return +current_town_name.nextElementSibling.innerText.replace(/(\D)*/, '') !== mh_user?.townDetails?.day;
 }
 
 function getI18N(item) {
@@ -1753,9 +1776,13 @@ function getCurrentPosition() {
 
 function getCellDetailsByPosition() {
     let position = getCurrentPosition();
-    if (position) {
+    if (position && map.cells) {
         return map.cells.find((cell) => +cell.displayX === +position[0] && +cell.displayY === +position[1]);
     }
+}
+
+function normalizeString(str) {
+    return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
 /** Affiche ou masque la page de chargement de MyHordes en fonction du nombre d'appels en cours */
@@ -3458,6 +3485,7 @@ function calculateCampingProbabilities(conf) {
         let probability = Math.min(Math.max((100.0 - (Math.abs(Math.min(0, chances)) * 5)) / 100.0, .1), (conf.job === 'survivalist' ? 1.0 : 0.9));
         let camping_result_text = camping_results.find((camping_result) => camping_result.string ? probability < camping_result.probability : probability <= camping_result.probability);
         let result = document.querySelector('#camping-result');
+        if (!result) return;
         result.innerText = `${camping_result_text ? getI18N(camping_result_text.label) : ''} (${Math.round(probability * 10000) / 100}%)`;
     });
 };
@@ -3952,36 +3980,89 @@ function displaySearchFields() {
         displaySearchFieldOnBuildings();
         displaySearchFieldOnRecipientList();
         displaySearchFieldOnRegistry();
+        hideCompletedBuildings();
+    }
+}
+
+/** Si l'option associée est activée, affiche un champ de recherche sur la page de chantiers */
+function hideCompletedBuildings() {
+    if (mho_parameters.hide_completed_buildings_field && pageIsConstructions()) {
+
+        let buildings = Array.from(document.querySelectorAll('.buildings') || []);
+
+        let filterBuildings = () => {
+            let building_rows = [];
+            buildings.forEach((building) => {
+                building_rows.push(...Array.from(building.querySelectorAll('.building')));
+            });
+            building_rows.forEach((building_row) => {
+                if (building_row.classList.contains('complete')) {
+                    building_row.classList.add('hidden');
+                } else {
+                    building_row.classList.remove('hidden');
+                }
+            });
+
+            buildings.forEach((building) => {
+                if (Array.from(building.children).filter((child) => child.classList.contains('building')).every((child) => child.classList.contains('hidden'))) {
+                    building.classList.add('hidden');
+                } else {
+                    building.classList.remove('hidden');
+                }
+            });
+        };
+
+        filterBuildings();
     }
 }
 
 /** Si l'option associée est activée, affiche un champ de recherche sur la page de chantiers */
 function displaySearchFieldOnBuildings() {
-    let search_field = document.getElementById(mho_search_building_field_id);
+    let fields_container = document.getElementById(mho_search_building_field_id);
     if (mho_parameters.display_search_field_buildings && pageIsConstructions()) {
-        if (search_field) return;
+        if (fields_container) return;
 
         let tabs = document.querySelector('ul.buildings-tabs');
         if (tabs) {
             let tabs_block = tabs.parentElement;
 
-            let search_field_container = document.createElement('div');
+            fields_container = document.createElement('div');
+            fields_container.style.display = 'flex';
+            fields_container.style.flexWrap = 'wrap';
+            fields_container.style.alignItems = 'center';
+            fields_container.style.gap = '0.5em';
+            fields_container.style.marginTop = '0.5em';
+            fields_container.id = mho_search_building_field_id;
+            tabs_block.insertBefore(fields_container, tabs);
 
-            search_field = document.createElement('input');
+            let search_field_div = document.createElement('div');
+            search_field_div.style.display = 'flex';
+            search_field_div.style.alignItems = 'center';
+            fields_container.appendChild(search_field_div);
+            if (!mho_parameters.display_search_field_buildings) {
+                search_field_div.classList.add('hidden');
+            }
+
+            let search_field = document.createElement('input');
             search_field.type = 'text';
-            search_field.id = mho_search_building_field_id;
             search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
             search_field.classList.add('inline');
-            search_field.setAttribute('style', 'min-width: 250px; margin-top: 1em; padding-left: 24px;');
+            search_field.setAttribute('style', 'min-width: 200px; padding-left: 24px;');
+            search_field_div.appendChild(search_field);
 
             let buildings = Array.from(document.querySelectorAll('.buildings') || []);
-            search_field.addEventListener('keyup', (event) => {
+
+            let filterBuildings = () => {
                 let building_rows = [];
                 buildings.forEach((building) => {
                     building_rows.push(...Array.from(building.querySelectorAll('.building')));
                 });
                 building_rows.forEach((building_row) => {
-                    if (building_row.querySelector('.building_name').innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {
+                    let force_hide = mho_parameters.hide_completed_buildings_field && building_row.classList.contains('complete');
+
+                    if (force_hide) {
+                        building_row.classList.add('hidden');
+                    } else if (normalizeString(building_row.querySelector('.building_name').innerText).indexOf(normalizeString(search_field.value)) > -1) {
                         building_row.classList.remove('hidden');
                     } else {
                         building_row.classList.add('hidden');
@@ -3989,27 +4070,31 @@ function displaySearchFieldOnBuildings() {
                 });
 
                 buildings.forEach((building) => {
-                    if (Array.from(building.children).every((child) => child.classList.contains('hidden'))) {
+                    if (Array.from(building.children).filter((child) => child.classList.contains('building')).every((child) => child.classList.contains('hidden'))) {
                         building.classList.add('hidden');
                     } else {
                         building.classList.remove('hidden');
                     }
                 });
+            };
+
+            search_field.addEventListener('keyup', (event) => {
+                filterBuildings();
             });
 
-            search_field_container.appendChild(search_field);
 
-            let header_mho_img = document.createElement('img');
-            header_mho_img.src = mh_optimizer_icon;
-            header_mho_img.style.height = '24px';
-            header_mho_img.style.position = 'relative';
-            header_mho_img.style.left = '-250px';
-            header_mho_img.style.top = '-2px';
-            search_field_container.appendChild(header_mho_img);
-            tabs_block.insertBefore(search_field_container, tabs);
+            setTimeout(() => {
+                let header_mho_img = document.createElement('img');
+                header_mho_img.src = mh_optimizer_icon;
+                header_mho_img.style.height = '24px';
+                header_mho_img.style.position = 'absolute';
+                header_mho_img.style.left = `${search_field.offsetLeft}px`;
+                header_mho_img.style.top = `${search_field.offsetTop}px`;
+                search_field_div.appendChild(header_mho_img);
+            }, 250)
         }
-    } else if (search_field) {
-        search_field.parentElement.remove();
+    } else if (fields_container) {
+        fields_container.remove();
     }
 }
 
@@ -4033,7 +4118,7 @@ function displaySearchFieldOnRecipientList() {
             search_field.addEventListener('keyup', (event) => {
                 let recipients_list = Array.from(document.querySelectorAll('.recipient.link') || []);
                 recipients_list.forEach((recipient) => {
-                    if (recipient.innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {
+                    if (normalizeString(recipient.innerText).indexOf(normalizeString(search_field.value)) > -1) {
                         recipient.classList.remove('hidden');
                     } else {
                         recipient.classList.add('hidden');
@@ -4115,7 +4200,7 @@ function displaySearchFieldOnRegistry() {
                 search_field.addEventListener('keyup', (event) => {
                     let logs_list = Array.from(document.querySelectorAll('.log-entry .log-part-content') || []);
                     logs_list.forEach((log) => {
-                        if (log.innerText.toLowerCase().indexOf(search_field.value.toLowerCase()) > -1) {
+                        if (normalizeString(log.innerText).indexOf(normalizeString(search_field.value)) > -1) {
                             log.parentElement.classList.remove('hidden');
                         } else {
                             log.parentElement.classList.add('hidden');
@@ -4464,7 +4549,7 @@ function displayAdvancedTooltips() {
                 // Remove opened tooltips
                 let current_tooltips_containers = document.querySelectorAll('.tooltip.item[style*="display: block"]');
                 Array.from(tooltip_containers).forEach((container) => {
-                    if (getItemFromImg(container.querySelector('h1 img').src).id !== hovered_item.id) {
+                    if (getItemFromImg(container.querySelector('h1 img')?.src)?.id !== hovered_item.id) {
                         container.style.display = 'none';
                     }
                 });
@@ -4544,7 +4629,7 @@ function createAdvancedProperties(content, item, tooltip) {
         stock_div.appendChild(bank_div);
 
         let wishlist_for_zone = getWishlistForZone();
-        let item_in_wishlist = wishlist_for_zone.find((item_in_wishlist_for_zone) => item.id === item_in_wishlist_for_zone.item.id);
+        let item_in_wishlist = wishlist_for_zone?.find((item_in_wishlist_for_zone) => item.id === item_in_wishlist_for_zone.item.id);
 
         if (item_in_wishlist && item_in_wishlist.item.wishListCount && item_in_wishlist.item.wishListCount > 0) {
             let wishlist_wanted_div = document.createElement('div');
@@ -5804,73 +5889,98 @@ function displayTranslateTool() {
 function displayCellDetailsOnPage() {
     if (mho_parameters.display_more_informations_from_mho && pageIsDesert()) {
         let cell = getCellDetailsByPosition();
-        let cell_note = document.querySelector('#cell-note');
-        if (cell && (!current_cell || cell.id !== current_cell.id)) {
+        let cell_informations = document.querySelector('#cell-informations');
+        if (cell) {
             current_cell = cell;
-            if (!cell_note) {
-                cell_note = document.createElement('div');
-                cell_note.id = 'cell-note';
-                cell_note.classList.add('row');
+            if (!cell_informations) {
+                cell_informations = document.createElement('div');
+                cell_informations.id = 'cell-informations';
+                cell_informations.classList.add('row');
 
-                let cell_note_div = document.createElement('div');
-                cell_note_div.style.width = '100%';
-                cell_note_div.classList.add('background', 'cell');
-                cell_note.appendChild(cell_note_div);
+                let cell_informations_div = document.createElement('div');
+                cell_informations_div.style.width = '100%';
+                cell_informations_div.classList.add('background', 'cell');
+                cell_informations.appendChild(cell_informations_div);
 
-                let cell_note_header = document.createElement('h5');
-                cell_note_header.style.marginTop = '0';
-                cell_note_header.style.display = 'flex';
-                cell_note_header.style.justifyContent = 'space-between';
-                cell_note_header.style.alignItems = 'center';
-                cell_note_div.appendChild(cell_note_header);
+                let cell_informations_header = document.createElement('h5');
+                cell_informations_header.style.marginTop = '0';
+                cell_informations_header.style.display = 'flex';
+                cell_informations_header.style.justifyContent = 'space-between';
+                cell_informations_header.style.alignItems = 'center';
+                cell_informations_div.appendChild(cell_informations_header);
 
-                let cell_note_header_left = document.createElement('div');
-                cell_note_header_left.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px; height: 24px; margin-right: 0.5em">${getI18N(texts.note)}`;
-                cell_note_header.appendChild(cell_note_header_left);
+                let cell_informations_header_left = document.createElement('div');
+                cell_informations_header_left.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px; height: 24px; margin-right: 0.5em">${getI18N(texts.additional_informations)}`;
+                cell_informations_header.appendChild(cell_informations_header_left);
 
-                let cell_note_header_right = document.createElement('div');
-                cell_note_header_right.innerHTML = `🗘`;
-                cell_note_header_right.style.fontSize = '16px';
-                cell_note_header_right.style.cursor = 'pointer';
-                cell_note_header.appendChild(cell_note_header_right);
+                let cell_informations_header_right = document.createElement('div');
+                cell_informations_header_right.innerHTML = `🗘`;
+                cell_informations_header_right.style.fontSize = '16px';
+                cell_informations_header_right.style.cursor = 'pointer';
+                cell_informations_header.appendChild(cell_informations_header_right);
 
-                cell_note_header_right.addEventListener('click', () => {
-                    cell_note.querySelector('#cell-note-content').innerText = '🗘';
+                cell_informations_header_right.addEventListener('click', () => {
+                    cell_informations.querySelector('#cell-note-content').innerText = '🗘';
+                    cell_informations.querySelector('#cell-digs-content').innerText = '🗘';
                     getMap().then(() => {
                         cell = getCellDetailsByPosition();
-                        cell_note.querySelector('#cell-note-content').innerText = cell.note;
+                        updateInformations(cell);
                     });
                 });
 
+                let cell_informations_content = document.createElement('div');
+                cell_informations_content.style.display = 'flex';
+                cell_informations_content.style.flexDirection = 'column';
+                cell_informations_content.style.gap = '0.5em';
+                cell_informations_div.appendChild(cell_informations_content);
+
+                let createSubBlock = (id, title) => {
+                    let sub_block = document.createElement('div');
+                    sub_block.id = id;
+                    cell_informations_content.appendChild(sub_block);
+
+                    let sub_block_header = document.createElement('h5');
+                    sub_block_header.id = id + '-header'
+                    sub_block_header.style.marginTop = '0';
+                    sub_block_header.style.borderBottomWidth = '1px';
+                    sub_block_header.style.fontWeight = 'normal';
+                    sub_block_header.innerText = title;
+                    sub_block.appendChild(sub_block_header);
+
+                    let sub_block_content = document.createElement('div');
+                    sub_block_content.id = id + '-content';
+                    sub_block.appendChild(sub_block_content);
+                }
+
                 // console.log('cell', cell);
 
-                let cell_note_content = document.createElement('div');
-                cell_note_content.id = 'cell-note-content';
-                cell_note_div.appendChild(cell_note_content);
-
                 let map_box = document.querySelector('.map-box');
+                map_box.parentElement.parentElement.appendChild(cell_informations);
 
-                map_box.parentElement.parentElement.appendChild(cell_note);
-
-                let cell_digs_header = document.createElement('h5');
-                cell_digs_header.style.marginTop = '0';
-                cell_digs_header.style.display = 'flex';
-                cell_digs_header.style.justifyContent = 'space-between';
-                cell_digs_header.style.alignItems = 'center';
-                cell_note_div.appendChild(cell_digs_header);
-
-                let cell_dig_header_left = document.createElement('div');
-                cell_dig_header_left.innerHTML = getI18N(texts.digs_state_header);
-                cell_digs_header.appendChild(cell_dig_header_left);
-
-                let cell_digs_content = document.createElement('div');
-                cell_digs_content.id = 'cell-digs-content';
-                cell_note_div.appendChild(cell_digs_content);
+                let cell_note = createSubBlock('cell-note', getI18N(texts.note));
+                let cell_digs = createSubBlock('cell-digs', getI18N(texts.digs_state_header));
             }
-            cell_note.querySelector('#cell-note-content').innerText = cell.note;
-            cell_note.querySelector('#cell-digs-content').innerHTML = `
-            <div>${getI18N(texts.digs_max)} : ${cell.totalSucces - cell.maxPotentialRemainingDig}</div>
-            <div>${getI18N(texts.digs_average)} : ${cell.totalSucces - cell.averagePotentialRemainingDig}</div>`;
+
+            let insertCellNote = (cell) => {
+                cell_informations.querySelector('#cell-note-content').innerHTML = cell.note && cell.note !== ''
+                    ? `<div>${cell.note}</div>`
+                    : `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.no_note)}</div>`;
+            };
+
+            let insertCellDigs = (cell) => {
+                cell_informations.querySelector('#cell-digs-content').innerHTML = `
+                    <div>${getI18N(texts.digs_max)} : ${Math.round(cell.maxPotentialRemainingDig - cell.totalSucces)}</div>
+                    <div>${getI18N(texts.digs_average)} : ${Math.round(cell.averagePotentialRemainingDig - cell.totalSucces)}</div>
+                `;
+            };
+
+            let updateInformations = (cell) => {
+                insertCellNote(cell);
+                insertCellDigs(cell);
+            }
+
+            updateInformations(cell);
+
         }
     } else {
         current_cell = undefined;
@@ -5953,8 +6063,9 @@ function displayEstimationsOnWatchtower() {
                                 max: +watchtower_planif_block_prediction?.split(' ')[2]
                             }
                         })
-                        .then(() => {
+                        .then((test) => {
                             estim_block_title_save_button.innerHTML = `<img src="${repo_img_hordes_url}icons/done.png">`;
+                            updateEstimationsOnWatchtower(test);
                         });
                 });
 
@@ -6104,6 +6215,10 @@ function displayEstimationsOnWatchtower() {
             });
         }
     }
+}
+
+function updateEstimationsOnWatchtower(new_estimations) {
+    console.log('new_estimations', new_estimations);
 }
 
 function displayAntiAbuseCounter() {
@@ -6693,9 +6808,9 @@ function addCopyRegisterButton() {
             copy_button.addEventListener('click', () => {
                 let entries = logs.querySelectorAll('.log-entry');
                 let soft_entries = Array.from(entries).map((entry) => {
-                    let time = entry.querySelector('.log-part-time').innerText;
+                    let time = entry.querySelector('.log-part-time').innerText.trim();
                     let separator = ' [X] ';
-                    let content = entry.querySelector('.log-part-content').innerText;
+                    let content = entry.querySelector('.log-part-content').innerText.trim();
                     return time + separator + content;
                 });
 
@@ -8629,7 +8744,7 @@ function updateExternalTools() {
                 fr: `est arrivé depuis`
             }
 
-            let arrivals = logs.filter((log) => log.innerText.toLowerCase().indexOf(getI18N(arrivals_texts).toLowerCase()) > -1).map((log) => {
+            let arrivals = logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(arrivals_texts))) > -1).map((log) => {
                 return {
                     time: log.querySelector('.log-part-time')?.innerText,
                     citizen: log.querySelector('.log-part-content .container span')?.innerText
@@ -8656,7 +8771,7 @@ function updateExternalTools() {
                         es: `no encontró nada...`,
                         fr: `rien trouvé...`
                     };
-                    let failed_digs = Array.from(logs.filter((log) => log.innerText.toLowerCase().indexOf(getI18N(failed_texts).toLowerCase()) > -1) || []).filter((log) => log.innerText.indexOf(citizen.userName) > -1) || [];
+                    let failed_digs = Array.from(logs.filter((log) => normalizeString(log.innerText).indexOf(normalizeString(getI18N(failed_texts))) > -1) || []).filter((log) => log.innerText.indexOf(citizen.userName) > -1) || [];
                     let nb_failed_digs = failed_digs.length;
 
                     let nb_minutes_for_dig = citizen.job === 'dig' ? 90 : 120; // Une fouille = 2h = 120 minutes pour un tous les métiers, ou 1h30 = 90 minutes pour une pelle
@@ -9129,11 +9244,12 @@ function getApiKey() {
                 getApiKey().then(() => {
                     getMe().then(() => {
 
-                        initOptionsWithLoginNeeded();
-                        initOptionsWithoutLoginNeeded();
+                        setTimeout(() => {
+                            initOptionsWithLoginNeeded();
+                            initOptionsWithoutLoginNeeded();
+                        });
 
                         document.addEventListener('mh-navigation-complete', (event) => {
-                            // console.log('navigation');
                             if (shouldRefreshMe()) {
                                 getMe().then(() => {
                                     initOptionsWithLoginNeeded();

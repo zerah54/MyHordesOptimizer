@@ -8,12 +8,13 @@
         gap: 1em;
 
         .card {
-            background-color: variables.$sidenav_bg_color;
+            background-color: variables.$sidenav_bg_color !important;
             width: 300px;
-            height: 400px;
+            height: 400px !important;
 
             .card-header {
                 font-variant-caps: all-small-caps;
+                padding-top: 0;
 
                 h3 {
                     margin: 0;
@@ -22,19 +23,12 @@
             }
 
             .content {
-                .title {
-                    display: flex;
-                    gap: 0.5em;
-                    align-items: flex-start;
-                    position: sticky;
-                    top: 0;
-                    background-color: variables.$sidenav_bg_color;
-
-                    h5 {
-                        flex: 1;
-                        margin: 0;
-                        font-weight: bold;
-                    }
+                .mat-mdc-table {
+                    --mat-table-background-color: #{variables.$sidenav_bg_color};
+                    --mat-table-row-item-container-height: undefined;
+                    --mat-table-header-container-height: undefined;
+                    --mat-table-header-headline-line-height: undefined;
+                    --mat-table-header-headline-size: 0.8em;
                 }
             }
         }

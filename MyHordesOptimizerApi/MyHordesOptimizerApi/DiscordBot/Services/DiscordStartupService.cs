@@ -13,7 +13,6 @@ namespace MyHordesOptimizerApi.DiscordBot.Services
     {
         private readonly DiscordSocketClient _discordSocketClient;
         private readonly IDiscordBotConfiguration _configuration;
-        private readonly ILogger<DiscordStartupHostedService> _logger;
 
         public DiscordStartupHostedService(
             DiscordSocketClient discord, 
@@ -22,9 +21,8 @@ namespace MyHordesOptimizerApi.DiscordBot.Services
         {
             _discordSocketClient = discord;
             _configuration = configuration;
-            _logger = logger;
 
-            _discordSocketClient.Log += msg => LogHelper.OnLogAsync(_logger, msg);
+            _discordSocketClient.Log += msg => LogHelper.OnLogAsync(logger, msg);
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)

@@ -48,7 +48,7 @@
                     <td mat-cell *matCellDef="let row" [ngClass]="column.id">
                         <ng-container [ngSwitch]="column.id">
                             <ng-container *ngSwitchCase="'label'">
-                                <img [ngSrc]="HORDES_IMG_REPO + 'ruin/' + row.img + '.gif'" width="16" height="16">
+                                <img [src]="HORDES_IMG_REPO + 'ruin/' + row.img + '.gif'">
                                 <div>{{row[column.id][locale]}}</div>
                             </ng-container>
                             <ng-container *ngSwitchCase="'description'">
