@@ -678,7 +678,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Open();
             var userIds = wrapper.Citizens.Select(x => x.Id).ToList();
             var existingUsers = connection.Query<UsersModel>("SELECT * FROM Users WHERE idUser IN @UserIds", new { UserIds = userIds });
-            //  var insertBuilder = new StringBuilder("INSERT INTO User(idUser,name,userKey) VALUES ");
+
             foreach (var citizen in wrapper.Citizens)
             {
                 var userModel = Mapper.Map<UsersModel>(citizen);
@@ -693,6 +693,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                     connection.Insert(userModel);
                 }
             }
+
             var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(wrapper.LastUpdateInfo);
             var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
                                                                    VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
@@ -899,7 +900,52 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
                                                                    VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
 
-            var existings = connection.Query(@"SELECT tca.idCadaver,
+            var userIds = wrapper.Cadavers.Select(x => x.Id).ToList();
+            var existingUsers = connection.Query<UsersModel>("SELECT * FROM Users WHERE idUser IN @UserIds", new { UserIds = userIds });
+
+            foreach (var cadaver in wrapper.Cadavers)
+            {
+                // Il se pourrait qu'un cadavre n'ait pas de user si la personne est déjà morte quand l'update est fait
+                var userModel = Mapper.Map<UsersModel>(cadaver);
+                var existingUser = existingUsers.FirstOrDefault(x => x.IdUser == cadaver.Id);
+                if (existingUser != null && existingUser.Name != cadaver.Name)
+                {
+                    // On devrait pas souvent faire des updates, alors on est pas obliger de bulk
+                    connection.Execute("UPDATE Users SET name = @Name WHERE idUser = @UserId", new { Name = userModel.Name, UserId = userModel.IdUser });
+                }
+                else if (existingUser == null)
+                {
+                    connection.Insert(userModel);
+                }
+            }
+
+            // Il se pourrait que l'on ait des cadavres sans citizen précédemment créé. On va le faire ici.
+            var existings = connection.Query("SELECT idUser, idBag FROM TownCitizen WHERE idTown = @IdTown", new { IdTown = townId });
+            var cadaverCitizenModels = Mapper.Map<IEnumerable<TownCadaverModel>>(wrapper.Cadavers).ToList();
+            cadaverCitizenModels.ForEach(x => { x.IdLastUpdateInfo = idLastUpdateInfo; });
+
+            var cadaverCitizenToCreate = cadaverCitizenModels.Where(x => !existings.Any(existing => existing.idUser == x.IdCitizen)).ToList();
+
+            foreach (var cadaverCitizen in cadaverCitizenToCreate)
+            {
+                connection.Execute(@"INSERT INTO TownCitizen ( idUser,
+                                                               idTown,
+                                                               idLastUpdateInfo,
+                                                               avatar )
+                                                      VALUES ( @IdUser,
+                                                               @IdTown,
+                                                               @IdLastUpdateInfo,
+                                                               @Avatar )",
+                                                    new
+                                                    {
+                                                        IdLastUpdateInfo = cadaverCitizen.IdLastUpdateInfo,
+                                                        IdTown = townId,
+                                                        IdUser = cadaverCitizen.IdCitizen,
+                                                        Avatar = cadaverCitizen.Avatar
+                                                    });
+            }
+
+            existings = connection.Query(@"SELECT tca.idCadaver,
                                                       tca.idCitizen,
                                                       tca.cleanUp
                                                  FROM TownCadaver tca,

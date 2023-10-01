@@ -45,7 +45,9 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
                         Survival = cadaver.Survival,
                     };
 
-                    destinationCadaver.CleanUp.IdCleanUp = citizens.Citizens.Where(x => x.Id == cadaver.Id).FirstOrDefault().Cadaver.CleanUp.IdCleanUp;
+                    var cadaverCleanUpId = citizens.Citizens.Where(x => x.Id == cadaver.Id).FirstOrDefault();
+
+                    destinationCadaver.CleanUp.IdCleanUp = cadaverCleanUpId != null ? cadaverCleanUpId.Cadaver.CleanUp.IdCleanUp : 0;
                     destinationCadaver.CleanUp.CitizenCleanUp = citizens.Citizens.Where(x => x.Name == cadaver.Cleanup.User).FirstOrDefault();
                     destinationCadaver.CleanUp.Type = cleanUpTypes.Where(x => x.MyHordesApiName == cadaver.Cleanup.Type).FirstOrDefault();
 
