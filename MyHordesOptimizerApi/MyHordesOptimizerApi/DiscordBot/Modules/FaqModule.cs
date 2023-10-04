@@ -69,6 +69,26 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             await RespondAsync(embed: embedBuilder.Build(), ephemeral: privateMsg);
         }
         
+        [SlashCommand(name: "mse", description: "mse")]
+        public async Task MseResultAsync(
+            [Summary(name: "private-msg", description: "True if the message should not be seen by all")]
+            bool privateMsg = false
+        )
+        {
+            var description = "";
+            description += "Donne 6 PA : 40%\n";
+            description += "Terrorise : 20%\n";
+            description += "Donne 7 PA + addiction : 20%\n";
+            description += "Ne fait rien : 20%\n";
+
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle("Résultats de la consommation de MSE")
+                .WithDescription(description)
+                .WithColor(DiscordBotConsts.MhoColorPink);
+
+            await RespondAsync(embed: embedBuilder.Build(), ephemeral: privateMsg);
+        }
+        
         [SlashCommand(name: "discord-cheat-sheet", description: "List of Discord shaping shortcuts")]
         public async Task DiscordCheatSheetAsync(
             [Summary(name: "private-msg", description: "True if the message should not be seen by all")]
