@@ -1,0 +1,32 @@
+<div mat-dialog-title class="mho-despair-deaths-calculator-title">
+    <h2 i18n>Calculateur de morts par désespoir</h2>
+    <button mat-icon-button mat-dialog-close>
+        <mat-icon>close</mat-icon>
+    </button>
+</div>
+
+<mat-dialog-content class="mho-despair-deaths-calculator">
+
+    <div *ngFor="let day of days; let index = index" class="day">
+        <h3 class="day-label">{{day.day}}</h3>
+        <div class="fields">
+            <!--            <mat-form-field *ngIf="index <= 0">-->
+            <!--                <mat-label>Points de contrôle</mat-label>-->
+            <!--                <input matInput [(ngModel)]="day.nb_pdc">-->
+            <!--            </mat-form-field>-->
+            <mat-form-field class="no-bottom" appearance="outline">
+                <mat-label>Zombies sur la case</mat-label>
+                <input matInput type="number" [(ngModel)]="day.nb_zombies" [disabled]="index > 0" (ngModelChange)="rebuildElements()">
+            </mat-form-field>
+            <mat-form-field class="no-bottom" appearance="outline" *ngIf="index > 0">
+                <mat-label>Zombies morts dans la nuit</mat-label>
+                <input matInput type="number" [(ngModel)]="day.nb_night_dead_zombies" disabled>
+            </mat-form-field>
+            <mat-form-field class="no-bottom" appearance="outline">
+                <mat-label> <!--*ngIf="index > 0"-->Zombies tués</mat-label>
+                <!--                <mat-label *ngIf="index <= 0">Kills nécessaires</mat-label>-->
+                <input matInput type="number" [(ngModel)]="day.nb_killed_zombies" (ngModelChange)="rebuildElements()">
+            </mat-form-field>
+        </div>
+    </div>
+</mat-dialog-content>

@@ -6,7 +6,13 @@
         <ng-container *ngFor="let misc_card of misc">
             <mat-card class="card">
                 <mat-card-header class="card-header">
-                    <mat-card-title>{{misc_card.header}}</mat-card-title>
+                    <mat-card-title>
+                        {{misc_card.header}}
+                    </mat-card-title>
+                    <button mat-icon-button *ngIf="misc_card.header_action" (click)="misc_card.header_action.action()">
+                        <mat-icon>{{misc_card.header_action.icon}}
+                        </mat-icon>
+                    </button>
                 </mat-card-header>
                 <mat-card-content class="content">
                     <table mat-table [dataSource]="misc_card.table">

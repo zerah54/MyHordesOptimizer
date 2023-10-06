@@ -63,10 +63,6 @@ body {
             height: 1em;
         }
     }
-
-    .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-        background-color: variables.$card-background-color !important;
-    }
 }
 
 .mat-mdc-icon-button {

@@ -27,7 +27,7 @@
         </mat-sidenav>
         <mat-sidenav-content class="mho-content">
             <mat-card>
-                <router-outlet></router-outlet>
+                <router-outlet *ngIf="ready"></router-outlet>
             </mat-card>
         </mat-sidenav-content>
     </mat-sidenav-container>
