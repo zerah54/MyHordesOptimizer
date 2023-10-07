@@ -36,7 +36,7 @@
         "moment": "^2.29.4",
         "ng-table-virtual-scroll": "^1.6.0",
         "rxjs": "~7.8.1",
-        "zone.js": "~0.14.0"
+        "zone.js": "~0.13.3"
     },
     "devDependencies": {
         "@angular-devkit/build-angular": "~16.2.5",
