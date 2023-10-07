@@ -1,10 +1,12 @@
 import { Component, HostBinding, Input, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { AutoDestroy } from '../../decorators/autodestroy.decorator';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { Item } from '../../../_abstract_model/types/item.class';
 import { WishlistServices } from '../../../_abstract_model/services/wishlist.service';
+import { Item } from '../../../_abstract_model/types/item.class';
+import { TownDetails } from '../../../_abstract_model/types/town-details.class';
+import { AutoDestroy } from '../../decorators/autodestroy.decorator';
+import { getTown } from '../../utilities/localstorage.util';
 
 @Component({
     selector: 'mho-item',
@@ -25,6 +27,7 @@ export class ItemComponent implements OnInit {
     public readonly locale: string = moment.locale();
 
     public display_mode: 'simple' | 'advanced' = 'simple';
+    public town: TownDetails | null = getTown();
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 

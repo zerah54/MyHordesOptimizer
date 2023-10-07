@@ -1,11 +1,16 @@
-<mat-card-header>
+<mat-card-header class="mho-probabilities-header">
     <mat-card-title>
         <ng-container i18n>Chances de survie</ng-container>
 
-        <button mat-icon-button (click)="createSimulation()">
+        <button mat-icon-button (click)="createSimulation()" matTooltip="Ajouter une simulation" i18n-matTooltip>
             <mat-icon>add</mat-icon>
         </button>
     </mat-card-title>
+
+    <mat-form-field [appearance]="'outline'" class="no-bottom default-value">
+        <mat-label i18n>Valeur par défaut</mat-label>
+        <input matInput type="number" [min]="0" [max]="100" [(ngModel)]="default_value">
+    </mat-form-field>
 </mat-card-header>
 <mat-card-content>
     <div class="mho-probabilities">
@@ -64,7 +69,7 @@
                 </div>
                 <div class="chances" *ngIf="simulation.show_detail">
                     <mat-form-field *ngFor="let people of [].constructor(simulation.nb_people); let i = index"
-                                    appearance="outline" class="short-bottom">
+                                    appearance="outline" class="short-bottom surviving-chance">
                         <mat-label i18n>Chances de survie</mat-label>
                         <input matInput type="number" (change)="calculateProbabilities(simulation)"
                                [(ngModel)]="simulation.current_chances[i]"
