@@ -153,9 +153,9 @@ export class ApiServices extends GlobalServices {
             });
     }
 
-    public getApofooAttackCalculation(today: boolean, day: number): Observable<MinMax | null> {
+    public getApofooAttackCalculation(day: number, beta: boolean): Observable<MinMax | null> {
         return new Observable((sub: Subscriber<MinMax | null>) => {
-            super.get<MinMax>(this.API_URL + `/attaqueEstimation/apofooAttackCalculation/${today ? 'attack' : 'planif'}?day=${day}&townId=${getTown()?.town_id}`)
+            super.get<MinMax>(this.API_URL + `/attaqueEstimation/apofooAttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<MinMax>) => {
                         sub.next(response.body);

@@ -17,6 +17,7 @@ import { LoadingOverlayService } from './shared/services/loading-overlay.service
 export class AppComponent implements OnInit {
     public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     public is_loading: boolean = false;
+    public ready: boolean = false;
     public readonly theme: string | null = localStorage.getItem('theme');
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
@@ -32,18 +33,21 @@ export class AppComponent implements OnInit {
 
     public ngOnInit(): void {
 
-        if (this.theme) {
-            this.overlay_container.getContainerElement().classList.add(this.theme);
-        }
-        this.loaderOnRouting();
-        this.api.getMe()
-            .pipe(takeUntil(this.destroy_sub))
-            .subscribe();
-
         this.loading_service.is_loading_obs
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((is_loading: boolean) => {
                 this.is_loading = is_loading;
+            });
+
+        if (this.theme) {
+            this.overlay_container.getContainerElement().classList.add(this.theme);
+        }
+        this.loaderOnRouting();
+
+        this.api.getMe()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe(() => {
+                this.ready = true;
             });
     }
 

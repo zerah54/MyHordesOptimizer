@@ -1,9 +1,11 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import * as moment from 'moment';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { getMaxAttack, getMinAttack } from '../../shared/utilities/estimations.util';
+import { DespairDeathsCalculatorComponent } from './despair-deaths-calculator/despair-deaths-calculator.component';
 
 @Component({
     selector: 'mho-miscellaneous-info',
@@ -19,6 +21,12 @@ export class MiscellaneousInfoComponent {
     public misc: Misc[] = [
         {
             header: $localize`Morts par désespoir`,
+            header_action: {
+                icon: 'calculate',
+                action: (): void => {
+                    this.openCalculator();
+                }
+            },
             columns: [
                 { id: 'nb_killed_zombies', header: $localize`Zombies morts sur la case depuis la dernière attaque` },
                 { id: 'will_dead_zombies', header: $localize`Zombies qui vont mourir par désespoir` }
@@ -87,13 +95,23 @@ export class MiscellaneousInfoComponent {
     ];
 
 
-    constructor(private decimal_pipe: DecimalPipe) {
+    constructor(private decimal_pipe: DecimalPipe, private dialog: MatDialog) {
 
+    }
+
+    private openCalculator(): void {
+        this.dialog.open(DespairDeathsCalculatorComponent);
     }
 }
 
 interface Misc {
     header: string;
+    header_action?: MiscHeaderAction;
     columns: StandardColumn[];
     table: MatTableDataSource<{ [key: string]: number | string | null }>;
+}
+
+interface MiscHeaderAction {
+    icon: string;
+    action: () => void
 }

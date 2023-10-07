@@ -77,4 +77,14 @@
     .mat-expansion-panel {
         --mat-expansion-container-background-color: #{variables.$card-background-color};
     }
+
+
+    .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+        background-color: variables.$card-background-color !important;
+    }
+
+    .mdc-text-field {
+        --mdc-filled-text-field-disabled-container-color: variables.$card-background-color;
+        --mdc-filled-text-field-container-color: variables.$card-background-color;
+    }
 }
