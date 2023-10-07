@@ -10,7 +10,7 @@
                     <ng-container *ngIf="item?.is_broken">&nbsp;(<ng-container i18n>Cassé</ng-container>)</ng-container>
                 </span>
             </div>
-            <div class="add_to_wishlist" *ngIf="item.wishlist_count === 0">
+            <div class="add_to_wishlist" *ngIf="town && town.town_id && item.wishlist_count === 0">
                 <button mat-icon-button type="button"
                         (click)="$event.stopPropagation(); addItemToWishlist(item)">
                     <img [ngSrc]="HORDES_IMG_REPO + 'item/item_cart.gif'" width="16" height="16">
