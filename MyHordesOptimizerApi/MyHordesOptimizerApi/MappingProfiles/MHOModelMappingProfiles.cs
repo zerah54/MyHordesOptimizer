@@ -175,6 +175,11 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.UserKey, opt => opt.Ignore());
 
+            CreateMap<Cadaver, UsersModel>()
+               .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.Id))
+               .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+               .ForMember(dest => dest.UserKey, opt => opt.Ignore());
+
             //TownCitizen
             CreateMap<Citizen, TownCitizenModel>()
                 .ForMember(dest => dest.IdTown, opt => opt.Ignore())

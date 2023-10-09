@@ -44,6 +44,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
                         Score = cadaver.Score,
                         Survival = cadaver.Survival,
                     };
+
                     var deadCitizen = citizens.Citizens.Where(x => x.Id == cadaver.Id).FirstOrDefault();
                     if(deadCitizen != null)
                     {
@@ -51,7 +52,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
                         destinationCadaver.CleanUp.CitizenCleanUp = citizens.Citizens.Where(x => x.Name == cadaver.Cleanup.User).FirstOrDefault();
                         destinationCadaver.CleanUp.Type = cleanUpTypes.Where(x => x.MyHordesApiName == cadaver.Cleanup.Type).FirstOrDefault();
                     }
-                  
 
                     wrapper.Cadavers.Add(destinationCadaver);
                 }
