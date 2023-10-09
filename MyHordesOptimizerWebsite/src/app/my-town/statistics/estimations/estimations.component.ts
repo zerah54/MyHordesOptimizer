@@ -1,9 +1,13 @@
 import { Component, ElementRef, HostBinding, HostListener, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
+import { ChartConfiguration, ChartEvent, LegendElement } from 'chart.js';
 import Chart from 'chart.js/auto';
+import { ChartDataset, LegendItem } from 'chart.js/dist/types';
+import { Color } from 'chartjs-plugin-datalabels/types/options';
 import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
 import { MinMax } from '../../../_abstract_model/interfaces';
 import { ApiServices } from '../../../_abstract_model/services/api.services';
+import { Dictionary } from '../../../_abstract_model/types/_types';
 import { Estimations } from '../../../_abstract_model/types/estimations.class';
 import { Regen } from '../../../_abstract_model/types/regen.class';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
@@ -44,6 +48,13 @@ export class EstimationsComponent implements OnInit {
     public today_chart!: Chart<'line'>;
     public tomorrow_chart!: Chart<'line'>;
 
+    public today_calculated_attack!: MinMax | null;
+    public today_calculated_attack_beta!: MinMax | null;
+    public tomorrow_calculated_attack!: MinMax | null;
+    public tomorrow_calculated_attack_beta!: MinMax | null;
+
+    public step?: number = 0;
+
     public separators: string[] = [' à ', ' - '];
 
     constructor(private clipboard: ClipboardService, private api: ApiServices) {
@@ -63,11 +74,25 @@ export class EstimationsComponent implements OnInit {
     public getEstimations(): void {
         this.api.getEstimations(this.selected_day).subscribe((estimations: Estimations) => {
             this.estimations = estimations;
-            setTimeout(() => {
-                this.defineTodayCanvas();
-                this.defineTomorrowCanvas();
+            this.api.getApofooAttackCalculation(this.selected_day, false).subscribe((result: MinMax | null) => {
+                this.today_calculated_attack = result;
+                this.api.getApofooAttackCalculation(this.selected_day, true).subscribe((result: MinMax | null) => {
+                    this.today_calculated_attack_beta = result;
+                    this.defineTodayCanvas();
+                });
+            });
+            this.api.getApofooAttackCalculation(this.selected_day + 1, false).subscribe((result: MinMax | null) => {
+                this.tomorrow_calculated_attack = result;
+                this.api.getApofooAttackCalculation(this.selected_day + 1, true).subscribe((result: MinMax | null) => {
+                    this.tomorrow_calculated_attack_beta = result;
+                    this.defineTomorrowCanvas();
+                });
             });
         });
+    }
+
+    public setStep(step: number): void {
+        this.step = step;
     }
 
     private defineTodayCanvas(): void {
@@ -77,47 +102,7 @@ export class EstimationsComponent implements OnInit {
             }
 
             const today_ctx: CanvasRenderingContext2D = this.today_canvas.nativeElement.getContext('2d');
-            this.today_chart = new Chart<'line'>(today_ctx, {
-                type: 'line',
-                data: {
-                    labels: TDG_VALUES.map((value: number): string => value + '%'),
-                    datasets: [
-                        {
-                            label: 'Minimum théorique',
-                            data: Array(TDG_VALUES.length).fill(getMinAttack(this.selected_day, getTown()?.town_type || 'RE')),
-                            spanGaps: true,
-                            borderDash: [3, 3],
-                        },
-                        {
-                            label: 'Attaque minimum',
-                            data: TDG_VALUES.map((value: number) => +(this.estimations.estim['_' + value].min || 'NaN')),
-                            spanGaps: true,
-                        },
-                        {
-                            label: 'Attaque maximum',
-                            data: TDG_VALUES.map((value: number) => +(this.estimations.estim['_' + value].max || 'NaN')),
-                            spanGaps: true,
-                        },
-                        {
-                            label: 'Maximum théorique',
-                            data: Array(TDG_VALUES.length).fill(getMaxAttack(this.selected_day, getTown()?.town_type || 'RE')),
-                            spanGaps: true,
-                            borderDash: [3, 3],
-                        },
-                    ]
-                },
-                options: {
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: $localize`Attaque du jour`
-                        }
-                    },
-                    interaction: {
-                        intersect: false
-                    }
-                }
-            });
+            this.today_chart = new Chart<'line'>(today_ctx, this.getConfig(this.selected_day, TDG_VALUES, this.estimations.estim, this.today_calculated_attack, this.today_calculated_attack_beta));
         }
     }
 
@@ -128,47 +113,7 @@ export class EstimationsComponent implements OnInit {
             }
 
             const tomorrow_ctx: CanvasRenderingContext2D = this.tomorrow_canvas.nativeElement.getContext('2d');
-            this.tomorrow_chart = new Chart<'line'>(tomorrow_ctx, {
-                type: 'line',
-                data: {
-                    labels: PLANIF_VALUES.map((value: number): string => value + '%'),
-                    datasets: [
-                        {
-                            label: 'Minimum théorique',
-                            data: Array(PLANIF_VALUES.length).fill(getMinAttack(this.selected_day + 1, getTown()?.town_type || 'RE')),
-                            spanGaps: true,
-                            borderDash: [3, 3],
-                        },
-                        {
-                            label: 'Attaque minimum',
-                            data: PLANIF_VALUES.map((value: number) => +(this.estimations.planif['_' + value].min || 'NaN')),
-                            spanGaps: true,
-                        },
-                        {
-                            label: 'Attaque maximum',
-                            data: PLANIF_VALUES.map((value: number) => +(this.estimations.planif['_' + value].max || 'NaN')),
-                            spanGaps: true,
-                        },
-                        {
-                            label: 'Maximum théorique',
-                            data: Array(PLANIF_VALUES.length).fill(getMaxAttack(this.selected_day + 1, getTown()?.town_type || 'RE')),
-                            spanGaps: true,
-                            borderDash: [3, 3],
-                        },
-                    ]
-                },
-                options: {
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: $localize`Attaque du lendemain`
-                        }
-                    },
-                    interaction: {
-                        intersect: false
-                    }
-                }
-            });
+            this.tomorrow_chart = new Chart<'line'>(tomorrow_ctx, this.getConfig(this.selected_day + 1, PLANIF_VALUES, this.estimations.planif, this.tomorrow_calculated_attack, this.tomorrow_calculated_attack_beta));
         }
     }
 
@@ -230,5 +175,124 @@ export class EstimationsComponent implements OnInit {
 
         this.clipboard.copy(text, $localize`La liste a bien été copiée au format forum`);
 
+    }
+
+    private clickOnLegendItem(_event: ChartEvent, legendItem: LegendItem, legend: LegendElement<'line'>): void {
+        const hidden: boolean = !legend.chart.getDatasetMeta(<number>legendItem.datasetIndex).hidden;
+        const dataSetIndex: number[] = legendItem.datasetIndex === 1 ? [0, 1] : (legendItem.datasetIndex === 3 ? [2, 3] : [4, 5]);
+        dataSetIndex.forEach((i: number) => legend.chart.getDatasetMeta(i).hidden = hidden);
+        legend.chart.update();
+    }
+
+    private generateLegendLabels(chart: Chart<'line'>): LegendItem[] {
+        return chart.data.datasets
+            .map((ds: ChartDataset<'line'>, i: number): LegendItem => ({
+                text: ds.label?.substring(0, ds.label.indexOf('-')) || '',
+                datasetIndex: i,
+                fontColor: chart.legend?.options.labels.color,
+                fillStyle: <Color>chart.data.datasets[i].backgroundColor,
+                strokeStyle: <Color>chart.data.datasets[i].borderColor,
+                lineDash: <number[]>chart.data.datasets[i].borderDash,
+                lineWidth: 3,
+                hidden: chart.getDatasetMeta(i).hidden
+            }))
+            .filter((_ds: LegendItem, i: number) => i % 2);
+    }
+
+    private getConfig(day: number, PERCENTS: number[], values: Dictionary<MinMax>, calculated_attack: MinMax | null, calculated_attack_beta: MinMax | null)
+        : ChartConfiguration<'line'> {
+        return {
+            type: 'line',
+            data: {
+                labels: PERCENTS.map((value: number): string => value + '%'),
+                datasets: [
+                    {
+                        label: $localize`Attaque théorique - Min`,
+                        data: Array(PERCENTS.length).fill(getMinAttack(day, getTown()?.town_type || 'RE')),
+                        spanGaps: true,
+                        borderColor: '#36A2EB',
+                        backgroundColor: '#36A2EB88',
+                        pointRadius: 0,
+                        pointHoverRadius: 0
+                    },
+                    {
+                        label: $localize`Attaque théorique - Max`,
+                        data: Array(PERCENTS.length).fill(getMaxAttack(day, getTown()?.town_type || 'RE')),
+                        spanGaps: true,
+                        borderColor: '#36A2EB',
+                        backgroundColor: '#36A2EB88',
+                        pointRadius: 0,
+                        pointHoverRadius: 0
+                    },
+                    {
+                        label: $localize`Attaque J${day} calculée (By Apofoo) - Min`,
+                        data: Array(PERCENTS.length).fill(calculated_attack?.min),
+                        spanGaps: true,
+                        borderColor: '#FF6384',
+                        backgroundColor: '#FF638488',
+                        pointRadius: 0,
+                        pointHoverRadius: 0
+                    },
+                    {
+                        label: $localize`Attaque J${day} calculée (By Apofoo) - Max`,
+                        data: Array(PERCENTS.length).fill(calculated_attack?.max),
+                        spanGaps: true,
+                        borderColor: '#FF6384',
+                        backgroundColor: '#FF638488',
+                        pointRadius: 0,
+                        pointHoverRadius: 0
+                    },
+                    {
+                        label: $localize`Attaque J${day} calculée (By Apofoo) (beta) - Min`,
+                        data: Array(PERCENTS.length).fill(calculated_attack_beta?.min),
+                        spanGaps: true,
+                        borderColor: '#FF6384',
+                        backgroundColor: '#FF638488',
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        borderDash: [3, 3]
+                    },
+                    {
+                        label: $localize`Attaque J${day} calculée (By Apofoo) (beta) - Max`,
+                        data: Array(PERCENTS.length).fill(calculated_attack_beta?.max),
+                        spanGaps: true,
+                        borderColor: '#FF6384',
+                        backgroundColor: '#FF638488',
+                        pointRadius: 0,
+                        pointHoverRadius: 0,
+                        borderDash: [3, 3]
+                    },
+                    {
+                        label: $localize`Estimation de l'attaque - Min`,
+                        data: PERCENTS.map((value: number) => +(values['_' + value].min || 'NaN')),
+                        spanGaps: true,
+                        borderColor: '#4BC0C0',
+                        backgroundColor: '#4BC0C088'
+                    },
+                    {
+                        label: $localize`Estimation de l'attaque - Max`,
+                        data: PERCENTS.map((value: number) => +(values['_' + value].max || 'NaN')),
+                        spanGaps: true,
+                        borderColor: '#4BC0C0',
+                        backgroundColor: '#4BC0C088'
+                    },
+                ]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            generateLabels: this.generateLegendLabels
+                        },
+                        onClick: this.clickOnLegendItem
+                    }
+                },
+                interaction: {
+                    intersect: false
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        };
     }
 }
