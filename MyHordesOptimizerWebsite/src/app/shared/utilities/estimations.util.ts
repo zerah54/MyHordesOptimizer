@@ -11,7 +11,7 @@ function getMinRatio(day: number, town_type: TownType): number {
 function getMaxRatio(day: number, town_type: TownType): number {
     if (day <= 1) {
         return 0.4;
-    } else if (town_type === 'RNE') {
+    } else if (town_type === 'RNE' || day <= 3) {
         return 0.66;
     } else {
         return town_type === 'RE' ? 1 : 3;
@@ -20,10 +20,10 @@ function getMaxRatio(day: number, town_type: TownType): number {
 
 export function getMinAttack(day: number, town_type: TownType): number {
     town_type = 'RE';
-    return Math.floor(getMinRatio(day, town_type) * Math.pow(Math.max(1, day - 1) * 0.75 + 2.5, 3));
+    return Math.round(getMinRatio(day, town_type) * Math.pow(Math.max(1, day - 1) * 0.75 + 2.5, 3));
 }
 
 export function getMaxAttack(day: number, town_type: TownType): number {
     town_type = 'RE';
-    return Math.ceil(getMaxRatio(day, town_type) * Math.pow(day * 0.75 + 3.5, 3));
+    return Math.round(getMaxRatio(day, town_type) * Math.pow(day * 0.75 + 3.5, 3));
 }
