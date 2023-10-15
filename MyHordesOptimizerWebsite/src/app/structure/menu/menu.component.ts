@@ -187,32 +187,22 @@ export class MenuComponent implements OnInit {
 
     private defineThemes(): void {
         /** Noël */
-        if (moment().isSameOrAfter(moment(`01-12-${moment().year()} 00:00:00`, 'DD-MM-YYYY HH:mm:ss'))
-            && moment().isSameOrBefore(moment(`25-12-${moment().year()} 23:59:59`, 'DD-MM-YYYY HH:mm:ss'))) {
+        if (this.isNoel()) {
             this.themes.push({ label: $localize`Noël`, class: 'noel' });
             this.themes.splice(0, 1);
-            if (this.selected_theme?.class === '' || !this.selected_theme) {
-                setTimeout(() => {
-                    this.changeTheme(this.themes[this.themes.length - 1]);
-                });
-            }
-        } else if (this.selected_theme?.class === 'noel' || !this.selected_theme) {
+            this.useEventTheme();
+        } else if (this.isNothing() && (this.selected_theme?.class === 'noel' || !this.selected_theme)) {
             setTimeout(() => {
                 this.changeTheme(this.themes[0]);
             });
         }
 
         /** Halloween */
-        if (moment().isSameOrAfter(moment(`15-10-${moment().year()} 00:00:00`, 'DD-MM-YYYY HH:mm:ss'))
-            && moment().isSameOrBefore(moment(`01-11-${moment().year()} 23:59:59`, 'DD-MM-YYYY HH:mm:ss'))) {
+        if (this.isHalloween()) {
             this.themes.push({ label: $localize`Halloween`, class: 'halloween' });
             this.themes.splice(0, 1);
-            if (this.selected_theme?.class === '' || !this.selected_theme) {
-                setTimeout(() => {
-                    this.changeTheme(this.themes[this.themes.length - 1]);
-                });
-            }
-        } else if (this.selected_theme?.class === 'halloween' || !this.selected_theme) {
+            this.useEventTheme();
+        } else if (this.isNothing() && (this.selected_theme?.class === 'halloween' || !this.selected_theme)) {
             setTimeout(() => {
                 this.changeTheme(this.themes[0]);
             });
@@ -224,6 +214,29 @@ export class MenuComponent implements OnInit {
 
 
         this.charts_theming_service.defineColorsWithTheme(this.selected_theme);
+    }
+
+    private isNoel(): boolean {
+        return moment().isSameOrAfter(moment(`01-12-${moment().year()} 00:00:00`, 'DD-MM-YYYY HH:mm:ss'))
+            && moment().isSameOrBefore(moment(`25-12-${moment().year()} 23:59:59`, 'DD-MM-YYYY HH:mm:ss'));
+    }
+
+    private isHalloween(): boolean {
+        return moment().isSameOrAfter(moment(`15-10-${moment().year()} 00:00:00`, 'DD-MM-YYYY HH:mm:ss'))
+            && moment().isSameOrBefore(moment(`01-11-${moment().year()} 23:59:59`, 'DD-MM-YYYY HH:mm:ss'));
+    }
+
+    private isNothing(): boolean {
+        return !this.isNoel() && !this.isHalloween();
+    }
+
+    private useEventTheme(): void {
+        this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
+        if (this.selected_theme?.class === '' || !this.selected_theme) {
+            setTimeout(() => {
+                this.changeTheme(this.themes[this.themes.length - 1]);
+            });
+        }
     }
 }
 
