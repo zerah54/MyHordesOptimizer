@@ -6,6 +6,7 @@ import { StatusEnum } from '../enum/status.enum';
 import { CommonModel } from './_common.class';
 import { Dictionary } from './_types';
 import { Bag } from './bag.class';
+import { Cadaver } from './cadaver.class';
 import { HeroicActions, HeroicActionsWithValue } from './heroic-actions.class';
 import { Home, HomeWithValue } from './home.class';
 import { Status } from './status.class';
@@ -26,6 +27,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
     public status?: Status;
     public home?: Home;
     public heroic_actions?: HeroicActions;
+    public cadaver?: Cadaver;
 
     constructor(dto?: CitizenDTO) {
         super();
@@ -49,7 +51,8 @@ export class Citizen extends CommonModel<CitizenDTO> {
             chest: this.chest?.modelToDto(),
             status: this.status?.modelToDto(),
             home: this.home?.modelToDto(),
-            actionsHeroic: this.heroic_actions?.modelToDto()
+            actionsHeroic: this.heroic_actions?.modelToDto(),
+            cadaver: this.cadaver?.modelToDto()
         };
     }
 
@@ -108,6 +111,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.status = new Status(dto.status);
             this.home = new Home(dto.home);
             this.heroic_actions = new HeroicActions(dto.actionsHeroic);
+            this.cadaver = dto.cadaver && dto.cadaver.id > 0 ? new Cadaver(dto.cadaver) : undefined;
         }
     }
 }
