@@ -102,37 +102,37 @@
                 @include animation(legs-wriggle-right 1s 0.2s infinite);
             }
 
-            &:nth-of-type(2) {
+            &:nth-of-type(4) {
                 top: 14px;
                 left: -11px;
                 @include animation(legs-wriggle-left 1s 0.8s infinite);
             }
 
-            &:nth-of-type(3) {
+            &:nth-of-type(5) {
                 top: 22px;
                 left: -12px;
                 @include animation(legs-wriggle-left 1s 0.2s infinite);
             }
 
-            &:nth-of-type(4) {
+            &:nth-of-type(6) {
                 top: 31px;
                 left: -10px;
                 @include animation(legs-wriggle-left 1s 0.4s infinite);
             }
 
-            &:nth-of-type(6) {
+            &:nth-of-type(8) {
                 top: 14px;
                 right: -11px;
                 @include animation(legs-wriggle-right 1s 0.4s infinite);
             }
 
-            &:nth-of-type(7) {
+            &:nth-of-type(9) {
                 top: 22px;
                 right: -12px;
                 @include animation(legs-wriggle-right 1s 0.7s infinite);
             }
 
-            &:nth-of-type(8) {
+            &:nth-of-type(10) {
                 top: 31px;
                 right: -10px;
                 @include animation(legs-wriggle-right 1s 0.3s infinite);
