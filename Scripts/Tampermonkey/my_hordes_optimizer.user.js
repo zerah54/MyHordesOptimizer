@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.68
+// @version      1.0.0-beta.69
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,10 +32,9 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[nouveauté] Ajout d'un filtre pour masquer les chantiers terminés\n\n`
-    + `[amélioration] Les différents filtres ne tiennent désormais plus compte des accents\n`
-    + `[amélioration] Amélioration visuelle du bloc d'informations complémentaires\n\n`
-    + `[correctif] La copie du registre retire désormais les espaces en trop en début de ligne\n`;
+    + `[amélioration] Le filtre pour masquer les chantiers terminés ne masque plus les chantiers ayant pris des dégâts\n`
+    + `[amélioration] Correctifs sur les estimations\n`
+    + `[amélioration] Le bloc des informations complémentaires indique désormais si le bâtiment est vide\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -481,6 +480,18 @@ const texts = {
         de: `Keine Hinweis für diese Box`,
         es: `No hay nota para esta caja`
     },
+    ruin_dried: {
+        en: `The ruin is empty`,
+        fr: `Le bâtiment est vide`,
+        de: `Die Ruine ist leer`,
+        es: `La ruina esta vacia`
+    },
+    ruin_not_dried: {
+        en: `The ruin is not empty`,
+        fr: `Le bâtiment n'est pas vide`,
+        de: `Die Ruine ist nicht leer`,
+        es: `La ruina no está vacía`
+    },
     additional_informations: {
         en: `Further information`,
         fr: `Informations complémentaires`,
@@ -534,6 +545,12 @@ const texts = {
         fr: `État des fouilles`,
         de: `Stand der Ausgrabungen`,
         es: `Estado de las excavaciones`
+    },
+    ruin_state_header: {
+        en: `Ruin`,
+        fr: `Bâtiment`,
+        de: `Ruine`,
+        es: `Ruina`
     },
     digs_average: {
         en: `Average remaining digs`,
@@ -730,6 +747,12 @@ const api_texts = {
         fr: `Votre script n'est pas à jour (votre version : $your_version$ / version la plus récente : $recent_version$).<br /><br />Certaines fonctionnalités risquent de ne pas fonctionner.<br /><br />Mettez le script à jour pour ne plus voir cette erreur.`,
         de: `Ihr Skript ist nicht aktuell (Ihre Version: $your_version$ / aktuellste Version: $recent_version$).<br /><br />Einige Funktionen funktionieren möglicherweise nicht.<br /><br />Aktualisieren Sie das Skript, damit dieser Fehler nicht mehr angezeigt wird.`,
         es: `Tu script no está actualizado (su versión: $your_version$ / versión más reciente: $recent_version$).<br /><br />Es posible que algunas funciones no funcionen.<br /><br />Actualice el script para que ya no vea este error.`
+    },
+    update_script: {
+        en: `To update your script, you can use your extension's update functionality or <a target="_blank" href="${GM_info.scriptUpdateURL}" style="text-decoration: underline;"><i >click on this link</i></a>, then refresh the game page.`,
+        fr: `Pour mettre votre script à jour, vous pouvez utiliser la fonctionnalité de mise à jour de votre extension ou <a target="_blank" href="${GM_info.scriptUpdateURL}" style="text-decoration: underline;"><i>cliquer sur ce lien</i></a>, puis rafraîchir la page du jeu.`,
+        de: `Um Ihr Skript zu aktualisieren, können Sie die Aktualisierungsfunktion Ihrer Erweiterung verwenden oder <a target="_blank" href="${GM_info.scriptUpdateURL}" style="text-decoration: underline;"><i >auf diesen Link klicken</ i></a>, dann aktualisiere die Spieleseite.`,
+        es: `Para actualizar su secuencia de comandos, puede utilizar la función de actualización de su extensión o <a target="_blank" href="${GM_info.scriptUpdateURL}" style="text-decoration: underline;"><i >haga clic en este enlace</ i></a>, luego actualiza la página del juego.`
     },
     error_discord: {
         en: `If the error persists, please let us know on <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.`,
@@ -1762,7 +1785,7 @@ function pageIsForum() {
 function shouldRefreshMe() {
     let current_town_name = document.querySelector('.town-name');
     if (!current_town_name) return false;
-    return +current_town_name.nextElementSibling.innerText.replace(/(\D)*/, '') !== mh_user?.townDetails?.day;
+    return +current_town_name.nextElementSibling.innerText.replace(/(\D)*/, '') !== +mh_user.townDetails?.day;
 }
 
 function getI18N(item) {
@@ -1788,10 +1811,12 @@ function normalizeString(str) {
 /** Affiche ou masque la page de chargement de MyHordes en fonction du nombre d'appels en cours */
 function displayLoading() {
     let loadzone = document.getElementById('loadzone');
-    if (loading_count > 0) {
-        loadzone.setAttribute('x-stack', 1);
-    } else {
-        loadzone.setAttribute('x-stack', 0);
+    if (loadzone) {
+        if (loading_count > 0) {
+            loadzone.setAttribute('x-stack', 1);
+        } else {
+            loadzone.setAttribute('x-stack', 0);
+        }
     }
 }
 
@@ -1844,7 +1869,11 @@ function addError(error) {
         let notifications = document.getElementById('notifications');
         let notification = document.createElement('div');
         notification.classList.add('error', 'show');
-        notification.innerHTML = typeof error === 'string' ? error : getErrorFromApi(error);
+        let error_text = `
+            <div style="vertical_align: middle"><img src="${mh_optimizer_icon}" style="width: 24px; margin-right: 0.5em;">${GM_info.script.name}</div>
+            <br />
+        `;
+        notification.innerHTML = error_text + (typeof error === 'string' ? error : getErrorFromApi(error));
         notifications.appendChild(notification);
         notification.addEventListener('click', () => {
             notification.remove();
@@ -1860,12 +1889,11 @@ function getErrorFromApi(error) {
     if (error.name !== 'AbortError' && error.name !== 'TypeError') {
         let error = '';
         error += `
-            <div style="vertical_align: middle"><img src="${mh_optimizer_icon}" style="width: 24px; margin-right: 0.5em;">${GM_info.script.name} :</div>
-            <br />
             <div>${getI18N(api_texts.error).replace('$error$', error.status ? (error.status + ' ' + error.name + ' - ' + error.message) : (error.name + ' - ' + error.message))}</div>
             <br />`
         if (!isScriptVersionLastVersion()) {
-            error += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', GM_info.script.version).replace('$recent_version$', parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small><div>`
+            error += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', GM_info.script.version).replace('$recent_version$', parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small></div>`
+            error += `<small>${getI18N(api_texts.update_script)}</small>`
         }
         error += `<div><small>${getI18N(api_texts.error_discord)}</small><div>`;
         return error;
@@ -1883,7 +1911,7 @@ function isScriptVersionLastVersion(display_error) {
     return splitted_base.every((part, index) => {
         const is_ok = !splitted_current[index] || splitted_current[index] >= part;
         if (display_error && !is_ok) {
-            addError(getI18N(api_texts.error_version_startup).replace('$your_version$', current_script_version).replace('$recent_version$', base_script_version));
+            addError(`<div>${getI18N(api_texts.error_version_startup).replace('$your_version$', current_script_version).replace('$recent_version$', base_script_version)}</div><small>${getI18N(api_texts.update_script)}</small>`);
         }
         return is_ok;
     });
@@ -1969,7 +1997,9 @@ function initOptionsWithLoginNeeded() {
     displayWishlistInApp();
     displayPriorityOnItems();
     createUpdateExternalToolsButton();
-    displayCellDetailsOnPage();
+    setTimeout(() => {
+        displayCellDetailsOnPage();
+    }, 250)
     displayEstimationsOnWatchtower();
 }
 
@@ -1981,7 +2011,9 @@ function initOptionsWithoutLoginNeeded() {
     clickOnVotedToRedirect();
     displaySearchFields();
     displayMinApOnBuildings();
-    displayNbDeadZombies();
+    setTimeout(() => {
+        displayNbDeadZombies();
+    }, 250)
     displayTranslateTool();
     notifyOnNewMessage();
     displayCampingPredict();
@@ -3987,32 +4019,39 @@ function displaySearchFields() {
 /** Si l'option associée est activée, affiche un champ de recherche sur la page de chantiers */
 function hideCompletedBuildings() {
     if (mho_parameters.hide_completed_buildings_field && pageIsConstructions()) {
-
         let buildings = Array.from(document.querySelectorAll('.buildings') || []);
 
-        let filterBuildings = () => {
-            let building_rows = [];
-            buildings.forEach((building) => {
-                building_rows.push(...Array.from(building.querySelectorAll('.building')));
-            });
-            building_rows.forEach((building_row) => {
-                if (building_row.classList.contains('complete')) {
-                    building_row.classList.add('hidden');
-                } else {
-                    building_row.classList.remove('hidden');
-                }
-            });
+        let building_rows = [];
+        buildings.forEach((building) => {
+            building_rows.push(...Array.from(building.querySelectorAll('.building')));
+        });
+        /** Masque les lignes de chantiers devant être masquées */
+        building_rows.forEach((building_row) => {
+            if (building_row.classList.contains('complete') && !building_row.querySelector('.to_repair')) {
+                building_row.classList.add('mho-hidden');
+            } else {
+                building_row.classList.remove('mho-hidden');
+            }
+        });
 
-            buildings.forEach((building) => {
-                if (Array.from(building.children).filter((child) => child.classList.contains('building')).every((child) => child.classList.contains('hidden'))) {
-                    building.classList.add('hidden');
-                } else {
-                    building.classList.remove('hidden');
-                }
-            });
-        };
-
-        filterBuildings();
+        /** Masque les catégories de chantiers dont toutes les lignes ont été masquées */
+        buildings.forEach((building) => {
+            if (Array.from(building.children).filter((child) => child.classList.contains('building')).every((child) => child.classList.contains('mho-hidden'))) {
+                building.classList.add('mho-hidden');
+            } else {
+                building.classList.remove('mho-hidden');
+            }
+        });
+    } else if (pageIsConstructions) {
+        let buildings = Array.from(document.querySelectorAll('.buildings') || []);
+        buildings.forEach((building) => {
+            if (building.classList.contains('mho-hidden')) {
+                building.classList.remove('mho-hidden');
+            }
+            Array.from(building.querySelectorAll('.building.mho-hidden')).forEach((building) => {
+                building.classList.remove('mho-hidden');
+            })
+        });
     }
 }
 
@@ -5890,8 +5929,11 @@ function displayCellDetailsOnPage() {
     if (mho_parameters.display_more_informations_from_mho && pageIsDesert()) {
         let cell = getCellDetailsByPosition();
         let cell_informations = document.querySelector('#cell-informations');
+        // console.log('cell', cell);
+        // console.log('current_cell', current_cell);
         if (cell) {
             current_cell = cell;
+            // console.log('cell_info', cell_informations);
             if (!cell_informations) {
                 cell_informations = document.createElement('div');
                 cell_informations.id = 'cell-informations';
@@ -5955,10 +5997,15 @@ function displayCellDetailsOnPage() {
                 // console.log('cell', cell);
 
                 let map_box = document.querySelector('.map-box');
+                // console.log('map_box', map_box);
+
                 map_box.parentElement.parentElement.appendChild(cell_informations);
 
                 let cell_note = createSubBlock('cell-note', getI18N(texts.note));
                 let cell_digs = createSubBlock('cell-digs', getI18N(texts.digs_state_header));
+                if (current_cell.idRuin !== null && current_cell.idRuin !== undefined) {
+                    let cell_ruin = createSubBlock('cell-ruin', getI18N(texts.ruin_state_header));
+                }
             }
 
             let insertCellNote = (cell) => {
@@ -5974,9 +6021,18 @@ function displayCellDetailsOnPage() {
                 `;
             };
 
+            let insertRuinDigs = (cell) => {
+                if (current_cell.idRuin !== null && current_cell.idRuin !== undefined) {
+                    let empty_text = `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.ruin_dried)}</div>`;
+                    let complete_text = `<div>${getI18N(texts.ruin_not_dried)}</div>`;
+                    cell_informations.querySelector('#cell-ruin-content').innerHTML = current_cell.isRuinDryed ? empty_text : complete_text;
+                }
+            };
+
             let updateInformations = (cell) => {
                 insertCellNote(cell);
                 insertCellDigs(cell);
+                insertRuinDigs(cell);
             }
 
             updateInformations(cell);
@@ -6017,8 +6073,59 @@ function displayEstimationsOnWatchtower() {
             // console.log('watchtower_planif_block_prediction', watchtower_planif_block_prediction);
             // console.log('current_planif_percent', current_planif_percent);
 
+            let createEstimationRow = (value, is_new_estimation, estimation, type) => {
+                return `<b style="color: #afb3cf; opacity: .8;">[${value}%]</b>
+                        <div id="${type}_${value}" style="font-weight: ${is_new_estimation ? 'bold' : 'normal'}; color: ${is_new_estimation ? 'lightgreen' : 'unset'}">
+                            <span class="start" style="width: 100px">${estimation?.min || ''}</span> - <span class="end" style="width: 100px">${estimation?.max || ''}</span><img src="${repo_img_hordes_url}emotes/zombie.gif">
+                        </div>`;
+            };
+            let createCalculatedAttackRow = (calculated_attack) => {
+                let estim_values_block_title_calculated_text = ``;
+                estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>Calculé (Apofoo)</b><div><span>${calculated_attack.min}</span> - <span>${calculated_attack.max}</span></div></div>`;
+
+                return estim_values_block_title_calculated_text;
+            }
+
+            let updateEstimationRow = (estimations, percent, type) => {
+                if (!estimations.estimations[type][`_${percent}`]) {
+                    estimations.estimations[type][`_${percent}`] = {min: null, max: null};
+                }
+                let estimation = estimations.estimations[type][`_${percent}`];
+                let main = document.querySelector(`#${mho_watchtower_estim_id}`);
+                let row = main.querySelector(`#${type}_${percent}`);
+                row.style.fontWeight = 'normal';
+                row.style.color = 'unset';
+
+                let start = row.querySelector(`.start`);
+                start.innerText = estimation?.min || '';
+                let end = row.querySelector(`.end`);
+                end.innerText = estimation?.max || '';
+            }
+
+            let updateCalculatedAttackRow = (estimations, type) => {
+                let main = document.querySelector(`#${mho_watchtower_estim_id}`);
+                let block = main.querySelector(`#${type}`);
+                if (block) {
+                    let header = block.querySelector(`h5`);
+                    let calc_block = header.lastElementChild;
+                    let calc_attack = calc_block.querySelector('.attack').lastElementChild;
+                    if (type === 'estim') {
+                        if (calc_attack) {
+                            calc_attack.firstElementChild.innerText = estimations.today_attack.min;
+                            calc_attack.lastElementChild.innerText = estimations.today_attack.max;
+                        }
+                    } else {
+                        if (calc_attack) {
+                            calc_attack.firstElementChild.innerText = estimations.today_atomorrow_attackttack.min;
+                            calc_attack.lastElementChild.innerText = estimations.tomorrow_attack.max;
+                        }
+                    }
+                }
+            }
+
             getEstimations().then((estimations) => {
 
+                console.log('estimations', estimations);
                 estim_block = document.createElement('div');
                 estim_block.style.marginTop = '1em';
                 estim_block.style.padding = '0.25em';
@@ -6063,9 +6170,21 @@ function displayEstimationsOnWatchtower() {
                                 max: +watchtower_planif_block_prediction?.split(' ')[2]
                             }
                         })
-                        .then((test) => {
+                        .then(() => {
                             estim_block_title_save_button.innerHTML = `<img src="${repo_img_hordes_url}icons/done.png">`;
-                            updateEstimationsOnWatchtower(test);
+
+                            getEstimations().then((new_saved_estimations) => {
+                                updateCalculatedAttackRow(new_saved_estimations, 'estim')
+                                updateCalculatedAttackRow(new_saved_estimations, 'planif')
+                                TDG_VALUES.forEach((percent) => {
+                                    updateEstimationRow(new_saved_estimations, percent, 'estim');
+                                });
+                                if (watchtower_planif_block && watchtower_planif_block_prediction) {
+                                    PLANIF_VALUES.forEach((percent) => {
+                                        updateEstimationRow(new_saved_estimations, percent, 'planif');
+                                    });
+                                }
+                            });
                         });
                 });
 
@@ -6081,27 +6200,29 @@ function displayEstimationsOnWatchtower() {
                     getEstimations().then((saved_estimations) => {
                         let text = '';
                         /** Ajout du titre **/
-                        text += `[big][b][bad]J${saved_estimations.day}[/bad][/b][/big]{hr}\n`;
+                        text += `[big][b][bad]J${saved_estimations.estimations.day}[/bad][/b][/big]{hr}\n`;
 
                         /** Ajout du titre "Attaque du jour" */
-                        text += `[i]${getI18N(texts.estim_title)} (J${saved_estimations.day})[/i]\n`;
+                        text += `[i]${getI18N(texts.estim_title)} (J${saved_estimations.estimations.day})[/i]\n`;
 
                         /** Ajout des valeurs du jour */
                         TDG_VALUES.forEach((value_key) => {
-                            const value = saved_estimations.estim['_' + value_key];
+                            const value = saved_estimations.estimations.estim['_' + value_key];
                             if (value && (value.min || value.max)) {
                                 text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
+                            } else {
+                                text += `[b][${value_key}%][/b] \n`
                             }
                         });
 
                         text += '{hr}\n';
 
                         /** Ajout du titre "Attaque du lendemain" */
-                        text += `[i]${getI18N(texts.planif_title)} (J${saved_estimations.day + 1})[/i]\n`;
+                        text += `[i]${getI18N(texts.planif_title)} (J${saved_estimations.estimations.day + 1})[/i]\n`;
 
                         /** Ajout des valeurs du lendemain */
                         PLANIF_VALUES.forEach((value_key) => {
-                            const value = saved_estimations.planif['_' + value_key];
+                            const value = saved_estimations.estimations.planif['_' + value_key];
                             if (value && (value.min || value.max)) {
                                 text += `[b][${value_key}%][/b] ${value.min || '?'} - ${value.max || '?'} :zombie:\n`;
                             }
@@ -6123,22 +6244,31 @@ function displayEstimationsOnWatchtower() {
                 estim_block.appendChild(estim_block_content);
 
                 let estim_values_block = document.createElement('div');
+                estim_values_block.id = 'estim';
                 estim_block_content.appendChild(estim_values_block);
 
                 let estim_values_block_title = document.createElement('h5');
                 estim_values_block_title.style.marginTop = '0.25em';
-                estim_values_block_title.innerText = getI18N(texts.estim_title);
-                ;
+
+                let estim_values_block_title_title = document.createElement('div');
+                estim_values_block_title_title.innerText = getI18N(texts.estim_title);
+                estim_values_block_title.appendChild(estim_values_block_title_title);
+
+                let estim_values_block_title_calculated = document.createElement('div');
+                let estim_values_block_title_calculated_text = createCalculatedAttackRow(estimations.today_attack);
+                estim_values_block_title_calculated.innerHTML = estim_values_block_title_calculated_text;
+                estim_values_block_title.appendChild(estim_values_block_title_calculated);
+
                 estim_values_block.appendChild(estim_values_block_title);
 
                 TDG_VALUES.forEach((value) => {
-                    let saved_estimation = estimations.estim['_' + value] ? {
-                        min: estimations.estim['_' + value].min,
-                        max: estimations.estim['_' + value].max
+                    let saved_estimation = estimations.estimations.estim['_' + value] ? {
+                        min: estimations.estimations.estim['_' + value].min,
+                        max: estimations.estimations.estim['_' + value].max
                     } : undefined;
 
-                    if (!estimations.estim['_' + value]) {
-                        estimations.estim['_' + value] = {min: null, max: null};
+                    if (!estimations.estimations.estim['_' + value]) {
+                        estimations.estimations.estim['_' + value] = {min: null, max: null};
                     }
                     let value_block = document.createElement('div');
                     value_block.style.display = 'flex';
@@ -6146,7 +6276,7 @@ function displayEstimationsOnWatchtower() {
                     value_block.style.gap = '1em';
                     estim_values_block.appendChild(value_block);
 
-                    let estimation = estimations.estim['_' + value];
+                    let estimation = estimations.estimations.estim['_' + value];
 
                     if (current_estimation_percent === value) {
                         let current_estimation_value = {
@@ -6159,31 +6289,37 @@ function displayEstimationsOnWatchtower() {
                         }
                     }
                     const is_new_estimation = current_estimation_percent === value && (+saved_estimation?.min !== +estimation?.min || +saved_estimation?.max !== +estimation?.max);
-                    value_block.innerHTML = `
-                    <b style="color: #afb3cf; opacity: .8;">[${value}%]</b>
-                    <div id="estim_${value}" style="font-weight: ${is_new_estimation ? 'bold' : 'normal'}; color: ${is_new_estimation ? 'lightgreen' : 'unset'}">
-                        <span class="start" style="width: 100px">${estimation?.min || ''}</span> - <span class="end" style="width: 100px">${estimation?.max || ''}</span><img src="${repo_img_hordes_url}emotes/zombie.gif">
-                    </div>`;
+                    value_block.innerHTML = createEstimationRow(value, is_new_estimation, estimation, 'estim');
                 });
 
                 if (watchtower_planif_block && watchtower_planif_block_prediction) {
 
                     let planif_values_block = document.createElement('div');
+                    planif_values_block.id = 'planif';
                     estim_block_content.appendChild(planif_values_block);
 
                     let planif_values_block_title = document.createElement('h5');
                     planif_values_block_title.style.marginTop = '0.25em';
-                    planif_values_block_title.innerText = getI18N(texts.planif_title);
+
+                    let planif_values_block_title_title = document.createElement('div');
+                    planif_values_block_title_title.innerText = getI18N(texts.planif_title);
+                    planif_values_block_title.appendChild(planif_values_block_title_title);
+
+                    let planif_values_block_title_calculated = document.createElement('div');
+                    let planif_values_block_title_calculated_text = createCalculatedAttackRow(estimations.tomorrow_attack);
+                    planif_values_block_title_calculated.innerHTML = planif_values_block_title_calculated_text;
+                    planif_values_block_title.appendChild(planif_values_block_title_calculated);
+
                     planif_values_block.appendChild(planif_values_block_title);
 
                     PLANIF_VALUES.forEach((value) => {
-                        let saved_estimation = estimations.planif['_' + value] ? {
-                            min: estimations.planif['_' + value].min,
-                            max: estimations.planif['_' + value].max
+                        let saved_estimation = estimations.estimations.planif['_' + value] ? {
+                            min: estimations.estimations.planif['_' + value].min,
+                            max: estimations.estimations.planif['_' + value].max
                         } : undefined;
 
-                        if (!estimations.planif['_' + value]) {
-                            estimations.planif['_' + value] = {min: null, max: null};
+                        if (!estimations.estimations.planif['_' + value]) {
+                            estimations.estimations.planif['_' + value] = {min: null, max: null};
                         }
 
                         let value_block = document.createElement('div');
@@ -6192,7 +6328,7 @@ function displayEstimationsOnWatchtower() {
                         value_block.style.gap = '1em';
                         planif_values_block.appendChild(value_block);
 
-                        let estimation = estimations.planif['_' + value];
+                        let estimation = estimations.estimations.planif['_' + value];
 
                         if (current_planif_percent === value) {
                             let current_estimation_value = {
@@ -6205,20 +6341,12 @@ function displayEstimationsOnWatchtower() {
                             }
                         }
                         const is_new_estimation = current_planif_percent === value && (+saved_estimation?.min !== +estimation?.min || +saved_estimation?.max !== +estimation?.max);
-                        value_block.innerHTML = `
-                        <b style="color: #afb3cf; opacity: .8;">[${value}%]</b>
-                        <div id="planif_${value}" style="font-weight: ${is_new_estimation ? 'bold' : 'normal'}; color: ${is_new_estimation ? 'lightgreen' : 'unset'}">
-                            <span class="start" style="width: 100px">${estimation?.min || ''}</span> - <span class="end" style="width: 100px">${estimation?.max || ''}</span><img src="${repo_img_hordes_url}emotes/zombie.gif">
-                        </div>`
+                        value_block.innerHTML = createEstimationRow(value, is_new_estimation, estimation, 'planif');
                     });
                 }
             });
         }
     }
-}
-
-function updateEstimationsOnWatchtower(new_estimations) {
-    console.log('new_estimations', new_estimations);
 }
 
 function displayAntiAbuseCounter() {
@@ -7518,6 +7646,10 @@ function createStyles() {
         + `min-width: 18px;`
         + `}`;
 
+    let hidden = '.mho-hidden {'
+        + 'display: none !important;'
+        + '}'
+
 
     let css = params_style + btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
         + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
@@ -7530,7 +7662,7 @@ function createStyles() {
         + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
         + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
         + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
-        + citizen_list_more_info_header_content;
+        + citizen_list_more_info_header_content + hidden;
 
     let style = document.createElement('style');
 
@@ -9009,7 +9141,18 @@ function getEstimations() {
                 }
             })
             .then((response) => {
-                resolve(response);
+                let estimations = {
+                    estimations: response,
+                    today_attack: undefined,
+                    tomorrow_attack: undefined
+                }
+                getApofooAttackCalculation(mh_user.townDetails.day, false).then((today_result) => {
+                    estimations.today_attack = today_result;
+                    getApofooAttackCalculation(mh_user.townDetails.day + 1, false).then((tomorrow_result) => {
+                        estimations.tomorrow_attack = tomorrow_result;
+                        resolve(estimations);
+                    });
+                });
             })
             .catch((error) => {
                 endLoading();
@@ -9019,10 +9162,33 @@ function getEstimations() {
     });
 }
 
+function getApofooAttackCalculation(day, beta) {
+    return new Promise((resolve, reject) => {
+        fetcher(api_url + `/attaqueEstimation/apofooAttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${mh_user.townDetails.townId}`)
+            .then((response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    addError(response);
+                    reject(response);
+                }
+            })
+            .then((response) => {
+                resolve(response);
+                endLoading();
+            })
+            .catch((error) => {
+                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
+                endLoading();
+                reject(error);
+            });
+    });
+}
+
 function saveEstimations(estim_value, planif_value) {
     return new Promise((resolve, reject) => {
         getEstimations().then((estimations) => {
-            let new_estimations = estimations;
+            let new_estimations = estimations.estimations;
             if (estim_value && estim_value.value && (estim_value.value.min || estim_value.value.max)) {
                 new_estimations.estim['_' + estim_value.percent] = estim_value.value;
             }
@@ -9249,18 +9415,20 @@ function getApiKey() {
                             initOptionsWithoutLoginNeeded();
                         });
 
-                        document.addEventListener('mh-navigation-complete', (event) => {
-                            if (shouldRefreshMe()) {
-                                getMe().then(() => {
+                        ['mh-navigation-complete'/*, 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
+                            document.addEventListener(event_name, (event) => {
+                                // console.trace('event', event_name, event);
+                                if (shouldRefreshMe()) {
+                                    getMe().then(() => {
+                                        initOptionsWithLoginNeeded();
+                                        initOptionsWithoutLoginNeeded();
+                                    });
+                                } else {
                                     initOptionsWithLoginNeeded();
                                     initOptionsWithoutLoginNeeded();
-                                });
-                            } else {
-                                initOptionsWithLoginNeeded();
-                                initOptionsWithoutLoginNeeded();
-                            }
+                                }
+                            });
                         });
-
                         setInterval(() => {
                             displayAdvancedTooltips();
                         }, 10);
