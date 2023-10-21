@@ -100,6 +100,9 @@ namespace MyHordesOptimizerApi.Controllers
             var estim = EstimationService.GetEstimations(townId, dayAttack).Estim;
             var planif = EstimationService.GetEstimations(townId, dayAttack - 1).Planif;
 
+            var lastPlanif = GetLast(planif);
+            var lastEstim = GetLast(estim);
+            
             var redSouls = 0;
 
             var maxRatio = 1; // doit être déterminé en fonction du type de ville (3 en pandé, 0.66 en RNE)
@@ -221,15 +224,26 @@ namespace MyHordesOptimizerApi.Controllers
                         }
                     }
                 }
-
+                
                 /**
                  * Si le tableau des résultats possibles a bien été alimenté, alors on peut déterminer un min et un max de l'attaque
                  * On choisi la valeur parmi toutes les valeurs possibles ainsi que la valeur théorique
                  */
                 if (resultsMin.Count > 0 && resultsMax.Count > 0)
                 {
+                    
                     result.Min = Convert.ToInt32(Math.Max(resultsMin.Min(), attaqueMin));
                     result.Max = Convert.ToInt32(Math.Min(resultsMax.Max(), attaqueMax));
+                    if (lastEstim != null)
+                    {
+                        result.Min = Math.Max(result.Min, lastEstim.Min);
+                        result.Max = Math.Min(result.Max, lastEstim.Max);
+                    }
+                    if (lastPlanif != null)
+                    {
+                        result.Min = Math.Max(result.Min, lastPlanif.Min);
+                        result.Max = Math.Min(result.Max, lastPlanif.Max);
+                    }
                     return result;
                 }
             }
@@ -237,6 +251,16 @@ namespace MyHordesOptimizerApi.Controllers
             /* Si le planif 0% n'existe pas, ou que la fonction ne renvoie pas de résultat, alors on renvoie le min et le max théorique du jour */
             result.Min = Convert.ToInt32(attaqueMin);
             result.Max = Convert.ToInt32(attaqueMax);
+            if (lastEstim != null)
+            {
+                result.Min = Math.Max(result.Min, lastEstim.Min);
+                result.Max = Math.Min(result.Max, lastEstim.Max);
+            }
+            if (lastPlanif != null)
+            {
+                result.Min = Math.Max(result.Min, lastPlanif.Min);
+                result.Max = Math.Min(result.Max, lastPlanif.Max);
+            }
             return result;
         }
 
@@ -583,6 +607,31 @@ namespace MyHordesOptimizerApi.Controllers
                     && estim._100 != null
                     && estimationTuple.Key != "_100"
                     && (estimationTuple.Min != estim._100.Min || estimationTuple.Max != estim._100.Max)
+                   )
+                {
+                    values.Add(estimationTuple);
+                }
+            }
+
+            var orderedValues = values.OrderBy(tuple => tuple.Percent).ToList();
+            if (orderedValues.Count > 0)
+            {
+                return typeof(EstimationsDto).GetProperty(orderedValues.Last().Key).GetValue(estim) as
+                    EstimationValueDto;
+            }
+
+            return null;
+        }
+
+        private EstimationValueDto GetLast(EstimationsDto estim)
+        {
+            var values = new List<EstimationTuple>();
+            foreach (var tuple in estim.GetType().GetProperties())
+            {
+                var estimationTuple = CreateTupleFromValue(tuple.Name, tuple.GetValue(estim) as EstimationValueDto);
+                if (estimationTuple != null
+                    && estimationTuple.Min != null && estimationTuple.Min > 0
+                    && estimationTuple.Max != null && estimationTuple.Max > 0
                    )
                 {
                     values.Add(estimationTuple);
