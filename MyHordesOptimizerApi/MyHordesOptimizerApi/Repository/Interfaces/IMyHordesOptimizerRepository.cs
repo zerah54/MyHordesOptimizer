@@ -7,6 +7,7 @@ using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Models.Wishlist;
 using System.Collections.Generic;
 using MyHordesOptimizerApi.Models.Estimations;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.UserAvailability;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
 {
@@ -102,5 +103,8 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
 
         void UpdateEstimation(int townId, TownEstimationModel estimation);
         IEnumerable<TownEstimationModel> GetEstimations(int townId, int day);
+
+        void UpdateUserAvailability(int townId, int userId, List<MyHordesOptimizerUserAvailability> availabilities);
+        IEnumerable<MyHordesOptimizerUserAvailability> GetUserAvailabilities(int townId, int userId);
     }
 }

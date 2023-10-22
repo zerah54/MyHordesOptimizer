@@ -4,12 +4,14 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.UserAvailability;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
 using MyHordesOptimizerApi.Models.Citizen.Bags;
 using MyHordesOptimizerApi.Models.Estimations;
 using MyHordesOptimizerApi.Models.Map;
+using MyHordesOptimizerApi.Models.UserAvailability;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Items.Bank;
@@ -1727,6 +1729,104 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var estimations = connection.Query<TownEstimationModel>("SELECT * FROM TownEstimation WHERE idTown = @idTown AND day = @day", new { idTown = townId, day = day });
             connection.Close();
             return estimations;
+        }
+
+        #endregion
+
+        #region UserAvailability
+
+        public void UpdateUserAvailability(int townId, int userId, List<MyHordesOptimizerUserAvailability> availabilities)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var existings = connection.Query<UserAvailabilityModel>(@"SELECT idUser,
+                                                                             idTown,
+                                                                             startDate,
+                                                                             endDate,
+                                                                             userAvailabilityType,
+                                                                             comment,
+                                                                             canLead
+                                                                        FROM UserAvailability");
+            foreach (var availability in availabilities)
+            {
+                if (existings.Any(i => i.IdUser == availability.IdUser && i.IdTown == availability.IdTown))
+                {
+                    connection.Execute(@"UPDATE UserAvailability SET startDate = @startDate
+                                                                     endDate = @endDate
+                                                                     idUserAvailability = @idUserAvailability
+                                                                     comment = @comment
+                                                                     canLead = @canLead
+                                                               WHERE idCell = @idCell",
+                                                               new
+                                                               {
+                                                                   startDate = availability.StartDate,
+                                                                   endDate = availability.EndDate,
+                                                                   idUserAvailability = availability.Type.IdType,
+                                                                   comment = availability.Comment,
+                                                                   canLead = availability.CanLead
+                                                               });
+                }
+                else
+                {
+                    var id = connection.ExecuteScalar<int>($@"INSERT INTO UserAvailability ( idUser
+                                                                                            ,idTown
+                                                                                            ,startDate
+                                                                                            ,endDate
+                                                                                            ,idUserAvailability
+                                                                                            ,comment
+                                                                                            ,canLead)
+                                                                                    VALUES ( @idUser
+                                                                                            ,@idTown
+                                                                                            ,@startDate
+                                                                                            ,@endDate
+                                                                                            ,@idUserAvailability
+                                                                                            ,@comment
+                                                                                            ,@canLead);
+                                                                                    SELECT LAST_INSERT_ID()",
+                                                            new
+                                                            {
+                                                                idUser = availability.IdUser,
+                                                                idTown = availability.IdTown,
+                                                                startDate = availability.StartDate,
+                                                                endDate = availability.EndDate,
+                                                                idUserAvailability = availability.Type.IdType,
+                                                                comment = availability.Comment,
+                                                                canLead = availability.CanLead
+                                                            });
+                }
+            }
+            connection.Close();
+        }
+        public IEnumerable<MyHordesOptimizerUserAvailability> GetUserAvailabilities(int townId, int userId)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var availabilitiesModel = connection.Query<UserAvailabilityModel>(@"SELECT idUser,
+                                                                                       idTown,
+                                                                                       startDate,
+                                                                                       endDate,
+                                                                                       userAvailabilityType,
+                                                                                       comment,
+                                                                                       canLead
+                                                                                  FROM UserAvailability");
+
+            var availabilityTypesModel = connection.Query<UserAvailabilityTypeModel>(@"SELECT idUserAvailabilityType,
+                                                                                              typeName_fr,
+                                                                                              typeName_en,
+                                                                                              typeName_de,
+                                                                                              typeName_es
+                                                                                         FROM UserAvailabilityType");
+            connection.Close();
+
+            var availabilities = Mapper.Map<IEnumerable<MyHordesOptimizerUserAvailability>>(availabilitiesModel);
+            var availabilityTypes = Mapper.Map<IEnumerable<MyHordesOptimizerUserAvailabilityType>>(availabilityTypesModel);
+
+            foreach (var availability in availabilities)
+            {
+                availability.Type = availabilityTypes.Where(x => x.IdType == availabilitiesModel.Where(y => y.IdUserAvailability == availability.Id).FirstOrDefault().IdUserAvailability).FirstOrDefault();
+            }
+
+            return availabilities;
         }
 
         #endregion

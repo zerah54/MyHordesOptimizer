@@ -7,12 +7,14 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.UserAvailability;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.MappingProfiles.Converters;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
 using MyHordesOptimizerApi.Models.Map;
+using MyHordesOptimizerApi.Models.UserAvailability;
 using MyHordesOptimizerApi.Models.Views.Items;
 using MyHordesOptimizerApi.Models.Views.Items.Bank;
 using MyHordesOptimizerApi.Models.Views.Items.Citizen;
@@ -375,6 +377,41 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IsWorkshop, opt => opt.Ignore())
                 .ForMember(dest => dest.BagCount, opt => opt.Ignore())
                 .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.Count));
+
+            // UserAvailability
+
+            CreateMap<UserAvailabilityTypeModel, MyHordesOptimizerUserAvailabilityType>()
+                 .ForMember(dest => dest.IdType, opt => opt.MapFrom(src => src.IdType))
+                 .ForMember(dest => dest.Names, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.NameFr }, { "en", src.NameEn }, { "es", src.NameEs }, { "de", src.NameDe } }));
+
+            CreateMap<MyHordesOptimizerUserAvailabilityType, UserAvailabilityTypeModel>()
+                .ForMember(dest => dest.IdType, opt => opt.MapFrom(src => src.IdType))
+                .ForMember(dest => dest.NameFr, opt => opt.MapFrom(src => src.Names.GetValueOrDefault("fr")))
+                .ForMember(dest => dest.NameEn, opt => opt.MapFrom(src => src.Names.GetValueOrDefault("en")))
+                .ForMember(dest => dest.NameDe, opt => opt.MapFrom(src => src.Names.GetValueOrDefault("de")))
+                .ForMember(dest => dest.NameEs, opt => opt.MapFrom(src => src.Names.GetValueOrDefault("es")));
+
+            CreateMap<UserAvailabilityModel, MyHordesOptimizerUserAvailability>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IdUserAvailability))
+                .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.IdUser))
+                .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => src.IdTown))
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate))
+                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate))
+                .ForMember(dest => dest.Type, opt => opt.Ignore())
+                .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
+                .ForMember(dest => dest.CanLead, opt => opt.MapFrom(src => src.CanLead));
+
+            CreateMap<MyHordesOptimizerUserAvailability, UserAvailabilityModel>()
+                .ForMember(dest => dest.IdUserAvailability, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.IdUser))
+                .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => src.IdTown))
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate))
+                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate))
+                .ForMember(dest => dest.UserAvailabilityType, opt => opt.MapFrom(src => src.Type.IdType))
+                .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
+                .ForMember(dest => dest.CanLead, opt => opt.MapFrom(src => src.CanLead));
+
+            // HomeUpgrade
 
             CreateMap<HomeUpgradeDetailsDto, TownCitizenDetailModel>()
                 .ForMember(dest => dest.ApagCharges, opt => opt.Ignore())
