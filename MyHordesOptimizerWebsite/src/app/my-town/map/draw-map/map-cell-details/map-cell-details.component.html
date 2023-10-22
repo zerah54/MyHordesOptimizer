@@ -44,7 +44,7 @@
     <ng-container *ngIf="cell.citizens && cell.citizens.length > 0">
         <div class="citizens">
             <div *ngFor="let citizen of (cell.citizens | citizensFromShort:allCitizens)">
-                <img [ngSrc]="HORDES_IMG_REPO + 'professions/' + citizen.job?.value?.img + '.gif'" width="16" height="16">
+                <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">
                 <span>{{citizen.name}}</span>
             </div>
         </div>

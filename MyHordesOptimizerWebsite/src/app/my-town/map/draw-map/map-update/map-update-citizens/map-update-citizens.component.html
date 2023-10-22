@@ -18,7 +18,7 @@
         <tbody>
         <tr *ngFor="let citizen of citizens">
             <th class="name">
-                <img [ngSrc]="HORDES_IMG_REPO + 'professions/' + citizen.job?.value?.img + '.gif'" width="16" height="16">{{citizen.name}}
+                <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{citizen.name}}
             </th>
             <td class="bag">
                 <img *ngFor="let item of citizen.bag?.items" [ngSrc]="HORDES_IMG_REPO + item.img"
@@ -42,7 +42,7 @@
         <mat-list class="mho-add-citizen-list" style="max-height: 300px">
             <mat-list-item *ngFor="let citizen of (allCitizens | notInListCitizen:citizens)"
                            (click)="addCitizen(citizen)">
-                <img [ngSrc]="HORDES_IMG_REPO + 'professions/' + citizen.job?.value?.img + '.gif'" width="16" height="16">{{citizen.name}}
+                <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{citizen.name}}
             </mat-list-item>
         </mat-list>
     </mat-menu>

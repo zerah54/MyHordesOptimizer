@@ -3,8 +3,7 @@
             (closed)="closed.next()" [placeholder]="placeholder">
     <mat-select-trigger *ngIf="multiple">
         <mat-chip-listbox>
-            <mat-chip *ngFor="let single_value of $any(value); let i = index" (removed)="remove(single_value)"
-                      class="mho-select-chip">
+            <mat-chip *ngFor="let single_value of $any(value); let i = index" (removed)="remove(single_value)" class="mho-select-chip">
                 <button type="reset" matChipRemove>
                     <mat-icon>cancel</mat-icon>
                 </button>
@@ -45,6 +44,6 @@
 
 <ng-template #icons let-option>
     <ng-container *ngIf="bindIcon && option">
-        <img [ngSrc]="HORDES_IMG_REPO + option[bindIcon]" width="16" height="16">
+        <img [ngSrc]="HORDES_IMG_REPO + (option | icon:bindIcon)" width="16" height="16">
     </ng-container>
 </ng-template>

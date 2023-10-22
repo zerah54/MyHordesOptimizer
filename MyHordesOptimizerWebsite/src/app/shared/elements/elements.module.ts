@@ -23,6 +23,7 @@ import { HeaderWithNumberPreviousNextFilterComponent } from './lists/header-with
 import { HeaderWithSelectFilterComponent } from './lists/header-with-select-filter/header-with-select-filter.component';
 import { HeaderWithStringFilterComponent } from './lists/header-with-string-filter/header-with-string-filter.component';
 import { RecipeComponent } from './recipe/recipe.component';
+import { IconPipe } from './select/icon.pipe';
 import { LabelPipe } from './select/label.pipe';
 import { SelectComponent } from './select/select.component';
 
@@ -31,7 +32,7 @@ const components: Components = [
     MenuRemoveComponent, ConfirmDialogComponent, DigComponent, AvatarComponent
 ];
 const list_headers: Components = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent];
-const local_components: Components = [LabelPipe];
+const local_components: Components = [LabelPipe, IconPipe];
 const custom_modules: Modules = [MaterialModule, PipesModule];
 const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, NgOptimizedImage];
 const pipes: Components = [DecimalPipe];

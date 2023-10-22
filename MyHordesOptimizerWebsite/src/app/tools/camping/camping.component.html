@@ -23,7 +23,7 @@
                 <div>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Métier</mat-label>
-                        <mho-select [formControlName]="'job'" [options]="jobs" [multiple]="false" [bindLabel]="'value.label'">
+                        <mho-select [formControlName]="'job'" [options]="jobs" [multiple]="false" [bindLabel]="'value.label'" [bindIcon]="'value.img'">
                         </mho-select>
                     </mat-form-field>
                     <mat-checkbox [formControlName]="'vest'" *ngIf="$any(configuration_form.get('job')?.value)?.key === JOB_SCOUT.key">

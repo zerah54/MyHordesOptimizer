@@ -4,16 +4,19 @@
 .web-spider {
     display: contents;
 
-    > img {
+    .web {
         position: absolute;
-        width: 1000px;
-        height: 1000px;
+        top: 0;
+        right: 0;
         z-index: 2;
-        top: -375px;
-        right: -500px;
-        filter: brightness(10);
-        opacity: 0.25;
         pointer-events: none;
+        overflow: auto;
+
+        > img {
+            filter: brightness(10);
+            opacity: 0.25;
+            translate: 500px -375px;
+        }
     }
 
     /******************** Les araignées ********************/

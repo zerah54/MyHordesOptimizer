@@ -6,7 +6,9 @@
     </ul>
 
     <div *ngIf="theme === 'halloween'" class="web-spider">
-        <img [ngSrc]="'assets/img/halloween/spider-web.png'" height="1000" width="1000">
+        <div class="web">
+            <img [ngSrc]="'assets/img/halloween/spider-web.png'" height="1000" width="1000">
+        </div>
         <div class="spider">
             <span class="eye left"></span>
             <span class="eye right"></span>

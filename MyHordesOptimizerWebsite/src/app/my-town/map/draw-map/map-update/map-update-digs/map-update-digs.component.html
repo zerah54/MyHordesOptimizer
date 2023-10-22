@@ -41,7 +41,7 @@
         <mat-list class="mho-add-citizen-list">
             <mat-list-item *ngFor="let citizen of (allCitizens | notInListCitizenDig:digs)"
                            (click)="addCitizen(citizen)">
-                <img [ngSrc]="HORDES_IMG_REPO + 'professions/' + citizen.job?.value?.img + '.gif'" width="16" height="16">{{citizen.name}}
+                <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{citizen.name}}
             </mat-list-item>
         </mat-list>
     </mat-menu>
