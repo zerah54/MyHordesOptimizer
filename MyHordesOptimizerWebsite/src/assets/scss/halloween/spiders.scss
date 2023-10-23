@@ -28,7 +28,7 @@
         @include border-radius(50%);
         margin: 210px 0 0 0;
         background: #110D04;
-        right: 5%;
+        right: 25px;
         @include animation(spider-move 5s infinite);
         pointer-events: none;
 

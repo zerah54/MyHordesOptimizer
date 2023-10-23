@@ -25,7 +25,8 @@ $snow-3: url('/assets/img/noel/s3.png');
 }
 
 .mho-main {
-    height: 100vh;
+    height: 100%;
+    flex: 1;
     display: flex;
     flex-direction: column;
     background-color: variables.$sidenav_bg_color;
@@ -76,8 +77,8 @@ $snow-3: url('/assets/img/noel/s3.png');
         content: '';
         pointer-events: none;
         background-image: $snow-1, $snow-2, $snow-3;
-        height: 100vh;
-        width: 100vw;
+        height: 100dvh;
+        width: 100dvw;
     }
 }
 

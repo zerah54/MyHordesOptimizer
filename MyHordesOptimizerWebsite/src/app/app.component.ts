@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { Event, NavigationCancel, NavigationEnd, NavigationSkipped, NavigationStart, Router } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { BREAKPOINTS } from './_abstract_model/const';
@@ -15,6 +15,8 @@ import { LoadingOverlayService } from './shared/services/loading-overlay.service
     encapsulation: ViewEncapsulation.None
 })
 export class AppComponent implements OnInit {
+    @HostBinding('style.display') display: string = 'contents';
+
     public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     public is_loading: boolean = false;
     public ready: boolean = false;
