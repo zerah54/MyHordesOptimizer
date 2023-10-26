@@ -1,9 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-using MyHordesOptimizerApi.Configuration.Interfaces;
-using MyHordesOptimizerApi.Providers.Interfaces;
-using System;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Web;
+using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Exceptions;
+using MyHordesOptimizerApi.Providers.Interfaces;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MyHordesOptimizerApi.Repository.Abstract
 {
@@ -24,9 +28,9 @@ namespace MyHordesOptimizerApi.Repository.Abstract
 
 
         protected AbstractMyHordeRepositoryBase(ILogger<AbstractMyHordeRepositoryBase> logger,
-          IHttpClientFactory httpClientFactory,
-          IMyHordesApiConfiguration myHordesApiConfiguration,
-          IUserInfoProvider userKeyProvider) : base(logger, httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            IMyHordesApiConfiguration myHordesApiConfiguration,
+            IUserInfoProvider userKeyProvider) : base(logger, httpClientFactory)
         {
             MyHordesApiConfiguration = myHordesApiConfiguration;
             UserKeyProvider = userKeyProvider;
@@ -42,6 +46,26 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             uriBulder.Query = query.ToString();
             var url = uriBulder.ToString();
             return url;
+        }
+
+        protected override TResult GetResult<TResult>(string mediaTypeOut, string stringResult)
+        {
+            dynamic dynamicResult = JsonConvert.DeserializeObject(stringResult);
+            if (dynamicResult != null && ((JToken)dynamicResult).Type == JTokenType.Object &&
+                dynamicResult.ContainsKey("error") != null)
+            {
+                var error = dynamicResult.error;
+                if (error == "nightly_attack")
+                    throw new MyHordesApiException(message: "Le site est assiégé par des hordes de zombies !", statusCode: HttpStatusCode.ServiceUnavailable);
+                if (error == "rate_limit_reached")
+                    throw new MyHordesApiException(message: "Quota dépassé. Tout devrait fonctionner de nouveau d'ici quelques minutes.", statusCode: HttpStatusCode.TooManyRequests);
+                if (error == "invalid_appkey")
+                    throw new MyHordesApiException(message: "Clé d'application invalide.", statusCode: HttpStatusCode.BadRequest);
+                if (error == "invalid_userkey")
+                    throw new MyHordesApiException(message: "Clé d'utilisateur invalide.", statusCode: HttpStatusCode.BadRequest);
+            }
+
+            return base.GetResult<TResult>(mediaTypeOut, stringResult);
         }
     }
 }
