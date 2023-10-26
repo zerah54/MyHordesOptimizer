@@ -228,7 +228,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
         }
 
 
-        private static TResult GetResult<TResult>(string mediaTypeOut, string stringResult)
+        protected virtual TResult GetResult<TResult>(string mediaTypeOut, string stringResult)
         {
             switch (mediaTypeOut)
             {

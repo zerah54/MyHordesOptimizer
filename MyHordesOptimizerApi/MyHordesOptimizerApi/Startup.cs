@@ -74,6 +74,7 @@ namespace MyHordesOptimizerApi
             services.AddControllers(config =>
             {
                 config.Filters.Add<GlobalActionFilter>();
+                config.Filters.Add<ApiExceptionFilter>();
             });
 
             services.AddAutoMapper(Assembly.GetAssembly(this.GetType()));

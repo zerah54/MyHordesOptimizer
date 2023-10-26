@@ -35,7 +35,11 @@ export class ErrorsInterceptor implements HttpInterceptor {
         }
         // Return an observable with a user-facing error message.
         return throwError(() => {
-            this.snackbar.errorSnackbar(`Une erreur s'est produite lors de l'appel (Erreur ${error.status})`);
+            if (error.error && error.error !== '') {
+                this.snackbar.errorSnackbar(`Erreur ${error.status} : ${error.error}`);
+            } else {
+                this.snackbar.errorSnackbar(`Une erreur s'est produite lors de l'appel (Erreur ${error.status})`);
+            }
         });
     }
 }
