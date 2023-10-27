@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.69
+// @version      1.0.0-beta.70
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,9 +32,9 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[amélioration] Le filtre pour masquer les chantiers terminés ne masque plus les chantiers ayant pris des dégâts\n`
-    + `[amélioration] Correctifs sur les estimations\n`
-    + `[amélioration] Le bloc des informations complémentaires indique désormais si le bâtiment est vide\n`;
+    + `[amélioration] Les erreurs issues de MH sont désormais mieux gérées et affichées\n`
+    + `[amélioration] Le bloc des informations complémentaires indique désormais les objets trouvables dans le bâtiment\n\n`
+    + `[fix] Correctifs de l'affichage des chantiers à réparer en pandé\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -1799,7 +1799,7 @@ function getCurrentPosition() {
 
 function getCellDetailsByPosition() {
     let position = getCurrentPosition();
-    if (position && map.cells) {
+    if (position && map && map.cells) {
         return map.cells.find((cell) => +cell.displayX === +position[0] && +cell.displayY === +position[1]);
     }
 }
@@ -1885,18 +1885,27 @@ function addError(error) {
     console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
 }
 
+function convertResponsePromiseToError(response) {
+    return response.text().then((text) => {
+        let error = new Error(text);
+        error.status = response.status;
+        error.name = response.statusText;
+        throw error;
+    })
+}
+
 function getErrorFromApi(error) {
     if (error.name !== 'AbortError' && error.name !== 'TypeError') {
-        let error = '';
-        error += `
-            <div>${getI18N(api_texts.error).replace('$error$', error.status ? (error.status + ' ' + error.name + ' - ' + error.message) : (error.name + ' - ' + error.message))}</div>
+        let error_text = '';
+        error_text += `
+            <div>${getI18N(api_texts.error).replace('$error$', (error.status ?? '') + ' - ' + (error.message ?? error.name ?? error.statusText))}</div>
             <br />`
         if (!isScriptVersionLastVersion()) {
-            error += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', GM_info.script.version).replace('$recent_version$', parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small></div>`
-            error += `<small>${getI18N(api_texts.update_script)}</small>`
+            error_text += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', GM_info.script.version).replace('$recent_version$', parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small></div>`
+            error_text += `<small>${getI18N(api_texts.update_script)}</small>`
         }
-        error += `<div><small>${getI18N(api_texts.error_discord)}</small><div>`;
-        return error;
+        error_text += `<div><small>${getI18N(api_texts.error_discord)}</small><div>`;
+        return error_text;
     }
 }
 
@@ -1999,7 +2008,7 @@ function initOptionsWithLoginNeeded() {
     createUpdateExternalToolsButton();
     setTimeout(() => {
         displayCellDetailsOnPage();
-    }, 250)
+    }, 500)
     displayEstimationsOnWatchtower();
 }
 
@@ -4256,39 +4265,45 @@ function displaySearchFieldOnRegistry() {
 /** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */
 function displayMinApOnBuildings() {
     if (mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
-        let complete_buildings = document.querySelectorAll('.row-flex.complete');
+        let complete_buildings = document.querySelectorAll('.building.complete');
         if (!complete_buildings || complete_buildings.length === 0) return;
 
-        let broken_buildings = Array.from(complete_buildings).filter((complete_building) => complete_building.querySelector('.ap-bar'));
+        let broken_buildings = Array.from(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
 
         if (!broken_buildings || broken_buildings.length === 0) return;
 
         broken_buildings.forEach((broken_building) => {
-            let bar = broken_building.querySelector('.ap-bar');
-            let tooltip = bar.querySelector('.tooltip');
+            let bar_element = broken_building.querySelector('.ap-bar');
+            let nb_ap_element = broken_building.querySelector('.build-req');
+
+            bar_element.dispatchEvent(new Event('mouseenter'));
+            let tooltip = document.querySelector('.tooltip[style*="display: block"]');
+            bar_element.dispatchEvent(new Event('mouseleave'));
+
             if (!tooltip || !tooltip.innerHTML) return;
 
             let status = tooltip.innerText.match(/[0-9]+\/[0-9]+/)[0].split('/');
+
             let nb_pts_per_ap = parseInt(tooltip.innerHTML.match(/<b>[0-9]+<\/b>/)[0].match(/[0-9]+/)[0], 10);
-            let current = parseInt(status[0], 10);
-            let total = parseInt(status[1], 10);
+            let current_pv = parseInt(status[0], 10);
+            let total_pv = parseInt(status[1], 10);
 
-            let minimum_safe = Math.ceil(total * 70 / 100) + 1
-            if (minimum_safe <= current) return;
+            let minimum_safe = Math.ceil(total_pv * 70 / 100) + 1
+            if (minimum_safe <= current_pv) return;
 
-            let missing_pts = minimum_safe - current;
-            bar.style.display = 'flex';
-            let new_ap_bar = bar.querySelector('.mho-safe-ap');
+            let missing_pts = minimum_safe - current_pv;
+
+            bar_element.style.display = 'flex';
+            let new_ap_bar = bar_element.querySelector('.mho-safe-ap');
             if (!new_ap_bar) {
                 new_ap_bar = document.createElement('div');
                 new_ap_bar.classList.add('mho-safe-ap');
             }
             new_ap_bar.style.background = 'yellow';
-            new_ap_bar.style.width = missing_pts / total * 100 + '%';
-            bar.appendChild(new_ap_bar);
+            new_ap_bar.style.width = missing_pts / total_pv * 100 + '%';
+            bar_element.appendChild(new_ap_bar);
 
-            let nb_ap = broken_building.querySelector('.build-req');
-            let missing_ap_info = nb_ap.querySelector('.mho-missing-ap');
+            let missing_ap_info = nb_ap_element.querySelector('.mho-missing-ap');
             if (!missing_ap_info) {
                 missing_ap_info = document.createElement('span')
                 missing_ap_info.classList.add('mho-missing-ap');
@@ -4296,7 +4311,7 @@ function displayMinApOnBuildings() {
             missing_ap_info.style.fontWeight = 'initial';
             missing_ap_info.style.fontSize = '0.8em';
             missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
-            nb_ap.appendChild(missing_ap_info);
+            nb_ap_element.appendChild(missing_ap_info);
         });
     } else if (pageIsConstructions()) {
         let missing_ap_infos = document.querySelectorAll('.mho-missing-ap');
@@ -5929,11 +5944,8 @@ function displayCellDetailsOnPage() {
     if (mho_parameters.display_more_informations_from_mho && pageIsDesert()) {
         let cell = getCellDetailsByPosition();
         let cell_informations = document.querySelector('#cell-informations');
-        // console.log('cell', cell);
-        // console.log('current_cell', current_cell);
         if (cell) {
             current_cell = cell;
-            // console.log('cell_info', cell_informations);
             if (!cell_informations) {
                 cell_informations = document.createElement('div');
                 cell_informations.id = 'cell-informations';
@@ -5994,8 +6006,6 @@ function displayCellDetailsOnPage() {
                     sub_block.appendChild(sub_block_content);
                 }
 
-                // console.log('cell', cell);
-
                 let map_box = document.querySelector('.map-box');
                 // console.log('map_box', map_box);
 
@@ -6023,9 +6033,20 @@ function displayCellDetailsOnPage() {
 
             let insertRuinDigs = (cell) => {
                 if (current_cell.idRuin !== null && current_cell.idRuin !== undefined) {
+                    let current_ruin = ruins.find((ruin) => ruin.id === current_cell.idRuin);
                     let empty_text = `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.ruin_dried)}</div>`;
                     let complete_text = `<div>${getI18N(texts.ruin_not_dried)}</div>`;
-                    cell_informations.querySelector('#cell-ruin-content').innerHTML = current_cell.isRuinDryed ? empty_text : complete_text;
+                    let ruin_drops = ``;
+                    if (current_ruin && (current_ruin.explorable || !current_ruin.isRuinDryied)) {
+                        ruin_drops += `<div style="display: flex; flex-direction: row; gap: 0.5em; flex-wrap: wrap; font-size: 12px;">`;
+                        if (current_ruin?.drops) {
+                            current_ruin.drops.forEach((drop) => {
+                                ruin_drops += `<span style="display: flex; flex-direction: column; align-items: center;"><img src="${repo_img_hordes_url}/${drop.item.img}">${Math.round(drop.probability * 100 * 10) / 10}%</span>`
+                            })
+                        }
+                    }
+                    ruin_drops += `</div>`;
+                    cell_informations.querySelector('#cell-ruin-content').innerHTML = (!current_ruin?.explorable ? (current_cell.isRuinDryed ? empty_text : complete_text) : '') + ruin_drops;
                 }
             };
 
@@ -7965,8 +7986,7 @@ function getBBHMap() {
                 if (response.status === 200) {
                     return response.text();
                 } else {
-                    addError(response);
-                    reject(response);
+                    return convertResponsePromiseToError(response);
                 }
             })
             .then((response) => {
@@ -8319,8 +8339,7 @@ function getItems() {
                 if (response.status === 200) {
                     return response.json();
                 } else {
-                    addError(response);
-                    reject(response);
+                    return convertResponsePromiseToError(response);
                 }
             })
             .then((response) => {
@@ -8358,8 +8377,7 @@ function getRuins() {
                     if (response.status === 200) {
                         return response.json();
                     } else {
-                        endLoading();
-                        reject(response);
+                        return convertResponsePromiseToError(response);
                     }
                 })
                 .then((response) => {
@@ -8388,7 +8406,7 @@ function getRuins() {
 }
 
 /** Récupère les informations de la ville */
-function getMe() {
+function getMe(stop) {
     return new Promise((resolve, reject) => {
         if (external_app_id) {
             fetcher(api_url + '/myhordesfetcher/me?userKey=' + external_app_id)
@@ -8396,8 +8414,7 @@ function getMe() {
                     if (response.status === 200) {
                         return response.json();
                     } else {
-                        addError(response);
-                        reject(response);
+                        return convertResponsePromiseToError(response);
                     }
                 })
                 .then((response) => {
@@ -8408,7 +8425,9 @@ function getMe() {
                     GM.setValue(mh_user_key, mh_user);
                     console.log('MHO - I am...', mh_user);
                     getItems().then(() => {
-                        resolve();
+                        getRuins().then(() => {
+                            resolve();
+                        });
                     });
 
                     if (mh_user !== '' && mh_user.townDetails.townId) {
@@ -8417,8 +8436,18 @@ function getMe() {
                     }
                 })
                 .catch((error) => {
-                    addError(error);
-                    reject(error);
+                    if (error.status === 400 && !stop) {
+                        /** Si on a une erreur 400 ça peut être parce que la clé d'app n'est pas bonne : on tente de récupérer la clé d'app une seule et unique fois pour essayer de rendre ça transparent pour l'utilisateur */
+                        external_app_id = undefined;
+                        getApiKey().then(() => {
+                            getMe(true).then(() => {
+                                resolve();
+                            });
+                        });
+                    } else {
+                        addError(error);
+                        resolve();
+                    }
                 });
         } else {
             resolve();
@@ -8434,17 +8463,15 @@ function getCitizens() {
             fetcher(api_url + `/myhordesfetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails.townId}`)
                 .then((response) => {
                     if (response.status === 200) {
-                        endLoading();
                         return response.json();
                     } else {
-                        addError(response);
-                        reject(response);
-                        endLoading();
+                        return convertResponsePromiseToError(response);
                     }
                 })
                 .then((response) => {
                     citizens = response;
                     citizens.citizens = Object.keys(citizens.citizens).map((key) => citizens.citizens[key])
+                    endLoading();
                     resolve(citizens);
                 })
                 .catch((error) => {
@@ -8467,9 +8494,7 @@ function getBank() {
                     endLoading();
                     return response.json();
                 } else {
-                    addError(response);
-                    reject(response);
-                    endLoading();
+                    return convertResponsePromiseToError(response);
                 }
             })
             .then((response) => {
@@ -8505,9 +8530,7 @@ function getWishlist() {
                 if (response.status === 200) {
                     return response.json();
                 } else {
-                    wishlist = undefined;
-                    addError(response);
-                    reject(response);
+                    return convertResponsePromiseToError(response);
                 }
             })
             .then((response) => {
@@ -8561,8 +8584,7 @@ function addItemToWishlist(item) {
                 if (response.status === 200) {
                     return response.json();
                 } else {
-                    addError(response);
-                    reject(response);
+                    return convertResponsePromiseToError(response);
                 }
             })
             .then((response) => {
@@ -8585,7 +8607,7 @@ function updateExternalTools() {
         startLoading();
 
         let convertImgToItem = (img) => {
-            return items.find((item) => img.src.replace(/(.*)\/(\w+)\.(\w+)\.(\w+)/, '$1/$2.$4').indexOf(item.img) >= 0);
+            return items?.find((item) => img.src.replace(/(.*)\/(\w+)\.(\w+)\.(\w+)/, '$1/$2.$4').indexOf(item.img) >= 0);
         }
 
         let convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
@@ -8691,7 +8713,9 @@ function updateExternalTools() {
             let rucksacks = [];
             let my_rusksack = Array.from(document.querySelector('.pointer.rucksack')?.querySelectorAll('li.item:not(.locked)') || []).map((rucksack_item) => {
                 let item = convertImgToItem(rucksack_item.querySelector('img'));
-                return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
+                if (item) {
+                    return {id: item.id, isBroken: rucksack_item.classList.contains('broken')};
+                }
             });
 
             rucksacks.push({
@@ -8952,9 +8976,7 @@ function updateExternalTools() {
                 if (response.status === 200) {
                     return response.json();
                 } else {
-                    addError(response);
-                    reject();
-                    endLoading();
+                    return convertResponsePromiseToError(response);
                 }
             })
             .then((response) => {
@@ -8965,6 +8987,7 @@ function updateExternalTools() {
             })
             .catch((error) => {
                 endLoading();
+                reject();
                 addError(error);
             });
     });
@@ -8980,8 +9003,7 @@ function getHeroSkills() {
                     if (response.status === 200) {
                         return response.json();
                     } else {
-                        addError(response);
-                        reject(response);
+                        return convertResponsePromiseToError(response);
                     }
                 })
                 .then((response) => {
@@ -9019,9 +9041,7 @@ function getTranslation(string_to_translate, source_language) {
                     if (response.status === 200) {
                         return response.json();
                     } else {
-                        endLoading();
-                        addError(response);
-                        reject(response);
+                        return convertResponsePromiseToError(response);
                     }
                 })
                 .then((response) => {
@@ -9047,8 +9067,7 @@ function getRecipes() {
                     if (response.status === 200) {
                         return response.json();
                     } else {
-                        addError(response);
-                        reject(response);
+                        return convertResponsePromiseToError(response);
                     }
                 })
                 .then((response) => {
@@ -9088,8 +9107,7 @@ function getParameters() {
                 if (response.status === 200) {
                     return response.json();
                 } else {
-                    addError(response);
-                    reject(response);
+                    return convertResponsePromiseToError(response);
                 }
             })
             .then((response) => {
@@ -9113,8 +9131,7 @@ function getMap() {
                 if (response.status === 200) {
                     return response.json();
                 } else {
-                    addError(response);
-                    reject(response);
+                    return convertResponsePromiseToError(response);
                 }
             })
             .then((response) => {
@@ -9136,8 +9153,7 @@ function getEstimations() {
                 if (response.status === 200) {
                     return response.json();
                 } else {
-                    addError(response);
-                    reject(response);
+                    return convertResponsePromiseToError(response);
                 }
             })
             .then((response) => {
@@ -9169,8 +9185,7 @@ function getApofooAttackCalculation(day, beta) {
                 if (response.status === 200) {
                     return response.json();
                 } else {
-                    addError(response);
-                    reject(response);
+                    return convertResponsePromiseToError(response);
                 }
             })
             .then((response) => {
@@ -9178,9 +9193,9 @@ function getApofooAttackCalculation(day, beta) {
                 endLoading();
             })
             .catch((error) => {
-                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
-                endLoading();
+                addError(error);
                 reject(error);
+                endLoading();
             });
     });
 }
@@ -9206,8 +9221,7 @@ function saveEstimations(estim_value, planif_value) {
                     if (response.status === 200) {
                         return response.text();
                     } else {
-                        addError(response);
-                        reject(response);
+                        return convertResponsePromiseToError(response);
                     }
                 })
                 .then((response) => {
@@ -9215,7 +9229,7 @@ function saveEstimations(estim_value, planif_value) {
                     endLoading();
                 })
                 .catch((error) => {
-                    console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
+                    addError(error);
                     endLoading();
                     reject(error);
                 });
@@ -9241,8 +9255,7 @@ function getOptimalPath(map, html, button) {
                 if (response.status === 200) {
                     return response.json();
                 } else {
-                    addError(response);
-                    reject(response);
+                    return convertResponsePromiseToError(response);
                 }
             })
             .then((response) => {
@@ -9250,7 +9263,7 @@ function getOptimalPath(map, html, button) {
                 endLoading();
             })
             .catch((error) => {
-                console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
+                addError(error);
                 endLoading();
                 reject(error);
             });
@@ -9275,8 +9288,7 @@ function getApiKey() {
                     if (response.status === 200) {
                         return response.text();
                     } else {
-                        addError(response);
-                        reject(response);
+                        return convertResponsePromiseToError(response);
                     }
                 })
                 .then((response) => {
@@ -9307,8 +9319,8 @@ function getApiKey() {
                     }
                 })
                 .catch((error) => {
-                    console.error(`${GM_info.script.name} : Une erreur s'est produite : \n`, error);
                     reject(error);
+                    addError(error);
                 });
         } else {
             resolve(external_app_id);
