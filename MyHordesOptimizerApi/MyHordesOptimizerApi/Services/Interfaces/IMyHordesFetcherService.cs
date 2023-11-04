@@ -9,7 +9,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
     {
         IEnumerable<Item> GetItems(int? townId);
         Town GetTown();
-        SimpleMe GetSimpleMe();
+        SimpleMeDto GetSimpleMe();
         IEnumerable<HeroSkill> GetHeroSkills();
         IEnumerable<CauseOfDeath> GetCausesOfDeath();
         IEnumerable<CleanUpType> GetCleanUpTypes();

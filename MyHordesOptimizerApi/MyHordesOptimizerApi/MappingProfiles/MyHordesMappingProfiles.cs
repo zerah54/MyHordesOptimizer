@@ -42,7 +42,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<MyHordesCitizen, Citizen>()
                 .ForMember(dest => dest.NombreJourHero, opt => opt.Ignore());
 
-            CreateMap<MyHordesMeResponseDto, SimpleMe>()
+            CreateMap<MyHordesMeResponseDto, SimpleMeDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.TownDetails, opt => opt.MapFrom(src => src))

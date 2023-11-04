@@ -112,7 +112,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             return town;
         }
 
-        public SimpleMe GetSimpleMe()
+
+        public SimpleMeDto GetSimpleMe()
         {
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
             if (myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
@@ -187,7 +188,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
                 _ = Task.Run(() => CheckAndUpdateCellDigs(myHordeMeResponse, town.Id));
             }
-            var simpleMe = Mapper.Map<SimpleMe>(myHordeMeResponse);
+            var simpleMe = Mapper.Map<SimpleMeDto>(myHordeMeResponse);
 
             return simpleMe;
         }

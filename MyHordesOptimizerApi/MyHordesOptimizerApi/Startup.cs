@@ -95,6 +95,7 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<IMyHordesOptimizerSqlConfiguration, MyHordesOptimizerSqlConfiguration>();
             services.AddSingleton<IMyHordesScrutateurConfiguration, MyHordesScrutateurConfiguration>();
             services.AddSingleton<IDiscordBotConfiguration, DiscordBotConfiguration>();
+            services.AddSingleton<IAuthenticationConfiguration, AuthenticationConfiguration>();
 
             services.AddSingleton<IMyHordesOptimizerFirebaseConfiguration, MyHordesOptimizerFirebaseConfiguration>();
 
@@ -122,7 +123,8 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<IGlossaryService, GlossaryService>();
             services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimizerParametersService>();
             services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
-            services.AddScoped<IMyHordesOptimizerEstimationService, MyHordesOptimizerEstimationService>();
+            services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
 
             services.AddSingleton<DiscordSocketClient>();       // Add the discord client to services
             services.AddSingleton<InteractionService>();        // Add the interaction service to services
