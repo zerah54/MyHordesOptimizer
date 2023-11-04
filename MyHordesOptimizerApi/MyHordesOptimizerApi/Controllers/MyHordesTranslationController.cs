@@ -8,7 +8,7 @@ using MyHordesOptimizerApi.Services.Interfaces.Translations;
 namespace MyHordesOptimizerApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Translation")]
     public class MyHordesTranslationController : AbstractMyHordesOptimizerControllerBase
     {
         protected ITranslationService TranslationService { get; set; }

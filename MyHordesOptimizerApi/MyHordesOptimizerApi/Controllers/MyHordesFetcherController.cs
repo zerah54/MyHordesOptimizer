@@ -12,7 +12,7 @@ using System.Linq;
 namespace MyHordesOptimizerApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Fetcher")]
     public class MyHordesFetcherController : AbstractMyHordesOptimizerControllerBase
     {
         private readonly IMyHordesFetcherService _myHordesFetcherService;
