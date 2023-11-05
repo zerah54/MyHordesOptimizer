@@ -35,6 +35,7 @@
     "express": "^4.18.2",
     "localstorage-polyfill": "^1.0.1",
     "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
     "ng-table-virtual-scroll": "^1.6.0",
     "rxjs": "~7.8.1",
     "uuid": "^9.0.1",

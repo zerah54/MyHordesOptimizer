@@ -1,5 +1,6 @@
 import { Component, HostBinding, Input } from '@angular/core';
 import * as moment from 'moment';
+import { Moment } from 'moment';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 
 @Component({
@@ -14,7 +15,7 @@ export class LastUpdateComponent {
     @Input() thresholds!: [number, number, number, number];
     @Input() hideDetails: boolean = false;
 
-    public moment: moment.Moment = moment();
+    public moment: Moment = moment();
 
 }
 

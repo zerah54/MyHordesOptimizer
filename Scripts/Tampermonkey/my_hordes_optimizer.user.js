@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.70
+// @version      1.0.0-beta.71
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,9 +32,9 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[amélioration] Les erreurs issues de MH sont désormais mieux gérées et affichées\n`
-    + `[amélioration] Le bloc des informations complémentaires indique désormais les objets trouvables dans le bâtiment\n\n`
-    + `[fix] Correctifs de l'affichage des chantiers à réparer en pandé\n`;
+    + `[amélioration] Mise en place de méthodes pour limiter le nombre d'appels à l'API MyHordes\n\n`
+    + `[fix] Correction de l'affichage des informations complémentaires sur un bâtiment\n`;
++`[fix] Correction (en théorie ^^') du fonctionnement du compteur anti-abus\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -48,6 +48,7 @@ const gm_mh_external_app_id_key = is_mh_beta ? 'mh_beta_external_app_id' : 'mh_e
 const gm_parameters_key = 'mh_optimizer_parameters';
 const mh_user_key = 'mh_user';
 const mho_map_key = 'mho_map';
+const mho_token_key = 'mho_token';
 const mho_blacklist_key = 'mho_blacklist';
 const mho_anti_abuse_key = 'mho_anti_abuse';
 
@@ -62,6 +63,10 @@ GM.getValue(mh_user_key).then((user) => {
 let external_app_id;
 GM.getValue(gm_mh_external_app_id_key).then((app_id) => {
     external_app_id = app_id;
+});
+let token;
+GM.getValue(mho_token_key).then((saved_token) => {
+    token = saved_token;
 });
 
 
@@ -349,7 +354,7 @@ const texts = {
         es: `Cantidad de acampes ya realizados`,
     },
     hidden_campers: {
-        en: `Number of campers already hidden on the cell`,
+        en: `Number of campers already hidden on the zone`,
         fr: `Nombre de campeurs déjà cachés sur la case`,
         de: `Anzahl der Camper, die bereits auf der Zelle versteckt sind`,
         es: `Cantidad de campistas ya escondidos en la zona`,
@@ -385,7 +390,7 @@ const texts = {
         es: `Faro`,
     },
     zombies_on_cell: {
-        en: `Number of zombies on the cell`,
+        en: `Number of zombies on the zone`,
         fr: `Nombre de zombies sur la case`,
         de: `Anzahl der Zombies auf der Zelle`,
         es: `Cantidad de zombis en la zona`,
@@ -397,13 +402,13 @@ const texts = {
         es: `Cantidad de pellejos humanos y telas de carpa en el bolso`,
     },
     improve: {
-        en: `Number of simple improvements made on the cell (must subtract 3 after each attack)`,
+        en: `Number of simple improvements made on the zone (must subtract 3 after each attack)`,
         fr: `Nombre d'améliorations simples faites sur la case (il faut en soustraire 3 après chaque attaque)`,
         de: `Anzahl der einfachen Verbesserungen, die an der Zelle vorgenommen wurden (muss nach jedem Angriff 3 abziehen)`,
         es: `Cantidad de mejoras simples hechas en la zona (hay que restar 3 luego de cada ataque)`,
     },
     object_improve: {
-        en: `Number of defense objects installed on the cell`,
+        en: `Number of defense objects installed on the zone`,
         fr: `Nombre d'objets de défense installés sur la case`,
         de: `Anzahl der auf der Zelle installierten Verteidigungsobjekte`,
         es: `Cantidad de objetos defensivos instalados en la zona`,
@@ -1937,6 +1942,13 @@ function calculateDespairDeaths(nb_killed_zombies) {
 
 function fixMhCompiledImg(img) {
     return img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3')
+}
+
+function isValidToken() {
+    if (!token) return false;
+    let expiration_date = new Date(token.token.validTo).getTime();
+    let current_date = new Date().getTime();
+    return !shouldRefreshMe() && current_date < expiration_date;
 }
 
 function getHoveredItem() {
@@ -4265,54 +4277,56 @@ function displaySearchFieldOnRegistry() {
 /** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */
 function displayMinApOnBuildings() {
     if (mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
-        let complete_buildings = document.querySelectorAll('.building.complete');
-        if (!complete_buildings || complete_buildings.length === 0) return;
+        setTimeout(() => {
+            let complete_buildings = document.querySelectorAll('.building.complete');
+            if (!complete_buildings || complete_buildings.length === 0) return;
 
-        let broken_buildings = Array.from(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
+            let broken_buildings = Array.from(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
 
-        if (!broken_buildings || broken_buildings.length === 0) return;
+            if (!broken_buildings || broken_buildings.length === 0) return;
 
-        broken_buildings.forEach((broken_building) => {
-            let bar_element = broken_building.querySelector('.ap-bar');
-            let nb_ap_element = broken_building.querySelector('.build-req');
+            broken_buildings.forEach((broken_building) => {
+                let bar_element = broken_building.querySelector('.ap-bar');
+                let nb_ap_element = broken_building.querySelector('.build-req');
 
-            bar_element.dispatchEvent(new Event('mouseenter'));
-            let tooltip = document.querySelector('.tooltip[style*="display: block"]');
-            bar_element.dispatchEvent(new Event('mouseleave'));
+                bar_element.dispatchEvent(new Event('mouseenter'));
+                let tooltip = document.querySelector('.tooltip[style*="display: block"]');
+                bar_element.dispatchEvent(new Event('mouseleave'));
 
-            if (!tooltip || !tooltip.innerHTML) return;
+                if (!tooltip || !tooltip.innerHTML) return;
 
-            let status = tooltip.innerText.match(/[0-9]+\/[0-9]+/)[0].split('/');
+                let status = tooltip.innerText.match(/[0-9]+\/[0-9]+/)[0].split('/');
 
-            let nb_pts_per_ap = parseInt(tooltip.innerHTML.match(/<b>[0-9]+<\/b>/)[0].match(/[0-9]+/)[0], 10);
-            let current_pv = parseInt(status[0], 10);
-            let total_pv = parseInt(status[1], 10);
+                let nb_pts_per_ap = parseInt(tooltip.innerHTML.match(/<b>[0-9]+<\/b>/)[0].match(/[0-9]+/)[0], 10);
+                let current_pv = parseInt(status[0], 10);
+                let total_pv = parseInt(status[1], 10);
 
-            let minimum_safe = Math.ceil(total_pv * 70 / 100) + 1
-            if (minimum_safe <= current_pv) return;
+                let minimum_safe = Math.ceil(total_pv * 70 / 100) + 1
+                if (minimum_safe <= current_pv) return;
 
-            let missing_pts = minimum_safe - current_pv;
+                let missing_pts = minimum_safe - current_pv;
 
-            bar_element.style.display = 'flex';
-            let new_ap_bar = bar_element.querySelector('.mho-safe-ap');
-            if (!new_ap_bar) {
-                new_ap_bar = document.createElement('div');
-                new_ap_bar.classList.add('mho-safe-ap');
-            }
-            new_ap_bar.style.background = 'yellow';
-            new_ap_bar.style.width = missing_pts / total_pv * 100 + '%';
-            bar_element.appendChild(new_ap_bar);
+                bar_element.style.display = 'flex';
+                let new_ap_bar = bar_element.querySelector('.mho-safe-ap');
+                if (!new_ap_bar) {
+                    new_ap_bar = document.createElement('div');
+                    new_ap_bar.classList.add('mho-safe-ap');
+                }
+                new_ap_bar.style.background = 'yellow';
+                new_ap_bar.style.width = missing_pts / total_pv * 100 + '%';
+                bar_element.appendChild(new_ap_bar);
 
-            let missing_ap_info = nb_ap_element.querySelector('.mho-missing-ap');
-            if (!missing_ap_info) {
-                missing_ap_info = document.createElement('span')
-                missing_ap_info.classList.add('mho-missing-ap');
-            }
-            missing_ap_info.style.fontWeight = 'initial';
-            missing_ap_info.style.fontSize = '0.8em';
-            missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
-            nb_ap_element.appendChild(missing_ap_info);
-        });
+                let missing_ap_info = nb_ap_element.querySelector('.mho-missing-ap');
+                if (!missing_ap_info) {
+                    missing_ap_info = document.createElement('span')
+                    missing_ap_info.classList.add('mho-missing-ap');
+                }
+                missing_ap_info.style.fontWeight = 'initial';
+                missing_ap_info.style.fontSize = '0.8em';
+                missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
+                nb_ap_element.appendChild(missing_ap_info);
+            });
+        }, 250)
     } else if (pageIsConstructions()) {
         let missing_ap_infos = document.querySelectorAll('.mho-missing-ap');
         if (!missing_ap_infos) return;
@@ -6007,7 +6021,7 @@ function displayCellDetailsOnPage() {
                 }
 
                 let map_box = document.querySelector('.map-box');
-                // console.log('map_box', map_box);
+                console.log('map_box', map_box);
 
                 map_box.parentElement.parentElement.appendChild(cell_informations);
 
@@ -6037,7 +6051,7 @@ function displayCellDetailsOnPage() {
                     let empty_text = `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.ruin_dried)}</div>`;
                     let complete_text = `<div>${getI18N(texts.ruin_not_dried)}</div>`;
                     let ruin_drops = ``;
-                    if (current_ruin && (current_ruin.explorable || !current_ruin.isRuinDryied)) {
+                    if (current_ruin && (current_ruin.explorable || !current_cell.isRuinDryed)) {
                         ruin_drops += `<div style="display: flex; flex-direction: row; gap: 0.5em; flex-wrap: wrap; font-size: 12px;">`;
                         if (current_ruin?.drops) {
                             current_ruin.drops.forEach((drop) => {
@@ -6145,8 +6159,6 @@ function displayEstimationsOnWatchtower() {
             }
 
             getEstimations().then((estimations) => {
-
-                console.log('estimations', estimations);
                 estim_block = document.createElement('div');
                 estim_block.style.marginTop = '1em';
                 estim_block.style.padding = '0.25em';
@@ -6453,33 +6465,44 @@ function displayAntiAbuseCounter() {
             })
 
             let define_row = (counter_value, index, new_content) => {
-                let value_in_list = document.createElement('div');
-                value_in_list.style.display = 'flex';
-                value_in_list.style.gap = '0.5em';
-                new_content.appendChild(value_in_list);
-
-                let item_name = document.createElement('div');
-                item_name.style.flex = 1;
-                item_name.innerHTML = `<img src="${repo_img_hordes_url + counter_value.item?.item?.img}" style="margin-right: 0.5em; ${counter_value.item?.broken ? 'border: 1px dotted red' : ''}">${counter_value.item?.item?.label[lang]}`;
-                value_in_list.appendChild(item_name);
-
-                let item_counter = document.createElement('div');
-                item_counter.style.width = '50px';
-                let interval = setInterval(() => {
-                    let since = (Date.now() - parseInt(counter_value.take_at))
+                let is_time_invalid = (_counter_value, _index) => {
+                    let since = (Date.now() - parseInt(_counter_value.take_at))
                     let time_left = new Date((15 * 60000) - since);
                     if (time_left < 0) {
                         counter_values.splice(index, 1);
                         GM.setValue(mho_anti_abuse_key, counter_values);
-                        clearInterval(interval);
-                        value_in_list.remove();
-                    } else {
-                        let minute = time_left.getMinutes();
-                        let seconds = time_left.getSeconds();
-                        item_counter.innerText = minute + ':' + (seconds < 10 ? ('0' + seconds) : seconds);
                     }
-                }, 250);
-                value_in_list.appendChild(item_counter);
+                    return time_left < 0;
+                };
+                if (!is_time_invalid(counter_value, index)) {
+                    let value_in_list = document.createElement('div');
+                    value_in_list.style.display = 'flex';
+                    value_in_list.style.gap = '0.5em';
+                    new_content.appendChild(value_in_list);
+
+                    let item_name = document.createElement('div');
+                    item_name.style.flex = 1;
+                    item_name.innerHTML = `<img src="${repo_img_hordes_url + counter_value.item?.item?.img}" style="margin-right: 0.5em; ${counter_value.item?.broken ? 'border: 1px dotted red' : ''}">${counter_value.item?.item?.label[lang]}`;
+                    value_in_list.appendChild(item_name);
+
+                    let item_counter = document.createElement('div');
+                    item_counter.style.width = '50px';
+                    let interval = setInterval(() => {
+                        let since = (Date.now() - parseInt(counter_value.take_at))
+                        let time_left = new Date((15 * 60000) - since);
+                        if (is_time_invalid(counter_value, index)) {
+                            clearInterval(interval);
+                            if (value_in_list) {
+                                value_in_list.remove();
+                            }
+                        } else {
+                            let minute = time_left.getMinutes();
+                            let seconds = time_left.getSeconds();
+                            item_counter.innerText = minute + ':' + (seconds < 10 ? ('0' + seconds) : seconds);
+                        }
+                    }, 250);
+                    value_in_list.appendChild(item_counter);
+                }
             }
 
             if (!counter_values) {
@@ -6561,7 +6584,6 @@ function displayAntiAbuseCounter() {
                 controller.abort();
             }
         });
-
     } else {
         controller.abort();
     }
@@ -8334,7 +8356,7 @@ function getFMRuin() {
 
 function getItems() {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + '/myhordesfetcher/items' + (mh_user && mh_user.townDetails ? ('?townId=' + mh_user.townDetails.townId) : ''))
+        fetcher(api_url + '/Fetcher/items' + (mh_user && mh_user.townDetails ? ('?townId=' + mh_user.townDetails.townId) : ''))
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -8372,7 +8394,7 @@ function getRuins() {
     return new Promise((resolve, reject) => {
         if (!ruins) {
             startLoading();
-            fetcher(api_url + '/myhordesfetcher/ruins?userKey=' + external_app_id)
+            fetcher(api_url + '/Fetcher/ruins?userKey=' + external_app_id)
                 .then((response) => {
                     if (response.status === 200) {
                         return response.json();
@@ -8406,49 +8428,66 @@ function getRuins() {
 }
 
 /** Récupère les informations de la ville */
-function getMe(stop) {
+function getToken(force, stop) {
     return new Promise((resolve, reject) => {
         if (external_app_id) {
-            fetcher(api_url + '/myhordesfetcher/me?userKey=' + external_app_id)
-                .then((response) => {
-                    if (response.status === 200) {
-                        return response.json();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
-                .then((response) => {
-                    mh_user = response;
-                    if (!mh_user || mh_user.id === 0 && mh_user.townDetails.townId === 0) {
-                        mh_user = '';
-                    }
-                    GM.setValue(mh_user_key, mh_user);
-                    console.log('MHO - I am...', mh_user);
-                    getItems().then(() => {
-                        getRuins().then(() => {
-                            resolve();
-                        });
-                    });
-
-                    if (mh_user !== '' && mh_user.townDetails.townId) {
-                        getWishlist().then();
-                        getMap().then();
-                    }
-                })
-                .catch((error) => {
-                    if (error.status === 400 && !stop) {
-                        /** Si on a une erreur 400 ça peut être parce que la clé d'app n'est pas bonne : on tente de récupérer la clé d'app une seule et unique fois pour essayer de rendre ça transparent pour l'utilisateur */
-                        external_app_id = undefined;
-                        getApiKey().then(() => {
-                            getMe(true).then(() => {
+            if (!isValidToken() || force) {
+                fetcher(api_url + '/Authentication/Token?userKey=' + external_app_id)
+                    .then((response) => {
+                        if (response.status === 200) {
+                            return response.json();
+                        } else {
+                            return convertResponsePromiseToError(response);
+                        }
+                    })
+                    .then((response) => {
+                        token = response;
+                        mh_user = token.simpleMe;
+                        if (!mh_user || mh_user.id === 0 && mh_user.townDetails.townId === 0) {
+                            mh_user = '';
+                        }
+                        GM.setValue(mh_user_key, mh_user);
+                        GM.setValue(mho_token_key, token);
+                        console.log('MHO - I am...', mh_user);
+                        getItems().then(() => {
+                            getRuins().then(() => {
                                 resolve();
                             });
                         });
-                    } else {
-                        addError(error);
+
+                        if (mh_user !== '' && mh_user.townDetails.townId) {
+                            getWishlist().then();
+                            getMap().then();
+                        }
+                    })
+                    .catch((error) => {
+                        if (error.status === 400 && !stop) {
+                            /** Si on a une erreur 400 ça peut être parce que la clé d'app n'est pas bonne : on tente de récupérer la clé d'app une seule et unique fois pour essayer de rendre ça transparent pour l'utilisateur */
+                            external_app_id = undefined;
+                            getApiKey().then(() => {
+                                getToken(false, true).then(() => {
+                                    resolve();
+                                });
+                            });
+                        } else {
+                            addError(error);
+                            resolve();
+                        }
+                    });
+            } else {
+                mh_user = token.simpleMe;
+                console.log('MHO - I am...', mh_user);
+                getItems().then(() => {
+                    getRuins().then(() => {
                         resolve();
-                    }
+                    });
                 });
+
+                if (mh_user !== '' && mh_user.townDetails.townId) {
+                    getWishlist().then();
+                    getMap().then();
+                }
+            }
         } else {
             resolve();
         }
@@ -8460,7 +8499,7 @@ function getCitizens() {
     return new Promise((resolve, reject) => {
         getHeroSkills().then((hero_skills) => {
             startLoading();
-            fetcher(api_url + `/myhordesfetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails.townId}`)
+            fetcher(api_url + `/Fetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails.townId}`)
                 .then((response) => {
                     if (response.status === 200) {
                         return response.json();
@@ -8488,7 +8527,7 @@ function getCitizens() {
 function getBank() {
     return new Promise((resolve, reject) => {
         startLoading();
-        fetcher(api_url + '/myhordesfetcher/bank?userKey=' + external_app_id)
+        fetcher(api_url + '/Fetcher/bank?userKey=' + external_app_id)
             .then((response) => {
                 if (response.status === 200) {
                     endLoading();
@@ -8998,7 +9037,7 @@ function getHeroSkills() {
     return new Promise((resolve, reject) => {
         if (!hero_skills) {
             startLoading();
-            fetcher(api_url + '/myhordesfetcher/heroSkills')
+            fetcher(api_url + '/Fetcher/heroSkills')
                 .then((response) => {
                     if (response.status === 200) {
                         return response.json();
@@ -9036,7 +9075,7 @@ function getTranslation(string_to_translate, source_language) {
         if (string_to_translate && string_to_translate !== '') {
             let locale = 'locale=' + source_language;
             let sourceString = 'sourceString=' + string_to_translate;
-            fetcher(api_url + '/myhordestranslation?' + locale + '&' + sourceString)
+            fetcher(api_url + '/Translation?' + locale + '&' + sourceString)
                 .then((response) => {
                     if (response.status === 200) {
                         return response.json();
@@ -9062,7 +9101,7 @@ function getRecipes() {
     return new Promise((resolve, reject) => {
         if (!recipes) {
             startLoading();
-            fetcher(api_url + '/myhordesfetcher/recipes')
+            fetcher(api_url + '/Fetcher/recipes')
                 .then((response) => {
                     if (response.status === 200) {
                         return response.json();
@@ -9126,7 +9165,7 @@ function getParameters() {
 
 function getMap() {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + '/myhordesfetcher/map?townId=' + mh_user.townDetails.townId)
+        fetcher(api_url + '/Fetcher/map?townId=' + mh_user.townDetails.townId)
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -9420,7 +9459,7 @@ function getApiKey() {
             getParameters().then(() => {
 
                 getApiKey().then(() => {
-                    getMe().then(() => {
+                    getToken().then(() => {
 
                         setTimeout(() => {
                             initOptionsWithLoginNeeded();
@@ -9431,7 +9470,7 @@ function getApiKey() {
                             document.addEventListener(event_name, (event) => {
                                 // console.trace('event', event_name, event);
                                 if (shouldRefreshMe()) {
-                                    getMe().then(() => {
+                                    getToken(true).then(() => {
                                         initOptionsWithLoginNeeded();
                                         initOptionsWithoutLoginNeeded();
                                     });

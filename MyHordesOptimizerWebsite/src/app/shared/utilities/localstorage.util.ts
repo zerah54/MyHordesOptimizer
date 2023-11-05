@@ -1,4 +1,5 @@
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
+import { Moment } from 'moment';
 import { EXTERNAL_APP_ID_KEY, ITEMS_KEY, RUINS_KEY, TOKEN_KEY, TOWN_KEY, USER_KEY } from '../../_abstract_model/const';
 import { dtoToModelArray, modelToDtoArray } from '../../_abstract_model/types/_common.class';
 import { Me } from '../../_abstract_model/types/me.class';
@@ -53,7 +54,7 @@ export function getItemsWithExpirationDate(): Item[] {
 
 export function setItemsWithExpirationDate(items: Item[]): void {
     const element_with_expiration: ElementWithExpiration<ItemDTO[] | null> = {
-        expire_at: moment().endOf('day'),
+        expire_at: moment().utc().tz('Europe/Paris').endOf('day'),
         element: modelToDtoArray(items)
     };
     localStorage.setItem(ITEMS_KEY, JSON.stringify(element_with_expiration));
@@ -71,7 +72,7 @@ export function getRuinsWithExpirationDate(): Ruin[] {
 
 export function setRuinsWithExpirationDate(items: Ruin[]): void {
     const element_with_expiration: ElementWithExpiration<RuinDTO[] | null> = {
-        expire_at: moment().endOf('day'),
+        expire_at: moment().utc().tz('Europe/Paris').endOf('day'),
         element: modelToDtoArray(items)
     };
     localStorage.setItem(RUINS_KEY, JSON.stringify(element_with_expiration));
@@ -81,7 +82,9 @@ export function setRuinsWithExpirationDate(items: Ruin[]): void {
 export function getTokenWithMeWithExpirationDate(): TokenWithMe | null {
     const local_storage: string | null = localStorage.getItem(TOKEN_KEY) || '';
     const element_with_expiration: ElementWithExpiration<TokenWithMeDTO> = local_storage ? JSON.parse(local_storage) : undefined;
-    if (!element_with_expiration || moment(element_with_expiration.expire_at).isBefore(moment())) {
+    if (!element_with_expiration
+        || moment(element_with_expiration.expire_at).isBefore(moment())
+        || moment().utc().tz('Europe/Paris').format('D') !== moment(element_with_expiration.expire_at).utc().tz('Europe/Paris').format('D')) {
         return null;
     } else {
         return new TokenWithMe(element_with_expiration.element);
@@ -96,8 +99,7 @@ export function setTokenWithMeWithExpirationDate(token: TokenWithMe): void {
     localStorage.setItem(TOKEN_KEY, JSON.stringify(element_with_expiration));
 }
 
-
 interface ElementWithExpiration<T> {
-    expire_at: moment.Moment;
+    expire_at: Moment;
     element: T;
 }
