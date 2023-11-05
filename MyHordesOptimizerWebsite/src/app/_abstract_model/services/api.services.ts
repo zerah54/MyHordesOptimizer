@@ -11,8 +11,6 @@ import {
     getUserId,
     setItemsWithExpirationDate,
     setRuinsWithExpirationDate,
-    setTown,
-    setUser
 } from '../../shared/utilities/localstorage.util';
 import { BankInfoDTO } from '../dto/bank-info.dto';
 import { CellDTO } from '../dto/cell.dto';
@@ -20,7 +18,6 @@ import { CitizenInfoDTO } from '../dto/citizen-info.dto';
 import { EstimationsDTO } from '../dto/estimations.dto';
 import { HeroSkillDTO } from '../dto/hero-skill.dto';
 import { ItemDTO } from '../dto/item.dto';
-import { MeDTO } from '../dto/me.dto';
 import { RecipeDTO } from '../dto/recipe.dto';
 import { RegenDTO } from '../dto/regen.dto';
 import { RuinDTO } from '../dto/ruin.dto';
@@ -36,11 +33,9 @@ import { Citizen } from '../types/citizen.class';
 import { Estimations } from '../types/estimations.class';
 import { HeroSkill } from '../types/hero-skill.class';
 import { Item } from '../types/item.class';
-import { Me } from '../types/me.class';
 import { Recipe } from '../types/recipe.class';
 import { Regen } from '../types/regen.class';
 import { Ruin } from '../types/ruin.class';
-import { TownDetails } from '../types/town-details.class';
 import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
 import { GlobalServices } from './global.services';
@@ -66,7 +61,7 @@ export class ApiServices extends GlobalServices {
             if (saved_items && saved_items.length > 0 && !force) {
                 sub.next(saved_items);
             } else {
-                super.get<ItemDTO[]>(this.API_URL + `/myhordesfetcher/items?${getTown()?.town_id ? 'townId=' + getTown()?.town_id : ''}`)
+                super.get<ItemDTO[]>(this.API_URL + `/Fetcher/items?${getTown()?.town_id ? 'townId=' + getTown()?.town_id : ''}`)
                     .subscribe({
                         next: (response: HttpResponse<ItemDTO[]>) => {
                             const items: Item[] = dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302);
@@ -81,25 +76,6 @@ export class ApiServices extends GlobalServices {
         });
     }
 
-    /** Récupère l'identifiant de citoyen */
-    public getMe(): Observable<Me | null> {
-        return new Observable((sub: Subscriber<Me | null>) => {
-            if (getExternalAppId()) {
-                super.get<MeDTO>(this.API_URL + `/myhordesfetcher/me?userKey=${getExternalAppId()}`)
-                    .subscribe((response: HttpResponse<MeDTO | null>) => {
-                        const me: Me | null = response.body ? new Me(response.body) : null;
-                        setUser(me);
-                        setTown(response.body ? new TownDetails(response.body.townDetails) : null);
-                        sub.next(me);
-                    });
-            } else {
-                setUser(null);
-                setTown(null);
-                sub.next(null);
-            }
-        });
-    }
-
     /**
      * Récupère les informations de la banque
      *
@@ -107,7 +83,7 @@ export class ApiServices extends GlobalServices {
      */
     public getBank(): Observable<BankInfo> {
         return new Observable((sub: Subscriber<BankInfo>) => {
-            super.get<BankInfoDTO>(this.API_URL + `/myhordesfetcher/bank?userKey=${getExternalAppId()}`)
+            super.get<BankInfoDTO>(this.API_URL + `/Fetcher/bank?userKey=${getExternalAppId()}`)
                 .subscribe({
                     next: (response: HttpResponse<BankInfoDTO>) => {
                         sub.next(new BankInfo(response.body));
@@ -178,7 +154,7 @@ export class ApiServices extends GlobalServices {
             if (saved_ruins && saved_ruins.length > 0 && !force) {
                 sub.next(saved_ruins);
             } else {
-                super.get<RuinDTO[]>(this.API_URL + '/myhordesfetcher/ruins')
+                super.get<RuinDTO[]>(this.API_URL + '/Fetcher/ruins')
                     .subscribe({
                         next: (response: HttpResponse<RuinDTO[]>) => {
                             const ruins: Ruin[] = dtoToModelArray(Ruin, response.body).sort((a: Ruin, b: Ruin) => {
@@ -209,7 +185,7 @@ export class ApiServices extends GlobalServices {
      */
     public getHeroSkill(): Observable<HeroSkill[]> {
         return new Observable((sub: Subscriber<HeroSkill[]>) => {
-            super.get<HeroSkillDTO[]>(this.API_URL + '/myhordesfetcher/heroSkills')
+            super.get<HeroSkillDTO[]>(this.API_URL + '/Fetcher/heroSkills')
                 .subscribe({
                     next: (response: HttpResponse<HeroSkillDTO[]>) => {
                         const skills: HeroSkill[] = dtoToModelArray(HeroSkill, response.body).sort((a: HeroSkill, b: HeroSkill) => {
@@ -237,7 +213,7 @@ export class ApiServices extends GlobalServices {
      */
     public getCitizens(): Observable<CitizenInfo> {
         return new Observable((sub: Subscriber<CitizenInfo>) => {
-            super.get<CitizenInfoDTO>(this.API_URL + `/myhordesfetcher/citizens?townId=${getTown()?.town_id}&userId=${getUserId()}`)
+            super.get<CitizenInfoDTO>(this.API_URL + `/Fetcher/citizens?townId=${getTown()?.town_id}&userId=${getUserId()}`)
                 .subscribe({
                     next: (response: HttpResponse<CitizenInfoDTO>) => {
                         sub.next(new CitizenInfo(response.body));
@@ -256,7 +232,7 @@ export class ApiServices extends GlobalServices {
      */
     public getRecipes(): Observable<Recipe[]> {
         return new Observable((sub: Subscriber<Recipe[]>) => {
-            super.get<RecipeDTO[]>(this.API_URL + '/myhordesfetcher/recipes')
+            super.get<RecipeDTO[]>(this.API_URL + '/Fetcher/recipes')
                 .subscribe({
                     next: (response: HttpResponse<RecipeDTO[]>) => {
                         sub.next(dtoToModelArray(Recipe, response.body));
@@ -326,7 +302,7 @@ export class ApiServices extends GlobalServices {
 
     public getMap(): Observable<Town> {
         return new Observable((sub: Subscriber<Town>) => {
-            super.get<TownDTO>(this.API_URL + `/myhordesfetcher/map?townId=${getTown()?.town_id}`)
+            super.get<TownDTO>(this.API_URL + `/Fetcher/map?townId=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<TownDTO>) => {
                         sub.next(new Town(response.body));
@@ -340,7 +316,7 @@ export class ApiServices extends GlobalServices {
 
     public getScrutList(): Observable<Regen[]> {
         return new Observable((sub: Subscriber<Regen[]>) => {
-            super.get<RegenDTO[]>(this.API_URL + `/myhordesfetcher/MapUpdates?townid=${getTown()?.town_id}`)
+            super.get<RegenDTO[]>(this.API_URL + `/Fetcher/MapUpdates?townid=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<RegenDTO[]>) => {
                         sub.next(dtoToModelArray(Regen, response.body));

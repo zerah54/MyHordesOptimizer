@@ -5,6 +5,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,7 @@ using MyHordesOptimizerApi.Repository.Impl;
 using MyHordesOptimizerApi.Repository.Impl.ExternalTools;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
+using MyHordesOptimizerApi.Serilog;
 using MyHordesOptimizerApi.Services.Impl;
 using MyHordesOptimizerApi.Services.Impl.Estimations;
 using MyHordesOptimizerApi.Services.Impl.ExternalTools;
@@ -56,10 +58,6 @@ namespace MyHordesOptimizerApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(Configuration)
-                .CreateLogger();
-
             services.AddHttpContextAccessor();
 
             services.AddHttpClient();
@@ -95,6 +93,7 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<IMyHordesOptimizerSqlConfiguration, MyHordesOptimizerSqlConfiguration>();
             services.AddSingleton<IMyHordesScrutateurConfiguration, MyHordesScrutateurConfiguration>();
             services.AddSingleton<IDiscordBotConfiguration, DiscordBotConfiguration>();
+            services.AddSingleton<IAuthenticationConfiguration, AuthenticationConfiguration>();
 
             services.AddSingleton<IMyHordesOptimizerFirebaseConfiguration, MyHordesOptimizerFirebaseConfiguration>();
 
@@ -123,6 +122,7 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimizerParametersService>();
             services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
             services.AddScoped<IMyHordesOptimizerEstimationService, MyHordesOptimizerEstimationService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
 
             services.AddSingleton<DiscordSocketClient>();       // Add the discord client to services
             services.AddSingleton<InteractionService>();        // Add the interaction service to services
@@ -134,6 +134,7 @@ namespace MyHordesOptimizerApi
             services.AddHostedService<InteractionHandlingHostedService>();    // Add the slash command handler
             services.AddHostedService<DiscordStartupHostedService>();         // Add the discord startup service
 
+            services.AddTransient<MyHordesOptimizerEnricher>();
             services.AddHttpLogging(logging =>
             {
                 logging.LoggingFields = HttpLoggingFields.All | HttpLoggingFields.RequestQuery;
@@ -161,6 +162,12 @@ namespace MyHordesOptimizerApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.Use((context, next) =>
+            {
+                context.Request.EnableBuffering();
+                return next();
+            });
 
             app.UseHttpsRedirection();
 

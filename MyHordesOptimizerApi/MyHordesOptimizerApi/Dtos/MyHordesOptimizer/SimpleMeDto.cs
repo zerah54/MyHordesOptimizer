@@ -2,14 +2,14 @@
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
-    public class SimpleMe
+    public class SimpleMeDto
     {
         public int Id { get; set; }
         public string UserName { get; set; }
         public SimpleMeTownDetailDto TownDetails { get; set; }
         public SimpleMeJobDetailDto JobDetails { get; set; }
 
-        public SimpleMe()
+        public SimpleMeDto()
         {
             TownDetails = new SimpleMeTownDetailDto();
             JobDetails = new SimpleMeJobDetailDto();

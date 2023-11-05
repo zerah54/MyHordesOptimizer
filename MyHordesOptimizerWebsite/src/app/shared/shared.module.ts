@@ -19,10 +19,11 @@ import { ChartsThemingService } from './services/charts-theming.service';
 import { ClipboardService } from './services/clipboard.service';
 import { LoadingOverlayService } from './services/loading-overlay.service';
 import { SnackbarService } from './services/snackbar.service';
+import { AuthenticationService } from '../_abstract_model/services/authentication.services';
 
 const custom_modules: Modules = [MaterialModule, ElementsModule, PipesModule];
 const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule, NgOptimizedImage];
-const services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService, WishlistServices, ChartsThemingService];
+const services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService, WishlistServices, ChartsThemingService, AuthenticationService];
 const guards: Components = [IsInTownGuard, InDevModeGuard];
 const external_modules: Modules = [TableVirtualScrollModule];
 

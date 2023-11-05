@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
@@ -46,10 +45,12 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(updateRequestDto)} cannot be null");
             }
-            if (updateRequestDto.TownDetails==null || updateRequestDto.TownDetails.TownId == 0)
+            if (updateRequestDto.TownDetails == null || updateRequestDto.TownDetails.TownId == 0)
             {
                 return BadRequest($"{nameof(updateRequestDto.TownDetails)} cannot be empty");
             }
+            throw new System.Exception("hehe");
+
             var bbh = updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes;
             var fata = updateRequestDto.Map.ToolsToUpdate.IsFataMorgana;
             if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(bbh))

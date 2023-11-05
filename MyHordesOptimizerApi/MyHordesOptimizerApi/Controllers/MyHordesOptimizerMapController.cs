@@ -9,7 +9,7 @@ using MyHordesOptimizerApi.Services.Interfaces;
 namespace MyHordesOptimizerApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Map")]
     public class MyHordesOptimizerMapController : AbstractMyHordesOptimizerControllerBase
     {
         protected IMyHordesOptimizerMapService _mapService { get; private set; }

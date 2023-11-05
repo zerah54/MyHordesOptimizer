@@ -6,14 +6,13 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MyHordesOptimizerApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Fetcher")]
     public class MyHordesFetcherController : AbstractMyHordesOptimizerControllerBase
     {
         private readonly IMyHordesFetcherService _myHordesFetcherService;
@@ -32,20 +31,6 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var items = _myHordesFetcherService.GetItems(townId).ToList();
             return items;
-        }
-
-        [HttpGet]
-        [Route("Me")]
-        public ActionResult<SimpleMe> GetMe(string userKey)
-        {
-            if (string.IsNullOrWhiteSpace(userKey))
-            {
-                return BadRequest($"{nameof(userKey)} cannot be empty");
-            }
-
-            UserKeyProvider.UserKey = userKey;
-            var me = _myHordesFetcherService.GetSimpleMe();
-            return me;
         }
 
         [HttpGet]
