@@ -49,8 +49,6 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(updateRequestDto.TownDetails)} cannot be empty");
             }
-            throw new System.Exception("hehe");
-
             var bbh = updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes;
             var fata = updateRequestDto.Map.ToolsToUpdate.IsFataMorgana;
             if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(bbh))
