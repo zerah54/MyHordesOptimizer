@@ -4,9 +4,9 @@ import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from 
 import { Event, NavigationCancel, NavigationEnd, NavigationSkipped, NavigationStart, Router } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { BREAKPOINTS } from './_abstract_model/const';
-import { ApiServices } from './_abstract_model/services/api.services';
 import { AutoDestroy } from './shared/decorators/autodestroy.decorator';
 import { LoadingOverlayService } from './shared/services/loading-overlay.service';
+import { AuthenticationService } from './_abstract_model/services/authentication.services';
 
 @Component({
     selector: 'mho-root',
@@ -29,8 +29,9 @@ export class AppComponent implements OnInit {
         this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     }
 
-    constructor(public loading_service: LoadingOverlayService, private api: ApiServices, private router: Router,
-                private overlay_container: OverlayContainer, private breakpoint_observer: BreakpointObserver) {
+    constructor(public loading_service: LoadingOverlayService, private authentication_api: AuthenticationService,
+                private router: Router, private overlay_container: OverlayContainer,
+                private breakpoint_observer: BreakpointObserver) {
     }
 
     public ngOnInit(): void {
@@ -46,7 +47,7 @@ export class AppComponent implements OnInit {
         }
         this.loaderOnRouting();
 
-        this.api.getMe()
+        this.authentication_api.getMe()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe(() => {
                 this.ready = true;
