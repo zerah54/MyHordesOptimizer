@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import { EXTERNAL_APP_ID_KEY, ITEMS_KEY, RUINS_KEY, TOWN_KEY, USER_KEY } from '../../_abstract_model/const';
+import { EXTERNAL_APP_ID_KEY, ITEMS_KEY, RUINS_KEY, TOKEN_KEY, TOWN_KEY, USER_KEY } from '../../_abstract_model/const';
 import { dtoToModelArray, modelToDtoArray } from '../../_abstract_model/types/_common.class';
 import { Me } from '../../_abstract_model/types/me.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
@@ -7,6 +7,8 @@ import { Item } from '../../_abstract_model/types/item.class';
 import { ItemDTO } from '../../_abstract_model/dto/item.dto';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { RuinDTO } from '../../_abstract_model/dto/ruin.dto';
+import { TokenWithMeDTO } from '../../_abstract_model/dto/token-with-me.dto';
+import { TokenWithMe } from '../../_abstract_model/types/token-with-me.class';
 
 export function setUser(user: Me | null): void {
     localStorage.setItem(USER_KEY, user ? JSON.stringify(user) : '');
@@ -73,6 +75,25 @@ export function setRuinsWithExpirationDate(items: Ruin[]): void {
         element: modelToDtoArray(items)
     };
     localStorage.setItem(RUINS_KEY, JSON.stringify(element_with_expiration));
+}
+
+
+export function getTokenWithMeWithExpirationDate(): TokenWithMe | null {
+    const local_storage: string | null = localStorage.getItem(TOKEN_KEY) || '';
+    const element_with_expiration: ElementWithExpiration<TokenWithMeDTO> = local_storage ? JSON.parse(local_storage) : undefined;
+    if (!element_with_expiration || moment(element_with_expiration.expire_at).isBefore(moment())) {
+        return null;
+    } else {
+        return new TokenWithMe(element_with_expiration.element);
+    }
+}
+
+export function setTokenWithMeWithExpirationDate(token: TokenWithMe): void {
+    const element_with_expiration: ElementWithExpiration<TokenWithMeDTO | null> = {
+        expire_at: moment(token.token.valid_to),
+        element: token.modelToDto()
+    };
+    localStorage.setItem(TOKEN_KEY, JSON.stringify(element_with_expiration));
 }
 
 
