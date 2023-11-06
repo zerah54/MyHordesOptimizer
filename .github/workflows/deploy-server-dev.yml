@@ -11,7 +11,7 @@ jobs:
     runs-on: windows-latest
     defaults:
       run:
-        working-directory: ./Serilog.Sinks.Discord
+        working-directory: ./MyHordesOptimizerApi
 
     steps:
       - uses: actions/checkout@main
@@ -25,9 +25,9 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
-  #      - name: dotnet publish
-  #        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
-  #
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
+
   #      - name: Upload artifact for deployment job
   #        uses: actions/upload-artifact@v2
   #        with:
