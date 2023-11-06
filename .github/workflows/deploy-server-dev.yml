@@ -36,6 +36,7 @@ jobs:
 
   build-api:
     runs-on: windows-latest
+    needs: build-sinks
     defaults:
       run:
         working-directory: ./MyHordesOptimizerApi
@@ -63,7 +64,7 @@ jobs:
 
   deploy:
     runs-on: windows-latest
-    needs: build
+    needs: build-api
     environment:
       name: 'deployment'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
