@@ -35,7 +35,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
         {
             try
             {
-                var completeTranslation = _translationService.GetTranslation(locale.ToString().ToLower(), searchValue);
+                var completeTranslation = await _translationService.GetTranslationAsync(locale.ToString().ToLower(), searchValue);
 
                 var hasExactResponse = completeTranslation.Translations
                     .Exists((translation) => translation.Key.IsExactMatch);
