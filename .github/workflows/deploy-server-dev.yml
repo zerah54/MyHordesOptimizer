@@ -57,8 +57,10 @@ jobs:
 
       - name: Logs
         run: ls
-          | cd.. ls
-          | cd.. ls
+          | cd..
+          | ls
+          | cd..
+          | ls
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
