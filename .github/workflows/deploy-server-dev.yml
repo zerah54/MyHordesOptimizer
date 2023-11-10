@@ -57,12 +57,12 @@ jobs:
 
       - name: Logs
         run: ls -Path ..
-
+          | ls -Path ../..
+          | ls
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
-          app-name: 'MyHordesOptimizerApi'
-          slot-name: 'deployment'
+          app-name: MyHordesOptimizerApi
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_46612d33e3fc456283a3700e421f4a93 }}
           package: .
