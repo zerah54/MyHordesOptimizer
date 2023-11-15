@@ -22,11 +22,8 @@ jobs:
           dotnet-version: '6.0'
           include-prerelease: true
 
-      - name: Log
-        run: ls
-
       - name: Log2
-        run: ls -path ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
+        run: ls -path ./${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
