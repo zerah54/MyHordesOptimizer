@@ -8,6 +8,19 @@ env:
 
 jobs:
 
+  logs:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: ./MyHordesOptimizerApi
+
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Log
+        run: ls
+
+
   build-sinks:
     runs-on: windows-latest
     defaults:
@@ -23,11 +36,11 @@ jobs:
           dotnet-version: '6.0'
           include-prerelease: true
 
+      - name: Log
+        run: ls
+
       - name: Build with dotnet
         run: dotnet build --configuration Release
-
-      - name: dotnet publish sinks
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
 
   build-api:
     runs-on: windows-latest
@@ -44,6 +57,9 @@ jobs:
         with:
           dotnet-version: '6.0'
           include-prerelease: true
+
+      - name: Log
+        run: ls
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
