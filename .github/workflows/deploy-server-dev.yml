@@ -7,8 +7,7 @@ env:
   DOTNET_ROOT: '.'
 
 jobs:
-
-  logs:
+  build:
     runs-on: windows-latest
     defaults:
       run:
@@ -17,19 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name: Log
-        run: ls
-
-
-  build-sinks:
-    runs-on: windows-latest
-    defaults:
-      run:
-        working-directory: ./MyHordesOptimizerApi/Serilog.Sinks.Discord
-
-    steps:
-      - uses: actions/checkout@main
-
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v2
         with:
@@ -39,36 +25,23 @@ jobs:
       - name: Log
         run: ls
 
+      - name: Log2
+        run: ls -path ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
+
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
-      - name: dotnet publish api
+      - name: dotnet publish sinks
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
-
-  build-api:
-    runs-on: windows-latest
-    needs: build-sinks
-    defaults:
-      run:
-        working-directory: ./MyHordesOptimizerApi/MyHordesOptimizerApi
-
-    steps:
-      - uses: actions/checkout@main
-
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: '6.0'
-          include-prerelease: true
-
-      - name: Log
-        run: ls
-
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
 
       - name: dotnet publish api
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
+
+      - name: Upload sinks for deployment job
+        uses: actions/upload-artifact@v2
+        with:
+          name: .net-sinks
+          path: ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
@@ -78,7 +51,7 @@ jobs:
 
   deploy:
     runs-on: windows-latest
-    needs: build-api
+    needs: build
     environment:
       name: 'deployment'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
