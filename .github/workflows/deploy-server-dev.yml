@@ -42,6 +42,9 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
+      - name: dotnet publish api
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
+
   build-api:
     runs-on: windows-latest
     needs: build-sinks
@@ -71,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}
+          path: ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
 
   deploy:
     runs-on: windows-latest
