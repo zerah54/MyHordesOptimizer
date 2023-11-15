@@ -7,8 +7,29 @@ env:
   DOTNET_ROOT: '.'
 
 jobs:
+
+  build-sinks:
+    runs-on: windows-latest
+    needs: build-sinks
+    defaults:
+      run:
+        working-directory: ./Serilog.Sinks.Discord
+
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0'
+          include-prerelease: true
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
   build:
     runs-on: windows-latest
+    needs: build-sinks
     defaults:
       run:
         working-directory: ./MyHordesOptimizerApi
