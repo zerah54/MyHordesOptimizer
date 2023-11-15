@@ -10,7 +10,6 @@ jobs:
 
   build-sinks:
     runs-on: windows-latest
-    needs: build-sinks
     defaults:
       run:
         working-directory: ./Serilog.Sinks.Discord
