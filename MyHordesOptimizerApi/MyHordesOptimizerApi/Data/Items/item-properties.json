@@ -494,8 +494,8 @@
     ],
     "fungus_#00": [
         "food",
-        "can_cook",
-        "single_use"
+        "inedible",
+        "can_cook"
     ],
     "radio_on_#00": [
         "impoundable",

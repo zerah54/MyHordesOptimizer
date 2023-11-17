@@ -13,7 +13,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         List<MyHordesCategoryCodeModel> GetCategories();
         Dictionary<string, List<string>> GetItemsProperties();
         Dictionary<string, List<string>> GetItemsActions();
-        Dictionary<string, Dictionary<string, int>> GetItemsDropRates();
+        Dictionary<string, Dictionary<string, string[]>> GetItemsDropRates();
         List<MyHordesHerosCapacitiesCodeModel> GetHeroCapacities();
         List<MyHordesCauseOfDeathModel> GetCausesOfDeath();
         List<MyHordesCleanUpTypeModel> GetCleanUpTypes();

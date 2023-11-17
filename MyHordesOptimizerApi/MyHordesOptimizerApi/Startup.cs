@@ -122,6 +122,7 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimizerParametersService>();
             services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
             services.AddScoped<IMyHordesOptimizerEstimationService, MyHordesOptimizerEstimationService>();
+            services.AddScoped<ICampingService, CampingService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
 
             services.AddSingleton<DiscordSocketClient>();       // Add the discord client to services

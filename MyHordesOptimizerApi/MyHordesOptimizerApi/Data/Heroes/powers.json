@@ -25,7 +25,8 @@
     {
         "name": "hero_generic_find_lucky",
         "unlockable": true,
-        "used": "Du hast heute schon verdammt viel Schwein gehabt. So viel Glück kannst du erst in deinem nächsten Leben wieder haben..."
+        "used": "Du hast heute schon verdammt viel Schwein gehabt. So viel Glück kannst du erst in deinem nächsten Leben wieder haben...",
+        "replace": "hero_generic_find"
     },
     {
         "name": "hero_generic_rescue",

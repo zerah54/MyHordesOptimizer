@@ -150,19 +150,19 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var totalWeightPraf = 0.0;
             foreach (var kvp in listOfPrafDrops)
             {
-                totalWeightPraf += kvp.Value;
+                totalWeightPraf += Convert.ToInt32(kvp.Value[0]);
             }
             var listOfNotPrafDrops = droprates.GetValueOrDefault("base_dig");
             var totalWeightNotPraf = 0.0;
             foreach (var kvp in listOfNotPrafDrops)
             {
-                totalWeightNotPraf += kvp.Value;
+                totalWeightNotPraf += Convert.ToInt32(kvp.Value[0]);
             }
             mhoItems.ForEach(item =>
             {
                 if (listOfPrafDrops.TryGetValue(item.Uid, out var dropWeight))
                 {
-                    item.DropRatePraf = dropWeight / totalWeightPraf;
+                    item.DropRatePraf = Convert.ToInt32(dropWeight[0]) / totalWeightPraf;
                 }
                 else
                 {
@@ -173,7 +173,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 if (listOfNotPrafDrops.TryGetValue(item.Uid, out var dropWeight))
                 {
-                    item.DropRateNotPraf = dropWeight / totalWeightNotPraf;
+                    item.DropRateNotPraf = Convert.ToInt32(dropWeight[0]) / totalWeightNotPraf;
                 }
                 else
                 {

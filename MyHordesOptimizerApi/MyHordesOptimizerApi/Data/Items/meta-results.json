@@ -482,14 +482,5 @@
     },
     "home_kitchen_failure": {
         "spawn": "kitchen_fail_food"
-    },
-    "become_ghoul": {
-        "status": "become_ghoul"
-    },
-    "become_ghoul_5": {
-        "status": "become_ghoul_5"
-    },
-    "become_ghoul_25": {
-        "status": "become_ghoul_25"
     }
 }

@@ -1,5 +1,5 @@
-[
-    {
+{
+    "none": {
         "hero": false,
         "icon": "looser",
         "name": "none",
@@ -12,9 +12,10 @@
             "basic_suit_dirt_#00"
         ],
         "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0
+        "nightwatch_surv_bonus": 0,
+        "dig_bonus": 0
     },
-    {
+    "basic": {
         "hero": false,
         "icon": "basic",
         "name": "basic",
@@ -28,9 +29,10 @@
         ],
         "picto": "r_jbasic_#00",
         "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0
+        "nightwatch_surv_bonus": 0,
+        "dig_bonus": 0
     },
-    {
+    "collec": {
         "hero": true,
         "icon": "dig",
         "name": "collec",
@@ -45,9 +47,10 @@
         ],
         "picto": "r_jcolle_#00",
         "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0
+        "nightwatch_surv_bonus": 0,
+        "dig_bonus": 0.2
     },
-    {
+    "guardian": {
         "hero": true,
         "icon": "shield",
         "name": "guardian",
@@ -62,9 +65,10 @@
         ],
         "picto": "r_jguard_#00",
         "nightwatch_def_bonus": 30,
-        "nightwatch_surv_bonus": 0.04
+        "nightwatch_surv_bonus": 0.04,
+        "dig_bonus": 0
     },
-    {
+    "hunter": {
         "hero": true,
         "icon": "vest",
         "name": "hunter",
@@ -80,9 +84,10 @@
         ],
         "picto": "r_jrangr_#00",
         "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0
+        "nightwatch_surv_bonus": 0,
+        "dig_bonus": 0
     },
-    {
+    "tamer": {
         "hero": true,
         "icon": "tamer",
         "name": "tamer",
@@ -99,9 +104,10 @@
         ],
         "picto": "r_jtamer_#00",
         "nightwatch_def_bonus": 20,
-        "nightwatch_surv_bonus": 0
+        "nightwatch_surv_bonus": 0,
+        "dig_bonus": 0
     },
-    {
+    "tech": {
         "hero": true,
         "icon": "tech",
         "name": "tech",
@@ -116,9 +122,10 @@
         ],
         "picto": "r_jtech_#00",
         "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0
+        "nightwatch_surv_bonus": 0,
+        "dig_bonus": 0
     },
-    {
+    "shaman": {
         "hero": true,
         "icon": "shaman",
         "name": "shaman",
@@ -133,9 +140,10 @@
         ],
         "picto": "r_jsham_#00",
         "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0
+        "nightwatch_surv_bonus": 0,
+        "dig_bonus": 0
     },
-    {
+    "survivalist": {
         "hero": true,
         "icon": "book",
         "name": "survivalist",
@@ -150,6 +158,7 @@
         ],
         "picto": "r_jermit_#00",
         "nightwatch_def_bonus": 0,
-        "nightwatch_surv_bonus": 0
+        "nightwatch_surv_bonus": 0,
+        "dig_bonus": 0
     }
-]
+}

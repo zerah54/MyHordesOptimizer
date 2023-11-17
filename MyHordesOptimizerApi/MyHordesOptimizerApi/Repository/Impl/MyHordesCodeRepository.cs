@@ -44,11 +44,11 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return dico;
         }
 
-        public Dictionary<string, Dictionary<string, int>> GetItemsDropRates()
+        public Dictionary<string, Dictionary<string, string[]>> GetItemsDropRates()
         {
             var path = "Data/Items/find.json";
             var json = File.ReadAllText(path);
-            var dico = json.FromJson<Dictionary<string, Dictionary<string, int>>>();
+            var dico = json.FromJson<Dictionary<string, Dictionary<string, string[]>>>();
             return dico;
         }
 
