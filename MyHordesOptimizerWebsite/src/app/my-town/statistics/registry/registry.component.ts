@@ -3,7 +3,7 @@ import * as moment from 'moment/moment';
 import { environment } from '../../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { Entry } from '../../../_abstract_model/interfaces';
-import { ApiServices } from '../../../_abstract_model/services/api.services';
+import { ApiService } from '../../../_abstract_model/services/api.service';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 
@@ -30,7 +30,7 @@ export class RegistryComponent implements OnInit {
     public readonly locale: string = moment.locale();
 
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiService) {
 
     }
 

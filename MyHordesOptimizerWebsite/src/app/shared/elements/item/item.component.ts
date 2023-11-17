@@ -2,7 +2,7 @@ import { Component, HostBinding, Input, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { WishlistServices } from '../../../_abstract_model/services/wishlist.service';
+import { WishlistService } from '../../../_abstract_model/services/wishlist.service';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { AutoDestroy } from '../../decorators/autodestroy.decorator';
@@ -31,7 +31,7 @@ export class ItemComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private wishlist_services: WishlistServices) {
+    constructor(private wishlist_services: WishlistService) {
     }
 
     public ngOnInit(): void {

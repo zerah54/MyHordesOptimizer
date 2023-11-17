@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
-import { ApiServices } from '../../_abstract_model/services/api.services';
+import { ApiService } from '../../_abstract_model/services/api.service';
 import { HeroSkill } from '../../_abstract_model/types/hero-skill.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 
@@ -35,7 +35,7 @@ export class HeroSkillsComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiService) {
 
     }
 

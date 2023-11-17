@@ -4,9 +4,9 @@ import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from 
 import { Event, NavigationCancel, NavigationEnd, NavigationSkipped, NavigationStart, Router } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { BREAKPOINTS } from './_abstract_model/const';
+import { AuthenticationService } from './_abstract_model/services/authentication.service';
 import { AutoDestroy } from './shared/decorators/autodestroy.decorator';
 import { LoadingOverlayService } from './shared/services/loading-overlay.service';
-import { AuthenticationService } from './_abstract_model/services/authentication.services';
 
 @Component({
     selector: 'mho-root',

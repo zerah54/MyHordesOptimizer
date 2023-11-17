@@ -17,4 +17,4 @@ export interface Dictionary<T> {
     [key: string | number]: T;
 }
 
-export type TownType = 'RNE' | 'RE' | 'PANDE';
+export type TownTypeId = 'RNE' | 'RE' | 'PANDE';

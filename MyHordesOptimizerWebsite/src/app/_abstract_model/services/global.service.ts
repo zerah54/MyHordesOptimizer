@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export class GlobalServices {
+export class GlobalService {
     protected readonly API_URL: string = environment.api_url;
 
     constructor(private http: HttpClient) {

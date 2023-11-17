@@ -10,12 +10,12 @@ import {
 } from '../../shared/utilities/localstorage.util';
 import { TokenWithMeDTO } from '../dto/token-with-me.dto';
 import { Me } from '../types/me.class';
-import { GlobalServices } from './global.services';
 import { TokenWithMe } from '../types/token-with-me.class';
+import { GlobalService } from './global.service';
 
 
 @Injectable()
-export class AuthenticationService extends GlobalServices {
+export class AuthenticationService extends GlobalService {
 
     constructor(_http: HttpClient) {
         super(_http);

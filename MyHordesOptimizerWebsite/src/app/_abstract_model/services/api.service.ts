@@ -38,10 +38,10 @@ import { Regen } from '../types/regen.class';
 import { Ruin } from '../types/ruin.class';
 import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
-import { GlobalServices } from './global.services';
+import { GlobalService } from './global.service';
 
 @Injectable()
-export class ApiServices extends GlobalServices {
+export class ApiService extends GlobalService {
 
     /** La locale */
     private readonly locale: string = moment.locale();

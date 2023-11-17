@@ -38,6 +38,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     @Input() multiple: boolean = false;
     @Input() bindLabel!: string;
+    @Input() noLabel: boolean = false;
     @Input() bindIcon!: string;
     @Input() moreInfo!: (element: string | T) => string;
     @Input() emptyOption: boolean = false;

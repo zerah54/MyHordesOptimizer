@@ -14,8 +14,8 @@ import { HORDES_IMG_REPO, WISHLIST_EDITION_MODE_KEY } from '../../_abstract_mode
 import { WishlistDepot } from '../../_abstract_model/enum/wishlist-depot.enum';
 import { WishlistPriority } from '../../_abstract_model/enum/wishlist-priority.enum';
 import { StandardColumn } from '../../_abstract_model/interfaces';
-import { ApiServices } from '../../_abstract_model/services/api.services';
-import { WishlistServices } from '../../_abstract_model/services/wishlist.service';
+import { ApiService } from '../../_abstract_model/services/api.service';
+import { WishlistService } from '../../_abstract_model/services/wishlist.service';
 import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
@@ -112,7 +112,7 @@ export class WishlistComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices, private wishlist_sercices: WishlistServices, private clipboard: ClipboardService, private dialog: MatDialog,
+    constructor(private api: ApiService, private wishlist_sercices: WishlistService, private clipboard: ClipboardService, private dialog: MatDialog,
                 @Inject(DOCUMENT) private document: Document) {
 
     }

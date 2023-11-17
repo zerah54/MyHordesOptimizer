@@ -4,11 +4,11 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { Title } from '@angular/platform-browser';
 import { Subject, takeUntil } from 'rxjs';
 import { BREAKPOINTS } from '../../_abstract_model/const';
-import { ApiServices } from '../../_abstract_model/services/api.services';
+import { ApiService } from '../../_abstract_model/services/api.service';
+import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { Me } from '../../_abstract_model/types/me.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { getExternalAppId, getTown, getUser, setExternalAppId } from '../../shared/utilities/localstorage.util';
-import { AuthenticationService } from '../../_abstract_model/services/authentication.services';
 
 @Component({
     selector: 'mho-header',
@@ -44,7 +44,7 @@ export class HeaderComponent {
         this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     }
 
-    public constructor(private breakpoint_observer: BreakpointObserver, private title_service: Title, private api: ApiServices,
+    public constructor(private breakpoint_observer: BreakpointObserver, private title_service: Title, private api: ApiService,
                        private authentication_api: AuthenticationService) {
         this.title = this.title_service.getTitle();
     }

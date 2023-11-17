@@ -23,13 +23,16 @@
                 <div>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Métier</mat-label>
-                        <mho-select [formControlName]="'job'" [options]="jobs" [multiple]="false" [bindLabel]="'value.label'" [bindIcon]="'value.img'">
+                        <mho-select [formControlName]="'job'" [options]="jobs" [multiple]="false"
+                                    [bindLabel]="'value.label'" [bindIcon]="'value.img'">
                         </mho-select>
                     </mat-form-field>
-                    <mat-checkbox [formControlName]="'vest'" *ngIf="$any(configuration_form.get('job')?.value)?.key === JOB_SCOUT.key">
+                    <mat-checkbox [formControlName]="'vest'"
+                                  *ngIf="$any(configuration_form.get('job')?.value)?.key === JOB_SCOUT.key">
                         <img [ngSrc]="HORDES_IMG_REPO + 'emotes/proscout.gif'" width="16" height="16">
                         <ng-container i18n>Tenue de camouflage</ng-container>&nbsp;
-                        <small i18n>(Bonus&nbsp;:&nbsp;{{bonus['zombie_with_vest']}}&nbsp;par zombie au lieu de&nbsp;{{bonus['zombie_without_vest']}})</small>
+                        <small i18n>(Bonus&nbsp;:&nbsp;{{bonus['zombie_with_vest']}}&nbsp;par zombie au lieu
+                            de&nbsp;{{bonus['zombie_without_vest']}})</small>
                     </mat-checkbox>
                     <mat-checkbox [formControlName]="'pro'">
                         <img [ngSrc]="HORDES_IMG_REPO + 'status/status_camper.gif'" width="16" height="16">
@@ -44,7 +47,8 @@
                         <mat-label i18n>Nombre de campings déjà effectués</mat-label>
                         <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/sleep.gif'" width="16" height="16">
                         <input matInput type="number" [formControlName]="'campings'" min="0">
-                        <small matSuffix i18n>Bonus&nbsp;:&nbsp;{{ configuration_form.get('town')?.value['id'] === 'pande'
+                        <small matSuffix
+                               i18n>Bonus&nbsp;:&nbsp;{{ configuration_form.get('town')?.value['id'] === 'pande'
                             ? (configuration_form.get('pro')?.value
                                     ? (configuration_form.get('campings')?.value > 9 ? campings['pande']['pro'][9] : campings['pande']['pro'][configuration_form.get('campings')?.value])
                                     : (configuration_form.get('campings')?.value > 9 ? campings['pande']['nonpro'][9] : campings['pande']['nonpro'][configuration_form.get('campings')?.value])
@@ -108,10 +112,15 @@
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Bâtiment</mat-label>
                         <mho-select [formControlName]="'ruin'" [options]="ruins | filterRuinsByKm:townDistance.value"
-                                    [bindLabel]="'label.' + locale" [moreInfo]="getMoreRuinInfo">
+                                    [bindLabel]="'label.' + locale" [bindIcon]="'formatted_img'" [moreInfo]="getMoreRuinInfo">
                         </mho-select>
                         <mat-icon matSuffix [matTooltip]="help_ruins" style="vertical-align: middle" [color]="'primary'">help_outline</mat-icon>
                         <small matSuffix i18n>Bonus&nbsp;:&nbsp;{{configuration_form.get('ruin')?.value['camping']}}</small>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="short-bottom" *ngIf="configuration_form.get('ruin')?.value['id'] === -1">
+                        <mat-label i18n>Nombre de tas</mat-label>
+                        <input matInput type="number" [formControlName]="'bury_count'">
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom">
@@ -176,7 +185,8 @@
                     <ng-container i18n>Résultat</ng-container>
                     &nbsp;:&nbsp;
                 </h3>
-                <div i18n>{{camping_result.probability * 100 | number:'1.0-2':locale }}% de chances de survie ({{(camping_result.chances || 0) / 100}}&nbsp;points)
+                <div i18n
+                >{{camping_result.probability * 100 | number:'1.0-2':locale }}% de chances de survie ({{(camping_result.chances || 0) / 100}}&nbsp;points)
                 </div>
                 <small>{{ camping_result.label }}</small>
             </ng-container>

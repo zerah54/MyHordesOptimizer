@@ -5,7 +5,7 @@ import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
-import { ApiServices } from '../../../_abstract_model/services/api.services';
+import { ApiService } from '../../../_abstract_model/services/api.service';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
@@ -49,7 +49,7 @@ export class CitizensDispoComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiService) {
 
     }
 

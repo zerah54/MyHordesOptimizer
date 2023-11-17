@@ -2,13 +2,13 @@ import { Component, HostBinding, Inject, OnInit, ViewEncapsulation } from '@angu
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
+import { ApiService } from '../../../../_abstract_model/services/api.service';
+import { DigsService } from '../../../../_abstract_model/services/digs.service';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
-import { Dig } from '../../../../_abstract_model/types/dig.class';
-import { AutoDestroy } from '../../../../shared/decorators/autodestroy.decorator';
-import { ApiServices } from '../../../../_abstract_model/services/api.services';
-import { DigsServices } from '../../../../_abstract_model/services/digs.service';
-import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { Dig } from '../../../../_abstract_model/types/dig.class';
+import { Ruin } from '../../../../_abstract_model/types/ruin.class';
+import { AutoDestroy } from '../../../../shared/decorators/autodestroy.decorator';
 
 @Component({
     selector: 'mho-map-update',
@@ -27,8 +27,8 @@ export class MapUpdateComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(@Inject(MAT_DIALOG_DATA) public data: MapUpdateData, private api: ApiServices, private digs_services: DigsServices) {
-        this.cell = new Cell({...this.data.cell.modelToDto()});
+    constructor(@Inject(MAT_DIALOG_DATA) public data: MapUpdateData, private api: ApiService, private digs_services: DigsService) {
+        this.cell = new Cell({ ...this.data.cell.modelToDto() });
     }
 
     public ngOnInit(): void {
@@ -43,7 +43,7 @@ export class MapUpdateComponent implements OnInit {
         this.api.saveCell(this.cell)
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((): void => {
-                this.data.cell = new Cell({...this.cell.modelToDto()});
+                this.data.cell = new Cell({ ...this.cell.modelToDto() });
             });
         this.digs_services.updateDig(this.digs)
             .pipe(takeUntil(this.destroy_sub))

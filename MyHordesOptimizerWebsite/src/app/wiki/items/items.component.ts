@@ -1,12 +1,12 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { ApiServices } from '../../_abstract_model/services/api.services';
-import { Item } from '../../_abstract_model/types/item.class';
-import { normalizeString } from '../../shared/utilities/string.utils';
-import { Property } from '../../_abstract_model/enum/property.enum';
 import { Action } from '../../_abstract_model/enum/action.enum';
+import { Property } from '../../_abstract_model/enum/property.enum';
+import { ApiService } from '../../_abstract_model/services/api.service';
+import { Item } from '../../_abstract_model/types/item.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { normalizeString } from '../../shared/utilities/string.utils';
 
 @Component({
     selector: 'mho-items',
@@ -33,7 +33,7 @@ export class ItemsComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiService) {
 
     }
 

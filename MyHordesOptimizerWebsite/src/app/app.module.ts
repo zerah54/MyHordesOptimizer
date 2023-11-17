@@ -8,6 +8,7 @@ import localeFR from '@angular/common/locales/fr';
 import { Inject, LOCALE_ID, NgModule } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import * as moment from 'moment';
 import { environment } from '../environments/environment';
 import { Modules } from './_abstract_model/types/_types';
@@ -38,6 +39,8 @@ const app_modules: Modules = [StructureModule, WikiModule, ThanksModule, ToolsMo
         SharedModule,
         ...app_modules,
         AppRoutingModule,
+        AngularFireModule.initializeApp(environment.firebase_config),
+        AngularFireAnalyticsModule,
         provideFirebaseApp(() => initializeApp(environment.firebase_config)),
     ],
     providers: [

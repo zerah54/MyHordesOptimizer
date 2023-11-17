@@ -6,7 +6,7 @@ import { ChartDataset, LegendItem } from 'chart.js/dist/types';
 import { Color } from 'chartjs-plugin-datalabels/types/options';
 import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
 import { MinMax } from '../../../_abstract_model/interfaces';
-import { ApiServices } from '../../../_abstract_model/services/api.services';
+import { ApiService } from '../../../_abstract_model/services/api.service';
 import { Dictionary } from '../../../_abstract_model/types/_types';
 import { Estimations } from '../../../_abstract_model/types/estimations.class';
 import { Regen } from '../../../_abstract_model/types/regen.class';
@@ -57,7 +57,7 @@ export class EstimationsComponent implements OnInit {
 
     public separators: string[] = [' à ', ' - '];
 
-    constructor(private clipboard: ClipboardService, private api: ApiServices) {
+    constructor(private clipboard: ClipboardService, private api: ApiService) {
     }
 
     public ngOnInit(): void {

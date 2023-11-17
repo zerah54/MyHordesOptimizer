@@ -2,7 +2,7 @@ import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/co
 import { MatDialog } from '@angular/material/dialog';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { DigsServices } from '../../../_abstract_model/services/digs.service';
+import { DigsService } from '../../../_abstract_model/services/digs.service';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { AutoDestroy } from '../../decorators/autodestroy.decorator';
@@ -49,7 +49,7 @@ export class DigComponent {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private digs_api: DigsServices, private dialog: MatDialog) {
+    constructor(private digs_api: DigsService, private dialog: MatDialog) {
     }
 
     protected deleteDig(dig_to_delete: Dig): void {

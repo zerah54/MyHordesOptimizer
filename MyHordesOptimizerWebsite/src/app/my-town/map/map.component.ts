@@ -3,7 +3,7 @@ import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from 
 import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
-import { ApiServices } from '../../_abstract_model/services/api.services';
+import { ApiService } from '../../_abstract_model/services/api.service';
 import { Dictionary } from '../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
@@ -53,7 +53,7 @@ export class MapComponent implements OnInit {
     }
 
 
-    constructor(private breakpoint_observer: BreakpointObserver, private api: ApiServices) {
+    constructor(private breakpoint_observer: BreakpointObserver, private api: ApiService) {
 
     }
 

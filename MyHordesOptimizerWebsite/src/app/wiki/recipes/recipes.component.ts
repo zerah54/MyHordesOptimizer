@@ -4,7 +4,7 @@ import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
-import { ApiServices } from '../../_abstract_model/services/api.services';
+import { ApiService } from '../../_abstract_model/services/api.service';
 import { Item } from '../../_abstract_model/types/item.class';
 import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item.class';
 import { Recipe } from '../../_abstract_model/types/recipe.class';
@@ -38,7 +38,7 @@ export class RecipesComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiService) {
     }
 
     ngOnInit(): void {

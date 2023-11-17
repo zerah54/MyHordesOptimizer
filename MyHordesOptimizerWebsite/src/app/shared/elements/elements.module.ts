@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
+import { AngularEditorModule } from '@kolkov/angular-editor';
 import { Components, Modules } from '../../_abstract_model/types/_types';
 import { MaterialModule } from '../material-modules.module';
 import { PipesModule } from '../pipes/pipes.module';
@@ -12,6 +13,7 @@ import { AccordionComponent } from './accordion/accordion.component';
 import { AvatarComponent } from './avatar/avatar.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import { DigComponent } from './dig/dig.component';
+import { EditorComponent } from './editor/editor.component';
 import { FilterFieldComponent } from './filter-field/filter-field.component';
 import { ItemComponent } from './item/item.component';
 import { LastUpdateComponent } from './last-update/last-update.component';
@@ -29,11 +31,11 @@ import { SelectComponent } from './select/select.component';
 
 const components: Components = [
     ItemComponent, SelectComponent, RecipeComponent, FilterFieldComponent, LastUpdateComponent, AccordionComponent, ListElementAddRemoveComponent, MenuAddComponent,
-    MenuRemoveComponent, ConfirmDialogComponent, DigComponent, AvatarComponent
+    MenuRemoveComponent, ConfirmDialogComponent, DigComponent, AvatarComponent, EditorComponent
 ];
 const list_headers: Components = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent];
 const local_components: Components = [LabelPipe, IconPipe];
-const custom_modules: Modules = [MaterialModule, PipesModule];
+const custom_modules: Modules = [MaterialModule, PipesModule, AngularEditorModule];
 const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, NgOptimizedImage];
 const pipes: Components = [DecimalPipe];
 

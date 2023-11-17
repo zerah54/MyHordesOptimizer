@@ -58,11 +58,13 @@ export class MiscellaneousInfoComponent {
             columns: [
                 { id: 'day', header: $localize`Jour` },
                 { id: 'success', header: $localize`Chances de réussite du manuel` },
+                { id: 'success_devastated', header: $localize`Chances de réussite du manuel en ville dévastée` },
             ],
             table: new MatTableDataSource(Array.from({ length: 50 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
                     day: i + 1,
-                    success: this.decimal_pipe.transform((i + 1 <= 3 ? 1 : Math.max(0.1, 1 - ((i + 1) * 0.025))) * 100, '1.0-2', this.locale) + '%'
+                    success: this.getSurvivalistOdds(i + 1, false),
+                    success_devastated: this.getSurvivalistOdds(i + 1, true)
                 };
             }))
         },
@@ -101,6 +103,25 @@ export class MiscellaneousInfoComponent {
 
     private openCalculator(): void {
         this.dialog.open(DespairDeathsCalculatorComponent);
+    }
+
+    private getSurvivalistOdds(day: number, devastated: boolean): string {
+
+        let chances: number = 1;
+        if (day >= 20) {
+            chances = 0.50;
+        } else if (day >= 15) {
+            chances = 0.60;
+        } else if (day >= 13) {
+            chances = 0.70;
+        } else if (day >= 10) {
+            chances = 0.80;
+        } else if (day >= 5) {
+            chances = 0.85;
+        }
+        if (devastated) chances = Math.max(0.1, chances - 0.2);
+
+        return this.decimal_pipe.transform(chances * 100, '1.0-2', this.locale) + '%';
     }
 }
 

@@ -6,9 +6,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
-import { ApiServices } from '../_abstract_model/services/api.services';
-import { DigsServices } from '../_abstract_model/services/digs.service';
-import { WishlistServices } from '../_abstract_model/services/wishlist.service';
+import { ApiService } from '../_abstract_model/services/api.service';
+import { AuthenticationService } from '../_abstract_model/services/authentication.service';
+import { CampingService } from '../_abstract_model/services/camping.service';
+import { DigsService } from '../_abstract_model/services/digs.service';
+import { WishlistService } from '../_abstract_model/services/wishlist.service';
 import { Components, Modules } from '../_abstract_model/types/_types';
 import { ElementsModule } from './elements/elements.module';
 import { IsInTownGuard } from './guards/has-app-key.guard';
@@ -19,11 +21,10 @@ import { ChartsThemingService } from './services/charts-theming.service';
 import { ClipboardService } from './services/clipboard.service';
 import { LoadingOverlayService } from './services/loading-overlay.service';
 import { SnackbarService } from './services/snackbar.service';
-import { AuthenticationService } from '../_abstract_model/services/authentication.services';
 
 const custom_modules: Modules = [MaterialModule, ElementsModule, PipesModule];
 const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule, NgOptimizedImage];
-const services: Components = [ApiServices, DigsServices, LoadingOverlayService, SnackbarService, ClipboardService, WishlistServices, ChartsThemingService, AuthenticationService];
+const services: Components = [ApiService, DigsService, LoadingOverlayService, SnackbarService, ClipboardService, WishlistService, ChartsThemingService, AuthenticationService, CampingService];
 const guards: Components = [IsInTownGuard, InDevModeGuard];
 const external_modules: Modules = [TableVirtualScrollModule];
 

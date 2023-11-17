@@ -4,7 +4,7 @@ import Chart from 'chart.js/auto';
 import { Subject, takeUntil } from 'rxjs';
 import { ZoneRegen } from '../../../_abstract_model/enum/zone-regen.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
-import { ApiServices } from '../../../_abstract_model/services/api.services';
+import { ApiService } from '../../../_abstract_model/services/api.service';
 import { Regen } from '../../../_abstract_model/types/regen.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { groupBy } from '../../../shared/utilities/array.util';
@@ -41,7 +41,7 @@ export class ScrutateurComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiService) {
 
     }
 

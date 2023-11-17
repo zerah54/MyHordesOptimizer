@@ -1,7 +1,7 @@
 import { RuinDTO } from '../dto/ruin.dto';
-import { RuinItem } from './ruin-item.class';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { I18nLabels } from './_types';
+import { RuinItem } from './ruin-item.class';
 
 export class Ruin extends CommonModel<RuinDTO> {
     public id!: number;
@@ -11,6 +11,7 @@ export class Ruin extends CommonModel<RuinDTO> {
     public description!: I18nLabels;
     public explorable!: boolean;
     public img!: string;
+    public formatted_img!: string;
     public min_dist!: number;
     public max_dist!: number;
     public drops: RuinItem[] = [];
@@ -44,6 +45,7 @@ export class Ruin extends CommonModel<RuinDTO> {
             this.description = dto.description;
             this.explorable = dto.explorable;
             this.img = dto.img;
+            this.formatted_img = 'ruin/' + dto.img + '.gif';
             this.min_dist = dto.minDist;
             this.max_dist = dto.maxDist;
             this.drops = dtoToModelArray(RuinItem, dto.drops);

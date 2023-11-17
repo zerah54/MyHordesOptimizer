@@ -7,10 +7,10 @@ import { getTown, getUserId } from '../../shared/utilities/localstorage.util';
 import { WishlistInfoDTO } from '../dto/wishlist-info.dto';
 import { Item } from '../types/item.class';
 import { WishlistInfo } from '../types/wishlist-info.class';
-import { GlobalServices } from './global.services';
+import { GlobalService } from './global.service';
 
 @Injectable()
-export class WishlistServices extends GlobalServices {
+export class WishlistService extends GlobalService {
 
     /** La locale */
     private readonly locale: string = moment.locale();

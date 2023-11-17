@@ -1,14 +1,14 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { ApiServices } from '../../_abstract_model/services/api.services';
-import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { BANK_CONDENSED_DISPLAY_KEY, HORDES_IMG_REPO } from '../../_abstract_model/const';
-import { normalizeString } from '../../shared/utilities/string.utils';
-import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { Property } from '../../_abstract_model/enum/property.enum';
 import { Action } from '../../_abstract_model/enum/action.enum';
+import { Property } from '../../_abstract_model/enum/property.enum';
+import { ApiService } from '../../_abstract_model/services/api.service';
+import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { Item } from '../../_abstract_model/types/item.class';
+import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { normalizeString } from '../../shared/utilities/string.utils';
 
 @Component({
     selector: 'mho-bank',
@@ -41,7 +41,7 @@ export class BankComponent implements OnInit {
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiService) {
 
     }
 

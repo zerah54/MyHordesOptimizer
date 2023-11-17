@@ -2,13 +2,13 @@ import { Component, EventEmitter, HostBinding, Input, OnInit, Output, ViewEncaps
 import { FormBuilder, FormGroup } from '@angular/forms';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
+import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
+import { ApiService } from '../../../../../_abstract_model/services/api.service';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
-import { Item } from '../../../../../_abstract_model/types/item.class';
-import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
-import { AutoDestroy } from '../../../../../shared/decorators/autodestroy.decorator';
-import { ApiServices } from '../../../../../_abstract_model/services/api.services';
 import { ItemCountShort } from '../../../../../_abstract_model/types/item-count-short.class';
+import { Item } from '../../../../../_abstract_model/types/item.class';
+import { AutoDestroy } from '../../../../../shared/decorators/autodestroy.decorator';
 
 @Component({
     selector: 'mho-map-update-cell',
@@ -33,7 +33,7 @@ export class MapUpdateCellComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices, private fb: FormBuilder) {
+    constructor(private api: ApiService, private fb: FormBuilder) {
 
     }
 

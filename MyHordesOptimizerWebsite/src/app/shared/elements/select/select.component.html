@@ -3,21 +3,22 @@
             (closed)="closed.next()" [placeholder]="placeholder">
     <mat-select-trigger *ngIf="multiple">
         <mat-chip-listbox>
-            <mat-chip *ngFor="let single_value of $any(value); let i = index" (removed)="remove(single_value)" class="mho-select-chip">
+            <mat-chip *ngFor="let single_value of $any(value); let i = index" (removed)="remove(single_value)"
+                      class="mho-select-chip">
                 <button type="reset" matChipRemove>
                     <mat-icon>cancel</mat-icon>
                 </button>
                 <ng-container *ngIf="single_value">
                     <ng-container *ngTemplateOutlet="icons; context: {$implicit: single_value}"></ng-container>
-                    <span>{{ single_value | label:bindLabel }}</span>
+                    <span *ngIf="!noLabel">{{ single_value | label:bindLabel }}</span>
                 </ng-container>
             </mat-chip>
         </mat-chip-listbox>
     </mat-select-trigger>
     <mat-select-trigger *ngIf="!multiple" style="display: flex; justify-content: space-between;">
-        <span *ngIf="value">
+        <span *ngIf="value" style="display: flex; align-items: center; gap: 0.5em;">
             <ng-container *ngTemplateOutlet="icons; context: {$implicit: value}"></ng-container>
-            {{ value | label:bindLabel }}
+            <ng-container *ngIf="!noLabel">{{ value | label:bindLabel }}</ng-container>
         </span>
         <i matSuffix class="fal fa-close" *ngIf="value" style="margin-right: 0.5em; position: relative; bottom: 3px"
            (click)="$event.stopPropagation(); value = undefined; writeValue(undefined)">
@@ -35,7 +36,7 @@
                     [title]="option | label:bindLabel">
             <span style="display: flex; align-items: center; gap: 0.5em;">
                 <ng-container *ngTemplateOutlet="icons; context: {$implicit: option}"></ng-container>
-                {{option | label:bindLabel}}
+                <ng-container *ngIf="!noLabel">{{option | label:bindLabel}}</ng-container>
             </span>
             <span *ngIf="moreInfo" [innerHTML]="moreInfo(option)" class="more-info"></span>
         </mat-option>
