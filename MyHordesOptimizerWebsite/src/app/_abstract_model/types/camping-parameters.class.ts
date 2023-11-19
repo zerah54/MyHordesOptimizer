@@ -30,7 +30,7 @@ export class CampingParameters extends CommonModel<CampingParametersDTO> {
 
     public override modelToDto(): CampingParametersDTO {
         return {
-            TownType: this.town_type,
+            townType: this.town_type,
             job: this.job,
             distance: this.distance,
             campings: this.campings,
@@ -53,7 +53,7 @@ export class CampingParameters extends CommonModel<CampingParametersDTO> {
 
     protected override dtoToModel(dto?: CampingParametersDTO): void {
         if (dto) {
-            this.town_type = dto.TownType;
+            this.town_type = dto.townType;
             this.job = dto.job;
             this.distance = dto.distance;
             this.campings = dto.campings;
@@ -69,7 +69,7 @@ export class CampingParameters extends CommonModel<CampingParametersDTO> {
             this.improve = dto.improve;
             this.object_improve = dto.objectImprove;
             this.ruin_bonus = dto.ruinBonus;
-            this.ruin_bury_count = dto.ruinCapacity;
+            this.ruin_bury_count = dto.ruinBuryCount;
             this.ruin_capacity = dto.ruinCapacity;
         }
     }

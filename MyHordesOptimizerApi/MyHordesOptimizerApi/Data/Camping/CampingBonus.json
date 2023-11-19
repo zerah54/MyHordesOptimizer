@@ -1,0 +1,21 @@
+﻿{
+  "tomb": 8,
+  "pande": -40,
+  "improve": 5,
+  "objectImprove": 9,
+  "lighthouse": 25,
+  "campItems": 5,
+  "zombieVest": -3,
+  "zombieNoVest": -7,
+  "night": 10,
+  "devastated": -50,
+  "distChances": [ -100, -75, -50, -25, -10, 0, 0, 0, 0, 0, 0, 0, 5, 7, 10, 15, 20 ],
+  "crowdChances": [ 0,-10,-30,-50,-70 ],
+  "pandaProCamperByAlreadyCamped": [ 50, 45, 40, 30, 20, 10, 0 ],
+  "pandaNoProCamperByAlreadyCamped": [ 50, 30, 20, 10, 0 ],
+  "normalProCamperByAlreadyCamped": [ 80, 70, 60, 40, 30, 20, 0 ],
+  "normalNoProCamperByAlreadyCamped": [ 80, 60, 35, 15, 0 ],
+  "commonByAlreadyCamped": [ -50, -100, -200, -400, -1000, -2000, -5000 ],
+  "buriedBonus": 15,
+  "desertBonus": -25
+}

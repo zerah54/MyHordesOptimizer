@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using MyHordesOptimizerApi.Data.CauseOfDeath;
 using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
@@ -6,6 +7,9 @@ using MyHordesOptimizerApi.Data.Wishlist;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Wishlist;
 using System.Collections.Generic;
+using System.Linq;
+using MyHordesOptimizerApi.Data.Camping;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
@@ -74,6 +78,28 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.LabelEs, opt => opt.MapFrom(src => src.Name["es"]))
                 .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Name["en"]))
                 .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Name["de"]));
+
+            CreateMap<MyHordesCampingBonusModel, CampingBonusDto>()
+                .ForMember(dest => dest.Tomb, opt => opt.MapFrom(src => src.Tomb))
+                .ForMember(dest => dest.Pande, opt => opt.MapFrom(src => src.Pande))
+                .ForMember(dest => dest.Improve, opt => opt.MapFrom(src => src.Improve))
+                .ForMember(dest => dest.ObjectImprove, opt => opt.MapFrom(src => src.ObjectImprove))
+                .ForMember(dest => dest.Lighthouse, opt => opt.MapFrom(src => src.Lighthouse))
+                .ForMember(dest => dest.CampItems, opt => opt.MapFrom(src => src.CampItems))
+                .ForMember(dest => dest.ZombieVest, opt => opt.MapFrom(src => src.ZombieVest))
+                .ForMember(dest => dest.ZombieNoVest, opt => opt.MapFrom(src => src.ZombieNoVest))
+                .ForMember(dest => dest.Night, opt => opt.MapFrom(src => src.Night))
+                .ForMember(dest => dest.Devastated, opt => opt.MapFrom(src => src.Devastated))
+                .ForMember(dest => dest.DistChances, opt => opt.MapFrom(src => src.DistChances))
+                .ForMember(dest => dest.CrowdChances, opt => opt.MapFrom(src => src.CrowdChances))
+                .ForMember(dest => dest.PandaProCamperByAlreadyCamped,
+                    opt => opt.MapFrom(src => src.PandaProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)))
+                .ForMember(dest => dest.PandaNoProCamperByAlreadyCamped,
+                    opt => opt.MapFrom(src => src.PandaNoProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)))
+                .ForMember(dest => dest.NormalProCamperByAlreadyCamped,
+                    opt => opt.MapFrom(src => src.NormalProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)))
+                .ForMember(dest => dest.NormalNoProCamperByAlreadyCamped,
+                    opt => opt.MapFrom(src => src.NormalNoProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)));
         }
     }
 }

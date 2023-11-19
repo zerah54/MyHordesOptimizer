@@ -24,11 +24,18 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpPost]
-        [Route("CalculateCamping")]
+        [Route("Calculate")]
         public ActionResult<int> PostCampingResult([FromBody] CampingParametersDto campingParameters)
         {
             Logger.LogDebug($"test + {campingParameters.ToString()}");
             return Ok(CampingService.CalculateCamping(campingParameters));
+        }
+
+        [HttpGet]
+        [Route("Bonus")]
+        public ActionResult<int> GetCampingBonus()
+        {
+            return Ok(CampingService.GetBonus());
         }
     }
 }

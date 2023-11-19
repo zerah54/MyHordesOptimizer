@@ -7,6 +7,7 @@ using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using System.Collections.Generic;
 using System.IO;
+using MyHordesOptimizerApi.Data.Camping;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
@@ -98,6 +99,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var json = File.ReadAllText(path);
             var list = json.FromJson<List<MyHordesOptimizerDefaultWishlist>>();
             return list;
+        }
+
+        public MyHordesCampingBonusModel GetCampingBonus()
+        {
+            var path = "Data/Camping/CampingBonus.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<MyHordesCampingBonusModel>();
+            return dico;
         }
     }
 }

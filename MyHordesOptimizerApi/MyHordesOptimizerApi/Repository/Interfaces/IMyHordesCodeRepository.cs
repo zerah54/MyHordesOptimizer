@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Ruins;
 using MyHordesOptimizerApi.Data.Wishlist;
 using System.Collections.Generic;
+using MyHordesOptimizerApi.Data.Camping;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
 {
@@ -20,5 +21,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         Dictionary<string, MyHordesRecipeCodeModel> GetRecipes();
         List<MyHordesOptimizerWishlistItemCategorie> GetWishlistItemCategories();
         List<MyHordesOptimizerDefaultWishlist> GetDefaultWishlists();
+        MyHordesCampingBonusModel GetCampingBonus();
     }
 }

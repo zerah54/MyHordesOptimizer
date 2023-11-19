@@ -1,7 +1,7 @@
 import { TownTypeId } from '../types/_types';
 
 export interface CampingParametersDTO {
-    TownType: TownTypeId;
+    townType: TownTypeId;
     job: string;
     distance: number;
     campings: number;
