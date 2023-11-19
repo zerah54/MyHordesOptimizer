@@ -92,14 +92,11 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Devastated, opt => opt.MapFrom(src => src.Devastated))
                 .ForMember(dest => dest.DistChances, opt => opt.MapFrom(src => src.DistChances))
                 .ForMember(dest => dest.CrowdChances, opt => opt.MapFrom(src => src.CrowdChances))
-                .ForMember(dest => dest.PandaProCamperByAlreadyCamped,
-                    opt => opt.MapFrom(src => src.PandaProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)))
-                .ForMember(dest => dest.PandaNoProCamperByAlreadyCamped,
-                    opt => opt.MapFrom(src => src.PandaNoProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)))
-                .ForMember(dest => dest.NormalProCamperByAlreadyCamped,
-                    opt => opt.MapFrom(src => src.NormalProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)))
-                .ForMember(dest => dest.NormalNoProCamperByAlreadyCamped,
-                    opt => opt.MapFrom(src => src.NormalNoProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)));
+                .ForMember(dest => dest.PandaProCamperByAlreadyCamped, opt => opt.MapFrom(src => src.PandaProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)))
+                .ForMember(dest => dest.PandaNoProCamperByAlreadyCamped, opt => opt.MapFrom(src => src.PandaNoProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)))
+                .ForMember(dest => dest.NormalProCamperByAlreadyCamped, opt => opt.MapFrom(src => src.NormalProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)))
+                .ForMember(dest => dest.NormalNoProCamperByAlreadyCamped, opt => opt.MapFrom(src => src.NormalNoProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)))
+                .ForMember(dest => dest.DesertBonus, opt => opt.MapFrom(src => src.DesertBonus));
         }
     }
 }

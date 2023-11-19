@@ -15,4 +15,5 @@ export interface CampingBonusDTO {
     pandaNoProCamperByAlreadyCamped: number[];
     normalProCamperByAlreadyCamped: number[];
     normalNoProCamperByAlreadyCamped: number[];
+    desertBonus: number;
 }

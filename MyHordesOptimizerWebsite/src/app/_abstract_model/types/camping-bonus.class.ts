@@ -18,6 +18,7 @@ export class CampingBonus extends CommonModel<CampingBonusDTO> {
     public panda_no_pro_camper_by_already_camped!: number[];
     public normal_pro_camper_by_already_camped!: number[];
     public normal_no_pro_camper_by_already_camped!: number[];
+    public desert_bonus!: number;
 
 
     constructor(dto?: CampingBonusDTO) {
@@ -43,6 +44,7 @@ export class CampingBonus extends CommonModel<CampingBonusDTO> {
             pandaNoProCamperByAlreadyCamped: this.panda_no_pro_camper_by_already_camped,
             normalProCamperByAlreadyCamped: this.normal_pro_camper_by_already_camped,
             normalNoProCamperByAlreadyCamped: this.normal_no_pro_camper_by_already_camped,
+            desertBonus: this.desert_bonus,
         };
     }
 
@@ -64,6 +66,7 @@ export class CampingBonus extends CommonModel<CampingBonusDTO> {
             this.panda_no_pro_camper_by_already_camped = dto.pandaNoProCamperByAlreadyCamped;
             this.normal_pro_camper_by_already_camped = dto.normalProCamperByAlreadyCamped;
             this.normal_no_pro_camper_by_already_camped = dto.normalNoProCamperByAlreadyCamped;
+            this.desert_bonus = dto.desertBonus;
         }
     }
 

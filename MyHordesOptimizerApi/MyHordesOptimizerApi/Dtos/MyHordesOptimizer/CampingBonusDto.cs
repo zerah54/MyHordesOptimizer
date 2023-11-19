@@ -52,5 +52,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 
         [JsonProperty("normalNoProCamperByAlreadyCamped")]
         public List<int> NormalNoProCamperByAlreadyCamped { get; set; }
+
+        [JsonProperty("desertBonus")] 
+        public int DesertBonus { get; set; }
     }
 }

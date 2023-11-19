@@ -8,7 +8,6 @@ import { HORDES_IMG_REPO, NO_RUIN } from '../../_abstract_model/const';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { CampingService } from '../../_abstract_model/services/camping.service';
-import { dtoToModelArray } from '../../_abstract_model/types/_common.class';
 import { TownTypeId } from '../../_abstract_model/types/_types';
 import { CampingBonus } from '../../_abstract_model/types/camping-bonus.class';
 import { CampingParameters } from '../../_abstract_model/types/camping-parameters.class';
@@ -93,7 +92,7 @@ export class CampingComponent implements OnInit {
     public readonly jobs: JobEnum[] = JobEnum.getAllValues();
     public readonly JOB_SCOUT: JobEnum = JobEnum.SCOUT;
 
-    private readonly added_ruins: Ruin[] = dtoToModelArray(Ruin, [NO_RUIN]);
+    private readonly no_ruin: Ruin = new Ruin(NO_RUIN);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
@@ -112,13 +111,14 @@ export class CampingComponent implements OnInit {
                     .pipe(takeUntil(this.destroy_sub))
                     .subscribe((ruins: Ruin[]) => {
                         ruins = ruins.sort((ruin_a: Ruin, ruin_b: Ruin) => ruin_a.label[this.locale].toLocaleLowerCase().localeCompare(ruin_b.label[this.locale].toLocaleLowerCase()));
-                        this.ruins = [...this.added_ruins].concat([...ruins]);
 
                         this.camping_service.getBonus()
                             .pipe(takeUntil(this.destroy_sub))
                             .subscribe((bonus: CampingBonus) => {
                                 this.bonus = bonus;
 
+                                this.no_ruin.camping = this.bonus.desert_bonus;
+                                this.ruins = [this.no_ruin].concat([...ruins]);
                                 const pande_town: TownType = <TownType>this.town_types.find((town_type: TownType) => town_type.id === 'PANDE');
                                 pande_town.bonus = this.bonus.pande;
 
@@ -141,7 +141,7 @@ export class CampingComponent implements OnInit {
                                     improve: [0],
                                     object_improve: [0],
                                     complete_improve: [0],
-                                    ruin: [this.added_ruins[0]],
+                                    ruin: [this.no_ruin],
                                     bury_count: [0],
                                 });
                                 this.calculateCamping();
