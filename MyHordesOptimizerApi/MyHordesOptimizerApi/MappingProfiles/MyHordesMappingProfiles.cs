@@ -87,7 +87,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Label, opt => opt.Ignore())
                 .ForMember(dest => dest.Description, opt => opt.Ignore())
                 .ForMember(dest => dest.Explorable, opt => opt.Ignore())
-                .ForMember(dest => dest.Id, opt => opt.Ignore());
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.Capacity, opt => opt.Ignore());
 
             CreateMap<EstimationsDto, TownEstimationModel>()
                 .ForMember(dest => dest.Day, opt => opt.Ignore())

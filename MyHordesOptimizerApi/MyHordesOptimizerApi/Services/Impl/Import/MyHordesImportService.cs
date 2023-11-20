@@ -293,8 +293,13 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var jsonRuins = Mapper.Map<List<MyHordesOptimizerRuin>>(jsonApiResult);
 
             var codeResult = MyHordesCodeRepository.GetRuins();
+            
+            Logger.LogDebug($"codeResult {codeResult}");
+            
             var codeRuins = Mapper.Map<List<MyHordesOptimizerRuin>>(codeResult);
 
+            Logger.LogDebug($"codeRuins {codeResult}");
+            
             var items = MyHordesOptimizerRepository.GetItems();
 
             foreach (var ruin in jsonRuins)
@@ -306,12 +311,12 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     var totalWeight = 0;
                     foreach (var drop in codeRuin.Drops)
                     {
-                        totalWeight += drop.Value;
+                        totalWeight += Convert.ToInt32(drop.Value[0]);
                         var item = items.FirstOrDefault(x => x.Uid == drop.Key);
                         miror.Drops.Add(new ItemResult()
                         {
                             Item = item,
-                            Weight = drop.Value
+                            Weight = Convert.ToInt32(drop.Value[0])
                         });
                     }
                     miror.Drops.ForEach(x => x.Probability = (double)x.Weight / totalWeight);
@@ -335,9 +340,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 Explorable = false,
                 Img = "burried",
                 MinDist = 1,
-                MaxDist = 1000
+                MaxDist = 1000,
+                Capacity = 0
             });
-            MyHordesOptimizerRepository.PatchRuins(jsonRuins);
+            // MyHordesOptimizerRepository.PatchRuins(jsonRuins);
         }
 
         #endregion

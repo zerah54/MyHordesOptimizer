@@ -1007,10 +1007,212 @@ $ruins = [
             'infect_poison_part_#00' => [15, 'DropMod::Infective']
         ], 'desc' => 'Diese heruntergekommene Gebäude scheint einmal ein Hospital gewesen zu sein. Du entdeckst einen Einstieg ins Gebäude, modriger Gestank schlägt dir entgegen. Du verziehst das Gesicht, aber hier könntest du mit ziemlicher Sicherheit etwas Nützliches finden...'],
 ];
+$ruins_additional_info = [
+    // id 20
+    'home' => ['capacity' => 100],
+
+    // id 41
+    'albi' => ['capacity' => 100],
+
+    // id 57
+    'cave' => ['capacity' => 2],
+
+    // id 3
+    'pump' => ['capacity' => 100],
+
+    // id 24
+    'bike' => ['capacity' => 100],
+
+    // id 53
+    'freight' => ['capacity' => 100],
+
+    // id 54
+    'hospital' => ['capacity' => 100],
+
+    // id 48
+    'aerodrome' => ['capacity' => 100],
+
+    // id 8
+    'police' => ['capacity' => 100],
+
+    // id 10
+    'bunker' => ['capacity' => 100],
+
+    // id 38
+    'cafe' => ['capacity' => 100],
+
+    // id 61
+    'autobahn' => ['capacity' => 100],
+
+    // id 7
+    'cars' => ['capacity' => 100],
+
+    // id 62
+    'bar2' => ['capacity' => 100],
+
+    // id 19
+    'obi' => ['capacity' => 100],
+
+    // id 43
+    'container' => ['capacity' => 100],
+
+    // id 23
+    'doner' => ['capacity' => 100],
+
+    // id 25
+    'duke' => ['capacity' => 100],
+
+    // id 13
+    'woods' => ['capacity' => 100],
+
+    // id 52
+    'mine' => ['capacity' => 100],
+
+    // id 30
+    'quarry' => ['capacity' => 100],
+
+    // id 59
+    'ufo' => ['capacity' => 100],
+
+    // id 40
+    'ekea' => ['capacity' => 100],
+
+    // id 28
+    'tomb' => ['capacity' => 100],
+
+    // id 18
+    'mczombie' => ['capacity' => 100],
+
+    // id 2
+    'plane' => ['capacity' => 100],
+
+    // id 44
+    'shed' => ['capacity' => 100],
+
+    // id 5
+    'supermarket' => ['capacity' => 100],
+
+    // id 27
+    'cave2' => ['capacity' => 1],
+
+    // id 37
+    'cemetary' => ['capacity' => 100],
+
+    // id 11
+    'fair' => ['capacity' => 100],
+
+    // id 12
+    'house' => ['capacity' => 100],
+
+    // id 21
+    'water' => ['capacity' => 100],
+
+    // id 6
+    'lab' => ['capacity' => 100],
+
+    // id 36
+    'ambulance' => ['capacity' => 100],
+
+    // id 47
+    'warehouse' => ['capacity' => 100],
+
+    // id 14
+    'carpark' => ['capacity' => 100],
+
+    // id 58
+    'tank' => ['capacity' => 100],
+
+    // id 51
+    'motel' => ['capacity' => 100],
+
+    // id 55
+    'army' => ['capacity' => 100],
+
+    // id 46
+    'post' => ['capacity' => 100],
+
+    // id 33
+    'cave3' => ['capacity' => 100],
+
+    // id 32
+    'trench' => ['capacity' => 100],
+
+    // id 45
+    'dll' => ['capacity' => 100],
+
+    // id 42
+    'emma' => ['capacity' => 100],
+
+    // id 56
+    'mayor' => ['capacity' => 100],
+
+    // id 35
+    'lkw' => ['capacity' => 100],
+
+    // id 16
+    'school' => ['capacity' => 100],
+
+    // id 49
+    'office' => ['capacity' => 100],
+
+    // id 4
+    'villa' => ['capacity' => 100],
+
+    // id 15
+    'construction' => ['capacity' => 100],
+
+    // id 60
+    'well' => ['capacity' => 100],
+
+    // id 39
+    'silo' => ['capacity' => 100],
+
+    // id 31
+    'street' => ['capacity' => 100],
+
+    // id 29
+    'park' => ['capacity' => 100],
+
+    // id 22
+    'guns' => ['capacity' => 100],
+
+    // id 34
+    'warehouse2' => ['capacity' => 100],
+
+    // id 50
+    'tent' => ['capacity' => 100],
+
+    // id 17
+    'pharma' => ['capacity' => 100],
+
+    // id 9
+    'bar' => ['capacity' => 100],
+
+    // Explorable Ruins.
+    // id 100
+    'deserted_bunker' => ['capacity' => 0],
+
+    // id 101
+    'deserted_hotel' => ['capacity' => 0],
+
+    // id 102
+    'deserted_hospital' => ['capacity' => 0],
+];
+
+foreach ($ruins as &$ruin) {
+    foreach ($ruin['drops'] as &$drops)
+        if (!is_array($drops)) {
+            $drops = [$drops];
+        }
+}
 
 $new_ruins = json_encode($ruins, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 $filename_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Ruins/ruins.json';
 file_put_contents($filename_target, $new_ruins);
+
+$new_ruins_bonus = json_encode($ruins_additional_info, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+$filename_ruin_additional_info_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Ruins/ruins_additional_info.json';
+file_put_contents($filename_ruin_additional_info_target, $new_ruins_bonus);
 
 ?>
 
