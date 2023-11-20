@@ -12,4 +12,5 @@ export interface RuinDTO {
     minDist: number;
     maxDist: number;
     drops: RuinItemDTO[];
+    capacity?: number;
 }

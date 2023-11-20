@@ -15,6 +15,7 @@ export class Ruin extends CommonModel<RuinDTO> {
     public min_dist!: number;
     public max_dist!: number;
     public drops: RuinItem[] = [];
+    public capacity?: number;
 
     constructor(dto?: RuinDTO) {
         super();
@@ -32,7 +33,8 @@ export class Ruin extends CommonModel<RuinDTO> {
             img: this.img,
             minDist: this.min_dist,
             maxDist: this.max_dist,
-            drops: modelToDtoArray(this.drops)
+            drops: modelToDtoArray(this.drops),
+            capacity: this.capacity
         };
     }
 
@@ -49,6 +51,7 @@ export class Ruin extends CommonModel<RuinDTO> {
             this.min_dist = dto.minDist;
             this.max_dist = dto.maxDist;
             this.drops = dtoToModelArray(RuinItem, dto.drops);
+            this.capacity = dto.capacity;
         }
     }
 }
