@@ -1163,6 +1163,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                                                   ,ruinMinDist
                                                                   ,ruinMaxDist
                                                                   ,ruinChance
+                                                                  ,ruinCapacity
                                                                   ,idItem
                                                                   ,itemUid
                                                                   ,itemLabel_fr AS ItemLabelFr

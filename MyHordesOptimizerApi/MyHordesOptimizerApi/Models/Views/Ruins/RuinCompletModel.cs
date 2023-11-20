@@ -35,6 +35,8 @@ namespace MyHordesOptimizerApi.Models.Views.Ruins
         public int RuinMaxDist { get; set; }
         [Column("ruinChance")]
         public int RuinChance { get; set; }
+        [Column("ruinCapacity")]
+        public int RuinCapacity { get; set; }
         [Column("idItem")]
         public int IdItem { get; set; }
         [Column("itemUid")]
@@ -45,6 +47,5 @@ namespace MyHordesOptimizerApi.Models.Views.Ruins
         public float DropProbability { get; set; }
         [Column("dropWeight")]
         public int DropWeight { get; set; }
-
     }
 }

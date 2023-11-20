@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using MyHordesOptimizerApi.Data.Camping;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
@@ -68,8 +69,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             var path = "Data/Heroes/capacities.json";
             var json = File.ReadAllText(path);
-            var list = json.FromJson<List<MyHordesHerosCapacitiesCodeModel>>();
-            return list;
+            var dictionnary = json.FromJson<Dictionary<string, MyHordesHerosCapacitiesCodeModel>>();
+            return dictionnary.Values.ToList();
         }
 
         public List<MyHordesCauseOfDeathModel> GetCausesOfDeath()

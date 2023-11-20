@@ -124,6 +124,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IdRuin))
                 .ForMember(dest => dest.Explorable, opt => opt.MapFrom(src => src.RuinExplorable))
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.RuinImg))
+                .ForMember(dest => dest.Capacity, opt => opt.MapFrom(src => src.RuinCapacity))
                 .ForMember(dest => dest.Drops, opt => opt.Ignore());
 
             //HeroSkills
