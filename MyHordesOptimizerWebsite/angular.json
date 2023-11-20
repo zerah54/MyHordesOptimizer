@@ -33,6 +33,7 @@
                             "src/robots.txt"
                         ],
                         "styles": [
+                            "node_modules/@fortawesome/fontawesome-free/css/all.css",
                             "src/styles.scss",
                             "src/assets/scss/material-theme/theming.scss"
                         ],
@@ -139,6 +140,7 @@
                             "src/assets/img"
                         ],
                         "styles": [
+                            "node_modules/@fortawesome/fontawesome-free/css/all.css",
                             "src/styles.scss"
                         ],
                         "stylePreprocessorOptions": {
