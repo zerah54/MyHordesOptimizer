@@ -78,7 +78,7 @@
         "capacity": 100
     },
     "shed": {
-        "capacity": 100
+        "capacity": 1
     },
     "supermarket": {
         "capacity": 100
@@ -132,7 +132,7 @@
         "capacity": 100
     },
     "emma": {
-        "capacity": 100
+        "capacity": 1
     },
     "mayor": {
         "capacity": 100
