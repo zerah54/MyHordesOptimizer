@@ -328,7 +328,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             jsonRuins.Add(new MyHordesOptimizerRuin()
             {
                 Id = -1,
-                Camping = 8,
+                Camping = 15,
                 Label = new Dictionary<string, string>()
                 {
                       { "fr", "Bâtiment non déterré" },

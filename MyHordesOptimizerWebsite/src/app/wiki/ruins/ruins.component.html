@@ -26,6 +26,9 @@
                                 <ng-container *ngSwitchCase="'camping'">
                                     {{column.header}}
                                 </ng-container>
+                                <ng-container *ngSwitchCase="'capacity'">
+                                    {{column.header}}
+                                </ng-container>
                             </ng-container>
                         </th>
                     </ng-container>
@@ -66,7 +69,7 @@
                                 {{row.camping}}
                             </ng-container>
                             <ng-container *ngSwitchCase="'capacity'">
-                                {{row.camping}}
+                                {{row.capacity}}
                             </ng-container>
                             <ng-container *ngSwitchDefault>
                                 {{row[column.id]}}km
