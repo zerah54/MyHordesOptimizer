@@ -1087,7 +1087,7 @@ $ruins_additional_info = [
     'plane' => ['capacity' => 100],
 
     // id 44
-    'shed' => ['capacity' => 100],
+    'shed' => ['capacity' => 1],
 
     // id 5
     'supermarket' => ['capacity' => 100],
@@ -1141,7 +1141,7 @@ $ruins_additional_info = [
     'dll' => ['capacity' => 100],
 
     // id 42
-    'emma' => ['capacity' => 100],
+    'emma' => ['capacity' => 1],
 
     // id 56
     'mayor' => ['capacity' => 100],

@@ -70,5 +70,8 @@
         <mat-icon *ngIf="route.children && route.children.length > 0">
             {{route.expanded ? 'expand_more' : 'chevron_right'}}</mat-icon>
         {{route.label}}
+        <ng-container *ngIf="route.spoil">
+            <span class="spoil" matTooltip="Cette page peut contenir des spoils de la saison 16" i18n-matTooltip>Spoil S16</span>
+        </ng-container>
     </a>
 </ng-template>

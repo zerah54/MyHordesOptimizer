@@ -44,7 +44,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     @Input() emptyOption: boolean = false;
     //current form control input. helpful in validating and accessing form control
     @Input() form_control: AbstractControl = new UntypedFormControl();
-
+    @Input() clearable: boolean = false;
 
     @Input() set options(options: (T | string)[]) {
         this.displayed_options = [...options];

@@ -79,17 +79,24 @@ export class MenuComponent implements OnInit {
         },
         {
             label: $localize`Outils`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
-                { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true },
+                { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
                 { label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true },
             ]
         },
         {
             label: $localize`Wiki`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
-                { label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: (): boolean => true },
+                { label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
                 { label: $localize`Recettes`, path: 'wiki/recipes', displayed: true, lvl: 1, authorized: (): boolean => true },
                 { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: true, lvl: 1, authorized: (): boolean => true },
-                { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: (): boolean => true },
-                { label: $localize`Informations diverses`, path: 'wiki/miscellaneous-info', displayed: true, lvl: 1, authorized: (): boolean => true }
+                { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
+                {
+                    label: $localize`Informations diverses`,
+                    path: 'wiki/miscellaneous-info',
+                    displayed: true,
+                    lvl: 1,
+                    authorized: (): boolean => true,
+                    spoil: true
+                }
             ]
         },
         {
@@ -248,6 +255,7 @@ interface SidenavLinks {
     displayed: boolean;
     authorized: () => boolean;
     expanded?: boolean;
+    spoil?: boolean;
 }
 
 interface Language {

@@ -33,6 +33,7 @@
                             "src/robots.txt"
                         ],
                         "styles": [
+                            "node_modules/@fortawesome/fontawesome-free/css/all.css",
                             "src/styles.scss",
                             "src/assets/scss/material-theme/theming.scss"
                         ],
@@ -107,13 +108,13 @@
                     },
                     "configurations": {
                         "production": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:production"
+                            "buildTarget": "MyHordesOptimizerWebsite:build:production"
                         },
                         "development": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:development"
+                            "buildTarget": "MyHordesOptimizerWebsite:build:development"
                         },
                         "staging": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:staging"
+                            "buildTarget": "MyHordesOptimizerWebsite:build:staging"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -121,7 +122,7 @@
                 "extract-i18n": {
                     "builder": "@angular-devkit/build-angular:extract-i18n",
                     "options": {
-                        "browserTarget": "MyHordesOptimizerWebsite:build"
+                        "buildTarget": "MyHordesOptimizerWebsite:build"
                     }
                 },
                 "test": {
@@ -139,6 +140,7 @@
                             "src/assets/img"
                         ],
                         "styles": [
+                            "node_modules/@fortawesome/fontawesome-free/css/all.css",
                             "src/styles.scss"
                         ],
                         "stylePreprocessorOptions": {
@@ -197,7 +199,7 @@
                     "defaultConfiguration": "production"
                 },
                 "serve-ssr": {
-                    "builder": "@nguniversal/builders:ssr-dev-server",
+                    "builder": "@angular-devkit/build-angular:ssr-dev-server",
                     "configurations": {
                         "production": {
                             "browserTarget": "MyHordesOptimizerWebsite:build:production",
@@ -215,7 +217,7 @@
                     "defaultConfiguration": "development"
                 },
                 "prerender": {
-                    "builder": "@nguniversal/builders:prerender",
+                    "builder": "@angular-devkit/build-angular:prerender",
                     "options": {
                         "routes": [
                             "/"

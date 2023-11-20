@@ -42,6 +42,7 @@ export class RuinsComponent implements OnInit {
         { id: 'min_dist', header: $localize`Distance minimum`, sortable: true },
         { id: 'max_dist', header: $localize`Distance maximum`, sortable: true },
         { id: 'camping', header: $localize`Bonus en camping`, sortable: true },
+        { id: 'capacity', header: $localize`Capacité`, sortable: true },
         { id: 'drops', header: $localize`Objets`, sortable: false }
     ];
 
