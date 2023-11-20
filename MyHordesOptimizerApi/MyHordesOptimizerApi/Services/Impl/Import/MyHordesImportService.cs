@@ -343,7 +343,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 MaxDist = 1000,
                 Capacity = 0
             });
-            // MyHordesOptimizerRepository.PatchRuins(jsonRuins);
+            MyHordesOptimizerRepository.PatchRuins(jsonRuins);
         }
 
         #endregion
