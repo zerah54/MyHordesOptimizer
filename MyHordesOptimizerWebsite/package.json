@@ -29,7 +29,6 @@
         "@angular/router": "~16.2.9",
         "@fortawesome/fontawesome-free": "^6.4.2",
         "@kolkov/angular-editor": "^3.0.0-beta.0",
-        "@nguniversal/express-engine": "^16.2.0",
         "chart.js": "^4.4.0",
         "chartjs-plugin-datalabels": "^2.2.0",
         "compass-mixins": "^0.12.12",
