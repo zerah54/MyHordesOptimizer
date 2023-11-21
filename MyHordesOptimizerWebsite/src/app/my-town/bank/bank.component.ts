@@ -1,4 +1,10 @@
+import { NgFor, NgIf, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { BANK_CONDENSED_DISPLAY_KEY, HORDES_IMG_REPO } from '../../_abstract_model/const';
@@ -8,12 +14,18 @@ import { ApiService } from '../../_abstract_model/services/api.service';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
+import { ItemComponent } from '../../shared/elements/item/item.component';
+import { SelectComponent } from '../../shared/elements/select/select.component';
+import { ItemsGroupByCategory } from '../../shared/pipes/items-group-by-category.pipe';
 import { normalizeString } from '../../shared/utilities/string.utils';
 
 @Component({
     selector: 'mho-bank',
     templateUrl: './bank.component.html',
-    styleUrls: ['./bank.component.scss']
+    styleUrls: ['./bank.component.scss'],
+    standalone: true,
+    imports: [MatCardModule, MatSlideToggleModule, FormsModule, NgIf, FilterFieldComponent, MatFormFieldModule, SelectComponent, NgFor, ItemComponent, MatTooltipModule, NgOptimizedImage, ItemsGroupByCategory]
 })
 export class BankComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

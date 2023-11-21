@@ -1,11 +1,13 @@
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
-import { AreAllScrutDirectionsSelectedPipe } from './is-scrut-direction-selected.pipe';
 import { Dictionary } from '../../../_abstract_model/types/_types';
+import { AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe } from './is-scrut-direction-selected.pipe';
 
 @Component({
     selector: 'mho-compass-rose',
     templateUrl: './compass-rose.component.html',
-    styleUrls: ['./compass-rose.component.scss']
+    styleUrls: ['./compass-rose.component.scss'],
+    standalone: true,
+    imports: [AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe]
 })
 export class CompassRoseComponent {
     @HostBinding('style.display') display: string = 'contents';

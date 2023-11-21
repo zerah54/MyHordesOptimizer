@@ -1,6 +1,13 @@
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, NgClass, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavContainer } from '@angular/material/sidenav';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import * as moment from 'moment';
 import { environment } from '../../../environments/environment';
 import { Theme } from '../../_abstract_model/interfaces';
@@ -12,7 +19,9 @@ import { getTown } from '../../shared/utilities/localstorage.util';
     selector: 'mho-menu',
     templateUrl: './menu.component.html',
     styleUrls: ['./menu.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatListModule, NgFor, NgTemplateOutlet, MatDividerModule, NgIf, MatButtonModule, MatMenuModule, MatIconModule, RouterLinkActive, RouterLink, NgClass, MatTooltipModule]
 })
 export class MenuComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

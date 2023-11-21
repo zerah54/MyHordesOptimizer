@@ -1,6 +1,14 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { NgIf, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, HostListener, Output, ViewChild } from '@angular/core';
-import { MatToolbar } from '@angular/material/toolbar';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatToolbar, MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Title } from '@angular/platform-browser';
 import { Subject, takeUntil } from 'rxjs';
 import { BREAKPOINTS } from '../../_abstract_model/const';
@@ -13,7 +21,9 @@ import { getExternalAppId, getTown, getUser, setExternalAppId } from '../../shar
 @Component({
     selector: 'mho-header',
     templateUrl: './header.component.html',
-    styleUrls: ['./header.component.scss']
+    styleUrls: ['./header.component.scss'],
+    standalone: true,
+    imports: [MatToolbarModule, MatButtonModule, MatIconModule, NgOptimizedImage, NgIf, MatTooltipModule, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule]
 })
 export class HeaderComponent {
     @HostBinding('style.display') display: string = 'contents';

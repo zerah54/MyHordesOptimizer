@@ -1,9 +1,16 @@
+import { NgIf } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
     selector: 'mho-header-with-string-filter',
     templateUrl: './header-with-string-filter.component.html',
-    styleUrls: ['./header-with-string-filter.component.scss']
+    styleUrls: ['./header-with-string-filter.component.scss'],
+    standalone: true,
+    imports: [NgIf, MatIconModule, MatFormFieldModule, MatInputModule, FormsModule]
 })
 export class HeaderWithStringFilterComponent {
     @HostBinding('style.display') display: string = 'contents';

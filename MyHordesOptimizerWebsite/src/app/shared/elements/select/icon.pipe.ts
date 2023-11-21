@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'icon',
+    standalone: true,
 })
 export class IconPipe<T> implements PipeTransform {
     transform(object: string | T, bind_icon: string): string {

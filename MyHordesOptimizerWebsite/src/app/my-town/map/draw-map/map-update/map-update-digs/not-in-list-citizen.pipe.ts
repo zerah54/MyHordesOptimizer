@@ -5,6 +5,7 @@ import { Dig } from '../../../../../_abstract_model/types/dig.class';
 
 @Pipe({
     name: 'notInListCitizenDig',
+    standalone: true,
 })
 export class NotInListCitizenDigPipe implements PipeTransform {
     transform(all_citizens: Citizen[], digs: Dig[]): Citizen[] {

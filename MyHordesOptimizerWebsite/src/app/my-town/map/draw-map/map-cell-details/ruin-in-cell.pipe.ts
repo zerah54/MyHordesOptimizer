@@ -5,6 +5,7 @@ import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 
 @Pipe({
     name: 'ruinInCell',
+    standalone: true,
 })
 export class RuinInCell implements PipeTransform {
     transform(cell: Cell, all_ruins: Ruin[]): Ruin | undefined {

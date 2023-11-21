@@ -6,10 +6,7 @@ import { SharedModule } from '../../shared/shared.module';
 const components: Components = [ProbabilitiesComponent];
 
 @NgModule({
-    imports: [SharedModule],
-    declarations: [
-        ...components
-    ],
+    imports: [SharedModule, ...components],
     exports: [...components]
 })
 

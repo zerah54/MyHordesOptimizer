@@ -8,8 +8,7 @@ const components: Components = [TutoSiteFirstUseComponent];
 
 
 @NgModule({
-    declarations: [...components],
-    imports: [SharedModule],
+    imports: [SharedModule, ...components],
     exports: [...components],
 })
 export class SiteTutorialsModule {

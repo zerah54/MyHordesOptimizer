@@ -17,8 +17,7 @@ const internal_components: Components = [WellRegistryComponent, BankDiffRegistry
 const pipes: Components = [CitizenUseDiceOrCardsPipe, BankDiffPipe, BankCleanEntriesPipe, WellPipe, CitizenForDigPipe, CitizenNotInDigListPipe];
 
 @NgModule({
-    imports: [SharedModule],
-    declarations: [...components, ...internal_components, ...pipes],
+    imports: [SharedModule, ...components, ...internal_components, ...pipes],
     exports: [...components]
 })
 

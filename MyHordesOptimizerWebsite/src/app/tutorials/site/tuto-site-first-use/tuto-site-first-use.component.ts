@@ -1,12 +1,19 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, HostBinding, Inject, ViewEncapsulation } from '@angular/core';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-tuto-site-first-use',
     templateUrl: './tuto-site-first-use.component.html',
     styleUrls: ['./tuto-site-first-use.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatMenuModule, MatIconModule]
 })
 export class TutoSiteFirstUseComponent {
     @HostBinding('style.display') display: string = 'contents';

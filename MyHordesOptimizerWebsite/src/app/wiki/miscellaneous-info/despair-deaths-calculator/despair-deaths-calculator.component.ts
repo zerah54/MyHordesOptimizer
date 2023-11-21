@@ -1,10 +1,30 @@
 import { Component, HostBinding } from '@angular/core';
 import * as moment from 'moment';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { NgFor, NgIf } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogTitle, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
 
 @Component({
     selector: 'mho-despair-deaths-calculator',
     templateUrl: './despair-deaths-calculator.component.html',
     styleUrls: ['./despair-deaths-calculator.component.scss'],
+    standalone: true,
+    imports: [
+        MatDialogTitle,
+        MatButtonModule,
+        MatDialogClose,
+        MatIconModule,
+        MatDialogContent,
+        NgFor,
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule,
+        NgIf,
+    ],
 })
 export class DespairDeathsCalculatorComponent {
     @HostBinding('style.display') display: string = 'contents';

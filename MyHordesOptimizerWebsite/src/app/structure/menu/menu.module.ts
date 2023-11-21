@@ -1,15 +1,12 @@
-import { SharedModule } from '../../shared/shared.module';
 import { NgModule } from '@angular/core';
-import { MenuComponent } from './menu.component';
 import { Components } from '../../_abstract_model/types/_types';
+import { SharedModule } from '../../shared/shared.module';
+import { MenuComponent } from './menu.component';
 
 const components: Components = [MenuComponent];
 
 @NgModule({
-    imports: [SharedModule],
-    declarations: [
-        ...components
-    ],
+    imports: [SharedModule, ...components],
     exports: [...components]
 })
 

@@ -1,11 +1,21 @@
 import { AfterViewInit, Component, HostBinding, ViewEncapsulation } from '@angular/core';
 import * as moment from 'moment';
+import { NgFor, NgIf, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-probabilities',
     templateUrl: './probabilities.component.html',
     styleUrls: ['./probabilities.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, MatFormFieldModule, MatInputModule, FormsModule, NgFor, NgIf, DecimalPipe]
 })
 export class ProbabilitiesComponent implements AfterViewInit {
     @HostBinding('style.display') display: string = 'contents';

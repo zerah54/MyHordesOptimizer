@@ -6,6 +6,7 @@ import { Item } from '../../../../../_abstract_model/types/item.class';
 
 @Pipe({
     name: 'itemsInBags',
+    standalone: true,
 })
 export class ItemsInBagsPipe implements PipeTransform {
     transform(citizens: Citizen[], all_citizens: Citizen[]): ItemCount[] {

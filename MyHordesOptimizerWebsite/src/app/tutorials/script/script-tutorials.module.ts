@@ -16,8 +16,7 @@ const components: Components = [
 
 
 @NgModule({
-    declarations: [...components],
-    imports: [SharedModule],
+    imports: [SharedModule, ...components],
     exports: [...components],
 })
 export class ScriptTutorialsModule {

@@ -6,6 +6,7 @@ import { getUserId } from '../../../../../shared/utilities/localstorage.util';
 
 @Pipe({
     name: 'myCell',
+    standalone: true,
 })
 export class MyCellPipe implements PipeTransform {
     transform(cell: Cell): boolean {

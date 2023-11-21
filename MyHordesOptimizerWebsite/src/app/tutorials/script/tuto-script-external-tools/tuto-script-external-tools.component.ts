@@ -1,13 +1,20 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, HostBinding, Inject, ViewEncapsulation } from '@angular/core';
-import { AccordionItem } from '../../../shared/elements/accordion/accordion.component';
+import { AccordionItem, AccordionComponent } from '../../../shared/elements/accordion/accordion.component';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-tuto-script-external-tools',
     templateUrl: './tuto-script-external-tools.component.html',
     styleUrls: ['./tuto-script-external-tools.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatMenuModule, MatIconModule, AccordionComponent]
 })
 export class TutoScriptExternalToolsComponent {
     @HostBinding('style.display') display: string = 'contents';

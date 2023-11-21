@@ -1,13 +1,14 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import * as moment from 'moment';
+import { Category } from '../../_abstract_model/types/category.class';
+import { Item } from '../../_abstract_model/types/item.class';
 import { groupBy } from '../utilities/array.util';
 import { normalizeString } from '../utilities/string.utils';
-import { Item } from '../../_abstract_model/types/item.class';
-import { Category } from '../../_abstract_model/types/category.class';
 
 
 @Pipe({
     name: 'itemsGroupByCategory',
+    standalone: true,
 })
 export class ItemsGroupByCategory implements PipeTransform {
 

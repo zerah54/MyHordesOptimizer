@@ -12,8 +12,7 @@ const pipes: Components = [SelectedDayEstimationPipe];
 const submodules: Modules = [RegistryModule];
 
 @NgModule({
-    imports: [SharedModule, ...submodules],
-    declarations: [...components, ...pipes],
+    imports: [SharedModule, ...submodules, ...components, ...pipes],
     exports: [...components]
 })
 

@@ -16,11 +16,8 @@ const components: Components = [
 const local_components: Components = [DespairDeathsPipe];
 
 @NgModule({
-    imports: [SharedModule, WikiRoutingModule],
-    declarations: [
-        ...components,
-        ...local_components
-    ],
+    imports: [SharedModule, WikiRoutingModule, ...components,
+        ...local_components],
     exports: [...components]
 })
 

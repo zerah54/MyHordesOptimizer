@@ -40,10 +40,7 @@ const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, Router
 const pipes: Components = [DecimalPipe];
 
 @NgModule({
-    imports: [...custom_modules, ...angular_modules],
-    declarations: [
-        ...components, ...local_components, ...list_headers
-    ],
+    imports: [...custom_modules, ...angular_modules, ...components, ...local_components, ...list_headers],
     exports: [...components, ...list_headers],
     providers: [...pipes]
 })

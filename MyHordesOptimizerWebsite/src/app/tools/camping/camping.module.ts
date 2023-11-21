@@ -1,15 +1,12 @@
 import { NgModule } from '@angular/core';
-import { CampingComponent } from './camping.component';
-import { SharedModule } from '../../shared/shared.module';
 import { Components } from '../../_abstract_model/types/_types';
+import { SharedModule } from '../../shared/shared.module';
+import { CampingComponent } from './camping.component';
 
 const components: Components = [CampingComponent];
 
 @NgModule({
-    imports: [SharedModule],
-    declarations: [
-        ...components,
-    ],
+    imports: [SharedModule, ...components],
     exports: [...components]
 })
 

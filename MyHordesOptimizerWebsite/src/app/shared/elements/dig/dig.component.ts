@@ -1,5 +1,10 @@
+import { NgIf, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { DigsService } from '../../../_abstract_model/services/digs.service';
@@ -12,7 +17,9 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 @Component({
     selector: 'mho-dig',
     templateUrl: './dig.component.html',
-    styleUrls: ['./dig.component.scss']
+    styleUrls: ['./dig.component.scss'],
+    standalone: true,
+    imports: [NgIf, MatDividerModule, NgOptimizedImage, FormsModule, MatButtonModule, MatTooltipModule]
 })
 export class DigComponent {
     @HostBinding('style.display') display: string = 'contents';

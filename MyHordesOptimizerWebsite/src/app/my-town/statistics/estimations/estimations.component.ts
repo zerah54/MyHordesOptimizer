@@ -1,5 +1,13 @@
+import { NgFor, NgIf } from '@angular/common';
 import { Component, ElementRef, HostBinding, HostListener, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChartConfiguration, ChartEvent, LegendElement } from 'chart.js';
 import Chart from 'chart.js/auto';
 import { ChartDataset, LegendItem } from 'chart.js/dist/types';
@@ -10,6 +18,9 @@ import { ApiService } from '../../../_abstract_model/services/api.service';
 import { Dictionary } from '../../../_abstract_model/types/_types';
 import { Estimations } from '../../../_abstract_model/types/estimations.class';
 import { Regen } from '../../../_abstract_model/types/regen.class';
+import {
+    HeaderWithNumberPreviousNextFilterComponent
+} from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
 import { getMaxAttack, getMinAttack } from '../../../shared/utilities/estimations.util';
 import { getTown } from '../../../shared/utilities/localstorage.util';
@@ -18,7 +29,9 @@ import { getTown } from '../../../shared/utilities/localstorage.util';
     selector: 'mho-estimations',
     templateUrl: './estimations.component.html',
     styleUrls: ['./estimations.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [HeaderWithNumberPreviousNextFilterComponent, MatButtonModule, MatTooltipModule, MatIconModule, NgIf, NgFor, MatFormFieldModule, MatInputModule, FormsModule, MatExpansionModule]
 })
 export class EstimationsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

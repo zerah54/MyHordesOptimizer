@@ -1,18 +1,27 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
-import { Event, NavigationCancel, NavigationEnd, NavigationSkipped, NavigationStart, Router } from '@angular/router';
+import { Event, NavigationCancel, NavigationEnd, NavigationSkipped, NavigationStart, Router, RouterOutlet } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { BREAKPOINTS } from './_abstract_model/const';
 import { AuthenticationService } from './_abstract_model/services/authentication.service';
 import { AutoDestroy } from './shared/decorators/autodestroy.decorator';
 import { LoadingOverlayService } from './shared/services/loading-overlay.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { FooterComponent } from './structure/footer/footer.component';
+import { MatCardModule } from '@angular/material/card';
+import { MenuComponent } from './structure/menu/menu.component';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { HeaderComponent } from './structure/header/header.component';
+import { NgClass, NgIf, NgFor, NgOptimizedImage, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 
 @Component({
     selector: 'mho-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [NgClass, HeaderComponent, NgIf, NgFor, NgOptimizedImage, MatSidenavModule, MenuComponent, MatCardModule, RouterOutlet, FooterComponent, NgSwitch, NgSwitchCase, NgSwitchDefault, MatProgressSpinnerModule]
 })
 export class AppComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

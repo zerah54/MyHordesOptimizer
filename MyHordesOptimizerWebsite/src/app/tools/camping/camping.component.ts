@@ -1,6 +1,15 @@
-import { DOCUMENT, Location } from '@angular/common';
+import { DecimalPipe, DOCUMENT, Location, NgIf, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, Inject, OnInit, ViewEncapsulation } from '@angular/core';
-import { FormControl, FormGroup, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
@@ -13,13 +22,17 @@ import { CampingBonus } from '../../_abstract_model/types/camping-bonus.class';
 import { CampingParameters } from '../../_abstract_model/types/camping-parameters.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { SelectComponent } from '../../shared/elements/select/select.component';
+import { FilterRuinsByKmPipe } from '../../shared/pipes/filter-ruins-by-km.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
 
 @Component({
     selector: 'mho-camping',
     templateUrl: './camping.component.html',
     styleUrls: ['./camping.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, NgIf, FormsModule, ReactiveFormsModule, NgTemplateOutlet, MatFormFieldModule, SelectComponent, MatCheckboxModule, NgOptimizedImage, MatInputModule, MatDividerModule, MatButtonToggleModule, DecimalPipe, FilterRuinsByKmPipe]
 })
 export class CampingComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

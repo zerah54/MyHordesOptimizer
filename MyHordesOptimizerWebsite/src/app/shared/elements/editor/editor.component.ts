@@ -16,10 +16,10 @@ import {
     SimpleChanges,
     ViewEncapsulation
 } from '@angular/core';
-import { ControlValueAccessor, NgControl } from '@angular/forms';
+import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { DomSanitizer } from '@angular/platform-browser';
-import { AngularEditorConfig } from '@kolkov/angular-editor';
+import { AngularEditorConfig, AngularEditorModule } from '@kolkov/angular-editor';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -33,7 +33,9 @@ import { Subject } from 'rxjs';
         }
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [AngularEditorModule, FormsModule]
 })
 export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestroy, MatFormFieldControl<string> {
     @HostBinding('class.floating')

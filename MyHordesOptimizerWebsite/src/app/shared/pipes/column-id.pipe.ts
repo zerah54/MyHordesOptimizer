@@ -4,7 +4,8 @@ import { StandardColumn } from '../../_abstract_model/interfaces';
 
 @Pipe({
     name: 'ids',
-    pure: false
+    pure: false,
+    standalone: true
 })
 export class ColumnIdPipe implements PipeTransform {
     transform(columns: StandardColumn[]): string[] {

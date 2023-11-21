@@ -1,5 +1,5 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
@@ -10,11 +10,18 @@ import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item
 import { Recipe } from '../../_abstract_model/types/recipe.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { normalizeString } from '../../shared/utilities/string.utils';
+import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
+import { MatSortModule } from '@angular/material/sort';
+import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
+import { NgIf, NgFor, NgSwitch, NgSwitchCase, NgOptimizedImage, DecimalPipe } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-recipes',
     templateUrl: './recipes.component.html',
-    styleUrls: ['./recipes.component.scss']
+    styleUrls: ['./recipes.component.scss'],
+    standalone: true,
+    imports: [MatCardModule, NgIf, FilterFieldComponent, MatTableModule, MatSortModule, NgFor, NgSwitch, NgSwitchCase, NgOptimizedImage, DecimalPipe, ColumnIdPipe]
 })
 export class RecipesComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

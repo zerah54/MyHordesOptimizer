@@ -1,12 +1,26 @@
 import { Component, HostBinding, Inject } from '@angular/core';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
-import { AccordionItem } from '../../../shared/elements/accordion/accordion.component';
+import { AccordionItem, AccordionComponent } from '../../../shared/elements/accordion/accordion.component';
 import { DOCUMENT } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-tuto-script-wiki',
     templateUrl: './tuto-script-wiki.component.html',
     styleUrls: ['./tuto-script-wiki.component.scss'],
+    standalone: true,
+    imports: [
+        MatCardModule,
+        MatButtonModule,
+        MatTooltipModule,
+        MatMenuModule,
+        MatIconModule,
+        AccordionComponent,
+    ],
 })
 export class TutoScriptWikiComponent {
     @HostBinding('style.display') display: string = 'contents';

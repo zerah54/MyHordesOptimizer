@@ -11,8 +11,7 @@ const components: Components = [CitizensComponent, CitizensListComponent, Citize
 const pipes: Components = [TypeRowPipe];
 
 @NgModule({
-    imports: [SharedModule],
-    declarations: [...components, ...pipes],
+    imports: [SharedModule, ...components, ...pipes],
     exports: [...components]
 })
 

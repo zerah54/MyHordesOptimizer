@@ -1,11 +1,25 @@
 import { Component, HostBinding } from '@angular/core';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
-import { AccordionItem } from '../../../shared/elements/accordion/accordion.component';
+import { AccordionItem, AccordionComponent } from '../../../shared/elements/accordion/accordion.component';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-tuto-script-alerts',
     templateUrl: './tuto-script-alerts.component.html',
     styleUrls: ['./tuto-script-alerts.component.scss'],
+    standalone: true,
+    imports: [
+        MatCardModule,
+        MatButtonModule,
+        MatTooltipModule,
+        MatMenuModule,
+        MatIconModule,
+        AccordionComponent,
+    ],
 })
 export class TutoScriptAlertsComponent {
     @HostBinding('style.display') display: string = 'contents';

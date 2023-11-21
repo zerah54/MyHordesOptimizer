@@ -14,7 +14,7 @@ const pipes: Components = [
 ];
 
 @NgModule({
-    declarations: [...pipes],
+    imports: [...pipes],
     exports: [
         ...pipes
     ],

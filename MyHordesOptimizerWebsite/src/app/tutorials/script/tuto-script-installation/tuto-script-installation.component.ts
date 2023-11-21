@@ -1,12 +1,26 @@
 import { Component, HostBinding, Inject } from '@angular/core';
-import { AccordionItem } from '../../../shared/elements/accordion/accordion.component';
+import { AccordionItem, AccordionComponent } from '../../../shared/elements/accordion/accordion.component';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
 import { DOCUMENT } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-tuto-script-installation',
     templateUrl: './tuto-script-installation.component.html',
     styleUrls: ['./tuto-script-installation.component.scss'],
+    standalone: true,
+    imports: [
+        MatCardModule,
+        MatButtonModule,
+        MatTooltipModule,
+        MatMenuModule,
+        MatIconModule,
+        AccordionComponent,
+    ],
 })
 export class TutoScriptInstallationComponent {
     @HostBinding('style.display') display: string = 'contents';

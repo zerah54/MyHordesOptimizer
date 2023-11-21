@@ -7,11 +7,21 @@ import { ApiService } from '../../_abstract_model/services/api.service';
 import { Item } from '../../_abstract_model/types/item.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { normalizeString } from '../../shared/utilities/string.utils';
+import { ItemsGroupByCategory } from '../../shared/pipes/items-group-by-category.pipe';
+import { ItemComponent } from '../../shared/elements/item/item.component';
+import { FormsModule } from '@angular/forms';
+import { SelectComponent } from '../../shared/elements/select/select.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
+import { NgIf, NgFor } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-items',
     templateUrl: './items.component.html',
-    styleUrls: ['./items.component.scss']
+    styleUrls: ['./items.component.scss'],
+    standalone: true,
+    imports: [MatCardModule, NgIf, FilterFieldComponent, MatFormFieldModule, SelectComponent, FormsModule, NgFor, ItemComponent, ItemsGroupByCategory]
 })
 export class ItemsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

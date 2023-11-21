@@ -1,4 +1,10 @@
+import { NgIf, NgOptimizedImage, NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, HostBinding, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import * as moment from 'moment/moment';
 import { environment } from '../../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
@@ -6,12 +12,19 @@ import { Entry } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../../_abstract_model/types/item.class';
+import { BankDiffRegistryComponent } from './bank-diff/bank-diff-registry.component';
+import { DiceCardsRegistryComponent } from './dice-cards/dice-cards-registry.component';
+import { DigsRegistryComponent } from './digs/digs-registry.component';
+import { DoorsRegistryComponent } from './doors/doors-registry.component';
+import { WellRegistryComponent } from './well/well-registry.component';
 
 @Component({
     selector: 'mho-registry',
     templateUrl: './registry.component.html',
     styleUrls: ['./registry.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatFormFieldModule, MatInputModule, FormsModule, NgIf, MatButtonModule, MatTooltipModule, NgOptimizedImage, NgSwitch, NgSwitchCase, DiceCardsRegistryComponent, DigsRegistryComponent, BankDiffRegistryComponent, WellRegistryComponent, DoorsRegistryComponent]
 })
 export class RegistryComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

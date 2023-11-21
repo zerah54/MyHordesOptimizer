@@ -1,5 +1,7 @@
+import { NgClass, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Component, ElementRef, HostBinding, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import Chart from 'chart.js/auto';
 import { Subject, takeUntil } from 'rxjs';
 import { ZoneRegen } from '../../../_abstract_model/enum/zone-regen.enum';
@@ -7,6 +9,7 @@ import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { Regen } from '../../../_abstract_model/types/regen.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
+import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
 import { groupBy } from '../../../shared/utilities/array.util';
 
 // import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
@@ -14,7 +17,9 @@ import { groupBy } from '../../../shared/utilities/array.util';
 @Component({
     selector: 'mho-scrutateur',
     templateUrl: './scrutateur.component.html',
-    styleUrls: ['./scrutateur.component.scss']
+    styleUrls: ['./scrutateur.component.scss'],
+    standalone: true,
+    imports: [MatTableModule, MatSortModule, NgFor, NgClass, NgSwitch, NgSwitchCase, NgSwitchDefault, ColumnIdPipe]
 })
 export class ScrutateurComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

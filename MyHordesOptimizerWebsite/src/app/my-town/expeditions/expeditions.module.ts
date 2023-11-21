@@ -6,8 +6,7 @@ import { ExpeditionsComponent } from './expeditions.component';
 const components: Components = [ExpeditionsComponent];
 
 @NgModule({
-    imports: [SharedModule],
-    declarations: [...components],
+    imports: [SharedModule, ...components],
     exports: [...components]
 })
 

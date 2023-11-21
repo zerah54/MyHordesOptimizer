@@ -1,10 +1,15 @@
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { NgClass, NgFor, NgIf, NgOptimizedImage, NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MatCheckboxChange } from '@angular/material/checkbox';
-import { MatSelectChange } from '@angular/material/select';
-import { MatSort } from '@angular/material/sort';
-import { MatTable } from '@angular/material/table';
+import { FormsModule } from '@angular/forms';
+import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
+import { MatOptionModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTable, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
-import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
+import { TableVirtualScrollDataSource, TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { HeroicActionEnum } from '../../../_abstract_model/enum/heroic-action.enum';
@@ -20,13 +25,21 @@ import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
+import { AvatarComponent } from '../../../shared/elements/avatar/avatar.component';
+import { LastUpdateComponent } from '../../../shared/elements/last-update/last-update.component';
+import { ListElementAddRemoveComponent } from '../../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
+import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
+import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
 import { getUser } from '../../../shared/utilities/localstorage.util';
+import { TypeRowPipe } from './type-row.pipe';
 
 @Component({
     selector: 'mho-citizens-list',
     templateUrl: './citizens-list.component.html',
     styleUrls: ['./citizens-list.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [NgIf, CdkVirtualScrollViewport, TableVirtualScrollModule, MatTableModule, MatSortModule, NgFor, NgClass, NgSwitch, NgSwitchCase, HeaderWithSelectFilterComponent, AvatarComponent, ListElementAddRemoveComponent, LastUpdateComponent, MatFormFieldModule, MatSelectModule, FormsModule, MatOptionModule, MatCheckboxModule, NgOptimizedImage, ColumnIdPipe, TypeRowPipe]
 })
 export class CitizensListComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

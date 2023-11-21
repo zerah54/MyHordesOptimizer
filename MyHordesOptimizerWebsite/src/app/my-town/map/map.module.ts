@@ -1,4 +1,6 @@
 import { NgModule } from '@angular/core';
+import { Components } from '../../_abstract_model/types/_types';
+import { SharedModule } from '../../shared/shared.module';
 import { CompassRoseComponent } from './compass-rose/compass-rose.component';
 import { AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe } from './compass-rose/is-scrut-direction-selected.pipe';
 import { DrawMapComponent } from './draw-map/draw-map.component';
@@ -6,12 +8,14 @@ import { MapBorderComponent } from './draw-map/map-border/map-border.component';
 import { CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe } from './draw-map/map-cell-details/cell-details-position.pipe';
 import { MapCellDetailsComponent } from './draw-map/map-cell-details/map-cell-details.component';
 import { RuinInCell } from './draw-map/map-cell-details/ruin-in-cell.pipe';
+import { MapCellComponent } from './draw-map/map-cell/map-cell.component';
 import { DigLevelPipe } from './draw-map/map-cell/pipes/dig-level.pipe';
 import { DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop } from './draw-map/map-cell/pipes/dist-borders.pipe';
 import { IsRuinPipe } from './draw-map/map-cell/pipes/is_ruin.pipe';
-import { MapCellComponent } from './draw-map/map-cell/map-cell.component';
 import { MyCellPipe } from './draw-map/map-cell/pipes/my-cell.pipe';
 import { ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop } from './draw-map/map-cell/pipes/scrut-borders.pipe';
+import { TrashLevelPipe } from './draw-map/map-cell/pipes/trash-level.pipe';
+import { TrashValuePipe } from './draw-map/map-cell/pipes/trash-value.pipe';
 import { ItemsInBagsPipe } from './draw-map/map-update/map-update-cell/items-in-bags.pipe';
 import { MapUpdateCellComponent } from './draw-map/map-update/map-update-cell/map-update-cell.component';
 import { HasStillHeroicPipe } from './draw-map/map-update/map-update-citizens/has-still-heroic.pipe';
@@ -23,10 +27,6 @@ import { NotInListCitizenDigPipe } from './draw-map/map-update/map-update-digs/n
 import { MapUpdateRuinComponent } from './draw-map/map-update/map-update-ruin/map-update-ruin.component';
 import { MapUpdateComponent } from './draw-map/map-update/map-update.component';
 import { MapComponent } from './map.component';
-import { Components } from '../../_abstract_model/types/_types';
-import { SharedModule } from '../../shared/shared.module';
-import { TrashValuePipe } from './draw-map/map-cell/pipes/trash-value.pipe';
-import { TrashLevelPipe } from './draw-map/map-cell/pipes/trash-level.pipe';
 
 const components: Components = [MapComponent];
 const map_components: Components = [
@@ -41,12 +41,9 @@ const pipes: Components = [
 ];
 
 @NgModule({
-    imports: [SharedModule],
-    declarations: [
-        ...components,
+    imports: [SharedModule, ...components,
         ...pipes,
-        ...map_components
-    ],
+        ...map_components],
     exports: [...components],
     providers: [AreAllScrutDirectionsSelectedPipe]
 })

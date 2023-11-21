@@ -1,4 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
+import { DecimalPipe, NgClass, NgIf, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import * as moment from 'moment';
@@ -11,7 +12,15 @@ import { Item } from '../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 import { AutoDestroy } from '../../../../shared/decorators/autodestroy.decorator';
 import { MapOptions } from '../../map.component';
+import { MapCellDetailsComponent } from '../map-cell-details/map-cell-details.component';
 import { MapUpdateComponent, MapUpdateData } from '../map-update/map-update.component';
+import { DigLevelPipe } from './pipes/dig-level.pipe';
+import { DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop } from './pipes/dist-borders.pipe';
+import { IsRuinPipe } from './pipes/is_ruin.pipe';
+import { MyCellPipe } from './pipes/my-cell.pipe';
+import { ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop } from './pipes/scrut-borders.pipe';
+import { TrashLevelPipe } from './pipes/trash-level.pipe';
+import { TrashValuePipe } from './pipes/trash-value.pipe';
 
 @Component({
     selector: 'mho-map-cell',
@@ -19,23 +28,19 @@ import { MapUpdateComponent, MapUpdateData } from '../map-update/map-update.comp
     styleUrls: ['./map-cell.component.scss', '../draw-map.component.scss'],
     encapsulation: ViewEncapsulation.None,
     animations: [
-        trigger('toggleCurrentCell',
-            [
-                transition(':enter',
-                    [
-                        style({ opacity: 0, display: 'inline' }),
-                        animate('500ms ease-out', style({ opacity: 1 }))
-                    ]
-                ),
-                transition(':leave',
-                    [
-                        style({ opacity: 1, display: 'inline' }),
-                        animate('500ms ease-in', style({ opacity: 0 }))
-                    ]
-                )
-            ]
-        )
-    ]
+        trigger('toggleCurrentCell', [
+            transition(':enter', [
+                style({ opacity: 0, display: 'inline' }),
+                animate('500ms ease-out', style({ opacity: 1 }))
+            ]),
+            transition(':leave', [
+                style({ opacity: 1, display: 'inline' }),
+                animate('500ms ease-in', style({ opacity: 0 }))
+            ])
+        ])
+    ],
+    standalone: true,
+    imports: [NgClass, NgIf, NgOptimizedImage, MapCellDetailsComponent, DecimalPipe, IsRuinPipe, DigLevelPipe, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop, ScrutBorderBottom, MyCellPipe, DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop, TrashValuePipe, TrashLevelPipe]
 })
 export class MapCellComponent {
     @HostBinding('style.display') display: string = 'contents';

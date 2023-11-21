@@ -1,17 +1,23 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgFor, NgIf } from '@angular/common';
 import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { getMaxAttack, getMinAttack } from '../../shared/utilities/estimations.util';
 import { DespairDeathsCalculatorComponent } from './despair-deaths-calculator/despair-deaths-calculator.component';
+import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-miscellaneous-info',
     templateUrl: './miscellaneous-info.component.html',
     styleUrls: ['./miscellaneous-info.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatCardModule, NgFor, NgIf, MatButtonModule, MatIconModule, MatTableModule, ColumnIdPipe]
 })
 export class MiscellaneousInfoComponent {
     @HostBinding('style.display') display: string = 'contents';
