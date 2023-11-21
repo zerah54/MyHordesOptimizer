@@ -264,11 +264,11 @@ export class CampingComponent implements OnInit {
 
     private calculateObjectsFromTotal(): { improve: number, improve_objects: number } {
         const complete_improve: number = this.configuration_form.get('complete_improve')?.value ?? 0;
-        for (let i: number = 0; i <= 10; i += this.bonus.improve) {
+        for (let i: number = 0; i <= Math.floor(complete_improve); i += this.bonus.improve) {
             const tested_improve_objects: number = (complete_improve - i) / this.bonus.object_improve;
-            if (Number.isInteger(tested_improve_objects)) return { improve: i, improve_objects: tested_improve_objects };
+            if (Number.isInteger(tested_improve_objects)) return { improve: tested_improve_objects - i, improve_objects: tested_improve_objects };
         }
-        return { improve: 0, improve_objects: 0 };
+        return { improve: complete_improve, improve_objects: 0 };
     }
 
     private calculateCamping(): void {
