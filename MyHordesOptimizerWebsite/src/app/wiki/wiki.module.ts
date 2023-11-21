@@ -8,7 +8,6 @@ import { MiscellaneousInfoComponent } from './miscellaneous-info/miscellaneous-i
 import { DespairDeathsPipe } from './miscellaneous-info/miscellaneous-info.pipe';
 import { RecipesComponent } from './recipes/recipes.component';
 import { RuinsComponent } from './ruins/ruins.component';
-import { WikiRoutingModule } from './wiki.routing.module';
 
 const components: Components = [
     HeroSkillsComponent, ItemsComponent, RecipesComponent, RuinsComponent, MiscellaneousInfoComponent, DespairDeathsCalculatorComponent
@@ -16,8 +15,7 @@ const components: Components = [
 const local_components: Components = [DespairDeathsPipe];
 
 @NgModule({
-    imports: [SharedModule, WikiRoutingModule, ...components,
-        ...local_components],
+    imports: [SharedModule, ...components, ...local_components],
     exports: [...components]
 })
 

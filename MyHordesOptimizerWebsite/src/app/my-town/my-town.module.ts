@@ -7,7 +7,6 @@ import { CampingsModule } from './campings/campings.module';
 import { CitizensModule } from './citizens/citizens.module';
 import { ExpeditionsModule } from './expeditions/expeditions.module';
 import { MapModule } from './map/map.module';
-import { MyTownRoutingModule } from './my-town.routing.module';
 import { NightwatchModule } from './nightwatch/nightwatch.module';
 import { StatisticsModule } from './statistics/statistics.module';
 import { WishlistModule } from './wishlist/wishlist.module';
@@ -17,7 +16,7 @@ const modules: Modules = [
 ];
 
 @NgModule({
-    imports: [SharedModule, MyTownRoutingModule, ...modules],
+    imports: [SharedModule, ...modules],
     exports: [...modules]
 })
 

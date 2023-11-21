@@ -6,10 +6,11 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import { bootstrapApplication } from '@angular/platform-browser';
+import { provideRouter, withRouterConfig } from '@angular/router';
 import { Modules } from './app/_abstract_model/types/_types';
-import { AppRoutingModule } from './app/app-routing.module';
 import { AppComponent } from './app/app.component';
 import { MyTownModule } from './app/my-town/my-town.module';
+import { ROUTES, ROUTES_OPTIONS } from './app/routes';
 import { ErrorsInterceptor } from './app/shared/services/errors-interceptor.service';
 import { HeadersInterceptor } from './app/shared/services/headers-interceptor.service';
 import { LoadingInterceptor } from './app/shared/services/loading-interceptor.service';
@@ -32,7 +33,10 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
     providers: [
-        importProvidersFrom(SharedModule, ...app_modules, AppRoutingModule, AngularFireModule.initializeApp(environment.firebase_config), AngularFireAnalyticsModule, provideFirebaseApp(() => initializeApp(environment.firebase_config))),
+        provideRouter(ROUTES,
+            withRouterConfig(ROUTES_OPTIONS),
+        ),
+        importProvidersFrom(SharedModule, ...app_modules, AngularFireModule.initializeApp(environment.firebase_config), AngularFireAnalyticsModule, provideFirebaseApp(() => initializeApp(environment.firebase_config))),
         AngularFireModule,
         { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: HeadersInterceptor, multi: true },

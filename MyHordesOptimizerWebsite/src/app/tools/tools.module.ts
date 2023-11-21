@@ -3,12 +3,11 @@ import { Modules } from '../_abstract_model/types/_types';
 import { SharedModule } from '../shared/shared.module';
 import { CampingModule } from './camping/camping.module';
 import { ProbabilitiesModule } from './probabilities/probabilities.module';
-import { ToolsRoutingModule } from './tools.routing.module';
 
 const modules: Modules = [CampingModule, ProbabilitiesModule];
 
 @NgModule({
-    imports: [SharedModule, ToolsRoutingModule, ...modules],
+    imports: [SharedModule, ...modules],
     exports: [...modules]
 })
 
