@@ -48,7 +48,7 @@ export class DigsRegistryComponent {
                     const nb_minutes_for_dig: 90 | 120 = citizen.job?.key === JobEnum.SCAVENGER.key ? 90 : 120;
                     /** Les heures d'arrivée du citoyen sur la case */
                     const citizen_arrivals: Entry[] = arrivals.filter((arrival: Entry): boolean => arrival.entry.indexOf(citizen.name) > -1);
-                    const citizen_last_arrival: string = citizen_arrivals[0].hour;
+                    const citizen_last_arrival: string = citizen_arrivals[0]?.hour;
 
                     const failed_digs: number = registry
                         .filter((entry: Entry): boolean => this.failed_digs_keywords.some((failed_digs_keyword: string) => entry.entry.indexOf(failed_digs_keyword) > -1))
