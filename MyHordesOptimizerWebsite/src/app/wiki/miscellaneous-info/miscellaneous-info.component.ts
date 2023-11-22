@@ -1,15 +1,15 @@
-import { DecimalPipe, NgFor, NgIf } from '@angular/common';
+import { formatNumber, NgFor, NgIf } from '@angular/common';
 import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { StandardColumn } from '../../_abstract_model/interfaces';
+import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { getMaxAttack, getMinAttack } from '../../shared/utilities/estimations.util';
 import { DespairDeathsCalculatorComponent } from './despair-deaths-calculator/despair-deaths-calculator.component';
-import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-miscellaneous-info',
@@ -54,8 +54,8 @@ export class MiscellaneousInfoComponent {
             table: new MatTableDataSource(Array.from({ length: 50 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
                     day: i + 1,
-                    re_min: this.decimal_pipe.transform(getMinAttack(i + 1, 'RE'), '1.0-0', this.locale),
-                    re_max: this.decimal_pipe.transform(getMaxAttack(i + 1, 'RE'), '1.0-0', this.locale)
+                    re_min: formatNumber(getMinAttack(i + 1, 'RE'), this.locale, '1.0-0'),
+                    re_max: formatNumber(getMaxAttack(i + 1, 'RE'), this.locale, '1.0-0')
                 };
             }))
         },
@@ -103,7 +103,7 @@ export class MiscellaneousInfoComponent {
     ];
 
 
-    constructor(private decimal_pipe: DecimalPipe, private dialog: MatDialog) {
+    constructor(private dialog: MatDialog) {
 
     }
 
@@ -127,7 +127,7 @@ export class MiscellaneousInfoComponent {
         }
         if (devastated) chances = Math.max(0.1, chances - 0.2);
 
-        return this.decimal_pipe.transform(chances * 100, '1.0-2', this.locale) + '%';
+        return formatNumber(chances * 100, this.locale, '1.0-2') + '%';
     }
 }
 

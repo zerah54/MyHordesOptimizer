@@ -13,10 +13,13 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter, withRouterConfig } from '@angular/router';
-import { ServicesModule } from './app/_abstract_model/services/services.module';
-import { Modules } from './app/_abstract_model/types/_types';
+import { ApiService } from './app/_abstract_model/services/api.service';
+import { AuthenticationService } from './app/_abstract_model/services/authentication.service';
+import { CampingService } from './app/_abstract_model/services/camping.service';
+import { DigsService } from './app/_abstract_model/services/digs.service';
+import { WishlistService } from './app/_abstract_model/services/wishlist.service';
+import { Components } from './app/_abstract_model/types/_types';
 import { AppComponent } from './app/app.component';
-import { MyTownModule } from './app/my-town/my-town.module';
 import { ROUTES, ROUTES_OPTIONS } from './app/routes';
 import { ErrorsInterceptor } from './app/shared/services/errors-interceptor.service';
 import { HeadersInterceptor } from './app/shared/services/headers-interceptor.service';
@@ -26,12 +29,11 @@ import { SharedModule } from './app/shared/shared.module';
 
 import { environment } from './environments/environment';
 
-const app_modules: Modules = [MyTownModule];
-
-
 if (environment.production) {
     enableProdMode();
 }
+
+const services: Components = [AuthenticationService, ApiService, CampingService, DigsService, WishlistService];
 
 registerLocaleData(localeDE);
 registerLocaleData(localeEN);
@@ -40,14 +42,13 @@ registerLocaleData(localeFR);
 
 bootstrapApplication(AppComponent, {
     providers: [
+        ...services,
         provideRouter(
             ROUTES,
             withRouterConfig(ROUTES_OPTIONS),
         ),
         importProvidersFrom(
             SharedModule,
-            ServicesModule,
-            ...app_modules,
             AngularFireModule.initializeApp(environment.firebase_config),
             AngularFireAnalyticsModule,
             provideFirebaseApp(() => initializeApp(environment.firebase_config))
@@ -60,7 +61,7 @@ bootstrapApplication(AppComponent, {
         {
             provide: LOCALE_ID,
             useFactory: (): string | null => localStorage.getItem('mho-locale') || 'fr'
-        }
+        },
     ]
 })
     .catch((err: unknown) => console.error(err));

@@ -7,7 +7,8 @@ import { AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe } from 
     templateUrl: './compass-rose.component.html',
     styleUrls: ['./compass-rose.component.scss'],
     standalone: true,
-    imports: [AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe]
+    imports: [AreAllScrutDirectionsSelectedPipe, IsScrutDirectionSelectedPipe],
+    providers: [AreAllScrutDirectionsSelectedPipe]
 })
 export class CompassRoseComponent {
     @HostBinding('style.display') display: string = 'contents';
@@ -21,7 +22,7 @@ export class CompassRoseComponent {
     }
 
     public addToSelection(direction: string): void {
-        const selected_scrut: Dictionary<boolean> = {...this.selectedScrutZone};
+        const selected_scrut: Dictionary<boolean> = { ...this.selectedScrutZone };
         selected_scrut[direction] = !selected_scrut[direction];
         this.selectedScrutZoneChange.next(selected_scrut);
     }
@@ -29,7 +30,7 @@ export class CompassRoseComponent {
     public addAllToSelection(): void {
         const is_all_selected: boolean = this.are_all_scrut_direction_selected_pipe.transform(this.selectedScrutZone);
 
-        const selected_scrut: Dictionary<boolean> = {...this.selectedScrutZone};
+        const selected_scrut: Dictionary<boolean> = { ...this.selectedScrutZone };
 
         Object.keys(this.selectedScrutZone).forEach((key: string) => {
             selected_scrut[key] = !is_all_selected;

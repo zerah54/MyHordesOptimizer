@@ -1,4 +1,4 @@
-import { DecimalPipe, NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -7,8 +7,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { Components, Modules } from '../../_abstract_model/types/_types';
-import { MaterialModule } from '../material-modules.module';
-import { PipesModule } from '../pipes/pipes.module';
 import { AccordionComponent } from './accordion/accordion.component';
 import { AvatarComponent } from './avatar/avatar.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
@@ -35,14 +33,12 @@ const components: Components = [
 ];
 const list_headers: Components = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent];
 const local_components: Components = [LabelPipe, IconPipe];
-const custom_modules: Modules = [MaterialModule, PipesModule, AngularEditorModule];
+const custom_modules: Modules = [AngularEditorModule];
 const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, NgOptimizedImage];
-const pipes: Components = [DecimalPipe];
 
 @NgModule({
     imports: [...custom_modules, ...angular_modules, ...components, ...local_components, ...list_headers],
-    exports: [...components, ...list_headers],
-    providers: [...pipes]
+    exports: [...components, ...list_headers]
 })
 
 export class ElementsModule {
