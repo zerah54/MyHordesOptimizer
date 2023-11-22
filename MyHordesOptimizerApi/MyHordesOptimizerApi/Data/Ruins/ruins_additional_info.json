@@ -30,7 +30,7 @@
         "capacity": 100
     },
     "cafe": {
-        "capacity": 100
+        "capacity": 3
     },
     "autobahn": {
         "capacity": 100
@@ -81,7 +81,7 @@
         "capacity": 1
     },
     "supermarket": {
-        "capacity": 100
+        "capacity": 4
     },
     "cave2": {
         "capacity": 1

@@ -1039,7 +1039,7 @@ $ruins_additional_info = [
     'bunker' => ['capacity' => 100],
 
     // id 38
-    'cafe' => ['capacity' => 100],
+    'cafe' => ['capacity' => 3],
 
     // id 61
     'autobahn' => ['capacity' => 100],
@@ -1090,7 +1090,7 @@ $ruins_additional_info = [
     'shed' => ['capacity' => 1],
 
     // id 5
-    'supermarket' => ['capacity' => 100],
+    'supermarket' => ['capacity' => 4],
 
     // id 27
     'cave2' => ['capacity' => 1],
