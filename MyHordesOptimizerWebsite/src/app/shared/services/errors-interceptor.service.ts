@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { SnackbarService } from './snackbar.service';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ErrorsInterceptor implements HttpInterceptor {
 
     constructor(private snackbar: SnackbarService) {

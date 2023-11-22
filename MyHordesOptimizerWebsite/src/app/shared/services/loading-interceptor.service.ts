@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { LoadingOverlayService } from './loading-overlay.service';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class LoadingInterceptor implements HttpInterceptor {
 
     constructor(private loading_service: LoadingOverlayService) {

@@ -9,7 +9,7 @@ import { Dig } from '../types/dig.class';
 import { GlobalService } from './global.service';
 
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class DigsService extends GlobalService {
 
     constructor(_http: HttpClient, private snackbar: SnackbarService) {

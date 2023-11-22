@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class LoadingOverlayService {
     /** L'observable à souscrire pour vérifier l'état */
     public is_loading_obs: Observable<boolean>;

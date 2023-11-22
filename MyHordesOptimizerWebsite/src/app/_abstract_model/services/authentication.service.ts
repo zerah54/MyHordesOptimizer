@@ -14,7 +14,7 @@ import { TokenWithMe } from '../types/token-with-me.class';
 import { GlobalService } from './global.service';
 
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AuthenticationService extends GlobalService {
 
     constructor(_http: HttpClient) {

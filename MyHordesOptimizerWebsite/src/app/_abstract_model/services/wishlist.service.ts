@@ -9,7 +9,7 @@ import { Item } from '../types/item.class';
 import { WishlistInfo } from '../types/wishlist-info.class';
 import { GlobalService } from './global.service';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class WishlistService extends GlobalService {
 
     /** La locale */

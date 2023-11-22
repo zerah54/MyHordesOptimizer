@@ -7,7 +7,7 @@ import { CampingParameters } from '../types/camping-parameters.class';
 import { GlobalService } from './global.service';
 
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class CampingService extends GlobalService {
 
     constructor(_http: HttpClient) {

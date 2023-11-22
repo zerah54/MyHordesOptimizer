@@ -40,7 +40,7 @@ import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
 import { GlobalService } from './global.service';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ApiService extends GlobalService {
 
     /** La locale */
