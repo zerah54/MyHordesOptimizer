@@ -99,7 +99,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
 	        var chance = CampingBonus.DesertBonus;
 
-	        if (CanHideInsideBuilding(hiddenCampers, GetBuildingCampingCapacity(buryCount, capacity))) {
+	        if (CanHideInsideBuilding(hiddenCampers, GetBuildingCampingCapacity(capacity, buryCount))) {
 		        chance = CampingBonus.BuriedBonus;
 
 		        if(buryCount == 0) 
