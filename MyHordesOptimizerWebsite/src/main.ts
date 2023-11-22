@@ -1,6 +1,12 @@
 /// <reference types="@angular/localize" />
 
+import { registerLocaleData } from '@angular/common';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+
+import localeDE from '@angular/common/locales/de';
+import localeEN from '@angular/common/locales/en';
+import localeES from '@angular/common/locales/es';
+import localeFR from '@angular/common/locales/fr';
 import { enableProdMode, importProvidersFrom, LOCALE_ID } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { AngularFireModule } from '@angular/fire/compat';
@@ -30,6 +36,11 @@ const app_modules: Modules = [StructureModule, WikiModule, ThanksModule, ToolsMo
 if (environment.production) {
     enableProdMode();
 }
+
+registerLocaleData(localeDE);
+registerLocaleData(localeEN);
+registerLocaleData(localeES);
+registerLocaleData(localeFR);
 
 bootstrapApplication(AppComponent, {
     providers: [

@@ -1,19 +1,20 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { NgClass, NgFor, NgIf, NgOptimizedImage, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { Component, HostBinding, HostListener, Inject, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { Event, NavigationCancel, NavigationEnd, NavigationSkipped, NavigationStart, Router, RouterOutlet } from '@angular/router';
+import * as moment from 'moment/moment';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { BREAKPOINTS } from './_abstract_model/const';
 import { AuthenticationService } from './_abstract_model/services/authentication.service';
 import { AutoDestroy } from './shared/decorators/autodestroy.decorator';
 import { LoadingOverlayService } from './shared/services/loading-overlay.service';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FooterComponent } from './structure/footer/footer.component';
-import { MatCardModule } from '@angular/material/card';
-import { MenuComponent } from './structure/menu/menu.component';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { HeaderComponent } from './structure/header/header.component';
-import { NgClass, NgIf, NgFor, NgOptimizedImage, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { MenuComponent } from './structure/menu/menu.component';
 
 @Component({
     selector: 'mho-root',
@@ -38,9 +39,9 @@ export class AppComponent implements OnInit {
         this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     }
 
-    constructor(public loading_service: LoadingOverlayService, private authentication_api: AuthenticationService,
-                private router: Router, private overlay_container: OverlayContainer,
-                private breakpoint_observer: BreakpointObserver) {
+    constructor(public loading_service: LoadingOverlayService, private authentication_api: AuthenticationService, private router: Router,
+                private overlay_container: OverlayContainer, private breakpoint_observer: BreakpointObserver, @Inject(LOCALE_ID) private locale_id: string) {
+        moment.locale(this.locale_id);
     }
 
     public ngOnInit(): void {
