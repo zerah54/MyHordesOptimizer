@@ -1,191 +1,191 @@
 {
-    "home": {
-        "capacity": 100
-    },
-    "albi": {
-        "capacity": 100
-    },
-    "cave": {
-        "capacity": 2
-    },
-    "pump": {
-        "capacity": 100
-    },
-    "bike": {
-        "capacity": 100
-    },
-    "freight": {
-        "capacity": 100
-    },
-    "hospital": {
-        "capacity": 100
-    },
-    "aerodrome": {
-        "capacity": 100
-    },
-    "police": {
-        "capacity": 100
-    },
-    "bunker": {
-        "capacity": 100
-    },
-    "cafe": {
-        "capacity": 3
-    },
-    "autobahn": {
-        "capacity": 100
-    },
-    "cars": {
-        "capacity": 100
-    },
-    "bar2": {
-        "capacity": 100
-    },
-    "obi": {
-        "capacity": 100
-    },
-    "container": {
-        "capacity": 100
-    },
-    "doner": {
-        "capacity": 100
-    },
-    "duke": {
-        "capacity": 100
-    },
-    "woods": {
-        "capacity": 100
-    },
-    "mine": {
-        "capacity": 100
-    },
-    "quarry": {
-        "capacity": 100
-    },
-    "ufo": {
-        "capacity": 100
-    },
-    "ekea": {
-        "capacity": 100
-    },
-    "tomb": {
-        "capacity": 100
-    },
-    "mczombie": {
-        "capacity": 100
-    },
-    "plane": {
-        "capacity": 100
-    },
-    "shed": {
-        "capacity": 1
-    },
-    "supermarket": {
-        "capacity": 4
-    },
-    "cave2": {
-        "capacity": 1
-    },
-    "cemetary": {
-        "capacity": 100
-    },
-    "fair": {
-        "capacity": 100
-    },
-    "house": {
-        "capacity": 100
-    },
-    "water": {
-        "capacity": 100
-    },
-    "lab": {
-        "capacity": 100
-    },
-    "ambulance": {
-        "capacity": 100
-    },
-    "warehouse": {
-        "capacity": 100
-    },
-    "carpark": {
-        "capacity": 100
-    },
-    "tank": {
-        "capacity": 100
-    },
-    "motel": {
-        "capacity": 100
-    },
-    "army": {
-        "capacity": 100
-    },
-    "post": {
-        "capacity": 100
-    },
-    "cave3": {
-        "capacity": 100
-    },
-    "trench": {
-        "capacity": 100
-    },
-    "dll": {
-        "capacity": 100
-    },
-    "emma": {
-        "capacity": 1
-    },
-    "mayor": {
-        "capacity": 100
-    },
-    "lkw": {
-        "capacity": 100
-    },
-    "school": {
-        "capacity": 100
-    },
-    "office": {
-        "capacity": 100
-    },
-    "villa": {
-        "capacity": 100
-    },
-    "construction": {
-        "capacity": 100
-    },
-    "well": {
-        "capacity": 100
-    },
-    "silo": {
-        "capacity": 100
-    },
-    "street": {
-        "capacity": 100
-    },
-    "park": {
-        "capacity": 100
-    },
-    "guns": {
-        "capacity": 100
-    },
-    "warehouse2": {
-        "capacity": 100
-    },
-    "tent": {
-        "capacity": 100
-    },
-    "pharma": {
-        "capacity": 100
-    },
-    "bar": {
-        "capacity": 100
-    },
-    "deserted_bunker": {
-        "capacity": 0
-    },
-    "deserted_hotel": {
-        "capacity": 0
-    },
-    "deserted_hospital": {
-        "capacity": 0
-    }
+  "home": {
+    "capacity": 100
+  },
+  "albi": {
+    "capacity": 100
+  },
+  "cave": {
+    "capacity": 2
+  },
+  "pump": {
+    "capacity": 100
+  },
+  "bike": {
+    "capacity": 100
+  },
+  "freight": {
+    "capacity": 100
+  },
+  "hospital": {
+    "capacity": 100
+  },
+  "aerodrome": {
+    "capacity": 100
+  },
+  "police": {
+    "capacity": 100
+  },
+  "bunker": {
+    "capacity": 100
+  },
+  "cafe": {
+    "capacity": 3
+  },
+  "autobahn": {
+    "capacity": 100
+  },
+  "cars": {
+    "capacity": 100
+  },
+  "bar2": {
+    "capacity": 100
+  },
+  "obi": {
+    "capacity": 100
+  },
+  "container": {
+    "capacity": 100
+  },
+  "doner": {
+    "capacity": 100
+  },
+  "duke": {
+    "capacity": 100
+  },
+  "woods": {
+    "capacity": 100
+  },
+  "mine": {
+    "capacity": 100
+  },
+  "quarry": {
+    "capacity": 100
+  },
+  "ufo": {
+    "capacity": 100
+  },
+  "ekea": {
+    "capacity": 3
+  },
+  "tomb": {
+    "capacity": 100
+  },
+  "mczombie": {
+    "capacity": 100
+  },
+  "plane": {
+    "capacity": 100
+  },
+  "shed": {
+    "capacity": 1
+  },
+  "supermarket": {
+    "capacity": 4
+  },
+  "cave2": {
+    "capacity": 1
+  },
+  "cemetary": {
+    "capacity": 100
+  },
+  "fair": {
+    "capacity": 100
+  },
+  "house": {
+    "capacity": 100
+  },
+  "water": {
+    "capacity": 100
+  },
+  "lab": {
+    "capacity": 100
+  },
+  "ambulance": {
+    "capacity": 100
+  },
+  "warehouse": {
+    "capacity": 100
+  },
+  "carpark": {
+    "capacity": 100
+  },
+  "tank": {
+    "capacity": 100
+  },
+  "motel": {
+    "capacity": 100
+  },
+  "army": {
+    "capacity": 100
+  },
+  "post": {
+    "capacity": 100
+  },
+  "cave3": {
+    "capacity": 100
+  },
+  "trench": {
+    "capacity": 100
+  },
+  "dll": {
+    "capacity": 100
+  },
+  "emma": {
+    "capacity": 1
+  },
+  "mayor": {
+    "capacity": 100
+  },
+  "lkw": {
+    "capacity": 100
+  },
+  "school": {
+    "capacity": 100
+  },
+  "office": {
+    "capacity": 100
+  },
+  "villa": {
+    "capacity": 100
+  },
+  "construction": {
+    "capacity": 100
+  },
+  "well": {
+    "capacity": 100
+  },
+  "silo": {
+    "capacity": 100
+  },
+  "street": {
+    "capacity": 100
+  },
+  "park": {
+    "capacity": 100
+  },
+  "guns": {
+    "capacity": 100
+  },
+  "warehouse2": {
+    "capacity": 100
+  },
+  "tent": {
+    "capacity": 100
+  },
+  "pharma": {
+    "capacity": 100
+  },
+  "bar": {
+    "capacity": 100
+  },
+  "deserted_bunker": {
+    "capacity": 0
+  },
+  "deserted_hotel": {
+    "capacity": 0
+  },
+  "deserted_hospital": {
+    "capacity": 0
+  }
 }

@@ -1075,7 +1075,7 @@ $ruins_additional_info = [
     'ufo' => ['capacity' => 100],
 
     // id 40
-    'ekea' => ['capacity' => 100],
+    'ekea' => ['capacity' => 3],
 
     // id 28
     'tomb' => ['capacity' => 100],
