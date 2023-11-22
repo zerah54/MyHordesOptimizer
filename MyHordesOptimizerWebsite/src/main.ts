@@ -26,11 +26,10 @@ import { SharedModule } from './app/shared/shared.module';
 import { StructureModule } from './app/structure/structure.module';
 import { ThanksModule } from './app/thanks/thanks.module';
 import { ToolsModule } from './app/tools/tools.module';
-import { TutorialsModule } from './app/tutorials/tutorials.module';
 
 import { environment } from './environments/environment';
 
-const app_modules: Modules = [StructureModule, ThanksModule, ToolsModule, TutorialsModule, MyTownModule];
+const app_modules: Modules = [StructureModule, ThanksModule, ToolsModule, MyTownModule];
 
 
 if (environment.production) {
