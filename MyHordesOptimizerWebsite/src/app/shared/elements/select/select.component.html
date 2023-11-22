@@ -33,8 +33,7 @@
     <mat-divider></mat-divider>
     <div class="options-container">
         <mat-option *ngIf="emptyOption" class="mho-option" [value]="undefined">--</mat-option>
-        <mat-option *ngFor="let option of displayed_options" class="mho-option" [value]="option"
-                    [title]="option | label:bindLabel">
+        <mat-option *ngFor="let option of displayed_options" class="mho-option" [value]="option" [title]="option | label:bindLabel">
             <span style="display: flex; align-items: center; gap: 0.5em;">
                 <ng-container *ngTemplateOutlet="icons; context: {$implicit: option}"></ng-container>
                 <ng-container *ngIf="!noLabel">{{option | label:bindLabel}}</ng-container>
@@ -46,6 +45,6 @@
 
 <ng-template #icons let-option>
     <ng-container *ngIf="bindIcon && option">
-        <img [ngSrc]="HORDES_IMG_REPO + (option | icon:bindIcon)" width="16" height="16">
+        <img *ngIf="(option | icon:bindIcon) !== ''" [ngSrc]="HORDES_IMG_REPO + (option | icon:bindIcon)" width="16" height="16">
     </ng-container>
 </ng-template>
