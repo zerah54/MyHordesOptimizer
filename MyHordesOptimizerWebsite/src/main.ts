@@ -25,11 +25,10 @@ import { SnackbarService } from './app/shared/services/snackbar.service';
 import { SharedModule } from './app/shared/shared.module';
 import { StructureModule } from './app/structure/structure.module';
 import { ThanksModule } from './app/thanks/thanks.module';
-import { ToolsModule } from './app/tools/tools.module';
 
 import { environment } from './environments/environment';
 
-const app_modules: Modules = [StructureModule, ThanksModule, ToolsModule, MyTownModule];
+const app_modules: Modules = [StructureModule, ThanksModule, MyTownModule];
 
 
 if (environment.production) {
