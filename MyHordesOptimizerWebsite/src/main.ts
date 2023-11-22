@@ -13,6 +13,7 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter, withRouterConfig } from '@angular/router';
+import { ServicesModule } from './app/_abstract_model/services/services.module';
 import { Modules } from './app/_abstract_model/types/_types';
 import { AppComponent } from './app/app.component';
 import { MyTownModule } from './app/my-town/my-town.module';
@@ -26,11 +27,10 @@ import { StructureModule } from './app/structure/structure.module';
 import { ThanksModule } from './app/thanks/thanks.module';
 import { ToolsModule } from './app/tools/tools.module';
 import { TutorialsModule } from './app/tutorials/tutorials.module';
-import { WikiModule } from './app/wiki/wiki.module';
 
 import { environment } from './environments/environment';
 
-const app_modules: Modules = [StructureModule, WikiModule, ThanksModule, ToolsModule, TutorialsModule, MyTownModule];
+const app_modules: Modules = [StructureModule, ThanksModule, ToolsModule, TutorialsModule, MyTownModule];
 
 
 if (environment.production) {
@@ -44,10 +44,18 @@ registerLocaleData(localeFR);
 
 bootstrapApplication(AppComponent, {
     providers: [
-        provideRouter(ROUTES,
+        provideRouter(
+            ROUTES,
             withRouterConfig(ROUTES_OPTIONS),
         ),
-        importProvidersFrom(SharedModule, ...app_modules, AngularFireModule.initializeApp(environment.firebase_config), AngularFireAnalyticsModule, provideFirebaseApp(() => initializeApp(environment.firebase_config))),
+        importProvidersFrom(
+            SharedModule,
+            ServicesModule,
+            ...app_modules,
+            AngularFireModule.initializeApp(environment.firebase_config),
+            AngularFireAnalyticsModule,
+            provideFirebaseApp(() => initializeApp(environment.firebase_config))
+        ),
         AngularFireModule,
         { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: HeadersInterceptor, multi: true },

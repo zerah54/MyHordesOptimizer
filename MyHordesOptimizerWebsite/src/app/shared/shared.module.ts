@@ -6,11 +6,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
-import { ApiService } from '../_abstract_model/services/api.service';
-import { AuthenticationService } from '../_abstract_model/services/authentication.service';
-import { CampingService } from '../_abstract_model/services/camping.service';
-import { DigsService } from '../_abstract_model/services/digs.service';
-import { WishlistService } from '../_abstract_model/services/wishlist.service';
 import { Components, Modules } from '../_abstract_model/types/_types';
 import { ElementsModule } from './elements/elements.module';
 import { IsInTownGuard } from './guards/has-app-key.guard';
@@ -24,7 +19,7 @@ import { SnackbarService } from './services/snackbar.service';
 
 const custom_modules: Modules = [MaterialModule, ElementsModule, PipesModule];
 const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule, NgOptimizedImage];
-const services: Components = [ApiService, DigsService, LoadingOverlayService, SnackbarService, ClipboardService, WishlistService, ChartsThemingService, AuthenticationService, CampingService];
+const services: Components = [LoadingOverlayService, SnackbarService, ClipboardService, ChartsThemingService];
 const guards: Components = [IsInTownGuard, InDevModeGuard];
 const external_modules: Modules = [TableVirtualScrollModule];
 
