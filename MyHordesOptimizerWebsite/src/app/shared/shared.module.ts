@@ -1,10 +1,8 @@
 import { NgOptimizedImage } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule } from '@angular/router';
 import { TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { Components, Modules } from '../_abstract_model/types/_types';
 import { ElementsModule } from './elements/elements.module';
@@ -18,7 +16,7 @@ import { LoadingOverlayService } from './services/loading-overlay.service';
 import { SnackbarService } from './services/snackbar.service';
 
 const custom_modules: Modules = [MaterialModule, ElementsModule, PipesModule];
-const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, RouterModule, HttpClientModule, FormsModule, ReactiveFormsModule, NgOptimizedImage];
+const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, FormsModule, ReactiveFormsModule, NgOptimizedImage];
 const services: Components = [LoadingOverlayService, SnackbarService, ClipboardService, ChartsThemingService];
 const guards: Components = [IsInTownGuard, InDevModeGuard];
 const external_modules: Modules = [TableVirtualScrollModule];

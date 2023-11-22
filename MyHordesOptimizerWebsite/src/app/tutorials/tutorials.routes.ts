@@ -9,10 +9,10 @@ import { TutoScriptWikiComponent } from './script/tuto-script-wiki/tuto-script-w
 import { TutoSiteFirstUseComponent } from './site/tuto-site-first-use/tuto-site-first-use.component';
 
 export default [
-    { path: 'tutorials', redirectTo: 'tutorials/script/installation', pathMatch: 'full' },
-    { path: 'tutorials/script', redirectTo: 'script/installation', pathMatch: 'full' },
-    { path: 'tutorials/site', redirectTo: 'script/first-use', pathMatch: 'full' },
-    { path: 'tutorials/discord-bot', redirectTo: 'discord-bot/installation', pathMatch: 'full' },
+    { path: '', redirectTo: 'script/installation', pathMatch: 'full' },
+    { path: 'script', redirectTo: 'script/installation', pathMatch: 'full' },
+    { path: 'site', redirectTo: 'script/first-use', pathMatch: 'full' },
+    { path: 'discord-bot', redirectTo: 'discord-bot/installation', pathMatch: 'full' },
     {
         path: 'script', children: [
             {

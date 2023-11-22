@@ -1,7 +1,7 @@
 /// <reference types="@angular/localize" />
 
 import { registerLocaleData } from '@angular/common';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
 
 import localeDE from '@angular/common/locales/de';
 import localeEN from '@angular/common/locales/en';
@@ -23,12 +23,10 @@ import { HeadersInterceptor } from './app/shared/services/headers-interceptor.se
 import { LoadingInterceptor } from './app/shared/services/loading-interceptor.service';
 import { SnackbarService } from './app/shared/services/snackbar.service';
 import { SharedModule } from './app/shared/shared.module';
-import { StructureModule } from './app/structure/structure.module';
-import { ThanksModule } from './app/thanks/thanks.module';
 
 import { environment } from './environments/environment';
 
-const app_modules: Modules = [StructureModule, ThanksModule, MyTownModule];
+const app_modules: Modules = [MyTownModule];
 
 
 if (environment.production) {
@@ -54,6 +52,7 @@ bootstrapApplication(AppComponent, {
             AngularFireAnalyticsModule,
             provideFirebaseApp(() => initializeApp(environment.firebase_config))
         ),
+        provideHttpClient(),
         AngularFireModule,
         { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: HeadersInterceptor, multi: true },

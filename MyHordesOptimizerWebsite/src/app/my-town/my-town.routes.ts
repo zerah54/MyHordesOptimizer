@@ -17,9 +17,9 @@ import { StatisticsComponent } from './statistics/statistics.component';
 import { WishlistComponent } from './wishlist/wishlist.component';
 
 export default [
-    { path: 'my-town', redirectTo: 'my-town/citizens/list', pathMatch: 'full' },
-    { path: 'my-town/citizens', redirectTo: 'my-town/citizens/list', pathMatch: 'full' },
-    { path: 'my-town/stats', redirectTo: 'my-town/stats/estimations', pathMatch: 'full' },
+    { path: '', redirectTo: 'citizens/list', pathMatch: 'full' },
+    { path: 'citizens', redirectTo: 'citizens/list', pathMatch: 'full' },
+    { path: 'stats', redirectTo: 'stats/estimations', pathMatch: 'full' },
     {
         path: 'bank',
         component: BankComponent,

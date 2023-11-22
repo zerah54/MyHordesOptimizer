@@ -6,7 +6,7 @@ import { RecipesComponent } from './recipes/recipes.component';
 import { RuinsComponent } from './ruins/ruins.component';
 
 export default [
-    { path: 'wiki', redirectTo: 'wiki/items', pathMatch: 'full' },
+    { path: '', redirectTo: 'items', pathMatch: 'full' },
     {
         path: 'miscellaneous-info',
         component: MiscellaneousInfoComponent,
