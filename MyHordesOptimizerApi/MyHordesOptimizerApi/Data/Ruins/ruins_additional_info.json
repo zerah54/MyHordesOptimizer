@@ -90,7 +90,7 @@
     "capacity": 100
   },
   "fair": {
-    "capacity": 100
+    "capacity": 2
   },
   "house": {
     "capacity": 100

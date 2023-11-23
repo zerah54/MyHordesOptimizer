@@ -1099,7 +1099,7 @@ $ruins_additional_info = [
     'cemetary' => ['capacity' => 100],
 
     // id 11
-    'fair' => ['capacity' => 100],
+    'fair' => ['capacity' => 2],
 
     // id 12
     'house' => ['capacity' => 100],
