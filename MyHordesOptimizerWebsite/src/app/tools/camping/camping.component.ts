@@ -346,7 +346,7 @@ export class CampingComponent implements OnInit {
             objectImprove: total_object_improve ?? 0,
             ruinBonus: (<Ruin>this.configuration_form.get('ruin')?.value).camping ?? 0,
             ruinCapacity: this.configuration_form.get('ruin')?.value.capacity ?? 100,
-            ruinBuryCount: this.configuration_form.get('bury_count')?.value ?? 0,
+            ruinBuryCount: (<Ruin>this.configuration_form.get('ruin')?.value).id === -1 ? this.configuration_form.get('bury_count')?.value : 0,
         });
         this.camping_service.calculateCamping(camping_parameters).subscribe((chance: number) => {
             this.camping_result.chances = chance;

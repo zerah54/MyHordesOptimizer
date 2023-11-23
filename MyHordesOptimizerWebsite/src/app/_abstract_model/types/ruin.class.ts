@@ -47,7 +47,9 @@ export class Ruin extends CommonModel<RuinDTO> {
             this.description = dto.description;
             this.explorable = dto.explorable;
             this.img = dto.img;
-            this.formatted_img = 'ruin/' + dto.img + '.gif';
+            if (this.img && this.img !== '') {
+                this.formatted_img = 'ruin/' + dto.img + '.gif';
+            }
             this.min_dist = dto.minDist;
             this.max_dist = dto.maxDist;
             this.drops = dtoToModelArray(RuinItem, dto.drops).sort((drop_a: RuinItem, drop_b: RuinItem) => {
