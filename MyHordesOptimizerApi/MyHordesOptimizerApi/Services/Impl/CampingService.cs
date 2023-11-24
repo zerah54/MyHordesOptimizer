@@ -58,7 +58,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 		        {"lighthouse", campingParameters.Phare ? CampingBonus.Lighthouse : 0},
 		        {"campItems", campingParameters.Objects * CampingBonus.CampItems},
 		        {"zombies", campingParameters.Zombies * (campingParameters.Vest ? CampingBonus.ZombieVest : CampingBonus.ZombieNoVest)},
-		        {"campers", CampingBonus.CrowdChances[Math.Min(CampingBonus.CrowdChances.Count - 1, Math.Max(0, campingParameters.HiddenCampers - 1))]}, // peut être -2 ?
+		        {"campers", CampingBonus.CrowdChances[Math.Min(CampingBonus.CrowdChances.Count - 1, Math.Max(0, campingParameters.HiddenCampers))]},
 		        {"night", campingParameters.Night ? CampingBonus.Night : 0},
 		        {"distance", CampingBonus.DistChances[Math.Min(CampingBonus.DistChances.Count - 1, campingParameters.Distance)]},
 		        {"devastated", campingParameters.Devastated ? CampingBonus.Devastated : 0}

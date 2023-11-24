@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.71
+// @version      1.0.0-beta.72
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,9 +32,10 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[amélioration] Mise en place de méthodes pour limiter le nombre d'appels à l'API MyHordes\n\n`
-    + `[fix] Correction de l'affichage des informations complémentaires sur un bâtiment\n`;
-+`[fix] Correction (en théorie ^^') du fonctionnement du compteur anti-abus\n`;
+    + `[amélioration] Les objets trouvables dans un bâtiment sont triés par probabilité\n\n`
+    + `[fix] Lien de mise à jour du script en cas de script pas à jour\n`
+    + `[fix] Mise à jour du calculateur de camping en S16\n`
+    + `[fix] Correction de l'affichage des réparations en pandemonium\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -75,7 +76,7 @@ GM.getValue(mho_token_key).then((saved_token) => {
 ////////////////////
 
 const api_url = 'https://api.myhordesoptimizer.fr' + (is_mh_beta ? '/beta' : '');
-const api_url_2 = 'https://myhordesoptimizerapi.azurewebsites.net';
+// const api_url = 'https://myhordesoptimizerapi.azurewebsites.net';
 
 
 ///////////////////////////////////////////
@@ -347,6 +348,12 @@ const texts = {
         de: `Entfernung von der Stadt (in km)`,
         es: `Distancia con respecto al pueblo (en km)`,
     },
+    digs: {
+        en: `Number of piles on the ruin`,
+        fr: `Nombre de tas sur le bâtiment`,
+        de: `Anzahl der Pfähle am Gebäude`,
+        es: `Número de pilotes en el edificio`,
+    },
     nb_campings: {
         en: `Number of campsites already made`,
         fr: `Nombre de campings déjà effectués`,
@@ -463,7 +470,7 @@ const texts = {
     },
     wishlist_moved: {
         en: `Due to too much complexity, the shopping list has been moved to the website.`,
-        fr: `Du fait d'une trop grande complexité, la liste de courses à été déplacée sur le site web.`,
+        fr: `Du fait d'une trop grande complexité, la liste de courses a été déplacée sur le site web.`,
         de: `Aufgrund zu großer Komplexität wurde die Einkaufsliste auf die Website verschoben.`,
         es: `Debido a demasiada complejidad, la lista de compras se ha movido al sitio web.`
     },
@@ -573,7 +580,7 @@ const texts = {
 
 const camping_results = [
     {
-        probability: 0.1,
+        probability: 10,
         strict: false,
         label: {
             en: `You reckon your chances of surviving here are hee haw... Might as well take some cyanide now.`,
@@ -583,7 +590,7 @@ const camping_results = [
         }
     },
     {
-        probability: 0.3,
+        probability: 30,
         strict: false,
         label: {
             en: `You reckon your chances of surviving here are really poor. Maybe you should play heads or tails?`,
@@ -593,7 +600,7 @@ const camping_results = [
         }
     },
     {
-        probability: 0.5,
+        probability: 50,
         strict: false,
         label: {
             en: `You reckon your chances of surviving here are poor. Difficult to say.`,
@@ -603,7 +610,7 @@ const camping_results = [
         }
     },
     {
-        probability: 0.65,
+        probability: 65,
         strict: false,
         label: {
             en: `You reckon your chances of surviving here are limited, but tempting. However, accidents happen...`,
@@ -613,7 +620,7 @@ const camping_results = [
         }
     },
     {
-        probability: 0.8,
+        probability: 80,
         strict: false,
         label: {
             en: `You reckon your chances of surviving here are largely satisfactory, as long as nothing unforeseen happens.`,
@@ -623,7 +630,7 @@ const camping_results = [
         }
     },
     {
-        probability: 0.9,
+        probability: 90,
         strict: false,
         label: {
             en: `You reckon your chances of surviving here are decent: you just have to hope for the best!`,
@@ -633,7 +640,7 @@ const camping_results = [
         }
     },
     {
-        probability: 1,
+        probability: 100,
         strict: true,
         label: {
             en: `You reckon your chances of surviving here are good, you should be able to spend the night here.`,
@@ -643,7 +650,7 @@ const camping_results = [
         }
     },
     {
-        probability: 1,
+        probability: 100,
         strict: false,
         label: {
             en: `You reckon your chances of surviving here are optimal. Nobody would see you, even if they were looking straight at you.`,
@@ -754,10 +761,10 @@ const api_texts = {
         es: `Tu script no está actualizado (su versión: $your_version$ / versión más reciente: $recent_version$).<br /><br />Es posible que algunas funciones no funcionen.<br /><br />Actualice el script para que ya no vea este error.`
     },
     update_script: {
-        en: `To update your script, you can use your extension's update functionality or <a target="_blank" href="${GM_info.scriptUpdateURL}" style="text-decoration: underline;"><i >click on this link</i></a>, then refresh the game page.`,
-        fr: `Pour mettre votre script à jour, vous pouvez utiliser la fonctionnalité de mise à jour de votre extension ou <a target="_blank" href="${GM_info.scriptUpdateURL}" style="text-decoration: underline;"><i>cliquer sur ce lien</i></a>, puis rafraîchir la page du jeu.`,
-        de: `Um Ihr Skript zu aktualisieren, können Sie die Aktualisierungsfunktion Ihrer Erweiterung verwenden oder <a target="_blank" href="${GM_info.scriptUpdateURL}" style="text-decoration: underline;"><i >auf diesen Link klicken</ i></a>, dann aktualisiere die Spieleseite.`,
-        es: `Para actualizar su secuencia de comandos, puede utilizar la función de actualización de su extensión o <a target="_blank" href="${GM_info.scriptUpdateURL}" style="text-decoration: underline;"><i >haga clic en este enlace</ i></a>, luego actualiza la página del juego.`
+        en: `To update your script, you can use your extension's update functionality or <a target="_blank" href="${GM_info.script.updateURL}" style="text-decoration: underline;"><i >click on this link</i></a>, then refresh the game page.`,
+        fr: `Pour mettre votre script à jour, vous pouvez utiliser la fonctionnalité de mise à jour de votre extension ou <a target="_blank" href="${GM_info.script.updateURL}" style="text-decoration: underline;"><i>cliquer sur ce lien</i></a>, puis rafraîchir la page du jeu.`,
+        de: `Um Ihr Skript zu aktualisieren, können Sie die Aktualisierungsfunktion Ihrer Erweiterung verwenden oder <a target="_blank" href="${GM_info.script.updateURL}" style="text-decoration: underline;"><i >auf diesen Link klicken</ i></a>, dann aktualisiere die Spieleseite.`,
+        es: `Para actualizar su secuencia de comandos, puede utilizar la función de actualización de su extensión o <a target="_blank" href="${GM_info.script.updateURL}" style="text-decoration: underline;"><i >haga clic en este enlace</ i></a>, luego actualiza la página del juego.`
     },
     error_discord: {
         en: `If the error persists, please let us know on <a href="https://discord.gg/ZQH7ZPWcCm">Discord</a>.`,
@@ -1687,21 +1694,21 @@ const table_ruins_headers = [
         label: {en: `Maximum distance`, fr: `Distance maximum`, de: `Maximale Entfernung`, es: `Distancia máxima`},
         type: 'td'
     },
+    {
+        id: 'camping',
+        label: {en: `Camping bonus`, fr: `Bonus en camping`, de: `Campingbonus`, es: `Bono de acampada`},
+        type: 'td'
+    },
+    {
+        id: 'capacity',
+        label: {en: `Capacity`, fr: `Capacité`, de: `Kapazität`, es: `Capacidad`},
+        type: 'td'
+    },
     {id: 'drops', label: {en: `Items`, fr: 'Objets', de: `Gegenstände`, es: `Objetos`}, type: 'td'},
 ];
 
 const added_ruins = [
-    {id: '', camping: 0, label: {en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna`}},
-    {
-        id: 'nondig',
-        camping: 8,
-        label: {
-            en: `Buried building`,
-            fr: `Bâtiment non déterré`,
-            de: `Verschüttete Ruine`,
-            es: `Edificio no desenterrado`
-        }
-    }
+    {id: '-1000', camping: 0, label: {en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna`}}
 ];
 
 const town_type = [
@@ -2994,12 +3001,12 @@ function displayCamping() {
         tab_content.appendChild(camping_tab_content);
 
         let conf = {
-            town: 'rne',
+            townType: 'RNE',
             job: 'citizen',
             distance: 1,
             campings: 0,
-            pro: false,
-            hidden_campers: 0,
+            proCamper: false,
+            hiddenCampers: 0,
             objects: 0,
             vest: false,
             tomb: false,
@@ -3008,8 +3015,11 @@ function displayCamping() {
             devastated: false,
             phare: false,
             improve: 0,
-            object_improve: 0,
-            ruin: ''
+            objectImprove: 0,
+            ruinBonus: 0,
+            ruinBuryCount: 0,
+            ruinCapacity: 0,
+            ruin: 'noruin'
         }
 
         let my_info = document.createElement('div');
@@ -3072,8 +3082,8 @@ function displayCamping() {
             select_town.appendChild(town_option);
         });
         select_town.addEventListener('change', ($event) => {
-            conf.town = $event.srcElement.value;
-            calculateCampingProbabilities(conf);
+            conf.townType = $event.srcElement.value.toUpperCase();
+            calculateCamping(conf);
         })
         town_div.appendChild(select_town_label);
         town_div.appendChild(select_town);
@@ -3106,7 +3116,7 @@ function displayCamping() {
             } else {
                 vest_field.style.display = 'initial';
             }
-            calculateCampingProbabilities(conf);
+            calculateCamping(conf);
         })
 
         job_div.appendChild(select_job_label);
@@ -3127,7 +3137,7 @@ function displayCamping() {
         vest.checked = conf.vest;
         vest.addEventListener('change', ($event) => {
             conf.vest = $event.srcElement.checked;
-            calculateCampingProbabilities(conf);
+            calculateCamping(conf);
         })
         vest_div.appendChild(vest);
         vest_div.appendChild(vest_label);
@@ -3144,8 +3154,8 @@ function displayCamping() {
         pro_camper.id = 'pro';
         pro_camper.checked = conf.pro;
         pro_camper.addEventListener('change', ($event) => {
-            conf.pro = $event.srcElement.checked;
-            calculateCampingProbabilities(conf);
+            conf.proCamper = $event.srcElement.checked;
+            calculateCamping(conf);
         })
         pro_camper_div.appendChild(pro_camper);
         pro_camper_div.appendChild(pro_camper_label);
@@ -3163,7 +3173,7 @@ function displayCamping() {
         tomb.checked = conf.tomb;
         tomb.addEventListener('change', ($event) => {
             conf.tomb = $event.srcElement.checked;
-            calculateCampingProbabilities(conf);
+            calculateCamping(conf);
         })
         tomb_div.appendChild(tomb);
         tomb_div.appendChild(tomb_label);
@@ -3183,7 +3193,7 @@ function displayCamping() {
         nb_campings.classList.add('inline');
         nb_campings.addEventListener('change', ($event) => {
             conf.campings = +$event.srcElement.value;
-            calculateCampingProbabilities(conf);
+            calculateCamping(conf);
         })
         nb_campings_div.appendChild(nb_campings_label);
         nb_campings_div.appendChild(nb_campings);
@@ -3204,7 +3214,7 @@ function displayCamping() {
         objects_in_bag.classList.add('inline');
         objects_in_bag.addEventListener('change', ($event) => {
             conf.objects = +$event.srcElement.value;
-            calculateCampingProbabilities(conf);
+            calculateCamping(conf);
         })
         objects_in_bag_div.appendChild(objects_in_bag_label);
         objects_in_bag_div.appendChild(objects_in_bag);
@@ -3230,10 +3240,46 @@ function displayCamping() {
         });
         select_ruin.addEventListener('change', ($event) => {
             conf.ruin = $event.srcElement.value;
-            calculateCampingProbabilities(conf);
+            let current_ruin = all_ruins.find((_current_ruin) => +_current_ruin.id === +conf.ruin);
+
+            conf.ruinBonus = current_ruin.chance;
+            conf.ruinCapacity = current_ruin.capacity;
+
+            let digs_field = document.querySelector('#digs-field');
+            if (current_ruin.id === -1) {
+                digs_field.style.display = 'block';
+            } else {
+                digs_field.style.display = 'none';
+                digs_field.querySelector('input').value = 0;
+            }
+
+            calculateCamping(conf);
         })
         ruin_type_div.appendChild(select_ruin_label);
         ruin_type_div.appendChild(select_ruin);
+
+        /** Nombre de tas sur le bat ? */
+        let digs_div = document.createElement('div');
+        digs_div.id = 'digs-field'
+        digs_div.style.display = 'none'
+        cell_info_content.appendChild(digs_div);
+
+        let digs_label = document.createElement('label');
+        digs_label.htmlFor = 'digs';
+        digs_label.innerText = getI18N(texts.digs);
+        digs_label.innerHTML = `<img src="${repo_img_hordes_url}icons/uncover.gif"> ${getI18N(texts.digs)}`;
+        digs_label.classList.add('spaced-label');
+        let digs = document.createElement('input');
+        digs.type = 'number';
+        digs.id = 'digs';
+        digs.value = conf.ruinBuryCount;
+        digs.classList.add('inline');
+        digs.addEventListener('change', ($event) => {
+            conf.ruinBuryCount = +$event.srcElement.value;
+            calculateCamping(conf);
+        })
+        digs_div.appendChild(digs_label);
+        digs_div.appendChild(digs);
 
         /** Distance de la ville */
         let distance_div = document.createElement('div');
@@ -3251,7 +3297,7 @@ function displayCamping() {
         distance.classList.add('inline');
         distance.addEventListener('change', ($event) => {
             conf.distance = +$event.srcElement.value;
-            calculateCampingProbabilities(conf);
+            calculateCamping(conf);
         })
         distance_div.appendChild(distance_label);
         distance_div.appendChild(distance);
@@ -3271,7 +3317,7 @@ function displayCamping() {
         zombies.classList.add('inline');
         zombies.addEventListener('change', ($event) => {
             conf.zombies = +$event.srcElement.value;
-            calculateCampingProbabilities(conf);
+            calculateCamping(conf);
         })
         zombies_div.appendChild(zombies_label);
         zombies_div.appendChild(zombies);
@@ -3291,7 +3337,7 @@ function displayCamping() {
         improve.classList.add('inline');
         improve.addEventListener('change', ($event) => {
             conf.improve = +$event.srcElement.value;
-            calculateCampingProbabilities(conf);
+            calculateCamping(conf);
         })
         improve_div.appendChild(improve_label);
         improve_div.appendChild(improve);
@@ -3307,11 +3353,11 @@ function displayCamping() {
         let object_improve = document.createElement('input');
         object_improve.type = 'number';
         object_improve.id = 'nb-object-improve';
-        object_improve.value = conf.object_improve;
+        object_improve.value = conf.objectImprove;
         object_improve.classList.add('inline');
         object_improve.addEventListener('change', ($event) => {
-            conf.object_improve = +$event.srcElement.value;
-            calculateCampingProbabilities(conf);
+            conf.objectImprove = +$event.srcElement.value;
+            calculateCamping(conf);
         })
         object_improve_div.appendChild(object_improve_label);
         object_improve_div.appendChild(object_improve);
@@ -3327,11 +3373,11 @@ function displayCamping() {
         let hidden_campers = document.createElement('input');
         hidden_campers.type = 'number';
         hidden_campers.id = 'hidden-campers';
-        hidden_campers.value = conf.hidden_campers;
+        hidden_campers.value = conf.hiddenCampers;
         hidden_campers.classList.add('inline');
         hidden_campers.addEventListener('change', ($event) => {
-            conf.hidden_campers = +$event.srcElement.value;
-            calculateCampingProbabilities(conf);
+            conf.hiddenCampers = +$event.srcElement.value;
+            calculateCamping(conf);
         })
         hidden_campers_div.appendChild(hidden_campers_label);
         hidden_campers_div.appendChild(hidden_campers);
@@ -3349,7 +3395,7 @@ function displayCamping() {
         night.checked = conf.night;
         night.addEventListener('change', ($event) => {
             conf.night = $event.srcElement.checked;
-            calculateCampingProbabilities(conf);
+            calculateCamping(conf);
         })
         night_div.appendChild(night);
         night_div.appendChild(night_label);
@@ -3367,7 +3413,7 @@ function displayCamping() {
         devastated.checked = conf.devastated;
         devastated.addEventListener('change', ($event) => {
             conf.devastated = $event.srcElement.checked;
-            calculateCampingProbabilities(conf);
+            calculateCamping(conf);
         })
         devastated_div.appendChild(devastated);
         devastated_div.appendChild(devastated_label);
@@ -3386,162 +3432,15 @@ function displayCamping() {
         phare.checked = conf.phare;
         phare.addEventListener('change', ($event) => {
             conf.phare = $event.srcElement.checked;
-            calculateCampingProbabilities(conf);
+            calculateCamping(conf);
         })
         phare_div.appendChild(phare);
         phare_div.appendChild(phare_label);
 
 
-        calculateCampingProbabilities(conf);
+        calculateCamping(conf);
     });
 }
-
-function calculateCampingProbabilities(conf) {
-    getRuins().then((ruins) => {
-        let all_ruins = [...added_ruins];
-        all_ruins = all_ruins.concat(ruins);
-        /** @see CitizenHandler > getCampingValues > $distance_map */
-        let distance_map = {
-            1: -24,
-            2: -19,
-            3: -14,
-            4: -11,
-            5: -9,
-            6: -9,
-            7: -9,
-            8: -9,
-            9: -9,
-            10: -9,
-            11: -9,
-            12: -8,
-            13: -7.6,
-            14: -7,
-            15: -6,
-            16: -5 // 16 et +
-        };
-
-        /** @see CitizenHandler > getCampingValues > $campings_map */
-        let campings_map = {
-            normal: {
-                nonpro: {
-                    0: 0,
-                    1: -4,
-                    2: -9,
-                    3: -13,
-                    4: -16,
-                    5: -26,
-                    6: -36,
-                    7: -50, // Totally arbitrary
-                    8: -65, // Totally arbitrary
-                    9: -80 // Totally arbitrary // 9 et +
-                },
-                pro: {
-                    0: 0,
-                    1: -2,
-                    2: -4,
-                    3: -8,
-                    4: -10,
-                    5: -12,
-                    6: -16,
-                    7: -26,
-                    8: -36,
-                    9: -60 // Totally arbitrary // 9 et +
-                }
-            },
-            pande: {
-                nonpro: {
-                    0: 0,
-                    1: -4,
-                    2: -6,
-                    3: -8,
-                    4: -10,
-                    5: -20,
-                    6: -36,
-                    7: -50,
-                    8: -65,
-                    9: -80 // 9 et +
-                },
-                pro: {
-                    0: 0,
-                    1: -1,
-                    2: -2,
-                    3: -4,
-                    4: -6,
-                    5: -8,
-                    6: -10,
-                    7: -20,
-                    8: -36,
-                    9: -60 // 9 et +
-                }
-            },
-        };
-
-        /** @see CitizenHandler > getCampingValues > $campers_map */
-        let hidden_campers_map = {
-            0: 0,
-            1: 0,
-            2: -2,
-            3: -6,
-            4: -10,
-            5: -14,
-            6: -20,
-            7: -26
-        };
-
-        let chances = 0;
-        /** Type de ville */
-        chances += conf.town === 'pande' ? -14 : 0;
-        /** Tombe creusée */
-        chances += conf.tomb ? 1.6 : 0;
-        /** Mode nuit */
-        chances += conf.night ? 2 : 0;
-        /** Ville devastée */
-        chances += conf.devastated ? -10 : 0;
-        /** Phare */
-        chances += conf.phare ? 5 : 0;
-        /** Zombies dans la zone */
-        let zombies_factor = conf.vest ? 0.6 : 1.4;
-        chances += -zombies_factor * conf.zombies;
-
-        /** Nombre de campings */
-        let nb_camping_town_type_mapping = conf.town === 'pande' ? campings_map.pande : campings_map.normal;
-        let nb_camping_mapping = conf.pro ? nb_camping_town_type_mapping.pro : nb_camping_town_type_mapping.nonpro;
-        chances += (conf.campings > 9 ? nb_camping_mapping[9] : nb_camping_mapping[conf.campings]);
-
-        /** Distance de la ville */
-        chances += (conf.distance > 16 ? distance_map[16] : distance_map[conf.distance]);
-
-        /** Nombre de personnes déjà cachées */
-        chances += (conf.hidden_campers > 7 ? hidden_campers_map[7] : hidden_campers_map[conf.hidden_campers]);
-
-        /** Nombre d'objets de protection dans l'inventaire */
-        chances += conf.objects;
-
-        /**
-         * Nombre d'améliorations simples sur la case
-         * @see ActionDataService.php : 'improve'
-         */
-        chances += conf.improve;
-
-        /**
-         * Nombre d'objets de défense installés sur la case
-         * @see ActionDataService.php : 'cm_campsite_improve'
-         */
-        chances += conf.object_improve * 1.8;
-
-        /**
-         * Bonus liés au bâtiment
-         * @see RuinDataService.php
-         */
-        chances += parseInt(all_ruins.find((ruin) => conf.ruin.toString() === ruin.id.toString()).camping, 10);
-
-        let probability = Math.min(Math.max((100.0 - (Math.abs(Math.min(0, chances)) * 5)) / 100.0, .1), (conf.job === 'survivalist' ? 1.0 : 0.9));
-        let camping_result_text = camping_results.find((camping_result) => camping_result.string ? probability < camping_result.probability : probability <= camping_result.probability);
-        let result = document.querySelector('#camping-result');
-        if (!result) return;
-        result.innerText = `${camping_result_text ? getI18N(camping_result_text.label) : ''} (${Math.round(probability * 10000) / 100}%)`;
-    });
-};
 
 /** Affiche la liste des pouvoirs */
 function displaySkills() {
@@ -3663,6 +3562,14 @@ function displayRuins() {
                             cell.setAttribute('style', 'text-align: center');
                             cell.innerHTML = ruin[header_cell.id] + 'km';
                             break;
+                        case 'camping':
+                            cell.setAttribute('style', 'text-align: center');
+                            cell.innerHTML = ruin[header_cell.id] + '%';
+                            break;
+                        case 'capacity':
+                            cell.setAttribute('style', 'text-align: center');
+                            cell.innerHTML = ruin[header_cell.id];
+                            break;
                         default:
                             break;
                     }
@@ -3777,7 +3684,7 @@ function createHelpButton(text_to_display) {
     help_button.classList.add('help-button');
 
     let help_tooltip = document.createElement('div')
-    help_tooltip.classList.add('tooltip', 'help', 'hidden');
+    help_tooltip.classList.add('tooltip', 'help', 'hidden', 'mho');
     help_tooltip.setAttribute('style', `text-transform: initial; display: block; position: absolute; width: 250px;`);
     help_tooltip.innerHTML = text_to_display;
     help_button.appendChild(help_tooltip);
@@ -3946,7 +3853,7 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
     if (!external_tools_btn_tooltip) {
         external_tools_btn_tooltip = document.createElement('div');
         external_tools_btn_tooltip.id = 'external-tools-btn-tooltip';
-        external_tools_btn_tooltip.classList.add('tooltip', 'help');
+        external_tools_btn_tooltip.classList.add('tooltip', 'help', 'mho');
         tooltips_container.appendChild(external_tools_btn_tooltip);
     } else {
         external_tools_btn_tooltip.innerHTML = undefined;
@@ -4277,56 +4184,54 @@ function displaySearchFieldOnRegistry() {
 /** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */
 function displayMinApOnBuildings() {
     if (mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
-        setTimeout(() => {
-            let complete_buildings = document.querySelectorAll('.building.complete');
-            if (!complete_buildings || complete_buildings.length === 0) return;
+        let complete_buildings = document.querySelectorAll('.building.complete');
+        if (!complete_buildings || complete_buildings.length === 0) return;
 
-            let broken_buildings = Array.from(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
+        let broken_buildings = Array.from(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
 
-            if (!broken_buildings || broken_buildings.length === 0) return;
+        if (!broken_buildings || broken_buildings.length === 0) return;
 
-            broken_buildings.forEach((broken_building) => {
-                let bar_element = broken_building.querySelector('.ap-bar');
-                let nb_ap_element = broken_building.querySelector('.build-req');
+        broken_buildings.forEach((broken_building) => {
+            let bar_element = broken_building.querySelector('.ap-bar');
+            let nb_ap_element = broken_building.querySelector('.build-req');
 
-                bar_element.dispatchEvent(new Event('mouseenter'));
-                let tooltip = document.querySelector('.tooltip[style*="display: block"]');
-                bar_element.dispatchEvent(new Event('mouseleave'));
+            bar_element.dispatchEvent(new Event('mouseenter'));
+            let tooltip = new Object(document.querySelector('.tooltip:not(.mho)[style*="display: block"]'));
+            bar_element.dispatchEvent(new Event('mouseleave'));
 
-                if (!tooltip || !tooltip.innerHTML) return;
+            if (!tooltip || !tooltip.innerHTML) return;
 
-                let status = tooltip.innerText.match(/[0-9]+\/[0-9]+/)[0].split('/');
+            let status = tooltip.innerText.match(/[0-9]+\/[0-9]+/)[0]?.split('/');
 
-                let nb_pts_per_ap = parseInt(tooltip.innerHTML.match(/<b>[0-9]+<\/b>/)[0].match(/[0-9]+/)[0], 10);
-                let current_pv = parseInt(status[0], 10);
-                let total_pv = parseInt(status[1], 10);
+            let nb_pts_per_ap = parseInt(tooltip.innerHTML.match(/<b>[0-9]+<\/b>/)[0].match(/[0-9]+/)[0], 10);
+            let current_pv = parseInt(status[0], 10);
+            let total_pv = parseInt(status[1], 10);
 
-                let minimum_safe = Math.ceil(total_pv * 70 / 100) + 1
-                if (minimum_safe <= current_pv) return;
+            let minimum_safe = Math.ceil(total_pv * 70 / 100) + 1
+            if (minimum_safe <= current_pv) return;
 
-                let missing_pts = minimum_safe - current_pv;
+            let missing_pts = minimum_safe - current_pv;
 
-                bar_element.style.display = 'flex';
-                let new_ap_bar = bar_element.querySelector('.mho-safe-ap');
-                if (!new_ap_bar) {
-                    new_ap_bar = document.createElement('div');
-                    new_ap_bar.classList.add('mho-safe-ap');
-                }
-                new_ap_bar.style.background = 'yellow';
-                new_ap_bar.style.width = missing_pts / total_pv * 100 + '%';
-                bar_element.appendChild(new_ap_bar);
+            bar_element.style.display = 'flex';
+            let new_ap_bar = bar_element.querySelector('.mho-safe-ap');
+            if (!new_ap_bar) {
+                new_ap_bar = document.createElement('div');
+                new_ap_bar.classList.add('mho-safe-ap');
+            }
+            new_ap_bar.style.background = 'yellow';
+            new_ap_bar.style.width = missing_pts / total_pv * 100 + '%';
+            bar_element.appendChild(new_ap_bar);
 
-                let missing_ap_info = nb_ap_element.querySelector('.mho-missing-ap');
-                if (!missing_ap_info) {
-                    missing_ap_info = document.createElement('span')
-                    missing_ap_info.classList.add('mho-missing-ap');
-                }
-                missing_ap_info.style.fontWeight = 'initial';
-                missing_ap_info.style.fontSize = '0.8em';
-                missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
-                nb_ap_element.appendChild(missing_ap_info);
-            });
-        }, 250)
+            let missing_ap_info = nb_ap_element.querySelector('.mho-missing-ap');
+            if (!missing_ap_info) {
+                missing_ap_info = document.createElement('span')
+                missing_ap_info.classList.add('mho-missing-ap');
+            }
+            missing_ap_info.style.fontWeight = 'initial';
+            missing_ap_info.style.fontSize = '0.8em';
+            missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
+            nb_ap_element.appendChild(missing_ap_info);
+        });
     } else if (pageIsConstructions()) {
         let missing_ap_infos = document.querySelectorAll('.mho-missing-ap');
         if (!missing_ap_infos) return;
@@ -4860,7 +4765,21 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'hero_surv_1':
             if (mh_user.townDetails) {
                 var days = mh_user.townDetails.day;
-                var success = Math.round((+days <= 3 ? 1 : Math.max(0.1, 1 - (+days * 0.025))) * 10000) / 100;
+                var devastated = mh_user.townDetails.isDevaste;
+                var chances = 1;
+                if (days >= 20) {
+                    chances = 0.50;
+                } else if (days >= 15) {
+                    chances = 0.60;
+                } else if (days >= 13) {
+                    chances = 0.70;
+                } else if (days >= 10) {
+                    chances = 0.80;
+                } else if (days >= 5) {
+                    chances = 0.85;
+                }
+                if (devastated) chances = Math.max(0.1, chances - 0.2);
+                var success = chances * 100;
                 item_action.innerHTML = `${success}% de chances de réussir son manuel`;
             } else {
                 item_action.classList.remove('item-tag');
@@ -5988,8 +5907,15 @@ function displayCellDetailsOnPage() {
                 cell_informations_header.appendChild(cell_informations_header_right);
 
                 cell_informations_header_right.addEventListener('click', () => {
-                    cell_informations.querySelector('#cell-note-content').innerText = '🗘';
-                    cell_informations.querySelector('#cell-digs-content').innerText = '🗘';
+                    if (cell_informations.querySelector('#cell-note-content')) {
+                        cell_informations.querySelector('#cell-note-content').innerText = '🗘';
+                    }
+                    if (cell_informations.querySelector('#cell-digs-content')) {
+                        cell_informations.querySelector('#cell-digs-content').innerText = '🗘';
+                    }
+                    if (cell_informations.querySelector('#cell-ruin-content')) {
+                        cell_informations.querySelector('#cell-ruin-content').innerText = '🗘';
+                    }
                     getMap().then(() => {
                         cell = getCellDetailsByPosition();
                         updateInformations(cell);
@@ -6046,7 +5972,7 @@ function displayCellDetailsOnPage() {
             };
 
             let insertRuinDigs = (cell) => {
-                if (current_cell.idRuin !== null && current_cell.idRuin !== undefined) {
+                if (current_cell.idRuin !== null && current_cell.idRuin !== undefined && current_cell.idRuin > 0) {
                     let current_ruin = ruins.find((ruin) => ruin.id === current_cell.idRuin);
                     let empty_text = `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.ruin_dried)}</div>`;
                     let complete_text = `<div>${getI18N(texts.ruin_not_dried)}</div>`;
@@ -6151,7 +6077,7 @@ function displayEstimationsOnWatchtower() {
                         }
                     } else {
                         if (calc_attack) {
-                            calc_attack.firstElementChild.innerText = estimations.today_atomorrow_attackttack.min;
+                            calc_attack.firstElementChild.innerText = estimations.tomorrow_attack.min;
                             calc_attack.lastElementChild.innerText = estimations.tomorrow_attack.max;
                         }
                     }
@@ -6584,6 +6510,7 @@ function displayAntiAbuseCounter() {
                 controller.abort();
             }
         });
+        4
     } else {
         controller.abort();
     }
@@ -6641,17 +6568,17 @@ function displayCampingPredict() {
                 camping_predict_container.appendChild(updater_title);
 
                 let zone_ruin = document.querySelector('.ruin-info b');
-                let ruin = '';
+                let ruin = 'noruin';
                 if (zone_ruin) {
                     ruin = all_ruins.find((one_ruin) => getI18N(one_ruin.label).toLowerCase() === zone_ruin.innerText.toLowerCase()).id;
                 }
                 let conf = {
-                    town: mh_user.townDetails.townType.toLowerCase(),
+                    townType: mh_user.townDetails.townType.toUpperCase(),
                     job: jobs.find((job) => mh_user.jobDetails.uid === job.img).id,
                     distance: document.querySelector('.zone-dist > div > b')?.innerText.replace('km', ''), // OK
                     campings: 0,
-                    pro: false,
-                    hidden_campers: 0,
+                    proCamper: false,
+                    hiddenCampers: 0,
                     objects: 0,
                     vest: false,
                     tomb: false,
@@ -6660,8 +6587,11 @@ function displayCampingPredict() {
                     devastated: mh_user.townDetails.isDevaste,
                     phare: false,
                     improve: 0,
-                    object_improve: 0,
-                    ruin: ruin
+                    objectImprove: 0,
+                    ruinBonus: 0,
+                    ruinBuryCount: 0,
+                    ruinCapacity: 0,
+                    ruin: 'noruin'
                 }
 
                 let my_info = document.createElement('div');
@@ -6720,7 +6650,7 @@ function displayCampingPredict() {
                 vest.checked = conf.vest;
                 vest.addEventListener('change', ($event) => {
                     conf.vest = $event.srcElement.checked;
-                    calculateCampingProbabilities(conf);
+                    calculateCamping(conf);
                 })
                 vest_div.appendChild(vest);
                 vest_div.appendChild(vest_label);
@@ -6737,8 +6667,8 @@ function displayCampingPredict() {
                 pro_camper.id = 'pro';
                 pro_camper.checked = conf.pro;
                 pro_camper.addEventListener('change', ($event) => {
-                    conf.pro = $event.srcElement.checked;
-                    calculateCampingProbabilities(conf);
+                    conf.proCamper = $event.srcElement.checked;
+                    calculateCamping(conf);
                 })
                 pro_camper_div.appendChild(pro_camper);
                 pro_camper_div.appendChild(pro_camper_label);
@@ -6756,7 +6686,7 @@ function displayCampingPredict() {
                 tomb.checked = conf.tomb;
                 tomb.addEventListener('change', ($event) => {
                     conf.tomb = $event.srcElement.checked;
-                    calculateCampingProbabilities(conf);
+                    calculateCamping(conf);
                 })
                 tomb_div.appendChild(tomb);
                 tomb_div.appendChild(tomb_label);
@@ -6776,7 +6706,7 @@ function displayCampingPredict() {
                 nb_campings.classList.add('inline');
                 nb_campings.addEventListener('change', ($event) => {
                     conf.campings = +$event.srcElement.value;
-                    calculateCampingProbabilities(conf);
+                    calculateCamping(conf);
                 })
                 nb_campings_div.appendChild(nb_campings_label);
                 nb_campings_div.appendChild(nb_campings);
@@ -6797,7 +6727,7 @@ function displayCampingPredict() {
                 objects_in_bag.classList.add('inline');
                 objects_in_bag.addEventListener('change', ($event) => {
                     conf.objects = +$event.srcElement.value;
-                    calculateCampingProbabilities(conf);
+                    calculateCamping(conf);
                 })
                 objects_in_bag_div.appendChild(objects_in_bag_label);
                 objects_in_bag_div.appendChild(objects_in_bag);
@@ -6826,10 +6756,46 @@ function displayCampingPredict() {
                 });
                 select_ruin.addEventListener('change', ($event) => {
                     conf.ruin = $event.srcElement.value;
-                    calculateCampingProbabilities(conf);
+                    let current_ruin = all_ruins.find((_current_ruin) => +_current_ruin.id === +conf.ruin);
+
+                    conf.ruinBonus = current_ruin.chance;
+                    conf.ruinCapacity = current_ruin.capacity;
+
+                    let digs_field = document.querySelector('#digs-field');
+                    if (current_ruin.id === -1) {
+                        digs_field.style.display = 'block';
+                    } else {
+                        digs_field.style.display = 'none';
+                        digs_field.querySelector('input').value = 0;
+                    }
+
+                    calculateCamping(conf);
                 })
                 ruin_type_div.appendChild(select_ruin_label);
                 ruin_type_div.appendChild(select_ruin);
+
+                /** Nombre de tas sur le bat ? */
+                let digs_div = document.createElement('div');
+                digs_div.id = 'digs-field'
+                digs_div.style.display = 'none'
+                cell_info_content.appendChild(digs_div);
+
+                let digs_label = document.createElement('label');
+                digs_label.htmlFor = 'digs';
+                digs_label.innerText = getI18N(texts.digs);
+                digs_label.innerHTML = `<img src="${repo_img_hordes_url}icons/uncover.gif"> ${getI18N(texts.digs)}`;
+                digs_label.classList.add('spaced-label');
+                let digs = document.createElement('input');
+                digs.type = 'number';
+                digs.id = 'digs';
+                digs.value = conf.ruinBuryCount;
+                digs.classList.add('inline');
+                digs.addEventListener('change', ($event) => {
+                    conf.ruinBuryCount = +$event.srcElement.value;
+                    calculateCamping(conf);
+                })
+                digs_div.appendChild(digs_label);
+                digs_div.appendChild(digs);
 
                 /** Nombre de zombies sur la case */
                 let zombies_div = document.createElement('div');
@@ -6846,7 +6812,7 @@ function displayCampingPredict() {
                 zombies.classList.add('inline');
                 zombies.addEventListener('change', ($event) => {
                     conf.zombies = +$event.srcElement.value;
-                    calculateCampingProbabilities(conf);
+                    calculateCamping(conf);
                 })
                 zombies_div.appendChild(zombies_label);
                 zombies_div.appendChild(zombies);
@@ -6866,7 +6832,7 @@ function displayCampingPredict() {
                 improve.classList.add('inline');
                 improve.addEventListener('change', ($event) => {
                     conf.improve = +$event.srcElement.value;
-                    calculateCampingProbabilities(conf);
+                    calculateCamping(conf);
                 })
                 improve_div.appendChild(improve_label);
                 improve_div.appendChild(improve);
@@ -6882,11 +6848,11 @@ function displayCampingPredict() {
                 let object_improve = document.createElement('input');
                 object_improve.type = 'number';
                 object_improve.id = 'nb-object-improve';
-                object_improve.value = conf.object_improve;
+                object_improve.value = conf.objectImprove;
                 object_improve.classList.add('inline');
                 object_improve.addEventListener('change', ($event) => {
-                    conf.object_improve = +$event.srcElement.value;
-                    calculateCampingProbabilities(conf);
+                    conf.objectImprove = +$event.srcElement.value;
+                    calculateCamping(conf);
                 })
                 object_improve_div.appendChild(object_improve_label);
                 object_improve_div.appendChild(object_improve);
@@ -6906,7 +6872,7 @@ function displayCampingPredict() {
                 hidden_campers.classList.add('inline');
                 hidden_campers.addEventListener('change', ($event) => {
                     conf.hidden_campers = +$event.srcElement.value;
-                    calculateCampingProbabilities(conf);
+                    calculateCamping(conf);
                 })
                 hidden_campers_div.appendChild(hidden_campers_label);
                 hidden_campers_div.appendChild(hidden_campers);
@@ -6924,7 +6890,7 @@ function displayCampingPredict() {
                 night.checked = conf.night;
                 night.addEventListener('change', ($event) => {
                     conf.night = $event.srcElement.checked;
-                    calculateCampingProbabilities(conf);
+                    calculateCamping(conf);
                 })
                 night_div.appendChild(night);
                 night_div.appendChild(night_label);
@@ -6943,13 +6909,13 @@ function displayCampingPredict() {
                 phare.checked = conf.phare;
                 phare.addEventListener('change', ($event) => {
                     conf.phare = $event.srcElement.checked;
-                    calculateCampingProbabilities(conf);
+                    calculateCamping(conf);
                 })
                 phare_div.appendChild(phare);
                 phare_div.appendChild(phare_label);
 
 
-                calculateCampingProbabilities(conf);
+                calculateCamping(conf);
             });
 
         } else if (camping_predict_container) {
@@ -8412,6 +8378,18 @@ function getRuins() {
                         }
                         return 0;
                     });
+
+                    ruins.forEach((ruin) => {
+                        ruin.drops.sort((drop_a, drop_b) => {
+                            if (drop_a.probability < drop_b.probability) {
+                                return 1;
+                            } else if (drop_b.probability < drop_a.probability) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        });
+                    })
                     endLoading();
                     resolve(ruins);
                 })
@@ -9273,6 +9251,38 @@ function saveEstimations(estim_value, planif_value) {
                     reject(error);
                 });
         });
+    });
+}
+
+function calculateCamping(camping_parameters) {
+    return new Promise((resolve, reject) => {
+        fetcher(api_url + '/Camping/Calculate',
+            {
+                method: 'POST',
+                body: JSON.stringify(camping_parameters),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
+            .then((response) => {
+                let camping_result_text = camping_results.find((camping_result) => camping_result.strict ? response < camping_result.probability : response <= camping_result.probability);
+                let result = document.querySelector('#camping-result');
+                if (result) {
+                    result.innerText = `${camping_result_text ? getI18N(camping_result_text.label) : ''} (${response}%)`;
+                }
+                resolve(response);
+            })
+            .catch((error) => {
+                addError(error);
+                reject(error);
+            });
     });
 }
 

@@ -112,6 +112,7 @@
 
                     <mat-form-field appearance="outline" class="short-bottom" *ngIf="configuration_form.get('ruin')?.value['id'] === -1">
                         <mat-label i18n>Nombre de tas</mat-label>
+                        <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'icons/uncover.gif'" width="16" height="16">
                         <input matInput type="number" [formControlName]="'bury_count'">
                     </mat-form-field>
 
@@ -159,7 +160,7 @@
                         </mat-button-toggle-group>
                     </div>
                     <mat-form-field appearance="outline" class="short-bottom">
-                        <mat-label i18n>Nombre total d'améliotations sur la case</mat-label>
+                        <mat-label i18n>Pourcentage total d'améliotations sur la case</mat-label>
                         <span matPrefix>
                             <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_refine.gif'" width="16" height="16"> + <img
                             [ngSrc]="HORDES_IMG_REPO + 'item/cat_def.gif'" width="16" height="16">
