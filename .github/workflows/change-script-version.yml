@@ -3,14 +3,16 @@ name: (Script) Update Version
 on:
   workflow_dispatch:
   push:
-    paths: 
+    branches:
+      - main
+    paths:
       - 'Scripts/Tampermonkey/my_hordes_optimizer.user.js'
 
 jobs:
-  script-change-version:    
-  
+  script-change-version:
+
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@main
 
@@ -22,15 +24,15 @@ jobs:
         uses: actions-ecosystem/action-regex-match@v2
         id: regex-match
         with:
-          text:     ${{ steps.read-script.outputs.version_row }}
-          regex:     '@version *(.+)'
-          
+          text: ${{ steps.read-script.outputs.version_row }}
+          regex: '@version *(.+)'
+
       - name: Get Script Version
         id: get-version
         env:
           VERSION: "${{ steps.regex-match.outputs.group1 }}"
         run: echo "version=$VERSION" >> $GITHUB_OUTPUT
-          
+
       - name: Save version
         run: |
           curl --request POST \
