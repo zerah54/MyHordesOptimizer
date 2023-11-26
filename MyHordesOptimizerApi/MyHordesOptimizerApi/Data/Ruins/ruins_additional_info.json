@@ -129,7 +129,7 @@
     "capacity": 100
   },
   "dll": {
-    "capacity": 100
+    "capacity": 2
   },
   "emma": {
     "capacity": 1
