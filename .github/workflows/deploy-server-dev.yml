@@ -31,12 +31,6 @@ jobs:
       - name: dotnet publish api
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
 
-      #      - name: Upload sinks for deployment job
-      #        uses: actions/upload-artifact@v2
-      #        with:
-      #          name: .net-sinks
-      #          path: ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
-
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
