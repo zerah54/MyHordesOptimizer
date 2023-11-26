@@ -1042,7 +1042,7 @@ $ruins_additional_info = [
     'cafe' => ['capacity' => 3],
 
     // id 61
-    'autobahn' => ['capacity' => 100],
+    'autobahn' => ['capacity' => 2],
 
     // id 7
     'cars' => ['capacity' => 100],
