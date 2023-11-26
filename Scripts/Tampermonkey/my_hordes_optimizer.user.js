@@ -32,10 +32,12 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
+    + `[amélioration] Le script ne devrait plus afficher plusieurs erreurs simultanées en cas de multiples appels en erreur en même temps\n`
     + `[amélioration] Les objets trouvables dans un bâtiment sont triés par probabilité\n\n`
     + `[fix] Lien de mise à jour du script en cas de script pas à jour\n`
     + `[fix] Mise à jour du calculateur de camping en S16\n`
-    + `[fix] Correction de l'affichage des réparations en pandemonium\n`;
+    + `[fix] Correction de l'affichage des réparations en pandemonium\n`
+    + `[fix] Corrige la prise de ration dans l'anti-abus\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -129,6 +131,8 @@ let wishlist;
 let parameters;
 let map;
 let current_cell;
+/** True quand une erreur vient d'être affichée. Repasse à false au bout d'une seconde, pour éviter le spam d'erreurs */
+let is_error = false;
 
 ///////////////////
 // Les variables //
@@ -1708,7 +1712,7 @@ const table_ruins_headers = [
 ];
 
 const added_ruins = [
-    {id: '-1000', camping: 0, label: {en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna`}}
+    {id: '-1000', camping: 0, label: {en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna`}, capacity: -1}
 ];
 
 const town_type = [
@@ -1877,7 +1881,7 @@ function addWarning(message) {
 
 /** Affiche une notification d'erreur */
 function addError(error) {
-    if (typeof error === 'string' || (error.name !== 'AbortError' && error.name !== 'TypeError')) {
+    if (typeof error === 'string' || (error.name !== 'AbortError' && error.name !== 'TypeError') && !is_error) {
         let notifications = document.getElementById('notifications');
         let notification = document.createElement('div');
         notification.classList.add('error', 'show');
@@ -1887,9 +1891,13 @@ function addError(error) {
         `;
         notification.innerHTML = error_text + (typeof error === 'string' ? error : getErrorFromApi(error));
         notifications.appendChild(notification);
+        is_error = true
         notification.addEventListener('click', () => {
             notification.remove();
         });
+        setTimeout(() => {
+            is_error = false;
+        }, 1000)
         setTimeout(() => {
             notification.remove();
         }, 10000);
@@ -6477,7 +6485,7 @@ function displayAntiAbuseCounter() {
                 });
 
             } else if (pageIsWell()) {
-                let btn = document.querySelector('button[x-well-confirm="1"][x-well-direction="up"]');
+                let btn = document.querySelector('button[data-fetch-method="get"]');/*[data-fetch-confirm]*/
                 btn?.addEventListener('click', (event) => {
                     document.addEventListener('mh-navigation-complete', () => {
                         controller.abort();
@@ -6510,7 +6518,6 @@ function displayAntiAbuseCounter() {
                 controller.abort();
             }
         });
-        4
     } else {
         controller.abort();
     }
