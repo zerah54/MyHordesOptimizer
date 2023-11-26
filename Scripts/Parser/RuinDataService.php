@@ -1009,7 +1009,7 @@ $ruins = [
 ];
 $ruins_additional_info = [
     // id 20
-    'home' => ['capacity' => 100],
+    'home' => ['capacity' => 2],
 
     // id 41
     'albi' => ['capacity' => 100],
@@ -1030,13 +1030,13 @@ $ruins_additional_info = [
     'hospital' => ['capacity' => 100],
 
     // id 48
-    'aerodrome' => ['capacity' => 100],
+    'aerodrome' => ['capacity' => 5],
 
     // id 8
     'police' => ['capacity' => 100],
 
     // id 10
-    'bunker' => ['capacity' => 100],
+    'bunker' => ['capacity' => 5],
 
     // id 38
     'cafe' => ['capacity' => 3],
@@ -1111,7 +1111,7 @@ $ruins_additional_info = [
     'lab' => ['capacity' => 100],
 
     // id 36
-    'ambulance' => ['capacity' => 100],
+    'ambulance' => ['capacity' => 1],
 
     // id 47
     'warehouse' => ['capacity' => 100],
@@ -1126,7 +1126,7 @@ $ruins_additional_info = [
     'motel' => ['capacity' => 100],
 
     // id 55
-    'army' => ['capacity' => 100],
+    'army' => ['capacity' => 5],
 
     // id 46
     'post' => ['capacity' => 100],
@@ -1147,7 +1147,7 @@ $ruins_additional_info = [
     'mayor' => ['capacity' => 100],
 
     // id 35
-    'lkw' => ['capacity' => 100],
+    'lkw' => ['capacity' => 1],
 
     // id 16
     'school' => ['capacity' => 100],
@@ -1165,7 +1165,7 @@ $ruins_additional_info = [
     'well' => ['capacity' => 100],
 
     // id 39
-    'silo' => ['capacity' => 100],
+    'silo' => ['capacity' => 3],
 
     // id 31
     'street' => ['capacity' => 100],
@@ -1177,7 +1177,7 @@ $ruins_additional_info = [
     'guns' => ['capacity' => 100],
 
     // id 34
-    'warehouse2' => ['capacity' => 100],
+    'warehouse2' => ['capacity' => 4],
 
     // id 50
     'tent' => ['capacity' => 100],
@@ -1196,7 +1196,7 @@ $ruins_additional_info = [
     'deserted_hotel' => ['capacity' => 0],
 
     // id 102
-    'deserted_hospital' => ['capacity' => 0],
+    'deserted_hospital' => ['capacity' => 4],
 ];
 
 foreach ($ruins as &$ruin) {

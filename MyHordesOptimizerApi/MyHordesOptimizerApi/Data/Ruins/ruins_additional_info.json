@@ -1,6 +1,6 @@
 {
   "home": {
-    "capacity": 100
+    "capacity": 2
   },
   "albi": {
     "capacity": 100
@@ -21,13 +21,13 @@
     "capacity": 100
   },
   "aerodrome": {
-    "capacity": 100
+    "capacity": 5
   },
   "police": {
     "capacity": 100
   },
   "bunker": {
-    "capacity": 100
+    "capacity": 5
   },
   "cafe": {
     "capacity": 3
@@ -102,7 +102,7 @@
     "capacity": 100
   },
   "ambulance": {
-    "capacity": 100
+    "capacity": 1
   },
   "warehouse": {
     "capacity": 100
@@ -117,7 +117,7 @@
     "capacity": 100
   },
   "army": {
-    "capacity": 100
+    "capacity": 5
   },
   "post": {
     "capacity": 100
@@ -138,7 +138,7 @@
     "capacity": 100
   },
   "lkw": {
-    "capacity": 100
+    "capacity": 1
   },
   "school": {
     "capacity": 100
@@ -156,7 +156,7 @@
     "capacity": 100
   },
   "silo": {
-    "capacity": 100
+    "capacity": 3
   },
   "street": {
     "capacity": 100
@@ -168,7 +168,7 @@
     "capacity": 100
   },
   "warehouse2": {
-    "capacity": 100
+    "capacity": 4
   },
   "tent": {
     "capacity": 100
@@ -186,6 +186,6 @@
     "capacity": 0
   },
   "deserted_hospital": {
-    "capacity": 0
+    "capacity": 4
   }
 }
