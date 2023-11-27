@@ -2,7 +2,7 @@
 import Chart from 'chart.js/auto';
 import { Theme } from '../../_abstract_model/interfaces';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ChartsThemingService {
 
     private readonly DARK_THEME_GRAPH_COLOR: string = 'rgba(255, 255, 255, 0.9)';

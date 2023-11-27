@@ -34,10 +34,10 @@ using MyHordesOptimizerApi.Services.Interfaces.Estimations;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
-using Serilog;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace MyHordesOptimizerApi
 {
@@ -73,7 +73,7 @@ namespace MyHordesOptimizerApi
             {
                 config.Filters.Add<GlobalActionFilter>();
                 config.Filters.Add<ApiExceptionFilter>();
-            });
+            }).AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             services.AddAutoMapper(Assembly.GetAssembly(this.GetType()));
 
@@ -122,6 +122,7 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IMyHordesOptimizerParametersService, MyHordesOptimizerParametersService>();
             services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();
             services.AddScoped<IMyHordesOptimizerEstimationService, MyHordesOptimizerEstimationService>();
+            services.AddScoped<ICampingService, CampingService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
 
             services.AddSingleton<DiscordSocketClient>();       // Add the discord client to services

@@ -1,9 +1,9 @@
-
 import { Pipe, PipeTransform } from '@angular/core';
 
 
 @Pipe({
     name: 'cellDetailsTop',
+    standalone: true,
 })
 export class CellDetailsTopPipe implements PipeTransform {
     transform(cell_html: HTMLTableCellElement): string | undefined {
@@ -14,6 +14,7 @@ export class CellDetailsTopPipe implements PipeTransform {
 
 @Pipe({
     name: 'cellDetailsBottom',
+    standalone: true,
 })
 export class CellDetailsBottomPipe implements PipeTransform {
     transform(cell_html: HTMLTableCellElement): string | undefined {
@@ -24,6 +25,7 @@ export class CellDetailsBottomPipe implements PipeTransform {
 
 @Pipe({
     name: 'cellDetailsLeft',
+    standalone: true,
 })
 export class CellDetailsLeftPipe implements PipeTransform {
     transform(cell_html: HTMLTableCellElement): string | undefined {
@@ -34,6 +36,7 @@ export class CellDetailsLeftPipe implements PipeTransform {
 
 @Pipe({
     name: 'cellDetailsRight',
+    standalone: true,
 })
 export class CellDetailsRightPipe implements PipeTransform {
     transform(cell_html: HTMLTableCellElement): string | undefined {

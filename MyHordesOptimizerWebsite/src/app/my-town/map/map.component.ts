@@ -1,9 +1,23 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { NgFor, NgIf } from '@angular/common';
 import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatOptionModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
-import { ApiServices } from '../../_abstract_model/services/api.services';
+import { ApiService } from '../../_abstract_model/services/api.service';
 import { Dictionary } from '../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
@@ -11,12 +25,16 @@ import { Item } from '../../_abstract_model/types/item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { Town } from '../../_abstract_model/types/town.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { CompassRoseComponent } from './compass-rose/compass-rose.component';
+import { DrawMapComponent } from './draw-map/draw-map.component';
 
 @Component({
     selector: 'mho-map',
     templateUrl: './map.component.html',
     styleUrls: ['./map.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatCardModule, MatButtonModule, MatIconModule, MatSidenavModule, DrawMapComponent, NgIf, MatChipsModule, CompassRoseComponent, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule, MatSelectModule, MatOptionModule, MatCheckboxModule, MatListModule, NgFor]
 })
 export class MapComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -53,7 +71,7 @@ export class MapComponent implements OnInit {
     }
 
 
-    constructor(private breakpoint_observer: BreakpointObserver, private api: ApiServices) {
+    constructor(private breakpoint_observer: BreakpointObserver, private api: ApiService) {
 
     }
 

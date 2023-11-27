@@ -3,6 +3,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'despairDeaths',
+    standalone: true,
 })
 export class DespairDeathsPipe implements PipeTransform {
     transform(nb_killed_zombies: number): number {

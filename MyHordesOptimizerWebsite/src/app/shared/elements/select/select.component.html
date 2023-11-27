@@ -3,25 +3,27 @@
             (closed)="closed.next()" [placeholder]="placeholder">
     <mat-select-trigger *ngIf="multiple">
         <mat-chip-listbox>
-            <mat-chip *ngFor="let single_value of $any(value); let i = index" (removed)="remove(single_value)" class="mho-select-chip">
+            <mat-chip *ngFor="let single_value of $any(value); let i = index" (removed)="remove(single_value)"
+                      class="mho-select-chip">
                 <button type="reset" matChipRemove>
                     <mat-icon>cancel</mat-icon>
                 </button>
                 <ng-container *ngIf="single_value">
                     <ng-container *ngTemplateOutlet="icons; context: {$implicit: single_value}"></ng-container>
-                    <span>{{ single_value | label:bindLabel }}</span>
+                    <span *ngIf="!noLabel">{{ single_value | label:bindLabel }}</span>
                 </ng-container>
             </mat-chip>
         </mat-chip-listbox>
     </mat-select-trigger>
     <mat-select-trigger *ngIf="!multiple" style="display: flex; justify-content: space-between;">
-        <span *ngIf="value">
+        <span *ngIf="value" style="display: flex; align-items: center; gap: 0.5em;">
             <ng-container *ngTemplateOutlet="icons; context: {$implicit: value}"></ng-container>
-            {{ value | label:bindLabel }}
+            <ng-container *ngIf="!noLabel">{{ value | label:bindLabel }}</ng-container>
         </span>
-        <i matSuffix class="fal fa-close" *ngIf="value" style="margin-right: 0.5em; position: relative; bottom: 3px"
-           (click)="$event.stopPropagation(); value = undefined; writeValue(undefined)">
-        </i>
+        <mat-icon matSuffix *ngIf="value && clearable" style="margin-right: 0.5em; position: relative;"
+                  (click)="$event.stopPropagation(); value = undefined; writeValue(undefined)">
+            close
+        </mat-icon>
     </mat-select-trigger>
 
     <mat-form-field class="no-bottom" style="width: 100%" *ngIf="displayed_options && displayed_options.length > 0">
@@ -31,11 +33,10 @@
     <mat-divider></mat-divider>
     <div class="options-container">
         <mat-option *ngIf="emptyOption" class="mho-option" [value]="undefined">--</mat-option>
-        <mat-option *ngFor="let option of displayed_options" class="mho-option" [value]="option"
-                    [title]="option | label:bindLabel">
+        <mat-option *ngFor="let option of displayed_options" class="mho-option" [value]="option" [title]="option | label:bindLabel">
             <span style="display: flex; align-items: center; gap: 0.5em;">
                 <ng-container *ngTemplateOutlet="icons; context: {$implicit: option}"></ng-container>
-                {{option | label:bindLabel}}
+                <ng-container *ngIf="!noLabel">{{option | label:bindLabel}}</ng-container>
             </span>
             <span *ngIf="moreInfo" [innerHTML]="moreInfo(option)" class="more-info"></span>
         </mat-option>
@@ -44,6 +45,6 @@
 
 <ng-template #icons let-option>
     <ng-container *ngIf="bindIcon && option">
-        <img [ngSrc]="HORDES_IMG_REPO + (option | icon:bindIcon)" width="16" height="16">
+        <img *ngIf="(option | icon:bindIcon) !== ''" [ngSrc]="HORDES_IMG_REPO + (option | icon:bindIcon)" width="16" height="16">
     </ng-container>
 </ng-template>

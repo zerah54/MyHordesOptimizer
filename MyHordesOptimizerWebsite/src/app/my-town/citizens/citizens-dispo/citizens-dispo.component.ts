@@ -1,15 +1,21 @@
+import { NgClass, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MatSort } from '@angular/material/sort';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
-import { ApiServices } from '../../../_abstract_model/services/api.services';
+import { ApiService } from '../../../_abstract_model/services/api.service';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
+import {
+    HeaderWithNumberPreviousNextFilterComponent
+} from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
+import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
+import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
 import { getTown } from '../../../shared/utilities/localstorage.util';
 
 
@@ -17,7 +23,9 @@ import { getTown } from '../../../shared/utilities/localstorage.util';
     selector: 'mho-citizens-dispo',
     templateUrl: './citizens-dispo.component.html',
     styleUrls: ['./citizens-dispo.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [NgIf, MatTableModule, MatSortModule, NgFor, NgClass, NgSwitch, NgSwitchCase, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent, ColumnIdPipe]
 })
 export class CitizensDispoComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -49,7 +57,7 @@ export class CitizensDispoComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiService) {
 
     }
 

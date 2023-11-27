@@ -1,11 +1,24 @@
 import { Component, HostBinding, Inject } from '@angular/core';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
 import { DOCUMENT } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-tuto-discord-bot-installation',
     templateUrl: './tuto-discord-bot-installation.component.html',
     styleUrls: ['./tuto-discord-bot-installation.component.scss'],
+    standalone: true,
+    imports: [
+        MatCardModule,
+        MatButtonModule,
+        MatTooltipModule,
+        MatMenuModule,
+        MatIconModule,
+    ],
 })
 export class TutoDiscordBotInstallationComponent {
     @HostBinding('style.display') display: string = 'contents';

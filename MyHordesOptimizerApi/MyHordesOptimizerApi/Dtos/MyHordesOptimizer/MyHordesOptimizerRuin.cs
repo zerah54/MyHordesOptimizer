@@ -29,6 +29,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public int MaxDist { get; set; }
 
         public int Chance { get; set; }
+        
+        public int Capacity { get; set; }
 
         public List<ItemResult> Drops { get; set; }
 
@@ -46,6 +48,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
             MaxDist = miror.MaxDist;
             Chance = miror.Chance;
             Drops = miror.Drops;
+            Capacity = miror.Capacity;
         }
     }
 }

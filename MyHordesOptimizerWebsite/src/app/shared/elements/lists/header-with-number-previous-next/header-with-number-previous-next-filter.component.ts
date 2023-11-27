@@ -1,9 +1,17 @@
+import { NgIf } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
     selector: 'mho-header-with-number-previous-next-filter',
     templateUrl: './header-with-number-previous-next-filter.component.html',
-    styleUrls: ['./header-with-number-previous-next-filter.component.scss']
+    styleUrls: ['./header-with-number-previous-next-filter.component.scss'],
+    standalone: true,
+    imports: [NgIf, MatIconModule, MatFormFieldModule, MatButtonModule, MatInputModule, FormsModule]
 })
 export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

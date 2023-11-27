@@ -1,10 +1,15 @@
+import { NgFor } from '@angular/common';
 import { Component, HostBinding } from '@angular/core';
-import { Router } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
+import { MatTabsModule } from '@angular/material/tabs';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 
 @Component({
     selector: 'mho-statistics',
     templateUrl: './statistics.component.html',
-    styleUrls: ['./statistics.component.scss']
+    styleUrls: ['./statistics.component.scss'],
+    standalone: true,
+    imports: [MatCardModule, MatTabsModule, NgFor, RouterLink, RouterOutlet]
 })
 export class StatisticsComponent {
     @HostBinding('style.display') display: string = 'contents';

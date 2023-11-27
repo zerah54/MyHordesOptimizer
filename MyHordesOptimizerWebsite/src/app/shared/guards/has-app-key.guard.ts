@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
-import { getTown } from '../utilities/localstorage.util';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { getTown } from '../utilities/localstorage.util';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class IsInTownGuard implements CanActivate {
 
     /**

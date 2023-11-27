@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'label',
+    standalone: true,
 })
 export class LabelPipe<T> implements PipeTransform {
     transform(object: string | T, bind_label: string): string {

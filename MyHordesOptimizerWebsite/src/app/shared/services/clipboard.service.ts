@@ -2,7 +2,7 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { Injectable } from '@angular/core';
 import { SnackbarService } from './snackbar.service';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ClipboardService {
 
     constructor(private clipboard: Clipboard, private snackbar_service: SnackbarService) {

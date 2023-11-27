@@ -1,21 +1,29 @@
 import { Component, EventEmitter, HostBinding, OnInit, ViewChild } from '@angular/core';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
-import { ApiServices } from '../../_abstract_model/services/api.services';
+import { ApiService } from '../../_abstract_model/services/api.service';
 import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { getTown } from '../../shared/utilities/localstorage.util';
 import { normalizeString } from '../../shared/utilities/string.utils';
+import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
+import { HeaderWithSelectFilterComponent } from '../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
+import { HeaderWithNumberFilterComponent } from '../../shared/elements/lists/header-with-number-filter/header-with-number-filter.component';
+import { HeaderWithStringFilterComponent } from '../../shared/elements/lists/header-with-string-filter/header-with-string-filter.component';
+import { NgIf, NgFor, NgSwitch, NgSwitchCase, NgClass, NgOptimizedImage, NgSwitchDefault, DecimalPipe } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-ruins',
     templateUrl: './ruins.component.html',
-    styleUrls: ['./ruins.component.scss']
+    styleUrls: ['./ruins.component.scss'],
+    standalone: true,
+    imports: [MatCardModule, NgIf, MatTableModule, MatSortModule, NgFor, NgSwitch, NgSwitchCase, HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, NgClass, NgOptimizedImage, NgSwitchDefault, DecimalPipe, ColumnIdPipe]
 })
 export class RuinsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -42,6 +50,7 @@ export class RuinsComponent implements OnInit {
         { id: 'min_dist', header: $localize`Distance minimum`, sortable: true },
         { id: 'max_dist', header: $localize`Distance maximum`, sortable: true },
         { id: 'camping', header: $localize`Bonus en camping`, sortable: true },
+        { id: 'capacity', header: $localize`Capacité`, sortable: true },
         { id: 'drops', header: $localize`Objets`, sortable: false }
     ];
 
@@ -57,7 +66,7 @@ export class RuinsComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiService) {
     }
 
     ngOnInit(): void {

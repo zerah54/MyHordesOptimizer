@@ -89,13 +89,13 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "role_ghoul",
-            "is_not_wounded",
-            "drink_cross"
+            "drink_mesg"
         ],
         "result": [
             "inflict_wound",
             "consume_item"
         ],
+        "escort_message_key": "escort_water_drink",
         "message_key": "water_drink_ghoul"
     },
     "potion_tl0a": {
@@ -222,7 +222,7 @@
         "meta": [
             "role_ghoul",
             "not_yet_immune",
-            "drink_cross"
+            "drink_mesg"
         ],
         "result": [
             "inflict_wound",
@@ -231,7 +231,8 @@
                 "group": "g_immune_98"
             }
         ],
-        "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
+        "message": "Du hast soeben den mystischen Trank getrunken. Hoffen wir, dass dieser Schamane weiß, was er tut...",
+        "escort_message": "Der Bürger hat den mystischen Trank in einem Zug ausgetrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
     },
     "potion_tl0a_immune": {
         "label": "Trinken",
@@ -357,7 +358,7 @@
         "meta": [
             "role_ghoul",
             "immune",
-            "drink_cross"
+            "drink_mesg"
         ],
         "result": [
             "inflict_wound",
@@ -366,7 +367,8 @@
                 "group": "g_immune_98"
             }
         ],
-        "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!"
+        "message": "Tja, Vertrauen ist gut, Kontrolle ist besser... Ja, du wurdest bereits geschützt!",
+        "escort_message": "Der Bürger hat den mystischen Trank in einem Zug ausgetrunken. Hoffen wir, dass dieser Schamane weiß, was er tut..."
     },
     "watercan3_tl0": {
         "label": "Trinken",
@@ -458,13 +460,13 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "role_ghoul",
-            "is_not_wounded",
-            "drink_cross"
+            "drink_mesg"
         ],
         "result": [
             "inflict_wound",
             "produce_watercan2"
         ],
+        "escort_message_key": "escort_water_drink",
         "message_key": "water_drink_ghoul"
     },
     "watercan2_tl0": {
@@ -557,13 +559,13 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "role_ghoul",
-            "is_not_wounded",
-            "drink_cross"
+            "drink_mesg"
         ],
         "result": [
             "inflict_wound",
             "produce_watercan1"
         ],
+        "escort_message_key": "escort_water_drink",
         "message_key": "water_drink_ghoul"
     },
     "watercan1_tl0": {
@@ -656,13 +658,13 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "role_ghoul",
-            "is_not_wounded",
-            "drink_cross"
+            "drink_mesg"
         ],
         "result": [
             "inflict_wound",
             "produce_watercan0"
         ],
+        "escort_message_key": "escort_water_drink",
         "message_key": "water_drink_ghoul"
     },
     "water_no_effect": {
@@ -830,7 +832,7 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "eat_ap",
-            "no_full_ap"
+            "no_full_ap_msg_food"
         ],
         "result": [
             "contaminated_zone_infect",
@@ -847,7 +849,7 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "eat_ap",
-            "no_full_ap"
+            "no_full_ap_msg_food"
         ],
         "result": [
             "contaminated_zone_infect",
@@ -930,6 +932,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_1",
@@ -952,6 +955,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_2",
@@ -974,6 +978,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_1",
@@ -997,6 +1002,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_2",
@@ -1020,6 +1026,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_1"
@@ -1036,6 +1043,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_2"
@@ -1052,6 +1060,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_1"
@@ -1067,6 +1076,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_2"
@@ -1082,6 +1092,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_1"
@@ -1098,6 +1109,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_2"
@@ -1114,6 +1126,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_1",
@@ -1132,6 +1145,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_2",
@@ -1150,6 +1164,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_1",
@@ -1167,6 +1182,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_2",
@@ -1184,6 +1200,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_1",
@@ -1201,6 +1218,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_2",
@@ -1218,6 +1236,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_1",
@@ -1235,6 +1254,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "drug_2",
@@ -1252,6 +1272,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "not_yet_beta"
@@ -1273,6 +1294,7 @@
         "label": "Einnehmen",
         "cover": true,
         "at00": true,
+        "allow_when_terrorized": true,
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "not_before_day_2"
@@ -1487,11 +1509,12 @@
                                 }
                             }
                         ],
-                        1
+                        75
                     ],
                     [
                         [
                             "drug_any",
+                            "just_ap6",
                             "terrorize",
                             {
                                 "message": {
@@ -1499,31 +1522,7 @@
                                 }
                             }
                         ],
-                        1
-                    ],
-                    [
-                        [
-                            "drug_any",
-                            "drug_addict",
-                            "just_ap7",
-                            {
-                                "message": {
-                                    "text_key": "drug_addict_ap"
-                                }
-                            }
-                        ],
-                        3
-                    ],
-                    [
-                        [
-                            "do_nothing",
-                            {
-                                "message": {
-                                    "text_key": "drug_no_effect"
-                                }
-                            }
-                        ],
-                        2
+                        25
                     ]
                 ]
             }
@@ -1557,11 +1556,12 @@
                                 }
                             }
                         ],
-                        1
+                        75
                     ],
                     [
                         [
                             "drug_addict",
+                            "just_ap6",
                             "terrorize",
                             {
                                 "message": {
@@ -1569,30 +1569,7 @@
                                 }
                             }
                         ],
-                        1
-                    ],
-                    [
-                        [
-                            "drug_addict",
-                            "just_ap7",
-                            {
-                                "message": {
-                                    "text_key": "drug_addict_ap"
-                                }
-                            }
-                        ],
-                        3
-                    ],
-                    [
-                        [
-                            "do_nothing",
-                            {
-                                "message": {
-                                    "text_key": "drug_no_effect"
-                                }
-                            }
-                        ],
-                        2
+                        25
                     ]
                 ]
             }
@@ -1626,7 +1603,7 @@
                                 }
                             }
                         ],
-                        11
+                        4
                     ],
                     [
                         [
@@ -1638,7 +1615,7 @@
                                 }
                             }
                         ],
-                        6
+                        2
                     ],
                     [
                         [
@@ -1651,7 +1628,7 @@
                                 }
                             }
                         ],
-                        5
+                        2
                     ],
                     [
                         [
@@ -1662,7 +1639,7 @@
                                 }
                             }
                         ],
-                        4
+                        2
                     ]
                 ]
             }
@@ -1696,7 +1673,7 @@
                                 }
                             }
                         ],
-                        11
+                        4
                     ],
                     [
                         [
@@ -1708,7 +1685,7 @@
                                 }
                             }
                         ],
-                        6
+                        2
                     ],
                     [
                         [
@@ -1720,7 +1697,7 @@
                                 }
                             }
                         ],
-                        5
+                        2
                     ],
                     [
                         [
@@ -1731,7 +1708,7 @@
                                 }
                             }
                         ],
-                        4
+                        2
                     ]
                 ]
             }
@@ -1758,17 +1735,6 @@
                     [
                         [
                             "plus_ap8_30",
-                            {
-                                "message": {
-                                    "text": "Du schluckst das Bonbon mit einem Lächeln auf den Lippen herunter."
-                                }
-                            }
-                        ],
-                        22
-                    ],
-                    [
-                        [
-                            "plus_ap8_30",
                             "drug_addict_no_msg",
                             {
                                 "message": {
@@ -1776,7 +1742,7 @@
                                 }
                             }
                         ],
-                        13
+                        18
                     ],
                     [
                         [
@@ -1788,7 +1754,7 @@
                                 }
                             }
                         ],
-                        58
+                        50
                     ],
                     [
                         [
@@ -1800,7 +1766,7 @@
                                 }
                             }
                         ],
-                        5
+                        30
                     ],
                     [
                         [
@@ -3542,7 +3508,7 @@
                         [
                             "do_nothing"
                         ],
-                        95
+                        85
                     ],
                     [
                         [
@@ -3553,7 +3519,7 @@
                                 ]
                             }
                         ],
-                        5
+                        15
                     ]
                 ]
             },
@@ -3591,7 +3557,7 @@
                 ]
             }
         ],
-        "message": "<t-stat-up-tg_meta_wound>Diese Katze ist unglaublich! Sie scheint keine Angst zu haben, nicht einmal vor dir. Das Tier springt dir an die Kehle und vergräbt seine Krallen tief in deinem Fleisch.</t-stat-up-tg_meta_wound><t-kills>Diese Katze ist unglaublich! Sie scheint keine Angst zu haben, nicht einmal vor dem abartigen Gestank der Zombies. Mit mehr Zerstörungskraft als der Duracell-Hase und das Killer-Kaninchen von Caerbannog hat sie die Zone komplett bereinigt.</t-kills>"
+        "message": "<nt-kills>Diese Katze ist unglaublich! Sie scheint keine Angst zu haben, nicht einmal vor dir. Das Tier springt dir an die Kehle und vergräbt seine Krallen tief in deinem Fleisch.</nt-kills><t-kills>Diese Katze ist unglaublich! Sie scheint keine Angst zu haben, nicht einmal vor dem abartigen Gestank der Zombies. Mit mehr Zerstörungskraft als der Duracell-Hase und das Killer-Kaninchen von Caerbannog hat sie die Zone komplett bereinigt.</t-kills>"
     },
     "throw_b_machine_1": {
         "label": "Waffe einsetzen",
@@ -4800,7 +4766,7 @@
         "label": "Werfen",
         "cover": true,
         "meta": [
-            "must_be_outside",
+            "must_be_outside_or_exploring",
             "must_be_blocked"
         ],
         "result": [
@@ -4835,7 +4801,7 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "eat_ap",
-            "no_full_ap",
+            "no_full_ap_msg_food",
             "not_role_ghoul"
         ],
         "result": [
@@ -4843,16 +4809,13 @@
             "eat_ap6",
             "consume_item",
             {
-                "group": [
-                    [
-                        "do_nothing",
-                        96
-                    ],
-                    [
-                        "become_ghoul_25",
-                        4
-                    ]
-                ]
+                "status": {
+                    "role": "ghoul",
+                    "enabled": true,
+                    "hunger": 25,
+                    "force": true,
+                    "probability": 4
+                }
             }
         ],
         "escort_message_key": "escort_food_eat"
@@ -4864,7 +4827,7 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "eat_ap",
-            "no_full_ap",
+            "no_full_ap_msg_food",
             "role_ghoul"
         ],
         "result": [
@@ -4881,7 +4844,7 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "eat_ap",
-            "no_full_ap",
+            "no_full_ap_msg_food",
             "not_role_ghoul"
         ],
         "result": [
@@ -4892,16 +4855,13 @@
                 "picto": [
                     "r_cannib_#00"
                 ],
-                "group": [
-                    [
-                        "do_nothing",
-                        95
-                    ],
-                    [
-                        "become_ghoul_25",
-                        5
-                    ]
-                ]
+                "status": {
+                    "role": "ghoul",
+                    "enabled": true,
+                    "hunger": 25,
+                    "force": true,
+                    "probability": 5
+                }
             }
         ],
         "message_key": "eat_human_meat",
@@ -4937,7 +4897,7 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "eat_ap",
-            "no_full_ap",
+            "no_full_ap_msg_food",
             "not_role_ghoul"
         ],
         "result": [
@@ -4961,7 +4921,17 @@
                         50
                     ],
                     [
-                        "become_ghoul_25",
+                        [
+                            {
+                                "status": {
+                                    "role": "ghoul",
+                                    "enabled": true,
+                                    "hunger": 25,
+                                    "force": true,
+                                    "probability": 100
+                                }
+                            }
+                        ],
                         3
                     ]
                 ]
@@ -5001,7 +4971,7 @@
         "poison": "ItemAction::PoisonHandlerConsume",
         "meta": [
             "eat_ap",
-            "no_full_ap",
+            "no_full_ap_msg_food",
             "not_role_ghoul"
         ],
         "result": [
@@ -5023,7 +4993,17 @@
                         10
                     ],
                     [
-                        "become_ghoul_5",
+                        [
+                            {
+                                "status": {
+                                    "role": "ghoul",
+                                    "enabled": true,
+                                    "hunger": 5,
+                                    "force": true,
+                                    "probability": 100
+                                }
+                            }
+                        ],
                         90
                     ]
                 ]
@@ -5075,15 +5055,7 @@
         "label": "Knuddeln",
         "meta": [
             "must_be_terrorized",
-            {
-                "type": "Requirement::CrossOnFail",
-                "collection": {
-                    "status": {
-                        "enabled": false,
-                        "status": "tg_teddy"
-                    }
-                }
-            }
+            "not_yet_teddy"
         ],
         "result": [
             {
@@ -5377,25 +5349,8 @@
         "at00": true,
         "meta": [
             "must_be_outside",
-            {
-                "type": "Requirement::MessageOnFail",
-                "collection": {
-                    "custom": [
-                        100
-                    ]
-                }
-            },
-            {
-                "type": "Requirement::MessageOnFail",
-                "collection": {
-                    "zombies": {
-                        "min": 0,
-                        "block": false,
-                        "temp": true
-                    }
-                },
-                "text": "Das kannst die <strong>Tarnkleidung</strong> nicht verwenden, solange die Zombies diese Zone kontrollieren!"
-            }
+            "hunter_no_followers",
+            "must_have_control_hunter"
         ],
         "result": [
             "hero_hunter"
@@ -5747,7 +5702,9 @@
         },
         "meta": [
             "must_be_outside",
-            "custom_vote_shaman"
+            "profession_heroic",
+            "vote_shaman_needed",
+            "vote_shaman_not_given"
         ],
         "result": [
             {
@@ -5764,7 +5721,9 @@
         },
         "meta": [
             "must_be_outside",
-            "custom_vote_guide"
+            "profession_heroic",
+            "vote_guide_needed",
+            "vote_guide_not_given"
         ],
         "result": [
             {
@@ -5788,7 +5747,7 @@
             "consume_item",
             {
                 "zone": {
-                    "improve": 1.8
+                    "improve": 9
                 }
             }
         ],
@@ -5825,7 +5784,7 @@
             "minus_1ap",
             {
                 "zone": {
-                    "improve": 1
+                    "improve": 5
                 }
             }
         ],

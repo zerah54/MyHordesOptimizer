@@ -1,9 +1,12 @@
+import { NgIf } from '@angular/common';
 import { Component, HostBinding, Input } from '@angular/core';
 
 @Component({
     selector: 'mho-avatar',
     templateUrl: './avatar.component.html',
-    styleUrls: ['./avatar.component.scss']
+    styleUrls: ['./avatar.component.scss'],
+    standalone: true,
+    imports: [NgIf]
 })
 export class AvatarComponent {
     @HostBinding('style.display') display: string = 'contents';

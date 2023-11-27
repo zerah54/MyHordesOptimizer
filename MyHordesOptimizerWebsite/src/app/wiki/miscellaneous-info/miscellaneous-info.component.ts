@@ -1,9 +1,13 @@
-import { DecimalPipe } from '@angular/common';
+import { formatNumber, NgFor, NgIf } from '@angular/common';
 import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { StandardColumn } from '../../_abstract_model/interfaces';
+import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { getMaxAttack, getMinAttack } from '../../shared/utilities/estimations.util';
 import { DespairDeathsCalculatorComponent } from './despair-deaths-calculator/despair-deaths-calculator.component';
 
@@ -11,7 +15,9 @@ import { DespairDeathsCalculatorComponent } from './despair-deaths-calculator/de
     selector: 'mho-miscellaneous-info',
     templateUrl: './miscellaneous-info.component.html',
     styleUrls: ['./miscellaneous-info.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatCardModule, NgFor, NgIf, MatButtonModule, MatIconModule, MatTableModule, ColumnIdPipe]
 })
 export class MiscellaneousInfoComponent {
     @HostBinding('style.display') display: string = 'contents';
@@ -48,8 +54,8 @@ export class MiscellaneousInfoComponent {
             table: new MatTableDataSource(Array.from({ length: 50 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
                     day: i + 1,
-                    re_min: this.decimal_pipe.transform(getMinAttack(i + 1, 'RE'), '1.0-0', this.locale),
-                    re_max: this.decimal_pipe.transform(getMaxAttack(i + 1, 'RE'), '1.0-0', this.locale)
+                    re_min: formatNumber(getMinAttack(i + 1, 'RE'), this.locale, '1.0-0'),
+                    re_max: formatNumber(getMaxAttack(i + 1, 'RE'), this.locale, '1.0-0')
                 };
             }))
         },
@@ -58,11 +64,13 @@ export class MiscellaneousInfoComponent {
             columns: [
                 { id: 'day', header: $localize`Jour` },
                 { id: 'success', header: $localize`Chances de réussite du manuel` },
+                { id: 'success_devastated', header: $localize`Chances de réussite du manuel en ville dévastée` },
             ],
             table: new MatTableDataSource(Array.from({ length: 50 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
                     day: i + 1,
-                    success: this.decimal_pipe.transform((i + 1 <= 3 ? 1 : Math.max(0.1, 1 - ((i + 1) * 0.025))) * 100, '1.0-2', this.locale) + '%'
+                    success: this.getSurvivalistOdds(i + 1, false),
+                    success_devastated: this.getSurvivalistOdds(i + 1, true)
                 };
             }))
         },
@@ -95,12 +103,31 @@ export class MiscellaneousInfoComponent {
     ];
 
 
-    constructor(private decimal_pipe: DecimalPipe, private dialog: MatDialog) {
+    constructor(private dialog: MatDialog) {
 
     }
 
     private openCalculator(): void {
         this.dialog.open(DespairDeathsCalculatorComponent);
+    }
+
+    private getSurvivalistOdds(day: number, devastated: boolean): string {
+
+        let chances: number = 1;
+        if (day >= 20) {
+            chances = 0.50;
+        } else if (day >= 15) {
+            chances = 0.60;
+        } else if (day >= 13) {
+            chances = 0.70;
+        } else if (day >= 10) {
+            chances = 0.80;
+        } else if (day >= 5) {
+            chances = 0.85;
+        }
+        if (devastated) chances = Math.max(0.1, chances - 0.2);
+
+        return formatNumber(chances * 100, this.locale, '1.0-2') + '%';
     }
 }
 

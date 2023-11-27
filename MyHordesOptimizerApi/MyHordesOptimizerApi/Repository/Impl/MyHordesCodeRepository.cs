@@ -7,6 +7,9 @@ using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using System.Collections.Generic;
 using System.IO;
+using MyHordesOptimizerApi.Data.Camping;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
@@ -15,8 +18,18 @@ namespace MyHordesOptimizerApi.Repository.Impl
         public Dictionary<string, MyHordesRuinCodeModel> GetRuins()
         {
             var path = "Data/Ruins/ruins.json";
-            var json = File.ReadAllText(path);
-            var dico = json.FromJson<Dictionary<string, MyHordesRuinCodeModel>>();
+            var text = File.ReadAllText(path);
+            var json = JObject.Parse(text);
+            
+            var path2 = "Data/Ruins/ruins_additional_info.json";
+            var text2 = File.ReadAllText(path2);
+            var json2 = JObject.Parse(text2);
+            
+            var jsonFinal = new JObject();
+            jsonFinal.Merge(json);
+            jsonFinal.Merge(json2);
+            
+            var dico = jsonFinal.ToJson().FromJson<Dictionary<string, MyHordesRuinCodeModel>>();
             return dico;
         }
 
@@ -44,11 +57,11 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return dico;
         }
 
-        public Dictionary<string, Dictionary<string, int>> GetItemsDropRates()
+        public Dictionary<string, Dictionary<string, dynamic[]>> GetItemsDropRates()
         {
             var path = "Data/Items/find.json";
             var json = File.ReadAllText(path);
-            var dico = json.FromJson<Dictionary<string, Dictionary<string, int>>>();
+            var dico = json.FromJson<Dictionary<string, Dictionary<string, dynamic[]>>>();
             return dico;
         }
 
@@ -56,8 +69,8 @@ namespace MyHordesOptimizerApi.Repository.Impl
         {
             var path = "Data/Heroes/capacities.json";
             var json = File.ReadAllText(path);
-            var list = json.FromJson<List<MyHordesHerosCapacitiesCodeModel>>();
-            return list;
+            var dictionnary = json.FromJson<Dictionary<string, MyHordesHerosCapacitiesCodeModel>>();
+            return dictionnary.Values.ToList();
         }
 
         public List<MyHordesCauseOfDeathModel> GetCausesOfDeath()
@@ -98,6 +111,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var json = File.ReadAllText(path);
             var list = json.FromJson<List<MyHordesOptimizerDefaultWishlist>>();
             return list;
+        }
+
+        public MyHordesCampingBonusModel GetCampingBonus()
+        {
+            var path = "Data/Camping/CampingBonus.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<MyHordesCampingBonusModel>();
+            return dico;
         }
     }
 }

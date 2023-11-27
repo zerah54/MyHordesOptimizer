@@ -17,18 +17,15 @@ namespace MyHordesOptimizerApi.Controllers
     public class AttaqueEstimationController : AbstractMyHordesOptimizerControllerBase
     {
         protected IMyHordesOptimizerEstimationService EstimationService { get; private set; }
-        protected IMapper Mapper { get; private set; }
 
         private double safetyRatioOffset = 3;
         private double shift = 10;
 
         public AttaqueEstimationController(ILogger<AbstractMyHordesOptimizerControllerBase> logger,
             IUserInfoProvider userKeyProvider,
-            IMyHordesOptimizerEstimationService estimationService,
-            IMapper mapper) : base(logger, userKeyProvider)
+            IMyHordesOptimizerEstimationService estimationService) : base(logger, userKeyProvider)
         {
             EstimationService = estimationService;
-            Mapper = mapper;
         }
 
         [HttpPost]
@@ -105,9 +102,15 @@ namespace MyHordesOptimizerApi.Controllers
             
             var redSouls = 0;
 
-            var maxRatio = 1; // doit être déterminé en fonction du type de ville (3 en pandé, 0.66 en RNE)
+            var constRatioBase = 0.5;
+            var constRatioLow = 0.75;
+            var confAttackMode = "normal";
+            var confAttackByMode = new Dictionary<string, double>() { {"normal", 1.1}, {"hard", 3.1}, {"easy", constRatioLow} };
+                
+            var maxRatio = confAttackByMode[confAttackMode];
+
             var ratioMin = dayAttack <= 3 ? 0.66 : maxRatio;
-            var ratioMax = dayAttack <= 3 ? (dayAttack <= 1 ? 0.4 : 0.66) : maxRatio;
+            var ratioMax = dayAttack <= 3 ? (dayAttack <= 1 ? constRatioBase : constRatioLow) : maxRatio;
 
             var attaqueMin = Math.Round(ratioMin * Math.Pow(Math.Max(1, dayAttack - 1) * 0.75 + 2.5, 3),
                 MidpointRounding.AwayFromZero);

@@ -1,13 +1,22 @@
+import { NgFor, NgIf, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
 import * as moment from 'moment';
-import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
-import { HeroicActionEnum } from '../../../../../_abstract_model/enum/heroic-action.enum';
 import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
+import { HeroicActionEnum } from '../../../../../_abstract_model/enum/heroic-action.enum';
+import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
+import { HasStillHeroicPipe } from './has-still-heroic.pipe';
+import { NotInListCitizenPipe } from './not-in-list-citizen.pipe';
 
 @Component({
     selector: 'mho-map-update-citizens',
     templateUrl: './map-update-citizens.component.html',
-    styleUrls: ['./map-update-citizens.component.scss']
+    styleUrls: ['./map-update-citizens.component.scss'],
+    standalone: true,
+    imports: [NgIf, MatButtonModule, MatMenuModule, NgFor, NgOptimizedImage, MatIconModule, MatListModule, HasStillHeroicPipe, NotInListCitizenPipe]
 })
 export class MapUpdateCitizensComponent {
     @HostBinding('style.display') display: string = 'contents';

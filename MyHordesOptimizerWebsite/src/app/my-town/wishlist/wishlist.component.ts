@@ -1,12 +1,25 @@
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { DOCUMENT } from '@angular/common';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { DOCUMENT, NgFor, NgIf, NgOptimizedImage, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatOptionModule } from '@angular/material/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSort } from '@angular/material/sort';
-import { MatTable } from '@angular/material/table';
-import { MatTabChangeEvent, MatTabGroup } from '@angular/material/tabs';
+import { MatTable, MatTableModule } from '@angular/material/table';
+import { MatTabChangeEvent, MatTabGroup, MatTabsModule } from '@angular/material/tabs';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import * as moment from 'moment';
-import { TableVirtualScrollDataSource } from 'ng-table-virtual-scroll';
+import { TableVirtualScrollDataSource, TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { Subject, takeUntil } from 'rxjs';
 import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';
 import { environment } from '../../../environments/environment';
@@ -14,21 +27,28 @@ import { HORDES_IMG_REPO, WISHLIST_EDITION_MODE_KEY } from '../../_abstract_mode
 import { WishlistDepot } from '../../_abstract_model/enum/wishlist-depot.enum';
 import { WishlistPriority } from '../../_abstract_model/enum/wishlist-priority.enum';
 import { StandardColumn } from '../../_abstract_model/interfaces';
-import { ApiServices } from '../../_abstract_model/services/api.services';
-import { WishlistServices } from '../../_abstract_model/services/wishlist.service';
+import { ApiService } from '../../_abstract_model/services/api.service';
+import { WishlistService } from '../../_abstract_model/services/wishlist.service';
 import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ConfirmDialogComponent } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
+import { LastUpdateComponent } from '../../shared/elements/last-update/last-update.component';
+import { HeaderWithStringFilterComponent } from '../../shared/elements/lists/header-with-string-filter/header-with-string-filter.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
+import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
+import { CustomKeyValuePipe } from '../../shared/pipes/key-value.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
+import { IsItemDisplayedPipe } from './is-item-displayed.pipe';
 
 @Component({
     selector: 'mho-wishlist',
     templateUrl: './wishlist.component.html',
     styleUrls: ['./wishlist.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, MatMenuModule, MatSlideToggleModule, FormsModule, NgIf, MatTabsModule, NgFor, MatFormFieldModule, SelectComponent, CdkVirtualScrollViewport, TableVirtualScrollModule, MatTableModule, CdkDropList, NgSwitch, NgSwitchCase, HeaderWithStringFilterComponent, NgSwitchDefault, CdkDragHandle, NgOptimizedImage, MatSelectModule, MatOptionModule, MatInputModule, MatCheckboxModule, CdkDrag, LastUpdateComponent, CustomKeyValuePipe, ColumnIdPipe, IsItemDisplayedPipe]
 })
 export class WishlistComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -112,7 +132,7 @@ export class WishlistComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices, private wishlist_sercices: WishlistServices, private clipboard: ClipboardService, private dialog: MatDialog,
+    constructor(private api: ApiService, private wishlist_sercices: WishlistService, private clipboard: ClipboardService, private dialog: MatDialog,
                 @Inject(DOCUMENT) private document: Document) {
 
     }

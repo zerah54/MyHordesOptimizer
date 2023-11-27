@@ -82,6 +82,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.MinDist, opt => opt.MapFrom(src => src.Value.MinDist))
                 .ForMember(dest => dest.MaxDist, opt => opt.MapFrom(src => src.Value.MaxDist))
                 .ForMember(dest => dest.Chance, opt => opt.MapFrom(src => src.Value.Chance))
+                .ForMember(dest => dest.Capacity, opt => opt.MapFrom(src => src.Value.Capacity))
                 .ForMember(dest => dest.Drops, opt => opt.Ignore())
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Value.Icon))
                 .ForMember(dest => dest.Label, opt => opt.Ignore())

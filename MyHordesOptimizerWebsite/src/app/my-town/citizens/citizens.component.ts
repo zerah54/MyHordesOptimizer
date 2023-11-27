@@ -1,11 +1,16 @@
+import { NgFor, NgIf } from '@angular/common';
 import { Component, HostBinding } from '@angular/core';
-import { Router } from '@angular/router';
+import { MatCardModule } from '@angular/material/card';
+import { MatTabsModule } from '@angular/material/tabs';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'mho-citizens',
     templateUrl: './citizens.component.html',
-    styleUrls: ['./citizens.component.scss']
+    styleUrls: ['./citizens.component.scss'],
+    standalone: true,
+    imports: [MatCardModule, MatTabsModule, NgFor, NgIf, RouterLink, RouterOutlet]
 })
 export class CitizensComponent {
     @HostBinding('style.display') display: string = 'contents';

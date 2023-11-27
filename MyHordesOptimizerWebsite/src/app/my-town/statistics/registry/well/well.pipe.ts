@@ -7,6 +7,7 @@ import { groupBy } from '../../../../shared/utilities/array.util';
 
 @Pipe({
     name: 'well',
+    standalone: true,
 })
 export class WellPipe implements PipeTransform {
     transform(entries: Entry[], complete_citizen_list: CitizenInfo): { citizen: string, rations: number }[] {

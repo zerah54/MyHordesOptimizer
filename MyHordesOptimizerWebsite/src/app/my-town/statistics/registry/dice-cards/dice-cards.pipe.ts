@@ -7,6 +7,7 @@ import { normalizeString } from '../../../../shared/utilities/string.utils';
 
 @Pipe({
     name: 'citizenUseDiceOrCards',
+    standalone: true,
 })
 export class CitizenUseDiceOrCardsPipe implements PipeTransform {
     transform(entries: Entry[], complete_citizen_list: CitizenInfo, reverse?: boolean): string[] {

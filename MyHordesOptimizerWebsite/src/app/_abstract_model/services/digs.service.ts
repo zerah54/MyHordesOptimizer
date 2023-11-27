@@ -6,11 +6,11 @@ import { getTown, getUserId } from '../../shared/utilities/localstorage.util';
 import { DigDTO } from '../dto/dig.dto';
 import { dtoToModelArray, modelToDtoArray } from '../types/_common.class';
 import { Dig } from '../types/dig.class';
-import { GlobalServices } from './global.services';
+import { GlobalService } from './global.service';
 
 
-@Injectable()
-export class DigsServices extends GlobalServices {
+@Injectable({ providedIn: 'root' })
+export class DigsService extends GlobalService {
 
     constructor(_http: HttpClient, private snackbar: SnackbarService) {
         super(_http);

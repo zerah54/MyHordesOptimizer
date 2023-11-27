@@ -1,17 +1,23 @@
+import { DecimalPipe, NgClass, NgFor, NgIf, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, Input, OnInit } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { WishlistServices } from '../../../_abstract_model/services/wishlist.service';
+import { WishlistService } from '../../../_abstract_model/services/wishlist.service';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { AutoDestroy } from '../../decorators/autodestroy.decorator';
 import { getTown } from '../../utilities/localstorage.util';
+import { RecipeComponent } from '../recipe/recipe.component';
 
 @Component({
     selector: 'mho-item',
     templateUrl: './item.component.html',
-    styleUrls: ['./item.component.scss']
+    styleUrls: ['./item.component.scss'],
+    standalone: true,
+    imports: [NgIf, NgClass, MatButtonModule, NgOptimizedImage, MatDividerModule, NgFor, RecipeComponent, DecimalPipe]
 })
 export class ItemComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -31,7 +37,7 @@ export class ItemComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private wishlist_services: WishlistServices) {
+    constructor(private wishlist_services: WishlistService) {
     }
 
     public ngOnInit(): void {
