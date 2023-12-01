@@ -1,7 +1,7 @@
 /// <reference types="@angular/localize" />
 
 import { NgOptimizedImage, registerLocaleData } from '@angular/common';
-import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import localeDE from '@angular/common/locales/de';
 import localeEN from '@angular/common/locales/en';
@@ -18,10 +18,9 @@ import { provideRouter, withRouterConfig } from '@angular/router';
 import { Modules } from './app/_abstract_model/types/_types';
 import { AppComponent } from './app/app.component';
 import { ROUTES, ROUTES_OPTIONS } from './app/routes';
-import { ErrorsInterceptor } from './app/shared/services/errors-interceptor.service';
-import { HeadersInterceptor } from './app/shared/services/headers-interceptor.service';
-import { LoadingInterceptor } from './app/shared/services/loading-interceptor.service';
-import { SnackbarService } from './app/shared/services/snackbar.service';
+import { errorInterceptor } from './app/shared/services/errors-interceptor.service';
+import { headersInterceptor } from './app/shared/services/headers-interceptor.service';
+import { loadingInterceptor } from './app/shared/services/loading-interceptor.service';
 
 import { environment } from './environments/environment';
 
@@ -38,6 +37,7 @@ const angular_modules: Modules = [BrowserModule, BrowserAnimationsModule, FormsM
 
 bootstrapApplication(AppComponent, {
     providers: [
+        AngularFireModule,
         provideRouter(
             ROUTES,
             withRouterConfig(ROUTES_OPTIONS),
@@ -48,11 +48,7 @@ bootstrapApplication(AppComponent, {
             AngularFireAnalyticsModule,
             provideFirebaseApp(() => initializeApp(environment.firebase_config))
         ),
-        provideHttpClient(),
-        AngularFireModule,
-        { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: HeadersInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: ErrorsInterceptor, multi: true, deps: [SnackbarService] },
+        provideHttpClient(withInterceptors([headersInterceptor, loadingInterceptor, errorInterceptor])),
         {
             provide: LOCALE_ID,
             useFactory: (): string | null => localStorage.getItem('mho-locale') || 'fr'
