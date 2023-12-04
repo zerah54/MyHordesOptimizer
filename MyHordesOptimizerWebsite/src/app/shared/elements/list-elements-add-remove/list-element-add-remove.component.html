@@ -2,7 +2,7 @@
     <div *ngIf="label && label !== ''" class="label">
         {{label}}
 
-        <div class="add-remove">
+        <div class="add-remove" *ngIf="!readonly">
             <ng-container *ngTemplateOutlet="buttonRemove"></ng-container>
             <ng-container *ngTemplateOutlet="buttonAdd"></ng-container>
         </div>
@@ -15,7 +15,7 @@
                      style="cursor: pointer" width="16" height="16">
             </ng-container>
         </div>
-        <div class="add-remove" *ngIf="!label">
+        <div class="add-remove" *ngIf="!label && !readonly">
             <ng-container *ngTemplateOutlet="buttonAdd"></ng-container>
             <ng-container *ngTemplateOutlet="buttonRemove"></ng-container>
         </div>

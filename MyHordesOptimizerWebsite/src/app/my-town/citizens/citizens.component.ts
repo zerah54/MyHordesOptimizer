@@ -1,4 +1,4 @@
-import { NgFor, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, HostBinding } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment';
     templateUrl: './citizens.component.html',
     styleUrls: ['./citizens.component.scss'],
     standalone: true,
-    imports: [MatCardModule, MatTabsModule, NgFor, NgIf, RouterLink, RouterOutlet]
+    imports: [MatCardModule, MatTabsModule, CommonModule, RouterLink, RouterOutlet]
 })
 export class CitizensComponent {
     @HostBinding('style.display') display: string = 'contents';

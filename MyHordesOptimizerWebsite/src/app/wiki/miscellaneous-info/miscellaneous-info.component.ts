@@ -1,4 +1,4 @@
-import { formatNumber, NgFor, NgIf } from '@angular/common';
+import { CommonModule, formatNumber } from '@angular/common';
 import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -17,7 +17,7 @@ import { DespairDeathsCalculatorComponent } from './despair-deaths-calculator/de
     styleUrls: ['./miscellaneous-info.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatCardModule, NgFor, NgIf, MatButtonModule, MatIconModule, MatTableModule, ColumnIdPipe]
+    imports: [MatCardModule, CommonModule, MatButtonModule, MatIconModule, MatTableModule, ColumnIdPipe]
 })
 export class MiscellaneousInfoComponent {
     @HostBinding('style.display') display: string = 'contents';

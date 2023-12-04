@@ -1,4 +1,4 @@
-import { DecimalPipe, NgClass, NgFor, NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, Input, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -17,7 +17,7 @@ import { RecipeComponent } from '../recipe/recipe.component';
     templateUrl: './item.component.html',
     styleUrls: ['./item.component.scss'],
     standalone: true,
-    imports: [NgIf, NgClass, MatButtonModule, NgOptimizedImage, MatDividerModule, NgFor, RecipeComponent, DecimalPipe]
+    imports: [CommonModule, NgClass, MatButtonModule, NgOptimizedImage, MatDividerModule, RecipeComponent, DecimalPipe]
 })
 export class ItemComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

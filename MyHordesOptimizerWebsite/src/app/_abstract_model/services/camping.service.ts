@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpBackend, HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { CampingBonusDTO } from '../dto/camping-bonus.dto';
@@ -10,8 +10,8 @@ import { GlobalService } from './global.service';
 @Injectable({ providedIn: 'root' })
 export class CampingService extends GlobalService {
 
-    constructor(_http: HttpClient) {
-        super(_http);
+    constructor(_http: HttpClient, backend: HttpBackend) {
+        super(new HttpClient(backend));
     }
 
     public calculateCamping(camping_parameters: CampingParameters): Observable<number> {
@@ -42,4 +42,3 @@ export class CampingService extends GlobalService {
         });
     }
 }
-

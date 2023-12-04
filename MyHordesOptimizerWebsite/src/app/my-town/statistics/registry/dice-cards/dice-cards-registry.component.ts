@@ -1,4 +1,4 @@
-import { NgFor, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
+import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
@@ -13,7 +13,7 @@ import { CitizenUseDiceOrCardsPipe } from './dice-cards.pipe';
     styleUrls: ['./dice-cards-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatTabsModule, NgOptimizedImage, NgTemplateOutlet, NgFor, CitizenUseDiceOrCardsPipe]
+    imports: [MatTabsModule, NgOptimizedImage, NgTemplateOutlet, CommonModule, CitizenUseDiceOrCardsPipe]
 })
 export class DiceCardsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';

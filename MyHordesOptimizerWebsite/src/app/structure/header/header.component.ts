@@ -1,5 +1,5 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, HostListener, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,7 +23,7 @@ import { getExternalAppId, getTown, getUser, setExternalAppId } from '../../shar
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
     standalone: true,
-    imports: [MatToolbarModule, MatButtonModule, MatIconModule, NgOptimizedImage, NgIf, MatTooltipModule, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule]
+    imports: [MatToolbarModule, MatButtonModule, MatIconModule, NgOptimizedImage, CommonModule, MatTooltipModule, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule]
 })
 export class HeaderComponent {
     @HostBinding('style.display') display: string = 'contents';

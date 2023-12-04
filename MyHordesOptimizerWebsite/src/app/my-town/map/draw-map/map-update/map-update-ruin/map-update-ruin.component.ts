@@ -1,4 +1,4 @@
-import { DecimalPipe, NgFor, NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -19,7 +19,7 @@ import { FilterRuinsByKmPipe } from '../../../../../shared/pipes/filter-ruins-by
     templateUrl: './map-update-ruin.component.html',
     styleUrls: ['./map-update-ruin.component.scss'],
     standalone: true,
-    imports: [NgIf, MatDividerModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, NgOptimizedImage, MatInputModule, MatCheckboxModule, NgFor, MatListModule, DecimalPipe, FilterRuinsByKmPipe]
+    imports: [CommonModule, MatDividerModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, NgOptimizedImage, MatInputModule, MatCheckboxModule, MatListModule, DecimalPipe, FilterRuinsByKmPipe]
 })
 export class MapUpdateRuinComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

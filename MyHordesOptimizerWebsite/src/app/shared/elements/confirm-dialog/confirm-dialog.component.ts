@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, HostBinding, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
@@ -8,7 +8,7 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, Ma
     templateUrl: './confirm-dialog.component.html',
     styleUrls: ['./confirm-dialog.component.scss'],
     standalone: true,
-    imports: [NgIf, MatDialogTitle, MatDialogContent, MatDialogActions, MatButtonModule, MatDialogClose]
+    imports: [CommonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatButtonModule, MatDialogClose]
 })
 export class ConfirmDialogComponent {
     @HostBinding('style.display') display: string = 'contents';

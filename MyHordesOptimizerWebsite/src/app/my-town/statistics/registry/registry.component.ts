@@ -1,4 +1,4 @@
-import { NgIf, NgOptimizedImage, NgSwitch, NgSwitchCase } from '@angular/common';
+import { CommonModule, NgOptimizedImage, NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, HostBinding, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,7 +24,7 @@ import { WellRegistryComponent } from './well/well-registry.component';
     styleUrls: ['./registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatFormFieldModule, MatInputModule, FormsModule, NgIf, MatButtonModule, MatTooltipModule, NgOptimizedImage, NgSwitch, NgSwitchCase, DiceCardsRegistryComponent, DigsRegistryComponent, BankDiffRegistryComponent, WellRegistryComponent, DoorsRegistryComponent]
+    imports: [MatFormFieldModule, MatInputModule, FormsModule, CommonModule, MatButtonModule, MatTooltipModule, NgOptimizedImage, NgSwitch, NgSwitchCase, DiceCardsRegistryComponent, DigsRegistryComponent, BankDiffRegistryComponent, WellRegistryComponent, DoorsRegistryComponent]
 })
 export class RegistryComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

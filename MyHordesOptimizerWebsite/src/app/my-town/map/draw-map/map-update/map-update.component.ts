@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, HostBinding, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -28,7 +28,7 @@ import { MapUpdateRuinComponent } from './map-update-ruin/map-update-ruin.compon
     styleUrls: ['./map-update.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatDialogTitle, NgIf, MatButtonModule, MatDialogClose, MatIconModule, MatDialogContent, MatTabsModule, MapUpdateCellComponent, MapUpdateRuinComponent, MapUpdateCitizensComponent, MatFormFieldModule, MatInputModule, FormsModule, MapUpdateDigsComponent, MatDialogActions, CitizensFromShortPipe]
+    imports: [MatDialogTitle, CommonModule, MatButtonModule, MatDialogClose, MatIconModule, MatDialogContent, MatTabsModule, MapUpdateCellComponent, MapUpdateRuinComponent, MapUpdateCitizensComponent, MatFormFieldModule, MatInputModule, FormsModule, MapUpdateDigsComponent, MatDialogActions, CitizensFromShortPipe]
 })
 export class MapUpdateComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

@@ -1,4 +1,4 @@
-import { DecimalPipe, NgFor, NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, Input } from '@angular/core';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
@@ -9,7 +9,7 @@ import { Recipe } from '../../../_abstract_model/types/recipe.class';
     templateUrl: './recipe.component.html',
     styleUrls: ['./recipe.component.scss'],
     standalone: true,
-    imports: [NgFor, NgOptimizedImage, NgIf, DecimalPipe]
+    imports: [CommonModule, NgOptimizedImage, DecimalPipe]
 })
 export class RecipeComponent {
     @HostBinding('style.display') display: string = 'contents';

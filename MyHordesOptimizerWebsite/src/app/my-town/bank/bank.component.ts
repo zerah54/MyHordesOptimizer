@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -25,7 +25,7 @@ import { normalizeString } from '../../shared/utilities/string.utils';
     templateUrl: './bank.component.html',
     styleUrls: ['./bank.component.scss'],
     standalone: true,
-    imports: [MatCardModule, MatSlideToggleModule, FormsModule, NgIf, FilterFieldComponent, MatFormFieldModule, SelectComponent, NgFor, ItemComponent, MatTooltipModule, NgOptimizedImage, ItemsGroupByCategory]
+    imports: [MatCardModule, MatSlideToggleModule, FormsModule, FilterFieldComponent, MatFormFieldModule, SelectComponent, CommonModule, ItemComponent, MatTooltipModule, NgOptimizedImage, ItemsGroupByCategory]
 })
 export class BankComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

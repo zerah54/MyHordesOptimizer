@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
+import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import * as moment from 'moment';
@@ -15,7 +15,7 @@ import { MenuRemoveComponent } from './menu-remove/menu-remove.component';
     styleUrls: ['./list-element-add-remove.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [NgIf, NgTemplateOutlet, NgFor, NgOptimizedImage, MatMenuModule, MenuAddComponent, MenuRemoveComponent]
+    imports: [CommonModule, NgTemplateOutlet, NgOptimizedImage, MatMenuModule, MenuAddComponent, MenuRemoveComponent]
 })
 export class ListElementAddRemoveComponent {
     @HostBinding('style.display') display: string = 'contents';
@@ -25,6 +25,7 @@ export class ListElementAddRemoveComponent {
 
     @Input() citizen!: Citizen;
     @Input() label!: string;
+    @Input() readonly: boolean = false;
 
     @Input() addLabel!: string;
     @Output() add: EventEmitter<number | string> = new EventEmitter();

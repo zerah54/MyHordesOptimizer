@@ -1,4 +1,7 @@
+import { CommonModule, DecimalPipe, NgOptimizedImage, NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, HostBinding, OnInit } from '@angular/core';
+import { MatCardModule } from '@angular/material/card';
+import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
@@ -9,19 +12,16 @@ import { Item } from '../../_abstract_model/types/item.class';
 import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item.class';
 import { Recipe } from '../../_abstract_model/types/recipe.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { normalizeString } from '../../shared/utilities/string.utils';
-import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
-import { MatSortModule } from '@angular/material/sort';
 import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
-import { NgIf, NgFor, NgSwitch, NgSwitchCase, NgOptimizedImage, DecimalPipe } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
+import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
+import { normalizeString } from '../../shared/utilities/string.utils';
 
 @Component({
     selector: 'mho-recipes',
     templateUrl: './recipes.component.html',
     styleUrls: ['./recipes.component.scss'],
     standalone: true,
-    imports: [MatCardModule, NgIf, FilterFieldComponent, MatTableModule, MatSortModule, NgFor, NgSwitch, NgSwitchCase, NgOptimizedImage, DecimalPipe, ColumnIdPipe]
+    imports: [MatCardModule, CommonModule, FilterFieldComponent, MatTableModule, MatSortModule, NgSwitch, NgSwitchCase, NgOptimizedImage, DecimalPipe, ColumnIdPipe]
 })
 export class RecipesComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, HostBinding, Input } from '@angular/core';
 
 @Component({
@@ -6,7 +6,7 @@ import { Component, HostBinding, Input } from '@angular/core';
     templateUrl: './avatar.component.html',
     styleUrls: ['./avatar.component.scss'],
     standalone: true,
-    imports: [NgIf]
+    imports: [CommonModule]
 })
 export class AvatarComponent {
     @HostBinding('style.display') display: string = 'contents';

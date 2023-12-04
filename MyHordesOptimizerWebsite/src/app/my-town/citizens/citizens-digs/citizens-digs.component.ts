@@ -1,4 +1,4 @@
-import { NgClass, NgFor, NgIf, NgSwitch, NgSwitchCase } from '@angular/common';
+import { CommonModule, NgClass, NgSwitch, NgSwitchCase } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -27,7 +27,7 @@ import { getTown } from '../../../shared/utilities/localstorage.util';
     styleUrls: ['./citizens-digs.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [NgIf, MatTableModule, MatSortModule, NgFor, NgClass, NgSwitch, NgSwitchCase, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent, DigComponent, ColumnIdPipe]
+    imports: [MatTableModule, MatSortModule, CommonModule, NgClass, NgSwitch, NgSwitchCase, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent, DigComponent, ColumnIdPipe]
 })
 export class CitizensDigsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

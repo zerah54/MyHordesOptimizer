@@ -1,4 +1,4 @@
-import { NgFor } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { Entry } from '../../../../_abstract_model/interfaces';
@@ -11,7 +11,7 @@ import { WellPipe } from './well.pipe';
     styleUrls: ['./well-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [NgFor, MatDividerModule, WellPipe]
+    imports: [CommonModule, MatDividerModule, WellPipe]
 })
 export class WellRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';

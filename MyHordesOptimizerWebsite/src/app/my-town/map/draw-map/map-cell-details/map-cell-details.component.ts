@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, Input } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import * as moment from 'moment';
@@ -19,7 +19,7 @@ import { RuinInCell } from './ruin-in-cell.pipe';
     templateUrl: './map-cell-details.component.html',
     styleUrls: ['./map-cell-details.component.scss'],
     standalone: true,
-    imports: [NgIf, NgOptimizedImage, MatDividerModule, NgFor, LastUpdateComponent, CitizensFromShortPipe, ItemDetailsPipe, CellDetailsLeftPipe, CellDetailsBottomPipe, CellDetailsRightPipe, CellDetailsTopPipe, RuinInCell]
+    imports: [CommonModule, NgOptimizedImage, MatDividerModule, LastUpdateComponent, CitizensFromShortPipe, ItemDetailsPipe, CellDetailsLeftPipe, CellDetailsBottomPipe, CellDetailsRightPipe, CellDetailsTopPipe, RuinInCell]
 })
 export class MapCellDetailsComponent {
     @HostBinding('style.display') display: string = 'contents';

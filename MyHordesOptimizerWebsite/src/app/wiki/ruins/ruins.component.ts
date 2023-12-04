@@ -1,4 +1,8 @@
+import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Component, EventEmitter, HostBinding, OnInit, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
@@ -9,21 +13,19 @@ import { ApiService } from '../../_abstract_model/services/api.service';
 import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { HeaderWithNumberFilterComponent } from '../../shared/elements/lists/header-with-number-filter/header-with-number-filter.component';
+import { HeaderWithSelectFilterComponent } from '../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
+import { HeaderWithStringFilterComponent } from '../../shared/elements/lists/header-with-string-filter/header-with-string-filter.component';
+import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { getTown } from '../../shared/utilities/localstorage.util';
 import { normalizeString } from '../../shared/utilities/string.utils';
-import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
-import { HeaderWithSelectFilterComponent } from '../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
-import { HeaderWithNumberFilterComponent } from '../../shared/elements/lists/header-with-number-filter/header-with-number-filter.component';
-import { HeaderWithStringFilterComponent } from '../../shared/elements/lists/header-with-string-filter/header-with-string-filter.component';
-import { NgIf, NgFor, NgSwitch, NgSwitchCase, NgClass, NgOptimizedImage, NgSwitchDefault, DecimalPipe } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-ruins',
     templateUrl: './ruins.component.html',
     styleUrls: ['./ruins.component.scss'],
     standalone: true,
-    imports: [MatCardModule, NgIf, MatTableModule, MatSortModule, NgFor, NgSwitch, NgSwitchCase, HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, NgClass, NgOptimizedImage, NgSwitchDefault, DecimalPipe, ColumnIdPipe]
+    imports: [MatCardModule, CommonModule, MatTableModule, MatSortModule, NgSwitch, NgSwitchCase, HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, NgClass, NgOptimizedImage, NgSwitchDefault, DecimalPipe, ColumnIdPipe, FormsModule, MatSlideToggleModule]
 })
 export class RuinsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -113,8 +115,11 @@ export class RuinsComponent implements OnInit {
             && !filter_object.inside_town) {
             return true;
         }
-        if (filter_object.inside_town) {
 
+        console.log('town', getTown());
+        console.log('ruins', this.ruins);
+        console.log('town', this.town_ruins);
+        if (!filter_object.inside_town) {
         }
         return (filter_object.label !== '' && filter_object.label !== undefined && normalizeString(data.label[locale]).indexOf(normalizeString(filter_object.label)) > -1)
             || (filter_object.min_dist !== '' && filter_object.min_dist !== undefined && +data.min_dist >= +filter_object.min_dist)

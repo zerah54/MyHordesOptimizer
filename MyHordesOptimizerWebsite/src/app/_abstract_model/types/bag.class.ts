@@ -1,12 +1,12 @@
 import { BagDTO } from '../dto/bag.dto';
 import { ItemCountDTO } from '../dto/item-count.dto';
+import { CommonModel } from './_common.class';
 import { Item } from './item.class';
 import { UpdateInfo } from './update-info.class';
-import { CommonModel } from './_common.class';
 
 export class Bag extends CommonModel<BagDTO> {
     public bag_id!: number;
-    public items!: Item[];
+    public items: Item[] = [];
     public update_info!: UpdateInfo;
 
 

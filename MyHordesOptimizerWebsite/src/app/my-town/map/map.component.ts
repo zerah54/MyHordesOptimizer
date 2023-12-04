@@ -1,5 +1,5 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { NgFor, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,7 +34,7 @@ import { DrawMapComponent } from './draw-map/draw-map.component';
     styleUrls: ['./map.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatCardModule, MatButtonModule, MatIconModule, MatSidenavModule, DrawMapComponent, NgIf, MatChipsModule, CompassRoseComponent, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule, MatSelectModule, MatOptionModule, MatCheckboxModule, MatListModule, NgFor]
+    imports: [MatCardModule, MatButtonModule, MatIconModule, MatSidenavModule, DrawMapComponent, CommonModule, MatChipsModule, CompassRoseComponent, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule, MatSelectModule, MatOptionModule, MatCheckboxModule, MatListModule]
 })
 export class MapComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,7 +11,7 @@ import { MatInputModule } from '@angular/material/input';
     templateUrl: './header-with-number-previous-next-filter.component.html',
     styleUrls: ['./header-with-number-previous-next-filter.component.scss'],
     standalone: true,
-    imports: [NgIf, MatIconModule, MatFormFieldModule, MatButtonModule, MatInputModule, FormsModule]
+    imports: [CommonModule, MatIconModule, MatFormFieldModule, MatButtonModule, MatInputModule, FormsModule]
 })
 export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

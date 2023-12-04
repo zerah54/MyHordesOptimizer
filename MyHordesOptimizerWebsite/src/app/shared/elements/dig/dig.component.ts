@@ -1,4 +1,4 @@
-import { NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,7 +19,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
     templateUrl: './dig.component.html',
     styleUrls: ['./dig.component.scss'],
     standalone: true,
-    imports: [NgIf, MatDividerModule, NgOptimizedImage, FormsModule, MatButtonModule, MatTooltipModule]
+    imports: [CommonModule, MatDividerModule, NgOptimizedImage, FormsModule, MatButtonModule, MatTooltipModule]
 })
 export class DigComponent {
     @HostBinding('style.display') display: string = 'contents';

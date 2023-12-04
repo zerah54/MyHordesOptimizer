@@ -6,7 +6,7 @@ import { Citizen } from './citizen.class';
 
 export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
     public citizen!: Citizen;
-    public bag!: Bag;
+    public bag: Bag = new Bag();
     public consigne!: string;
     public preinscrit!: boolean;
     public preinscrit_job?: JobEnum;

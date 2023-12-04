@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -26,7 +26,7 @@ import { ItemsInBagsPipe } from './items-in-bags.pipe';
     styleUrls: ['./map-update-cell.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule, NgOptimizedImage, MatInputModule, MatCheckboxModule, MatDividerModule, NgIf, MatMenuModule, NgFor, LastUpdateComponent, ArrayItemDetailsPipe, ItemDetailsPipe, ItemsInBagsPipe]
+    imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule, NgOptimizedImage, MatInputModule, MatCheckboxModule, MatDividerModule, CommonModule, MatMenuModule, LastUpdateComponent, ArrayItemDetailsPipe, ItemDetailsPipe, ItemsInBagsPipe]
 })
 export class MapUpdateCellComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

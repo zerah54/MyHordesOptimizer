@@ -1,5 +1,5 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { NgFor, NgIf, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
+import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, Input, OnDestroy, Optional, Output, Self, ViewChild, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NgControl, UntypedFormControl, ValidationErrors, Validator, Validators } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
@@ -28,7 +28,7 @@ import { LabelPipe } from './label.pipe';
         }
     ],
     standalone: true,
-    imports: [MatSelectModule, NgIf, MatChipsModule, NgFor, MatIconModule, NgTemplateOutlet, MatFormFieldModule, MatInputModule, MatDividerModule, MatOptionModule, NgOptimizedImage, LabelPipe, IconPipe]
+    imports: [MatSelectModule, CommonModule, MatChipsModule, MatIconModule, NgTemplateOutlet, MatFormFieldModule, MatInputModule, MatDividerModule, MatOptionModule, NgOptimizedImage, LabelPipe, IconPipe]
 })
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -52,6 +52,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     //current form control input. helpful in validating and accessing form control
     @Input() form_control: AbstractControl = new UntypedFormControl();
     @Input() clearable: boolean = false;
+    @Input() searchable: boolean = true;
 
     @Input() set options(options: (T | string)[]) {
         this.displayed_options = [...options];

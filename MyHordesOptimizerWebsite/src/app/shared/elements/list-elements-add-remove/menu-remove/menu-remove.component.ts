@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -17,8 +17,8 @@ import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
         MatMenuModule,
         MatFormFieldModule,
         MatInputModule,
-        NgFor,
-        NgIf,
+        CommonModule,
+        CommonModule,
         NgOptimizedImage,
     ],
 })

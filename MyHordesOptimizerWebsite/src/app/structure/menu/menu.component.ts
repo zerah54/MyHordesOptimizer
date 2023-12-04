@@ -1,4 +1,4 @@
-import { DOCUMENT, NgClass, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
+import { CommonModule, DOCUMENT, NgClass, NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -21,7 +21,7 @@ import { getTown } from '../../shared/utilities/localstorage.util';
     styleUrls: ['./menu.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatListModule, NgFor, NgTemplateOutlet, MatDividerModule, NgIf, MatButtonModule, MatMenuModule, MatIconModule, RouterLinkActive, RouterLink, NgClass, MatTooltipModule]
+    imports: [MatListModule, CommonModule, NgTemplateOutlet, MatDividerModule, MatButtonModule, MatMenuModule, MatIconModule, RouterLinkActive, RouterLink, NgClass, MatTooltipModule]
 })
 export class MenuComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

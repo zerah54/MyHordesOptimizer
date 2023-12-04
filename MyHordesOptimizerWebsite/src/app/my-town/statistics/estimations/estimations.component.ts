@@ -1,4 +1,4 @@
-import { NgFor, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostBinding, HostListener, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -31,7 +31,7 @@ import { getTown } from '../../../shared/utilities/localstorage.util';
     styleUrls: ['./estimations.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [HeaderWithNumberPreviousNextFilterComponent, MatButtonModule, MatTooltipModule, MatIconModule, NgIf, NgFor, MatFormFieldModule, MatInputModule, FormsModule, MatExpansionModule]
+    imports: [HeaderWithNumberPreviousNextFilterComponent, MatButtonModule, MatTooltipModule, MatIconModule, CommonModule, MatFormFieldModule, MatInputModule, FormsModule, MatExpansionModule]
 })
 export class EstimationsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

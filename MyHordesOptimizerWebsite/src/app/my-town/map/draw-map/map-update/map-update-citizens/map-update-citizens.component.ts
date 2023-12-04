@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,7 +16,7 @@ import { NotInListCitizenPipe } from './not-in-list-citizen.pipe';
     templateUrl: './map-update-citizens.component.html',
     styleUrls: ['./map-update-citizens.component.scss'],
     standalone: true,
-    imports: [NgIf, MatButtonModule, MatMenuModule, NgFor, NgOptimizedImage, MatIconModule, MatListModule, HasStillHeroicPipe, NotInListCitizenPipe]
+    imports: [CommonModule, MatButtonModule, MatMenuModule, NgOptimizedImage, MatIconModule, MatListModule, HasStillHeroicPipe, NotInListCitizenPipe]
 })
 export class MapUpdateCitizensComponent {
     @HostBinding('style.display') display: string = 'contents';

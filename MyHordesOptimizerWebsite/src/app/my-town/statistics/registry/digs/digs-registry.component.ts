@@ -1,4 +1,4 @@
-import { NgFor, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -21,7 +21,7 @@ import { CitizenForDigPipe, CitizenNotInDigListPipe } from './citizen-for-dig.pi
     styleUrls: ['./digs-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatFormFieldModule, SelectComponent, FormsModule, NgFor, NgIf, DigComponent, CitizenForDigPipe, CitizenNotInDigListPipe]
+    imports: [MatFormFieldModule, SelectComponent, FormsModule, CommonModule, DigComponent, CitizenForDigPipe, CitizenNotInDigListPipe]
 })
 export class DigsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';

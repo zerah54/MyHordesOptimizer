@@ -1190,10 +1190,10 @@ $ruins_additional_info = [
 
     // Explorable Ruins.
     // id 100
-    'deserted_bunker' => ['capacity' => 0],
+    'deserted_bunker' => ['capacity' => 100],
 
     // id 101
-    'deserted_hotel' => ['capacity' => 0],
+    'deserted_hotel' => ['capacity' => 100],
 
     // id 102
     'deserted_hospital' => ['capacity' => 4],

@@ -1,6 +1,6 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { DOCUMENT, NgFor, NgIf, NgOptimizedImage, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { CommonModule, DOCUMENT, NgOptimizedImage, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -48,7 +48,7 @@ import { IsItemDisplayedPipe } from './is-item-displayed.pipe';
     styleUrls: ['./wishlist.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, MatMenuModule, MatSlideToggleModule, FormsModule, NgIf, MatTabsModule, NgFor, MatFormFieldModule, SelectComponent, CdkVirtualScrollViewport, TableVirtualScrollModule, MatTableModule, CdkDropList, NgSwitch, NgSwitchCase, HeaderWithStringFilterComponent, NgSwitchDefault, CdkDragHandle, NgOptimizedImage, MatSelectModule, MatOptionModule, MatInputModule, MatCheckboxModule, CdkDrag, LastUpdateComponent, CustomKeyValuePipe, ColumnIdPipe, IsItemDisplayedPipe]
+    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, MatMenuModule, MatSlideToggleModule, FormsModule, CommonModule, MatTabsModule, MatFormFieldModule, SelectComponent, CdkVirtualScrollViewport, TableVirtualScrollModule, MatTableModule, CdkDropList, NgSwitch, NgSwitchCase, HeaderWithStringFilterComponent, NgSwitchDefault, CdkDragHandle, NgOptimizedImage, MatSelectModule, MatOptionModule, MatInputModule, MatCheckboxModule, CdkDrag, LastUpdateComponent, CustomKeyValuePipe, ColumnIdPipe, IsItemDisplayedPipe]
 })
 export class WishlistComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

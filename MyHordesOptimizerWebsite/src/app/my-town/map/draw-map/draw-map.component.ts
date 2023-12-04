@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
+import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, Input } from '@angular/core';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -16,7 +16,7 @@ import { MapCellComponent } from './map-cell/map-cell.component';
     templateUrl: './draw-map.component.html',
     styleUrls: ['./draw-map.component.scss'],
     standalone: true,
-    imports: [NgIf, NgTemplateOutlet, NgFor, MapBorderComponent, MapCellComponent]
+    imports: [CommonModule, NgTemplateOutlet, MapBorderComponent, MapCellComponent]
 })
 export class DrawMapComponent {
     @HostBinding('style.display') display: string = 'contents';

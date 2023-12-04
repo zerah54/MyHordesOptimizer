@@ -1,4 +1,4 @@
-import { DecimalPipe, DOCUMENT, Location, NgIf, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
+import { CommonModule, DecimalPipe, DOCUMENT, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -32,7 +32,7 @@ import { ClipboardService } from '../../shared/services/clipboard.service';
     styleUrls: ['./camping.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, NgIf, FormsModule, ReactiveFormsModule, NgTemplateOutlet, MatFormFieldModule, SelectComponent, MatCheckboxModule, NgOptimizedImage, MatInputModule, MatDividerModule, MatButtonToggleModule, DecimalPipe, FilterRuinsByKmPipe]
+    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, CommonModule, FormsModule, ReactiveFormsModule, NgTemplateOutlet, MatFormFieldModule, SelectComponent, MatCheckboxModule, NgOptimizedImage, MatInputModule, MatDividerModule, MatButtonToggleModule, DecimalPipe, FilterRuinsByKmPipe]
 })
 export class CampingComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

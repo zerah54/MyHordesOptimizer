@@ -26,11 +26,12 @@
         </mat-icon>
     </mat-select-trigger>
 
-    <mat-form-field class="no-bottom" style="width: 100%" *ngIf="displayed_options && displayed_options.length > 0">
-        <input matInput placeholder="Rechercher" class="mho-search" (input)="filter($event)"
-               (keydown.space)="$event.stopPropagation()" i18n-placeholder>
-    </mat-form-field>
-    <mat-divider></mat-divider>
+    <ng-container *ngIf="displayed_options && displayed_options.length > 0 && searchable">
+        <mat-form-field class="no-bottom" style="width: 100%">
+            <input matInput placeholder="Rechercher" class="mho-search" (input)="filter($event)" (keydown.space)="$event.stopPropagation()" i18n-placeholder>
+        </mat-form-field>
+        <mat-divider></mat-divider>
+    </ng-container>
     <div class="options-container">
         <mat-option *ngIf="emptyOption" class="mho-option" [value]="undefined">--</mat-option>
         <mat-option *ngFor="let option of displayed_options" class="mho-option" [value]="option" [title]="option | label:bindLabel">

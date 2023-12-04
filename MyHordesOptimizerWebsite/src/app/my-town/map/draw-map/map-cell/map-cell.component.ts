@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { DecimalPipe, NgClass, NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import * as moment from 'moment';
@@ -40,7 +40,7 @@ import { TrashValuePipe } from './pipes/trash-value.pipe';
         ])
     ],
     standalone: true,
-    imports: [NgClass, NgIf, NgOptimizedImage, MapCellDetailsComponent, DecimalPipe, IsRuinPipe, DigLevelPipe, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop, ScrutBorderBottom, MyCellPipe, DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop, TrashValuePipe, TrashLevelPipe]
+    imports: [NgClass, CommonModule, NgOptimizedImage, MapCellDetailsComponent, DecimalPipe, IsRuinPipe, DigLevelPipe, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop, ScrutBorderBottom, MyCellPipe, DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop, TrashValuePipe, TrashLevelPipe]
 })
 export class MapCellComponent {
     @HostBinding('style.display') display: string = 'contents';

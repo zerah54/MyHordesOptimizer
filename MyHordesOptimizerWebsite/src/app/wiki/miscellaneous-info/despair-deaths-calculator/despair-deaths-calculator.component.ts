@@ -1,12 +1,12 @@
+import { CommonModule } from '@angular/common';
 import { Component, HostBinding } from '@angular/core';
-import * as moment from 'moment';
 import { FormsModule } from '@angular/forms';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { NgFor, NgIf } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogTitle, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
+import { MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import * as moment from 'moment';
 
 @Component({
     selector: 'mho-despair-deaths-calculator',
@@ -19,11 +19,10 @@ import { MatDialogTitle, MatDialogClose, MatDialogContent } from '@angular/mater
         MatDialogClose,
         MatIconModule,
         MatDialogContent,
-        NgFor,
+        CommonModule,
         MatFormFieldModule,
         MatInputModule,
         FormsModule,
-        NgIf,
     ],
 })
 export class DespairDeathsCalculatorComponent {

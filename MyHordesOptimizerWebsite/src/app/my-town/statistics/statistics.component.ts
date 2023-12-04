@@ -1,4 +1,4 @@
-import { NgFor } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, HostBinding } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -9,7 +9,7 @@ import { Router, RouterLink, RouterOutlet } from '@angular/router';
     templateUrl: './statistics.component.html',
     styleUrls: ['./statistics.component.scss'],
     standalone: true,
-    imports: [MatCardModule, MatTabsModule, NgFor, RouterLink, RouterOutlet]
+    imports: [MatCardModule, MatTabsModule, CommonModule, RouterLink, RouterOutlet]
 })
 export class StatisticsComponent {
     @HostBinding('style.display') display: string = 'contents';

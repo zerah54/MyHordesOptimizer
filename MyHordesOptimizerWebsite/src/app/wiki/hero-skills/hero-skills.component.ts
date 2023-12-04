@@ -1,4 +1,7 @@
+import { CommonModule, NgOptimizedImage, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { Component, HostBinding, OnInit } from '@angular/core';
+import { MatCardModule } from '@angular/material/card';
+import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
@@ -8,16 +11,13 @@ import { ApiService } from '../../_abstract_model/services/api.service';
 import { HeroSkill } from '../../_abstract_model/types/hero-skill.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
-import { MatSortModule } from '@angular/material/sort';
-import { NgIf, NgFor, NgSwitch, NgSwitchCase, NgOptimizedImage, NgSwitchDefault } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
 
 @Component({
     selector: 'mho-hero-skills',
     templateUrl: './hero-skills.component.html',
     styleUrls: ['./hero-skills.component.scss'],
     standalone: true,
-    imports: [MatCardModule, NgIf, MatTableModule, MatSortModule, NgFor, NgSwitch, NgSwitchCase, NgOptimizedImage, NgSwitchDefault, ColumnIdPipe]
+    imports: [MatCardModule, CommonModule, MatTableModule, MatSortModule, NgSwitch, NgSwitchCase, NgOptimizedImage, NgSwitchDefault, ColumnIdPipe]
 })
 export class HeroSkillsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,7 +24,7 @@ import { NotInListCitizenDigPipe } from './not-in-list-citizen.pipe';
     templateUrl: './map-update-digs.component.html',
     styleUrls: ['./map-update-digs.component.scss'],
     standalone: true,
-    imports: [NgIf, HeaderWithNumberPreviousNextFilterComponent, MatButtonModule, MatMenuModule, NgFor, MatFormFieldModule, MatInputModule, FormsModule, MatIconModule, MatListModule, NgOptimizedImage, NotInListCitizenDigPipe, DigsPerDayPipe]
+    imports: [CommonModule, HeaderWithNumberPreviousNextFilterComponent, MatButtonModule, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule, MatIconModule, MatListModule, NgOptimizedImage, NotInListCitizenDigPipe, DigsPerDayPipe]
 })
 export class MapUpdateDigsComponent {
     @HostBinding('style.display') display: string = 'contents';

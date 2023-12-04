@@ -1,4 +1,4 @@
-import { NgFor, NgIf, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import * as moment from 'moment';
@@ -14,7 +14,7 @@ import { BankCleanEntriesPipe, BankDiffPipe } from './bank-gift.pipe';
     styleUrls: ['./bank-diff-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatSlideToggleModule, NgIf, NgFor, NgOptimizedImage, BankDiffPipe, BankCleanEntriesPipe]
+    imports: [MatSlideToggleModule, CommonModule, NgOptimizedImage, BankDiffPipe, BankCleanEntriesPipe]
 })
 export class BankDiffRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';
