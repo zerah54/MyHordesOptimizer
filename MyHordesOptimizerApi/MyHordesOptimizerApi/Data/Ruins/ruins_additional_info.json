@@ -3,13 +3,13 @@
         "capacity": 2
     },
     "albi": {
-        "capacity": 100
+        "capacity": 3
     },
     "cave": {
         "capacity": 2
     },
     "pump": {
-        "capacity": 100
+        "capacity": 1
     },
     "bike": {
         "capacity": 100
@@ -24,7 +24,7 @@
         "capacity": 5
     },
     "police": {
-        "capacity": 100
+        "capacity": 4
     },
     "bunker": {
         "capacity": 5
@@ -36,13 +36,13 @@
         "capacity": 2
     },
     "cars": {
-        "capacity": 100
+        "capacity": 2
     },
     "bar2": {
         "capacity": 100
     },
     "obi": {
-        "capacity": 100
+        "capacity": 2
     },
     "container": {
         "capacity": 100
@@ -51,7 +51,7 @@
         "capacity": 100
     },
     "duke": {
-        "capacity": 100
+        "capacity": 3
     },
     "woods": {
         "capacity": 100
@@ -99,7 +99,7 @@
         "capacity": 100
     },
     "lab": {
-        "capacity": 100
+        "capacity": 2
     },
     "ambulance": {
         "capacity": 1
@@ -108,19 +108,19 @@
         "capacity": 100
     },
     "carpark": {
-        "capacity": 100
+        "capacity": 2
     },
     "tank": {
-        "capacity": 100
+        "capacity": 1
     },
     "motel": {
-        "capacity": 100
+        "capacity": 5
     },
     "army": {
         "capacity": 5
     },
     "post": {
-        "capacity": 100
+        "capacity": 2
     },
     "cave3": {
         "capacity": 100
@@ -144,7 +144,7 @@
         "capacity": 100
     },
     "office": {
-        "capacity": 100
+        "capacity": 4
     },
     "villa": {
         "capacity": 100
@@ -165,25 +165,25 @@
         "capacity": 100
     },
     "guns": {
-        "capacity": 100
+        "capacity": 3
     },
     "warehouse2": {
         "capacity": 4
     },
     "tent": {
-        "capacity": 100
+        "capacity": 1
     },
     "pharma": {
-        "capacity": 100
+        "capacity": 2
     },
     "bar": {
-        "capacity": 100
+        "capacity": 2
     },
     "deserted_bunker": {
-        "capacity": 100
+        "capacity": 4
     },
     "deserted_hotel": {
-        "capacity": 100
+        "capacity": 4
     },
     "deserted_hospital": {
         "capacity": 4

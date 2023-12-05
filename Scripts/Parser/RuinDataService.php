@@ -1012,13 +1012,13 @@ $ruins_additional_info = [
     'home' => ['capacity' => 2],
 
     // id 41
-    'albi' => ['capacity' => 100],
+    'albi' => ['capacity' => 3],
 
     // id 57
     'cave' => ['capacity' => 2],
 
     // id 3
-    'pump' => ['capacity' => 100],
+    'pump' => ['capacity' => 1],
 
     // id 24
     'bike' => ['capacity' => 100],
@@ -1033,7 +1033,7 @@ $ruins_additional_info = [
     'aerodrome' => ['capacity' => 5],
 
     // id 8
-    'police' => ['capacity' => 100],
+    'police' => ['capacity' => 4],
 
     // id 10
     'bunker' => ['capacity' => 5],
@@ -1045,13 +1045,13 @@ $ruins_additional_info = [
     'autobahn' => ['capacity' => 2],
 
     // id 7
-    'cars' => ['capacity' => 100],
+    'cars' => ['capacity' => 2],
 
     // id 62
     'bar2' => ['capacity' => 100],
 
     // id 19
-    'obi' => ['capacity' => 100],
+    'obi' => ['capacity' => 2],
 
     // id 43
     'container' => ['capacity' => 100],
@@ -1060,7 +1060,7 @@ $ruins_additional_info = [
     'doner' => ['capacity' => 100],
 
     // id 25
-    'duke' => ['capacity' => 100],
+    'duke' => ['capacity' => 3],
 
     // id 13
     'woods' => ['capacity' => 100],
@@ -1108,7 +1108,7 @@ $ruins_additional_info = [
     'water' => ['capacity' => 100],
 
     // id 6
-    'lab' => ['capacity' => 100],
+    'lab' => ['capacity' => 2],
 
     // id 36
     'ambulance' => ['capacity' => 1],
@@ -1117,19 +1117,19 @@ $ruins_additional_info = [
     'warehouse' => ['capacity' => 100],
 
     // id 14
-    'carpark' => ['capacity' => 100],
+    'carpark' => ['capacity' => 2],
 
     // id 58
-    'tank' => ['capacity' => 100],
+    'tank' => ['capacity' => 1],
 
     // id 51
-    'motel' => ['capacity' => 100],
+    'motel' => ['capacity' => 5],
 
     // id 55
     'army' => ['capacity' => 5],
 
     // id 46
-    'post' => ['capacity' => 100],
+    'post' => ['capacity' => 2],
 
     // id 33
     'cave3' => ['capacity' => 100],
@@ -1153,7 +1153,7 @@ $ruins_additional_info = [
     'school' => ['capacity' => 100],
 
     // id 49
-    'office' => ['capacity' => 100],
+    'office' => ['capacity' => 4],
 
     // id 4
     'villa' => ['capacity' => 100],
@@ -1174,26 +1174,26 @@ $ruins_additional_info = [
     'park' => ['capacity' => 100],
 
     // id 22
-    'guns' => ['capacity' => 100],
+    'guns' => ['capacity' => 3],
 
     // id 34
     'warehouse2' => ['capacity' => 4],
 
     // id 50
-    'tent' => ['capacity' => 100],
+    'tent' => ['capacity' => 1],
 
     // id 17
-    'pharma' => ['capacity' => 100],
+    'pharma' => ['capacity' => 2],
 
     // id 9
-    'bar' => ['capacity' => 100],
+    'bar' => ['capacity' => 2],
 
     // Explorable Ruins.
     // id 100
-    'deserted_bunker' => ['capacity' => 100],
+    'deserted_bunker' => ['capacity' => 4],
 
     // id 101
-    'deserted_hotel' => ['capacity' => 100],
+    'deserted_hotel' => ['capacity' => 4],
 
     // id 102
     'deserted_hospital' => ['capacity' => 4],
