@@ -1054,7 +1054,7 @@ $ruins_additional_info = [
     'obi' => ['capacity' => 2],
 
     // id 43
-    'container' => ['capacity' => 100],
+    'container' => ['capacity' => 1],
 
     // id 23
     'doner' => ['capacity' => 100],
