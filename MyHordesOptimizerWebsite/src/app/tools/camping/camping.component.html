@@ -1,10 +1,15 @@
-<mat-card-header>
+<mat-card-header class="mho-camping-header">
     <mat-card-title>
         <ng-container i18n>Camping</ng-container>
         <button mat-icon-button (click)="shareCamping()" matTooltip="Copier le lien de la simulation" i18n-matTooltip>
             <mat-icon>share</mat-icon>
         </button>
     </mat-card-title>
+    <div class="actions">
+        <mat-slide-toggle [(ngModel)]="display_bonus_ap" (ngModelChange)="changeBonusMode($event)">
+            <ng-container i18n>Bonus en équivalent PA</ng-container>
+        </mat-slide-toggle>
+    </div>
 </mat-card-header>
 <mat-card-content class="mho-camping">
     <form [formGroup]="configuration_form" *ngIf="configuration_form && bonus">
@@ -23,16 +28,15 @@
                 <div>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Métier</mat-label>
-                        <mho-select [formControlName]="'job'" [options]="jobs" [multiple]="false"
-                                    [bindLabel]="'value.label'" [bindIcon]="'value.img'">
+                        <mho-select [formControlName]="'job'" [options]="jobs" [multiple]="false" [bindLabel]="'value.label'" [bindIcon]="'value.img'">
                         </mho-select>
                     </mat-form-field>
                     <mat-checkbox [formControlName]="'vest'"
                                   *ngIf="$any(configuration_form.get('job')?.value)?.key === JOB_SCOUT.key">
                         <img [ngSrc]="HORDES_IMG_REPO + 'emotes/proscout.gif'" width="16" height="16">
                         <ng-container i18n>Tenue de camouflage</ng-container>&nbsp;
-                        <small i18n>(Bonus&nbsp;:&nbsp;{{bonus.zombie_vest}}&nbsp;par zombie au lieu
-                            de&nbsp;{{bonus.zombie_no_vest}})</small>
+                        <small i18n>(Bonus&nbsp;:&nbsp;{{bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale}}&nbsp;par zombie au lieu
+                            de&nbsp;{{bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale}})</small>
                     </mat-checkbox>
                     <mat-checkbox [formControlName]="'pro'" #proCamper>
                         <img [ngSrc]="HORDES_IMG_REPO + 'status/status_camper.gif'" width="16" height="16">
@@ -41,21 +45,21 @@
                     <mat-checkbox [formControlName]="'tomb'" style="margin-bottom: 0.5em">
                         <img [ngSrc]="HORDES_IMG_REPO + 'building/small_cemetery.gif'" width="16" height="16">
                         <ng-container i18n>Tombe</ng-container>&nbsp;
-                        <small i18n>(Bonus&nbsp;:&nbsp;{{bonus.tomb}}%)</small>
+                        <small i18n>(Bonus&nbsp;:&nbsp;{{bonus.tomb | campingDisplayBonus:display_bonus_ap:locale}})</small>
                     </mat-checkbox>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre de campings déjà effectués</mat-label>
                         <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/sleep.gif'" width="16" height="16">
                         <input matInput type="number" #campings [formControlName]="'campings'" min="0">
                         <small matSuffix
-                               i18n>Bonus&nbsp;:&nbsp;{{calculateNbCampingsChance(+campings.value, proCamper.checked, configuration_form.get('town')?.value['id'] === 'PANDE')}}
-                            %</small>
+                               i18n>Bonus&nbsp;:&nbsp;{{calculateNbCampingsChance(+campings.value, proCamper.checked, configuration_form.get('town')?.value['id'] === 'PANDE') | campingDisplayBonus:display_bonus_ap:locale}}
+                        </small>
                     </mat-form-field>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre de pelures de peau et de toiles de tentes dans le sac</mat-label>
                         <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/bag.gif'" width="16" height="16">
                         <input matInput type="number" [formControlName]="'objects'" min="0">
-                        <small matSuffix i18n>Bonus&nbsp;:&nbsp;x{{bonus.camp_items}}%</small>
+                        <small matSuffix i18n>Bonus&nbsp;:&nbsp;x{{bonus.camp_items | campingDisplayBonus:display_bonus_ap:locale}}</small>
                     </mat-form-field>
                 </div>
             </div>
@@ -67,24 +71,25 @@
                 <div>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Type de ville</mat-label>
-                        <mho-select #town [formControlName]="'town'" [options]="town_types" [bindLabel]="'label'" [moreInfo]="getMoreTownTypeInfo">
+                        <mho-select #town [formControlName]="'town'" [options]="town_types" [bindLabel]="'label'" [moreInfo]="getMoreTownTypeInfoFn">
                         </mho-select>
-                        <small matSuffix i18n>Bonus&nbsp;:&nbsp;{{configuration_form.get('town')?.value['bonus']}}%</small>
+                        <small matSuffix
+                               i18n>Bonus&nbsp;:&nbsp;{{configuration_form.get('town')?.value['bonus'] | campingDisplayBonus:display_bonus_ap:locale}}</small>
                     </mat-form-field>
                     <mat-checkbox [formControlName]="'night'">
                         <img [ngSrc]="HORDES_IMG_REPO +  'pictos/r_doutsd.gif'" width="16" height="16">
                         <ng-container i18n>Nuit</ng-container>&nbsp;
-                        <small i18n>(Bonus&nbsp;:&nbsp;{{bonus.night}}%)</small>
+                        <small i18n>(Bonus&nbsp;:&nbsp;{{bonus.night | campingDisplayBonus:display_bonus_ap:locale}})</small>
                     </mat-checkbox>
                     <mat-checkbox [formControlName]="'devastated'">
                         <img [ngSrc]="HORDES_IMG_REPO + 'item/item_out_def_broken.gif'" width="16" height="16">
                         <ng-container i18n>Ville dévastée</ng-container>&nbsp;
-                        <small i18n>(Bonus&nbsp;:&nbsp;{{bonus.devastated}}%)</small>
+                        <small i18n>(Bonus&nbsp;:&nbsp;{{bonus.devastated | campingDisplayBonus:display_bonus_ap:locale}})</small>
                     </mat-checkbox>
                     <mat-checkbox [formControlName]="'phare'">
                         <img [ngSrc]="HORDES_IMG_REPO + 'building/small_lighthouse.gif'" width="16" height="16">
                         <ng-container i18n>Phare</ng-container>&nbsp;
-                        <small i18n>(Bonus&nbsp;:&nbsp;{{bonus.lighthouse}}%)</small>
+                        <small i18n>(Bonus&nbsp;:&nbsp;{{bonus.lighthouse | campingDisplayBonus:display_bonus_ap:locale}})</small>
                     </mat-checkbox>
                 </div>
             </div>
@@ -98,16 +103,18 @@
                         <mat-label i18n>Distance de la ville (en km)</mat-label>
                         <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/explo.gif'" width="16" height="16">
                         <input matInput type="number" #townDistance [formControlName]="'distance'" min="1">
-                        <small matSuffix i18n>Bonus&nbsp;:&nbsp;{{calculateDistanceChance(+townDistance.value)}}%</small>
+                        <small matSuffix
+                               i18n>Bonus&nbsp;:&nbsp;{{calculateDistanceChance(+townDistance.value) | campingDisplayBonus:display_bonus_ap:locale}}</small>
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Bâtiment</mat-label>
                         <mho-select [formControlName]="'ruin'" [options]="ruins | filterRuinsByKm:townDistance.value"
-                                    [bindLabel]="'label.' + locale" [bindIcon]="'formatted_img'" [moreInfo]="getMoreRuinInfo">
+                                    [bindLabel]="'label.' + locale" [bindIcon]="'formatted_img'" [moreInfo]="getMoreRuinInfoFn">
                         </mho-select>
                         <mat-icon matSuffix [matTooltip]="help_ruins" style="vertical-align: middle" [color]="'primary'">help_outline</mat-icon>
-                        <small matSuffix i18n>Bonus&nbsp;:&nbsp;{{configuration_form.get('ruin')?.value['camping']}}%</small>
+                        <small matSuffix
+                               i18n>Bonus&nbsp;:&nbsp;{{configuration_form.get('ruin')?.value['camping'] | campingDisplayBonus:display_bonus_ap:locale}}</small>
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom" *ngIf="configuration_form.get('ruin')?.value['id'] === -1">
@@ -121,37 +128,37 @@
                         <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/zombie.gif'" width="16" height="16">
                         <input matInput type="number" [formControlName]="'zombies'" min="0">
                         <small matSuffix
-                               i18n>Bonus&nbsp;:&nbsp;x{{configuration_form.get('vest')?.value ? bonus.zombie_vest : bonus.zombie_no_vest}}%</small>
+                               i18n>Bonus&nbsp;:&nbsp;x{{(configuration_form.get('vest')?.value ? bonus.zombie_vest : bonus.zombie_no_vest) | campingDisplayBonus:display_bonus_ap:locale}}</small>
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre de campeurs déjà cachés sur la case</mat-label>
                         <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'emotes/human.gif'" width="16" height="16">
                         <input #hiddenCampers matInput type="number" [formControlName]="'hidden_campers'" min="0">
-                        <small matSuffix i18n>Bonus&nbsp;:&nbsp;{{calculateCrowdChance(+hiddenCampers.value)}}%</small>
+                        <small matSuffix
+                               i18n>Bonus&nbsp;:&nbsp;{{calculateCrowdChance(+hiddenCampers.value) | campingDisplayBonus:display_bonus_ap:locale}}</small>
                     </mat-form-field>
 
                     <mat-divider style="margin: 0.5em 0"></mat-divider>
 
                     <h3>
                         <ng-container i18n>Améliorations</ng-container>
-                        <mat-icon matSuffix [matTooltip]="help_amelio"
-                                  style="vertical-align: middle; margin-left: 0.25em;"
-                                  [color]="'primary'">help_outline
+                        <mat-icon matSuffix [matTooltip]="help_amelio" style="vertical-align: middle; margin-left: 0.25em;" [color]="'primary'">
+                            help_outline
                         </mat-icon>
                     </h3>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre d'améliorations simples faites sur la case</mat-label>
                         <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'icons/small_refine.gif'" width="16" height="16">
                         <input matInput type="number" [formControlName]="'improve'" min="0">
-                        <small matSuffix i18n>Bonus&nbsp;:&nbsp;x{{bonus.improve}}%</small>
+                        <small matSuffix i18n>Bonus&nbsp;:&nbsp;x{{bonus.improve | campingDisplayBonus:display_bonus_ap:locale}}</small>
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Nombre d'objets de défense installés sur la case</mat-label>
                         <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'item/cat_def.gif'" width="16" height="16">
                         <input matInput type="number" [formControlName]="'object_improve'" min="0">
-                        <small matSuffix i18n>Bonus&nbsp;:&nbsp;x{{bonus.object_improve}}%</small>
+                        <small matSuffix i18n>Bonus&nbsp;:&nbsp;x{{bonus.object_improve | campingDisplayBonus:display_bonus_ap:locale}}</small>
                     </mat-form-field>
                     <div class="or">
                         <mat-button-toggle-group [(ngModel)]="and_amelio" [ngModelOptions]="{standalone: true}">
@@ -160,7 +167,7 @@
                         </mat-button-toggle-group>
                     </div>
                     <mat-form-field appearance="outline" class="short-bottom">
-                        <mat-label i18n>Pourcentage total d'améliotations sur la case</mat-label>
+                        <mat-label i18n>{{display_bonus_ap ? 'Nombre' : 'Pourcentage'}} total d'améliotations sur la case</mat-label>
                         <span matPrefix>
                             <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_refine.gif'" width="16" height="16"> + <img
                             [ngSrc]="HORDES_IMG_REPO + 'item/cat_def.gif'" width="16" height="16">
@@ -173,15 +180,18 @@
         </ng-template>
 
         <ng-template #campingResult>
-            <ng-container *ngIf="camping_result && camping_result.label && camping_result.label !== ''">
+            <ng-container *ngIf="camping_result && camping_result.label">
                 <h3>
-                    <ng-container i18n>Résultat</ng-container>
-                    &nbsp;:&nbsp;
+                    <ng-container i18n>Résultat</ng-container>&nbsp;:&nbsp;
                 </h3>
-                <div i18n
-                >{{camping_result.chances | number:'1.0-2':locale }}% de chances de survie.
+                <div>
+                    <ng-container i18n>Chances de survie&nbsp;:&nbsp;</ng-container>
+                    {{camping_result.bounded_probability | number:'1.0-2':locale}}%&nbsp;
+                    <ng-container *ngIf="camping_result.probability !== camping_result.bounded_probability || display_bonus_ap"
+                    >({{camping_result.probability | campingDisplayBonus:display_bonus_ap:locale}})&nbsp;
+                    </ng-container>
                 </div>
-                <small>{{ camping_result.label }}</small>
+                <small>{{ camping_result.label[locale] }}</small>
             </ng-container>
         </ng-template>
 

@@ -9,7 +9,7 @@ using MyHordesOptimizerApi.Models.Wishlist;
 using System.Collections.Generic;
 using System.Linq;
 using MyHordesOptimizerApi.Data.Camping;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
@@ -97,6 +97,10 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.NormalProCamperByAlreadyCamped, opt => opt.MapFrom(src => src.NormalProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)))
                 .ForMember(dest => dest.NormalNoProCamperByAlreadyCamped, opt => opt.MapFrom(src => src.NormalNoProCamperByAlreadyCamped.Concat(src.CommonByAlreadyCamped)))
                 .ForMember(dest => dest.DesertBonus, opt => opt.MapFrom(src => src.DesertBonus));
+
+            CreateMap<MyHordesCampingResultModel, CampingResultDto>()
+                .ForMember(dest => dest.Probability, opt => opt.MapFrom(src => src.Probability))
+                .ForMember(dest => dest.Strict, opt => opt.MapFrom(src => src.Strict));
         }
     }
 }

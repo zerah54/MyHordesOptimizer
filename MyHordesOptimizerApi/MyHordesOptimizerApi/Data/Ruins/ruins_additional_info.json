@@ -93,7 +93,7 @@
         "capacity": 2
     },
     "house": {
-        "capacity": 100
+        "capacity": 1
     },
     "water": {
         "capacity": 100
@@ -105,7 +105,7 @@
         "capacity": 1
     },
     "warehouse": {
-        "capacity": 100
+        "capacity": 5
     },
     "carpark": {
         "capacity": 2

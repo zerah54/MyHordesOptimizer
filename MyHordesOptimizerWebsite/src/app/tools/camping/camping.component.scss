@@ -1,5 +1,15 @@
 @use 'variables';
 
+.mho-camping-header {
+    justify-content: space-between;
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
 .mho-camping {
     .camping-params {
         display: flex;

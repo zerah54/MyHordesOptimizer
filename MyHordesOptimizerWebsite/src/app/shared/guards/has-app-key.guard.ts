@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { getTown } from '../utilities/localstorage.util';
 
 @Injectable({ providedIn: 'root' })
-export class IsInTownGuard implements CanActivate {
+export class IsInTownGuard {
 
     /**
      * Le constructeur de la classe
@@ -20,6 +21,8 @@ export class IsInTownGuard implements CanActivate {
      * @return {boolean}
      */
     public canActivate(): boolean {
+        if (!environment.production) return true;
+
         const town: TownDetails | null = getTown();
         let is_in_town: boolean;
         if (!town) {

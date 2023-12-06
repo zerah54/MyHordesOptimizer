@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -25,7 +25,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Calculate")]
-        public ActionResult<int> PostCampingResult([FromBody] CampingParametersDto campingParameters)
+        public ActionResult<CampingOddsDto> PostCampingResult([FromBody] CampingParametersDto campingParameters)
         {
             Logger.LogDebug($"test + {campingParameters.ToString()}");
             return Ok(CampingService.CalculateCamping(campingParameters));
@@ -36,6 +36,13 @@ namespace MyHordesOptimizerApi.Controllers
         public ActionResult<int> GetCampingBonus()
         {
             return Ok(CampingService.GetBonus());
+        }
+
+        [HttpGet]
+        [Route("Results")]
+        public ActionResult<int> GetCampingResults()
+        {
+            return Ok(CampingService.GetResults());
         }
     }
 }

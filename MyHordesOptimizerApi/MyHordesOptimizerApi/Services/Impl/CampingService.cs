@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper.Internal;
 using MyHordesOptimizerApi.Data.Camping;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
 
 namespace MyHordesOptimizerApi.Services.Impl
 {
@@ -16,6 +17,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IMyHordesOptimizerRepository MyHordesOptimizerRepository { get; private set; }
         protected IMyHordesCodeRepository MyHordesCodeRepository { get; private set; }
         protected MyHordesCampingBonusModel CampingBonus { get; private set; }
+        protected List<MyHordesCampingResultModel> CampingResults { get; private set; }
         protected IMapper Mapper { get; private set; }
 
         public CampingService(IMyHordesOptimizerRepository myHordesOptimizerRepository, IMyHordesCodeRepository myHordesCodeRepository, IMapper mapper)
@@ -24,31 +26,43 @@ namespace MyHordesOptimizerApi.Services.Impl
             MyHordesCodeRepository = myHordesCodeRepository;
             Mapper = mapper;
             CampingBonus = MyHordesCodeRepository.GetCampingBonus();
+            CampingResults = MyHordesCodeRepository.GetCampingResults();
 
         }
 
-        public int CalculateCamping(CampingParametersDto campingParametersDto)
+        public CampingOddsDto CalculateCamping(CampingParametersDto campingParametersDto)
         {
             var campingParameters = Mapper.Map<CampingParametersModel>(campingParametersDto);
             return GetCampingOdds(campingParameters);
-        }        
-        
+        }
+
         public CampingBonusDto GetBonus()
         {
 	        var campingBonusDto = Mapper.Map<CampingBonusDto>(CampingBonus);
 	        return campingBonusDto;
         }
 
-        private int GetCampingOdds(CampingParametersModel campingParameters) 
+        public List<CampingResultDto> GetResults()
         {
-	        return Math.Max(0, Math.Min(GetCampingValues(campingParameters).Sum(chancePair => chancePair.Value), campingParameters.Job == "survivalist" ? 100 : 90));
+	        var campingResultsDto = Mapper.Map<List<CampingResultDto>>(CampingResults);
+	        return campingResultsDto;
+        }
+
+        private CampingOddsDto GetCampingOdds(CampingParametersModel campingParameters)
+        {
+            var probability = GetCampingValues(campingParameters).Sum(chancePair => chancePair.Value);
+            var odds = new CampingOddsDto();
+            odds.BoundedProbability = Math.Max(0, Math.Min(probability, campingParameters.Job == "survivalist" ? 100 : 90));
+            odds.Probability = probability;
+            odds.Label = CampingResults.Find(result => result.Strict ? odds.BoundedProbability < result.Probability : odds.BoundedProbability <= result.Probability).Label;
+	        return odds;
         }
 
         private Dictionary<string, int> GetCampingValues(CampingParametersModel campingParameters)
         {
 
 	        var campChances = getCampChancesDependingOnNbPreviousCampings(campingParameters.TownType == TownType.Pande, campingParameters.ProCamper);
-	        
+
 	        var chance = new Dictionary<string, int>() {
 		        {"previous", campChances[Math.Min(Math.Max(campingParameters.Campings, 0), campChances.Length - 1)]},
 		        {"tomb", campingParameters.Tomb ? CampingBonus.Tomb : 0},
@@ -70,7 +84,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         private int[] getCampChancesDependingOnNbPreviousCampings(bool isPanda, bool proCamper)
         {
 	        List<int> campChances;
-	        if( isPanda ) 
+	        if( isPanda )
 	        {
 		        if( proCamper )
 		        {
@@ -102,21 +116,21 @@ namespace MyHordesOptimizerApi.Services.Impl
 	        if (CanHideInsideBuilding(hiddenCampers, GetBuildingCampingCapacity(capacity, buryCount))) {
 		        chance = CampingBonus.BuriedBonus;
 
-		        if(buryCount == 0) 
+		        if(buryCount == 0)
 		        {
 			        chance = ruinBonus;
 		        }
 	        }
-	        
+
 	        return chance;
         }
-        
+
         public int GetBuildingCampingCapacity(int capacity, int buryCount) {
-	        if (buryCount == 0) 
+	        if (buryCount == 0)
 	        {
 		        return capacity;
 	        }
-	        
+
 		    return Math.Max(0, Math.Min(3, Convert.ToInt32(Math.Floor((decimal)buryCount / 3))));
         }
 

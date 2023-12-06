@@ -22,5 +22,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         List<MyHordesOptimizerWishlistItemCategorie> GetWishlistItemCategories();
         List<MyHordesOptimizerDefaultWishlist> GetDefaultWishlists();
         MyHordesCampingBonusModel GetCampingBonus();
+        List<MyHordesCampingResultModel> GetCampingResults();
     }
 }

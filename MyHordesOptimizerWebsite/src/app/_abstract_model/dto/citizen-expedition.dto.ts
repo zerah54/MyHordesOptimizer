@@ -6,7 +6,8 @@ export interface CitizenExpeditionDTO {
     bag?: BagDTO;
     consigne: string;
     preinscrit: boolean;
-    preinscrit_job?: string;
+    preinscritJob?: string;
+    preinscritHeroic?: string;
     pdc: number;
     soif: boolean;
 }
