@@ -7,6 +7,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
@@ -55,6 +56,7 @@ export class RuinsComponent implements OnInit {
         { id: 'capacity', header: $localize`Capacité`, sortable: true },
         { id: 'drops', header: $localize`Objets`, sortable: false }
     ];
+    public readonly is_dev: boolean = !environment.production;
 
     public ruins_filters: RuinFilters = {
         label: '',
