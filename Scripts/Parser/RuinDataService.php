@@ -1066,7 +1066,7 @@ $ruins_additional_info = [
     'woods' => ['capacity' => 100],
 
     // id 52
-    'mine' => ['capacity' => 100],
+    'mine' => ['capacity' => 2],
 
     // id 30
     'quarry' => ['capacity' => 100],
@@ -1162,7 +1162,7 @@ $ruins_additional_info = [
     'construction' => ['capacity' => 100],
 
     // id 60
-    'well' => ['capacity' => 100],
+    'well' => ['capacity' => 1],
 
     // id 39
     'silo' => ['capacity' => 3],
