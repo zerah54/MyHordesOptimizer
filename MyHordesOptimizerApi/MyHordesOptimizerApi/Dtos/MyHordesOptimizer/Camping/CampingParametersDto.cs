@@ -1,7 +1,7 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Models;
 
-namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
+namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping
 {
     public class CampingParametersDto
     {
@@ -20,8 +20,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public bool Phare { get; set; }
         public int Improve { get; set; }
         public int ObjectImprove { get; set; }
-        public int RuinBonus { get; set; } 
-        public int RuinBuryCount { get; set; } 
-        public int RuinCapacity { get; set; } 
+        public int RuinBonus { get; set; }
+        public int RuinBuryCount { get; set; }
+        public int RuinCapacity { get; set; }
     }
 }

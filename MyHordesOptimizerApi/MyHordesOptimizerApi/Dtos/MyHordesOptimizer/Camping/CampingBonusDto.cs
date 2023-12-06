@@ -1,44 +1,44 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
+namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping
 {
     public class CampingBonusDto
     {
-        [JsonProperty("tomb")] 
+        [JsonProperty("tomb")]
         public int Tomb { get; set; }
 
-        [JsonProperty("pande")] 
+        [JsonProperty("pande")]
         public int Pande { get; set; }
 
-        [JsonProperty("improve")] 
+        [JsonProperty("improve")]
         public int Improve { get; set; }
 
-        [JsonProperty("objectImprove")] 
+        [JsonProperty("objectImprove")]
         public int ObjectImprove { get; set; }
 
-        [JsonProperty("lighthouse")] 
+        [JsonProperty("lighthouse")]
         public int Lighthouse { get; set; }
 
-        [JsonProperty("campItems")] 
+        [JsonProperty("campItems")]
         public int CampItems { get; set; }
 
-        [JsonProperty("zombieVest")] 
+        [JsonProperty("zombieVest")]
         public int ZombieVest { get; set; }
 
-        [JsonProperty("zombieNoVest")] 
+        [JsonProperty("zombieNoVest")]
         public int ZombieNoVest { get; set; }
 
-        [JsonProperty("night")] 
+        [JsonProperty("night")]
         public int Night { get; set; }
 
-        [JsonProperty("devastated")] 
+        [JsonProperty("devastated")]
         public int Devastated { get; set; }
 
-        [JsonProperty("distChances")] 
+        [JsonProperty("distChances")]
         public List<int> DistChances { get; set; }
 
-        [JsonProperty("crowdChances")] 
+        [JsonProperty("crowdChances")]
         public List<int> CrowdChances { get; set; }
 
         [JsonProperty("pandaProCamperByAlreadyCamped")]
@@ -53,7 +53,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         [JsonProperty("normalNoProCamperByAlreadyCamped")]
         public List<int> NormalNoProCamperByAlreadyCamped { get; set; }
 
-        [JsonProperty("desertBonus")] 
+        [JsonProperty("desertBonus")]
         public int DesertBonus { get; set; }
     }
 }

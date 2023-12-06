@@ -189,6 +189,7 @@ export class MenuComponent implements OnInit {
     }
 
     private isInTown(): boolean {
+        if (!environment.production) return true;
         const town: TownDetails | null = getTown();
         if (!town) return false;
         return town.town_id !== null && town.town_id !== undefined && town.town_id !== 0;

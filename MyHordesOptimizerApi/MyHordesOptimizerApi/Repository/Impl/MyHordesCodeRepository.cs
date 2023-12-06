@@ -20,15 +20,15 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var path = "Data/Ruins/ruins.json";
             var text = File.ReadAllText(path);
             var json = JObject.Parse(text);
-            
+
             var path2 = "Data/Ruins/ruins_additional_info.json";
             var text2 = File.ReadAllText(path2);
             var json2 = JObject.Parse(text2);
-            
+
             var jsonFinal = new JObject();
             jsonFinal.Merge(json);
             jsonFinal.Merge(json2);
-            
+
             var dico = jsonFinal.ToJson().FromJson<Dictionary<string, MyHordesRuinCodeModel>>();
             return dico;
         }
@@ -119,6 +119,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var json = File.ReadAllText(path);
             var dico = json.FromJson<MyHordesCampingBonusModel>();
             return dico;
+        }
+
+        public List<MyHordesCampingResultModel> GetCampingResults()
+        {
+            var path = "Data/Camping/CampingResult.json";
+            var json = File.ReadAllText(path);
+            var list = json.FromJson<List<MyHordesCampingResultModel>>();
+            return list;
         }
     }
 }

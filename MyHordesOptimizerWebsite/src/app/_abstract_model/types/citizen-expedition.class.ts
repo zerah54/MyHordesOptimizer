@@ -1,4 +1,5 @@
 ﻿import { CitizenExpeditionDTO } from '../dto/citizen-expedition.dto';
+import { HeroicActionEnum } from '../enum/heroic-action.enum';
 import { JobEnum } from '../enum/job.enum';
 import { CommonModel } from './_common.class';
 import { Bag } from './bag.class';
@@ -10,6 +11,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
     public consigne!: string;
     public preinscrit!: boolean;
     public preinscrit_job?: JobEnum;
+    public preinscrit_heroic?: HeroicActionEnum;
     public pdc!: number;
     public soif!: boolean;
 
@@ -25,7 +27,8 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             bag: this.bag ? this.bag.modelToDto() : undefined,
             consigne: this.consigne,
             preinscrit: this.preinscrit,
-            preinscrit_job: this.preinscrit_job?.value.id,
+            preinscritJob: this.preinscrit_job?.value.id,
+            preinscritHeroic: this.preinscrit_heroic?.key,
             pdc: this.pdc,
             soif: this.soif
         };
@@ -37,7 +40,8 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             this.bag = new Bag(dto.bag);
             this.consigne = dto.consigne;
             this.preinscrit = dto.preinscrit;
-            this.preinscrit_job = dto.preinscrit_job ? <JobEnum>JobEnum.getByKey(dto.preinscrit_job) : undefined;
+            this.preinscrit_job = dto.preinscritJob ? <JobEnum>JobEnum.getByKey(dto.preinscritJob) : undefined;
+            this.preinscrit_heroic = dto.preinscritHeroic ? <HeroicActionEnum>HeroicActionEnum.getByKey(dto.preinscritHeroic) : undefined;
             this.pdc = dto.pdc;
             this.soif = dto.soif;
         }

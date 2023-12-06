@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0-beta.72
+// @version      1.0.0-beta.73
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,12 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${GM_info.script.name} : Changelog pour la version ${GM_info.script.version}\n\n`
-    + `[amélioration] Le script ne devrait plus afficher plusieurs erreurs simultanées en cas de multiples appels en erreur en même temps\n`
-    + `[amélioration] Les objets trouvables dans un bâtiment sont triés par probabilité\n\n`
-    + `[fix] Lien de mise à jour du script en cas de script pas à jour\n`
-    + `[fix] Mise à jour du calculateur de camping en S16\n`
-    + `[fix] Correction de l'affichage des réparations en pandemonium\n`
-    + `[fix] Corrige la prise de ration dans l'anti-abus\n`;
+    + `[fix] Affichage des calculs de camping\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -79,7 +74,6 @@ GM.getValue(mho_token_key).then((saved_token) => {
 
 const api_url = 'https://api.myhordesoptimizer.fr' + (is_mh_beta ? '/beta' : '');
 // const api_url = 'https://myhordesoptimizerapi.azurewebsites.net';
-
 
 ///////////////////////////////////////////
 // Listes de constantes / Constants list //
@@ -581,89 +575,6 @@ const texts = {
         es: `Máximas excavaciones restantes`
     }
 };
-
-const camping_results = [
-    {
-        probability: 10,
-        strict: false,
-        label: {
-            en: `You reckon your chances of surviving here are hee haw... Might as well take some cyanide now.`,
-            fr: `Vous estimez que vos chances de survie ici sont quasi nulles… Autant gober du cyanure tout de suite.`,
-            de: `Du schätzt, dass deine Überlebenschancen hier quasi Null sind... Besser gleich 'ne Zyanidkapsel schlucken.`,
-            es: `Crees que tus posibilidades de sobrevivir aquí son casi nulas... ¿Cianuro?`,
-        }
-    },
-    {
-        probability: 30,
-        strict: false,
-        label: {
-            en: `You reckon your chances of surviving here are really poor. Maybe you should play heads or tails?`,
-            fr: `Vous estimez que vos chances de survie ici sont très faibles. Peut-être que vous aimez jouer à pile ou face ?`,
-            de: `Du schätzt, dass deine Überlebenschancen hier sehr gering sind. Vielleicht hast du ja Bock 'ne Runde Kopf oder Zahl zu spielen?`,
-            es: `Crees que tus posibilidades de sobrevivir aquí son muy pocas. ¿Apostamos?`,
-        }
-    },
-    {
-        probability: 50,
-        strict: false,
-        label: {
-            en: `You reckon your chances of surviving here are poor. Difficult to say.`,
-            fr: `Vous estimez que vos chances de survie ici sont faibles. Difficile à dire.`,
-            de: `Du schätzt, dass deine Überlebenschancen hier gering sind. Hmmm... schwer zu sagen, wie das hier ausgeht.`,
-            es: `Crees que tus posibilidades de sobrevivir aquí son pocas. Quién sabe...`,
-        }
-    },
-    {
-        probability: 65,
-        strict: false,
-        label: {
-            en: `You reckon your chances of surviving here are limited, but tempting. However, accidents happen...`,
-            fr: `Vous estimez que vos chances de survie ici sont limitées, bien que ça puisse se tenter. Mais un accident est vite arrivé...`,
-            de: `Du schätzt, dass deine Überlebenschancen hier mittelmäßig sind. Ist allerdings einen Versuch wert.. obwohl, Unfälle passieren schnell...`,
-            es: `Crees que tus posibilidades de sobrevivir aquí son reducidas, aunque se puede intentar. Tú sabes, podrías sufrir un accidente...`,
-        }
-    },
-    {
-        probability: 80,
-        strict: false,
-        label: {
-            en: `You reckon your chances of surviving here are largely satisfactory, as long as nothing unforeseen happens.`,
-            fr: `Vous estimez que vos chances de survie ici sont à peu près satisfaisantes, pour peu qu'aucun imprévu ne vous tombe dessus.`,
-            de: `Du schätzt, dass deine Überlebenschancen hier zufriedenstellend sind - vorausgesetzt du erlebst keine böse Überraschung.`,
-            es: `Crees que tus posibilidades de sobrevivir aquí son aceptables, esperando que no suceda ningún imprevisto.`,
-        }
-    },
-    {
-        probability: 90,
-        strict: false,
-        label: {
-            en: `You reckon your chances of surviving here are decent: you just have to hope for the best!`,
-            fr: `Vous estimez que vos chances de survie ici sont correctes : il ne vous reste plus qu'à croiser les doigts !`,
-            de: `Du schätzt, dass deine Überlebenschancen hier korrekt sind. Jetzt heißt's nur noch Daumen drücken!`,
-            es: `Crees que tus posibilidades de sobrevivir aquí son buenas. ¡Cruza los dedos!`,
-        }
-    },
-    {
-        probability: 100,
-        strict: true,
-        label: {
-            en: `You reckon your chances of surviving here are good, you should be able to spend the night here.`,
-            fr: `Vous estimez que vos chances de survie ici sont élevées : vous devriez pouvoir passer la nuit ici.`,
-            de: `Du schätzt, dass deine Überlebenschancen hier gut sind. Du müsstest hier problemlos die Nacht verbringen können.`,
-            es: `Crees que tus posibilidades de sobrevivir aquí son altas. Podías pasar la noche aquí.`,
-        }
-    },
-    {
-        probability: 100,
-        strict: false,
-        label: {
-            en: `You reckon your chances of surviving here are optimal. Nobody would see you, even if they were looking straight at you.`,
-            fr: `Vous estimez que vos chances de survie ici sont optimales : personne ne vous verrait même en vous pointant du doigt.`,
-            de: `Du schätzt, dass deine Überlebenschancen hier optimal sind. Niemand wird dich sehen - selbst wenn man mit dem Finger auf dich zeigt.`,
-            es: `Crees que tus posibilidades de sobrevivir aquí son óptimas. Nadie te verá, ni señalándote con el dedo`,
-        }
-    },
-];
 
 const jobs = [
     {
@@ -1712,7 +1623,7 @@ const table_ruins_headers = [
 ];
 
 const added_ruins = [
-    {id: '-1000', camping: 0, label: {en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna`}, capacity: -1}
+    {id: '-1000', camping: 0, label: {en: `None`, fr: `Aucun`, de: `Kein`, es: `Ninguna`}}
 ];
 
 const town_type = [
@@ -3027,7 +2938,7 @@ function displayCamping() {
             ruinBonus: 0,
             ruinBuryCount: 0,
             ruinCapacity: 0,
-            ruin: 'noruin'
+            ruin: '-1000'
         }
 
         let my_info = document.createElement('div');
@@ -6575,7 +6486,7 @@ function displayCampingPredict() {
                 camping_predict_container.appendChild(updater_title);
 
                 let zone_ruin = document.querySelector('.ruin-info b');
-                let ruin = 'noruin';
+                let ruin = '-1000';
                 if (zone_ruin) {
                     ruin = all_ruins.find((one_ruin) => getI18N(one_ruin.label).toLowerCase() === zone_ruin.innerText.toLowerCase()).id;
                 }
@@ -6598,7 +6509,7 @@ function displayCampingPredict() {
                     ruinBonus: 0,
                     ruinBuryCount: 0,
                     ruinCapacity: 0,
-                    ruin: 'noruin'
+                    ruin: '-1000'
                 }
 
                 let my_info = document.createElement('div');
@@ -9262,6 +9173,9 @@ function saveEstimations(estim_value, planif_value) {
 }
 
 function calculateCamping(camping_parameters) {
+    if (camping_parameters.camping < 0 || camping_parameters === null || camping_parameters === undefined || camping_parameters === '') {
+        camping_parameters.camping = 0;
+    }
     return new Promise((resolve, reject) => {
         fetcher(api_url + '/Camping/Calculate',
             {
@@ -9278,13 +9192,10 @@ function calculateCamping(camping_parameters) {
                     return convertResponsePromiseToError(response);
                 }
             })
-            .then((response) => {
-                let camping_result_text = camping_results.find((camping_result) => camping_result.strict ? response < camping_result.probability : response <= camping_result.probability);
+            .then((camping_result) => {
                 let result = document.querySelector('#camping-result');
-                if (result) {
-                    result.innerText = `${camping_result_text ? getI18N(camping_result_text.label) : ''} (${response}%)`;
-                }
-                resolve(response);
+                result.innerText = result ? `${getI18N(camping_result.label)} (${camping_result.boundedProbability}%)` : '';
+                resolve(camping_result);
             })
             .catch((error) => {
                 addError(error);

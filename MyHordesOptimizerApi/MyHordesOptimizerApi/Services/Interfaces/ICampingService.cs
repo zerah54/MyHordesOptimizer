@@ -1,11 +1,12 @@
-﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
 
 namespace MyHordesOptimizerApi.Services.Interfaces
 {
     public interface ICampingService
     {
-        int CalculateCamping(CampingParametersDto campingParametersDto);
+        CampingOddsDto CalculateCamping(CampingParametersDto campingParametersDto);
         CampingBonusDto GetBonus();
+        List<CampingResultDto> GetResults();
     }
 }

@@ -2,7 +2,9 @@ import { HttpBackend, HttpClient, HttpErrorResponse, HttpResponse } from '@angul
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { CampingBonusDTO } from '../dto/camping-bonus.dto';
+import { CampingOddsDTO } from '../dto/camping-odds.dto';
 import { CampingBonus } from '../types/camping-bonus.class';
+import { CampingOdds } from '../types/camping-odds.class';
 import { CampingParameters } from '../types/camping-parameters.class';
 import { GlobalService } from './global.service';
 
@@ -14,12 +16,12 @@ export class CampingService extends GlobalService {
         super(new HttpClient(backend));
     }
 
-    public calculateCamping(camping_parameters: CampingParameters): Observable<number> {
-        return new Observable((sub: Subscriber<number>) => {
-            super.post<number>(this.API_URL + '/Camping/Calculate', JSON.stringify(camping_parameters.modelToDto()))
+    public calculateCamping(camping_parameters: CampingParameters): Observable<CampingOdds> {
+        return new Observable((sub: Subscriber<CampingOdds>) => {
+            super.post<CampingOddsDTO>(this.API_URL + '/Camping/Calculate', JSON.stringify(camping_parameters.modelToDto()))
                 .subscribe({
-                    next: (response: number) => {
-                        sub.next(response);
+                    next: (response: CampingOddsDTO) => {
+                        sub.next(new CampingOdds(response));
                     },
                     error: (error: HttpErrorResponse) => {
                         sub.error(error);

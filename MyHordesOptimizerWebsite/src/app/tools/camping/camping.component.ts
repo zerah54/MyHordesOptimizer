@@ -1,4 +1,4 @@
-import { CommonModule, DecimalPipe, DOCUMENT, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
+import { CommonModule, DecimalPipe, DOCUMENT, formatNumber, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,6 +9,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
@@ -19,12 +20,14 @@ import { ApiService } from '../../_abstract_model/services/api.service';
 import { CampingService } from '../../_abstract_model/services/camping.service';
 import { TownTypeId } from '../../_abstract_model/types/_types';
 import { CampingBonus } from '../../_abstract_model/types/camping-bonus.class';
+import { CampingOdds } from '../../_abstract_model/types/camping-odds.class';
 import { CampingParameters } from '../../_abstract_model/types/camping-parameters.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { SelectComponent } from '../../shared/elements/select/select.component';
 import { FilterRuinsByKmPipe } from '../../shared/pipes/filter-ruins-by-km.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
+import { CampingDisplayBonusPipe } from './camping-display-bonus.pipe';
 
 @Component({
     selector: 'mho-camping',
@@ -32,13 +35,14 @@ import { ClipboardService } from '../../shared/services/clipboard.service';
     styleUrls: ['./camping.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, CommonModule, FormsModule, ReactiveFormsModule, NgTemplateOutlet, MatFormFieldModule, SelectComponent, MatCheckboxModule, NgOptimizedImage, MatInputModule, MatDividerModule, MatButtonToggleModule, DecimalPipe, FilterRuinsByKmPipe]
+    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, CommonModule, FormsModule, ReactiveFormsModule, NgTemplateOutlet, MatFormFieldModule, SelectComponent, MatCheckboxModule, NgOptimizedImage, MatInputModule, MatDividerModule, MatButtonToggleModule, DecimalPipe, FilterRuinsByKmPipe, MatSlideToggleModule, CampingDisplayBonusPipe]
 })
 export class CampingComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     public ruins: Ruin[] = [];
     public and_amelio: boolean = true;
+    public display_bonus_ap: boolean = false;
 
     public town_types: TownType[] = [
         { id: 'RNE', label: $localize`Petite carte`, bonus: 0 },
@@ -50,60 +54,18 @@ export class CampingComponent implements OnInit {
 
     public configuration_form!: UntypedFormGroup;
     // public configuration_form!: ModelFormGroup<CampingParameters>;
-    public camping_result: CampingResult = {
-        label: '',
-        chances: 0,
-    };
+    public camping_result!: CampingOdds;
     /** Le dossier dans lequel sont stockées les images */
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
     public readonly help_ruins: string = $localize`La liste est impactée par la distance choisie`;
     public readonly help_amelio: string = $localize`Il faut en soustraire 3 après chaque attaque`;
 
-    public readonly camping_results: CampingResult[] = [
-        {
-            chances: 10,
-            strict: false,
-            label: $localize`Vous estimez que vos chances de survie ici sont quasi nulles… Autant gober du cyanure tout de suite.`,
-        },
-        {
-            chances: 30,
-            strict: false,
-            label: $localize`Vous estimez que vos chances de survie ici sont très faibles. Peut-être que vous aimez jouer à pile ou face ?`,
-        },
-        {
-            chances: 50,
-            strict: false,
-            label: $localize`Vous estimez que vos chances de survie ici sont faibles. Difficile à dire.`,
-        },
-        {
-            chances: 65,
-            strict: false,
-            label: $localize`Vous estimez que vos chances de survie ici sont limitées, bien que ça puisse se tenter. Mais un accident est vite arrivé...`,
-        },
-        {
-            chances: 80,
-            strict: false,
-            label: $localize`Vous estimez que vos chances de survie ici sont à peu près satisfaisantes, pour peu qu'aucun imprévu ne vous tombe dessus.`,
-        },
-        {
-            chances: 90,
-            strict: false,
-            label: $localize`Vous estimez que vos chances de survie ici sont correctes : il ne vous reste plus qu'à croiser les doigts !`,
-        },
-        {
-            chances: 100,
-            strict: true,
-            label: $localize`Vous estimez que vos chances de survie ici sont élevées : vous devriez pouvoir passer la nuit ici.`,
-        },
-        {
-            chances: 100,
-            strict: false,
-            label: $localize`Vous estimez que vos chances de survie ici sont optimales : personne ne vous verrait même en vous pointant du doigt.`,
-        },
-    ];
     public readonly jobs: JobEnum[] = JobEnum.getAllValues();
     public readonly JOB_SCOUT: JobEnum = JobEnum.SCOUT;
+
+    public getMoreRuinInfoFn: (ruin: string | Ruin) => string = this.getMoreRuinInfo.bind(this);
+    public getMoreTownTypeInfoFn: (ruin: string | TownType) => string = this.getMoreTownTypeInfo.bind(this);
 
     private readonly no_ruin: Ruin = new Ruin(NO_RUIN);
 
@@ -182,7 +144,7 @@ export class CampingComponent implements OnInit {
         if (typeof ruin === 'string') {
             return ruin;
         } else {
-            return `<small>Bonus : ${ruin.camping}%</small>`;
+            return `<small i18n>Bonus&nbsp;:&nbsp;${formatNumber(this.display_bonus_ap ? (ruin.camping / 5) : (ruin.camping), this.locale, '1.0-2')}${this.display_bonus_ap ? '' : '%'}</small>`;
         }
     }
 
@@ -190,7 +152,7 @@ export class CampingComponent implements OnInit {
         if (typeof town_type === 'string') {
             return town_type;
         } else {
-            return `<small>Bonus : ${town_type.bonus}%</small>`;
+            return `<small i18n>Bonus&nbsp;:&nbsp;${formatNumber(this.display_bonus_ap ? (town_type.bonus / 5) : (town_type.bonus), this.locale, '1.0-2')}${this.display_bonus_ap ? '' : '%'}</small>`;
         }
     }
 
@@ -202,6 +164,13 @@ export class CampingComponent implements OnInit {
         return this.bonus.dist_chances[Math.min(this.bonus.dist_chances.length - 1, value)];
     }
 
+    public changeBonusMode(display_bonus_ap: boolean): void {
+        if (display_bonus_ap) {
+            this.configuration_form.get('complete_improve')?.setValue(+this.configuration_form.get('complete_improve')?.value / 5);
+        } else {
+            this.configuration_form.get('complete_improve')?.setValue(+this.configuration_form.get('complete_improve')?.value * 5);
+        }
+    }
 
     public calculateNbCampingsChance(value: number, pro_camper: boolean, pande: boolean): number {
 
@@ -277,8 +246,8 @@ export class CampingComponent implements OnInit {
 
     private calculateObjectsFromTotal(): { improve: number, improve_objects: number } {
         const complete_improve: number = this.configuration_form.get('complete_improve')?.value ?? 0;
-        for (let i: number = 0; i <= Math.floor(complete_improve); i += this.bonus.improve) {
-            const tested_improve_objects: number = (complete_improve - i) / this.bonus.object_improve;
+        for (let i: number = 0; i <= Math.floor(complete_improve); i += (this.display_bonus_ap ? this.bonus.improve / 5 : this.bonus.improve)) {
+            const tested_improve_objects: number = (complete_improve - i) / (this.display_bonus_ap ? this.bonus.object_improve / 5 : this.bonus.object_improve);
             if (Number.isInteger(tested_improve_objects)) return { improve: tested_improve_objects - i, improve_objects: tested_improve_objects };
         }
         return { improve: complete_improve, improve_objects: 0 };
@@ -348,13 +317,8 @@ export class CampingComponent implements OnInit {
             ruinCapacity: this.configuration_form.get('ruin')?.value.capacity ?? 100,
             ruinBuryCount: (<Ruin>this.configuration_form.get('ruin')?.value).id === -1 ? this.configuration_form.get('bury_count')?.value : 0,
         });
-        this.camping_service.calculateCamping(camping_parameters).subscribe((chance: number) => {
-            this.camping_result.chances = chance;
-            this.camping_result.label = <string>this.camping_results.find((camping_result: CampingResult) => {
-                return camping_result.strict
-                    ? <number>this.camping_result.chances < camping_result.chances
-                    : <number>this.camping_result.chances <= camping_result.chances;
-            })?.label;
+        this.camping_service.calculateCamping(camping_parameters).subscribe((camping_result: CampingOdds) => {
+            this.camping_result = camping_result;
         });
     }
 }
@@ -363,12 +327,6 @@ interface TownType {
     id: TownTypeId;
     label: string;
     bonus: number;
-}
-
-interface CampingResult {
-    label: string;
-    strict?: boolean;
-    chances: number
 }
 
 export type ModelFormGroup<T> = FormGroup<{

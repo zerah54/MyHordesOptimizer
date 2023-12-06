@@ -1054,7 +1054,7 @@ $ruins_additional_info = [
     'obi' => ['capacity' => 2],
 
     // id 43
-    'container' => ['capacity' => 100],
+    'container' => ['capacity' => 1],
 
     // id 23
     'doner' => ['capacity' => 100],
@@ -1102,7 +1102,7 @@ $ruins_additional_info = [
     'fair' => ['capacity' => 2],
 
     // id 12
-    'house' => ['capacity' => 100],
+    'house' => ['capacity' => 1],
 
     // id 21
     'water' => ['capacity' => 100],
@@ -1114,7 +1114,7 @@ $ruins_additional_info = [
     'ambulance' => ['capacity' => 1],
 
     // id 47
-    'warehouse' => ['capacity' => 100],
+    'warehouse' => ['capacity' => 5],
 
     // id 14
     'carpark' => ['capacity' => 2],
