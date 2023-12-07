@@ -60,6 +60,19 @@ export class MiscellaneousInfoComponent {
             }))
         },
         {
+            header: $localize`Débordement`,
+            columns: [
+                { id: 'day', header: $localize`Jour` },
+                { id: 'max', header: $localize`Débordement maximum` },
+            ],
+            table: new MatTableDataSource(Array.from({ length: 51 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
+                return {
+                    day: i + 1,
+                    max: this.getMaxActiveZombies(i + 1)
+                };
+            }))
+        },
+        {
             header: $localize`Manuel des ermites`,
             columns: [
                 { id: 'day', header: $localize`Jour` },
@@ -99,7 +112,7 @@ export class MiscellaneousInfoComponent {
                     clean: (i <= 3 ? 0 : parseFloat((Math.round((Math.round(Math.pow(i, 1.5)) * Math.pow(10, 0)) + (0.0001)) / Math.pow(10, 0)).toFixed(0)))
                 };
             }))
-        },
+        }
     ];
 
 
@@ -128,6 +141,24 @@ export class MiscellaneousInfoComponent {
         if (devastated) chances = Math.max(0.1, chances - 0.2);
 
         return formatNumber(chances * 100, this.locale, '1.0-2') + '%';
+    }
+
+    private getMaxActiveZombies(day: number): string {
+
+        let max_active: number;
+        if (day <= 3) {
+            max_active = Math.round(getMaxAttack(day, 'RE') * 0.5 / (140 / 100));
+        } else if (day <= 14) {
+            max_active = day * 15;
+        } else if (day <= 18) {
+            max_active = (day + 4) * 15;
+        } else if (day <= 23) {
+            max_active = (day + 5) * 15;
+        } else {
+            max_active = (day + 6) * 15;
+        }
+
+        return formatNumber(max_active, this.locale, '1.0-2');
     }
 }
 
