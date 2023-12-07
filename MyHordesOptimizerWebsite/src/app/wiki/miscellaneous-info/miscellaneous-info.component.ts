@@ -65,10 +65,10 @@ export class MiscellaneousInfoComponent {
                 { id: 'day', header: $localize`Jour` },
                 { id: 'max', header: $localize`Débordement maximum` },
             ],
-            table: new MatTableDataSource(Array.from({ length: 51 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
+            table: new MatTableDataSource(Array.from({ length: 50 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
                     day: i + 1,
-                    max: this.getMaxActiveZombies(i + 1)
+                    max: this.getMaxActiveZombies(i + 2)
                 };
             }))
         },
