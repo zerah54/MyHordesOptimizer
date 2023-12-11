@@ -21,7 +21,7 @@
                 gap: 0.5em;
                 justify-content: space-between;
                 align-items: baseline;
-                
+
                 h3 {
                     margin: 0;
                     font-weight: bold;
@@ -35,6 +35,12 @@
                     --mat-table-header-container-height: undefined;
                     --mat-table-header-headline-line-height: undefined;
                     --mat-table-header-headline-size: 0.8em;
+
+                    tr {
+                        &.today {
+                            background-color: rgba(0, 0, 0, 0.1);
+                        }
+                    }
                 }
             }
         }

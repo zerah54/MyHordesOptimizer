@@ -1,0 +1,43 @@
+@use 'variables';
+
+.mho-max-active-calculator-title {
+    padding: 0.5em 0.5em 0.5em 1em;
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    &::before {
+        content: unset;
+    }
+
+    > h2 {
+        margin: 0;
+    }
+}
+
+.mho-max-active-calculator {
+
+    div.nb-citizen {
+        margin-top: 0.25em;
+    }
+
+    div.table-container {
+        width: 100%;
+        overflow: auto;
+
+        table {
+            width: 100%;
+            overflow: auto;
+
+            .today {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+
+            th:not(.mat-column-header), td:not(.mat-column-header) {
+                text-align: center;
+            }
+        }
+    }
+}

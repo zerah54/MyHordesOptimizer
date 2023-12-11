@@ -6,10 +6,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
-import { StandardColumn } from '../../_abstract_model/interfaces';
+import { Misc } from '../../_abstract_model/interfaces';
+import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { getMaxAttack, getMinAttack } from '../../shared/utilities/estimations.util';
+import { getTown } from '../../shared/utilities/localstorage.util';
 import { DespairDeathsCalculatorComponent } from './despair-deaths-calculator/despair-deaths-calculator.component';
+import { MaxActiveCalculatorComponent } from './max-active-calculator/max-active-calculator.component';
+import { IsTodayMiscRowPipe } from './miscellaneous-info.pipe';
 
 @Component({
     selector: 'mho-miscellaneous-info',
@@ -17,20 +21,22 @@ import { DespairDeathsCalculatorComponent } from './despair-deaths-calculator/de
     styleUrls: ['./miscellaneous-info.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatCardModule, CommonModule, MatButtonModule, MatIconModule, MatTableModule, ColumnIdPipe]
+    imports: [MatCardModule, CommonModule, MatButtonModule, MatIconModule, MatTableModule, ColumnIdPipe, IsTodayMiscRowPipe]
 })
 export class MiscellaneousInfoComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     public readonly locale: string = moment.locale();
+    public readonly my_town: TownDetails | null = getTown();
 
     public misc: Misc[] = [
         {
             header: $localize`Morts par désespoir`,
+            highlight_day: false,
             header_action: {
                 icon: 'calculate',
                 action: (): void => {
-                    this.openCalculator();
+                    this.openDespairDeathCalculator();
                 }
             },
             columns: [
@@ -46,6 +52,7 @@ export class MiscellaneousInfoComponent {
         },
         {
             header: $localize`Attaque théorique`,
+            highlight_day: true,
             columns: [
                 { id: 'day', header: $localize`Jour` },
                 { id: 're_min', header: $localize`Minimum théorique` },
@@ -61,19 +68,29 @@ export class MiscellaneousInfoComponent {
         },
         {
             header: $localize`Débordement`,
+            highlight_day: true,
+            header_action: {
+                icon: 'calculate',
+                action: (): void => {
+                    this.openMaxActiveCalculator();
+                }
+            },
             columns: [
                 { id: 'day', header: $localize`Jour` },
                 { id: 'max', header: $localize`Débordement maximum` },
+                { id: 'old_max', header: $localize`Ancien débordement maximum` },
             ],
             table: new MatTableDataSource(Array.from({ length: 50 }, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
                     day: i + 1,
-                    max: this.getMaxActiveZombies(i + 2)
+                    max: this.getMaxActiveZombies(i + 2),
+                    old_max: this.getOldMaxActiveZombies(i + 2)
                 };
             }))
         },
         {
             header: $localize`Manuel des ermites`,
+            highlight_day: true,
             columns: [
                 { id: 'day', header: $localize`Jour` },
                 { id: 'success', header: $localize`Chances de réussite du manuel` },
@@ -89,6 +106,7 @@ export class MiscellaneousInfoComponent {
         },
         {
             header: $localize`Points d'âme`,
+            highlight_day: true,
             columns: [
                 { id: 'day', header: $localize`Jours validés` },
                 { id: 'soul', header: $localize`Points d'âmes gagnés` },
@@ -102,6 +120,7 @@ export class MiscellaneousInfoComponent {
         },
         {
             header: $localize`Points clean`,
+            highlight_day: true,
             columns: [
                 { id: 'day', header: $localize`Jours validés` },
                 { id: 'clean', header: $localize`Points clean gagnés` },
@@ -120,8 +139,12 @@ export class MiscellaneousInfoComponent {
 
     }
 
-    private openCalculator(): void {
+    private openDespairDeathCalculator(): void {
         this.dialog.open(DespairDeathsCalculatorComponent);
+    }
+
+    private openMaxActiveCalculator(): void {
+        this.dialog.open(MaxActiveCalculatorComponent);
     }
 
     private getSurvivalistOdds(day: number, devastated: boolean): string {
@@ -143,7 +166,7 @@ export class MiscellaneousInfoComponent {
         return formatNumber(chances * 100, this.locale, '1.0-2') + '%';
     }
 
-    private getMaxActiveZombies(day: number): string {
+    private getOldMaxActiveZombies(day: number): string {
 
         let max_active: number;
         if (day <= 3) {
@@ -160,16 +183,9 @@ export class MiscellaneousInfoComponent {
 
         return formatNumber(max_active, this.locale, '1.0-2');
     }
-}
 
-interface Misc {
-    header: string;
-    header_action?: MiscHeaderAction;
-    columns: StandardColumn[];
-    table: MatTableDataSource<{ [key: string]: number | string | null }>;
-}
-
-interface MiscHeaderAction {
-    icon: string;
-    action: () => void
+    private getMaxActiveZombies(day: number): string {
+        const max_active: number = Math.round(day * Math.max(1.0, day / 10)) * 40;
+        return formatNumber(max_active, this.locale, '1.0-2');
+    }
 }
