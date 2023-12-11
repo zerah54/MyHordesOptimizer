@@ -1081,7 +1081,7 @@ $ruins_additional_info = [
     'tomb' => ['capacity' => 100],
 
     // id 18
-    'mczombie' => ['capacity' => 100],
+    'mczombie' => ['capacity' => 2],
 
     // id 2
     'plane' => ['capacity' => 100],
@@ -1105,7 +1105,7 @@ $ruins_additional_info = [
     'house' => ['capacity' => 1],
 
     // id 21
-    'water' => ['capacity' => 100],
+    'water' => ['capacity' => 2],
 
     // id 6
     'lab' => ['capacity' => 2],
