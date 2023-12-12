@@ -192,71 +192,11 @@ export class CampingComponent implements OnInit {
         return chance[Math.min(value, chance.length - 1)];
     }
 
-    private convertFormToEasyReadable(): string {
-        let url_string: string = '';
-        for (const key in this.configuration_form.value) {
-            const element: string | number | boolean | TownType | JobEnum = this.configuration_form.value[key];
-            if (element !== null && element !== undefined && element !== '') {
-                if (typeof element === 'string' || typeof element === 'number' || typeof element === 'boolean') {
-                    url_string += `&${key}=${element.toString()}`;
-                } else {
-                    url_string += `&${key}=${(<{ [key: string]: unknown }><unknown>element)['id']
-                        ? (<{ [key: string]: unknown }><unknown>element)['id']
-                        : (<{ [key: string]: unknown }><unknown>(<{ [key: string]: unknown }><unknown>element)['value'])['id']}`;
-                }
-            } else {
-                url_string += `&${key}=`;
-            }
-        }
-        return url_string;
-    }
-
-    private convertEasyReadableToForm(params: Record<string, string>): Record<string, [unknown]> | undefined {
-        let init_form: Record<string, [unknown]> | undefined = undefined;
-        let index: number = 0;
-        for (const key in params) {
-            if (index === 0) {
-                init_form = {};
-            }
-            if (init_form) {
-                switch (key) {
-                    case 'town':
-                        init_form[key] = [this.town_types.find((town_type: TownType) => town_type.id.toString() === params[key].toString())];
-                        break;
-                    case 'ruin':
-                        init_form[key] = [this.ruins.find((ruin: Ruin) => ruin.id.toString() === params[key].toString())];
-                        break;
-                    case 'job':
-                        init_form[key] = [this.jobs.find((job: JobEnum) => job.value.id.toString() === params[key].toString())];
-                        break;
-                    default:
-                        if (params[key] === 'false') {
-                            init_form[key] = [false];
-                        } else if (params[key] === 'true') {
-                            init_form[key] = [true];
-                        } else {
-                            init_form[key] = [params[key]];
-                        }
-                }
-            }
-            index++;
-        }
-        return init_form;
-    }
-
-    private calculateObjectsFromTotal(): { improve: number, improve_objects: number } {
-        const complete_improve: number = this.configuration_form.get('complete_improve')?.value ?? 0;
-        for (let i: number = 0; i <= Math.floor(complete_improve); i += (this.display_bonus_ap ? this.bonus.improve / 5 : this.bonus.improve)) {
-            const tested_improve_objects: number = (complete_improve - i) / (this.display_bonus_ap ? this.bonus.object_improve / 5 : this.bonus.object_improve);
-            if (Number.isInteger(tested_improve_objects)) return { improve: tested_improve_objects - i, improve_objects: tested_improve_objects };
-        }
-        return { improve: complete_improve, improve_objects: 0 };
-    }
-
-    private calculateCamping(): void {
+    protected calculateCamping(): void {
         let total_improve: number;
         let total_object_improve: number;
 
+        console.log('and_amelio', this.and_amelio);
         if (this.and_amelio) {
             /**
              * Nombre d'améliorations simples sur la case
@@ -320,6 +260,70 @@ export class CampingComponent implements OnInit {
         this.camping_service.calculateCamping(camping_parameters).subscribe((camping_result: CampingOdds) => {
             this.camping_result = camping_result;
         });
+    }
+
+    private convertFormToEasyReadable(): string {
+        let url_string: string = '';
+        for (const key in this.configuration_form.value) {
+            const element: string | number | boolean | TownType | JobEnum = this.configuration_form.value[key];
+            if (element !== null && element !== undefined && element !== '') {
+                if (typeof element === 'string' || typeof element === 'number' || typeof element === 'boolean') {
+                    url_string += `&${key}=${element.toString()}`;
+                } else {
+                    url_string += `&${key}=${(<{ [key: string]: unknown }><unknown>element)['id']
+                        ? (<{ [key: string]: unknown }><unknown>element)['id']
+                        : (<{ [key: string]: unknown }><unknown>(<{ [key: string]: unknown }><unknown>element)['value'])['id']}`;
+                }
+            } else {
+                url_string += `&${key}=`;
+            }
+        }
+        return url_string;
+    }
+
+    private convertEasyReadableToForm(params: Record<string, string>): Record<string, [unknown]> | undefined {
+        let init_form: Record<string, [unknown]> | undefined = undefined;
+        let index: number = 0;
+        for (const key in params) {
+            if (index === 0) {
+                init_form = {};
+            }
+            if (init_form) {
+                switch (key) {
+                    case 'town':
+                        init_form[key] = [this.town_types.find((town_type: TownType) => town_type.id.toString() === params[key].toString())];
+                        break;
+                    case 'ruin':
+                        init_form[key] = [this.ruins.find((ruin: Ruin) => ruin.id.toString() === params[key].toString())];
+                        break;
+                    case 'job':
+                        init_form[key] = [this.jobs.find((job: JobEnum) => job.value.id.toString() === params[key].toString())];
+                        break;
+                    default:
+                        if (params[key] === 'false') {
+                            init_form[key] = [false];
+                        } else if (params[key] === 'true') {
+                            init_form[key] = [true];
+                        } else {
+                            init_form[key] = [params[key]];
+                        }
+                }
+            }
+            index++;
+        }
+        return init_form;
+    }
+
+    private calculateObjectsFromTotal(): { improve: number, improve_objects: number } {
+        const complete_improve: number = this.configuration_form.get('complete_improve')?.value ?? 0;
+        for (let i: number = 0; i <= Math.floor(complete_improve); i += (this.display_bonus_ap ? 1 : this.bonus.improve)) {
+            const tested_improve_objects: number = (complete_improve - i) / (this.display_bonus_ap ? (this.bonus.object_improve / this.bonus.improve) : this.bonus.object_improve);
+            if (Number.isInteger(tested_improve_objects)) {
+                const improve: number = complete_improve - (tested_improve_objects * (this.display_bonus_ap ? (this.bonus.object_improve / this.bonus.improve) : this.bonus.object_improve));
+                return { improve: improve / (this.display_bonus_ap ? 1 : this.bonus.improve), improve_objects: tested_improve_objects };
+            }
+        }
+        return { improve: Math.round(complete_improve / (this.display_bonus_ap ? 1 : this.bonus.improve)), improve_objects: 0 };
     }
 }
 

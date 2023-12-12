@@ -1,4 +1,4 @@
-import { HttpBackend, HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { CampingBonusDTO } from '../dto/camping-bonus.dto';
@@ -12,13 +12,13 @@ import { GlobalService } from './global.service';
 @Injectable({ providedIn: 'root' })
 export class CampingService extends GlobalService {
 
-    constructor(_http: HttpClient, backend: HttpBackend) {
-        super(new HttpClient(backend));
+    constructor(_http: HttpClient) {
+        super(_http);
     }
 
     public calculateCamping(camping_parameters: CampingParameters): Observable<CampingOdds> {
         return new Observable((sub: Subscriber<CampingOdds>) => {
-            super.post<CampingOddsDTO>(this.API_URL + '/Camping/Calculate', JSON.stringify(camping_parameters.modelToDto()))
+            super.post<CampingOddsDTO>(this.API_URL + '/Camping/Calculate', JSON.stringify(camping_parameters.modelToDto()), true)
                 .subscribe({
                     next: (response: CampingOddsDTO) => {
                         sub.next(new CampingOdds(response));
