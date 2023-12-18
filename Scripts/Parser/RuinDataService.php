@@ -1135,7 +1135,7 @@ $ruins_additional_info = [
     'cave3' => ['capacity' => 100],
 
     // id 32
-    'trench' => ['capacity' => 100],
+    'trench' => ['capacity' => 2],
 
     // id 45
     'dll' => ['capacity' => 2],

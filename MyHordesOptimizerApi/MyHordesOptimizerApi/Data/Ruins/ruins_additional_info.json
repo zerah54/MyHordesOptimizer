@@ -126,7 +126,7 @@
         "capacity": 100
     },
     "trench": {
-        "capacity": 100
+        "capacity": 2
     },
     "dll": {
         "capacity": 2

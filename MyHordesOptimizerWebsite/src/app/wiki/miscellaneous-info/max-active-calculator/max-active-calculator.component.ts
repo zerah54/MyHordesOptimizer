@@ -58,7 +58,7 @@ export class MaxActiveCalculatorComponent implements OnInit {
     }
 
     protected getMaxActiveZombies(day: number): string {
-        const max_active: number = Math.round((+day + 1) * Math.max(1.0, (+day + 1) / 10)) * this.nb_citizen;
+        const max_active: number = Math.round((+day + 1) * Math.max(1.0, (+day + 1) / 10)) * Math.max(15, this.nb_citizen);
         return formatNumber(max_active, this.locale, '1.0-2');
     }
 

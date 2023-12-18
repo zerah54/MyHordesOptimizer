@@ -39,9 +39,10 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
         {
             var majHeaders = new Dictionary<string, string>()
             {
-                {"Cookie", $"gh_session_id={sessid}" }
+                {"Cookie", $"gh_session_id={sessid}" },
             };
             majHeaders.Add("X-Requested-With", "XMLHttpRequest");
+            majHeaders.Add("X-Source", "MyHordes Optimizer");
             foreach(var cell in cellToUpdate)
             {
                 var cellAsJObject = cell as JObject;
@@ -56,7 +57,9 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
             {
                 Key = UserKeyProvider.UserKey
             };
-            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}", body: majBody, mediaTypeIn : "application/x-www-form-urlencoded");
+            var customHeaders = new Dictionary<string, string>() { };
+            customHeaders.Add("X-Source", "MyHordes Optimizer");
+            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}", body: majBody, customHeader: customHeaders, mediaTypeIn : "application/x-www-form-urlencoded");
         }
 
 
@@ -89,14 +92,17 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
             var majUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajPath}";
             var majHeaders = new Dictionary<string, string>()
             {
-                {"Cookie", $"gh_session_id={sessid};gh_remember_me={rememberMe}" }
+                {"Cookie", $"gh_session_id={sessid};gh_remember_me={rememberMe}" },
+                {"X-Source", "MyHordes Optimizer"}
             };
             return majHeaders;
         }
 
         public void UpdateCitizen(GestHordesMajCitizenRequest ghUpdateCitizenRequest)
         {
-            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajCitizenPath}", body: ghUpdateCitizenRequest);
+            var customHeaders = new Dictionary<string, string>() { };
+            customHeaders.Add("X-Source", "MyHordes Optimizer");
+            var majResponse = base.Post<GestHordesMajResponse>(url: $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajCitizenPath}", body: ghUpdateCitizenRequest, customHeader: customHeaders);
         }
 
         protected override void CustomizeHttpClient(HttpClient client)
@@ -108,14 +114,18 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
         {
             request.UserKey = UserKeyProvider.UserKey;
             var majUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajCasePath}";
-            base.Post(url: majUrl, body: request);
+            var customHeaders = new Dictionary<string, string>() { };
+            customHeaders.Add("X-Source", "MyHordes Optimizer");
+            base.Post(url: majUrl, body: request, customHeaders: customHeaders);
         }
 
         public void UpdateCellZombies(GestHordesMajCaseZombiesDto request)
         {
             request.UserKey = UserKeyProvider.UserKey;
             var majUrl = $"{GestHordesConfiguration.Url}/{GestHordesConfiguration.MajZombieTuePath}";
-            base.Post(url: majUrl, body: request);
+            var customHeaders = new Dictionary<string, string>() { };
+            customHeaders.Add("X-Source", "MyHordes Optimizer");
+            base.Post(url: majUrl, body: request, customHeaders: customHeaders);
         }
     }
 }
