@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CommonModule, NgClass, NgOptimizedImage, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
-import { Component, HostBinding, HostListener, Inject, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, HostListener, inject, Inject, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -32,6 +32,9 @@ export class AppComponent implements OnInit {
     public ready: boolean = false;
     public readonly theme: string | null = localStorage.getItem('theme');
 
+    private loading_service: LoadingOverlayService = inject(LoadingOverlayService);
+    private authentication_api: AuthenticationService = inject(AuthenticationService);
+
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     @HostListener('window:resize', ['$event'])
@@ -39,8 +42,7 @@ export class AppComponent implements OnInit {
         this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     }
 
-    constructor(public loading_service: LoadingOverlayService, private authentication_api: AuthenticationService, private router: Router,
-                private overlay_container: OverlayContainer, private breakpoint_observer: BreakpointObserver, @Inject(LOCALE_ID) private locale_id: string) {
+    constructor(private router: Router, private overlay_container: OverlayContainer, private breakpoint_observer: BreakpointObserver, @Inject(LOCALE_ID) private locale_id: string) {
         moment.locale(this.locale_id);
     }
 

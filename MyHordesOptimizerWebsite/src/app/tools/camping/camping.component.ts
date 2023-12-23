@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, DOCUMENT, formatNumber, Location, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, inject, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -67,14 +67,17 @@ export class CampingComponent implements OnInit {
     public getMoreRuinInfoFn: (ruin: string | Ruin) => string = this.getMoreRuinInfo.bind(this);
     public getMoreTownTypeInfoFn: (ruin: string | TownType) => string = this.getMoreTownTypeInfo.bind(this);
 
+
+    private camping_service: CampingService = inject(CampingService);
+    private api: ApiService = inject(ApiService);
     private readonly no_ruin: Ruin = new Ruin(NO_RUIN);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
 
-    constructor(private api: ApiService, private fb: UntypedFormBuilder, private route: ActivatedRoute, private clipboard: ClipboardService,
-                private router: Router, private activated_route: ActivatedRoute, private location: Location, @Inject(DOCUMENT) private document: Document,
-                private camping_service: CampingService) {
+    constructor(private fb: UntypedFormBuilder, private route: ActivatedRoute, private clipboard: ClipboardService,
+                private router: Router, private activated_route: ActivatedRoute, private location: Location,
+                @Inject(DOCUMENT) private document: Document) {
     }
 
     public ngOnInit(): void {

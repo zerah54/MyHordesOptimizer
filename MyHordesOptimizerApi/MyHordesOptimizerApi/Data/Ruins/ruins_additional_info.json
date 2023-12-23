@@ -159,7 +159,7 @@
         "capacity": 3
     },
     "street": {
-        "capacity": 100
+        "capacity": 1
     },
     "park": {
         "capacity": 100

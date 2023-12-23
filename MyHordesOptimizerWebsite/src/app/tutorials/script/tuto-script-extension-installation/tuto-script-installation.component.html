@@ -15,6 +15,14 @@
     </mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-tuto-script-installation">
-    <mho-accordion [items]="tuto_script_items"></mho-accordion>
-    <p i18n>{{ final_text }}</p>
+    <div>
+        <h3 i18n>Installation de l'extension de navigateur</h3>
+        <mho-accordion [items]="tuto_extension_items"></mho-accordion>
+        <p i18n>{{ extension_final_text }}</p>
+    </div>
+    <div>
+        <h3 i18n>Installation du script</h3>
+        <mho-accordion [items]="tuto_script_items"></mho-accordion>
+        <p i18n>{{ script_final_text }}</p>
+    </div>
 </mat-card-content>

@@ -1,12 +1,12 @@
-import { Component, HostBinding, Inject } from '@angular/core';
-import { AccordionItem, AccordionComponent } from '../../../shared/elements/accordion/accordion.component';
-import { ClipboardService } from '../../../shared/services/clipboard.service';
 import { DOCUMENT } from '@angular/common';
+import { Component, HostBinding, Inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
+import { AccordionComponent, AccordionItem } from '../../../shared/elements/accordion/accordion.component';
+import { ClipboardService } from '../../../shared/services/clipboard.service';
 
 @Component({
     selector: 'mho-tuto-script-installation',
@@ -25,8 +25,12 @@ import { MatCardModule } from '@angular/material/card';
 export class TutoScriptInstallationComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    public readonly title: string = $localize`Installation du script`;
+    public readonly title: string = $localize`Script / Extension`;
     public readonly download_link: string = $localize`<a color="accent" href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js" target="_blank">lien de téléchargement du script</a>`;
+    public readonly firefox_link_href: string = 'https://addons.mozilla.org/fr/firefox/addon/myhordes-optimizer';
+    public readonly firefox_extension_link: string = $localize`<a color="accent" href="${this.firefox_link_href}" target="_blank">page de l'extension</a>`;
+    public readonly chrome_link_href: string = 'https://chromewebstore.google.com/detail/myhordes-optimizer/jolghobcgphmgaiachbipnpiimmgknno';
+    public readonly chrome_extension_link: string = $localize`<a color="accent" href="${this.chrome_link_href}" target="_blank">page de l'extension</a>`;
     public readonly tuto_script_items: AccordionItem[] = [
         {
             title: $localize`Ordinateur`,
@@ -34,7 +38,7 @@ export class TutoScriptInstallationComponent {
         },
         {
             title: $localize`Android`, content: $localize`<ul>
-                <li>Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox Nightly ;</li>
+                <li>Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox ;</li>
                 <li>Rechercher l'extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;</li>
                 <li>Installer l'extension pour Chrome ;</li>
                 <li>Cliquer sur le ${this.download_link} ;</li>
@@ -61,7 +65,18 @@ export class TutoScriptInstallationComponent {
             </ul>`
         }
     ];
-    public readonly final_text: string = '\n' + $localize`Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.`;
+    public readonly tuto_extension_items: AccordionItem[] = [
+        {
+            title: $localize`Firefox`,
+            content: $localize`Rendez-vous sur la ${this.firefox_extension_link} pour l'installer.`
+        },
+        {
+            title: $localize`Chrome`,
+            content: $localize`Rendez-vous sur la ${this.chrome_extension_link} pour l'installer.`
+        }
+    ];
+    public readonly script_final_text: string = '\n' + $localize`Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.`;
+    public readonly extension_final_text: string = '\n' + $localize`Une fois l'extension installée, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.`;
 
     public constructor(private clipboard: ClipboardService, @Inject(DOCUMENT) private document: Document) {
 
@@ -76,12 +91,18 @@ export class TutoScriptInstallationComponent {
         let text: string = '';
 
         text += `[b][big]${this.title}[/big][/b]`;
-        text += '\n\n';
+        text += '{hr}';
+        this.tuto_extension_items.forEach((item: AccordionItem) => {
+            text += `[collapse=${item.title}]${item.content.replace(/<ul>/g, '').replace(/<\/ul>/g, '').replace(/<li>/g, '[0]').replace(/<\/li>/g, '').replace(/<a .* href="(.*)" .*>(.*)<\/a>/g, '[link=$1]$2[/link]')}[/collapse]\n\n`;
+        });
+
+        text += this.extension_final_text;
+        text += '{hr}';
         this.tuto_script_items.forEach((item: AccordionItem) => {
             text += `[collapse=${item.title}]${item.content.replace(/<ul>/g, '').replace(/<\/ul>/g, '').replace(/<li>/g, '[0]').replace(/<\/li>/g, '').replace(/<a .* href="(.*)" .*>(.*)<\/a>/g, '[link=$1]$2[/link]')}[/collapse]\n\n`;
         });
 
-        text += this.final_text;
+        text += this.script_final_text;
 
         this.clipboard.copy(text, $localize`Le texte a bien été copié`);
     }

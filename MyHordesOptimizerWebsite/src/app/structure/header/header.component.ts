@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, HostListener, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostBinding, HostListener, inject, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -32,7 +32,6 @@ export class HeaderComponent {
 
     @Output() changeSidenavStatus: EventEmitter<void> = new EventEmitter();
 
-
     /** Le titre de l'application */
     public title: string = '';
 
@@ -47,6 +46,10 @@ export class HeaderComponent {
 
     public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
 
+    private title_service: Title = inject(Title);
+    private api: ApiService = inject(ApiService);
+    private authentication_api: AuthenticationService = inject(AuthenticationService);
+
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     @HostListener('window:resize', ['$event'])
@@ -54,8 +57,7 @@ export class HeaderComponent {
         this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     }
 
-    public constructor(private breakpoint_observer: BreakpointObserver, private title_service: Title, private api: ApiService,
-                       private authentication_api: AuthenticationService) {
+    public constructor(private breakpoint_observer: BreakpointObserver) {
         this.title = this.title_service.getTitle();
     }
 
