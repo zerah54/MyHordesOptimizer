@@ -1,11 +1,13 @@
 import { Clipboard } from '@angular/cdk/clipboard';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { SnackbarService } from './snackbar.service';
 
 @Injectable({ providedIn: 'root' })
 export class ClipboardService {
 
-    constructor(private clipboard: Clipboard, private snackbar_service: SnackbarService) {
+    private snackbar_service: SnackbarService = inject(SnackbarService);
+
+    constructor(private clipboard: Clipboard) {
     }
 
     public copy(text: string, success: string): void {

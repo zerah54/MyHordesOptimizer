@@ -1,8 +1,7 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, inject, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatToolbar, MatToolbarModule } from '@angular/material/toolbar';
-import { Title } from '@angular/platform-browser';
 import { ThanksComponent } from '../../thanks/thanks.component';
 
 @Component({
@@ -18,11 +17,7 @@ export class FooterComponent {
 
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
 
-    public title: string = '';
-
-    public constructor(private title_service: Title, private dialog: MatDialog) {
-        this.title = this.title_service.getTitle();
-    }
+    private dialog: MatDialog = inject(MatDialog);
 
     public openThanks(): void {
         this.dialog.open(ThanksComponent, {

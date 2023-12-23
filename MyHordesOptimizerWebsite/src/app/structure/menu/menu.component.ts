@@ -1,5 +1,5 @@
 import { CommonModule, DOCUMENT, NgClass, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, inject, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,6 +27,8 @@ export class MenuComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input({ required: true }) sidenavContainer!: MatSidenavContainer;
+
+    public charts_theming_service: ChartsThemingService = inject(ChartsThemingService);
 
     public themes: Theme[] = [
         { label: $localize`Par défaut`, class: '' },
@@ -111,13 +113,25 @@ export class MenuComponent implements OnInit {
         {
             label: $localize`Tutoriels`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
                 {
-                    label: $localize`Script`, displayed: false, lvl: 1, authorized: (): boolean => true, expanded: false, children: [
-                        { label: $localize`Installation`, path: 'tutorials/script/installation', displayed: false, lvl: 2, authorized: (): boolean => true },
-                        { label: $localize`Outils`, path: 'tutorials/script/tools', displayed: false, lvl: 2, authorized: (): boolean => true },
-                        { label: $localize`Wiki`, path: 'tutorials/script/wiki', displayed: false, lvl: 2, authorized: (): boolean => true },
-                        { label: $localize`Outils Externes`, path: 'tutorials/script/external-tools', displayed: false, lvl: 2, authorized: (): boolean => true },
-                        { label: $localize`Affichage`, path: 'tutorials/script/display', displayed: false, lvl: 2, authorized: (): boolean => true },
-                        { label: $localize`Notifications`, path: 'tutorials/script/alerts', displayed: false, lvl: 2, authorized: (): boolean => true },
+                    label: $localize`Script / Extension`, displayed: false, lvl: 1, authorized: (): boolean => true, expanded: false, children: [
+                        {
+                            label: $localize`Installation`,
+                            path: 'tutorials/script-extension/installation',
+                            displayed: false,
+                            lvl: 2,
+                            authorized: (): boolean => true
+                        },
+                        { label: $localize`Outils`, path: 'tutorials/script-extension/tools', displayed: false, lvl: 2, authorized: (): boolean => true },
+                        { label: $localize`Wiki`, path: 'tutorials/script-extension/wiki', displayed: false, lvl: 2, authorized: (): boolean => true },
+                        {
+                            label: $localize`Outils Externes`,
+                            path: 'tutorials/script-extension/external-tools',
+                            displayed: false,
+                            lvl: 2,
+                            authorized: (): boolean => true
+                        },
+                        { label: $localize`Affichage`, path: 'tutorials/script-extension/display', displayed: false, lvl: 2, authorized: (): boolean => true },
+                        { label: $localize`Notifications`, path: 'tutorials/script-extension/alerts', displayed: false, lvl: 2, authorized: (): boolean => true },
                     ]
                 },
                 {
@@ -134,8 +148,7 @@ export class MenuComponent implements OnInit {
         }
     ];
 
-    constructor(@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document,
-                private charts_theming_service: ChartsThemingService) {
+    constructor(@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document) {
 
     }
 

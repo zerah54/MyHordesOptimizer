@@ -1021,7 +1021,7 @@ $ruins_additional_info = [
     'pump' => ['capacity' => 1],
 
     // id 24
-    'bike' => ['capacity' => 100],
+    'bike' => ['capacity' => 2],
 
     // id 53
     'freight' => ['capacity' => 100],
@@ -1168,7 +1168,7 @@ $ruins_additional_info = [
     'silo' => ['capacity' => 3],
 
     // id 31
-    'street' => ['capacity' => 100],
+    'street' => ['capacity' => 1],
 
     // id 29
     'park' => ['capacity' => 100],
