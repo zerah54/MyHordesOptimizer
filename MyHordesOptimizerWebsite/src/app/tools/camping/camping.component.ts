@@ -160,7 +160,7 @@ export class CampingComponent implements OnInit {
     }
 
     public calculateCrowdChance(value: number): number {
-        return this.bonus.crowd_chances[Math.min(this.bonus.crowd_chances.length - 1, Math.max(0, value - 1))];
+        return this.bonus.crowd_chances[Math.min(this.bonus.crowd_chances.length - 1, value)];
     }
 
     public calculateDistanceChance(value: number): number {
