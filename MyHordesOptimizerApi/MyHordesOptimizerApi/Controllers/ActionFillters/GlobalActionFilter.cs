@@ -50,17 +50,15 @@ namespace MyHordesOptimizerApi.Controllers.ActionFillters
                         context.Result = new BadRequestObjectResult($"Mho-Script-Version should contains 4 digits. Found {version} for Controller {controllerName} and method {methodName}");
 
                     }
-                    for (var index = 0; index < incomingVersionMatch.Count; index++)
-                    {
-                        var incomingNumber = incomingVersionMatch[index].Value;
-                        var expectedNumber = expectedVersionMatch[index].Value;
-                        int.TryParse(incomingNumber, out var incomingNumberValue);
-                        int.TryParse(expectedNumber, out var expectedNumberValue);
-                        if (incomingNumberValue < expectedNumberValue)
-                        {
-                            context.Result = new BadRequestObjectResult($"Incoming version {version} is too low. Expected {expectedVersion} for Controller {controllerName} and method {methodName}");
-                            return;
-                        }
+
+                    var incomingVersionVersion = new Version(version);
+                    var expectedVersionVersion = new Version(expectedVersion);
+                        
+                    var result = expectedVersionVersion.CompareTo(incomingVersionVersion);    
+                    if (result > 0) 
+                    {                            
+                        context.Result = new BadRequestObjectResult($"Incoming version {version} is too low. Expected {expectedVersion} for Controller {controllerName} and method {methodName}");
+                        return;
                     }
                 }
                 catch (Exception e)
