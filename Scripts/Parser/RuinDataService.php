@@ -1024,10 +1024,10 @@ $ruins_additional_info = [
     'bike' => ['capacity' => 2],
 
     // id 53
-    'freight' => ['capacity' => 100],
+    'freight' => ['capacity' => 3],
 
     // id 54
-    'hospital' => ['capacity' => 100],
+    'hospital' => ['capacity' => 4],
 
     // id 48
     'aerodrome' => ['capacity' => 5],
@@ -1069,10 +1069,10 @@ $ruins_additional_info = [
     'mine' => ['capacity' => 2],
 
     // id 30
-    'quarry' => ['capacity' => 100],
+    'quarry' => ['capacity' => 2],
 
     // id 59
-    'ufo' => ['capacity' => 100],
+    'ufo' => ['capacity' => 1],
 
     // id 40
     'ekea' => ['capacity' => 3],
@@ -1084,7 +1084,7 @@ $ruins_additional_info = [
     'mczombie' => ['capacity' => 2],
 
     // id 2
-    'plane' => ['capacity' => 100],
+    'plane' => ['capacity' => 2],
 
     // id 44
     'shed' => ['capacity' => 1],
@@ -1096,7 +1096,7 @@ $ruins_additional_info = [
     'cave2' => ['capacity' => 1],
 
     // id 37
-    'cemetary' => ['capacity' => 100],
+    'cemetary' => ['capacity' => 0],
 
     // id 11
     'fair' => ['capacity' => 2],
@@ -1132,7 +1132,7 @@ $ruins_additional_info = [
     'post' => ['capacity' => 2],
 
     // id 33
-    'cave3' => ['capacity' => 100],
+    'cave3' => ['capacity' => 2],
 
     // id 32
     'trench' => ['capacity' => 2],
@@ -1150,16 +1150,16 @@ $ruins_additional_info = [
     'lkw' => ['capacity' => 1],
 
     // id 16
-    'school' => ['capacity' => 100],
+    'school' => ['capacity' => 3],
 
     // id 49
     'office' => ['capacity' => 4],
 
     // id 4
-    'villa' => ['capacity' => 100],
+    'villa' => ['capacity' => 3],
 
     // id 15
-    'construction' => ['capacity' => 100],
+    'construction' => ['capacity' => 3],
 
     // id 60
     'well' => ['capacity' => 1],
@@ -1171,7 +1171,7 @@ $ruins_additional_info = [
     'street' => ['capacity' => 1],
 
     // id 29
-    'park' => ['capacity' => 100],
+    'park' => ['capacity' => 3],
 
     // id 22
     'guns' => ['capacity' => 3],

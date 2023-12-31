@@ -12,13 +12,13 @@
         "capacity": 1
     },
     "bike": {
-        "capacity": 100
+        "capacity": 2
     },
     "freight": {
-        "capacity": 100
+        "capacity": 3
     },
     "hospital": {
-        "capacity": 100
+        "capacity": 4
     },
     "aerodrome": {
         "capacity": 5
@@ -60,10 +60,10 @@
         "capacity": 2
     },
     "quarry": {
-        "capacity": 100
+        "capacity": 2
     },
     "ufo": {
-        "capacity": 100
+        "capacity": 1
     },
     "ekea": {
         "capacity": 3
@@ -75,7 +75,7 @@
         "capacity": 2
     },
     "plane": {
-        "capacity": 100
+        "capacity": 2
     },
     "shed": {
         "capacity": 1
@@ -87,7 +87,7 @@
         "capacity": 1
     },
     "cemetary": {
-        "capacity": 100
+        "capacity": 0
     },
     "fair": {
         "capacity": 2
@@ -123,7 +123,7 @@
         "capacity": 2
     },
     "cave3": {
-        "capacity": 100
+        "capacity": 2
     },
     "trench": {
         "capacity": 2
@@ -141,16 +141,16 @@
         "capacity": 1
     },
     "school": {
-        "capacity": 100
+        "capacity": 3
     },
     "office": {
         "capacity": 4
     },
     "villa": {
-        "capacity": 100
+        "capacity": 3
     },
     "construction": {
-        "capacity": 100
+        "capacity": 3
     },
     "well": {
         "capacity": 1
@@ -162,7 +162,7 @@
         "capacity": 1
     },
     "park": {
-        "capacity": 100
+        "capacity": 3
     },
     "guns": {
         "capacity": 3
