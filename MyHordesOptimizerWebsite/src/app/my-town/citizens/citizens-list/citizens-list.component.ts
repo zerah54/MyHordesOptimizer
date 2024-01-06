@@ -1,5 +1,5 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { CommonModule, NgClass, NgOptimizedImage, NgSwitch, NgSwitchCase } from '@angular/common';
+import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
@@ -39,7 +39,7 @@ import { TypeRowPipe } from './type-row.pipe';
     styleUrls: ['./citizens-list.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [CdkVirtualScrollViewport, TableVirtualScrollModule, MatTableModule, MatSortModule, CommonModule, NgClass, NgSwitch, NgSwitchCase, HeaderWithSelectFilterComponent, AvatarComponent, ListElementAddRemoveComponent, LastUpdateComponent, MatFormFieldModule, MatSelectModule, FormsModule, MatOptionModule, MatCheckboxModule, NgOptimizedImage, ColumnIdPipe, TypeRowPipe]
+    imports: [CdkVirtualScrollViewport, TableVirtualScrollModule, MatTableModule, MatSortModule, CommonModule, NgClass, HeaderWithSelectFilterComponent, AvatarComponent, ListElementAddRemoveComponent, LastUpdateComponent, MatFormFieldModule, MatSelectModule, FormsModule, MatOptionModule, MatCheckboxModule, NgOptimizedImage, ColumnIdPipe, TypeRowPipe]
 })
 export class CitizensListComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

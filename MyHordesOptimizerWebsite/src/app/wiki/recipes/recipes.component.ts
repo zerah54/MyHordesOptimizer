@@ -1,4 +1,4 @@
-import { CommonModule, DecimalPipe, NgOptimizedImage, NgSwitch, NgSwitchCase } from '@angular/common';
+import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatSortModule } from '@angular/material/sort';
@@ -21,7 +21,7 @@ import { normalizeString } from '../../shared/utilities/string.utils';
     templateUrl: './recipes.component.html',
     styleUrls: ['./recipes.component.scss'],
     standalone: true,
-    imports: [MatCardModule, CommonModule, FilterFieldComponent, MatTableModule, MatSortModule, NgSwitch, NgSwitchCase, NgOptimizedImage, DecimalPipe, ColumnIdPipe]
+    imports: [MatCardModule, CommonModule, FilterFieldComponent, MatTableModule, MatSortModule, NgOptimizedImage, DecimalPipe, ColumnIdPipe]
 })
 export class RecipesComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

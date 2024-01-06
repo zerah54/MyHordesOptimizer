@@ -54,91 +54,85 @@
                                     <ng-container *ngFor="let column of columns; trackBy: trackByColumnId"
                                                   [matColumnDef]="column.id" [sticky]="column.sticky || false">
                                         <th mat-header-cell *matHeaderCellDef>
-                                            <ng-container [ngSwitch]="column.id">
+                                            @switch (column.id) {
 
-                                                <ng-container *ngSwitchCase="'sort'">
-                                                </ng-container>
-                                                <mho-header-with-string-filter *ngSwitchCase="'name'"
-                                                                               [header]="column.header" [(filterValue)]="wishlist_filters.items"
-                                                                               (filterValueChange)="wishlist_filters_change.next()">
-                                                </mho-header-with-string-filter>
-                                                <ng-container *ngSwitchDefault>
-                                                    {{column.header}}
-                                                </ng-container>
-                                            </ng-container>
+                                                @case ('sort') {
+                                                }
+                                                @case ('name') {
+                                                    <mho-header-with-string-filter [header]="column.header" [(filterValue)]="wishlist_filters.items"
+                                                                                   (filterValueChange)="wishlist_filters_change.next()">
+                                                    </mho-header-with-string-filter>
+                                                }
+                                                @default {
+                                                    {{ column.header }}
+                                                }
+                                            }
                                         </th>
 
                                         <td mat-cell *matCellDef="let row">
-                                            <ng-container [ngSwitch]="column.id">
-                                                <ng-container *ngSwitchCase="'sort'">
+                                            @switch (column.id) {
+                                                @case ('sort') {
                                                     <div cdkDragHandle
                                                          (mousedown)="drag_disabled = false"
                                                          (mouseup)="drag_disabled = true"
                                                          class="dragdrop-indicator">
                                                         <mat-icon>drag_indicator</mat-icon>
                                                     </div>
-                                                </ng-container>
-                                                <ng-container *ngSwitchCase="'name'">
+                                                }
+                                                @case ('name') {
                                                     <div>
                                                         <img [ngSrc]="HORDES_IMG_REPO + row.item.img" width="16" height="16">
-                                                        <span>{{row.item.label[locale]}}</span>
+                                                        <span>{{ row.item.label[locale] }}</span>
                                                     </div>
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchCase="'heaver'">
+                                                }
+                                                @case ('heaver') {
                                                     <img [ngSrc]="HORDES_IMG_REPO + 'item/cat_heavy.gif'" *ngIf="row.item.is_heaver"
                                                          matTooltip="Objet encombrant" i18n-matTooltip width="16" height="16">
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchCase="'priority'">
+                                                }
+                                                @case ('priority') {
                                                     <mat-form-field class="no-bottom" appearance="outline" *ngIf="edition_mode; else readMode">
                                                         <mat-select [(ngModel)]="row.priority_main" [compareWith]="compareWith"
                                                                     (ngModelChange)="resetPriorities(this.datasource.data)">
                                                             <mat-option *ngFor="let priority of priorities" [value]="priority">
-                                                                {{priority.value.label}}
+                                                                {{ priority.value.label }}
                                                             </mat-option>
                                                         </mat-select>
                                                     </mat-form-field>
                                                     <ng-template #readMode>
-                                                        {{row.priority_main.value.label}}
+                                                        {{ row.priority_main.value.label }}
                                                     </ng-template>
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchCase="'depot'">
+                                                }
+                                                @case ('depot') {
                                                     <ng-container *ngIf="row.priority_main.value.count > -1">
                                                         <mat-form-field class="no-bottom" appearance="outline" *ngIf="edition_mode; else readMode">
                                                             <mat-select [(ngModel)]="row.depot" [compareWith]="compareWith">
                                                                 <mat-option *ngFor="let depot of depots" [value]="depot">
-                                                                    {{depot.value.label}}
+                                                                    {{ depot.value.label }}
                                                                 </mat-option>
                                                             </mat-select>
                                                         </mat-form-field>
                                                         <ng-template #readMode>
-                                                            {{row.depot.value.label}}
+                                                            {{ row.depot.value.label }}
                                                         </ng-template>
                                                     </ng-container>
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchCase="'bank_count'">
-                                                    {{row.bank_count}}
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchCase="'bag_count'">
-                                                    {{row.bag_count}}
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchCase="'count'">
+                                                }
+                                                @case ('bank_count') {
+                                                    {{ row.bank_count }}
+                                                }
+                                                @case ('bag_count') {
+                                                    {{ row.bag_count }}
+                                                }
+                                                @case ('count') {
                                                     <ng-container *ngIf="row.priority_main.value.count > -1">
                                                         <mat-form-field class="no-bottom count" appearance="outline" *ngIf="edition_mode; else readMode">
                                                             <input matInput type="number" [(ngModel)]="row.count">
                                                         </mat-form-field>
                                                         <ng-template #readMode>
-                                                            {{row.count}}
+                                                            {{ row.count }}
                                                         </ng-template>
                                                     </ng-container>
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchCase="'needed'">
+                                                }
+                                                @case ('needed') {
                                                     <ng-container *ngIf="row.priority_main.value.count > -1">
                                                         <mat-form-field class="no-bottom count" appearance="outline" *ngIf="edition_mode; else readMode">
                                                             <input matInput type="number"
@@ -146,12 +140,11 @@
                                                                    (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
                                                         </mat-form-field>
                                                         <ng-template #readMode>
-                                                            {{row.count - row.bank_count - row.bag_count}}
+                                                            {{ row.count - row.bank_count - row.bag_count }}
                                                         </ng-template>
                                                     </ng-container>
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchCase="'should_signal'">
+                                                }
+                                                @case ('should_signal') {
                                                     <ng-container *ngIf="row.priority_main.value.count > -1">
                                                         <mat-checkbox [(ngModel)]="row.should_signal" *ngIf="edition_mode; else readMode"></mat-checkbox>
                                                         <ng-template #readMode>
@@ -160,14 +153,13 @@
                                                             </mat-icon>
                                                         </ng-template>
                                                     </ng-container>
-                                                </ng-container>
-
-                                                <ng-container *ngSwitchCase="'delete'">
+                                                }
+                                                @case ('delete') {
                                                     <button mat-icon-button type="button" (click)="remove(row)">
                                                         <mat-icon>close</mat-icon>
                                                     </button>
-                                                </ng-container>
-                                            </ng-container>
+                                                }
+                                            }
                                         </td>
                                     </ng-container>
 
@@ -180,7 +172,7 @@
                                         <td class="mat-cell" colspan="9">
                                             <ng-container
                                                 *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
-                                                <ng-container i18n>Aucun objet ne correspond au filtre "{{filterInput.nativeElement.value}}"</ng-container>
+                                                <ng-container i18n>Aucun objet ne correspond au filtre "{{ filterInput.nativeElement.value }}"</ng-container>
                                             </ng-container>
                                             <ng-template #emptyTable>
                                                 <ng-container i18n>La liste est vide</ng-container>

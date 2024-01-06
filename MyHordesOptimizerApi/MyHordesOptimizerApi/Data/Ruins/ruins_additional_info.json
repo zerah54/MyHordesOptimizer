@@ -48,13 +48,13 @@
         "capacity": 1
     },
     "doner": {
-        "capacity": 100
+        "capacity": 2
     },
     "duke": {
         "capacity": 3
     },
     "woods": {
-        "capacity": 100
+        "capacity": 2
     },
     "mine": {
         "capacity": 2

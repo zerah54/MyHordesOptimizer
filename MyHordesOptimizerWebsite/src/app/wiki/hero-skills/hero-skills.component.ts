@@ -1,4 +1,4 @@
-import { CommonModule, NgOptimizedImage, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatSortModule } from '@angular/material/sort';
@@ -17,7 +17,7 @@ import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
     templateUrl: './hero-skills.component.html',
     styleUrls: ['./hero-skills.component.scss'],
     standalone: true,
-    imports: [MatCardModule, CommonModule, MatTableModule, MatSortModule, NgSwitch, NgSwitchCase, NgOptimizedImage, NgSwitchDefault, ColumnIdPipe]
+    imports: [MatCardModule, CommonModule, MatTableModule, MatSortModule, NgOptimizedImage, ColumnIdPipe]
 })
 export class HeroSkillsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

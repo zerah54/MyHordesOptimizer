@@ -37,32 +37,28 @@
         </div>
     </div>
     <div class="result">
-        <ng-container [ngSwitch]="display_mode">
-            <ng-container *ngSwitchCase="'plays'">
+        @switch (display_mode) {
+            @case ('plays') {
                 <mho-registry-dice-cards [completeCitizenList]="complete_citizen_list"
                                          [registry]="registry_entries"></mho-registry-dice-cards>
-            </ng-container>
-
-            <ng-container *ngSwitchCase="'digs'">
+            }
+            @case ('digs') {
                 <mho-registry-digs [completeCitizenList]="complete_citizen_list"
                                    [registry]="registry_entries"></mho-registry-digs>
-            </ng-container>
-
-            <ng-container *ngSwitchCase="'bank_diff'">
+            }
+            @case ('bank_diff') {
                 <mho-registry-bank-diff [completeCitizenList]="complete_citizen_list"
                                         [completeItemsList]="complete_items_list"
                                         [registry]="registry_entries"></mho-registry-bank-diff>
-            </ng-container>
-
-            <ng-container *ngSwitchCase="'well'">
+            }
+            @case ('well') {
                 <mho-registry-well [completeCitizenList]="complete_citizen_list"
                                    [registry]="registry_entries"></mho-registry-well>
-            </ng-container>
-
-            <ng-container *ngSwitchCase="'doors'">
+            }
+            @case ('doors') {
                 <mho-registry-doors [completeCitizenList]="complete_citizen_list"
                                     [registry]="registry_entries"></mho-registry-doors>
-            </ng-container>
-        </ng-container>
+            }
+        }
     </div>
 </div>

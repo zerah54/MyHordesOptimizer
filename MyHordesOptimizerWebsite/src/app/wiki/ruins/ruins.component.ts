@@ -1,4 +1,4 @@
-import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -26,7 +26,7 @@ import { normalizeString } from '../../shared/utilities/string.utils';
     templateUrl: './ruins.component.html',
     styleUrls: ['./ruins.component.scss'],
     standalone: true,
-    imports: [MatCardModule, CommonModule, MatTableModule, MatSortModule, NgSwitch, NgSwitchCase, HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, NgClass, NgOptimizedImage, NgSwitchDefault, DecimalPipe, ColumnIdPipe, FormsModule, MatSlideToggleModule]
+    imports: [MatCardModule, CommonModule, MatTableModule, MatSortModule, HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, NgClass, NgOptimizedImage, DecimalPipe, ColumnIdPipe, FormsModule, MatSlideToggleModule]
 })
 export class RuinsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

@@ -37,8 +37,8 @@
     <mho-footer #footer></mho-footer>
 
     <div class="mho-loading" *ngIf="is_loading">
-        <ng-container [ngSwitch]="theme">
-            <ng-container *ngSwitchCase="'halloween'">
+        @switch (theme) {
+            @case ('halloween') {
                 <div class="ghost-container">
                     <div class="ghost animate-hover">
                         <div class="face">
@@ -56,10 +56,10 @@
                         </div>
                     </div>
                 </div>
-            </ng-container>
-            <ng-container *ngSwitchDefault>
+            }
+            @default {
                 <mat-spinner [color]="'accent'"></mat-spinner>
-            </ng-container>
-        </ng-container>
+            }
+        }
     </div>
 </div>

@@ -1057,13 +1057,13 @@ $ruins_additional_info = [
     'container' => ['capacity' => 1],
 
     // id 23
-    'doner' => ['capacity' => 100],
+    'doner' => ['capacity' => 2],
 
     // id 25
     'duke' => ['capacity' => 3],
 
     // id 13
-    'woods' => ['capacity' => 100],
+    'woods' => ['capacity' => 2],
 
     // id 52
     'mine' => ['capacity' => 2],
