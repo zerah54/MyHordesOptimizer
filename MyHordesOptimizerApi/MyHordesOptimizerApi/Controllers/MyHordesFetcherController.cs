@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
@@ -67,7 +68,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Bank")]
-        public ActionResult<BankWrapper> GetBank(string userKey)
+        public ActionResult<BankLastUpdate> GetBank(string userKey)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
@@ -82,7 +83,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Citizens")]
-        public ActionResult<CitizensWrapper> GetCitizens(int? townId, int? userId)
+        public ActionResult<CitizensLastUpdate> GetCitizens(int? townId, int? userId)
         {
             if (!townId.HasValue)
             {
@@ -101,9 +102,9 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Ruins")]
-        public ActionResult<IEnumerable<MyHordesOptimizerRuin>> GetRuins()
+        public ActionResult<IEnumerable<MyHordesOptimizerRuin>> GetRuins(int? townId)
         {
-            var ruins = _myHordesFetcherService.GetRuins().ToList();
+            var ruins = _myHordesFetcherService.GetRuins(townId).ToList();
             return ruins;
         }
 

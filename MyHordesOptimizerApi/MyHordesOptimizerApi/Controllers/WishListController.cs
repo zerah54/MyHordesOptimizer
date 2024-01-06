@@ -23,14 +23,14 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpGet]
-        public ActionResult<WishListWrapper> GetWishList(int townId)
+        public ActionResult<WishListLastUpdate> GetWishList(int townId)
         {
             var wishList = _wishListService.GetWishList(townId);
             return wishList;
         }
 
         [HttpPut]
-        public ActionResult<WishListWrapper> PutWishList(int townId, int userId, List<WishListPutResquestDto> request)
+        public ActionResult<WishListLastUpdate> PutWishList(int townId, int userId, List<WishListPutResquestDto> request)
         {
             if (request == null)
             {
@@ -78,7 +78,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Template/{templateId}")]
-        public ActionResult<WishListWrapper> CreateFromTemplate(int? townId, int? userId, int? templateId)
+        public ActionResult<WishListLastUpdate> CreateFromTemplate(int? townId, int? userId, int? templateId)
         {
             if (!townId.HasValue)
             {

@@ -2,12 +2,12 @@
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
-    public class CadaversWrapper
+    public class CadaversLastUpdate
     {
         public List<Cadaver> Cadavers { get; set; }
         public LastUpdateInfo LastUpdateInfo { get; set; }
 
-        public CadaversWrapper()
+        public CadaversLastUpdate()
         {
             Cadavers = new List<Cadaver>();
         }

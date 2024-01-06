@@ -8,12 +8,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 
         public MyHordesMap MyHordesMap { get; set; }
 
-        public CitizensWrapper Citizens { get; set; }
+        public CitizensLastUpdate Citizens { get; set; }
 
-        public BankWrapper Bank { get; set; }
+        public BankLastUpdate Bank { get; set; }
 
-        public CadaversWrapper Cadavers { get; set; }
+        public CadaversLastUpdate Cadavers { get; set; }
 
-        public WishListWrapper WishList { get; set; }
+        public WishListLastUpdate WishList { get; set; }
     }
 }

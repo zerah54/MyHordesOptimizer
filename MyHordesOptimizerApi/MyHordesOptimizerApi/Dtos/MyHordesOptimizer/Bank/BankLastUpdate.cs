@@ -2,12 +2,12 @@
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
-    public class BankWrapper
+    public class BankLastUpdate
     {
         public List<BankItem> Bank { get; set; }
         public LastUpdateInfo LastUpdateInfo { get; set; }
 
-        public BankWrapper()
+        public BankLastUpdate()
         {
             Bank = new List<BankItem>();
         }
