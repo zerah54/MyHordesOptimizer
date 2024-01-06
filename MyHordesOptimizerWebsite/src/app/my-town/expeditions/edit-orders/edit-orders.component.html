@@ -1,0 +1,32 @@
+<div class="mho-edit-order">
+    <div mat-dialog-title>
+        <div>
+            <h2 i18n>Consignes</h2>
+        </div>
+    </div>
+    <mat-dialog-content>
+        <div style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 1em; justify-content: center;">
+            <button mat-button (click)="addTextOrder()" i18n>Ajouter une consigne texte</button>
+            <button mat-button (click)="addCheckableOrder()" i18n>Ajouter une consigne cochable</button>
+        </div>
+        <div style="display: flex; flex-direction: row" *ngFor="let order of orders">
+            <div class="row-header">
+                @switch (order.type) {
+                    @case ('text') {
+                        <mat-icon>edit_note</mat-icon>
+                    }
+                    @case ('checkbox') {
+                        <mat-icon>check_box</mat-icon>
+                    }
+                }
+            </div>
+            <div class="row-content">
+                <mho-editor [(content)]="order.text"></mho-editor>
+            </div>
+        </div>
+    </mat-dialog-content>
+</div>
+<div mat-dialog-actions [align]="'end'">
+    <button mat-button [color]="'accent'" [mat-dialog-close]="data.orders" i18n>Fermer</button>
+    <button mat-raised-button [color]="'accent'" [mat-dialog-close]="orders" i18n>Enregistrer</button>
+</div>

@@ -113,4 +113,10 @@ export default [
         title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Liste de courses`,
         canActivate: [(): boolean => inject(IsInTownGuard).canActivate()]
     },
+    {
+        path: 'expeditions',
+        component: ExpeditionsComponent,
+        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Expéditions`,
+        canActivate: [(): boolean => inject(IsInTownGuard).canActivate()]
+    },
 ] satisfies Route[];

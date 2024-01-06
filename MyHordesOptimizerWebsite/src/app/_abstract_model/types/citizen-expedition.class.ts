@@ -1,19 +1,20 @@
 ﻿import { CitizenExpeditionDTO } from '../dto/citizen-expedition.dto';
 import { HeroicActionEnum } from '../enum/heroic-action.enum';
 import { JobEnum } from '../enum/job.enum';
-import { CommonModel } from './_common.class';
+import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { Bag } from './bag.class';
 import { Citizen } from './citizen.class';
+import { ExpeditionOrder } from './expedition-order.class';
 
 export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
     public citizen!: Citizen;
     public bag: Bag = new Bag();
-    public consigne!: string;
+    public orders!: ExpeditionOrder[];
     public preinscrit!: boolean;
     public preinscrit_job?: JobEnum;
     public preinscrit_heroic?: HeroicActionEnum;
     public pdc!: number;
-    public soif!: boolean;
+    public soif?: boolean;
 
 
     constructor(dto?: CitizenExpeditionDTO) {
@@ -25,7 +26,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
         return {
             citizen: this.citizen ? this.citizen.modelToDto() : undefined,
             bag: this.bag ? this.bag.modelToDto() : undefined,
-            consigne: this.consigne,
+            orders: modelToDtoArray(this.orders),
             preinscrit: this.preinscrit,
             preinscritJob: this.preinscrit_job?.value.id,
             preinscritHeroic: this.preinscrit_heroic?.key,
@@ -38,7 +39,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
         if (dto) {
             this.citizen = new Citizen(dto.citizen);
             this.bag = new Bag(dto.bag);
-            this.consigne = dto.consigne;
+            this.orders = dtoToModelArray(ExpeditionOrder, dto.orders);
             this.preinscrit = dto.preinscrit;
             this.preinscrit_job = dto.preinscritJob ? <JobEnum>JobEnum.getByKey(dto.preinscritJob) : undefined;
             this.preinscrit_heroic = dto.preinscritHeroic ? <HeroicActionEnum>HeroicActionEnum.getByKey(dto.preinscritHeroic) : undefined;

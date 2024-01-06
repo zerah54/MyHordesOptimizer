@@ -1,6 +1,253 @@
-<mat-card-header>
-    <mat-card-title i18n>Expéditions</mat-card-title>
+<mat-card-header class="mho-expeditions-header">
+    <mat-card-title>
+        <ng-container i18n>Expéditions</ng-container>
+        <button mat-icon-button matTooltip="Copier au format forum" i18n-matTooltip>
+            <mat-icon>share</mat-icon>
+        </button>
+    </mat-card-title>
+    <div class="actions">
+        <mat-slide-toggle [(ngModel)]="edition_mode" (ngModelChange)="changeEditionMode()">
+            <ng-container i18n>Mode édition</ng-container>
+        </mat-slide-toggle>
+    </div>
 </mat-card-header>
 <mat-card-content class="mho-expeditions">
-
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selected_tab_index"
+                   (selectedTabChange)="changeTab($event)" *ngIf="all_citizens && all_items">
+        <mat-tab *ngFor="let day of [].constructor(current_day + 1); let day_index = index"
+                 label="Jour {{day_index + 1}}" i18n-label>
+            <ng-template matTabContent>
+                <div class="container">
+                    <div class="header">
+                        <h2><span i18n>Préinscrits&nbsp;:&nbsp;</span><span [innerHTML]="preRegistered"></span></h2>
+                    </div>
+                    <div class="actions" *ngIf="edition_mode">
+                        <div class="left-actions">
+                            <button mat-button (click)="addNewExpedition()" i18n>Créer une expédition</button>
+                        </div>
+                        <div class="right-actions">
+                            <button mat-icon-button [matMenuTriggerFor]="manageExpeditions">
+                                <mat-icon>more_vert</mat-icon>
+                            </button>
+                            <mat-menu #manageExpeditions="matMenu">
+                                <div mat-menu-item (click)="copyExpeditions()">
+                                    <ng-container i18n>Copier la page</ng-container>
+                                </div>
+                                <div mat-menu-item (click)="pasteExpeditions()">
+                                    <ng-container i18n>Coller la page</ng-container>
+                                </div>
+                            </mat-menu>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <div *ngFor="let expedition of expeditions; let expedition_index = index"
+                             [ngClass]="['expedition', expedition.state]">
+                            <div class="header">
+                                <div class="label">
+                                    <ng-container *ngIf="edition_mode; else readonlyLabel">
+                                        <mat-form-field class="no-bottom">
+                                            <mat-label i18n>Nom de l'expédition</mat-label>
+                                            <input matInput [(ngModel)]="expedition.label">
+                                        </mat-form-field>
+                                        <mat-form-field class="no-bottom">
+                                            <mat-label i18n>Points de contrôles requis</mat-label>
+                                            <input matInput type="number" [(ngModel)]="expedition.min_pdc">
+                                        </mat-form-field>
+                                    </ng-container>
+                                    <ng-template #readonlyLabel>
+                                        <h2>{{ expedition.label }}</h2>
+                                    </ng-template>
+                                </div>
+                                <div class="actions" *ngIf="edition_mode">
+                                    <mat-slide-toggle [ngModel]="expedition.state === 'ready'"
+                                                      (ngModelChange)="changeExpeditionState(expedition, $event);">
+                                        <ng-container i18n>Expédition prête</ng-container>
+                                    </mat-slide-toggle>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <div *ngFor="let expedition_part of expedition.parts">
+                                    <table class="expedition-table">
+                                        <thead>
+                                        <tr class="table-header">
+                                            <td class="action" *ngIf="edition_mode"></td>
+                                            <td class="job" i18n>Métier</td>
+                                            <td class="pseudo" i18n>Citoyen</td>
+                                            <td class="soif" i18n>
+                                                <div class="flex">
+                                                    <img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst1.gif'" [height]="16" [width]="16">
+                                                </div>
+                                            </td>
+                                            <td class="pdc" i18n>
+                                                <div class="flex">
+                                                    <img [ngSrc]="HORDES_IMG_REPO + 'professions/shield.gif'" [height]="16" [width]="16">
+                                                    {{ expedition_part | totalPdc }}/{{ expedition.min_pdc || 0 }}
+                                                </div>
+                                            </td>
+                                            <td class="path" i18n>Nom du tracé</td>
+                                            <td class="heroic" *ngIf="edition_mode || (expedition_part.citizens | someHeroicActionNeeded)" i18n>
+                                                Action héroïque
+                                            </td>
+                                            <td class="citizen-orders" i18n>Consigne perso</td>
+                                            <td class="bag" i18n>Sac</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr *ngFor="let citizen of expedition_part.citizens; let citizen_index = index"
+                                            class="citizen">
+                                            <td class="action" *ngIf="edition_mode">
+                                                <button mat-icon-button (click)="removeRow(expedition_part, citizen_index)">
+                                                    <mat-icon>delete</mat-icon>
+                                                </button>
+                                            </td>
+                                            <td class="job">
+                                                <ng-container *ngIf="edition_mode && !citizen.citizen; else readonlyJob">
+                                                    <mat-form-field [appearance]="'outline'" class="no-bottom">
+                                                        <mho-select [options]="all_citizens_job" [searchable]="false"
+                                                                    [emptyOption]="true"
+                                                                    [bindLabel]="'value.label'"
+                                                                    [noLabel]="true"
+                                                                    [bindIcon]="'value.img'"
+                                                                    [(ngModel)]="citizen.preinscrit_job"></mho-select>
+                                                    </mat-form-field>
+                                                </ng-container>
+                                                <ng-template #readonlyJob>
+                                                    <img
+                                                        [ngSrc]="HORDES_IMG_REPO + (citizen.preinscrit_job?.value?.img ?? (citizen.citizen ? citizen.citizen.job?.value?.img : ''))"
+                                                        width="16" height="16">
+                                                </ng-template>
+                                            </td>
+                                            <td class="pseudo">
+                                                <ng-container
+                                                    *ngIf="edition_mode || (expedition.state === 'ready' && !citizen.preinscrit); else readonlyCitizen">
+                                                    <mat-form-field [appearance]="'outline'" class="no-bottom">
+                                                        <mho-select [options]="all_citizens | citizensForExpe:citizen"
+                                                                    [emptyOption]="true"
+                                                                    [(ngModel)]="citizen.citizen" [bindLabel]="'name'"
+                                                                    [bindIcon]="'job.value.img'"
+                                                                    (ngModelChange)="citizen.citizen ? citizen.preinscrit_job = undefined : undefined; edition_mode && citizen.citizen ? citizen.preinscrit = true : citizen.preinscrit = false;"></mho-select>
+                                                    </mat-form-field>
+                                                </ng-container>
+                                                <ng-template
+                                                    #readonlyCitizen>{{ citizen.citizen ? citizen.citizen.name : '' }}
+                                                </ng-template>
+                                            </td>
+                                            <td class="soif">
+                                                <ng-container
+                                                    *ngIf="edition_mode || expedition.state === 'ready'; else readonlyCitizenSoif">
+                                                    <mat-checkbox [(ngModel)]="citizen.soif"></mat-checkbox>
+                                                </ng-container>
+                                                <ng-template #readonlyCitizenSoif>
+                                                    <ng-container
+                                                        *ngIf="citizen.soif !== undefined && citizen.soif !== null">
+                                                        <ng-container *ngIf="citizen.soif" i18n>Oui</ng-container>
+                                                        <ng-container *ngIf="!citizen.soif" i18n>Non</ng-container>
+                                                    </ng-container>
+                                                </ng-template>
+                                            </td>
+                                            <td class="pdc">
+                                                <ng-container
+                                                    *ngIf="edition_mode || expedition.state === 'ready'; else readonlyCitizenPdc">
+                                                    <mat-form-field [appearance]="'outline'" class="no-bottom">
+                                                        <input matInput [(ngModel)]="citizen.pdc">
+                                                    </mat-form-field>
+                                                </ng-container>
+                                                <ng-template #readonlyCitizenPdc>{{ citizen.pdc }}</ng-template>
+                                            </td>
+                                            <td class="path" [attr.rowspan]="expedition_part.citizens.length"
+                                                *ngIf="citizen_index === 0">
+                                                <ng-container *ngIf="edition_mode; else readonlyPath">
+                                                    <mat-form-field [appearance]="'outline'" class="no-bottom">
+                                                        <input matInput type="text" [(ngModel)]="expedition_part.path">
+                                                    </mat-form-field>
+                                                </ng-container>
+                                                <ng-template #readonlyPath>
+                                                    <span [innerHTML]="expedition_part.path"></span>
+                                                </ng-template>
+                                            </td>
+                                            <td class="heroic" *ngIf="edition_mode || (expedition_part.citizens | someHeroicActionNeeded)">
+                                                <ng-container
+                                                    *ngIf="edition_mode; else readonlyHeroic">
+                                                    <mat-form-field [appearance]="'outline'" class="no-bottom">
+                                                        <mho-select [options]="all_heroics"
+                                                                    [emptyOption]="true"
+                                                                    [(ngModel)]="citizen.preinscrit_heroic"
+                                                                    [bindLabel]="'value.label'"
+                                                                    [bindIcon]="'value.img'"></mho-select>
+                                                    </mat-form-field>
+                                                </ng-container>
+                                                <ng-template #readonlyHeroic>
+                                                    {{ citizen.preinscrit_heroic ? citizen.preinscrit_heroic : '' }}
+                                                </ng-template>
+                                            </td>
+                                            <td class="citizen-orders">
+                                                <ng-container *ngIf="edition_mode; else readonlyCitizenOrders">
+                                                    <ng-container *ngTemplateOutlet="displayOrder; context: {$implicit: citizen.orders}"></ng-container>
+                                                    <button mat-raised-button (click)="openExpeditionOrders(citizen.orders, citizen)">
+                                                        <ng-container i18n>Éditer</ng-container>
+                                                    </button>
+                                                </ng-container>
+                                                <ng-template #readonlyCitizenOrders>
+                                                    <ng-container *ngTemplateOutlet="displayOrder; context: {$implicit: citizen.orders}"></ng-container>
+                                                </ng-template>
+                                            </td>
+                                            <td class="bag">
+                                                <mho-list-element-add-remove [currentList]="citizen.bag.items" label="Sac"
+                                                                             i18n-label
+                                                                             [completeList]="all_items"
+                                                                             addLabel="Ajouter au sac" i18n-addLabel
+                                                                             (add)="addItem(citizen, +$event)"
+                                                                             removeLabel="Retirer du sac" i18n-removeLabel
+                                                                             (remove)="removeItem(citizen, +$event)"
+                                                                             emptyLabel="Vider le sac" i18n-emptyLabel
+                                                                             (empty)="emptyBag(citizen)"
+                                                                             [readonly]="!edition_mode">
+                                                </mho-list-element-add-remove>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="orders">
+                                        <h3 i18n>Consignes</h3>
+                                        <ng-container *ngIf="edition_mode; else readonlyExpeditionOrders">
+                                            <ng-container *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_part.orders}"></ng-container>
+                                            <button mat-raised-button
+                                                    (click)="openExpeditionOrders(expedition_part.orders, expedition_part)">
+                                                <ng-container i18n>Éditer</ng-container>
+                                            </button>
+                                        </ng-container>
+                                        <ng-template #readonlyExpeditionOrders>
+                                            <ng-container *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_part.orders}"></ng-container>
+                                        </ng-template>
+                                    </div>
+                                </div>
+                                <ng-template #displayOrder let-orders>
+                                    <div *ngFor="let order of orders">
+                                        @switch (order.type) {
+                                            @case ('text') {
+                                                <span [innerHTML]="order.text"></span>
+                                            }
+                                            @case ('checkbox') {
+                                                <mat-checkbox [(ngModel)]="order.done">
+                                                    <span [class.checked]="order.done" [innerHTML]="order.text"></span>
+                                                </mat-checkbox>
+                                            }
+                                        }
+                                    </div>
+                                </ng-template>
+                            </div>
+                            <div class="footer" *ngIf="edition_mode">
+                                <button mat-button (click)="addNewMember(expedition)">
+                                    <ng-container i18n>Ajouter un membre à l'expédition</ng-container>
+                                </button>
+                                <button mat-button (click)="addNewExpeditionPart(expedition)">
+                                    <ng-container i18n>Ajouter une partie à l'expédition</ng-container>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </mat-tab>
+    </mat-tab-group>
 </mat-card-content>
