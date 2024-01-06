@@ -1,42 +1,68 @@
 name: (Script) Update Version
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'Scripts/Tampermonkey/my_hordes_optimizer.user.js'
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+        paths:
+            - 'Scripts/Tampermonkey/my_hordes_optimizer.user.js'
 
 jobs:
-  script-change-version:
+    #    script-change-version:
+    #
+    #        runs-on: ubuntu-latest
+    #
+    #        steps:
+    #            -   uses: actions/checkout@main
+    #
+    #            -   name: Read Script
+    #                id: read-script
+    #                run: echo "version_row=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> $GITHUB_OUTPUT
+    #
+    #            -   name: Match Version
+    #                uses: actions-ecosystem/action-regex-match@v2
+    #                id: regex-match
+    #                with:
+    #                    text: ${{ steps.read-script.outputs.version_row }}
+    #                    regex: '@version *(.+)'
+    #
+    #            -   name: Get Script Version
+    #                id: get-version
+    #                env:
+    #                    VERSION: "${{ steps.regex-match.outputs.group1 }}"
+    #                run: echo "version=$VERSION" >> $GITHUB_OUTPUT
+    #
+    #            -   name: Save version
+    #                run: |
+    #                    curl --request POST \
+    #                      --url "https://api.myhordesoptimizer.fr/Parameters/Parameters" \
+    #                      --header "Content-Type: application/json" \
+    #                      --header "Authorization: Basic ${{secrets.AUTHENTICATION_BASIC}}" \
+    #                      --data '{"name": "ScriptVersion", "value": "${{ steps.get-version.outputs.version }}"}'
 
-    runs-on: ubuntu-latest
+    deploy_chrome_extension:
+        runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@main
+        steps:
+            -   name: Zip
+            -   uses: actions/checkout@v2
+            -   uses: vimtor/action-zip@latest
+                with:
+                    files: Extensions/Chrome/
+                    dest: Chrome.zip
 
-      - name: Read Script
-        id: read-script
-        run: echo "version_row=$(sed -n 3p ./Scripts/Tampermonkey/my_hordes_optimizer.user.js)" >> $GITHUB_OUTPUT
+            -   name: Download artifact
+                with:
+                    name: my-artifact
+                    path: ${{ github.workspace }}/Chrome.zip
 
-      - name: Match Version
-        uses: actions-ecosystem/action-regex-match@v2
-        id: regex-match
-        with:
-          text: ${{ steps.read-script.outputs.version_row }}
-          regex: '@version *(.+)'
+            -   name: Publish
+                uses: mnao305/chrome-extension-upload@latest
+                with:
+                    file-path: ${{ github.workspace }}/Chrome.zip
+                    extension-id: jolghobcgphmgaiachbipnpiimmgknno
+                    client-id: ${{ secrets.CHROME_EXTENSION_CLIENT_ID }}
+                    client-secret: ${{ secrets.CHROME_EXTENSION_CLIENT_SECRET }}
+                    refresh-token: ${{ secrets.CHROME_EXTENSION_REFRESH_TOKEN }}
 
-      - name: Get Script Version
-        id: get-version
-        env:
-          VERSION: "${{ steps.regex-match.outputs.group1 }}"
-        run: echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Save version
-        run: |
-          curl --request POST \
-            --url "https://api.myhordesoptimizer.fr/Parameters/Parameters" \
-            --header "Content-Type: application/json" \
-            --header "Authorization: Basic ${{secrets.AUTHENTICATION_BASIC}}" \
-            --data '{"name": "ScriptVersion", "value": "${{ steps.get-version.outputs.version }}"}'
