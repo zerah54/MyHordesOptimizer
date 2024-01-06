@@ -1,4 +1,4 @@
-import { CommonModule, NgClass, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { Component, ElementRef, HostBinding, OnInit, ViewChild } from '@angular/core';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -19,7 +19,7 @@ import { groupBy } from '../../../shared/utilities/array.util';
     templateUrl: './scrutateur.component.html',
     styleUrls: ['./scrutateur.component.scss'],
     standalone: true,
-    imports: [MatTableModule, MatSortModule, CommonModule, NgClass, NgSwitch, NgSwitchCase, NgSwitchDefault, ColumnIdPipe]
+    imports: [MatTableModule, MatSortModule, CommonModule, NgClass, ColumnIdPipe]
 })
 export class ScrutateurComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { CommonModule, NgClass, NgOptimizedImage, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, HostListener, inject, Inject, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -22,7 +22,7 @@ import { MenuComponent } from './structure/menu/menu.component';
     styleUrls: ['./app.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [NgClass, HeaderComponent, CommonModule, NgOptimizedImage, MatSidenavModule, MenuComponent, MatCardModule, RouterOutlet, FooterComponent, NgSwitch, NgSwitchCase, NgSwitchDefault, MatProgressSpinnerModule]
+    imports: [NgClass, HeaderComponent, CommonModule, NgOptimizedImage, MatSidenavModule, MenuComponent, MatCardModule, RouterOutlet, FooterComponent, MatProgressSpinnerModule]
 })
 export class AppComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

@@ -1,4 +1,4 @@
-import { CommonModule, NgClass, NgSwitch, NgSwitchCase } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -25,7 +25,7 @@ import { getTown } from '../../../shared/utilities/localstorage.util';
     styleUrls: ['./citizens-dispo.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatTableModule, MatSortModule, CommonModule, NgClass, NgSwitch, NgSwitchCase, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent, ColumnIdPipe]
+    imports: [MatTableModule, MatSortModule, CommonModule, NgClass, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent, ColumnIdPipe]
 })
 export class CitizensDispoComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
