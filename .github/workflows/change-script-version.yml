@@ -48,7 +48,7 @@ jobs:
             -   uses: actions/checkout@main
 
             -   name: Zip
-                uses: vimtor/action-zip@latest
+                uses: vimtor/action-zip@v1.1
                 with:
                     files: Extensions/Chrome/
                     dest: Chrome.zip
