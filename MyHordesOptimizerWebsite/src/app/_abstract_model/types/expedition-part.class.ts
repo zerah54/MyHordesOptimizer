@@ -11,7 +11,7 @@ export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
     public path!: string;
 
 
-    constructor(dto?: ExpeditionPartDTO) {
+    constructor(dto?: ExpeditionPartDTO | null) {
         super();
         this.dtoToModel(dto);
     }
@@ -25,7 +25,7 @@ export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
         };
     }
 
-    protected override dtoToModel(dto?: ExpeditionPartDTO): void {
+    protected override dtoToModel(dto?: ExpeditionPartDTO | null): void {
         if (dto) {
             this.id = dto.id;
             this.orders = dtoToModelArray(ExpeditionOrder, dto.orders);
