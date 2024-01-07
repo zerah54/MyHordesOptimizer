@@ -48,12 +48,12 @@ export class ExpeditionService extends GlobalService {
      * @param {number} day
      * @param {Expedition} expedition
      */
-    public createExpedition(day: number, expedition: Expedition): Observable<void> {
-        return new Observable((sub: Subscriber<void>) => {
-            super.post(this.API_URL + `/expeditions/${getTown()?.town_id}/${day}`, JSON.stringify(expedition.modelToDto()))
+    public createOrUpdateExpedition(day: number, expedition: Expedition): Observable<Expedition> {
+        return new Observable((sub: Subscriber<Expedition>) => {
+            super.post<ExpeditionDTO>(this.API_URL + `/expeditions/${getTown()?.town_id}/${day}`, JSON.stringify(expedition.modelToDto()))
                 .subscribe({
-                    next: () => {
-                        sub.next();
+                    next: (response: ExpeditionDTO) => {
+                        sub.next(new Expedition(response));
                         this.snackbar.successSnackbar($localize`L'expédition ${expedition.label} a bien été créée`);
                     },
                     error: (error: HttpErrorResponse) => {
@@ -64,36 +64,13 @@ export class ExpeditionService extends GlobalService {
     }
 
     /**
-     * Met à jour les données de l'expédition'
+     * Supprime l'expédition
      *
-     * @param {number} day
      * @param {Expedition} expedition
-     *
-     * @returns {Observable<Expedition>}
      */
-    public updateExpedition(day: number, expedition: Expedition): Observable<Expedition> {
-        return new Observable((sub: Subscriber<Expedition>) => {
-            super.put<ExpeditionDTO>(this.API_URL + `/expeditions/${getTown()?.town_id}/${day}/${expedition.id}`, JSON.stringify(expedition.modelToDto()))
-                .subscribe({
-                    next: (response: HttpResponse<ExpeditionDTO>) => {
-                        sub.next(new Expedition(response.body));
-                    },
-                    error: (error: HttpErrorResponse) => {
-                        sub.error(error);
-                    }
-                });
-        });
-    }
-
-    /**
-     * Ajoute un élément à l'expédition
-     * @param {number} day
-     * @param {Expedition} expedition
-     * @param {ExpeditionPart} expedition_part
-     */
-    public createExpeditionPart(day: number, expedition: Expedition, expedition_part: ExpeditionPart): Observable<void> {
+    public deleteExpedition(expedition: Expedition): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.post(this.API_URL + `/expeditions/${getTown()?.town_id}/${day}/${expedition.id}`, JSON.stringify(expedition_part.modelToDto()))
+            super.delete(this.API_URL + `/expeditions/${expedition.id}`)
                 .subscribe({
                     next: () => {
                         sub.next();
@@ -106,38 +83,36 @@ export class ExpeditionService extends GlobalService {
     }
 
     /**
-     * Met à jour les données de l'expédition'
+     * Ajoute un élément à l'expédition
      *
-     * @param {number} day
+     * @param {Expedition} expedition
+     * @param {ExpeditionPart} expedition_part
+     */
+    public createOrUpdateExpeditionPart(expedition: Expedition, expedition_part: ExpeditionPart): Observable<ExpeditionPart> {
+        return new Observable((sub: Subscriber<ExpeditionPart>) => {
+            super.post<ExpeditionPartDTO>(this.API_URL + `/expeditions/parts/${expedition.id}`, JSON.stringify(expedition_part.modelToDto()))
+                .subscribe({
+                    next: (response: ExpeditionPartDTO) => {
+                        sub.next(new ExpeditionPart(response));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
+
+    /**
+     * Supprime une partie de l'expédition
+     *
      * @param {Expedition} expedition
      * @param {ExpeditionPart} expedition_part
      *
      * @returns {Observable<ExpeditionPart>}
      */
-    public updateExpeditionPart(day: number, expedition: Expedition, expedition_part: ExpeditionPart): Observable<ExpeditionPart> {
-        return new Observable((sub: Subscriber<ExpeditionPart>) => {
-            super.put<ExpeditionPartDTO>(this.API_URL + `/expeditions/${getTown()?.town_id}/${day}/${expedition.id}?partID=${expedition_part.id}`, JSON.stringify(expedition_part.modelToDto()))
-                .subscribe({
-                    next: (response: HttpResponse<ExpeditionPartDTO>) => {
-                        sub.next(new ExpeditionPart(response.body));
-                    },
-                    error: (error: HttpErrorResponse) => {
-                        sub.error(error);
-                    }
-                });
-        });
-    }
-
-    /**
-     * Ajoute un élément à l'expédition
-     * @param {number} day
-     * @param {Expedition} expedition
-     * @param {ExpeditionPart} expedition_part
-     * @param {CitizenExpedition} citizen_expedition
-     */
-    public createCitizenExpedition(day: number, expedition: Expedition, expedition_part: ExpeditionPart, citizen_expedition: CitizenExpedition): Observable<void> {
+    public deleteExpeditionPart(expedition_part: ExpeditionPart): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.post(this.API_URL + `/expeditions/${getTown()?.town_id}/${day}/${expedition.id}/${expedition_part.id}/citizen`, JSON.stringify(citizen_expedition.modelToDto()))
+            super.delete(this.API_URL + `/expeditions/parts/${expedition_part.id}`)
                 .subscribe({
                     next: () => {
                         sub.next();
@@ -150,39 +125,36 @@ export class ExpeditionService extends GlobalService {
     }
 
     /**
-     * Met à jour les données de l'expédition'
+     * Ajoute un citoyen à l'expédition
      *
-     * @param {number} day
-     * @param {Expedition} expedition
+     * @param {ExpeditionPart} expedition_part
+     * @param {CitizenExpedition} citizen_expedition
+     */
+    public createOrUpdateCitizenExpedition(expedition_part: ExpeditionPart, citizen_expedition: CitizenExpedition): Observable<CitizenExpedition> {
+        return new Observable((sub: Subscriber<CitizenExpedition>) => {
+            super.post<CitizenExpeditionDTO>(this.API_URL + `/expeditions/parts/${expedition_part.id}/citizen`, JSON.stringify(citizen_expedition.modelToDto()))
+                .subscribe({
+                    next: (response: CitizenExpeditionDTO) => {
+                        sub.next(new CitizenExpedition(response));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
+
+    /**
+     * Supprime un citoyen d'une expédition
+     *
      * @param {ExpeditionPart} expedition_part
      * @param {CitizenExpedition} citizen_expedition
      *
      * @returns {Observable<CitizenExpedition>}
      */
-    public updateCitizenExpedition(day: number, expedition: Expedition, expedition_part: ExpeditionPart, citizen_expedition: CitizenExpedition): Observable<CitizenExpedition> {
-        return new Observable((sub: Subscriber<CitizenExpedition>) => {
-            super.put<CitizenExpeditionDTO>(this.API_URL + `/expeditions/${getTown()?.town_id}/${day}/${expedition.id}/${expedition_part.id}/citizen?citizenId=${citizen_expedition.id}`, JSON.stringify(citizen_expedition.modelToDto()))
-                .subscribe({
-                    next: (response: HttpResponse<CitizenExpeditionDTO>) => {
-                        sub.next(new CitizenExpedition(response.body));
-                    },
-                    error: (error: HttpErrorResponse) => {
-                        sub.error(error);
-                    }
-                });
-        });
-    }
-
-    /**
-     * Ajoute un élément à l'expédition
-     * @param {number} day
-     * @param {Expedition} expedition
-     * @param {ExpeditionPart} expedition_part
-     * @param {ExpeditionOrder} order
-     */
-    public createOrder(day: number, expedition: Expedition, expedition_part: ExpeditionPart, order: ExpeditionOrder): Observable<void> {
+    public deleteCitizenExpedition(expedition_part: ExpeditionPart, citizen_expedition: CitizenExpedition): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.post(this.API_URL + `/expeditions/${getTown()?.town_id}/${day}/${expedition.id}/${expedition_part.id}/order`, JSON.stringify(order.modelToDto()))
+            super.delete(this.API_URL + `/expeditions/parts/${expedition_part.id}/citizen/${citizen_expedition.id}`)
                 .subscribe({
                     next: () => {
                         sub.next();
@@ -195,21 +167,42 @@ export class ExpeditionService extends GlobalService {
     }
 
     /**
+     * Ajoute une consigne à l'expédition
+     *
+     * @param {ExpeditionPart} expedition_part
+     * @param {ExpeditionOrder} order
+     */
+    public createOrUpdateOrder(expedition_part: ExpeditionPart, order: ExpeditionOrder): Observable<ExpeditionOrder> {
+        return new Observable((sub: Subscriber<ExpeditionOrder>) => {
+            super.post<ExpeditionOrderDTO>(this.API_URL + `/expeditions/parts/${expedition_part.id}/order`, JSON.stringify(order.modelToDto()))
+                .subscribe({
+                    next: (response: ExpeditionOrderDTO) => {
+                        sub.next(new ExpeditionOrder(response));
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
+
+    // DELETE /order/{expeditionOrderId} => Delete ExpeditionOrder
+    //     /Expeditions/
+
+    /**
      * Met à jour les données de l'expédition'
      *
-     * @param {number} day
-     * @param {Expedition} expedition
      * @param {ExpeditionPart} expedition_part
      * @param {ExpeditionOrder} order
      *
      * @returns {Observable<ExpeditionOrder>}
      */
-    public updateOrder(day: number, expedition: Expedition, expedition_part: ExpeditionPart, order: ExpeditionOrder): Observable<ExpeditionOrder> {
-        return new Observable((sub: Subscriber<ExpeditionOrder>) => {
-            super.put<ExpeditionOrderDTO>(this.API_URL + `/expeditions/${getTown()?.town_id}/${day}/${expedition.id}/${expedition_part.id}/order?orderId=${order.id}`, JSON.stringify(order.modelToDto()))
+    public deleteOrder(expedition_part: ExpeditionPart, order: ExpeditionOrder): Observable<void> {
+        return new Observable((sub: Subscriber<void>) => {
+            super.delete(this.API_URL + `/expeditions/parts/${expedition_part.id}/order/${order.id}`)
                 .subscribe({
-                    next: (response: HttpResponse<ExpeditionOrderDTO>) => {
-                        sub.next(new ExpeditionOrder(response.body));
+                    next: () => {
+                        sub.next();
                     },
                     error: (error: HttpErrorResponse) => {
                         sub.error(error);

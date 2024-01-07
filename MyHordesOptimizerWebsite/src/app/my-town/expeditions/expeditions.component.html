@@ -109,7 +109,7 @@
                                                                     [noLabel]="true"
                                                                     [bindIcon]="'value.img'"
                                                                     [(ngModel)]="citizen.preinscrit_job"
-                                                                    (ngModelChange)="saveCitizen(expedition, expedition_part, citizen)"></mho-select>
+                                                                    (ngModelChange)="saveCitizen(expedition_part, citizen)"></mho-select>
                                                     </mat-form-field>
                                                 </ng-container>
                                                 <ng-template #readonlyJob>
@@ -126,7 +126,7 @@
                                                                     [emptyOption]="true"
                                                                     [(ngModel)]="citizen.citizen" [bindLabel]="'name'"
                                                                     [bindIcon]="'job.value.img'"
-                                                                    (ngModelChange)="citizen.citizen ? citizen.preinscrit_job = undefined : undefined; edition_mode && citizen.citizen ? citizen.preinscrit = true : citizen.preinscrit = false; saveCitizen(expedition, expedition_part, citizen)"></mho-select>
+                                                                    (ngModelChange)="citizen.citizen ? citizen.preinscrit_job = undefined : undefined; edition_mode && citizen.citizen ? citizen.preinscrit = true : citizen.preinscrit = false; saveCitizen(expedition_part, citizen)"></mho-select>
                                                     </mat-form-field>
                                                 </ng-container>
                                                 <ng-template
@@ -137,7 +137,7 @@
                                                 <ng-container
                                                     *ngIf="edition_mode || expedition.state === 'ready'; else readonlyCitizenSoif">
                                                     <mat-checkbox [(ngModel)]="citizen.soif"
-                                                                  (ngModelChange)="saveCitizen(expedition, expedition_part, citizen)"></mat-checkbox>
+                                                                  (ngModelChange)="saveCitizen(expedition_part, citizen)"></mat-checkbox>
                                                 </ng-container>
                                                 <ng-template #readonlyCitizenSoif>
                                                     <ng-container
@@ -152,7 +152,7 @@
                                                     *ngIf="edition_mode || expedition.state === 'ready'; else readonlyCitizenPdc">
                                                     <mat-form-field [appearance]="'outline'" class="no-bottom">
                                                         <input matInput [(ngModel)]="citizen.pdc"
-                                                               (ngModelChange)="saveCitizen(expedition, expedition_part, citizen)">
+                                                               (ngModelChange)="saveCitizen(expedition_part, citizen)">
                                                     </mat-form-field>
                                                 </ng-container>
                                                 <ng-template #readonlyCitizenPdc>{{ citizen.pdc }}</ng-template>
@@ -176,7 +176,7 @@
                                                         <mho-select [options]="all_heroics"
                                                                     [emptyOption]="true"
                                                                     [(ngModel)]="citizen.preinscrit_heroic"
-                                                                    (ngModelChange)="saveCitizen(expedition, expedition_part, citizen)"
+                                                                    (ngModelChange)="saveCitizen(expedition_part, citizen)"
                                                                     [bindLabel]="'value.label'"
                                                                     [bindIcon]="'value.img'"></mho-select>
                                                     </mat-form-field>
@@ -201,11 +201,11 @@
                                                                              i18n-label
                                                                              [completeList]="all_items"
                                                                              addLabel="Ajouter au sac" i18n-addLabel
-                                                                             (add)="addItem(expedition, expedition_part, citizen, +$event)"
+                                                                             (add)="addItem(expedition_part, citizen, +$event)"
                                                                              removeLabel="Retirer du sac" i18n-removeLabel
-                                                                             (remove)="removeItem(expedition, expedition_part, citizen, +$event)"
+                                                                             (remove)="removeItem(expedition_part, citizen, +$event)"
                                                                              emptyLabel="Vider le sac" i18n-emptyLabel
-                                                                             (empty)="emptyBag(expedition, expedition_part, citizen)"
+                                                                             (empty)="emptyBag(expedition_part, citizen)"
                                                                              [readonly]="!edition_mode">
                                                 </mho-list-element-add-remove>
                                             </td>

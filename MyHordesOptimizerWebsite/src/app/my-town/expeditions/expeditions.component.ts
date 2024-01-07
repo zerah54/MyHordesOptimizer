@@ -131,7 +131,7 @@ export class ExpeditionsComponent implements OnInit {
 
     public addNewMember(expedition: Expedition): void {
         expedition.parts.forEach((expedition_part: ExpeditionPart) => {
-            this.expedition_service.createCitizenExpedition(this.selected_tab_index + 1, expedition, expedition_part, new CitizenExpedition()).subscribe({
+            this.expedition_service.createOrUpdateCitizenExpedition(expedition_part, new CitizenExpedition()).subscribe({
                 next: () => {
                     expedition_part.citizens.push(new CitizenExpedition());
                 }
@@ -140,7 +140,7 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     public addNewExpedition(): void {
-        this.expedition_service.createExpedition(this.selected_tab_index + 1, new Expedition()).subscribe({
+        this.expedition_service.createOrUpdateExpedition(this.selected_tab_index + 1, new Expedition()).subscribe({
             next: () => {
                 this.expeditions.push(new Expedition());
             }
@@ -148,7 +148,7 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     public addNewExpeditionPart(expedition: Expedition): void {
-        this.expedition_service.createExpeditionPart(this.selected_tab_index + 1, expedition, new ExpeditionPart()).subscribe({
+        this.expedition_service.createOrUpdateExpeditionPart(expedition, new ExpeditionPart()).subscribe({
             next: () => {
                 expedition.parts.push(new ExpeditionPart());
             }
@@ -181,17 +181,16 @@ export class ExpeditionsComponent implements OnInit {
      * Si l'item est déjà dans la liste, on fait +1
      * Sinon on rajoute l'item à la liste
      *
-     * @param {Expedition} expedition
      * @param {ExpeditionPart} expedition_part
      * @param {CitizenExpedition} citizen
      * @param {number} item_id
      *
      * TODO Factoriser avec le bag des citoyens
      */
-    public addItem(expedition: Expedition, expedition_part: ExpeditionPart, citizen: CitizenExpedition, item_id: number): void {
+    public addItem(expedition_part: ExpeditionPart, citizen: CitizenExpedition, item_id: number): void {
         if (citizen && citizen.bag) {
             citizen.bag.items.push(<Item>this.all_items.find((item: Item): boolean => item.id === item_id));
-            this.saveCitizen(expedition, expedition_part, citizen);
+            this.saveCitizen(expedition_part, citizen);
         }
     }
 
@@ -200,32 +199,30 @@ export class ExpeditionsComponent implements OnInit {
      * On retire 1 au compteur de l'item
      * Si l'item tombe à 0, on le retire de la liste
      *
-     * @param {Expedition} expedition
      * @param {ExpeditionPart} expedition_part
      * @param {CitizenExpedition} citizen
      * @param {number} item_id
      */
-    public removeItem(expedition: Expedition, expedition_part: ExpeditionPart, citizen: CitizenExpedition, item_id: number): void {
+    public removeItem(expedition_part: ExpeditionPart, citizen: CitizenExpedition, item_id: number): void {
         if (citizen && citizen.bag) {
             const item_in_datasource_index: number | undefined = citizen.bag.items.findIndex((item_in_bag: Item) => item_in_bag.id === item_id);
             if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
                 citizen.bag.items.splice(item_in_datasource_index, 1);
             }
-            this.saveCitizen(expedition, expedition_part, citizen);
+            this.saveCitizen(expedition_part, citizen);
         }
     }
 
     /**
      * On vide complètement le sac
      *
-     * @param {Expedition} expedition
      * @param {ExpeditionPart} expedition_part
      * @param {CitizenExpedition} citizen
      */
-    public emptyBag(expedition: Expedition, expedition_part: ExpeditionPart, citizen: CitizenExpedition): void {
+    public emptyBag(expedition_part: ExpeditionPart, citizen: CitizenExpedition): void {
         if (citizen && citizen.bag) {
             citizen.bag.items = [];
-            this.saveCitizen(expedition, expedition_part, citizen);
+            this.saveCitizen(expedition_part, citizen);
         }
     }
 
@@ -251,7 +248,7 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     public saveExpedition(expedition: Expedition): void {
-        this.expedition_service.updateExpedition(this.selected_tab_index + 1, expedition).subscribe({
+        this.expedition_service.createOrUpdateExpedition(this.selected_tab_index + 1, expedition).subscribe({
             next: (new_expedition: Expedition) => {
                 expedition = new_expedition;
             }
@@ -259,15 +256,15 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     public saveExpeditionPart(expedition: Expedition, expedition_part: ExpeditionPart): void {
-        this.expedition_service.updateExpeditionPart(this.selected_tab_index + 1, expedition, expedition_part).subscribe({
+        this.expedition_service.createOrUpdateExpeditionPart(expedition, expedition_part).subscribe({
             next: (new_expedition_part: ExpeditionPart) => {
                 expedition_part = new_expedition_part;
             }
         });
     }
 
-    public saveCitizen(expedition: Expedition, expedition_part: ExpeditionPart, citizen: CitizenExpedition): void {
-        this.expedition_service.updateCitizenExpedition(this.selected_tab_index + 1, expedition, expedition_part, citizen).subscribe({
+    public saveCitizen(expedition_part: ExpeditionPart, citizen: CitizenExpedition): void {
+        this.expedition_service.createOrUpdateCitizenExpedition(expedition_part, citizen).subscribe({
             next: (new_citizen: CitizenExpedition) => {
                 citizen = new_citizen;
             }
