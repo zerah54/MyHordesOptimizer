@@ -3,7 +3,7 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Bag;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
@@ -873,7 +873,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             {
                 citizen.Cadaver.CleanUp.IdCleanUp = citizens.Where(x => x.CitizenId == citizen.Id).First().CitizenIdCleanUp;
                 var citizenItems = distinctCitizenItem.Where(x => x.CitizenId == citizen.Id);
-                citizen.Bag = Mapper.Map<CitizenBag>(citizenItems);
+                citizen.Bag = Mapper.Map<BagDto>(citizenItems);
                 if (!citizenItems.Any()) // Si y'a pas d'item dans le sac, il faut aller chercher l'info du last update dans la liste sans le distinct !
                 {
                     var c = citizens.First(x => x.CitizenId == citizen.Id);
@@ -1438,12 +1438,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
             StringBuilder inBuilder = GenerateInQuery(citizens.Select(x => x.Bag.IdBag), param);
             connection.ExecuteScalar($"DELETE FROM BagItem WHERE idBag {inBuilder}", param);
 
-            var modeles = new List<BagItem>();
+            var modeles = new List<Models.Citizen.Bags.BagItem>();
             foreach (var citizen in citizens)
             {
                 foreach (var item in citizen.Bag.Items)
                 {
-                    modeles.Add(new BagItem()
+                    modeles.Add(new Models.Citizen.Bags.BagItem()
                     {
                         Count = item.Count,
                         IsBroken = item.IsBroken,
@@ -1523,11 +1523,11 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return bagId.Value;
         }
 
-        public IEnumerable<BagItem> GetAllBagItems(int townId)
+        public IEnumerable<Models.Citizen.Bags.BagItem> GetAllBagItems(int townId)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var bagsItems = connection.Query<BagItem>(@"SELECT bi.idItem
+            var bagsItems = connection.Query<Models.Citizen.Bags.BagItem>(@"SELECT bi.idItem
                                                                ,SUM(bi.count) AS Count
 				                                               ,bi.isBroken
                                                               FROM BagItem bi

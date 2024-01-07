@@ -1,4 +1,4 @@
-﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Bag;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
@@ -29,7 +29,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 
         public int NombreJourHero { get; set; }
 
-        public CitizenBag Bag { get; set; }
+        public BagDto Bag { get; set; }
         public CitizenHome Home { get; set; }
         public CitizenStatus Status { get; set; }
         public CitizenActionsHeroic ActionsHeroic { get; set; }
@@ -37,7 +37,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 
         public Citizen()
         {
-            Bag = new CitizenBag();
+            Bag = new BagDto();
             Cadaver = new Cadaver();
         }
     }

@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Bag;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
@@ -88,12 +89,12 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.DropRatePraf, opt => opt.MapFrom(src => src.DropRatePraf))
                 .ForMember(dest => dest.DropRateNotPraf, opt => opt.MapFrom(src => src.DropRateNotPraf));
 
-            CreateMap<TownCitizenBagItemCompletModel, CitizenItem>()
+            CreateMap<TownCitizenBagItemCompletModel, BagItemDto>()
                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src))
                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.ItemCount));
 
-            CreateMap<IEnumerable<TownCitizenBagItemCompletModel>, CitizenBag>()
+            CreateMap<IEnumerable<TownCitizenBagItemCompletModel>, BagDto>()
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src))
                 .ForMember(dest => dest.LastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = GetBagLastUpdateDateWithNullCheck(src).Value, UserName = GetBagLastUpdateUserNameWithNullCheck(src) }); opt.PreCondition(src => GetBagLastUpdateDateWithNullCheck(src).HasValue); })
                 .ForMember(dest => dest.IdBag, opt => opt.MapFrom(src => GetBagIdWithNullCheck(src)));
