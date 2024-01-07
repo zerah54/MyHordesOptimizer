@@ -60,7 +60,7 @@ jobs:
                     path: ${{ github.workspace }}/Chrome.zip
 
             -   name: Publish
-                uses: mnao305/chrome-extension-upload@latest
+                uses: mnao305/chrome-extension-upload@master
                 with:
                     file-path: ${{ github.workspace }}/Chrome.zip
                     extension-id: jolghobcgphmgaiachbipnpiimmgknno
