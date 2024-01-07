@@ -1,5 +1,5 @@
 import { CommonModule, NgClass, NgForOf, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -18,6 +18,7 @@ import { EXPEDITIONS_EDITION_MODE_KEY, HORDES_IMG_REPO } from '../../_abstract_m
 import { HeroicActionEnum } from '../../_abstract_model/enum/heroic-action.enum';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
@@ -44,6 +45,8 @@ import { TotalPdcPipe } from './total-pdc.pipe';
 })
 export class ExpeditionsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
+
+    protected expedition_service: ExpeditionService = inject(ExpeditionService);
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly current_day: number = getTown()?.day || 1;
@@ -79,6 +82,13 @@ export class ExpeditionsComponent implements OnInit {
         this.api.getItems()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((items: Item[]) => this.all_items = items);
+
+        this.expedition_service.getExpeditions(this.current_day).subscribe({
+            next: (expeditions: Expedition[]) => {
+                console.log('success');
+                this.expeditions = expeditions;
+            }
+        });
     }
 
     /**
@@ -89,11 +99,17 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     public changeTab(event: MatTabChangeEvent): void {
-        console.log('event', event);
+        this.expedition_service.getExpeditions(event.index + 1).subscribe({
+            next: (expeditions: Expedition[]) => {
+                console.log('success');
+                this.expeditions = expeditions;
+            }
+        });
     }
 
     public changeExpeditionState(expedition: Expedition, event: boolean): void {
         expedition.state = event ? 'ready' : 'stop';
+        this.saveExpedition(expedition);
     }
 
     /** Enregistre les expéditions affichées pour les réutiliser dans un autre onglet */
@@ -115,29 +131,33 @@ export class ExpeditionsComponent implements OnInit {
 
     public addNewMember(expedition: Expedition): void {
         expedition.parts.forEach((expedition_part: ExpeditionPart) => {
-            expedition_part.citizens.push(new CitizenExpedition());
+            this.expedition_service.createCitizenExpedition(this.selected_tab_index + 1, expedition, expedition_part, new CitizenExpedition()).subscribe({
+                next: () => {
+                    expedition_part.citizens.push(new CitizenExpedition());
+                }
+            });
         });
     }
 
     public addNewExpedition(): void {
-        this.expeditions.push(new Expedition());
+        this.expedition_service.createExpedition(this.selected_tab_index + 1, new Expedition()).subscribe({
+            next: () => {
+                this.expeditions.push(new Expedition());
+            }
+        });
     }
 
-
     public addNewExpeditionPart(expedition: Expedition): void {
-        const part: ExpeditionPart = new ExpeditionPart();
-        part.citizens = expedition.parts[0] ? [...expedition.parts[0].citizens] : [];
-        expedition.parts.push(part);
+        this.expedition_service.createExpeditionPart(this.selected_tab_index + 1, expedition, new ExpeditionPart()).subscribe({
+            next: () => {
+                expedition.parts.push(new ExpeditionPart());
+            }
+        });
     }
 
     public removeRow(expedition_part: ExpeditionPart, citizen_index: number): void {
         expedition_part.citizens.splice(citizen_index, 1);
-    }
-
-    public updateExpedition(expedition: Expedition): void {
-        console.log('test');
-        const main_expedition_index: number = this.expeditions.findIndex((_expedition: Expedition): boolean => expedition.id === _expedition.id);
-        this.expeditions[main_expedition_index] = new Expedition(expedition.modelToDto());
+        // TODO
     }
 
     public openExpeditionOrders(orders: ExpeditionOrder[], prop: CitizenExpedition | ExpeditionPart): void {
@@ -161,14 +181,17 @@ export class ExpeditionsComponent implements OnInit {
      * Si l'item est déjà dans la liste, on fait +1
      * Sinon on rajoute l'item à la liste
      *
+     * @param {Expedition} expedition
+     * @param {ExpeditionPart} expedition_part
      * @param {CitizenExpedition} citizen
      * @param {number} item_id
      *
      * TODO Factoriser avec le bag des citoyens
      */
-    public addItem(citizen: CitizenExpedition, item_id: number): void {
+    public addItem(expedition: Expedition, expedition_part: ExpeditionPart, citizen: CitizenExpedition, item_id: number): void {
         if (citizen && citizen.bag) {
             citizen.bag.items.push(<Item>this.all_items.find((item: Item): boolean => item.id === item_id));
+            this.saveCitizen(expedition, expedition_part, citizen);
         }
     }
 
@@ -177,26 +200,32 @@ export class ExpeditionsComponent implements OnInit {
      * On retire 1 au compteur de l'item
      * Si l'item tombe à 0, on le retire de la liste
      *
-     * @param {citizen} CitizenExpedition
+     * @param {Expedition} expedition
+     * @param {ExpeditionPart} expedition_part
+     * @param {CitizenExpedition} citizen
      * @param {number} item_id
      */
-    public removeItem(citizen: CitizenExpedition, item_id: number): void {
+    public removeItem(expedition: Expedition, expedition_part: ExpeditionPart, citizen: CitizenExpedition, item_id: number): void {
         if (citizen && citizen.bag) {
             const item_in_datasource_index: number | undefined = citizen.bag.items.findIndex((item_in_bag: Item) => item_in_bag.id === item_id);
             if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
                 citizen.bag.items.splice(item_in_datasource_index, 1);
             }
+            this.saveCitizen(expedition, expedition_part, citizen);
         }
     }
 
     /**
      * On vide complètement le sac
      *
+     * @param {Expedition} expedition
+     * @param {ExpeditionPart} expedition_part
      * @param {CitizenExpedition} citizen
      */
-    public emptyBag(citizen: CitizenExpedition): void {
+    public emptyBag(expedition: Expedition, expedition_part: ExpeditionPart, citizen: CitizenExpedition): void {
         if (citizen && citizen.bag) {
             citizen.bag.items = [];
+            this.saveCitizen(expedition, expedition_part, citizen);
         }
     }
 
@@ -219,6 +248,30 @@ export class ExpeditionsComponent implements OnInit {
                 return citizen.name;
             }
         }).join(', ');
+    }
+
+    public saveExpedition(expedition: Expedition): void {
+        this.expedition_service.updateExpedition(this.selected_tab_index + 1, expedition).subscribe({
+            next: (new_expedition: Expedition) => {
+                expedition = new_expedition;
+            }
+        });
+    }
+
+    public saveExpeditionPart(expedition: Expedition, expedition_part: ExpeditionPart): void {
+        this.expedition_service.updateExpeditionPart(this.selected_tab_index + 1, expedition, expedition_part).subscribe({
+            next: (new_expedition_part: ExpeditionPart) => {
+                expedition_part = new_expedition_part;
+            }
+        });
+    }
+
+    public saveCitizen(expedition: Expedition, expedition_part: ExpeditionPart, citizen: CitizenExpedition): void {
+        this.expedition_service.updateCitizenExpedition(this.selected_tab_index + 1, expedition, expedition_part, citizen).subscribe({
+            next: (new_citizen: CitizenExpedition) => {
+                citizen = new_citizen;
+            }
+        });
     }
 }
 

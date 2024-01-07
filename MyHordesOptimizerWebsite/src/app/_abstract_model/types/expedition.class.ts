@@ -11,7 +11,7 @@ export class Expedition extends CommonModel<ExpeditionDTO> {
     public parts: ExpeditionPart[] = [];
 
 
-    constructor(dto?: ExpeditionDTO) {
+    constructor(dto?: ExpeditionDTO | null) {
         super();
         this.dtoToModel(dto);
     }
@@ -26,7 +26,7 @@ export class Expedition extends CommonModel<ExpeditionDTO> {
         };
     }
 
-    protected override dtoToModel(dto?: ExpeditionDTO): void {
+    protected override dtoToModel(dto?: ExpeditionDTO | null): void {
         if (dto) {
             this.id = dto.id;
             this.state = dto.state;
