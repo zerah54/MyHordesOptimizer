@@ -45,13 +45,14 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            -   uses: actions/checkout@main
+
             -   name: Zip
-            -   uses: actions/checkout@v2
-            -   uses: vimtor/action-zip@latest
+                uses: vimtor/action-zip@latest
                 with:
                     files: Extensions/Chrome/
                     dest: Chrome.zip
-                    
+
             -   name: Download artifact
                 uses: actions/download-artifact@v2
                 with:
