@@ -53,15 +53,6 @@ jobs:
                     files: Extensions/Chrome/
                     dest: Chrome.zip
 
-            -   name: Check output
-                uses: actions/upload-artifact@v2
-                with:
-                    name: chrome-artifact
-                    path: ${{ github.workspace }}/Chrome.zip
-            -   uses: actions/download-artifact@v4
-                with:
-                    name: chrome-artifact
-
             -   name: Publish
                 uses: mnao305/chrome-extension-upload@master
                 with:
@@ -75,6 +66,8 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            -   uses: actions/checkout@main
+
             -   name: Zip
                 uses: vimtor/action-zip@v1.1
                 with:
@@ -86,9 +79,6 @@ jobs:
                 with:
                     name: firefox-artifact
                     path: ${{ github.workspace }}/Firefox.zip
-            -   uses: actions/download-artifact@v4
-                with:
-                    name: firefox-artifact
 
             -   name: Publish
                 uses: wdzeng/firefox-addon@v1
