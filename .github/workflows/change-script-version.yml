@@ -62,3 +62,21 @@ jobs:
                     client-secret: ${{ secrets.CHROME_EXTENSION_CLIENT_SECRET }}
                     refresh-token: ${{ secrets.CHROME_EXTENSION_REFRESH_TOKEN }}
 
+    deploy_firefox_extension:
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Zip
+                uses: vimtor/action-zip@v1.1
+                with:
+                    files: Extensions/Firefox/
+                    dest: Firefox.zip
+
+            -   name: Publish
+                uses: wdzeng/firefox-addon@v1
+                with:
+                    addon-guid: 14876417-17c6-417d-80bb-b18c5b40c366
+                    xpi-path: ${{ github.workspace }}/Firefox.zip
+                    self-hosted: false
+                    jwt-issuer: ${{ secrets.FIREFOX_JWT_ISSUER }}
+                    jwt-secret: ${{ secrets.FIREFOX_JWT_SECRET }}
