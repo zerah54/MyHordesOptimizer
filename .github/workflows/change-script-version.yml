@@ -54,10 +54,10 @@ jobs:
                     dest: Chrome.zip
 
             -   name: Publish
-                uses: mnao305/chrome-extension-upload@master
+                uses: wdzeng/chrome-extension@v1
                 with:
-                    file-path: ${{ github.workspace }}/Chrome.zip
                     extension-id: jolghobcgphmgaiachbipnpiimmgknno
+                    zip-path: ${{ github.workspace }}/Chrome.zip
                     client-id: ${{ secrets.CHROME_EXTENSION_CLIENT_ID }}
                     client-secret: ${{ secrets.CHROME_EXTENSION_CLIENT_SECRET }}
                     refresh-token: ${{ secrets.CHROME_EXTENSION_REFRESH_TOKEN }}
@@ -73,12 +73,6 @@ jobs:
                 with:
                     files: Extensions/Firefox/
                     dest: Firefox.zip
-
-            -   name: Check output
-                uses: actions/upload-artifact@v2
-                with:
-                    name: firefox-artifact
-                    path: ${{ github.workspace }}/Firefox.zip
 
             -   name: Publish
                 uses: wdzeng/firefox-addon@v1
