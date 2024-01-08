@@ -54,7 +54,7 @@ jobs:
                     dest: Chrome.zip
 
             -   name: Check output
-                uses: actions/upload-artifact@v1.1
+                uses: actions/upload-artifact@v2
                 with:
                     name: chrome-artifact
                     path: ${{ github.workspace }}/Chrome.zip
@@ -79,7 +79,7 @@ jobs:
                     dest: Firefox.zip
 
             -   name: Check output
-                uses: actions/upload-artifact@v1.1
+                uses: actions/upload-artifact@v2
                 with:
                     name: firefox-artifact
                     path: ${{ github.workspace }}/Firefox.zip
