@@ -77,8 +77,7 @@ jobs:
             -   name: Publish
                 uses: wdzeng/firefox-addon@v1
                 with:
-                    addon-guid: 14876417-17c6-417d-80bb-b18c5b40c366
+                    addon-guid: '{14876417-17c6-417d-80bb-b18c5b40c366}'
                     xpi-path: ${{ github.workspace }}/Firefox.zip
-                    self-hosted: false
                     jwt-issuer: ${{ secrets.FIREFOX_JWT_ISSUER }}
                     jwt-secret: ${{ secrets.FIREFOX_JWT_SECRET }}
