@@ -53,6 +53,12 @@ jobs:
                     files: Extensions/Chrome/
                     dest: Chrome.zip
 
+            -   name: Check output
+                uses: actions/upload-artifact@v1.1
+                with:
+                    name: chrome-artifact
+                    path: ${{ github.workspace }}/Chrome.zip
+
             -   name: Publish
                 uses: mnao305/chrome-extension-upload@master
                 with:
@@ -71,6 +77,12 @@ jobs:
                 with:
                     files: Extensions/Firefox/
                     dest: Firefox.zip
+
+            -   name: Check output
+                uses: actions/upload-artifact@v1.1
+                with:
+                    name: firefox-artifact
+                    path: ${{ github.workspace }}/Firefox.zip
 
             -   name: Publish
                 uses: wdzeng/firefox-addon@v1
