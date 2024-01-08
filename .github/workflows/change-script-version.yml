@@ -58,6 +58,9 @@ jobs:
                 with:
                     name: chrome-artifact
                     path: ${{ github.workspace }}/Chrome.zip
+            -   uses: actions/download-artifact@v4
+                with:
+                    name: chrome-artifact
 
             -   name: Publish
                 uses: mnao305/chrome-extension-upload@master
@@ -83,6 +86,9 @@ jobs:
                 with:
                     name: firefox-artifact
                     path: ${{ github.workspace }}/Firefox.zip
+            -   uses: actions/download-artifact@v4
+                with:
+                    name: firefox-artifact
 
             -   name: Publish
                 uses: wdzeng/firefox-addon@v1
