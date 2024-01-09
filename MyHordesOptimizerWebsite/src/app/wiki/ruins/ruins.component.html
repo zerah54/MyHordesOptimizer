@@ -1,6 +1,13 @@
-<mat-card-header>
-    <mat-card-title i18n>Bâtiments</mat-card-title>
-    <mat-slide-toggle *ngIf="is_dev" [(ngModel)]="ruins_filters.inside_town" (ngModelChange)="ruins_filters_change.next()" i18n>Dans ma ville</mat-slide-toggle>
+<mat-card-header class="mho-ruins-header">
+    <mat-card-title>
+        <ng-container i18n>Bâtiments</ng-container>
+    </mat-card-title>
+    <div class="actions" *ngIf="town">
+        <mat-slide-toggle [(ngModel)]="ruins_filters.inside_town"
+                          (ngModelChange)="ruins_filters.inside_town ? datasource.data = town_ruins : datasource.data = ruins">
+            <ng-container i18n>Dans ma ville</ng-container>
+        </mat-slide-toggle>
+    </div>
 </mat-card-header>
 <mat-card-content class="mho-ruins">
     <ng-container *ngIf="ruins">

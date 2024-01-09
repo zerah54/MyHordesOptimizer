@@ -39,7 +39,7 @@
         "capacity": 2
     },
     "bar2": {
-        "capacity": 100
+        "capacity": 3
     },
     "obi": {
         "capacity": 2
@@ -135,7 +135,7 @@
         "capacity": 1
     },
     "mayor": {
-        "capacity": 100
+        "capacity": 1
     },
     "lkw": {
         "capacity": 1

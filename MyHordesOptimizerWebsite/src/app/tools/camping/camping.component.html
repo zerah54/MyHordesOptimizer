@@ -6,6 +6,10 @@
         </button>
     </mat-card-title>
     <div class="actions">
+        <mat-slide-toggle *ngIf="town" [(ngModel)]="in_town_camping" (ngModelChange)="changeInTownMode()">
+            <ng-container i18n>Dans ma ville</ng-container>
+        </mat-slide-toggle>
+
         <mat-slide-toggle [(ngModel)]="display_bonus_ap" (ngModelChange)="changeBonusMode($event)">
             <ng-container i18n>Bonus en équivalent PA</ng-container>
         </mat-slide-toggle>
@@ -71,7 +75,8 @@
                 <div>
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Type de ville</mat-label>
-                        <mho-select #town [formControlName]="'town'" [options]="town_types" [bindLabel]="'label'" [moreInfo]="getMoreTownTypeInfoFn">
+                        <mho-select #town [formControlName]="'town'" [options]="town_types" [bindLabel]="'label'" [moreInfo]="getMoreTownTypeInfoFn"
+                                    [disabled]="!!configuration_form.get('town')?.disabled || this.in_town_camping">
                         </mho-select>
                         <small matSuffix
                                i18n>Bonus&nbsp;:&nbsp;{{ configuration_form.get('town')?.value['bonus'] | campingDisplayBonus:display_bonus_ap:locale }}</small>
@@ -109,12 +114,11 @@
 
                     <mat-form-field appearance="outline" class="short-bottom">
                         <mat-label i18n>Bâtiment</mat-label>
-                        <mho-select [formControlName]="'ruin'" [options]="ruins | filterRuinsByKm:townDistance.value"
+                        <mho-select [formControlName]="'ruin'" [options]="(in_town_camping ? town_ruins : ruins) | filterRuinsByKm:townDistance.value"
                                     [bindLabel]="'label.' + locale" [bindIcon]="'formatted_img'" [moreInfo]="getMoreRuinInfoFn">
                         </mho-select>
                         <mat-icon matSuffix [matTooltip]="help_ruins" style="vertical-align: middle" [color]="'primary'">help_outline</mat-icon>
-                        <small matSuffix
-                               i18n>Bonus&nbsp;:&nbsp;{{ configuration_form.get('ruin')?.value['camping'] | campingDisplayBonus:display_bonus_ap:locale }}</small>
+                        <span matSuffix [innerHTML]="getMoreRuinInfoFn(configuration_form.get('ruin')?.value)"></span>
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="short-bottom" *ngIf="configuration_form.get('ruin')?.value['id'] === -1">
