@@ -35,7 +35,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             Mapper = mapper;
         }
 
-        public WishListWrapper GetWishList(int townId)
+        public WishListLastUpdate GetWishList(int townId)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -72,7 +72,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             return wishList;
         }
 
-        public WishListWrapper PutWishList(int townId, int userId, List<WishListPutResquestDto> wishListPutRequest)
+        public WishListLastUpdate PutWishList(int townId, int userId, List<WishListPutResquestDto> wishListPutRequest)
         {
             var items = Mapper.Map<List<TownWishlistItemModel>>(wishListPutRequest);
             MyHordesOptimizerRepository.PutWishList(townId, userId, items);
@@ -80,7 +80,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             return wishList;
         }
 
-        public WishListWrapper CreateFromTemplate(int townId, int userId, int templateId)
+        public WishListLastUpdate CreateFromTemplate(int townId, int userId, int templateId)
         {
             var itemTemplates = MyHordesOptimizerRepository.GetWishListTemplate(templateId);
             var items = Mapper.Map<List<TownWishlistItemModel>>(itemTemplates);

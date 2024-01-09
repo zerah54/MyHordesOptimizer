@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
 {
-    public class TownCadaversResolver : IValueResolver<MyHordesMap, Town, CadaversWrapper>
+    public class TownCadaversResolver : IValueResolver<MyHordesMap, Town, CadaversLastUpdate>
     {
         protected IMyHordesOptimizerRepository MhoRepository { get; set; }
         protected IUserInfoProvider UserInfoProvider { get; set; }
@@ -20,9 +20,9 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
             UserInfoProvider = userInfoProvider;
         }
 
-        public CadaversWrapper Resolve(MyHordesMap source, Town destination, CadaversWrapper destMember, ResolutionContext context)
+        public CadaversLastUpdate Resolve(MyHordesMap source, Town destination, CadaversLastUpdate destMember, ResolutionContext context)
         {
-            var wrapper = new CadaversWrapper();
+            var wrapper = new CadaversLastUpdate();
             var cod = MhoRepository.GetCausesOfDeath();
             var cleanUpTypes = MhoRepository.GetCleanUpTypes();
             var citizens = MhoRepository.GetCitizens(destination.Id);

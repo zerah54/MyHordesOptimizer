@@ -8,15 +8,14 @@ namespace MyHordesOptimizerApi.Services.Interfaces
     public interface IMyHordesFetcherService
     {
         IEnumerable<Item> GetItems(int? townId);
-        Town GetTown();
         SimpleMeDto GetSimpleMe();
         IEnumerable<HeroSkill> GetHeroSkills();
         IEnumerable<CauseOfDeath> GetCausesOfDeath();
         IEnumerable<CleanUpType> GetCleanUpTypes();
         IEnumerable<ItemRecipe> GetRecipes();
-        BankWrapper GetBank();
-        CitizensWrapper GetCitizens(int townId);
-        IEnumerable<MyHordesOptimizerRuin> GetRuins();
+        BankLastUpdate GetBank();
+        CitizensLastUpdate GetCitizens(int townId);
+        IEnumerable<MyHordesOptimizerRuin> GetRuins(int? townId);
         MyHordesOptimizerMapDto GetMap(int townId);
         IEnumerable<MyHordesOptimizerMapDigDto> GetMapDigs(int townId);
         List<MyHordesOptimizerMapDigDto> CreateOrUpdateMapDigs(int? townId, int userId, List<MyHordesOptimizerMapDigDto> requests);

@@ -96,23 +96,6 @@ namespace MyHordesOptimizerApi.Services.Impl
             return items;
         }
 
-        public Town GetTown()
-        {
-            var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
-            myHordeMeResponse.Map.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            var town = Mapper.Map<Town>(myHordeMeResponse.Map);
-
-            // Enregistrer en base
-            var townModel = Mapper.Map<TownModel>(myHordeMeResponse);
-            MyHordesOptimizerRepository.PatchTown(townModel);
-            MyHordesOptimizerRepository.PatchCitizen(town.Id, town.Citizens);
-            MyHordesOptimizerRepository.PutBank(town.Id, town.Bank);
-            town = MyHordesOptimizerRepository.GetTown(town.Id);
-
-            return town;
-        }
-
-
         public SimpleMeDto GetSimpleMe()
         {
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
@@ -405,7 +388,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             return recipes;
         }
 
-        public BankWrapper GetBank()
+        public BankLastUpdate GetBank()
         {
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
             var town = Mapper.Map<Town>(myHordeMeResponse.Map);
@@ -436,16 +419,24 @@ namespace MyHordesOptimizerApi.Services.Impl
             return bankWrapper;
         }
 
-        public CitizensWrapper GetCitizens(int townId)
+        public CitizensLastUpdate GetCitizens(int townId)
         {
             var citizens = MyHordesOptimizerRepository.GetCitizens(townId);
             return citizens;
         }
 
-        public IEnumerable<MyHordesOptimizerRuin> GetRuins()
+        public IEnumerable<MyHordesOptimizerRuin> GetRuins(int? townId)
         {
-            var ruins = MyHordesOptimizerRepository.GetRuins();
-            return ruins;
+            if(townId.HasValue)
+            {
+                var ruins = MyHordesOptimizerRepository.GetTownRuin(townId.Value);
+                return ruins;
+            }
+            else
+            {
+                var ruins = MyHordesOptimizerRepository.GetRuins();
+                return ruins;
+            }        
         }
 
         public MyHordesOptimizerMapDto GetMap(int townId)

@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
 {
-    public class TownBankResolver : IValueResolver<MyHordesMap, Town, BankWrapper>
+    public class TownBankResolver : IValueResolver<MyHordesMap, Town, BankLastUpdate>
     {
         protected IMyHordesOptimizerRepository MhoRepository { get; set; }
         protected IUserInfoProvider UserInfoProvider { get; set; }
@@ -20,9 +20,9 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
             UserInfoProvider = userInfoProvider;
         }
 
-        public BankWrapper Resolve(MyHordesMap source, Town destination, BankWrapper destMember, ResolutionContext context)
+        public BankLastUpdate Resolve(MyHordesMap source, Town destination, BankLastUpdate destMember, ResolutionContext context)
         {
-            var wrapper = new BankWrapper();
+            var wrapper = new BankLastUpdate();
             var items = MhoRepository.GetItems();
 
             if (source.City != null)

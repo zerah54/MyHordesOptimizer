@@ -2,18 +2,18 @@
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
-    public class CitizensWrapper
+    public class CitizensLastUpdate
     {
         public LastUpdateInfo LastUpdateInfo { get; set; }
 
         public List<Citizen> Citizens { get; set; }
 
-        public CitizensWrapper(List<Citizen> dictionary)
+        public CitizensLastUpdate(List<Citizen> dictionary)
         {
             Citizens = new List<Citizen>(dictionary);
         }
 
-        public CitizensWrapper()
+        public CitizensLastUpdate()
         {
             Citizens = new List<Citizen>();
         }

@@ -1048,7 +1048,7 @@ $ruins_additional_info = [
     'cars' => ['capacity' => 2],
 
     // id 62
-    'bar2' => ['capacity' => 100],
+    'bar2' => ['capacity' => 3],
 
     // id 19
     'obi' => ['capacity' => 2],
@@ -1144,7 +1144,7 @@ $ruins_additional_info = [
     'emma' => ['capacity' => 1],
 
     // id 56
-    'mayor' => ['capacity' => 100],
+    'mayor' => ['capacity' => 1],
 
     // id 35
     'lkw' => ['capacity' => 1],

@@ -178,6 +178,31 @@ export class ApiService extends GlobalService {
         });
     }
 
+    public getTownRuins(): Observable<Ruin[]> {
+        return new Observable((sub: Subscriber<Ruin[]>) => {
+
+            super.get<RuinDTO[]>(this.API_URL + `/Fetcher/ruins?townId=${getTown()?.town_id}`)
+                .subscribe({
+                    next: (response: HttpResponse<RuinDTO[]>) => {
+                        const ruins: Ruin[] = dtoToModelArray(Ruin, response.body).sort((a: Ruin, b: Ruin) => {
+                            if (a.label[this.locale].localeCompare(b.label[this.locale]) < 0) {
+                                return -1;
+                            }
+                            if (a.label[this.locale].localeCompare(b.label[this.locale]) > 0) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+
+                        sub.next(ruins);
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
+
     /**
      * Récupère la liste des pouvoirs héro
      *
