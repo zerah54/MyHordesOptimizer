@@ -1115,19 +1115,16 @@
                     <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-citizens/map-update-citizens.component.html</context>
                     <context context-type="linenumber">9</context>
                 </context-group>
-            </trans-unit>
-            <trans-unit id="5050216151704196655" datatype="html">
-                <source>Ajouter un citoyen </source>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-digs/map-update-digs.component.html</context>
-                    <context context-type="linenumber">9,10</context>
+                    <context context-type="linenumber">10</context>
                 </context-group>
             </trans-unit>
             <trans-unit id="3420757244733292611" datatype="html">
                 <source>Fouilles réussies</source>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-digs/map-update-digs.component.html</context>
-                    <context context-type="linenumber">12</context>
+                    <context context-type="linenumber">13</context>
                 </context-group>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context>
@@ -1138,7 +1135,7 @@
                 <source>Fouilles totales</source>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-digs/map-update-digs.component.html</context>
-                    <context context-type="linenumber">13</context>
+                    <context context-type="linenumber">14</context>
                 </context-group>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context>
