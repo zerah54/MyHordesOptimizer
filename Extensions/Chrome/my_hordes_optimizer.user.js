@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.1.0
+// @version      1.0.2.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,9 +32,11 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `Cette version contient des changements techniques importants. Pour cette raison, il faudra peut être remettre en place toutes vos options.`
-    + `[amélioration] Ajout d'une option sur chaque outil externe pour choisir si on souhaite qu'il soit rafraîchi au changement d'onglet ou non. Si vous comptiez sur cette fonctionnalité qui était déjà en place, n'oubliez pas d'aller l'activer dans les options. \n\n`
-    + `[correctif] Corrige le problème de chargement intempestif bloquant MyHordes.`;
+    + `[Correctif] Corrige l'affichage de l'icône de succès après une mise à jour des outils externes sur petit écran en mode compact \n`
+    + `[Correctif] Corrige l'affichage du loader sur les tooltips qui était en allemand alors qu'il ne devait pas avoir de texte \n`
+    + `[Correctif] L'affichage du tooltip d'APAG est désormais plus propre \n`
+    + `[Correctif] Corrige le calcul du camping qui prenait en compte la mauvaise valeur pour le bâtiment\n\n`
+    + `[Nouveauté] Ajout d'un bouton pour cocher tous les paramètres \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -574,6 +576,12 @@ const texts = {
         fr: `Fouilles maximum restantes`,
         de: `Maximal verbleibende Ausgrabungen`,
         es: `Máximas excavaciones restantes`
+    },
+    check_all: {
+        en: `Check all`,
+        fr: `Tout cocher`,
+        de: `Alle überprüfen`,
+        es: `Comprobar todo`
     }
 };
 
@@ -1882,20 +1890,26 @@ function getErrorFromApi(error) {
 }
 
 function isScriptVersionLastVersion(display_error) {
-    const current_script_version = getScriptInfo().version;
-    const base_script_version = parameters?.find((param) => param.name === 'ScriptVersion')?.value;
+    try {
+        GM_info.script;
 
-    const comparison_regex = /(\d+)/g;
-    const splitted_current = current_script_version.match(comparison_regex);
-    const splitted_base = base_script_version.match(comparison_regex);
+        const current_script_version = getScriptInfo().version;
+        const base_script_version = parameters?.find((param) => param.name === 'ScriptVersion')?.value;
 
-    return splitted_base.every((part, index) => {
-        const is_ok = !splitted_current[index] || splitted_current[index] >= part;
-        if (display_error && !is_ok) {
-            addError(`<div>${getI18N(api_texts.error_version_startup).replace('$your_version$', current_script_version).replace('$recent_version$', base_script_version)}</div><small>${getI18N(api_texts.update_script)}</small>`);
-        }
-        return is_ok;
-    });
+        const comparison_regex = /(\d+)/g;
+        const splitted_current = current_script_version.match(comparison_regex);
+        const splitted_base = base_script_version.match(comparison_regex);
+
+        return splitted_base.every((part, index) => {
+            const is_ok = !splitted_current[index] || splitted_current[index] >= part;
+            if (display_error && !is_ok) {
+                addError(`<div>${getI18N(api_texts.error_version_startup).replace('$your_version$', current_script_version).replace('$recent_version$', base_script_version)}</div><small>${getI18N(api_texts.update_script)}</small>`);
+            }
+            return is_ok;
+        });
+    } catch (error) {
+        return true;
+    }
 }
 
 function getScriptInfo() {
@@ -2370,8 +2384,31 @@ function createParams(content) {
     content.appendChild(categories_container);
 
     let params_title = document.createElement('h5');
-    params_title.innerText = getI18N(texts.parameters_section_label);
+    params_title.style.display = 'flex';
+    params_title.style.justifyContent = 'space-between';
     categories_container.appendChild(params_title);
+
+    let params_title_text = document.createElement('span');
+    params_title_text.innerText = getI18N(texts.parameters_section_label);
+    params_title.appendChild(params_title_text);
+
+    let params_title_select_all = document.createElement('a');
+    params_title_select_all.innerText = getI18N(texts.check_all);
+    params_title_select_all.style.cursor = 'pointer';
+    params_title.appendChild(params_title_select_all);
+
+    params_title_select_all.addEventListener('click', () => {
+        let first_level_checkboxes = Array.from(categories_container.querySelectorAll('input.mho-first-level-param[type=checkbox]:not(:checked)'));
+        first_level_checkboxes.forEach((checkbox) => {
+            checkbox.click();
+        })
+        setTimeout(() => {
+            let second_level_checkboxes = Array.from(categories_container.querySelectorAll('input.mho-second-level-param[type=checkbox]:not(:checked)'));
+            second_level_checkboxes.forEach((checkbox) => {
+                checkbox.click();
+            })
+        })
+    });
 
     let categories_list = document.createElement('ul');
     categories_container.appendChild(categories_list);
@@ -2409,6 +2446,7 @@ function createParams(content) {
             let param_input = document.createElement('input');
             param_input.type = 'checkbox';
             param_input.id = param.id + '_input';
+            param_input.classList.add('mho-first-level-param');
             param_input.checked = mho_parameters && mho_parameters[param.id] ? mho_parameters[param.id] : false;
             param_input_div.appendChild(param_input);
 
@@ -2487,6 +2525,7 @@ function createParams(content) {
                     let child_param_input = document.createElement('input');
                     child_param_input.type = 'checkbox';
                     child_param_input.id = param_child.id + '_input';
+                    child_param_input.classList.add('mho-second-level-param');
                     child_param_input.checked = mho_parameters && mho_parameters[param_child.id] ? mho_parameters[param_child.id] : false;
                     child_input_div.appendChild(child_param_input);
 
@@ -3305,7 +3344,7 @@ function displayCamping() {
             conf.ruin = $event.srcElement.value;
             let current_ruin = all_ruins.find((_current_ruin) => +_current_ruin.id === +conf.ruin);
 
-            conf.ruinBonus = current_ruin.chance;
+            conf.ruinBonus = current_ruin.camping;
             conf.ruinCapacity = current_ruin.capacity;
 
             let digs_field = document.querySelector('#digs-field');
@@ -3956,7 +3995,7 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
                 if (response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') setStorageItem(gm_bbh_updated_key, true);
                 if (response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') setStorageItem(gm_gh_updated_key, true);
                 if (response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') setStorageItem(gm_fata_updated_key, true);
-                if (response.mapResponseDto.MhoApiStatus.toLowerCase() === 'ok') setStorageItem(gm_mho_updated_key, true);
+                if (response.mapResponseDto.mhoApiStatus.toLowerCase() === 'ok') setStorageItem(gm_mho_updated_key, true);
 
                 let tools_fail = [];
                 let response_items = Object.keys(response).map((key) => {
@@ -3979,7 +4018,8 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
                     console.error(`Erreur lors de la mise à jour de l'un des outils`, response);
                 }
             })
-            .catch(() => {
+            .catch((error) => {
+                console.error(`Erreur lors de la mise à jour de l'un des outils`, error);
                 update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}professions/death.gif" height="16">`;
                 status.innerHTML = getI18N(texts.update_external_tools_fail_btn_label);
             });
@@ -4579,7 +4619,7 @@ function displayAdvancedTooltips() {
                 tooltip_loading.style.left = '8px';
                 tooltip_loading.style.top = '0';
                 tooltip_container.querySelector('h1').appendChild(tooltip_loading);
-                tooltip_loading.src = `${repo_img_hordes_url}anims/loading.gif`;
+                tooltip_loading.src = `${repo_img_hordes_url}anims/loading_wheel.gif`;
             } else {
                 tooltip_loading.style.display = 'inline';
             }
@@ -4778,14 +4818,17 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.innerHTML = `Ressource`;
             break;
         case 'flash_photo_1':
+            item_action.classList.add(`mho-item-tag-large`);
             var fail_1 = Math.round(60 / 90 * 100);
             item_action.innerHTML = `${100 - fail_1}% de chances de pouvoir fuir pendant 30 secondes`;
             break;
         case 'flash_photo_2':
+            item_action.classList.add(`mho-item-tag-large`);
             var fail_2 = Math.round(30 / 90 * 100);
             item_action.innerHTML = `${100 - fail_2}% de chances de pouvoir fuir pendant 60 secondes`;
             break;
         case 'flash_photo_3':
+            item_action.classList.add(`mho-item-tag-large`);
             var fail_3 = 1;
             item_action.innerHTML = `Succès : ${100 - fail_3}% de chances de pouvoir fuir pendant 120 secondes`;
             break;
@@ -6810,7 +6853,7 @@ function displayCampingPredict() {
                     conf.ruin = $event.srcElement.value;
                     let current_ruin = all_ruins.find((_current_ruin) => +_current_ruin.id === +conf.ruin);
 
-                    conf.ruinBonus = current_ruin.chance;
+                    conf.ruinBonus = current_ruin.camping;
                     conf.ruinCapacity = current_ruin.capacity;
 
                     let digs_field = document.querySelector('#digs-field');
@@ -7711,7 +7754,12 @@ function createStyles() {
 
     let hidden = '.mho-hidden {'
         + 'display: none !important;'
-        + '}'
+        + '}';
+
+    let item_tag = `.mho-item-tag-large {`
+        + `min-height: 18px;`
+        + `height: unset !important;`
+        + `}`;
 
 
     let css = params_style + btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
@@ -7725,7 +7773,7 @@ function createStyles() {
         + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
         + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
         + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
-        + citizen_list_more_info_header_content + hidden;
+        + citizen_list_more_info_header_content + hidden + item_tag;
 
     let style = document.createElement('style');
 
@@ -9017,6 +9065,7 @@ function updateExternalTools() {
                 }
             })
             .then((response) => {
+                getItems();
                 getMap();
                 resolve(response);
             })
