@@ -919,7 +919,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Fouilles du jour</target>
+        <target state="translated">Today's digs</target>
       </trans-unit>
       <trans-unit id="6779466566977517049" datatype="html">
         <source>Disponibilités du jour</source>
