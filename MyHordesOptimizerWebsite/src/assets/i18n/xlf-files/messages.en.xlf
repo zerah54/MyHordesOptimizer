@@ -146,13 +146,13 @@
         </context-group>
         <target state="final">Storage</target>
       </trans-unit>
-      <trans-unit id="6803021710280014868" datatype="html">
+      <trans-unit id="6803021710280014868" datatype="html" approved="yes">
         <source>Gros rideau</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="translated">Large Curtain</target>
+        <target state="final">Large Curtain</target>
       </trans-unit>
       <trans-unit id="8213871008620391117" datatype="html" approved="yes">
         <source>Renforts</source>
@@ -178,29 +178,29 @@
         </context-group>
         <target state="needs-translation">Cave laboratoire</target>
       </trans-unit>
-      <trans-unit id="6477064715313307165" datatype="html">
+      <trans-unit id="6477064715313307165" datatype="html" approved="yes">
         <source>Coin sieste</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="translated">Siesta Time™</target>
+        <target state="final">Siesta Time™</target>
       </trans-unit>
-      <trans-unit id="7352105174300788792" datatype="html">
+      <trans-unit id="7352105174300788792" datatype="html" approved="yes">
         <source>Verrou</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">119</context>
         </context-group>
-        <target state="translated">Lock</target>
+        <target state="final">Lock</target>
       </trans-unit>
-      <trans-unit id="7688265553248864164" datatype="html">
+      <trans-unit id="7688265553248864164" datatype="html" approved="yes">
         <source>Clôture</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">124</context>
         </context-group>
-        <target state="translated">Fence</target>
+        <target state="final">Fence</target>
       </trans-unit>
       <trans-unit id="8263357425236059440" datatype="html">
         <source>Habitant</source>
@@ -210,53 +210,53 @@
         </context-group>
         <target state="needs-translation">Habitant</target>
       </trans-unit>
-      <trans-unit id="8999093564615496242" datatype="html">
+      <trans-unit id="8999093564615496242" datatype="html" approved="yes">
         <source>Fouineur</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Scavenger</target>
+        <target state="final">Scavenger</target>
       </trans-unit>
-      <trans-unit id="5692239162610982878" datatype="html">
+      <trans-unit id="5692239162610982878" datatype="html" approved="yes">
         <source>Éclaireur</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">Scout</target>
+        <target state="final">Scout</target>
       </trans-unit>
-      <trans-unit id="6969224440581200019" datatype="html">
+      <trans-unit id="6969224440581200019" datatype="html" approved="yes">
         <source>Gardien</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="translated">Guardian</target>
+        <target state="final">Guardian</target>
       </trans-unit>
-      <trans-unit id="6227779130323052819" datatype="html">
+      <trans-unit id="6227779130323052819" datatype="html" approved="yes">
         <source>Ermite</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="translated">Survivalist</target>
+        <target state="final">Survivalist</target>
       </trans-unit>
-      <trans-unit id="6520359063458937943" datatype="html">
+      <trans-unit id="6520359063458937943" datatype="html" approved="yes">
         <source>Apprivoiseur</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">Tamer</target>
+        <target state="final">Tamer</target>
       </trans-unit>
-      <trans-unit id="144888502729862279" datatype="html">
+      <trans-unit id="144888502729862279" datatype="html" approved="yes">
         <source>Technicien</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="translated">Technician</target>
+        <target state="final">Technician</target>
       </trans-unit>
       <trans-unit id="5496259459820058286" datatype="html">
         <source>Ne peut pas être déposé par le chef d&apos;escorte</source>
@@ -378,21 +378,21 @@
         </context-group>
         <target state="needs-translation">Provisions</target>
       </trans-unit>
-      <trans-unit id="6713813306186507025" datatype="html">
+      <trans-unit id="6713813306186507025" datatype="html" approved="yes">
         <source>Pharmacie</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="translated">Pharmacy</target>
+        <target state="final">Pharmacy</target>
       </trans-unit>
-      <trans-unit id="9187731843021502220" datatype="html">
+      <trans-unit id="9187731843021502220" datatype="html" approved="yes">
         <source>Arme</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="translated">Weapon</target>
+        <target state="final">Weapon</target>
       </trans-unit>
       <trans-unit id="8487168000877643051" datatype="html">
         <source>Ressource</source>
@@ -573,7 +573,7 @@
         </context-group>
         <target state="needs-translation">Non défini</target>
       </trans-unit>
-      <trans-unit id="5382458688695417420" datatype="html">
+      <trans-unit id="5382458688695417420" datatype="html" approved="yes">
         <source>Banque</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-depot.enum.ts</context>
@@ -603,7 +603,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="translated">Bank</target>
+        <target state="final">Bank</target>
       </trans-unit>
       <trans-unit id="4169579143978188553" datatype="html">
         <source>Zone de rapatriement</source>
@@ -625,7 +625,7 @@
         </context-group>
         <target state="needs-translation">Ne pas ramener</target>
       </trans-unit>
-      <trans-unit id="5559973343890533582" datatype="html">
+      <trans-unit id="5559973343890533582" datatype="html" approved="yes">
         <source>Non définie</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-priority.enum.ts</context>
@@ -639,9 +639,9 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="translated">Not set</target>
+        <target state="final">Not set</target>
       </trans-unit>
-      <trans-unit id="955710000640596255" datatype="html">
+      <trans-unit id="955710000640596255" datatype="html" approved="yes">
         <source>Basse</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-priority.enum.ts</context>
@@ -651,9 +651,9 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="translated">Low</target>
+        <target state="final">Low</target>
       </trans-unit>
-      <trans-unit id="4819076195461123852" datatype="html">
+      <trans-unit id="4819076195461123852" datatype="html" approved="yes">
         <source>Moyenne</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-priority.enum.ts</context>
@@ -671,9 +671,9 @@
           <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="translated">Medium</target>
+        <target state="final">Medium</target>
       </trans-unit>
-      <trans-unit id="7453572823482729445" datatype="html">
+      <trans-unit id="7453572823482729445" datatype="html" approved="yes">
         <source>Haute</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-priority.enum.ts</context>
@@ -683,71 +683,71 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="translated">High</target>
+        <target state="final">High</target>
       </trans-unit>
-      <trans-unit id="2789207481544807989" datatype="html">
+      <trans-unit id="2789207481544807989" datatype="html" approved="yes">
         <source>Nord</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">North</target>
+        <target state="final">North</target>
       </trans-unit>
-      <trans-unit id="7445167327968420930" datatype="html">
+      <trans-unit id="7445167327968420930" datatype="html" approved="yes">
         <source>Nord-Est</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="translated">North-East</target>
+        <target state="final">North-East</target>
       </trans-unit>
-      <trans-unit id="6101095852391728628" datatype="html">
+      <trans-unit id="6101095852391728628" datatype="html" approved="yes">
         <source>Est</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="translated">East</target>
+        <target state="final">East</target>
       </trans-unit>
-      <trans-unit id="5360507263221140991" datatype="html">
+      <trans-unit id="5360507263221140991" datatype="html" approved="yes">
         <source>Sud-Est</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="translated">South-East</target>
+        <target state="final">South-East</target>
       </trans-unit>
-      <trans-unit id="650568627310891497" datatype="html">
+      <trans-unit id="650568627310891497" datatype="html" approved="yes">
         <source>Sud</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="translated">South</target>
+        <target state="final">South</target>
       </trans-unit>
-      <trans-unit id="3790572682369173368" datatype="html">
+      <trans-unit id="3790572682369173368" datatype="html" approved="yes">
         <source>Sud-Ouest</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="translated">South-West</target>
+        <target state="final">South-West</target>
       </trans-unit>
-      <trans-unit id="5671386105172434248" datatype="html">
+      <trans-unit id="5671386105172434248" datatype="html" approved="yes">
         <source>Ouest</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="translated">West</target>
+        <target state="final">West</target>
       </trans-unit>
-      <trans-unit id="9019892187269718023" datatype="html">
+      <trans-unit id="9019892187269718023" datatype="html" approved="yes">
         <source>Nord-Ouest</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="translated">North-West</target>
+        <target state="final">North-West</target>
       </trans-unit>
       <trans-unit id="5538525584308970360" datatype="html">
         <source>Les outils externes ont bien été mis à jour</source>
@@ -789,21 +789,21 @@
         </context-group>
         <target state="needs-translation">La liste de courses a bien été enregistrée</target>
       </trans-unit>
-      <trans-unit id="5161390510505382530" datatype="html">
+      <trans-unit id="5161390510505382530" datatype="html" approved="yes">
         <source>L&apos;objet <x id="PH" equiv-text="item.label[this.locale]"/> a bien été ajouté à la liste de courses</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/services/wishlist.service.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="translated">Item <x id="PH" equiv-text="item.label[this.locale]"/> was successfully added to shopping list</target>
+        <target state="final">Item <x id="PH" equiv-text="item.label[this.locale]"/> was successfully added to shopping list</target>
       </trans-unit>
-      <trans-unit id="7491144287113751802" datatype="html">
+      <trans-unit id="7491144287113751802" datatype="html" approved="yes">
         <source>Affichage condensé</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/bank/bank.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="translated">Condensed display</target>
+        <target state="final">Condensed display</target>
       </trans-unit>
       <trans-unit id="5333122727224525647" datatype="html">
         <source>Chercher des objets par propriétés</source>
@@ -867,7 +867,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
           <context context-type="linenumber">199,200</context>
         </context-group>
-        <target state="translated">Aucun objet ne correspond au filtre "<x id="INTERPOLATION" equiv-text="{{filterInput.nativeElement.value}}"/>" </target>
+        <target state="needs-translation">Aucun objet ne correspond au filtre "<x id="INTERPOLATION" equiv-text="{{ filterInput.nativeElement.value }}"/>" </target>
       </trans-unit>
       <trans-unit id="8265078634979801865" datatype="html">
         <source>La liste est vide</source>
@@ -893,7 +893,7 @@
         </context-group>
         <target state="needs-translation">La liste est vide</target>
       </trans-unit>
-      <trans-unit id="8297073205000664921" datatype="html">
+      <trans-unit id="8297073205000664921" datatype="html" approved="yes">
         <source>Citoyen</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.ts</context>
@@ -911,15 +911,15 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="translated">Citizen</target>
+        <target state="final">Citizen</target>
       </trans-unit>
-      <trans-unit id="7060072837623661429" datatype="html">
+      <trans-unit id="7060072837623661429" datatype="html" approved="yes">
         <source>Fouilles du jour</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="translated">Today's digs</target>
+        <target state="final">Today's digs</target>
       </trans-unit>
       <trans-unit id="6779466566977517049" datatype="html">
         <source>Disponibilités du jour</source>
@@ -1193,7 +1193,7 @@
         </context-group>
         <target state="needs-translation">Liste des objets en sacs</target>
       </trans-unit>
-      <trans-unit id="8529616953243398296" datatype="html">
+      <trans-unit id="8529616953243398296" datatype="html" approved="yes">
         <source>Ajouter un objet</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
@@ -1207,15 +1207,15 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="translated">Add item</target>
+        <target state="final">Add item</target>
       </trans-unit>
-      <trans-unit id="8620934575209945498" datatype="html">
+      <trans-unit id="8620934575209945498" datatype="html" approved="yes">
         <source>Supprimer un objet</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="translated">Delete Item</target>
+        <target state="final">Delete Item</target>
       </trans-unit>
       <trans-unit id="5210423582442777517" datatype="html">
         <source>Retirer tous les objets</source>
@@ -1225,7 +1225,7 @@
         </context-group>
         <target state="needs-translation">Retirer tous les objets</target>
       </trans-unit>
-      <trans-unit id="1434854699604569130" datatype="html">
+      <trans-unit id="1434854699604569130" datatype="html" approved="yes">
         <source>Ajouter un citoyen</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-citizens/map-update-citizens.component.html</context>
@@ -1235,7 +1235,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-digs/map-update-digs.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="translated">Add Citizen</target>
+        <target state="final">Add Citizen</target>
       </trans-unit>
       <trans-unit id="3420757244733292611" datatype="html">
         <source>Fouilles réussies</source>
@@ -1361,13 +1361,13 @@
         </context-group>
         <target state="needs-translation">Carte des fouilles</target>
       </trans-unit>
-      <trans-unit id="5460349843625378822" datatype="html">
+      <trans-unit id="5460349843625378822" datatype="html" approved="yes">
         <source>Paramètres</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="translated">Parameters</target>
+        <target state="final">Parameters</target>
       </trans-unit>
       <trans-unit id="6829489120150883241" datatype="html">
         <source>Type de carte</source>
@@ -1465,29 +1465,29 @@
         </context-group>
         <target state="needs-translation">Distance</target>
       </trans-unit>
-      <trans-unit id="4998616682175982835" datatype="html">
+      <trans-unit id="4998616682175982835" datatype="html" approved="yes">
         <source>Unité</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="translated">Unit</target>
+        <target state="final">Unit</target>
       </trans-unit>
-      <trans-unit id="6044256456943348938" datatype="html">
+      <trans-unit id="6044256456943348938" datatype="html" approved="yes">
         <source>km</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="translated">km</target>
+        <target state="final">km</target>
       </trans-unit>
-      <trans-unit id="4330356559988217596" datatype="html">
+      <trans-unit id="4330356559988217596" datatype="html" approved="yes">
         <source>pa</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="translated">ap</target>
+        <target state="final">ap</target>
       </trans-unit>
       <trans-unit id="7649141370266521403" datatype="html">
         <source>Aller / Retour</source>
@@ -1501,7 +1501,7 @@
         </context-group>
         <target state="needs-translation">Aller / Retour</target>
       </trans-unit>
-      <trans-unit id="70397346439942337" datatype="html">
+      <trans-unit id="70397346439942337" datatype="html" approved="yes">
         <source>Ajouter</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
@@ -1511,7 +1511,7 @@
           <context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="translated">Add</target>
+        <target state="final">Add</target>
       </trans-unit>
       <trans-unit id="6713347271514219101" datatype="html">
         <source>Aller simple</source>
@@ -3129,7 +3129,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">42,43</context>
         </context-group>
-        <target state="translated">(Bonus : <x id="INTERPOLATION" equiv-text="{{bonus['zombie_with_vest']}}"/> par zombie au lieu de <x id="INTERPOLATION_1" equiv-text="{{bonus['zombie_without_vest']}}"/>)</target>
+        <target state="needs-translation">(Bonus : <x id="INTERPOLATION" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale }}"/>)</target>
       </trans-unit>
       <trans-unit id="7954001980226848388" datatype="html">
         <source>Campeur professionnel</source>
@@ -3165,7 +3165,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="translated">(Bonus : <x id="INTERPOLATION" equiv-text="{{bonus['tomb']}}"/>)</target>
+        <target state="needs-translation">(Bonus : <x id="INTERPOLATION" equiv-text="{{ bonus.tomb | campingDisplayBonus:display_bonus_ap:locale }}"/>)</target>
       </trans-unit>
       <trans-unit id="3231213779188554984" datatype="html">
         <source>Nombre de campings déjà effectués</source>
@@ -3212,7 +3212,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">165</context>
         </context-group>
-        <target state="translated">Bonus : x<x id="INTERPOLATION" equiv-text="{{bonus['camping_objects_in_inventory']}}"/>
+        <target state="needs-translation">Bonus : x<x id="INTERPOLATION" equiv-text="{{ bonus.camp_items | campingDisplayBonus:display_bonus_ap:locale }}"/>
                 </target>
       </trans-unit>
       <trans-unit id="560884417072143682" datatype="html">
@@ -3246,7 +3246,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">143</context>
         </context-group>
-        <target state="translated">Bonus : <x id="INTERPOLATION" equiv-text="{{ configuration_form.get('town')?.value['id'] === 'pande'                             ? (configuration_form.get('pro')?.value                                     ? (configuration_form.get('campings')?.value &gt; 9 ? campings['pande']['pro'][9] : campings['pande']['pro'][configuration_form.get('campings')?.value])                                     : (configuration_form.get('campings')?.value &gt; 9 ? campings['pande']['nonpro'][9] : campings['pande']['nonpro'][configuration_form.get('campings')?.value])                             )                             : (configuration_form.get('pro')?.value                                     ? (configuration_form.get('campings')?.value &gt; 9 ? campings['normal']['pro'][9] : campings['normal']['pro'][configuration_form.get('campings')?.value])                                     : (configuration_form.get('campings')?.value &gt; 9 ? campings['normal']['nonpro'][9] : campings['normal']['nonpro'][configuration_form.get('campings')?.value])                             )                             }}"/>
+        <target state="needs-translation">Bonus : <x id="INTERPOLATION" equiv-text="{{ configuration_form.get('town')?.value['bonus'] | campingDisplayBonus:display_bonus_ap:locale }}"/>
                 </target>
       </trans-unit>
       <trans-unit id="5596519199501316309" datatype="html">
@@ -3351,8 +3351,8 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">174</context>
         </context-group>
-        <target state="translated">
-                    <x id="INTERPOLATION" equiv-text="{{ display_bonus_ap ? 'Nombre' : 'Pourcentage' }}"/> total d'améliotations sur la case</target>
+        <target state="needs-translation">
+<x id="INTERPOLATION" equiv-text="{{ display_bonus_ap ? 'Nombre' : 'Pourcentage' }}"/> total d'améliotations sur la case</target>
       </trans-unit>
       <trans-unit id="223574208640189770" datatype="html">
         <source>Bonus : x1</source>
@@ -3709,8 +3709,8 @@ Une fois activée, si vous êtes dans le désert et que votre attente d&apos;esc
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">31,32</context>
         </context-group>
-        <target state="translated">Dans l'interface, vous pouvez cocher l'option "Demander confirmation avant de quitter la page", ce qui activera la fonctionnalité.
-                Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l'onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.</target>
+        <target state="needs-translation">Dans l'interface, vous pouvez cocher l'option "Demander confirmation avant de quitter la page", ce qui activera la fonctionnalité.
+Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l'onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.</target>
       </trans-unit>
       <trans-unit id="4945794230367496950" datatype="html">
         <source>Avertissement en cas d&apos;inactivité</source>
@@ -3727,8 +3727,8 @@ Une fois activée, si vous êtes dans le désert et que votre attente d&apos;esc
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">35,36</context>
         </context-group>
-        <target state="translated">Dans l'interface, vous pouvez cocher l'option "Me notifier si je suis inactif depuis 5 minutes sur la page", ce qui activera la fonctionnalité.
-                Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.</target>
+        <target state="needs-translation">Dans l'interface, vous pouvez cocher l'option "Me notifier si je suis inactif depuis 5 minutes sur la page", ce qui activera la fonctionnalité.
+Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.</target>
       </trans-unit>
       <trans-unit id="2315492892193612031" datatype="html">
         <source>Notification à la fin de la fouille</source>
@@ -3833,13 +3833,13 @@ Dans le désert, les objets dans le sac ou au sol également présents dans la l
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">45,52</context>
         </context-group>
-        <target state="translated">En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l'atelier.
-                Cette liste contient des informations de priorité, de quantité en banque, de quantité dans les sacs, de quantité totale requise, et de quantité manquante.
-                &lt;br /&gt;&lt;br /&gt;
-                La liste de courses dans l'atelier ne présentera que les éléments pouvant obtenus à l'atelier.
-                Celle dans le désert affichera tous les éléments sans distinction.
-                &lt;br /&gt;&lt;br /&gt;
-                Dans le désert, les objets dans le sac ou au sol également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l'élément.
+        <target state="needs-translation">En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l'atelier.
+Cette liste contient des informations de priorité, de quantité en banque, de quantité dans les sacs, de quantité totale requise, et de quantité manquante.
+&lt;br /&gt;&lt;br /&gt;
+La liste de courses dans l'atelier ne présentera que les éléments pouvant obtenus à l'atelier.
+Celle dans le désert affichera tous les éléments sans distinction.
+&lt;br /&gt;&lt;br /&gt;
+Dans le désert, les objets dans le sac ou au sol également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l'élément.
                 </target>
       </trans-unit>
       <trans-unit id="4423220166056863975" datatype="html">
@@ -3857,8 +3857,8 @@ Il compte le nombre de zombies qui ont été tués sur la case depuis la derniè
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">56,57</context>
         </context-group>
-        <target state="translated">En cochant cette option, un nouvel encart apparaitra sous la carte dans l'Outre-Monde.
-                Il compte le nombre de zombies qui ont été tués sur la case depuis la dernière attaque, et calcule le nombre de zombies qui vont mourir de désespoir lors de la prochaine attaque.</target>
+        <target state="needs-translation">En cochant cette option, un nouvel encart apparaitra sous la carte dans l'Outre-Monde.
+Il compte le nombre de zombies qui ont été tués sur la case depuis la dernière attaque, et calcule le nombre de zombies qui vont mourir de désespoir lors de la prochaine attaque.</target>
       </trans-unit>
       <trans-unit id="6560590152891649669" datatype="html">
         <source>Affichage de l&apos;outil de traduction</source>
@@ -3895,8 +3895,8 @@ Cette option va montrer combien de pa manquent pour que le chantier ne risque pa
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">67,68</context>
         </context-group>
-        <target state="translated">En pandémonium, les chantiers subissent des dégats lors de l'attaque.
-                Cette option va montrer combien de pa manquent pour que le chantier ne risque pas d'être détruit lors de la prochaine attaque.</target>
+        <target state="needs-translation">En pandémonium, les chantiers subissent des dégats lors de l'attaque.
+Cette option va montrer combien de pa manquent pour que le chantier ne risque pas d'être détruit lors de la prochaine attaque.</target>
       </trans-unit>
       <trans-unit id="7507912867004115839" datatype="html">
         <source>Prédictions de camping dans les informations du secteur</source>
@@ -3914,9 +3914,9 @@ Certaines informations, comme par exemple le type de ville, ne sont pas visibles
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">72,74</context>
         </context-group>
-        <target state="translated">En cochant cette option, vous verrez apparaitre un nouvel encart dans les informations du secteur de votre case.
-                Cet encart vous permettra de saisir diverses informations pour calculer vos chances de survie sur cette case.
-                Certaines informations, comme par exemple le type de ville, ne sont pas visibles car elles sont déjà pré-renseignées et tiennent compte de votre ville actuelle.</target>
+        <target state="needs-translation">En cochant cette option, vous verrez apparaitre un nouvel encart dans les informations du secteur de votre case.
+Cet encart vous permettra de saisir diverses informations pour calculer vos chances de survie sur cette case.
+Certaines informations, comme par exemple le type de ville, ne sont pas visibles car elles sont déjà pré-renseignées et tiennent compte de votre ville actuelle.</target>
       </trans-unit>
       <trans-unit id="5457236869945529467" datatype="html">
         <source>Informations diverses issues de MyHordes Optimizer</source>
@@ -3933,8 +3933,8 @@ Quand cette option est cochée, la note associée s&apos;affiche sur votre case 
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">78,79</context>
         </context-group>
-        <target state="translated">Sur la carte du site de MyHordes Optimizer, vous pouvez saisir des notes sur chaque case.
-                Quand cette option est cochée, la note associée s'affiche sur votre case quand vous vous déplacez dans l'Outre-Monde.</target>
+        <target state="needs-translation">Sur la carte du site de MyHordes Optimizer, vous pouvez saisir des notes sur chaque case.
+Quand cette option est cochée, la note associée s'affiche sur votre case quand vous vous déplacez dans l'Outre-Monde.</target>
       </trans-unit>
       <trans-unit id="3270416149746032956" datatype="html">
         <source>Affiche les estimations enregistrées sur la page de la tour de guet</source>
@@ -3983,8 +3983,8 @@ Le compteur dans MyHordes tient compte des minutes &quot;glissantes&quot;, il su
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">91,92</context>
         </context-group>
-        <target state="translated">Quand cette option est cochée, un compteur qui liste vos prises en banque est ajouté aux pages de banque et puits.
-                Le compteur dans MyHordes tient compte des minutes "glissantes", il suffit donc d'attendre qu'une ligne disparaisse pour pouvoir prendre de nouveau un objet en banque.</target>
+        <target state="needs-translation">Quand cette option est cochée, un compteur qui liste vos prises en banque est ajouté aux pages de banque et puits.
+Le compteur dans MyHordes tient compte des minutes "glissantes", il suffit donc d'attendre qu'une ligne disparaisse pour pouvoir prendre de nouveau un objet en banque.</target>
       </trans-unit>
       <trans-unit id="7972524927973029550" datatype="html">
         <source>Ouvre automatiquement le menu &quot;Utiliser un objet de mon sac&quot;</source>
@@ -4017,8 +4017,8 @@ Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par 
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">100,101</context>
         </context-group>
-        <target state="translated">En cochant cette option, deux autres options représentant les options d'escorte dans l'Outre-Monde seront disponibles.
-                Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.</target>
+        <target state="needs-translation">En cochant cette option, deux autres options représentant les options d'escorte dans l'Outre-Monde seront disponibles.
+Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.</target>
       </trans-unit>
       <trans-unit id="8248895111587460156" datatype="html">
         <source>Outils externes</source>
@@ -4068,18 +4068,18 @@ Vous rendez également accessibles d&apos;autres options de mise à jour avancé
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">29,41</context>
         </context-group>
-        <target state="translated">
-                En cochant l'option "Mettre à jour MyHordesOptimizer", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de MyHordes Optimizer se fera automatiquement.
-                Vous rendez également accessibles d'autres options de mise à jour avancées.
-                &lt;ul&gt;
-                &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à MyHordes Optimizer.&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Détail de mon sac et de ceux de mon escorte :&lt;/strong&gt; Enregistre le contenu de votre sac ainsi que ceux de vos escortés&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre vos différents états (rassasié, soif, etc... Attention : n'enregistre pas l'état goule)&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Entregistrer les fouilles réussies :&lt;/strong&gt; Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte dédiée&lt;/li&gt;
-                &lt;/ul&gt;
+        <target state="needs-translation">
+En cochant l'option "Mettre à jour MyHordesOptimizer", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de MyHordes Optimizer se fera automatiquement.
+Vous rendez également accessibles d'autres options de mise à jour avancées.
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à MyHordes Optimizer.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Détail de mon sac et de ceux de mon escorte :&lt;/strong&gt; Enregistre le contenu de votre sac ainsi que ceux de vos escortés&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre vos différents états (rassasié, soif, etc... Attention : n'enregistre pas l'état goule)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Entregistrer les fouilles réussies :&lt;/strong&gt; Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte dédiée&lt;/li&gt;
+&lt;/ul&gt;
                 </target>
       </trans-unit>
       <trans-unit id="762928771016494268" datatype="html">
@@ -4105,15 +4105,15 @@ Vous rendez également accessibles d&apos;autres options de mise à jour avancé
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">44,53</context>
         </context-group>
-        <target state="translated">En cochant l'option "Mettre à jour Gest'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de Gest'Hordes se fera automatiquement.
-                Vous rendez également accessibles d'autres options de mise à jour avancées.
-                &lt;ul&gt;
-                &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à Gest'Hordes.&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre l'état clair&lt;/li&gt;
-                &lt;/ul&gt;
+        <target state="needs-translation">En cochant l'option "Mettre à jour Gest'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de Gest'Hordes se fera automatiquement.
+Vous rendez également accessibles d'autres options de mise à jour avancées.
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à Gest'Hordes.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre l'état clair&lt;/li&gt;
+&lt;/ul&gt;
                 </target>
       </trans-unit>
       <trans-unit id="4957168085124746094" datatype="html">
@@ -4264,13 +4264,13 @@ Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">40,46</context>
         </context-group>
-        <target state="translated">&lt;ul&gt;
-                &lt;li&gt;Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox ;&lt;/li&gt;
-                &lt;li&gt;Rechercher l'extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li&gt;
-                &lt;li&gt;Installer l'extension pour Chrome ;&lt;/li&gt;
-                &lt;li&gt;Cliquer sur le <x id="PH" equiv-text="this.download_link"/> ;&lt;/li&gt;
-                &lt;li&gt;Confirmer l'installation dans la page qui se sera ouverte.&lt;/li&gt;
-                &lt;/ul&gt;</target>
+        <target state="needs-translation">&lt;ul&gt;
+&lt;li&gt;Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox ;&lt;/li&gt;
+&lt;li&gt;Rechercher l'extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li&gt;
+&lt;li&gt;Installer l'extension pour Chrome ;&lt;/li&gt;
+&lt;li&gt;Cliquer sur le <x id="PH" equiv-text="this.download_link"/> ;&lt;/li&gt;
+&lt;li&gt;Confirmer l'installation dans la page qui se sera ouverte.&lt;/li&gt;
+&lt;/ul&gt;</target>
       </trans-unit>
       <trans-unit id="6674940684074453217" datatype="html">
         <source>iOS</source>
