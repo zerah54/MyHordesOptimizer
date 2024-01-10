@@ -603,7 +603,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">Banque</target>
+        <target state="translated">Bank</target>
       </trans-unit>
       <trans-unit id="4169579143978188553" datatype="html">
         <source>Zone de rapatriement</source>
@@ -639,7 +639,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Non définie</target>
+        <target state="translated">Not set</target>
       </trans-unit>
       <trans-unit id="955710000640596255" datatype="html">
         <source>Basse</source>
@@ -651,7 +651,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">Basse</target>
+        <target state="translated">Low</target>
       </trans-unit>
       <trans-unit id="4819076195461123852" datatype="html">
         <source>Moyenne</source>
@@ -671,7 +671,7 @@
           <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Moyenne</target>
+        <target state="translated">Medium</target>
       </trans-unit>
       <trans-unit id="7453572823482729445" datatype="html">
         <source>Haute</source>
@@ -683,7 +683,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">Haute</target>
+        <target state="translated">High</target>
       </trans-unit>
       <trans-unit id="2789207481544807989" datatype="html">
         <source>Nord</source>
@@ -691,7 +691,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Nord</target>
+        <target state="translated">North</target>
       </trans-unit>
       <trans-unit id="7445167327968420930" datatype="html">
         <source>Nord-Est</source>
@@ -699,7 +699,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Nord-Est</target>
+        <target state="translated">North-East</target>
       </trans-unit>
       <trans-unit id="6101095852391728628" datatype="html">
         <source>Est</source>
@@ -707,7 +707,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Est</target>
+        <target state="translated">East</target>
       </trans-unit>
       <trans-unit id="5360507263221140991" datatype="html">
         <source>Sud-Est</source>
@@ -715,7 +715,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Sud-Est</target>
+        <target state="translated">South-East</target>
       </trans-unit>
       <trans-unit id="650568627310891497" datatype="html">
         <source>Sud</source>
@@ -723,7 +723,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Sud</target>
+        <target state="translated">South</target>
       </trans-unit>
       <trans-unit id="3790572682369173368" datatype="html">
         <source>Sud-Ouest</source>
@@ -731,7 +731,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Sud-Ouest</target>
+        <target state="translated">South-West</target>
       </trans-unit>
       <trans-unit id="5671386105172434248" datatype="html">
         <source>Ouest</source>
@@ -739,7 +739,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Ouest</target>
+        <target state="translated">West</target>
       </trans-unit>
       <trans-unit id="9019892187269718023" datatype="html">
         <source>Nord-Ouest</source>
@@ -747,7 +747,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Nord-Ouest</target>
+        <target state="translated">North-West</target>
       </trans-unit>
       <trans-unit id="5538525584308970360" datatype="html">
         <source>Les outils externes ont bien été mis à jour</source>
@@ -1207,7 +1207,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Ajouter un objet</target>
+        <target state="translated">Add item</target>
       </trans-unit>
       <trans-unit id="8620934575209945498" datatype="html">
         <source>Supprimer un objet</source>
@@ -1215,7 +1215,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="needs-translation">Supprimer un objet</target>
+        <target state="translated">Delete Item</target>
       </trans-unit>
       <trans-unit id="5210423582442777517" datatype="html">
         <source>Retirer tous les objets</source>
@@ -1231,7 +1231,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-citizens/map-update-citizens.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Ajouter un citoyen</target>
+        <target state="translated">Add Citizen</target>
       </trans-unit>
       <trans-unit id="5050216151704196655" datatype="html">
         <source>Ajouter un citoyen </source>
@@ -1371,7 +1371,7 @@
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Paramètres</target>
+        <target state="translated">Parameters</target>
       </trans-unit>
       <trans-unit id="6829489120150883241" datatype="html">
         <source>Type de carte</source>
@@ -1475,7 +1475,7 @@
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Unité</target>
+        <target state="translated">Unit</target>
       </trans-unit>
       <trans-unit id="6044256456943348938" datatype="html">
         <source>km</source>
@@ -1483,7 +1483,7 @@
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="needs-translation">km</target>
+        <target state="translated">km</target>
       </trans-unit>
       <trans-unit id="4330356559988217596" datatype="html">
         <source>pa</source>
@@ -1491,7 +1491,7 @@
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">pa</target>
+        <target state="translated">ap</target>
       </trans-unit>
       <trans-unit id="7649141370266521403" datatype="html">
         <source>Aller / Retour</source>
@@ -1515,7 +1515,7 @@
           <context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="needs-translation">Ajouter</target>
+        <target state="translated">Add</target>
       </trans-unit>
       <trans-unit id="6713347271514219101" datatype="html">
         <source>Aller simple</source>
