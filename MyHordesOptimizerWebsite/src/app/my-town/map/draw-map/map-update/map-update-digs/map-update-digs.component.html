@@ -6,7 +6,8 @@
         <thead>
         <th>
             <button mat-button [matMenuTriggerFor]="addCitizenMenu"
-                    *ngIf="(allCitizens | notInListCitizenDig:digs).length > 0" i18n>Ajouter un citoyen
+                    *ngIf="(allCitizens | notInListCitizenDig:digs).length > 0">
+                <ng-container i18n>Ajouter un citoyen</ng-container>
             </button>
         </th>
         <th i18n>Fouilles réussies</th>
@@ -16,7 +17,7 @@
         <tbody>
         <tr *ngFor="let displayed_dig of digs | digsPerDay:selected_day">
             <th class="name">
-                {{displayed_dig.digger_name}}
+                {{ displayed_dig.digger_name }}
             </th>
             <td class="success">
                 <mat-form-field class="no-bottom">
@@ -41,7 +42,7 @@
         <mat-list class="mho-add-citizen-list">
             <mat-list-item *ngFor="let citizen of (allCitizens | notInListCitizenDig:digs)"
                            (click)="addCitizen(citizen)">
-                <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{citizen.name}}
+                <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{ citizen.name }}
             </mat-list-item>
         </mat-list>
     </mat-menu>

@@ -34,6 +34,7 @@
         "compass-mixins": "^0.12.12",
         "express": "^4.18.2",
         "localstorage-polyfill": "^1.0.1",
+        "material-icons": "^1.13.12",
         "moment": "^2.29.4",
         "moment-timezone": "^0.5.43",
         "ng-table-virtual-scroll": "^1.6.0",
