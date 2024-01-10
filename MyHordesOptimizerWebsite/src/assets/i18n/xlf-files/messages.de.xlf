@@ -170,13 +170,13 @@
         </context-group>
         <target state="needs-translation">Cuisine</target>
       </trans-unit>
-      <trans-unit id="7249755932437908154" datatype="html">
-        <source>Cave laboratoire</source>
+      <trans-unit id="1463247293350394462" datatype="html">
+        <source>Cave-laboratoire</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Cave laboratoire</target>
+        <target state="needs-translation">Cave-laboratoire</target>
       </trans-unit>
       <trans-unit id="6477064715313307165" datatype="html">
         <source>Coin sieste</source>
