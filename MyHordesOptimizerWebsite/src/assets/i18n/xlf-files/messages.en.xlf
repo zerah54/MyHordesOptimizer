@@ -264,7 +264,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Ne peut pas être déposé par le chef d'escorte</target>
+        <target state="translated">Cannot be dropped by the escort leader</target>
       </trans-unit>
       <trans-unit id="8260511042256310681" datatype="html">
         <source>Sécurise le coffre dans lequel il se trouve</source>
