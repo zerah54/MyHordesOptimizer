@@ -63,7 +63,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     wishlistItem.BagCount = bagItem.Count;
                 }
-                wishlistItem.IsWorkshop = recipes.Any(x => x.Type.StartsWith("WORKSHOP")
+                wishlistItem.IsWorkshop = recipes.Any(x => x.Type.StartsWith("Recipe::WorkshopType")
                                                              && (x.Components.Any(component => component.Id == wishlistItem.Item.Id) || x.Result.Any(result => result.Item.Id == wishlistItem.Item.Id)));
             }
             Logger.LogInformation($"[GetWishList] Récupération bankcount : {sw.ElapsedMilliseconds}");

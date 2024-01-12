@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.2.0
+// @version      1.0.3.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,11 +32,9 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Corrige l'affichage de l'icône de succès après une mise à jour des outils externes sur petit écran en mode compact \n`
-    + `[Correctif] Corrige l'affichage du loader sur les tooltips qui était en allemand alors qu'il ne devait pas avoir de texte \n`
-    + `[Correctif] L'affichage du tooltip d'APAG est désormais plus propre \n`
-    + `[Correctif] Corrige le calcul du camping qui prenait en compte la mauvaise valeur pour le bâtiment\n\n`
-    + `[Nouveauté] Ajout d'un bouton pour cocher tous les paramètres \n`;
+    + `[Correctif] Corrige l'affichage du bouton de mise à jour des outils externes sous chrome \n`
+    + `[Correctif] Corrige la récupération de la liste de courses quand elle existe \n`;
+
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -8626,9 +8624,8 @@ function getWishlist() {
             })
             .then((response) => {
                 for (let key in response.wishList) {
-                    let wishlist_zone = response.wishList[key];
-                    wishlist_zone = Object.keys(wishlist_zone)
-                        .map((item_key) => wishlist_zone[item_key])
+                    let wishlist_zone = Object.keys(response.wishList[key])
+                        .map((item_key) => response.wishList[key][item_key])
                         .map((item) => {
                             if (item.priority < 0) {
                                 item.priority_main = -1;
@@ -8647,7 +8644,7 @@ function getWishlist() {
                     wishlist_zone.forEach((item) => {
                         item.item.img = fixMhCompiledImg(item.item.img);
                     });
-                    response.wishList[key] = cloneInto(wishlist_zone);
+                    response.wishList[key] = cloneInto(wishlist_zone, response.wishList[key]);
                 }
                 wishlist = response;
                 resolve(wishlist);
@@ -9326,7 +9323,9 @@ function calculateCamping(camping_parameters) {
             })
             .then((camping_result) => {
                 let result = document.querySelector('#camping-result');
-                result.innerText = result ? `${getI18N(camping_result.label)} (${camping_result.boundedProbability}%)` : '';
+                if (result) {
+                    result.innerText = result ? `${getI18N(camping_result.label)} (${camping_result.boundedProbability}%)` : '';
+                }
                 resolve(camping_result);
             })
             .catch((error) => {
