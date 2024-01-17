@@ -8,6 +8,7 @@ using MyHordesOptimizerApi.Models.Translation;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -116,7 +117,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
                 {
                     var isExactMatch = false;
 
-                    var translatedDeutchString = translationFile.Translations.Where(kvp => kvp.Value.ToLower().IndexOf(sourceString.ToLower()) >= 0).ToList().Select(kvp => kvp.Key);
+                    var translatedDeutchString = translationFile.Translations.Where(kvp => CultureInfo.InvariantCulture.CompareInfo.IndexOf(kvp.Value, sourceString, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) >= 0).ToList().Select(kvp => kvp.Key);
                     var exactString = translationFile.Translations.Where(kvp => kvp.Value.ToLower() == sourceString.ToLower()).FirstOrDefault().Key;
                     if (exactString != null)
                     {
@@ -147,7 +148,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
                 {
                     var isExactMatch = false;
 
-                    var translatedDeutchStrings = translationFile.Translations.Keys.Where(key => key.ToLower().IndexOf(sourceString.ToLower()) >= 0).ToList().Select(key => key);
+                    var translatedDeutchStrings = translationFile.Translations.Keys.Where(key => CultureInfo.InvariantCulture.CompareInfo.IndexOf(key, sourceString, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) >= 0).ToList().Select(key => key);
                     var exactString = translationFile.Translations.Where(kvp => kvp.Value.ToLower() == sourceString.ToLower()).FirstOrDefault().Key;
                     if (exactString != null)
                     {
