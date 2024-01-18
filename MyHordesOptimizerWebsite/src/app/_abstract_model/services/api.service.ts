@@ -355,7 +355,7 @@ export class ApiService extends GlobalService {
 
     public saveCell(cell: Cell): Observable<Cell> {
         return new Observable((sub: Subscriber<Cell>) => {
-            super.post<CellDTO>(this.API_URL + `/MyHordesOptimizerMap/cell?townid=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(cell.toSaveCellDTO()))
+            super.post<CellDTO>(this.API_URL + `/Map/cell?townid=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(cell.toSaveCellDTO()))
                 .subscribe({
                     next: (response: CellDTO) => {
                         this.snackbar.successSnackbar($localize`La cellule a bien été modifiée`);
