@@ -1190,13 +1190,28 @@ $ruins_additional_info = [
 
     // Explorable Ruins.
     // id 100
-    'deserted_bunker' => ['capacity' => 4],
+    'deserted_bunker' => [
+        'capacity' => 4,
+        'constructions' => [
+            13, 33, 42, 44, 47, 51, 66, 100, 101, 111, 123, 125, 126, 129, 134, 152, 154, 158, 160, 162
+        ]
+    ],
 
     // id 101
-    'deserted_hotel' => ['capacity' => 4],
+    'deserted_hotel' => [
+        'capacity' => 4,
+        'constructions' => [
+            12, 48, 49, 55, 70, 73, 98, 106, 107, 108, 110, 127, 130, 133, 151, 155, 158, 159, 165
+        ]
+    ],
 
     // id 102
-    'deserted_hospital' => ['capacity' => 4],
+    'deserted_hospital' => [
+        'capacity' => 4,
+        'constructions' => [
+            11, 32, 35, 39, 61, 66, 67, 68, 74, 102, 105, 119, 129, 132, 135, 136, 144, 148, 150, 164
+        ]
+    ],
 ];
 
 foreach ($ruins as &$ruin) {

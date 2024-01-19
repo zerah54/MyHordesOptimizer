@@ -31,5 +31,8 @@ namespace MyHordesOptimizerApi.Data.Ruins
 
         [JsonProperty("capacity")]
         public int Capacity { get; set; }
+
+        [JsonProperty("constructions")]
+        public List<int> Constructions { get; set; }
     }
 }

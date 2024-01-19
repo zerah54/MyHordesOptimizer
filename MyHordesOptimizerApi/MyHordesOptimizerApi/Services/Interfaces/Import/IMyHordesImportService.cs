@@ -8,6 +8,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
         Task ImportCauseOfDeath();
         void ImportCleanUpTypes();
         void ImportRuins();
+        void ImportConstructions();
         Task ImportCategoriesAsync();
         Task ImportItemsAsync();
         Task ImportAllAsync();

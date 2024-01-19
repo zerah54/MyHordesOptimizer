@@ -48,5 +48,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
             url = AddParameterToQuery(url, _parameterFields, "id,name,desc,explorable,img");
             return base.Get<Dictionary<string, MyHordesApiRuinDto>>(url);
         }
+
+        public Dictionary<string, MyHordesApiConstructionDto> GetConstructions()
+        {
+            var url = GenerateUrl(EndpointConstructions);
+            url = AddParameterToQuery(url, _parameterFields, "id,img,name,desc,pa,maxLife,breakable,def,hasUpgrade,rarity,temporary,parent,resources");
+            return base.Get<Dictionary<string, MyHordesApiConstructionDto>>(url);
+        }
     }
 }

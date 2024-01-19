@@ -152,12 +152,14 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 totalWeightPraf += Convert.ToInt32(kvp.Value[0]);
             }
+
             var listOfNotPrafDrops = droprates.GetValueOrDefault("base_dig");
             var totalWeightNotPraf = 0.0;
             foreach (var kvp in listOfNotPrafDrops)
             {
                 totalWeightNotPraf += Convert.ToInt32(kvp.Value[0]);
             }
+
             mhoItems.ForEach(item =>
             {
                 if (listOfPrafDrops.TryGetValue(item.Uid, out var dropWeight))
@@ -231,6 +233,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     recipe.ActionEs = spanishTrads[recipe.ActionDe];
                 }
             }
+
             MyHordesOptimizerRepository.PatchRecipes(mhoRecipes);
             MyHordesOptimizerRepository.DeleteAllRecipeComponents();
             MyHordesOptimizerRepository.DeleteAllRecipeResults();
@@ -271,7 +274,11 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                             });
                         }
                     }
-                    results.ForEach(x => { if (x.Probability != 1) x.Probability = (float)x.Weight / totalWeight; });
+
+                    results.ForEach(x =>
+                    {
+                        if (x.Probability != 1) x.Probability = (float)x.Weight / totalWeight;
+                    });
                     MyHordesOptimizerRepository.PatchRecipeResults(results);
                 }
                 catch (Exception e)
@@ -293,13 +300,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var jsonRuins = Mapper.Map<List<MyHordesOptimizerRuin>>(jsonApiResult);
 
             var codeResult = MyHordesCodeRepository.GetRuins();
-            
-            Logger.LogDebug($"codeResult {codeResult}");
-            
             var codeRuins = Mapper.Map<List<MyHordesOptimizerRuin>>(codeResult);
 
-            Logger.LogDebug($"codeRuins {codeResult}");
-            
             var items = MyHordesOptimizerRepository.GetItems();
 
             foreach (var ruin in jsonRuins)
@@ -319,6 +321,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                             Weight = Convert.ToInt32(drop.Value[0])
                         });
                     }
+
                     miror.Drops.ForEach(x => x.Probability = (double)x.Weight / totalWeight);
                     ruin.HydrateMyHordesCodeValues(miror);
                 }
@@ -331,10 +334,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 Camping = 15,
                 Label = new Dictionary<string, string>()
                 {
-                      { "fr", "Bâtiment non déterré" },
-                      { "en", "Buried building" },
-                      { "de", "Verschüttete Ruine" },
-                      { "es", "Sector inexplotable" }
+                    { "fr", "Bâtiment non déterré" },
+                    { "en", "Buried building" },
+                    { "de", "Verschüttete Ruine" },
+                    { "es", "Sector inexplotable" }
                 },
                 Chance = 0,
                 Explorable = false,
@@ -344,6 +347,28 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 Capacity = 0
             });
             MyHordesOptimizerRepository.PatchRuins(jsonRuins);
+        }
+
+        #endregion
+
+        #region Constructions
+
+        public void ImportConstructions()
+        {
+            var jsonApiResult = MyHordesApiRepository.GetConstructions();
+            var jsonConstructions = Mapper.Map<List<MyHordesOptimizerConstruction>>(jsonApiResult);
+
+            var codeResult = MyHordesCodeRepository.GetRuins();
+            var codeRuins = Mapper.Map<List<MyHordesOptimizerRuin>>(codeResult);
+
+            Logger.LogDebug($"codeResult {codeResult}");
+            Logger.LogDebug($"codeRuins {codeRuins}");
+
+            foreach (var construction in jsonConstructions)
+            {
+
+            }
+            MyHordesOptimizerRepository.PatchConstructions(jsonConstructions);
         }
 
         #endregion
@@ -427,6 +452,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                         ZoneXPa = item.ZoneXPa
                     });
                 }
+
                 foreach (var categorie in wishlist.Categories)
                 {
                     var wishlistCategorie = wishlistCategories.Single(x => x.Id == categorie.CategorieId);

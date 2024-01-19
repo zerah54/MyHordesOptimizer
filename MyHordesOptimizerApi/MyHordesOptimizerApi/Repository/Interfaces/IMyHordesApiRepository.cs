@@ -3,6 +3,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Models.Map;
 using System.Collections.Generic;
+using MyHordesOptimizerApi.Configuration.Impl;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
 {
@@ -11,5 +12,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         Dictionary<string, MyHordesItem> GetItems();
         MyHordesMeResponseDto GetMe();
         Dictionary<string, MyHordesApiRuinDto> GetRuins();
+        Dictionary<string, MyHordesApiConstructionDto> GetConstructions();
     }
 }

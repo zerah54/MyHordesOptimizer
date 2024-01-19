@@ -247,8 +247,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         var realY = updateRequestDto.TownDetails.TownY - cell.Y;
                         if (townDetails.IsDevaste || cell.DeadZombies > 0)
                         {
-         
-                            if (cell.Objects != null && townDetails.IsDevaste)                        
+
+                            if (cell.Objects != null && townDetails.IsDevaste)
                             {
                                 var request = Mapper.Map<GestHordesMajCaseRequestDto>(updateRequestDto);
                                 GestHordesRepository.UpdateCellItem(request);

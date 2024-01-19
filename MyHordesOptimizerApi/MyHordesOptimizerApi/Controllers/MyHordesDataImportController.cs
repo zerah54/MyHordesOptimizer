@@ -73,6 +73,20 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpPost]
+        [Route("Buildins")]
+        public ActionResult ImportBuildins(string userKey)
+        {
+            if (string.IsNullOrWhiteSpace(userKey))
+            {
+                return BadRequest($"{nameof(userKey)} cannot be empty");
+            }
+            UserKeyProvider.UserKey = userKey;
+            MyHordesImportService.ImportConstructions();
+            return Ok();
+        }
+
+
+        [HttpPost]
         [Route("Categories")]
         public async Task<ActionResult> ImportCategories()
         {
