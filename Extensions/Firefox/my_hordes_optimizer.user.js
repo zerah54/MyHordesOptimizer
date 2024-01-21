@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.3.0
+// @version      1.0.4.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,9 +32,9 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Corrige l'affichage du bouton de mise à jour des outils externes sous chrome \n`
-    + `[Correctif] Corrige la récupération de la liste de courses quand elle existe \n`;
-
+    + `[Correctif] Le bouton pour ajouter un objet à la liste de courses n'apparait désormais plus sur les objets de l'outil Banque \n`
+    + `[Correctif] L'erreur de "CloneInto" devrait être (enfin) corrigée \n`
+    + `[Correctif] Le wiki des recettes est de nouveau accessible dans l'extension \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -6115,18 +6115,10 @@ function displayEstimationsOnWatchtower() {
             const current_estimation_percent_read = watchtower_estim_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '');
             const current_estimation_percent = current_estimation_percent_read !== undefined && current_estimation_percent_read !== null ? +current_estimation_percent_read : (watchtower_estim_block_prediction ? 100 : undefined);
 
-            // console.log('watchtower_estim_block', watchtower_estim_block);
-            // console.log('watchtower_estim_block_prediction', watchtower_estim_block_prediction);
-            // console.log('current_estimation_percent', current_estimation_percent);
-
             const watchtower_planif_block = watchtower_estim_block.nextElementSibling;
             const watchtower_planif_block_prediction = watchtower_planif_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
             const current_planif_percent_read = watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '')
             const current_planif_percent = current_planif_percent_read !== undefined && current_planif_percent_read !== null ? +current_planif_percent_read : (watchtower_planif_block_prediction ? 100 : undefined);
-
-            // console.log('watchtower_planif_block', watchtower_planif_block);
-            // console.log('watchtower_planif_block_prediction', watchtower_planif_block_prediction);
-            // console.log('current_planif_percent', current_planif_percent);
 
             let createEstimationRow = (value, is_new_estimation, estimation, type) => {
                 return `<b style="color: #afb3cf; opacity: .8;">[${value}%]</b>
@@ -8591,6 +8583,7 @@ function getBank() {
                 let bank = [];
                 response.bank.forEach((bank_item) => {
                     bank_item.item.broken = bank_item.isBroken;
+                    bank_item.item.wishListCount = bank_item.wishListCount;
                     bank.push(bank_item.item);
                 });
                 bank = bank.sort((item_a, item_b) => {
@@ -8623,9 +8616,11 @@ function getWishlist() {
                 }
             })
             .then((response) => {
-                for (let key in response.wishList) {
-                    let wishlist_zone = Object.keys(response.wishList[key])
-                        .map((item_key) => response.wishList[key][item_key])
+                let new_wishlist = {...response};
+                let new_wishlist_wishlist = {};
+                for (let key in new_wishlist.wishList) {
+                    let wishlist_zone = Object.keys(new_wishlist.wishList[key])
+                        .map((item_key) => new_wishlist.wishList[key][item_key])
                         .map((item) => {
                             if (item.priority < 0) {
                                 item.priority_main = -1;
@@ -8644,9 +8639,10 @@ function getWishlist() {
                     wishlist_zone.forEach((item) => {
                         item.item.img = fixMhCompiledImg(item.item.img);
                     });
-                    response.wishList[key] = cloneInto(wishlist_zone, response.wishList[key]);
+                    new_wishlist_wishlist[key] = [...wishlist_zone];
                 }
-                wishlist = response;
+                new_wishlist.wishList = new_wishlist_wishlist;
+                wishlist = new_wishlist;
                 resolve(wishlist);
             })
             .catch((error) => {
@@ -9146,10 +9142,12 @@ function getRecipes() {
                     }
                 })
                 .then((response) => {
-                    recipes = response.map((recipe) => {
-                        recipe.type = action_types.find((type) => type.id === recipe.type);
-                        return recipe;
-                    })
+                    let new_recipes = response
+                        .map((recipe) => {
+                            let new_recipe = {...recipe};
+                            new_recipe.type = action_types.find((type) => type.id === new_recipe.type);
+                            return new_recipe;
+                        })
                         .sort((a, b) => {
                             if (a.type.ordering > b.type.ordering) {
                                 return 1;
@@ -9159,6 +9157,7 @@ function getRecipes() {
                                 return -1;
                             }
                         });
+                    recipes = new_recipes;
                     resolve(recipes);
                 })
                 .catch((error) => {

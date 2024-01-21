@@ -69,7 +69,7 @@
         "capacity": 3
     },
     "tomb": {
-        "capacity": 100
+        "capacity": 1
     },
     "mczombie": {
         "capacity": 2

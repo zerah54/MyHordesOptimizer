@@ -1078,7 +1078,7 @@ $ruins_additional_info = [
     'ekea' => ['capacity' => 3],
 
     // id 28
-    'tomb' => ['capacity' => 100],
+    'tomb' => ['capacity' => 1],
 
     // id 18
     'mczombie' => ['capacity' => 2],
