@@ -1,66 +1,69 @@
-<div *ngIf="cell && cellHtml" class="mho-map-cell-detail" [style.top]="cellHtml|cellDetailsTop"
-     [style.bottom]="cellHtml|cellDetailsBottom" [style.left]="cellHtml|cellDetailsLeft"
-     [style.right]="cellHtml|cellDetailsRight">
+@if (cell && cellHtml) {
+    <div class="mho-map-cell-detail" [style.top]="cellHtml | cellDetailsTop"
+         [style.bottom]="cellHtml | cellDetailsBottom" [style.left]="cellHtml | cellDetailsLeft"
+         [style.right]="cellHtml | cellDetailsRight">
 
-    <div class="details-header">
-        <div class="title">
-            <h1>
-                <ng-container
-                    *ngIf="cell|ruinInCell:allRuins as ruin; else noRuin">{{ruin.label[locale]}}</ng-container>
-                <ng-template #noRuin>
-                    <ng-container *ngIf="cell.is_town; else noTown">
+        <div class="details-header">
+            <div class="title">
+                <h1>
+                    @if (cell | ruinInCell:allRuins; as ruin) {
+                        {{ ruin.label[locale] }}
+                    } @else if (cell.is_town) {
                         <ng-container i18n>Ville</ng-container>
-                    </ng-container>
-                </ng-template>
-                <ng-template #noTown>
-                    <ng-container i18n>Désert</ng-container>
-                </ng-template>
-            </h1>
+                    } @else {
+                        <ng-container i18n>Désert</ng-container>
+                    }
+                </h1>
+            </div>
+            <div class="coords-distance">
+                <span class="cords">[{{ cell.displayed_x }}&nbsp;;&nbsp;{{ cell.displayed_y }}]</span>
+                <span class="distance-pa">{{ cell.nb_pa }}<img [ngSrc]="HORDES_IMG_REPO + 'icons/ap_small_' + locale + '.gif'" width="16" height="16"></span>
+                <span class="distance-km">{{ cell.nb_km }}km</span>
+            </div>
+            <mat-divider></mat-divider>
         </div>
-        <div class="coords-distance">
-            <span class="cords">[{{cell.displayed_x}}&nbsp;;&nbsp;{{cell.displayed_y}}]</span>
-            <span class="distance-pa">{{cell.nb_pa}}<img [ngSrc]="HORDES_IMG_REPO + 'icons/ap_small_' + locale + '.gif'" width="16" height="16"></span>
-            <span class="distance-km">{{cell.nb_km}}km</span>
+        @if (!cell.is_town) {
+            <div class="content">
+                <div class="zombies">
+                    <div class="zombies-here">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="16" height="16">
+                        {{ cell.nb_zombie || 0 }}
+                    </div>
+                    <div class="killed-zombies">
+                        {{ cell.nb_zombie_killed || 0 }}
+                        <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'" width="23" height="17">
+                    </div>
+                </div>
+                <div class="pdc">
+                    <img [ngSrc]="HORDES_IMG_REPO + 'emotes/human.gif'" width="16" height="16">
+                    {{ cell.nb_hero || 0 }}&nbsp;<ng-container i18n>points</ng-container>
+                </div>
+                <mat-divider></mat-divider>
+            </div>
+        }
+        @if (cell.citizens && cell.citizens.length > 0) {
+            <div class="citizens">
+                <div *ngFor="let citizen of (cell.citizens | citizensFromShort:allCitizens)">
+                    <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">
+                    <span>{{ citizen.name }}</span>
+                </div>
+            </div>
+            <mat-divider></mat-divider>
+        }
+
+        @if (cell.items && cell.items.length > 0) {
+            <div class="items">
+                <div *ngFor="let item of cell.items">
+                    @if (item | itemDetails:allItems; as complete_item) {
+                        <img [ngSrc]="HORDES_IMG_REPO + complete_item.img" [class.broken]="item.is_broken" width="16" height="16">
+                    }
+                    <span class="item-quantity">{{ item.count }}</span>
+                </div>
+            </div>
+            <mat-divider></mat-divider>
+        }
+        <div class="last-update">
+            <mho-last-update [lastUpdateInfo]="cell.update_info"></mho-last-update>
         </div>
-        <mat-divider></mat-divider>
     </div>
-    <div class="content" *ngIf="!cell.is_town">
-        <div class="zombies">
-            <div class="zombies-here">
-                <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="16" height="16">
-                {{cell.nb_zombie || 0}}
-            </div>
-            <div class="killed-zombies">
-                {{cell.nb_zombie_killed || 0}}
-                <img [ngSrc]="HORDES_IMG_REPO + 'icons/map/map_icon_splatter.png'" width="23" height="17">
-            </div>
-        </div>
-        <div class="pdc">
-            <img [ngSrc]="HORDES_IMG_REPO + 'emotes/human.gif'" width="16" height="16">
-            {{cell.nb_hero || 0}}&nbsp;<ng-container i18n>points</ng-container>
-        </div>
-        <mat-divider></mat-divider>
-    </div>
-    <ng-container *ngIf="cell.citizens && cell.citizens.length > 0">
-        <div class="citizens">
-            <div *ngFor="let citizen of (cell.citizens | citizensFromShort:allCitizens)">
-                <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">
-                <span>{{citizen.name}}</span>
-            </div>
-        </div>
-        <mat-divider></mat-divider>
-    </ng-container>
-    <ng-container *ngIf="cell.items && cell.items.length > 0">
-        <div class="items">
-            <div *ngFor="let item of cell.items">
-                <img *ngIf="(item | itemDetails:allItems) as complete_item" [ngSrc]="HORDES_IMG_REPO + complete_item.img"
-                     [class.broken]="item.is_broken" width="16" height="16">
-                <span class="item-quantity">{{item.count}}</span>
-            </div>
-        </div>
-        <mat-divider></mat-divider>
-    </ng-container>
-    <div class="last-update">
-        <mho-last-update [lastUpdateInfo]="cell.update_info"></mho-last-update>
-    </div>
-</div>
+}

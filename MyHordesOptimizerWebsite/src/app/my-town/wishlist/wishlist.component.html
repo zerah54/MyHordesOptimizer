@@ -22,23 +22,24 @@
 
 </mat-card-header>
 <mat-card-content class="mho-wishlist">
-    <ng-container *ngIf="wishlist_info">
-        <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" [(selectedIndex)]="selected_tab_index"
-                       (selectedTabChange)="changeTab($event)">
+    @if (wishlist_info) {
+        <mat-tab-group [mat-stretch-tabs]="false" mat-align-tabs="start" [(selectedIndex)]="selected_tab_index" (selectedTabChange)="changeTab($event)">
             <mat-tab *ngFor="let item of (wishlist_info.wishlist_items | customKeyValue)"
                      [label]="!item.key || item.key === '0' ? basic_list_label : 'Z' + item.key">
                 <ng-template matTabContent>
                     <div class="table-container">
                         <div class="table-headers">
-                            <mat-form-field class="no-bottom" *ngIf="edition_mode">
-                                <mat-label i18n>Ajouter un objet</mat-label>
-                                <mho-select #addItemSelect [emptyOption]="true"
-                                            placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
-                                            (ngModelChange)="addItemToWishlist($any($event))"
-                                            [options]="items | isItemDisplayed:datasource.data"
-                                            [bindIcon]="'img'"
-                                            [bindLabel]="'label.' + locale"></mho-select>
-                            </mat-form-field>
+                            @if (edition_mode) {
+                                <mat-form-field class="no-bottom">
+                                    <mat-label i18n>Ajouter un objet</mat-label>
+                                    <mho-select #addItemSelect [emptyOption]="true"
+                                                placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
+                                                (ngModelChange)="addItemToWishlist($any($event))"
+                                                [options]="items | isItemDisplayed:datasource.data"
+                                                [bindIcon]="'img'"
+                                                [bindLabel]="'label.' + locale"></mho-select>
+                                </mat-form-field>
+                            }
                         </div>
                         <div class="mat-elevation-z8" style="flex: 1">
                             <cdk-virtual-scroll-viewport [tvsItemSize]="edition_mode ? 49 : 40"
@@ -86,35 +87,39 @@
                                                     </div>
                                                 }
                                                 @case ('heaver') {
-                                                    <img [ngSrc]="HORDES_IMG_REPO + 'item/cat_heavy.gif'" *ngIf="row.item.is_heaver"
-                                                         matTooltip="Objet encombrant" i18n-matTooltip width="16" height="16">
+                                                    @if (row.item.is_heaver) {
+                                                        <img [ngSrc]="HORDES_IMG_REPO + 'item/cat_heavy.gif'"
+                                                             matTooltip="Objet encombrant" i18n-matTooltip width="16" height="16">
+                                                    }
                                                 }
                                                 @case ('priority') {
-                                                    <mat-form-field class="no-bottom" appearance="outline" *ngIf="edition_mode; else readMode">
-                                                        <mat-select [(ngModel)]="row.priority_main" [compareWith]="compareWith"
-                                                                    (ngModelChange)="resetPriorities(this.datasource.data)">
-                                                            <mat-option *ngFor="let priority of priorities" [value]="priority">
-                                                                {{ priority.value.label }}
-                                                            </mat-option>
-                                                        </mat-select>
-                                                    </mat-form-field>
-                                                    <ng-template #readMode>
-                                                        {{ row.priority_main.value.label }}
-                                                    </ng-template>
-                                                }
-                                                @case ('depot') {
-                                                    <ng-container *ngIf="row.priority_main.value.count > -1">
-                                                        <mat-form-field class="no-bottom" appearance="outline" *ngIf="edition_mode; else readMode">
-                                                            <mat-select [(ngModel)]="row.depot" [compareWith]="compareWith">
-                                                                <mat-option *ngFor="let depot of depots" [value]="depot">
-                                                                    {{ depot.value.label }}
+                                                    @if (edition_mode) {
+                                                        <mat-form-field class="no-bottom" appearance="outline">
+                                                            <mat-select [(ngModel)]="row.priority_main" [compareWith]="compareWith"
+                                                                        (ngModelChange)="resetPriorities(this.datasource.data)">
+                                                                <mat-option *ngFor="let priority of priorities" [value]="priority">
+                                                                    {{ priority.value.label }}
                                                                 </mat-option>
                                                             </mat-select>
                                                         </mat-form-field>
-                                                        <ng-template #readMode>
+                                                    } @else {
+                                                        {{ row.priority_main.value.label }}
+                                                    }
+                                                }
+                                                @case ('depot') {
+                                                    @if (row.priority_main.value.count > -1) {
+                                                        @if (edition_mode) {
+                                                            <mat-form-field class="no-bottom" appearance="outline">
+                                                                <mat-select [(ngModel)]="row.depot" [compareWith]="compareWith">
+                                                                    <mat-option *ngFor="let depot of depots" [value]="depot">
+                                                                        {{ depot.value.label }}
+                                                                    </mat-option>
+                                                                </mat-select>
+                                                            </mat-form-field>
+                                                        } @else {
                                                             {{ row.depot.value.label }}
-                                                        </ng-template>
-                                                    </ng-container>
+                                                        }
+                                                    }
                                                 }
                                                 @case ('bank_count') {
                                                     {{ row.bank_count }}
@@ -123,36 +128,37 @@
                                                     {{ row.bag_count }}
                                                 }
                                                 @case ('count') {
-                                                    <ng-container *ngIf="row.priority_main.value.count > -1">
-                                                        <mat-form-field class="no-bottom count" appearance="outline" *ngIf="edition_mode; else readMode">
-                                                            <input matInput type="number" [(ngModel)]="row.count">
-                                                        </mat-form-field>
-                                                        <ng-template #readMode>
+                                                    @if (row.priority_main.value.count > -1) {
+                                                        @if (edition_mode) {
+                                                            <mat-form-field class="no-bottom count" appearance="outline">
+                                                                <input matInput type="number" [(ngModel)]="row.count">
+                                                            </mat-form-field>
+                                                        } @else {
                                                             {{ row.count }}
-                                                        </ng-template>
-                                                    </ng-container>
+                                                        }
+                                                    }
                                                 }
                                                 @case ('needed') {
-                                                    <ng-container *ngIf="row.priority_main.value.count > -1">
-                                                        <mat-form-field class="no-bottom count" appearance="outline" *ngIf="edition_mode; else readMode">
-                                                            <input matInput type="number"
-                                                                   [ngModel]="row.count - row.bank_count - row.bag_count"
-                                                                   (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
-                                                        </mat-form-field>
-                                                        <ng-template #readMode>
+                                                    @if (row.priority_main.value.count > -1) {
+                                                        @if (edition_mode) {
+                                                            <mat-form-field class="no-bottom count" appearance="outline">
+                                                                <input matInput type="number"
+                                                                       [ngModel]="row.count - row.bank_count - row.bag_count"
+                                                                       (ngModelChange)="row.count = row.bank_count + row.bag_count + $event">
+                                                            </mat-form-field>
+                                                        } @else {
                                                             {{ row.count - row.bank_count - row.bag_count }}
-                                                        </ng-template>
-                                                    </ng-container>
+                                                        }
+                                                    }
                                                 }
                                                 @case ('should_signal') {
-                                                    <ng-container *ngIf="row.priority_main.value.count > -1">
-                                                        <mat-checkbox [(ngModel)]="row.should_signal" *ngIf="edition_mode; else readMode"></mat-checkbox>
-                                                        <ng-template #readMode>
-                                                            <mat-icon *ngIf="row.should_signal" matTooltip="Objet à signaler" i18n-matTooltip>
-                                                                speaker_notes
-                                                            </mat-icon>
-                                                        </ng-template>
-                                                    </ng-container>
+                                                    @if (row.priority_main.value.count > -1) {
+                                                        @if (edition_mode) {
+                                                            <mat-checkbox [(ngModel)]="row.should_signal"></mat-checkbox>
+                                                        } @else if (row.should_signal) {
+                                                            <mat-icon matTooltip="Objet à signaler" i18n-matTooltip>speaker_notes</mat-icon>
+                                                        }
+                                                    }
                                                 }
                                                 @case ('delete') {
                                                     <button mat-icon-button type="button" (click)="remove(row)">
@@ -170,13 +176,11 @@
                                     <!-- Row shown when there is no matching data. -->
                                     <tr class="mat-row" *matNoDataRow>
                                         <td class="mat-cell" colspan="9">
-                                            <ng-container
-                                                *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
+                                            @if (filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== '') {
                                                 <ng-container i18n>Aucun objet ne correspond au filtre "{{ filterInput.nativeElement.value }}"</ng-container>
-                                            </ng-container>
-                                            <ng-template #emptyTable>
+                                            } @else {
                                                 <ng-container i18n>La liste est vide</ng-container>
-                                            </ng-template>
+                                            }
                                         </td>
                                     </tr>
                                 </table>
@@ -188,30 +192,34 @@
                                 style="display: flex; flex-direction: row; justify-content: end; align-content: center; align-items: center; padding-right: 1em">
                                 <mho-last-update [lastUpdateInfo]="wishlist_info.update_info"
                                                  [thresholds]="[24*60, 24*2*60, 24*3*60, 24*4]"></mho-last-update>
-                                <button mat-button [color]="'accent'" (click)="updateWishlist()" *ngIf="edition_mode" i18n>Enregistrer</button>
+                                @if (edition_mode) {
+                                    <button mat-button [color]="'accent'" (click)="updateWishlist()" i18n>Enregistrer</button>
+                                }
                             </div>
                         </div>
                     </div>
                 </ng-template>
             </mat-tab>
-            <mat-tab (click)="$event.preventDefault(); $event.stopPropagation()" *ngIf="edition_mode" labelClass="add-tab">
-                <ng-template mat-tab-label>
-                    <button mat-icon-button (click)="$event.preventDefault(); $event.stopPropagation()" [matMenuTriggerFor]="addItem">
-                        <mat-icon>add</mat-icon>
-                    </button>
-                </ng-template>
-                <mat-menu #addItem="matMenu">
-                    <form (submit)="addZone(+zone.value)" (click)="$event.stopPropagation()">
-                        <mat-form-field appearance="outline">
-                            <mat-label i18n>Zone de ramassage</mat-label>
-                            <input #zone matInput type="number">
-                            <button matSuffix mat-icon-button type="submit">
-                                <mat-icon>check</mat-icon>
-                            </button>
-                        </mat-form-field>
-                    </form>
-                </mat-menu>
-            </mat-tab>
+            @if (edition_mode) {
+                <mat-tab (click)="$event.preventDefault(); $event.stopPropagation()" labelClass="add-tab">
+                    <ng-template mat-tab-label>
+                        <button mat-icon-button (click)="$event.preventDefault(); $event.stopPropagation()" [matMenuTriggerFor]="addItem">
+                            <mat-icon>add</mat-icon>
+                        </button>
+                    </ng-template>
+                    <mat-menu #addItem="matMenu">
+                        <form (submit)="addZone(+zone.value)" (click)="$event.stopPropagation()">
+                            <mat-form-field appearance="outline">
+                                <mat-label i18n>Zone de ramassage</mat-label>
+                                <input #zone matInput type="number">
+                                <button matSuffix mat-icon-button type="submit">
+                                    <mat-icon>check</mat-icon>
+                                </button>
+                            </mat-form-field>
+                        </form>
+                    </mat-menu>
+                </mat-tab>
+            }
         </mat-tab-group>
-    </ng-container>
+    }
 </mat-card-content>

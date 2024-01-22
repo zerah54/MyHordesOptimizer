@@ -3,7 +3,7 @@
     <mat-slide-toggle [(ngModel)]="condensed_display" (ngModelChange)="changeCondensedDisplay()" i18n>Affichage condensé</mat-slide-toggle>
 </mat-card-header>
 <mat-card-content class="mho-bank">
-    <ng-container *ngIf="displayed_bank_items">
+    @if (displayed_bank_items) {
         <div class="filter">
             <mho-filter (filterChange)="filter_value = $event; applyFilters()"></mho-filter>
             <mat-form-field class="properties-filter">
@@ -13,24 +13,28 @@
                 </mho-select>
             </mat-form-field>
         </div>
-        <ul *ngIf="!condensed_display; else condensedDisplay">
-            <div class="category" *ngFor="let category of (displayed_bank_items | itemsGroupByCategory)">
-                <h2>{{category.category.label[locale]}}</h2>
-                <div class="items">
-                    <mho-item *ngFor="let bank_item of category.items" [item]="bank_item"></mho-item>
+        @if (!condensed_display) {
+            <ul>
+                <div class="category" *ngFor="let category of (displayed_bank_items | itemsGroupByCategory)">
+                    <h2>{{ category.category.label[locale] }}</h2>
+                    <div class="items">
+                        <mho-item *ngFor="let bank_item of category.items" [item]="bank_item"></mho-item>
+                    </div>
                 </div>
-            </div>
-        </ul>
-        <ng-template #condensedDisplay>
+            </ul>
+        } @else {
             <div class="condensed">
                 <div class="bank">
                     <div class="category" *ngFor="let category of (displayed_bank_items | itemsGroupByCategory:'id')">
-                        <h2>{{category.category.label[locale]}}</h2>
+                        <h2>{{ category.category.label[locale] }}</h2>
                         <ul class="items">
-                            <li *ngFor="let bank_item of category.items" class="item" (click)="detailed_item = bank_item" [class.broken]="bank_item.is_broken"
+                            <li *ngFor="let bank_item of category.items" class="item" (click)="detailed_item = bank_item"
+                                [class.broken]="bank_item.is_broken"
                                 [matTooltip]="bank_item.label[locale]">
                                 <img class="item-icon" [ngSrc]="HORDES_IMG_REPO + bank_item.img" width="16" height="16">
-                                <span class="item-count" *ngIf="bank_item.bank_count > 1">{{bank_item.bank_count}}</span>
+                                @if (bank_item.bank_count > 1) {
+                                    <span class="item-count">{{ bank_item.bank_count }}</span>
+                                }
                             </li>
                         </ul>
                     </div>
@@ -39,6 +43,6 @@
                     <mho-item [item]="detailed_item" [forceOpen]="true"></mho-item>
                 </div>
             </div>
-        </ng-template>
-    </ng-container>
+        }
+    }
 </mat-card-content>

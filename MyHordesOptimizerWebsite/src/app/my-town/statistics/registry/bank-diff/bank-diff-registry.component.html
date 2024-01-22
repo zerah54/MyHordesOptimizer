@@ -1,29 +1,41 @@
 <div class="bank-diff">
     <mat-slide-toggle #diffToggle i18n>Afficher uniquement la différence</mat-slide-toggle>
-    <div *ngIf="(entries | bankCleanEntries:give_keywords:completeCitizenList:completeItemsList:diffToggle.checked) as cleanEntries">
-        <div class="taken">
-            <h4 i18n>Ont été pris</h4>
-            <ng-container *ngFor="let entry of cleanEntries | bankDiff:'take'">
-                <div *ngIf="entry.item">
-                    <div *ngIf="entry.item" class="entry">
-                        [{{entry.hour}}]
-                        <img [ngSrc]="HORDES_IMG_REPO + entry.item.img" width="16" height="16">
-                        <div>{{entry.item.label[locale]}}<small
-                            *ngIf="entry.citizen">&nbsp;-&nbsp;{{entry.citizen.name}}</small></div>
-                    </div>
-                </div>
-            </ng-container>
+    @if (entries | bankCleanEntries:give_keywords:completeCitizenList:completeItemsList:diffToggle.checked; as cleanEntries) {
+        <div>
+            <div class="taken">
+                <h4 i18n>Ont été pris</h4>
+                <ng-container *ngFor="let entry of cleanEntries | bankDiff:'take'">
+                    @if (entry.item) {
+                        <div>
+                            <div class="entry">
+                                [{{ entry.hour }}]
+                                <img [ngSrc]="HORDES_IMG_REPO + entry.item.img" width="16" height="16">
+                                <div>{{ entry.item.label[locale] }}
+                                    @if (entry.citizen) {
+                                        <small>&nbsp;-&nbsp;{{ entry.citizen.name }}</small>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </ng-container>
+            </div>
+            <div class="gifted">
+                <h4 i18n>Ont été donnés</h4>
+                <ng-container *ngFor="let entry of cleanEntries | bankDiff:'gift'">
+                    @if (entry.item) {
+                        <div class="entry">
+                            [{{ entry.hour }}]
+                            <img [ngSrc]="HORDES_IMG_REPO + entry.item.img" width="16" height="16">
+                            <div>{{ entry.item.label[locale] }}
+                                @if (entry.citizen) {
+                                    <small>&nbsp;-&nbsp;{{ entry.citizen.name }}</small>
+                                }
+                            </div>
+                        </div>
+                    }
+                </ng-container>
+            </div>
         </div>
-        <div class="gifted">
-            <h4 i18n>Ont été donnés</h4>
-            <ng-container *ngFor="let entry of cleanEntries | bankDiff:'gift'">
-                <div *ngIf="entry.item" class="entry">
-                    [{{entry.hour}}]
-                    <img [ngSrc]="HORDES_IMG_REPO + entry.item.img" width="16" height="16">
-                    <div>{{entry.item.label[locale]}}<small
-                        *ngIf="entry.citizen">&nbsp;-&nbsp;{{entry.citizen.name}}</small></div>
-                </div>
-            </ng-container>
-        </div>
-    </div>
+    }
 </div>

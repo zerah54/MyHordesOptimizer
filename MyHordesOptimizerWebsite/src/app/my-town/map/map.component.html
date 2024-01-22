@@ -15,28 +15,34 @@
         </mat-sidenav-content>
         <mat-sidenav #sidenav class="map-settings" [position]="'end'" [mode]="is_gt_xs ? 'side' : 'over'">
             <h1 i18n>Paramètres</h1>
-            <div *ngIf="is_dev">
+            @if (is_dev) {
                 <h2 i18n>Type de carte</h2>
                 <mat-chip-listbox>
                     <mat-chip (click)="changeOptions('map_type', 'digs')" [highlighted]="options.map_type === 'digs'" i18n>Fouilles</mat-chip>
-                    <mat-chip *ngIf="is_dev" (click)="changeOptions('map_type', 'danger')" [highlighted]="options.map_type === 'danger'" i18n>Danger</mat-chip>
+                    @if (is_dev) {
+                        <mat-chip (click)="changeOptions('map_type', 'danger')" [highlighted]="options.map_type === 'danger'" i18n>Danger</mat-chip>
+                    }
                     <mat-chip (click)="changeOptions('map_type', 'trash')" [highlighted]="options.map_type === 'trash'" i18n>Décharge</mat-chip>
                 </mat-chip-listbox>
-            </div>
-            <div *ngIf="options.map_type === 'digs'">
-                <h2 i18n>Fouilles restantes</h2>
-                <mat-chip-listbox>
-                    <mat-chip (click)="changeOptions('dig_mode', 'max')" [highlighted]="options.dig_mode === 'max'" i18n>Maximum</mat-chip>
-                    <mat-chip (click)="changeOptions('dig_mode', 'average')" [highlighted]="options.dig_mode === 'average'" i18n>Moyenne</mat-chip>
-                </mat-chip-listbox>
-            </div>
-            <div *ngIf="options.map_type === 'trash'">
-                <h2 i18n>Mode d'affichage</h2>
-                <mat-chip-listbox>
-                    <mat-chip (click)="changeOptions('trash_mode', 'nb')" [highlighted]="options.trash_mode === 'nb'" i18n>Nombre d'objets</mat-chip>
-                    <mat-chip (click)="changeOptions('trash_mode', 'def')" [highlighted]="options.trash_mode === 'def'" i18n>Défense apportée</mat-chip>
-                </mat-chip-listbox>
-            </div>
+            }
+            @if (options.map_type === 'digs') {
+                <div>
+                    <h2 i18n>Fouilles restantes</h2>
+                    <mat-chip-listbox>
+                        <mat-chip (click)="changeOptions('dig_mode', 'max')" [highlighted]="options.dig_mode === 'max'" i18n>Maximum</mat-chip>
+                        <mat-chip (click)="changeOptions('dig_mode', 'average')" [highlighted]="options.dig_mode === 'average'" i18n>Moyenne</mat-chip>
+                    </mat-chip-listbox>
+                </div>
+            }
+            @if (options.map_type === 'trash') {
+                <div>
+                    <h2 i18n>Mode d'affichage</h2>
+                    <mat-chip-listbox>
+                        <mat-chip (click)="changeOptions('trash_mode', 'nb')" [highlighted]="options.trash_mode === 'nb'" i18n>Nombre d'objets</mat-chip>
+                        <mat-chip (click)="changeOptions('trash_mode', 'def')" [highlighted]="options.trash_mode === 'def'" i18n>Défense apportée</mat-chip>
+                    </mat-chip-listbox>
+                </div>
+            }
             <div>
                 <h2 i18n>Afficher les zones du scrutateur</h2>
                 <div class="scrut-zones">
@@ -64,10 +70,10 @@
                                     </mat-select>
                                 </mat-form-field>
                             </div>
-                            <ng-container *ngIf="new_distance_option.unit === 'pa'">
+                            @if (new_distance_option.unit === 'pa') {
                                 <mat-checkbox [(ngModel)]="new_distance_option.round_trip" i18n>Aller / Retour</mat-checkbox>
-                            </ng-container>
-                            <button mat-button i18n (click)="addDistanceToList(); addZone.closed.next('click')">Ajouter</button>
+                            }
+                            <button mat-button (click)="addDistanceToList(); addZone.closed.next('click')" i18n>Ajouter</button>
                         </div>
                     </mat-menu>
                     <mat-list>
@@ -75,11 +81,16 @@
                             <button mat-icon-button matListItemIcon (click)="removeDistanceFromList(option)">
                                 <mat-icon>delete</mat-icon>
                             </button>
-                            <div matListItemTitle>{{option.value}}&nbsp;{{option.unit}}</div>
-                            <div matListItemLine *ngIf="option.unit === 'pa'">
-                                <ng-container *ngIf="option.round_trip" i18n>Aller / Retour</ng-container>
-                                <ng-container *ngIf="!option.round_trip" i18n>Aller simple</ng-container>
-                            </div>
+                            <div matListItemTitle>{{ option.value }}&nbsp;{{ option.unit }}</div>
+                            @if (option.unit === 'pa') {
+                                <div matListItemLine>
+                                    @if (option.round_trip) {
+                                        <ng-container i18n>Aller / Retour</ng-container>
+                                    } @else {
+                                        <ng-container i18n>Aller simple</ng-container>
+                                    }
+                                </div>
+                            }
                         </mat-list-item>
                     </mat-list>
                 </div>

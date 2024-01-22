@@ -2,16 +2,16 @@
     <ng-template matMenuContent let-menuLabel="menuLabel" let-list="list">
         <div class="search" (click)="$event.stopPropagation()">
             <mat-form-field>
-                <mat-label>{{menuLabel}}</mat-label>
+                <mat-label>{{ menuLabel }}</mat-label>
                 <input matInput #searchItem>
             </mat-form-field>
         </div>
         <div class="items">
             <ng-container *ngFor="let item of list">
-                <img
-                    *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1"
-                    [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id);" width="16" height="16"
-                    [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+                @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
+                    <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id);" width="16" height="16"
+                         [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+                }
             </ng-container>
         </div>
     </ng-template>

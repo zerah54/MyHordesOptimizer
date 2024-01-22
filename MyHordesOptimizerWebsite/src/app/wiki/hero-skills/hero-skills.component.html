@@ -2,7 +2,7 @@
     <mat-card-title i18n>Pouvoirs</mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-hero-skills">
-    <ng-container *ngIf="hero_skills">
+    @if (hero_skills) {
         <div class="mat-elevation-z8">
             <table mat-table [dataSource]="datasource" matSort>
                 <ng-container *ngFor="let column of columns" [matColumnDef]="column.id" [sticky]="column.sticky || false">
@@ -30,5 +30,5 @@
                 <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
             </table>
         </div>
-    </ng-container>
+    }
 </mat-card-content>

@@ -1,212 +1,214 @@
-<div class="mho-citizens-list" *ngIf="alive_citizen_info || dead_citizen_info">
-    <cdk-virtual-scroll-viewport [tvsItemSize]="243" [headerHeight]="48" style="height: 100%" *ngIf="citizen_list.data.length > 0">
-        <table mat-table [dataSource]="citizen_list" matSort>
-            <ng-container *ngFor="let column of citizen_list_columns; trackBy: trackByColumnId" [matColumnDef]="column.id" [sticky]="column.sticky || false">
-                <th mat-header-cell *matHeaderCellDef [ngClass]="[column.id, column.class || '']">
-                    @switch (column.id) {
-                        @case ('avatar_name') {
-                            <mho-header-with-select-filter [header]="column.header"
-                                                           [(filterValue)]="citizen_filters"
-                                                           (filterValueChange)="citizen_filter_change.next()"
-                                                           [options]="alive_citizen_info.citizens" [bindLabel]="'name'">
-                            </mho-header-with-select-filter>
-                        }
-                        @case ('more_status') {
-                            {{ column.header }}
-                        }
-                        @case ('heroic_actions') {
-                            {{ column.header }}
-                        }
-                        @case ('home') {
-                            {{ column.header }}
-                        }
-                    }
-                </th>
-
-                <td mat-cell *matCellDef="let untyped_row" [ngClass]="[column.id, column.class || '']">
-                    <ng-container *ngIf="(untyped_row | typeRow) as row">
-                        @switch (column.id) {
-                            @case ('avatar_name') {
-                                <mho-avatar [src]="row.avatar"></mho-avatar>
-                                <div>{{ row.name }}</div>
+@if (alive_citizen_info || dead_citizen_info) {
+    <div class="mho-citizens-list">
+        @if (citizen_list.data.length > 0) {
+            <cdk-virtual-scroll-viewport [tvsItemSize]="243" [headerHeight]="48" style="height: 100%">
+                <table mat-table [dataSource]="citizen_list" matSort>
+                    <ng-container *ngFor="let column of citizen_list_columns; trackBy: trackByColumnId" [matColumnDef]="column.id"
+                                  [sticky]="column.sticky || false">
+                        <th mat-header-cell *matHeaderCellDef [ngClass]="[column.id, column.class || '']">
+                            @switch (column.id) {
+                                @case ('avatar_name') {
+                                    <mho-header-with-select-filter [header]="column.header"
+                                                                   [(filterValue)]="citizen_filters"
+                                                                   (filterValueChange)="citizen_filter_change.next()"
+                                                                   [options]="alive_citizen_info.citizens" [bindLabel]="'name'">
+                                    </mho-header-with-select-filter>
+                                }
+                                @case ('more_status') {
+                                    {{ column.header }}
+                                }
+                                @case ('heroic_actions') {
+                                    {{ column.header }}
+                                }
+                                @case ('home') {
+                                    {{ column.header }}
+                                }
                             }
-                            @case ('more_status') {
-                                <div>
-                                    <div class="status">
-                                        <mho-list-element-add-remove [currentList]="row.status?.icons || []" label="États"
-                                                                     i18n-label [completeList]="all_status"
-                                                                     addLabel="Ajouter aux états"
-                                                                     i18n-addLabel (add)="addStatus(row.id, $event + '')"
-                                                                     removeLabel="Retirer des états" i18n-removeLabel
-                                                                     (remove)="removeStatus(row.id, $event + '')"
-                                                                     emptyLabel="Vider les états"
-                                                                     i18n-emptyLabel (empty)="emptyStatus(row.id)">
-                                        </mho-list-element-add-remove>
-                                        <mho-last-update [lastUpdateInfo]="row.status?.update_info"
-                                                         [thresholds]="[30, 120, 120*2, 120*3]" [hideDetails]="true">
+                        </th>
+
+                        <td mat-cell *matCellDef="let untyped_row" [ngClass]="[column.id, column.class || '']">
+                            @if (untyped_row | typeRow; as row) {
+                                @switch (column.id) {
+                                    @case ('avatar_name') {
+                                        <mho-avatar [src]="row.avatar"></mho-avatar>
+                                        <div>{{ row.name }}</div>
+                                    }
+                                    @case ('more_status') {
+                                        <div>
+                                            <div class="status">
+                                                <mho-list-element-add-remove [currentList]="row.status?.icons || []" label="États"
+                                                                             i18n-label [completeList]="all_status"
+                                                                             addLabel="Ajouter aux états"
+                                                                             i18n-addLabel (add)="addStatus(row.id, $event + '')"
+                                                                             removeLabel="Retirer des états" i18n-removeLabel
+                                                                             (remove)="removeStatus(row.id, $event + '')"
+                                                                             emptyLabel="Vider les états"
+                                                                             i18n-emptyLabel (empty)="emptyStatus(row.id)">
+                                                </mho-list-element-add-remove>
+                                                <mho-last-update [lastUpdateInfo]="row.status?.update_info"
+                                                                 [thresholds]="[30, 120, 120*2, 120*3]" [hideDetails]="true">
+                                                </mho-last-update>
+                                            </div>
+                                            <div class="bag">
+                                                <mho-list-element-add-remove [currentList]="row.bag?.items || []" label="Sac" i18n-label
+                                                                             [completeList]="all_items" addLabel="Ajouter au sac"
+                                                                             i18n-addLabel
+                                                                             (add)="addItem(row.id, +$event)"
+                                                                             removeLabel="Retirer du sac" i18n-removeLabel
+                                                                             (remove)="removeItem(row.id, +$event)"
+                                                                             emptyLabel="Vider le sac" i18n-emptyLabel
+                                                                             (empty)="emptyBag(row.id)">
+                                                </mho-list-element-add-remove>
+                                                <mho-last-update [lastUpdateInfo]="row.bag?.update_info"
+                                                                 [thresholds]="[30, 120, 120*2, 120*3]" [hideDetails]="true">
+                                                </mho-last-update>
+                                            </div>
+                                        </div>
+                                    }
+                                    @case ('heroic_actions') {
+                                        <div class="heroic-actions">
+                                            <div class="lvl-element"
+                                                 *ngFor="let action of (row.heroic_actions?.content || []); trackBy: $any(trackByKey)"
+                                                 [class.full-width]="action.element.value.max_lvl > 1">
+                                                @if (action.element.value.max_lvl > 1) {
+                                                    <mat-form-field [appearance]="'outline'" class="short-bottom">
+                                                        <mat-label>{{ action.element.value.label }}</mat-label>
+                                                        <mat-select [(ngModel)]="action.value" (ngModelChange)="updateActions(action, $event, row.id)">
+                                                            <mat-option *ngFor="let option of action.element.value.options"
+                                                                        [value]="option">{{ option }}
+                                                            </mat-option>
+                                                        </mat-select>
+                                                    </mat-form-field>
+                                                } @else if (action.element.value.max_lvl === 1) {
+                                                    <mat-checkbox [checked]="action.value === true"
+                                                                  [indeterminate]="action.value === null || action.value === undefined"
+                                                                  (change)="updateActions(action, $event, row.id)">
+                                                        {{ action.element.value.label }}
+                                                    </mat-checkbox>
+                                                }
+                                            </div>
+                                        </div>
+                                        <mho-last-update [lastUpdateInfo]="row.heroic_actions?.update_info" [thresholds]="[30, 120, 120*2, 120*3]">
                                         </mho-last-update>
-                                    </div>
-                                    <div class="bag">
-                                        <mho-list-element-add-remove [currentList]="row.bag?.items || []" label="Sac" i18n-label
-                                                                     [completeList]="all_items" addLabel="Ajouter au sac"
-                                                                     i18n-addLabel
-                                                                     (add)="addItem(row.id, +$event)"
-                                                                     removeLabel="Retirer du sac" i18n-removeLabel
-                                                                     (remove)="removeItem(row.id, +$event)"
-                                                                     emptyLabel="Vider le sac" i18n-emptyLabel
-                                                                     (empty)="emptyBag(row.id)">
-                                        </mho-list-element-add-remove>
-                                        <mho-last-update [lastUpdateInfo]="row.bag?.update_info"
-                                                         [thresholds]="[30, 120, 120*2, 120*3]" [hideDetails]="true">
+                                    }
+                                    @case ('home') {
+                                        <div class="home">
+                                            <div class="lvl-element" *ngFor="let home of (row.home?.content || []); trackBy: $any(trackByKey)"
+                                                 [class.third-width]="home.element.value.max_lvl > 1">
+                                                @if (home.element.value.max_lvl > 1) {
+                                                    <mat-form-field [appearance]="'outline'" class="short-bottom">
+                                                        <mat-label>{{ home.element.value.label }}</mat-label>
+                                                        @if (home.element.value.img && home.element.value.img !== '') {
+                                                            <img style="vertical-align: super; margin-right: 0.5em;"
+                                                                 [ngSrc]="HORDES_IMG_REPO + home.element.value.img"
+                                                                 width="16" height="16">
+                                                        }
+                                                        @if (home.element.value.house_options) {
+                                                            <img style="vertical-align: super; margin-right: 0.5em;"
+                                                                 [ngSrc]="HORDES_IMG_REPO + 'home/home_lv' + home.value + '.gif'"
+                                                                 width="16" height="16">
+                                                        }
+                                                        <mat-select [ngModel]="home.value" (ngModelChange)="updateHome(home, $event, row.id)">
+                                                            <mat-option
+                                                                *ngFor="let option of $any(home.element.value.house_options || home.element.value.options); let i = index;"
+                                                                [value]="i">
+                                                                @if (!$any(option)[locale]) {
+                                                                    {{ i }}
+                                                                } @else {
+                                                                    <img [ngSrc]="HORDES_IMG_REPO + 'home/home_lv' + i + '.gif'"
+                                                                         style="margin-right: 0.5em;"
+                                                                         width="16" height="16">{{ $any(option)[locale] }}
+                                                                }
+                                                            </mat-option>
+                                                        </mat-select>
+                                                    </mat-form-field>
+                                                } @else {
+                                                    <mat-checkbox [checked]="home.value === true"
+                                                                  [indeterminate]="home.value === null || home.value === undefined"
+                                                                  (change)="updateHome(home, $event, row.id)">
+                                                        @if (home.element.value.img) {
+                                                            <img style="vertical-align: middle; margin-right: 0.5em;"
+                                                                 [ngSrc]="HORDES_IMG_REPO + home.element.value.img"
+                                                                 width="16" height="16">
+                                                        }
+                                                        {{ home.element.value.label }}
+                                                    </mat-checkbox>
+                                                }
+                                            </div>
+                                        </div>
+                                        <mho-last-update [lastUpdateInfo]="row.home?.update_info"
+                                                         [thresholds]="[30, 120, 120*2, 120*3]">
                                         </mho-last-update>
-                                    </div>
-                                </div>
+                                    }
+                                }
                             }
-                            @case ('heroic_actions') {
-                                <div class="heroic-actions">
-                                    <div class="lvl-element"
-                                         *ngFor="let action of (row.heroic_actions?.content || []); trackBy: $any(trackByKey)"
-                                         [class.full-width]="action.element.value.max_lvl > 1">
-                                        <mat-form-field *ngIf="action.element.value.max_lvl > 1; else checkboxHeroics"
-                                                        [appearance]="'outline'" class="short-bottom">
-                                            <mat-label>{{ action.element.value.label }}</mat-label>
-                                            <mat-select [(ngModel)]="action.value" (ngModelChange)="updateActions(action, $event, row.id)">
-                                                <mat-option *ngFor="let option of action.element.value.options"
-                                                            [value]="option">{{ option }}
-                                                </mat-option>
-                                            </mat-select>
-                                        </mat-form-field>
-                                        <ng-template #checkboxHeroics>
-                                            <mat-checkbox *ngIf="action.element.value.max_lvl === 1"
-                                                          [checked]="action.value === true"
-                                                          [indeterminate]="action.value === null || action.value === undefined"
-                                                          (change)="updateActions(action, $event, row.id)">
-                                                {{ action.element.value.label }}
-                                            </mat-checkbox>
-                                        </ng-template>
-                                    </div>
-                                </div>
-                                <mho-last-update [lastUpdateInfo]="row.heroic_actions?.update_info"
-                                                 [thresholds]="[30, 120, 120*2, 120*3]">
-                                </mho-last-update>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="citizen_list_columns | ids; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: citizen_list_columns | ids;"></tr>
+                    <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->
+
+                    <!-- Row shown when there is no matching data. -->
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" colspan="6">
+                            @if (filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== '') {
+                                <ng-container i18n>Aucun objet ne correspond au filtre "{{ filterInput.nativeElement.value }}"</ng-container>
+                            } @else {
+                                <ng-container i18n>La liste est vide</ng-container>
                             }
-                            @case ('home') {
-                                <div class="home">
-                                    <div class="lvl-element" *ngFor="let home of (row.home?.content || []); trackBy: $any(trackByKey)"
-                                         [class.third-width]="home.element.value.max_lvl > 1">
-                                        <mat-form-field *ngIf="home.element.value.max_lvl > 1; else checkboxHome"
-                                                        [appearance]="'outline'" class="short-bottom">
-                                            <mat-label>{{ home.element.value.label }}</mat-label>
-                                            <img *ngIf="home.element.value.img && home.element.value.img !== ''"
-                                                 style="vertical-align: super; margin-right: 0.5em;"
-                                                 [ngSrc]="HORDES_IMG_REPO + home.element.value.img" width="16"
-                                                 height="16">
-                                            <img *ngIf="home.element.value.house_options"
-                                                 style="vertical-align: super; margin-right: 0.5em;"
-                                                 [ngSrc]="HORDES_IMG_REPO + 'home/home_lv' + home.value + '.gif'"
-                                                 width="16" height="16">
-                                            <mat-select [ngModel]="home.value" (ngModelChange)="updateHome(home, $event, row.id)">
-                                                <mat-option
-                                                    *ngFor="let option of $any(home.element.value.house_options || home.element.value.options); let i = index;"
-                                                    [value]="i">
-                                                    <ng-container *ngIf="!$any(option)[locale]">{{ i }}</ng-container>
-                                                    <ng-container *ngIf="$any(option)[locale]">
-                                                        <img [ngSrc]="HORDES_IMG_REPO + 'home/home_lv' + i + '.gif'"
-                                                             style="margin-right: 0.5em;"
-                                                             width="16" height="16">{{ $any(option)[locale] }}
-                                                    </ng-container>
-                                                </mat-option>
-                                            </mat-select>
-                                        </mat-form-field>
-                                        <ng-template #checkboxHome>
-                                            <mat-checkbox [checked]="home.value === true"
-                                                          [indeterminate]="home.value === null || home.value === undefined"
-                                                          (change)="updateHome(home, $event, row.id)">
-                                                <img *ngIf="home.element.value.img"
-                                                     style="vertical-align: middle; margin-right: 0.5em;"
-                                                     [ngSrc]="HORDES_IMG_REPO + home.element.value.img"
-                                                     width="16" height="16">
-                                                {{ home.element.value.label }}
-                                            </mat-checkbox>
-                                        </ng-template>
-                                    </div>
-                                </div>
-                                <mho-last-update [lastUpdateInfo]="row.home?.update_info"
-                                                 [thresholds]="[30, 120, 120*2, 120*3]">
-                                </mho-last-update>
+                        </td>
+                    </tr>
+                </table>
+            </cdk-virtual-scroll-viewport>
+        }
+        @if (dead_citizen_list.data.length > 0) {
+            <cdk-virtual-scroll-viewport [tvsItemSize]="243" [headerHeight]="48" style="height: 100%">
+                <table mat-table [dataSource]="dead_citizen_list" matSort>
+                    <ng-container *ngFor="let column of dead_citizen_list_columns; trackBy: trackByColumnId" [matColumnDef]="column.id"
+                                  [sticky]="column.sticky || false">
+                        <th mat-header-cell *matHeaderCellDef [ngClass]="[column.id, column.class || '']">
+                            @switch (column.id) {
+                                @case ('avatar_name') {
+                                    <mho-header-with-select-filter [header]="column.header"
+                                                                   [(filterValue)]="citizen_filters"
+                                                                   (filterValueChange)="citizen_filter_change.next()"
+                                                                   [options]="dead_citizen_info.citizens" [bindLabel]="'name'">
+                                    </mho-header-with-select-filter>
+                                }
                             }
-                        }
-                    </ng-container>
-                </td>
-            </ng-container>
+                        </th>
 
-            <tr mat-header-row *matHeaderRowDef="citizen_list_columns | ids; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: citizen_list_columns | ids;"></tr>
-            <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->
-
-            <!-- Row shown when there is no matching data. -->
-            <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell" colspan="6">
-                    <ng-container
-                        *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
-                        <ng-container i18n>Aucun objet ne correspond au filtre "{{ filterInput.nativeElement.value }}"
-                        </ng-container>
-                    </ng-container>
-                    <ng-template #emptyTable>
-                        <ng-container i18n>La liste est vide</ng-container>
-                    </ng-template>
-                </td>
-            </tr>
-        </table>
-    </cdk-virtual-scroll-viewport>
-    <cdk-virtual-scroll-viewport [tvsItemSize]="243" [headerHeight]="48" style="height: 100%" *ngIf="dead_citizen_list.data.length > 0">
-        <table mat-table [dataSource]="dead_citizen_list" matSort>
-            <ng-container *ngFor="let column of dead_citizen_list_columns; trackBy: trackByColumnId" [matColumnDef]="column.id"
-                          [sticky]="column.sticky || false">
-                <th mat-header-cell *matHeaderCellDef [ngClass]="[column.id, column.class || '']">
-                    @switch (column.id) {
-                        @case ('avatar_name') {
-                            <mho-header-with-select-filter [header]="column.header"
-                                                           [(filterValue)]="citizen_filters"
-                                                           (filterValueChange)="citizen_filter_change.next()"
-                                                           [options]="dead_citizen_info.citizens" [bindLabel]="'name'">
-                            </mho-header-with-select-filter>
-                        }
-                    }
-                </th>
-
-                <td mat-cell *matCellDef="let untyped_row" [ngClass]="[column.id, column.class || '']">
-                    <ng-container *ngIf="(untyped_row | typeRow) as row">
-                        @switch (column.id) {
-                            @case ('avatar_name') {
-                                <mho-avatar [src]="row.avatar"></mho-avatar>
-                                <div>{{ row.name }}</div>
+                        <td mat-cell *matCellDef="let untyped_row" [ngClass]="[column.id, column.class || '']">
+                            @if (untyped_row | typeRow; as row) {
+                                @switch (column.id) {
+                                    @case ('avatar_name') {
+                                        <mho-avatar [src]="row.avatar"></mho-avatar>
+                                        <div>{{ row.name }}</div>
+                                    }
+                                }
                             }
-                        }
+                        </td>
                     </ng-container>
-                </td>
-            </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="dead_citizen_list_columns | ids; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: dead_citizen_list_columns | ids;"></tr>
-            <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->
+                    <tr mat-header-row *matHeaderRowDef="dead_citizen_list_columns | ids; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: dead_citizen_list_columns | ids;"></tr>
+                    <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->
 
-            <!-- Row shown when there is no matching data. -->
-            <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell" colspan="6">
-                    <ng-container
-                        *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
-                        <ng-container i18n>Aucun objet ne correspond au filtre "{{ filterInput.nativeElement.value }}"
-                        </ng-container>
-                    </ng-container>
-                    <ng-template #emptyTable>
-                        <ng-container i18n>La liste est vide</ng-container>
-                    </ng-template>
-                </td>
-            </tr>
-        </table>
-    </cdk-virtual-scroll-viewport>
-</div>
-
+                    <!-- Row shown when there is no matching data. -->
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" colspan="6">
+                            @if (filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== '') {
+                                <ng-container i18n>Aucun objet ne correspond au filtre "{{ filterInput.nativeElement.value }}"</ng-container>
+                            } @else {
+                                <ng-container i18n>La liste est vide</ng-container>
+                            }
+                        </td>
+                    </tr>
+                </table>
+            </cdk-virtual-scroll-viewport>
+        }
+    </div>
+}
 <!--<mho-menu-add #menuAdd="menuAdd"></mho-menu-add>-->
 <!--<mho-menu-remove #menuRemove="menuRemove"></mho-menu-remove>-->

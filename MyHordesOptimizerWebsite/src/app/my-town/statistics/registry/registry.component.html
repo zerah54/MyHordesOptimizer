@@ -3,39 +3,41 @@
         <mat-label i18n>Coller le contenu du registre à analyser</mat-label>
         <textarea matInput [(ngModel)]="registry" (ngModelChange)="readLogs(this.display_mode)"></textarea>
     </mat-form-field>
-    <div class="actions" *ngIf="registry && registry !== ''">
-        <div class="start">
-            <button mat-icon-button [class.active]="display_mode === 'plays'" (click)="readLogs('plays')"
-                    matTooltip="Dés / Cartes" matTooltipPosition="before" i18n-matTooltip>
-                <img [ngSrc]="HORDES_IMG_REPO + 'item/item_game_box.gif'" width="16" height="16"
-                     [disableOptimizedSrcset]="true">
-            </button>
-            <button [class.active]="display_mode === 'bank_diff'" mat-icon-button (click)="readLogs('bank_diff')"
-                    matTooltip="Différenciel de la banque" matTooltipPosition="before" i18n-matTooltip>
-                <img [ngSrc]="HORDES_IMG_REPO + 'icons/home.gif'" width="16" height="16" [disableOptimizedSrcset]="true">
-            </button>
-            <button [class.active]="display_mode === 'well'" mat-icon-button (click)="readLogs('well')"
-                    matTooltip="Prises dans le puits" matTooltipPosition="before" i18n-matTooltip>
-                <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_well.gif'" width="16" height="16"
-                     [disableOptimizedSrcset]="true">
-            </button>
-            <button [class.active]="display_mode === 'digs'" mat-icon-button (click)="readLogs('digs')"
-                    matTooltip="Fouilles" matTooltipPosition="before" i18n-matTooltip>
-                <img [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" width="16" height="16"
-                     [disableOptimizedSrcset]="true">
-            </button>
-            <button [class.active]="display_mode === 'doors'" mat-icon-button (click)="readLogs('doors')"
-                    matTooltip="Entrées / Sorties" matTooltipPosition="before" i18n-matTooltip>
-                <img [ngSrc]="HORDES_IMG_REPO + 'log/door_open.gif'" width="16" height="16" [disableOptimizedSrcset]="true">
-            </button>
+    @if (registry && registry !== '') {
+        <div class="actions">
+            <div class="start">
+                <button mat-icon-button [class.active]="display_mode === 'plays'" (click)="readLogs('plays')"
+                        matTooltip="Dés / Cartes" matTooltipPosition="before" i18n-matTooltip>
+                    <img [ngSrc]="HORDES_IMG_REPO + 'item/item_game_box.gif'" width="16" height="16"
+                         [disableOptimizedSrcset]="true">
+                </button>
+                <button [class.active]="display_mode === 'bank_diff'" mat-icon-button (click)="readLogs('bank_diff')"
+                        matTooltip="Différenciel de la banque" matTooltipPosition="before" i18n-matTooltip>
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/home.gif'" width="16" height="16" [disableOptimizedSrcset]="true">
+                </button>
+                <button [class.active]="display_mode === 'well'" mat-icon-button (click)="readLogs('well')"
+                        matTooltip="Prises dans le puits" matTooltipPosition="before" i18n-matTooltip>
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_well.gif'" width="16" height="16"
+                         [disableOptimizedSrcset]="true">
+                </button>
+                <button [class.active]="display_mode === 'digs'" mat-icon-button (click)="readLogs('digs')"
+                        matTooltip="Fouilles" matTooltipPosition="before" i18n-matTooltip>
+                    <img [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" width="16" height="16"
+                         [disableOptimizedSrcset]="true">
+                </button>
+                <button [class.active]="display_mode === 'doors'" mat-icon-button (click)="readLogs('doors')"
+                        matTooltip="Entrées / Sorties" matTooltipPosition="before" i18n-matTooltip>
+                    <img [ngSrc]="HORDES_IMG_REPO + 'log/door_open.gif'" width="16" height="16" [disableOptimizedSrcset]="true">
+                </button>
+            </div>
+            <div class="end">
+                <button mat-icon-button (click)="registry = undefined; registry_entries = undefined; display_mode = undefined"
+                        matTooltip="Vider le champ" matTooltipPosition="before" i18n-matTooltip>
+                    <img [ngSrc]="HORDES_IMG_REPO + 'emotes/trash.gif'" width="16" height="16">
+                </button>
+            </div>
         </div>
-        <div class="end">
-            <button mat-icon-button (click)="registry = undefined; registry_entries = undefined; display_mode = undefined"
-                    matTooltip="Vider le champ" matTooltipPosition="before" i18n-matTooltip>
-                <img [ngSrc]="HORDES_IMG_REPO + 'emotes/trash.gif'" width="16" height="16">
-            </button>
-        </div>
-    </div>
+    }
     <div class="result">
         @switch (display_mode) {
             @case ('plays') {
