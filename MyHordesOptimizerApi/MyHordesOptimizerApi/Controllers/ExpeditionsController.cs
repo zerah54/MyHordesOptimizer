@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,24 +13,19 @@ namespace MyHordesOptimizerApi.Controllers
     [Route("[controller]")]
     public class ExpeditionsController : AbstractMyHordesOptimizerControllerBase
     {
-        public ExpeditionsController(ILogger<AbstractMyHordesOptimizerControllerBase> logger, IUserInfoProvider userKeyProvider) : base(logger, userKeyProvider)
+        protected IExpeditionService ExpeditionService { get; private set; }
+
+        public ExpeditionsController(ILogger<AbstractMyHordesOptimizerControllerBase> logger, IUserInfoProvider userKeyProvider, IExpeditionService expeditionService) : base(logger, userKeyProvider)
         {
+            ExpeditionService = expeditionService;
         }
 
         [HttpPost]
         [Route("{townId}/{day}")]
         public async Task<ActionResult<ExpeditionDto>> PostExpedition([FromRoute] int townId, [FromRoute] int day, [FromBody] ExpeditionDto expedition)
         {
-            if (expedition.Id.HasValue)
-            {
-                // Update
-            }
-            else
-            {
-                // Create
-            }
-            //TODO
-            return Ok(null);
+            var savedExpedition = await ExpeditionService.SaveAsync(expedition, townId, day);
+            return Ok(savedExpedition);
         }
 
         [HttpPost]

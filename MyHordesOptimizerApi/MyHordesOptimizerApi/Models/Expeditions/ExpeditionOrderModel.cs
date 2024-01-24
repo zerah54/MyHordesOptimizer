@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyHordesOptimizerApi.Models.Expeditions
 {
@@ -6,7 +7,7 @@ namespace MyHordesOptimizerApi.Models.Expeditions
     public class ExpeditionOrderModel
     {
         [Column("idExpeditionOrder")]
-        public int idExpeditionOrder { get; set; }
+        public int IdExpeditionOrder { get; set; }
 
         [Column("type")]
         public string Type { get; set; }
@@ -19,5 +20,9 @@ namespace MyHordesOptimizerApi.Models.Expeditions
 
         [Column("position")]
         public int Position { get; set; }
+
+        public List<ExpeditionPartOrderModel> Parts { get; set; }
+        public List<ExpeditionCitizenOrderModel> ExpeditionCitizens { get; set; }
+
     }
 }

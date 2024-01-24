@@ -7,8 +7,8 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Bag;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Citizen;
-using MyHordesOptimizerApi.Models.Citizen.Bags;
 using MyHordesOptimizerApi.Models.Estimations;
+using MyHordesOptimizerApi.Models.Expeditions;
 using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Models.Views.Citizens;
 using MyHordesOptimizerApi.Models.Views.Items;
@@ -1767,6 +1767,37 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var estimations = connection.Query<TownEstimationModel>("SELECT * FROM TownEstimation WHERE idTown = @idTown AND day = @day", new { idTown = townId, day = day });
             connection.Close();
             return estimations;
+        }
+
+        #endregion
+
+        #region Expeditions
+        public ExpeditionModel InsertExpedition(ExpeditionModel expeditionModel)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            using var transaction = connection.BeginTransaction();
+            var idExpedition = connection.Insert(expeditionModel);
+            foreach(var part in expeditionModel.Parts)
+            {
+                var idPart = connection.Insert(part);
+                part.IdExpeditionPart = idPart;
+                foreach(var order in part.Orders)
+                {
+                    var idOrder = connection.Insert(order);
+                    order.IdExpeditionOrder = idOrder;
+                }
+                foreach(var citizen in part.ExpeditionCitizens)
+                {
+                    var idCitizen = connection.Insert(citizen);
+                    citizen.IdExpeditionCitizen = idCitizen;
+                    foreach(var order in citizen.ord)  // LE MAPPING EST PAS BON KEVIN
+                }
+            }
+            transaction.Commit();
+            connection.Close();
+            expeditionModel.IdExpedition = idExpedition;
+            return expeditionModel;
         }
 
         #endregion

@@ -60,7 +60,7 @@ namespace MyHordesOptimizerApi.Extensions
                         var value = kvp.Value.Invoke(model);
                         param.Add($"@{count}", value);
                         count++;
-                        listUpdates.Add($"{kvp.Key} = values({kvp.Key})");   
+                        listUpdates.Add($"{kvp.Key} = values({kvp.Key})");
                     }
                     listValues.Add($"({string.Join(",", list)})");
                 }
@@ -163,7 +163,7 @@ namespace MyHordesOptimizerApi.Extensions
             }
         }
 
-        public static void Insert<TModel>(this MySqlConnection connection, TModel model)
+        public static int Insert<TModel>(this MySqlConnection connection, TModel model)
         {
             var type = model.GetType();
             var tableAttribute = Attribute.GetCustomAttributes(type).FirstOrDefault(attr => attr.GetType() == typeof(TableAttribute)) as TableAttribute;
@@ -174,22 +174,17 @@ namespace MyHordesOptimizerApi.Extensions
             foreach (var prop in type.GetProperties())
             {
                 var columnAttr = prop.GetCustomAttributes().FirstOrDefault(attr => attr.GetType() == typeof(ColumnAttribute)) as ColumnAttribute;
-                var name = string.Empty;
-                if (columnAttr == null)
+                if (columnAttr != null)
                 {
-                    name = prop.Name;
+                    var name = columnAttr.Name;
+                    values.Add($"@{name}");
+                    props.Add(name);
+                    param.Add(name, prop.GetValue(model, null));
                 }
-                else
-                {
-                    name = columnAttr.Name;
-                }
-                values.Add($"@{name}");
-                props.Add(name);
-                param.Add(name, prop.GetValue(model, null));
             }
-            var sb = new StringBuilder($"INSERT INTO {tableName}({string.Join(",", props)}) VALUES ({string.Join(",", values)})");
+            var sb = new StringBuilder($"INSERT INTO {tableName}({string.Join(",", props)}) VALUES ({string.Join(",", values)}); SELECT LAST_INSERT_ID()");
             var query = sb.ToString();
-            connection.Execute(query, param);
+            return connection.ExecuteScalar<int>(query, param);
         }
     }
 }

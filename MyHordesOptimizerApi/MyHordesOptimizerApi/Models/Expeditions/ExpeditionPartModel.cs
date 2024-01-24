@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyHordesOptimizerApi.Models.Expeditions
@@ -22,5 +23,8 @@ namespace MyHordesOptimizerApi.Models.Expeditions
         [Column("label")]
         public string Label { get; set; }
 
+        public List<ExpeditionPartOrderModel> Orders { get; set; }
+
+        public List<ExpeditionCitizenOrderModel> ExpeditionCitizens { get; set;}
     }
 }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace MyHordesOptimizerApi.Models.Expeditions
 {
     [Table("ExpeditionBag")]
-    public class ExpeditionBagModel
+    public class ExpeditionBagItemModel
     {
         [Key]
         [Column("idExpeditionBag")]

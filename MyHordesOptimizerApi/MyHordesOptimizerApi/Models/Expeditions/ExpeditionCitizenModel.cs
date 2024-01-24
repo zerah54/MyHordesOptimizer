@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyHordesOptimizerApi.Models.Expeditions
@@ -29,9 +30,13 @@ namespace MyHordesOptimizerApi.Models.Expeditions
         public string PreinscritHeroic { get; set; }
 
         [Column("pdc")]
-        public int pdc { get; set; }
+        public int Pdc { get; set; }
 
         [Column("isThirsty")]
-        public bool? isThirsty { get; set; }
+        public bool? IsThirsty { get; set; }
+
+        public List<ExpeditionCitizenOrderModel> Orders { get; set; }
+
+        public List<ExpeditionBagItemModel> Items { get; set; }
     }
 }

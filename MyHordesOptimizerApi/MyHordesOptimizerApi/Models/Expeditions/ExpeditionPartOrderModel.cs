@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyHordesOptimizerApi.Models.Expeditions
 {
-    [Table("ExpeditionCitizenPart")]
-    public class ExpeditionCitizenPartModel
+    [Table("ExpeditionPartOrder")]
+    public class ExpeditionPartOrderModel
     {
         [Column("idExpeditionOrder")]
         [Key]

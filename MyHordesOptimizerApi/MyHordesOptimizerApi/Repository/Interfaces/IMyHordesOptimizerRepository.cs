@@ -7,6 +7,8 @@ using MyHordesOptimizerApi.Models.Map;
 using MyHordesOptimizerApi.Models.Wishlist;
 using System.Collections.Generic;
 using MyHordesOptimizerApi.Models.Estimations;
+using MyHordesOptimizerApi.Models.Expeditions;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
 {
@@ -103,5 +105,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
 
         void UpdateEstimation(int townId, TownEstimationModel estimation);
         IEnumerable<TownEstimationModel> GetEstimations(int townId, int day);
+
+        ExpeditionModel InsertExpedition(ExpeditionModel expeditionModel);
     }
 }
