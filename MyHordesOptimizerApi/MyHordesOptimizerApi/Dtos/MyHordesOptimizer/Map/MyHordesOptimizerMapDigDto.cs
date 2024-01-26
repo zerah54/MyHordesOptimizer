@@ -10,6 +10,6 @@
         public int Day { get; set; }
         public int NbSucces { get; set; }
         public int NbTotalDig { get; set; }
-        public LastUpdateInfo LastUpdateInfo { get; set; }
+        public LastUpdateInfoDto LastUpdateInfo { get; set; }
     }
 }

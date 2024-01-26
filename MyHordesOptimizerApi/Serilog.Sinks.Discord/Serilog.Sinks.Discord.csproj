@@ -7,6 +7,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Discord.Net.Webhook" Version="3.13.0" />
-		<PackageReference Include="serilog" Version="3.0.1" />
+		<PackageReference Include="serilog" Version="3.1.1" />
 	</ItemGroup>
 </Project>

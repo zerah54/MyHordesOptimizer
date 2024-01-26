@@ -86,7 +86,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Bag")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenBag([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleBagDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenBag([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleBagDto request)
         {
             UserKeyProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenBag(townId, request.UserId, request.Objects);
@@ -95,7 +95,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Status")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleStatusDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleStatusDto request)
         {
             UserKeyProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenStatus(townId, request.UserId, request.Status);
@@ -104,7 +104,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("HeroicActions")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenHeroicActions([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleHeroicActionsDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenHeroicActions([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleHeroicActionsDto request)
         {
             UserKeyProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenHeroicActions(townId, request.UserId, request.HeroicActions);
@@ -113,7 +113,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Home")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenHome([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleHomeDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenHome([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleHomeDto request)
         {
             UserKeyProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenHome(townId, request.UserId, request.Home);
@@ -122,7 +122,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Ghoul")]
-        public ActionResult<LastUpdateInfo> UpdateGhoulStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateGhoulStatusDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateGhoulStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateGhoulStatusDto request)
         {
             UserKeyProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateGhoulStatus(townId, userId, request);

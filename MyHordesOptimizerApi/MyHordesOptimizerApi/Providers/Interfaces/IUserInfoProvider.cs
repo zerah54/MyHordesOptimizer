@@ -1,4 +1,4 @@
-﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+﻿using MyHordesOptimizerApi.Models;
 
 namespace MyHordesOptimizerApi.Providers.Interfaces
 {

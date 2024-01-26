@@ -6,7 +6,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     public class CitizenActionsHeroic
     {
         public CitizenActionsHeroicValue Content { get; set; }
-        public LastUpdateInfo? LastUpdateInfo { get; set; }
+        public LastUpdateInfoDto? LastUpdateInfo { get; set; }
 
         public CitizenActionsHeroic()
         {

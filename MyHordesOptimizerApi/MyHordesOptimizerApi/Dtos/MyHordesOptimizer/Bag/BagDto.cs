@@ -7,7 +7,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Bag
         public List<BagItemDto> Items { get; set; }
         public int? IdBag { get; set; }
 
-        public LastUpdateInfo LastUpdateInfo { get; set; }
+        public LastUpdateInfoDto LastUpdateInfo { get; set; }
 
         public BagDto()
         {

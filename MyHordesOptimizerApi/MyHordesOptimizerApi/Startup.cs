@@ -17,6 +17,7 @@ using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Controllers.ActionFillters;
 using MyHordesOptimizerApi.DiscordBot.Services;
 using MyHordesOptimizerApi.MappingProfiles;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Impl;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Impl;
@@ -90,7 +91,7 @@ namespace MyHordesOptimizerApi
             services.AddSingleton<IBigBrothHordesConfiguration, BigBrothHordesConfiguration>();
             services.AddSingleton<IFataMorganaConfiguration, FataMorganaConfiguration>();
             services.AddSingleton<IMyHordesTranslationsConfiguration, MyHordesTranslationsConfiguration>();
-            services.AddSingleton<IMyHordesOptimizerSqlConfiguration, MyHordesOptimizerSqlConfiguration>();
+            services.AddTransient<IMyHordesOptimizerSqlConfiguration, MyHordesOptimizerSqlConfiguration>();
             services.AddSingleton<IMyHordesScrutateurConfiguration, MyHordesScrutateurConfiguration>();
             services.AddSingleton<IDiscordBotConfiguration, DiscordBotConfiguration>();
             services.AddSingleton<IAuthenticationConfiguration, AuthenticationConfiguration>();
@@ -106,8 +107,6 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IBigBrothHordesRepository, BigBrothHordesRepository>();
             services.AddScoped<IFataMorganaRepository, FataMorganaRepository>();
             services.AddScoped<IGestHordesRepository, GestHordesRepository>();
-
-            services.AddSingleton<IMyHordesOptimizerRepository, MyHordesOptimizerSqlRepository>();
 
             services.AddSingleton<IGlossaryRepository, GlossaryRepository>();
 
@@ -136,6 +135,7 @@ namespace MyHordesOptimizerApi
             services.AddHostedService<InteractionHandlingHostedService>();    // Add the slash command handler
             services.AddHostedService<DiscordStartupHostedService>();         // Add the discord startup service
 
+            services.AddDbContext<MhoContext>(ServiceLifetime.Transient);
             services.AddTransient<MyHordesOptimizerEnricher>();
             services.AddHttpLogging(logging =>
             {

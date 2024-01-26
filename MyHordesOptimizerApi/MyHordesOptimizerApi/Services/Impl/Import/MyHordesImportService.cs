@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Common.Core.Repository.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
-using MyHordesOptimizerApi.Models.Wishlist;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using Newtonsoft.Json.Linq;
@@ -19,7 +19,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 {
     public class MyHordesImportService : IMyHordesImportService
     {
-        protected readonly IMyHordesOptimizerRepository MyHordesOptimizerRepository;
+        protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
         protected readonly IWebApiRepository WebApiRepository;
         protected readonly IMyHordesTranslationsConfiguration TranslationsConfiguration;
 
@@ -29,7 +29,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         protected readonly ILogger<MyHordesImportService> Logger;
 
-        public MyHordesImportService(IMyHordesOptimizerRepository firebaseRepository,
+        public MyHordesImportService(IServiceScopeFactory serviceScopeFactory,
             IWebApiRepository webApiRepository,
             IMyHordesTranslationsConfiguration translationsConfiguration,
             IMyHordesApiRepository myHordesJsonApiRepository,
@@ -37,7 +37,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             IMapper mapper,
             ILogger<MyHordesImportService> logger)
         {
-            MyHordesOptimizerRepository = firebaseRepository;
+            ServiceScopeFactory = serviceScopeFactory;
             WebApiRepository = webApiRepository;
             TranslationsConfiguration = translationsConfiguration;
             MyHordesApiRepository = myHordesJsonApiRepository;
@@ -65,7 +65,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         {
             var codeResult = MyHordesCodeRepository.GetHeroCapacities();
 
-            var capacities = Mapper.Map<List<HeroSkillsModel>>(codeResult);
+            var capacities = Mapper.Map<List<HeroSkill>>(codeResult);
 
             // Traductions
             var ymlDeserializer = new DeserializerBuilder()
@@ -87,7 +87,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 capacitie.DescriptionEs = spanishTrads[capacitie.DescriptionDe];
             }
 
-            MyHordesOptimizerRepository.PatchHeroSkill(capacities);
+            //MyHordesOptimizerRepository.PatchHeroSkill(capacities);
         }
 
         #endregion
@@ -98,7 +98,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         {
             var codeResult = MyHordesCodeRepository.GetCausesOfDeath();
 
-            var causesOfDeaths = Mapper.Map<List<CauseOfDeathModel>>(codeResult);
+            var causesOfDeaths = Mapper.Map<List<CauseOfDeath>>(codeResult);
 
             // Traductions
             var ymlDeserializer = new DeserializerBuilder().Build();
@@ -119,7 +119,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 causeOfDeath.DescriptionEs = spanishTrads[causeOfDeath.DescriptionDe];
             }
 
-            MyHordesOptimizerRepository.PatchCauseOfDeath(causesOfDeaths);
+            //MyHordesOptimizerRepository.PatchCauseOfDeath(causesOfDeaths);
         }
 
         #endregion
@@ -130,9 +130,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         {
             var codeResult = MyHordesCodeRepository.GetCleanUpTypes();
 
-            var cleanUpTypes = Mapper.Map<List<CleanUpTypeModel>>(codeResult);
+            var cleanUpTypes = Mapper.Map<List<TownCadaverCleanUpType>>(codeResult);
 
-            MyHordesOptimizerRepository.PatchCleanUpType(cleanUpTypes);
+            //MyHordesOptimizerRepository.PatchCleanUpType(cleanUpTypes);
         }
 
         #endregion
@@ -143,7 +143,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         {
             // Récupération des items
             var myHordesItems = MyHordesApiRepository.GetItems();
-            var mhoItems = Mapper.Map<List<ItemModel>>(myHordesItems);
+            var mhoItems = Mapper.Map<List<Item>>(myHordesItems);
             // Enrichissement avec les droprates
             var droprates = MyHordesCodeRepository.GetItemsDropRates();
             var listOfPrafDrops = droprates.GetValueOrDefault("empty_dig");
@@ -180,37 +180,37 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     item.DropRateNotPraf = 0;
                 }
             });
-            MyHordesOptimizerRepository.PatchItems(mhoItems);
+            //MyHordesOptimizerRepository.PatchItems(mhoItems);
 
             // Récupération des properties
             var codeItemsProperty = MyHordesCodeRepository.GetItemsProperties();
             var allProperties = codeItemsProperty.Values.ToList().SelectMany(list => list).Distinct().ToList();
-            MyHordesOptimizerRepository.PatchProperties(allProperties);
+            //MyHordesOptimizerRepository.PatchProperties(allProperties);
 
-            MyHordesOptimizerRepository.DeleteAllPropertiesItem();
+            //MyHordesOptimizerRepository.DeleteAllPropertiesItem();
             foreach (var kvp in codeItemsProperty)
             {
                 var itemUid = kvp.Key;
                 var properties = kvp.Value;
-                MyHordesOptimizerRepository.PatchPropertiesItem(itemUid, properties);
+                //MyHordesOptimizerRepository.PatchPropertiesItem(itemUid, properties);
             }
 
             // Récupération des actions
             var codeItemsActions = MyHordesCodeRepository.GetItemsActions();
             var allActions = codeItemsActions.Values.ToList().SelectMany(list => list).Distinct().ToList();
-            MyHordesOptimizerRepository.PatchActions(allActions);
+            //MyHordesOptimizerRepository.PatchActions(allActions);
 
-            MyHordesOptimizerRepository.DeleteAllActionsItem();
+            //MyHordesOptimizerRepository.DeleteAllActionsItem();
             foreach (var kvp in codeItemsActions)
             {
                 var itemUid = kvp.Key;
                 var actions = kvp.Value;
-                MyHordesOptimizerRepository.PatchActionsItem(itemUid, actions);
+                //MyHordesOptimizerRepository.PatchActionsItem(itemUid, actions);
             }
 
             //Récupération des recipes
             var codeItemRecipes = MyHordesCodeRepository.GetRecipes();
-            var mhoRecipes = Mapper.Map<List<RecipeModel>>(codeItemRecipes);
+            var mhoRecipes = Mapper.Map<List<Recipe>>(codeItemRecipes);
 
             // Traductions
             var ymlDeserializer = new DeserializerBuilder()
@@ -231,25 +231,25 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     recipe.ActionEs = spanishTrads[recipe.ActionDe];
                 }
             }
-            MyHordesOptimizerRepository.PatchRecipes(mhoRecipes);
-            MyHordesOptimizerRepository.DeleteAllRecipeComponents();
-            MyHordesOptimizerRepository.DeleteAllRecipeResults();
+            //MyHordesOptimizerRepository.PatchRecipes(mhoRecipes);
+            //MyHordesOptimizerRepository.DeleteAllRecipeComponents();
+            //MyHordesOptimizerRepository.DeleteAllRecipeResults();
             foreach (var kvp in codeItemRecipes)
             {
                 var recipeName = kvp.Key;
                 var componentUids = kvp.Value.In;
-                MyHordesOptimizerRepository.PatchRecipeComponents(recipeName, componentUids);
+                //MyHordesOptimizerRepository.PatchRecipeComponents(recipeName, componentUids);
                 try
                 {
                     var resultsObjects = kvp.Value.Out;
-                    var results = new List<RecipeItemResultModel>();
+                    var results = new List<RecipeItemResult>();
                     var totalWeight = 0;
                     foreach (var @object in resultsObjects)
                     {
                         if (@object is string)
                         {
                             var uid = @object as string;
-                            results.Add(new RecipeItemResultModel()
+                            results.Add(new RecipeItemResult()
                             {
                                 IdItem = mhoItems.Where(i => i.Uid == uid).Select(i => i.IdItem).First(),
                                 Probability = 1,
@@ -263,7 +263,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                             var uid = jArray.First().Value<string>();
                             var weight = jArray.Last().Value<int>();
                             totalWeight += weight;
-                            results.Add(new RecipeItemResultModel()
+                            results.Add(new RecipeItemResult()
                             {
                                 IdItem = mhoItems.Where(i => i.Uid == uid).Select(i => i.IdItem).First(),
                                 Weight = weight,
@@ -272,7 +272,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                         }
                     }
                     results.ForEach(x => { if (x.Probability != 1) x.Probability = (float)x.Weight / totalWeight; });
-                    MyHordesOptimizerRepository.PatchRecipeResults(results);
+                    //MyHordesOptimizerRepository.PatchRecipeResults(results);
                 }
                 catch (Exception e)
                 {
@@ -290,17 +290,17 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         public void ImportRuins()
         {
             var jsonApiResult = MyHordesApiRepository.GetRuins();
-            var jsonRuins = Mapper.Map<List<MyHordesOptimizerRuin>>(jsonApiResult);
+            var jsonRuins = Mapper.Map<List<MyHordesOptimizerRuinDto>>(jsonApiResult);
 
             var codeResult = MyHordesCodeRepository.GetRuins();
-            
+
             Logger.LogDebug($"codeResult {codeResult}");
-            
-            var codeRuins = Mapper.Map<List<MyHordesOptimizerRuin>>(codeResult);
+
+            var codeRuins = Mapper.Map<List<MyHordesOptimizerRuinDto>>(codeResult);
 
             Logger.LogDebug($"codeRuins {codeResult}");
-            
-            var items = MyHordesOptimizerRepository.GetItems();
+
+            //var items = MyHordesOptimizerRepository.GetItems();
 
             foreach (var ruin in jsonRuins)
             {
@@ -312,10 +312,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     foreach (var drop in codeRuin.Drops)
                     {
                         totalWeight += Convert.ToInt32(drop.Value[0]);
-                        var item = items.FirstOrDefault(x => x.Uid == drop.Key);
+                        //var item = items.FirstOrDefault(x => x.Uid == drop.Key);
                         miror.Drops.Add(new ItemResult()
                         {
-                            Item = item,
+                            //Item = Mapper.Map<ItemDto>(item),
                             Weight = Convert.ToInt32(drop.Value[0])
                         });
                     }
@@ -325,7 +325,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             }
 
             // Enregistrer dans firebase
-            jsonRuins.Add(new MyHordesOptimizerRuin()
+            jsonRuins.Add(new MyHordesOptimizerRuinDto()
             {
                 Id = -1,
                 Camping = 15,
@@ -343,7 +343,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 MaxDist = 1000,
                 Capacity = 0
             });
-            MyHordesOptimizerRepository.PatchRuins(jsonRuins);
+            //MyHordesOptimizerRepository.PatchRuins(jsonRuins);
         }
 
         #endregion
@@ -353,7 +353,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         public async Task ImportCategoriesAsync()
         {
             var codeResult = MyHordesCodeRepository.GetCategories();
-            var categories = Mapper.Map<List<CategoryModel>>(codeResult);
+            var categories = Mapper.Map<List<Category>>(codeResult);
 
             // Traductions
             var ymlDeserializer = new DeserializerBuilder()
@@ -372,7 +372,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 category.LabelEs = spanishTrads[category.LabelDe];
             }
 
-            MyHordesOptimizerRepository.PatchCategories(categories);
+            //MyHordesOptimizerRepository.PatchCategories(categories);
         }
 
         #endregion
@@ -381,24 +381,24 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         public void ImportWishlistCategorie()
         {
-            var wishlistCategories = MyHordesCodeRepository.GetWishlistItemCategories();
-            var categories = Mapper.Map<List<WishlistCategorieModel>>(wishlistCategories);
+            //var wishlistCategories = MyHordesCodeRepository.GetWishlistItemCategories();
+            //var categories = Mapper.Map<List<WishlistCategorie>>(wishlistCategories);
 
-            var itemsCategorie = new List<WishlistCategorieItemModel>();
-            foreach (var category in wishlistCategories)
-            {
-                foreach (var item in category.Items)
-                {
-                    itemsCategorie.Add(new WishlistCategorieItemModel()
-                    {
-                        IdCategory = category.Id,
-                        IdItem = item
-                    });
-                }
-            }
+            //var itemsCategorie = new List<WishlistCategorie>();
+            //foreach (var category in wishlistCategories)
+            //{
+            //    foreach (var item in category.Items)
+            //    {
+            //        itemsCategorie.Add(new WishlistCategorie()
+            //        {
+            //            IdCategory = category.Id,
+            //            IdItem = item
+            //        });
+            //    }
+            //}
 
-            MyHordesOptimizerRepository.PatchWishlistCategories(categories);
-            MyHordesOptimizerRepository.PatchWishlistItemCategories(itemsCategorie);
+            //MyHordesOptimizerRepository.PatchWishlistCategories(categories);
+            //MyHordesOptimizerRepository.PatchWishlistItemCategories(itemsCategorie);
         }
 
         public void ImportDefaultWishlists()
@@ -406,12 +406,12 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var wishlistCategories = MyHordesCodeRepository.GetWishlistItemCategories();
             var defaultWishlists = MyHordesCodeRepository.GetDefaultWishlists();
 
-            var modeles = new List<DefaultWishlistItemModel>();
+            var modeles = new List<DefaultWishlistItem>();
             foreach (var wishlist in defaultWishlists)
             {
                 foreach (var item in wishlist.Items)
                 {
-                    modeles.Add(new DefaultWishlistItemModel()
+                    modeles.Add(new DefaultWishlistItem()
                     {
                         IdDefaultWishlist = wishlist.Id,
                         IdItem = item.ItemId,
@@ -421,10 +421,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                         LabelEs = wishlist.Name["es"],
                         LabelDe = wishlist.Name["de"],
                         Count = item.Count,
-                        Depot = item.Depot,
-                        ShouldSignal = item.ShouldSignal,
+                        Depot = Convert.ToUInt64(item.Depot),
+                        ShouldSignal = Convert.ToUInt64(item.ShouldSignal),
                         Priority = item.Priority,
-                        ZoneXPa = item.ZoneXPa
+                        ZoneXpa = item.ZoneXPa
                     });
                 }
                 foreach (var categorie in wishlist.Categories)
@@ -432,7 +432,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     var wishlistCategorie = wishlistCategories.Single(x => x.Id == categorie.CategorieId);
                     foreach (var itemId in wishlistCategorie.Items)
                     {
-                        modeles.Add(new DefaultWishlistItemModel()
+                        modeles.Add(new DefaultWishlistItem()
                         {
                             IdDefaultWishlist = wishlist.Id,
                             IdItem = itemId,
@@ -443,13 +443,13 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                             LabelDe = wishlist.Name["de"],
                             Count = categorie.Count,
                             Priority = categorie.Priority,
-                            ZoneXPa = categorie.ZoneXPa
+                            ZoneXpa = categorie.ZoneXPa
                         });
                     }
                 }
             }
 
-            MyHordesOptimizerRepository.PatchDefaultWishlistItems(modeles);
+            //MyHordesOptimizerRepository.PatchDefaultWishlistItems(modeles);
         }
 
         #endregion

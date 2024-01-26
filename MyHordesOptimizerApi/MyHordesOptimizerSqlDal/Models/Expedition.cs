@@ -1,0 +1,48 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+namespace MyHordesOptimizerApi.Models;
+
+[Table("Expedition")]
+[Index("IdLastUpdateInfo", Name = "idLastUpdateInfo")]
+[Index("IdTown", Name = "idTown")]
+public partial class Expedition
+{
+    [Key]
+    [Column("idExpedition", TypeName = "int(11)")]
+    public int IdExpedition { get; set; }
+
+    [Column("idTown", TypeName = "int(11)")]
+    public int? IdTown { get; set; }
+
+    [Column("idLastUpdateInfo", TypeName = "int(11)")]
+    public int? IdLastUpdateInfo { get; set; }
+
+    [Column("day", TypeName = "int(11)")]
+    public int? Day { get; set; }
+
+    [Column("state")]
+    [StringLength(255)]
+    public string State { get; set; }
+
+    [Column("label")]
+    [StringLength(255)]
+    public string Label { get; set; }
+
+    [Column("minPdc", TypeName = "int(11)")]
+    public int? MinPdc { get; set; }
+
+    [InverseProperty("IdExpeditionNavigation")]
+    public virtual ICollection<ExpeditionPart> ExpeditionParts { get; set; } = new List<ExpeditionPart>();
+
+    [ForeignKey("IdLastUpdateInfo")]
+    [InverseProperty("Expeditions")]
+    public virtual LastUpdateInfo IdLastUpdateInfoNavigation { get; set; }
+
+    [ForeignKey("IdTown")]
+    [InverseProperty("Expeditions")]
+    public virtual Town IdTownNavigation { get; set; }
+}

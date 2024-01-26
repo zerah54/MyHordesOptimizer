@@ -1,15 +1,13 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
+using MyHordesOptimizerApi.Data.Camping;
 using MyHordesOptimizerApi.Data.CauseOfDeath;
 using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Wishlist;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
 using MyHordesOptimizerApi.Models;
-using MyHordesOptimizerApi.Models.Wishlist;
 using System.Collections.Generic;
 using System.Linq;
-using MyHordesOptimizerApi.Data.Camping;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
@@ -17,7 +15,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
     {
         public CodeModelMappingProfiles()
         {
-            CreateMap<MyHordesCategoryCodeModel, CategoryModel>()
+            CreateMap<MyHordesCategoryCodeModel, Category>()
                 .ForMember(dest => dest.IdCategory, opt => opt.Ignore())
                 .ForMember(dest => dest.LabelFr, opt => opt.Ignore())
                 .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Label))
@@ -27,7 +25,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
 
-            CreateMap<MyHordesHerosCapacitiesCodeModel, HeroSkillsModel>()
+            CreateMap<MyHordesHerosCapacitiesCodeModel, HeroSkill>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.DaysNeeded, opt => opt.MapFrom(src => src.DaysNeeded))
                 .ForMember(dest => dest.NbUses, opt => opt.Ignore())
@@ -41,7 +39,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.DescriptionEn, opt => opt.Ignore())
                 .ForMember(dest => dest.DescriptionEs, opt => opt.Ignore());
 
-            CreateMap<MyHordesCauseOfDeathModel, CauseOfDeathModel>()
+            CreateMap<MyHordesCauseOfDeathModel, CauseOfDeath>()
                 .ForMember(dest => dest.Dtype, opt => opt.MapFrom(src => src.Dtype))
                 .ForMember(dest => dest.Ref, opt => opt.MapFrom(src => src.Ref))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.Icon))
@@ -54,12 +52,12 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.DescriptionEn, opt => opt.Ignore())
                 .ForMember(dest => dest.DescriptionEs, opt => opt.Ignore());
 
-            CreateMap<MyHordesCleanUpTypeModel, CleanUpTypeModel>()
-                .ForMember(dest => dest.IdType, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.TypeName, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.MyHordesApiName, opt => opt.MapFrom(src => src.MyHordesApiName));
+            //CreateMap<MyHordesCleanUpTypeModel, CleanUpType>()
+            //    .ForMember(dest => dest.IdType, opt => opt.MapFrom(src => src.Id))
+            //    .ForMember(dest => dest.TypeName, opt => opt.MapFrom(src => src.Name))
+            //    .ForMember(dest => dest.MyHordesApiName, opt => opt.MapFrom(src => src.MyHordesApiName));
 
-            CreateMap<KeyValuePair<string, MyHordesRecipeCodeModel>, RecipeModel>()
+            CreateMap<KeyValuePair<string, MyHordesRecipeCodeModel>, Recipe>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Key))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Value.Type))
                 .ForMember(dest => dest.ActionDe, opt => opt.MapFrom(src => src.Value.Action))
@@ -70,7 +68,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.ActionEn, opt => opt.Ignore());
 
 
-            CreateMap<MyHordesOptimizerWishlistItemCategorie, WishlistCategorieModel>()
+            CreateMap<MyHordesOptimizerWishlistItemCategorie, WishlistCategorie>()
                 .ForMember(dest => dest.IdCategory, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.IdUserAuthor, opt => opt.Ignore())
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name["fr"]))

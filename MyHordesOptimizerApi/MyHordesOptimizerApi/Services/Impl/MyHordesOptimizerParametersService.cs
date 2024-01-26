@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
-using MyHordesOptimizerApi.Models;
-using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
 
@@ -9,26 +8,27 @@ namespace MyHordesOptimizerApi.Services.Impl
 {
     public class MyHordesOptimizerParametersService : IMyHordesOptimizerParametersService
     {
-        protected IMyHordesOptimizerRepository MyHordesOptimizerRepository { get; private set; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
         protected IMapper Mapper { get; private set; }
 
-        public MyHordesOptimizerParametersService(IMyHordesOptimizerRepository myHordesOptimizerRepository, IMapper mapper)
+        public MyHordesOptimizerParametersService(IServiceScopeFactory serviceScopeFactory, IMapper mapper)
         {
-            MyHordesOptimizerRepository = myHordesOptimizerRepository;
+            ServiceScopeFactory = serviceScopeFactory;
             Mapper = mapper;
         }
 
         public IEnumerable<ParametersDto> GetParameters()
         {
-            var models = MyHordesOptimizerRepository.GetParameters();
-            var dtos = Mapper.Map<IEnumerable<ParametersDto>>(models);
-            return dtos;
+            //var models = MyHordesOptimizerRepository.GetParameters();
+            //var dtos = Mapper.Map<IEnumerable<ParametersDto>>(models);
+            //return dtos;
+            return null;
         }
 
         public void UpdateParameter(ParametersDto parameter)
         {
-            var model = Mapper.Map<ParametersModel>(parameter);
-            MyHordesOptimizerRepository.PatchParameter(model);
+            //var model = Mapper.Map<ParametersModel>(parameter);
+            //MyHordesOptimizerRepository.PatchParameter(model);
         }
     }
 }

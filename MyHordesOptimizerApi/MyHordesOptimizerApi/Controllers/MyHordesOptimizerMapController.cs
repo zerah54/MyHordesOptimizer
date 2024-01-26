@@ -22,7 +22,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Cell")]
-        public ActionResult<LastUpdateInfo> UpdateCell([FromQuery] int? townId, [FromQuery] int? userId, [FromBody] MyHordesOptimizerCellUpdateDto updateRequest)
+        public ActionResult<LastUpdateInfoDto> UpdateCell([FromQuery] int? townId, [FromQuery] int? userId, [FromBody] MyHordesOptimizerCellUpdateDto updateRequest)
         {
             if (!userId.HasValue)
             {

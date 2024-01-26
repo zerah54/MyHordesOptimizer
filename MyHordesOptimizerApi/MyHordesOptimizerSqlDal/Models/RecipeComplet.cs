@@ -1,0 +1,58 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+namespace MyHordesOptimizerApi.Models;
+
+[Keyless]
+public partial class RecipeComplet
+{
+    [Required]
+    [Column("recipeName")]
+    [StringLength(255)]
+    public string RecipeName { get; set; }
+
+    [Column("actionFr")]
+    [StringLength(255)]
+    public string ActionFr { get; set; }
+
+    [Column("actionEn")]
+    [StringLength(255)]
+    public string ActionEn { get; set; }
+
+    [Column("actionDe")]
+    [StringLength(255)]
+    public string ActionDe { get; set; }
+
+    [Column("actionEs")]
+    [StringLength(255)]
+    public string ActionEs { get; set; }
+
+    [Column("type")]
+    [StringLength(255)]
+    public string Type { get; set; }
+
+    [Column("pictoUid")]
+    [StringLength(255)]
+    public string PictoUid { get; set; }
+
+    [Column("stealthy", TypeName = "bit(1)")]
+    public ulong? Stealthy { get; set; }
+
+    [Column("componentItemId", TypeName = "int(11)")]
+    public int? ComponentItemId { get; set; }
+
+    [Column("componentCount", TypeName = "int(11)")]
+    public int? ComponentCount { get; set; }
+
+    [Column("resultItemId", TypeName = "int(11)")]
+    public int? ResultItemId { get; set; }
+
+    [Column("resultProbability")]
+    public float? ResultProbability { get; set; }
+
+    [Column("resultWeight", TypeName = "int(11)")]
+    public int? ResultWeight { get; set; }
+}

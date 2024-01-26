@@ -1,4 +1,4 @@
-﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+﻿using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using System;
 
@@ -19,9 +19,13 @@ namespace MyHordesOptimizerApi.Providers.Impl
         {
             return new LastUpdateInfo()
             {
-                UserId = UserId,
-                UserName = UserName,
-                UpdateTime = DateTime.UtcNow
+                IdUser = UserId,
+                IdUserNavigation = new User()
+                {
+                    IdUser = UserId,
+                    Name = UserName
+                },
+                DateUpdate = DateTime.UtcNow
             };
         }
     }

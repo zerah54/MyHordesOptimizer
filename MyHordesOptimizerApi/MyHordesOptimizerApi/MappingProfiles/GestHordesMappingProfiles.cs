@@ -4,7 +4,7 @@ using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.MajCase;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home;
-using MyHordesOptimizerApi.Models.Citizen;
+using MyHordesOptimizerApi.Models;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
@@ -41,8 +41,8 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Cuisine, opt => opt.MapFrom(src => src.Kitchen))
                 .ForMember(dest => dest.Cs, opt => opt.MapFrom(src => src.Rest));
 
-            CreateMap<TownCitizenDetailModel, GestHordesMajCitizenActionsHeroDto>()
-                .ForMember(dest => dest.Apag, opt => opt.MapFrom(src => src.ApagCharges))
+            CreateMap<TownCitizen, GestHordesMajCitizenActionsHeroDto>()
+                .ForMember(dest => dest.Apag, opt => opt.MapFrom(src => src.Apagcharges))
                 .ForMember(dest => dest.CorpsSain, opt => opt.MapFrom(src => src.IsCleanBody))
                 .ForMember(dest => dest.DonJH, opt => opt.Ignore())
                 .ForMember(dest => dest.Pef, opt => opt.MapFrom(src => src.HasBreakThrough))

@@ -1,47 +1,48 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Providers.Interfaces;
-using MyHordesOptimizerApi.Repository.Interfaces;
-using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
 {
-    public class TownBankResolver : IValueResolver<MyHordesMap, Town, BankLastUpdate>
+    public class TownBankResolver : IValueResolver<MyHordesMap, TownDto, BankLastUpdateDto>
     {
-        protected IMyHordesOptimizerRepository MhoRepository { get; set; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
+
         protected IUserInfoProvider UserInfoProvider { get; set; }
 
 
-        public TownBankResolver(IMyHordesOptimizerRepository firebaseRepository,
+        public TownBankResolver(IServiceScopeFactory serviceScopeFactory,
             IUserInfoProvider userInfoProvider)
         {
-            MhoRepository = firebaseRepository;
+            ServiceScopeFactory = serviceScopeFactory;
             UserInfoProvider = userInfoProvider;
         }
 
-        public BankLastUpdate Resolve(MyHordesMap source, Town destination, BankLastUpdate destMember, ResolutionContext context)
+        public BankLastUpdateDto Resolve(MyHordesMap source, TownDto destination, BankLastUpdateDto destMember, ResolutionContext context)
         {
-            var wrapper = new BankLastUpdate();
-            var items = MhoRepository.GetItems();
+            //var wrapper = new BankLastUpdateDto();
+            //var items = MhoRepository.GetItems();
 
-            if (source.City != null)
-            {
-                foreach (var bankItem in source.City.Bank)
-                {
-                    var item = items.First(x => x.Id == bankItem.Id);
-                    var destinationBankItem = new BankItem()
-                    {
-                        Item = item,
-                        Count = bankItem.Count,
-                        IsBroken = bankItem.Broken
-                    };
-                    wrapper.Bank.Add(destinationBankItem);
-                }
-            }
+            //if (source.City != null)
+            //{
+            //    foreach (var bankItem in source.City.Bank)
+            //    {
+            //        var item = items.First(x => x.IdItem == bankItem.Id);
+            //        var destinationBankItem = new BankItemDto()
+            //        {
+            //            Item = context.Mapper.Map<ItemDto>(item),
+            //            Count = bankItem.Count,
+            //            IsBroken = bankItem.Broken
+            //        };
+            //        wrapper.Bank.Add(destinationBankItem);
+            //    }
+            //}
 
-            wrapper.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            return wrapper;
+            //wrapper.LastUpdateInfo = context.Mapper.Map<LastUpdateInfoDto>(UserInfoProvider.GenerateLastUpdateInfo());
+            //return wrapper;
+            return null;
         }
     }
 }
