@@ -107,7 +107,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
-    private complete_options: (T | string)[] = [];
+    protected complete_options: (T | string)[] = [];
     //The internal data model for form control value access
     private innerValue: T | string | T[] | string[] | undefined = undefined;
     /** errors for the form control will be stored in this array */
