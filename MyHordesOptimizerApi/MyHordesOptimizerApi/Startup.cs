@@ -74,7 +74,10 @@ namespace MyHordesOptimizerApi
             {
                 config.Filters.Add<GlobalActionFilter>();
                 config.Filters.Add<ApiExceptionFilter>();
-            }).AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+            }).AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
             services.AddAutoMapper(Assembly.GetAssembly(this.GetType()));
 

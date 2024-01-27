@@ -8,7 +8,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
     {
         public string Name { get; set; }
         public string Type { get; set; }
-        public List<ItemResult> Result { get; set; }
+        public List<ItemResultDto> Result { get; set; }
         public List<ItemDto> Components { get; set; }
         public IDictionary<string, string> Actions { get; set; }
 
@@ -16,7 +16,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         {
             Actions = new Dictionary<string, string>();
             Components = new List<ItemDto>();
-            Result = new List<ItemResult>();
+            Result = new List<ItemResultDto>();
         }
     }
 }

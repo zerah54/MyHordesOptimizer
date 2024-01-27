@@ -86,7 +86,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             return filteredRecipes;
         }
 
-        private ItemResult GetItemResultFromRecipe(string searchValue, Locales locale, ItemRecipeDto recipe)
+        private ItemResultDto GetItemResultFromRecipe(string searchValue, Locales locale, ItemRecipeDto recipe)
         {
             return recipe.Result
                 .Find(result =>

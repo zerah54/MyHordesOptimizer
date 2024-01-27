@@ -42,22 +42,4 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
             return HashCode.Combine(Id);
         }
     }
-
-    public class ItemResult
-    {
-        public double Probability { get; set; }
-        public int Weight { get; set; }
-        public ItemDto Item { get; set; }
-
-        public override bool Equals(object obj)
-        {
-            return obj is ItemResult result &&
-                   EqualityComparer<ItemDto>.Default.Equals(Item, result.Item);
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Item);
-        }
-    }
 }

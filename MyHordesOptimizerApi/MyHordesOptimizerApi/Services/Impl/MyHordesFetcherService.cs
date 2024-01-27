@@ -3,17 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
-using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
-using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,6 +61,19 @@ namespace MyHordesOptimizerApi.Services.Impl
               .Include(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId))
               .Include(item => item.TownWishListItems.Where(wishListItem => wishListItem.IdTown == townId))
               .ToList();
+            items.ForEach(item =>
+            {
+                item.RecipeItemComponents.ToList().ForEach(ric =>
+                {
+                    ric.IdItemNavigation.RecipeItemComponents.Clear();
+                    ric.IdItemNavigation.RecipeItemResults.Clear();
+                });
+                item.RecipeItemResults.ToList().ForEach(rir =>
+                {
+                    rir.IdItemNavigation.RecipeItemResults.Clear();
+                    rir.IdItemNavigation.RecipeItemComponents.Clear();
+                });
+            });
             var itemsDto = Mapper.Map<List<ItemDto>>(items);
             return itemsDto;
             //var items = MyHordesOptimizerRepository.GetItems();

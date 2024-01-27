@@ -32,13 +32,13 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         
         public int Capacity { get; set; }
 
-        public List<ItemResult> Drops { get; set; }
+        public List<ItemResultDto> Drops { get; set; }
 
         #endregion
 
         public MyHordesOptimizerRuinDto()
         {
-            Drops = new List<ItemResult>();
+            Drops = new List<ItemResultDto>();
         }
 
         internal void HydrateMyHordesCodeValues(MyHordesOptimizerRuinDto miror)

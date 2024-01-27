@@ -313,7 +313,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     {
                         totalWeight += Convert.ToInt32(drop.Value[0]);
                         //var item = items.FirstOrDefault(x => x.Uid == drop.Key);
-                        miror.Drops.Add(new ItemResult()
+                        miror.Drops.Add(new ItemResultDto()
                         {
                             //Item = Mapper.Map<ItemDto>(item),
                             Weight = Convert.ToInt32(drop.Value[0])
