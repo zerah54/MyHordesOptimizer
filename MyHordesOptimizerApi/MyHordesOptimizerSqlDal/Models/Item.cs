@@ -19,52 +19,52 @@ public partial class Item
 
     [Column("uid")]
     [StringLength(255)]
-    public string Uid { get; set; }
+    public string? Uid { get; set; }
 
     [Column("deco", TypeName = "int(11)")]
     public int? Deco { get; set; }
 
     [Column("label_fr")]
     [StringLength(255)]
-    public string LabelFr { get; set; }
+    public string? LabelFr { get; set; }
 
     [Column("label_en")]
     [StringLength(255)]
-    public string LabelEn { get; set; }
+    public string? LabelEn { get; set; }
 
     [Column("label_es")]
     [StringLength(255)]
-    public string LabelEs { get; set; }
+    public string? LabelEs { get; set; }
 
     [Column("label_de")]
     [StringLength(255)]
-    public string LabelDe { get; set; }
+    public string? LabelDe { get; set; }
 
     [Column("description_fr")]
     [StringLength(1000)]
-    public string DescriptionFr { get; set; }
+    public string? DescriptionFr { get; set; }
 
     [Column("description_en")]
     [StringLength(1000)]
-    public string DescriptionEn { get; set; }
+    public string? DescriptionEn { get; set; }
 
     [Column("description_es")]
     [StringLength(1000)]
-    public string DescriptionEs { get; set; }
+    public string? DescriptionEs { get; set; }
 
     [Column("description_de")]
     [StringLength(1000)]
-    public string DescriptionDe { get; set; }
+    public string? DescriptionDe { get; set; }
 
     [Column("guard", TypeName = "int(11)")]
     public int? Guard { get; set; }
 
     [Column("img")]
     [StringLength(255)]
-    public string Img { get; set; }
+    public string? Img { get; set; }
 
-    [Column("isHeaver", TypeName = "bit(1)")]
-    public ulong? IsHeaver { get; set; }
+    [Column("isHeaver")]
+    public bool? IsHeaver { get; set; }
 
     [Column("dropRate_praf")]
     public float? DropRatePraf { get; set; }
@@ -83,7 +83,7 @@ public partial class Item
 
     [ForeignKey("IdCategory")]
     [InverseProperty("Items")]
-    public virtual Category IdCategoryNavigation { get; set; }
+    public virtual Category? IdCategoryNavigation { get; set; }
 
     [InverseProperty("IdItemNavigation")]
     public virtual ICollection<MapCellItem> MapCellItems { get; set; } = new List<MapCellItem>();

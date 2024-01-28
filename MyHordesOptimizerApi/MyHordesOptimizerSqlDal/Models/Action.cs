@@ -11,7 +11,7 @@ public partial class Action
 {
     [Key]
     [Column("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     [ForeignKey("ActionName")]
     [InverseProperty("ActionNames")]

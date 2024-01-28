@@ -25,11 +25,11 @@ public partial class TownCadaver
 
     [Column("cadaverName")]
     [StringLength(255)]
-    public string CadaverName { get; set; }
+    public string? CadaverName { get; set; }
 
     [Column("avatar")]
     [StringLength(255)]
-    public string Avatar { get; set; }
+    public string? Avatar { get; set; }
 
     [Column("survivalDay", TypeName = "int(11)")]
     public int? SurvivalDay { get; set; }
@@ -38,10 +38,10 @@ public partial class TownCadaver
     public int? Score { get; set; }
 
     [Column("deathMessage", TypeName = "text")]
-    public string DeathMessage { get; set; }
+    public string? DeathMessage { get; set; }
 
     [Column("townMessage", TypeName = "text")]
-    public string TownMessage { get; set; }
+    public string? TownMessage { get; set; }
 
     [Column("causeOfDeath", TypeName = "int(11)")]
     public int? CauseOfDeath { get; set; }
@@ -51,17 +51,17 @@ public partial class TownCadaver
 
     [ForeignKey("CauseOfDeath")]
     [InverseProperty("TownCadavers")]
-    public virtual CauseOfDeath CauseOfDeathNavigation { get; set; }
+    public virtual CauseOfDeath? CauseOfDeathNavigation { get; set; }
 
     [ForeignKey("CleanUp")]
     [InverseProperty("TownCadavers")]
-    public virtual TownCadaverCleanUp CleanUpNavigation { get; set; }
+    public virtual TownCadaverCleanUp? CleanUpNavigation { get; set; }
 
     [ForeignKey("IdCitizen")]
     [InverseProperty("TownCadavers")]
-    public virtual User IdCitizenNavigation { get; set; }
+    public virtual User? IdCitizenNavigation { get; set; }
 
     [ForeignKey("IdLastUpdateInfo")]
     [InverseProperty("TownCadavers")]
-    public virtual LastUpdateInfo IdLastUpdateInfoNavigation { get; set; }
+    public virtual LastUpdateInfo? IdLastUpdateInfoNavigation { get; set; }
 }

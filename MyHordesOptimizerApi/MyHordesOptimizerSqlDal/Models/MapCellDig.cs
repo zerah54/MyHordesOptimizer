@@ -35,13 +35,13 @@ public partial class MapCellDig
 
     [ForeignKey("IdCell")]
     [InverseProperty("MapCellDigs")]
-    public virtual MapCell IdCellNavigation { get; set; }
+    public virtual MapCell IdCellNavigation { get; set; } = null!;
 
     [ForeignKey("IdLastUpdateInfo")]
     [InverseProperty("MapCellDigs")]
-    public virtual LastUpdateInfo IdLastUpdateInfoNavigation { get; set; }
+    public virtual LastUpdateInfo? IdLastUpdateInfoNavigation { get; set; }
 
     [ForeignKey("IdUser")]
     [InverseProperty("MapCellDigs")]
-    public virtual User IdUserNavigation { get; set; }
+    public virtual User IdUserNavigation { get; set; } = null!;
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -7,6 +8,8 @@ using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
+using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.MappingProfiles.Towns;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -76,48 +79,6 @@ namespace MyHordesOptimizerApi.Services.Impl
             });
             var itemsDto = Mapper.Map<List<ItemDto>>(items);
             return itemsDto;
-            //var items = MyHordesOptimizerRepository.GetItems();
-            //var recipes = MyHordesOptimizerRepository.GetRecipes();
-            //foreach (var item in items)
-            //{
-            //    var recipesToAdd = recipes.Where(recipe => recipe.Components.Any(component => component.Id == item.Id)).ToList();
-            //    recipesToAdd.AddRange(recipes.Where(recipes => recipes.Result.Any(result => result.Item.Id == item.Id)));
-            //    item.Recipes = recipesToAdd;
-            //}
-
-            //if (townId.HasValue) // On ne récupère les info propres à la ville uniquement si on est incarné
-            //{
-            //    var wishList = MyHordesOptimizerRepository.GetWishList(townId.Value);
-            //    var bank = MyHordesOptimizerRepository.GetBank(townId.Value);
-            //    foreach (var item in items)
-            //    {
-            //        if (wishList != null && wishList.WishList != null)
-            //        {
-            //            var wishListItems = wishList.WishList.Values.SelectMany(x => x).ToList();
-            //            var wishlistItem = wishListItems.FirstOrDefault((Func<WishListItemDto, bool>)(x => x.Item.Id == item.Id));
-            //            if (wishlistItem != null)
-            //            {
-            //                item.WishListCount = wishlistItem.Count;
-            //            }
-            //            else
-            //            {
-            //                item.WishListCount = 0;
-            //            }
-            //        }
-
-            //        var bankItem = bank.Bank.FirstOrDefault((Func<BankItemDto, bool>)(x => x.Item.Id == item.Id));
-            //        if (bankItem != null)
-            //        {
-            //            item.BankCount = bankItem.Count;
-            //        }
-            //        else
-            //        {
-            //            item.BankCount = 0;
-            //        }
-            //    }
-            //}
-            //return items;
-            return null;
         }
 
         public SimpleMeDto GetSimpleMe()
@@ -125,10 +86,33 @@ namespace MyHordesOptimizerApi.Services.Impl
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
             if (myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
             {
-                myHordeMeResponse.Map.LastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-                var town = Mapper.Map<Town>(myHordeMeResponse.Map);
-                var townModel = Mapper.Map<Town>(myHordeMeResponse);
+                using var transaction = DbContext.Database.BeginTransaction();
+                var hehe = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo()));
+                DbContext.SaveChanges();
+                var lastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == hehe.Entity.IdLastUpdateInfo);
+                myHordeMeResponse.Map.LastUpdateInfo = lastUpdate;
 
+                var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
+                var existingTown = DbContext.Towns
+                    .Include(town => town.TownCitizens)
+                        .ThenInclude(tc => tc.IdLastUpdateInfoNavigation)
+                        .ThenInclude(tc => tc.IdUserNavigation)
+                    .Include(town => town.TownBankItems)
+                    .FirstOrDefault(t => t.IdTown == town.IdTown);
+                if (existingTown == null) // Si la ville est null, il faut créer toutes les cells
+                {
+                    //TODO: Cells
+                    DbContext.Add(town);
+                    DbContext.SaveChanges();
+                }
+                else
+                {
+                    //existingTown.UpdateNoNullProperties(town);
+                    DbContext.Update(town);
+                }
+
+                // TODO : Il manque les cadavers ?
+                transaction.Commit();
                 //var existingTownModel = MyHordesOptimizerRepository.GetTownModel(town.IdTown);
 
                 //MyHordesOptimizerRepository.PatchTown(townModel);

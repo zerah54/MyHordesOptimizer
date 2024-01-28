@@ -154,17 +154,17 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 //IdLastUpdateInfo = idLastUpdateInfo,
                                 X = zone.X,
                                 Y = zone.Y,
-                                IsTown = Convert.ToUInt64(zone.X == me.Map.City.X && zone.Y == me.Map.City.Y),
-                                IsVisitedToday = Convert.ToUInt64(!Convert.ToBoolean(zone.Nvt)),
-                                IsNeverVisited = Convert.ToUInt64(false),
+                                IsTown = zone.X == me.Map.City.X && zone.Y == me.Map.City.Y,
+                                IsVisitedToday = !Convert.ToBoolean(zone.Nvt),
+                                IsNeverVisited = false,
                                 DangerLevel = zone.Danger,
-                                IsDryed = Convert.ToUInt64(isDried),
+                                IsDryed = isDried,
                                 IdRuin = type,
                                 NbZombie = nbZombie,
                                 NbZombieKilled = null,
                                 NbHero = nbHero,
-                                IsRuinCamped = Convert.ToUInt64(zone.Building?.Camped),
-                                IsRuinDryed = Convert.ToUInt64(zone.Building?.Dried),
+                                IsRuinCamped = zone.Building?.Camped,
+                                IsRuinDryed = zone.Building?.Dried,
                                 NbRuinDig = zone.Building?.Dig,
                                 AveragePotentialRemainingDig = averagePotentialRemainingDig,
                                 MaxPotentialRemainingDig = maxPotentialRemainingDig
@@ -179,7 +179,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                     {
                                         Count = item.Count,
                                         IdItem = item.Id,
-                                        IsBroken = Convert.ToUInt64(item.Broken)
+                                        IsBroken = item.Broken
                                     };
                                     listCellItems.Add(cellItem);
                                 }
@@ -196,7 +196,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
                             cellToUpdate.NbZombie = updateCellDto.Zombies;
                             cellToUpdate.NbZombieKilled = updateCellDto.DeadZombies;
-                            cellToUpdate.IsDryed = Convert.ToUInt64(updateCellDto.ZoneEmpty);
+                            cellToUpdate.IsDryed = updateCellDto.ZoneEmpty;
 
                             listCellItems.Clear();
                             var items = Mapper.Map<List<MapCellItem>>(updateCellDto.Objects);
@@ -727,7 +727,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 citizen.Bag.Items.Add(citizenItem);
             }
             //MyHordesOptimizerRepository.PatchCitizenBags(townId, lastUpdateInfo, citizens);
-            return lastUpdateInfo;
+            //return lastUpdateInfo;
+            return null;
         }
 
         #endregion
@@ -741,7 +742,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             citizenDetail.IdTown = townId;
             //citizenDetail.IdLastUpdateInfoHome = homeLastUpdateInfo;
             //MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
-            return lastUpdateInfo;
+            //return lastUpdateInfo;
+            return null;
         }
 
         #region CitizenStatus
@@ -755,35 +757,36 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             citizenDetail.IdTown = townId;
             //citizenDetail.IdLastUpdateInfoStatus = statusLastUpdateInfo;
             //MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
-            return lastUpdateInfo;
+            //return lastUpdateInfo;
+            return null;
         }
 
         private TownCitizen GetTownCitizenStatusDetail(List<string> statusValues)
         {
             var statusDetail = new TownCitizen()
             {
-                IsAddict = Convert.ToUInt64(false),
-                IsArmWounded = Convert.ToUInt64(false),
-                IsCamper = Convert.ToUInt64(false),
-                IsCheatingDeathActive = Convert.ToUInt64(false),
-                IsCleanBody = Convert.ToUInt64(false),
-                IsConvalescent = Convert.ToUInt64(false),
-                IsDesy = Convert.ToUInt64(false),
-                IsDrugged = Convert.ToUInt64(false),
-                IsDrunk = Convert.ToUInt64(false),
-                IsEyeWounded = Convert.ToUInt64(false),
-                IsFootWounded = Convert.ToUInt64(false),
-                IsHandWounded = Convert.ToUInt64(false),
-                IsHungOver = Convert.ToUInt64(false),
-                IsHeadWounded = Convert.ToUInt64(false),
-                IsImmune = Convert.ToUInt64(false),
-                IsInfected = Convert.ToUInt64(false),
-                IsLegWounded = Convert.ToUInt64(false),
-                IsQuenched = Convert.ToUInt64(false),
-                IsSated = Convert.ToUInt64(false),
-                IsTerrorised = Convert.ToUInt64(false),
-                IsThirsty = Convert.ToUInt64(false),
-                IsTired = Convert.ToUInt64(false),
+                IsAddict = false,
+                IsArmWounded = false,
+                IsCamper = false,
+                IsCheatingDeathActive = false,
+                IsCleanBody = false,
+                IsConvalescent = false,
+                IsDesy = false,
+                IsDrugged = false,
+                IsDrunk = false,
+                IsEyeWounded = false,
+                IsFootWounded = false,
+                IsHandWounded = false,
+                IsHungOver = false,
+                IsHeadWounded = false,
+                IsImmune = false,
+                IsInfected = false,
+                IsLegWounded = false,
+                IsQuenched = false,
+                IsSated = false,
+                IsTerrorised = false,
+                IsThirsty = false,
+                IsTired = false,
             };
             foreach (var status in statusValues)
             {
@@ -794,70 +797,70 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         switch (statusValue)
                         {
                             case StatusValue.Addict:
-                                statusDetail.IsAddict = Convert.ToUInt64(true);
+                                statusDetail.IsAddict = true;
                                 break;
                             case StatusValue.ArmWounded:
-                                statusDetail.IsArmWounded = Convert.ToUInt64(true);
+                                statusDetail.IsArmWounded = true;
                                 break;
                             case StatusValue.Camper:
-                                statusDetail.IsCamper = Convert.ToUInt64(true);
+                                statusDetail.IsCamper = true;
                                 break;
                             case StatusValue.CheatingDeathActive:
-                                statusDetail.IsCheatingDeathActive = Convert.ToUInt64(true);
+                                statusDetail.IsCheatingDeathActive = true;
                                 break;
                             case StatusValue.CleanBody:
-                                statusDetail.IsCleanBody = Convert.ToUInt64(true);
+                                statusDetail.IsCleanBody = true;
                                 break;
                             case StatusValue.Convalescent:
-                                statusDetail.IsConvalescent = Convert.ToUInt64(true);
+                                statusDetail.IsConvalescent = true;
                                 break;
                             case StatusValue.Desy:
-                                statusDetail.IsDesy = Convert.ToUInt64(true);
+                                statusDetail.IsDesy = true;
                                 break;
                             case StatusValue.Drugged:
-                                statusDetail.IsDrugged = Convert.ToUInt64(true);
+                                statusDetail.IsDrugged = true;
                                 break;
                             case StatusValue.Drunk:
-                                statusDetail.IsDrunk = Convert.ToUInt64(true);
+                                statusDetail.IsDrunk = true;
                                 break;
                             case StatusValue.EyeWounded:
-                                statusDetail.IsEyeWounded = Convert.ToUInt64(true);
+                                statusDetail.IsEyeWounded = true;
                                 break;
                             case StatusValue.FootWounded:
-                                statusDetail.IsFootWounded = Convert.ToUInt64(true);
+                                statusDetail.IsFootWounded = true;
                                 break;
                             case StatusValue.HandWounded:
-                                statusDetail.IsHandWounded = Convert.ToUInt64(true);
+                                statusDetail.IsHandWounded = true;
                                 break;
                             case StatusValue.HangOver:
-                                statusDetail.IsHungOver = Convert.ToUInt64(true);
+                                statusDetail.IsHungOver = true;
                                 break;
                             case StatusValue.HeadWounded:
-                                statusDetail.IsHeadWounded = Convert.ToUInt64(true);
+                                statusDetail.IsHeadWounded = true;
                                 break;
                             case StatusValue.Immune:
-                                statusDetail.IsImmune = Convert.ToUInt64(true);
+                                statusDetail.IsImmune = true;
                                 break;
                             case StatusValue.Infected:
-                                statusDetail.IsInfected = Convert.ToUInt64(true);
+                                statusDetail.IsInfected = true;
                                 break;
                             case StatusValue.LegWounded:
-                                statusDetail.IsLegWounded = Convert.ToUInt64(true);
+                                statusDetail.IsLegWounded = true;
                                 break;
                             case StatusValue.Quenched:
-                                statusDetail.IsQuenched = Convert.ToUInt64(true);
+                                statusDetail.IsQuenched = true;
                                 break;
                             case StatusValue.Sated:
-                                statusDetail.IsSated = Convert.ToUInt64(true);
+                                statusDetail.IsSated = true;
                                 break;
                             case StatusValue.Terrorised:
-                                statusDetail.IsTerrorised = Convert.ToUInt64(true);
+                                statusDetail.IsTerrorised = true;
                                 break;
                             case StatusValue.Thirsty:
-                                statusDetail.IsThirsty = Convert.ToUInt64(true);
+                                statusDetail.IsThirsty = true;
                                 break;
                             case StatusValue.Tired:
-                                statusDetail.IsTired = Convert.ToUInt64(true);
+                                statusDetail.IsTired = true;
                                 break;
                         }
                     }
@@ -874,10 +877,11 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             citizenDetail.IdUser = userId;
             citizenDetail.IdTown = townId;
             //citizenDetail.IdLastUpdateInfoGhoulStatus = ghoulStatusLastUpdateInfo;
-            citizenDetail.IsGhoul = Convert.ToUInt64(request.IsGhoul);
+            citizenDetail.IsGhoul = request.IsGhoul;
             citizenDetail.GhoulVoracity = request.Voracity;
             //MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
-            return lastUpdateInfo;
+            //return lastUpdateInfo;
+            return null;
         }
         #endregion
 
@@ -892,7 +896,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             citizenDetail.IdTown = townId;
             //citizenDetail.IdLastUpdateInfoHeroicAction = heroicActionLastUpdateInfo;
             //MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
-            return lastUpdateInfo;
+            //return lastUpdateInfo;
+            return null;
         }
 
         private TownCitizen GetHeroicActionCitizenDetail(List<ActionHeroicDto> heroicActions)
@@ -904,20 +909,20 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 {
                     if (action.Value == (int)ActionHeroicZone.Outside)
                     {
-                        heroicActionDetail.HasLuckyFind = Convert.ToUInt64(false);
-                        heroicActionDetail.HasHeroicReturn = Convert.ToUInt64(false);
-                        heroicActionDetail.HasUppercut = Convert.ToUInt64(false);
-                        heroicActionDetail.HasSecondWind = Convert.ToUInt64(false);
-                        heroicActionDetail.HasCheatDeath = Convert.ToUInt64(false);
-                        heroicActionDetail.HasBrotherInArms = Convert.ToUInt64(false);
+                        heroicActionDetail.HasLuckyFind = false;
+                        heroicActionDetail.HasHeroicReturn = false;
+                        heroicActionDetail.HasUppercut = false;
+                        heroicActionDetail.HasSecondWind = false;
+                        heroicActionDetail.HasCheatDeath = false;
+                        heroicActionDetail.HasBrotherInArms = false;
                     }
                     if (action.Value == (int)ActionHeroicZone.Inside)
                     {
-                        heroicActionDetail.HasLuckyFind = Convert.ToUInt64(false);
-                        heroicActionDetail.HasRescue = Convert.ToUInt64(false);
-                        heroicActionDetail.HasSecondWind = Convert.ToUInt64(false);
-                        heroicActionDetail.HasCheatDeath = Convert.ToUInt64(false);
-                        heroicActionDetail.HasBrotherInArms = Convert.ToUInt64(false);
+                        heroicActionDetail.HasLuckyFind = false;
+                        heroicActionDetail.HasRescue = false;
+                        heroicActionDetail.HasSecondWind = false;
+                        heroicActionDetail.HasCheatDeath = false;
+                        heroicActionDetail.HasBrotherInArms = false;
                     }
                     return heroicActionDetail;
                 }
@@ -933,28 +938,28 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                     heroicActionDetail.Apagcharges = action.Value;
                                     break;
                                 case ActionHeroicType.CheatDeath:
-                                    heroicActionDetail.HasCheatDeath = Convert.ToUInt64(action.Value);
+                                    heroicActionDetail.HasCheatDeath = Convert.ToBoolean(action.Value);
                                     break;
                                 case ActionHeroicType.HeroicReturn:
-                                    heroicActionDetail.HasHeroicReturn = Convert.ToUInt64(action.Value);
+                                    heroicActionDetail.HasHeroicReturn = Convert.ToBoolean(action.Value);
                                     break;
                                 case ActionHeroicType.LuckyFind:
-                                    heroicActionDetail.HasLuckyFind = Convert.ToUInt64(action.Value);
+                                    heroicActionDetail.HasLuckyFind = Convert.ToBoolean(action.Value);
                                     break;
                                 case ActionHeroicType.Rescue:
-                                    heroicActionDetail.HasRescue = Convert.ToUInt64(action.Value);
+                                    heroicActionDetail.HasRescue = Convert.ToBoolean(action.Value);
                                     break;
                                 case ActionHeroicType.SecondWind:
-                                    heroicActionDetail.HasSecondWind = Convert.ToUInt64(action.Value);
+                                    heroicActionDetail.HasSecondWind = Convert.ToBoolean(action.Value);
                                     break;
                                 case ActionHeroicType.Uppercut:
-                                    heroicActionDetail.HasUppercut = Convert.ToUInt64(action.Value);
+                                    heroicActionDetail.HasUppercut = Convert.ToBoolean(action.Value);
                                     break;
                                 case ActionHeroicType.BreakThrough:
-                                    heroicActionDetail.HasBreakThrough = Convert.ToUInt64(action.Value);
+                                    heroicActionDetail.HasBreakThrough = Convert.ToBoolean(action.Value);
                                     break;
                                 case ActionHeroicType.BrotherInArms:
-                                    heroicActionDetail.HasBrotherInArms = Convert.ToUInt64(action.Value);
+                                    heroicActionDetail.HasBrotherInArms = Convert.ToBoolean(action.Value);
                                     break;
                             }
                         }

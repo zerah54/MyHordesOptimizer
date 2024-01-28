@@ -38,14 +38,14 @@ public partial class MapCell
     [Column("zoneRegen", TypeName = "int(11)")]
     public int? ZoneRegen { get; set; }
 
-    [Column("isTown", TypeName = "bit(1)")]
-    public ulong? IsTown { get; set; }
+    [Column("isTown")]
+    public bool? IsTown { get; set; }
 
-    [Column("isVisitedToday", TypeName = "bit(1)")]
-    public ulong? IsVisitedToday { get; set; }
+    [Column("isVisitedToday")]
+    public bool? IsVisitedToday { get; set; }
 
-    [Column("isNeverVisited", TypeName = "bit(1)")]
-    public ulong? IsNeverVisited { get; set; }
+    [Column("isNeverVisited")]
+    public bool? IsNeverVisited { get; set; }
 
     [Column("dangerLevel", TypeName = "int(11)")]
     public int? DangerLevel { get; set; }
@@ -53,8 +53,8 @@ public partial class MapCell
     [Column("idRuin", TypeName = "int(11)")]
     public int? IdRuin { get; set; }
 
-    [Column("isDryed", TypeName = "bit(1)")]
-    public ulong? IsDryed { get; set; }
+    [Column("isDryed")]
+    public bool? IsDryed { get; set; }
 
     [Column("nbZombie", TypeName = "int(11)")]
     public int? NbZombie { get; set; }
@@ -65,11 +65,11 @@ public partial class MapCell
     [Column("nbHero", TypeName = "int(11)")]
     public int? NbHero { get; set; }
 
-    [Column("isRuinCamped", TypeName = "bit(1)")]
-    public ulong? IsRuinCamped { get; set; }
+    [Column("isRuinCamped")]
+    public bool? IsRuinCamped { get; set; }
 
-    [Column("isRuinDryed", TypeName = "bit(1)")]
-    public ulong? IsRuinDryed { get; set; }
+    [Column("isRuinDryed")]
+    public bool? IsRuinDryed { get; set; }
 
     [Column("nbRuinDig", TypeName = "int(11)")]
     public int? NbRuinDig { get; set; }
@@ -81,19 +81,19 @@ public partial class MapCell
     public int? MaxPotentialRemainingDig { get; set; }
 
     [Column("note", TypeName = "text")]
-    public string Note { get; set; }
+    public string? Note { get; set; }
 
     [ForeignKey("IdLastUpdateInfo")]
     [InverseProperty("MapCells")]
-    public virtual LastUpdateInfo IdLastUpdateInfoNavigation { get; set; }
+    public virtual LastUpdateInfo? IdLastUpdateInfoNavigation { get; set; }
 
     [ForeignKey("IdRuin")]
     [InverseProperty("MapCells")]
-    public virtual Ruin IdRuinNavigation { get; set; }
+    public virtual Ruin? IdRuinNavigation { get; set; }
 
     [ForeignKey("IdTown")]
     [InverseProperty("MapCells")]
-    public virtual Town IdTownNavigation { get; set; }
+    public virtual Town? IdTownNavigation { get; set; }
 
     [InverseProperty("IdCellNavigation")]
     public virtual ICollection<MapCellDig> MapCellDigs { get; set; } = new List<MapCellDig>();

@@ -23,14 +23,14 @@ public partial class MapCellItem
     public int? Count { get; set; }
 
     [Key]
-    [Column("isBroken", TypeName = "bit(1)")]
-    public ulong IsBroken { get; set; }
+    [Column("isBroken")]
+    public bool? IsBroken { get; set; }
 
     [ForeignKey("IdCell")]
     [InverseProperty("MapCellItems")]
-    public virtual MapCell IdCellNavigation { get; set; }
+    public virtual MapCell IdCellNavigation { get; set; } = null!;
 
     [ForeignKey("IdItem")]
     [InverseProperty("MapCellItems")]
-    public virtual Item IdItemNavigation { get; set; }
+    public virtual Item IdItemNavigation { get; set; } = null!;
 }

@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MyHordesOptimizerApi.Extensions;
-using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi;
 using MyHordesOptimizerApiIntegrationTests.ApplicationFactory;
-using System.Net;
 
 namespace MyHordesOptimizerApiIntegrationTests.Controllers
 {

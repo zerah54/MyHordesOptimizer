@@ -20,13 +20,13 @@ public partial class ExpeditionBag
     [Column("count", TypeName = "int(11)")]
     public int? Count { get; set; }
 
-    [Column("isBroken", TypeName = "bit(1)")]
-    public ulong? IsBroken { get; set; }
+    [Column("isBroken")]
+    public bool? IsBroken { get; set; }
 
     [InverseProperty("IdExpeditionBagNavigation")]
     public virtual ICollection<ExpeditionCitizen> ExpeditionCitizens { get; set; } = new List<ExpeditionCitizen>();
 
     [ForeignKey("IdItem")]
     [InverseProperty("ExpeditionBags")]
-    public virtual Item IdItemNavigation { get; set; }
+    public virtual Item? IdItemNavigation { get; set; }
 }

@@ -15,13 +15,13 @@ public partial class ExpeditionOrder
 
     [Column("type")]
     [StringLength(255)]
-    public string Type { get; set; }
+    public string? Type { get; set; }
 
     [Column("text")]
-    public string Text { get; set; }
+    public string? Text { get; set; }
 
-    [Column("isDone", TypeName = "bit(1)")]
-    public ulong? IsDone { get; set; }
+    [Column("isDone")]
+    public bool? IsDone { get; set; }
 
     [Column("position", TypeName = "int(11)")]
     public int Position { get; set; }

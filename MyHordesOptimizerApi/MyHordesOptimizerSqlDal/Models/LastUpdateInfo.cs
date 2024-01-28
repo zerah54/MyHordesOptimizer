@@ -25,7 +25,7 @@ public partial class LastUpdateInfo
 
     [ForeignKey("IdUser")]
     [InverseProperty("LastUpdateInfos")]
-    public virtual User IdUserNavigation { get; set; }
+    public virtual User? IdUserNavigation { get; set; }
 
     [InverseProperty("IdLastUpdateInfoNavigation")]
     public virtual ICollection<MapCellDig> MapCellDigs { get; set; } = new List<MapCellDig>();

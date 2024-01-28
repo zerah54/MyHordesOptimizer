@@ -26,11 +26,11 @@ public partial class Expedition
 
     [Column("state")]
     [StringLength(255)]
-    public string State { get; set; }
+    public string? State { get; set; }
 
     [Column("label")]
     [StringLength(255)]
-    public string Label { get; set; }
+    public string? Label { get; set; }
 
     [Column("minPdc", TypeName = "int(11)")]
     public int? MinPdc { get; set; }
@@ -40,9 +40,9 @@ public partial class Expedition
 
     [ForeignKey("IdLastUpdateInfo")]
     [InverseProperty("Expeditions")]
-    public virtual LastUpdateInfo IdLastUpdateInfoNavigation { get; set; }
+    public virtual LastUpdateInfo? IdLastUpdateInfoNavigation { get; set; }
 
     [ForeignKey("IdTown")]
     [InverseProperty("Expeditions")]
-    public virtual Town IdTownNavigation { get; set; }
+    public virtual Town? IdTownNavigation { get; set; }
 }

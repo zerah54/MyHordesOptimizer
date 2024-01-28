@@ -22,10 +22,11 @@ public partial class BagItem
     [Column("count", TypeName = "int(11)")]
     public int? Count { get; set; }
 
-    [Column("isBroken", TypeName = "bit(1)")]
-    public ulong IsBroken { get; set; }
+    [Required]
+    [Column("isBroken")]
+    public bool? IsBroken { get; set; }
 
     [ForeignKey("IdItem")]
     [InverseProperty("BagItems")]
-    public virtual Item IdItemNavigation { get; set; }
+    public virtual Item IdItemNavigation { get; set; } = null!;
 }

@@ -19,22 +19,22 @@ public partial class ExpeditionPart
 
     [Column("path")]
     [StringLength(255)]
-    public string Path { get; set; }
+    public string? Path { get; set; }
 
     [Column("label")]
     [StringLength(255)]
-    public string Label { get; set; }
+    public string? Label { get; set; }
 
     [Column("direction")]
     [StringLength(255)]
-    public string Direction { get; set; }
+    public string? Direction { get; set; }
 
     [InverseProperty("IdExpeditionPartNavigation")]
     public virtual ICollection<ExpeditionCitizen> ExpeditionCitizens { get; set; } = new List<ExpeditionCitizen>();
 
     [ForeignKey("IdExpedition")]
     [InverseProperty("ExpeditionParts")]
-    public virtual Expedition IdExpeditionNavigation { get; set; }
+    public virtual Expedition? IdExpeditionNavigation { get; set; }
 
     [ForeignKey("IdExpeditionPart")]
     [InverseProperty("IdExpeditionParts")]

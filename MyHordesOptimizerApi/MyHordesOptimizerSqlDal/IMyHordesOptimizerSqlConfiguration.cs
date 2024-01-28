@@ -1,4 +1,4 @@
-﻿namespace MyHordesOptimizerApi.Repository.Impl
+﻿namespace MyHordesOptimizerApi
 {
     public interface IMyHordesOptimizerSqlConfiguration
     {

@@ -22,26 +22,25 @@ public partial class DefaultWishlistItem
     [Column("idUserAuthor", TypeName = "int(11)")]
     public int? IdUserAuthor { get; set; }
 
-    [Required]
     [Column("name")]
     [StringLength(255)]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     [Column("label_fr")]
     [StringLength(255)]
-    public string LabelFr { get; set; }
+    public string? LabelFr { get; set; }
 
     [Column("label_en")]
     [StringLength(255)]
-    public string LabelEn { get; set; }
+    public string? LabelEn { get; set; }
 
     [Column("label_es")]
     [StringLength(255)]
-    public string LabelEs { get; set; }
+    public string? LabelEs { get; set; }
 
     [Column("label_de")]
     [StringLength(255)]
-    public string LabelDe { get; set; }
+    public string? LabelDe { get; set; }
 
     [Column("count", TypeName = "int(11)")]
     public int? Count { get; set; }
@@ -49,16 +48,16 @@ public partial class DefaultWishlistItem
     [Column("priority", TypeName = "int(11)")]
     public int? Priority { get; set; }
 
-    [Column("depot", TypeName = "bit(1)")]
-    public ulong? Depot { get; set; }
+    [Column("depot")]
+    public bool? Depot { get; set; }
 
-    [Column("shouldSignal", TypeName = "bit(1)")]
-    public ulong? ShouldSignal { get; set; }
+    [Column("shouldSignal")]
+    public bool? ShouldSignal { get; set; }
 
     [Column("zoneXPa", TypeName = "int(11)")]
     public int? ZoneXpa { get; set; }
 
     [ForeignKey("IdItem")]
     [InverseProperty("DefaultWishlistItems")]
-    public virtual Item IdItemNavigation { get; set; }
+    public virtual Item IdItemNavigation { get; set; } = null!;
 }

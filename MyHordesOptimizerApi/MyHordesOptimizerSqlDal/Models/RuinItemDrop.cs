@@ -27,9 +27,9 @@ public partial class RuinItemDrop
 
     [ForeignKey("IdItem")]
     [InverseProperty("RuinItemDrops")]
-    public virtual Item IdItemNavigation { get; set; }
+    public virtual Item IdItemNavigation { get; set; } = null!;
 
     [ForeignKey("IdRuin")]
     [InverseProperty("RuinItemDrops")]
-    public virtual Ruin IdRuinNavigation { get; set; }
+    public virtual Ruin IdRuinNavigation { get; set; } = null!;
 }

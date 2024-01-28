@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyHordesOptimizerApi.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -24,6 +25,19 @@ namespace MyHordesOptimizerApi.Extensions
                 }
             }
             return dico;
+        }
+
+        public static void UpdateNoNullProperties<T>(this T objectToUpdate, T objectToCopy)
+        {
+            foreach (var toProp in typeof(T).GetProperties())
+            {
+                var fromProp = typeof(T).GetProperty(toProp.Name);
+                var toValue = fromProp.GetValue(objectToCopy, null);
+                if (toValue != null)
+                {
+                    toProp.SetValue(objectToUpdate, toValue, null);
+                }
+            }
         }
     }
 }

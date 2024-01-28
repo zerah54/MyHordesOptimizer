@@ -1,4 +1,5 @@
-﻿using MyHordesOptimizerApi.Models;
+﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using System;
 
@@ -15,17 +16,13 @@ namespace MyHordesOptimizerApi.Providers.Impl
         private string _userName;
         public string UserName { get => _userName; set => _userName = value; }
 
-        public LastUpdateInfo GenerateLastUpdateInfo()
+        public LastUpdateInfoDto GenerateLastUpdateInfo()
         {
-            return new LastUpdateInfo()
+            return new LastUpdateInfoDto()
             {
-                IdUser = UserId,
-                IdUserNavigation = new User()
-                {
-                    IdUser = UserId,
-                    Name = UserName
-                },
-                DateUpdate = DateTime.UtcNow
+                UserId = UserId,
+                UpdateTime = DateTime.UtcNow,
+                UserName = UserName
             };
         }
     }

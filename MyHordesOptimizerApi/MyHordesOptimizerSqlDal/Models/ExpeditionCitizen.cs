@@ -25,34 +25,34 @@ public partial class ExpeditionCitizen
     [Column("idExpeditionBag", TypeName = "int(11)")]
     public int? IdExpeditionBag { get; set; }
 
-    [Column("isPreinscrit", TypeName = "bit(1)")]
-    public ulong IsPreinscrit { get; set; }
+    [Column("isPreinscrit")]
+    public bool IsPreinscrit { get; set; }
 
     [Column("preinscritJob")]
     [StringLength(255)]
-    public string PreinscritJob { get; set; }
+    public string? PreinscritJob { get; set; }
 
     [Column("preinscritHeroic")]
     [StringLength(255)]
-    public string PreinscritHeroic { get; set; }
+    public string? PreinscritHeroic { get; set; }
 
     [Column("pdc", TypeName = "int(11)")]
     public int? Pdc { get; set; }
 
-    [Column("isThirsty", TypeName = "bit(1)")]
-    public ulong? IsThirsty { get; set; }
+    [Column("isThirsty")]
+    public bool? IsThirsty { get; set; }
 
     [ForeignKey("IdExpeditionBag")]
     [InverseProperty("ExpeditionCitizens")]
-    public virtual ExpeditionBag IdExpeditionBagNavigation { get; set; }
+    public virtual ExpeditionBag? IdExpeditionBagNavigation { get; set; }
 
     [ForeignKey("IdExpeditionPart")]
     [InverseProperty("ExpeditionCitizens")]
-    public virtual ExpeditionPart IdExpeditionPartNavigation { get; set; }
+    public virtual ExpeditionPart? IdExpeditionPartNavigation { get; set; }
 
     [ForeignKey("IdUser")]
     [InverseProperty("ExpeditionCitizens")]
-    public virtual User IdUserNavigation { get; set; }
+    public virtual User? IdUserNavigation { get; set; }
 
     [ForeignKey("IdExpeditionCitizen")]
     [InverseProperty("IdExpeditionCitizens")]

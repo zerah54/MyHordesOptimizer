@@ -7,7 +7,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
 {
     public class CategorieMappingProfile : Profile
     {
-        public CategorieMappingProfile() 
+        public CategorieMappingProfile()
         {
             CreateMap<Category, CategoryDto>()
                 .ForMember(dest => dest.IdCategory, opt => opt.MapFrom(src => src.IdCategory))

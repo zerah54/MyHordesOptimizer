@@ -1,16 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MyHordesOptimizerApi.Repository.Impl;
-
-namespace MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models;
+using Action = MyHordesOptimizerApi.Models.Action;
+namespace MyHordesOptimizerApi;
 
 public partial class MhoContext : DbContext
 {
-    protected IMyHordesOptimizerSqlConfiguration Configuration { get; private set; }
+    public MhoContext()
+    {
+    }
 
-    public MhoContext(DbContextOptions<MhoContext> options, IMyHordesOptimizerSqlConfiguration configuration)
+    public MhoContext(DbContextOptions<MhoContext> options)
         : base(options)
     {
-        Configuration = configuration;
     }
 
     public virtual DbSet<Action> Actions { get; set; }
@@ -90,12 +91,6 @@ public partial class MhoContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<WishlistCategorie> WishlistCategories { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseMySQL(Configuration.ConnectionString);
-        base.OnConfiguring(optionsBuilder);
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

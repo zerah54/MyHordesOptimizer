@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using MyHordesOptimizerApi.Repository.Impl;
+using MyHordesOptimizerApi;
 
 namespace MyHordesOptimizerApiIntegrationTests.Configuration
 {

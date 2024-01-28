@@ -201,11 +201,11 @@ namespace MyHordesOptimizerApi.MappingProfiles
             //    .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src))
             //    .ForMember(dest => dest.Bag, opt => opt.Ignore());
 
-            //LastUpdate
-            CreateMap<LastUpdateInfoDto, LastUpdateInfo>()
-                .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.UserId))
-                .ForMember(dest => dest.DateUpdate, opt => opt.MapFrom(src => src.UpdateTime))
-                .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore());
+            ////LastUpdate
+            //CreateMap<LastUpdateInfoDto, LastUpdateInfo>()
+            //    .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.UserId))
+            //    .ForMember(dest => dest.DateUpdate, opt => opt.MapFrom(src => src.UpdateTime))
+            //    .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
 
             //CreateMap<TownCitizenBagItemCompletModel, LastUpdateInfo>()
             //   .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
@@ -537,7 +537,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Citizens, opt => opt.Ignore())
                 .ForMember(dest => dest.DisplayX, opt => opt.MapFrom(src => src.X - src.TownX))
                 .ForMember(dest => dest.DisplayY, opt => opt.MapFrom(src => src.TownY - src.Y))
-                .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { DateUpdate = src.LastUpdateDateUpdate.Value, IdUserNavigation = new User() { Name = src.LastUpdateInfoUserName, IdUser = src.LastUpdateInfoUserId.Value}}));
+                .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { DateUpdate = src.LastUpdateDateUpdate.Value, IdUserNavigation = new User() { Name = src.LastUpdateInfoUserName, IdUser = src.LastUpdateInfoUserId.Value } }));
 
             CreateMap<MapCellComplet, CellItemDto>()
                 .ForMember(dest => dest.ItemId, opt => opt.MapFrom(src => src.ItemId))

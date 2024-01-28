@@ -10,10 +10,9 @@ public partial class Parameter
 {
     [Key]
     [Column("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
-    [Required]
     [Column("value")]
     [StringLength(255)]
-    public string Value { get; set; }
+    public string Value { get; set; } = null!;
 }

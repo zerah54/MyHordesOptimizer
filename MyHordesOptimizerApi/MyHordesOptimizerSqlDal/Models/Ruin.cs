@@ -15,42 +15,42 @@ public partial class Ruin
 
     [Column("label_fr")]
     [StringLength(255)]
-    public string LabelFr { get; set; }
+    public string? LabelFr { get; set; }
 
     [Column("label_en")]
     [StringLength(255)]
-    public string LabelEn { get; set; }
+    public string? LabelEn { get; set; }
 
     [Column("label_es")]
     [StringLength(255)]
-    public string LabelEs { get; set; }
+    public string? LabelEs { get; set; }
 
     [Column("label_de")]
     [StringLength(255)]
-    public string LabelDe { get; set; }
+    public string? LabelDe { get; set; }
 
     [Column("description_fr")]
     [StringLength(1000)]
-    public string DescriptionFr { get; set; }
+    public string? DescriptionFr { get; set; }
 
     [Column("description_en")]
     [StringLength(1000)]
-    public string DescriptionEn { get; set; }
+    public string? DescriptionEn { get; set; }
 
     [Column("description_es")]
     [StringLength(1000)]
-    public string DescriptionEs { get; set; }
+    public string? DescriptionEs { get; set; }
 
     [Column("description_de")]
     [StringLength(1000)]
-    public string DescriptionDe { get; set; }
+    public string? DescriptionDe { get; set; }
 
-    [Column("explorable", TypeName = "bit(1)")]
-    public ulong? Explorable { get; set; }
+    [Column("explorable")]
+    public bool? Explorable { get; set; }
 
     [Column("img")]
     [StringLength(255)]
-    public string Img { get; set; }
+    public string? Img { get; set; }
 
     [Column("camping", TypeName = "int(11)")]
     public int? Camping { get; set; }

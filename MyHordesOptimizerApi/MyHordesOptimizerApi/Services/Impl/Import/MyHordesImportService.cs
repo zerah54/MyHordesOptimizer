@@ -3,7 +3,6 @@ using Common.Core.Repository.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
-using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -421,8 +420,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                         LabelEs = wishlist.Name["es"],
                         LabelDe = wishlist.Name["de"],
                         Count = item.Count,
-                        Depot = Convert.ToUInt64(item.Depot),
-                        ShouldSignal = Convert.ToUInt64(item.ShouldSignal),
+                        Depot = Convert.ToBoolean(item.Depot),
+                        ShouldSignal = item.ShouldSignal,
                         Priority = item.Priority,
                         ZoneXpa = item.ZoneXPa
                     });

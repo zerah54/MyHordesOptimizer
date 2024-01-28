@@ -32,14 +32,14 @@ public partial class TownWishListItem
     [Column("depot", TypeName = "int(11)")]
     public int? Depot { get; set; }
 
-    [Column("shouldSignal", TypeName = "bit(1)")]
-    public ulong? ShouldSignal { get; set; }
+    [Column("shouldSignal")]
+    public bool? ShouldSignal { get; set; }
 
     [ForeignKey("IdItem")]
     [InverseProperty("TownWishListItems")]
-    public virtual Item IdItemNavigation { get; set; }
+    public virtual Item IdItemNavigation { get; set; } = null!;
 
     [ForeignKey("IdTown")]
     [InverseProperty("TownWishListItems")]
-    public virtual Town IdTownNavigation { get; set; }
+    public virtual Town IdTownNavigation { get; set; } = null!;
 }

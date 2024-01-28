@@ -10,38 +10,38 @@ public partial class HeroSkill
 {
     [Key]
     [Column("name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     [Column("daysNeeded", TypeName = "int(11)")]
     public int? DaysNeeded { get; set; }
 
     [Column("description_fr", TypeName = "text")]
-    public string DescriptionFr { get; set; }
+    public string? DescriptionFr { get; set; }
 
     [Column("description_en", TypeName = "text")]
-    public string DescriptionEn { get; set; }
+    public string? DescriptionEn { get; set; }
 
     [Column("description_es", TypeName = "text")]
-    public string DescriptionEs { get; set; }
+    public string? DescriptionEs { get; set; }
 
     [Column("description_de", TypeName = "text")]
-    public string DescriptionDe { get; set; }
+    public string? DescriptionDe { get; set; }
 
     [Column("icon")]
     [StringLength(255)]
-    public string Icon { get; set; }
+    public string? Icon { get; set; }
 
     [Column("label_fr", TypeName = "text")]
-    public string LabelFr { get; set; }
+    public string? LabelFr { get; set; }
 
     [Column("label_en", TypeName = "text")]
-    public string LabelEn { get; set; }
+    public string? LabelEn { get; set; }
 
     [Column("label_es", TypeName = "text")]
-    public string LabelEs { get; set; }
+    public string? LabelEs { get; set; }
 
     [Column("label_de", TypeName = "text")]
-    public string LabelDe { get; set; }
+    public string? LabelDe { get; set; }
 
     [Column("nbUses", TypeName = "int(11)")]
     public int? NbUses { get; set; }

@@ -23,8 +23,8 @@ public partial class TownEstimation
     public int Day { get; set; }
 
     [Key]
-    [Column("isPlanif", TypeName = "bit(1)")]
-    public ulong IsPlanif { get; set; }
+    [Column("isPlanif")]
+    public bool IsPlanif { get; set; }
 
     [Column("_0Min", TypeName = "int(11)")]
     public int? _0min { get; set; }
@@ -178,9 +178,9 @@ public partial class TownEstimation
 
     [ForeignKey("IdLastUpdateInfo")]
     [InverseProperty("TownEstimations")]
-    public virtual LastUpdateInfo IdLastUpdateInfoNavigation { get; set; }
+    public virtual LastUpdateInfo? IdLastUpdateInfoNavigation { get; set; }
 
     [ForeignKey("IdTown")]
     [InverseProperty("TownEstimations")]
-    public virtual Town IdTownNavigation { get; set; }
+    public virtual Town IdTownNavigation { get; set; } = null!;
 }

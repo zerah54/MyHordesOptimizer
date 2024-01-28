@@ -9,37 +9,36 @@ namespace MyHordesOptimizerApi.Models;
 [Keyless]
 public partial class RecipeComplet
 {
-    [Required]
     [Column("recipeName")]
     [StringLength(255)]
-    public string RecipeName { get; set; }
+    public string RecipeName { get; set; } = null!;
 
     [Column("actionFr")]
     [StringLength(255)]
-    public string ActionFr { get; set; }
+    public string? ActionFr { get; set; }
 
     [Column("actionEn")]
     [StringLength(255)]
-    public string ActionEn { get; set; }
+    public string? ActionEn { get; set; }
 
     [Column("actionDe")]
     [StringLength(255)]
-    public string ActionDe { get; set; }
+    public string? ActionDe { get; set; }
 
     [Column("actionEs")]
     [StringLength(255)]
-    public string ActionEs { get; set; }
+    public string? ActionEs { get; set; }
 
     [Column("type")]
     [StringLength(255)]
-    public string Type { get; set; }
+    public string? Type { get; set; }
 
     [Column("pictoUid")]
     [StringLength(255)]
-    public string PictoUid { get; set; }
+    public string? PictoUid { get; set; }
 
-    [Column("stealthy", TypeName = "bit(1)")]
-    public ulong? Stealthy { get; set; }
+    [Column("stealthy")]
+    public bool? Stealthy { get; set; }
 
     [Column("componentItemId", TypeName = "int(11)")]
     public int? ComponentItemId { get; set; }

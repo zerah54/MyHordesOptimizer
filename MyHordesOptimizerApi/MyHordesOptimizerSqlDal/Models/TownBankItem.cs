@@ -28,18 +28,18 @@ public partial class TownBankItem
     public int? Count { get; set; }
 
     [Key]
-    [Column("isBroken", TypeName = "bit(1)")]
-    public ulong IsBroken { get; set; }
+    [Column("isBroken")]
+    public bool? IsBroken { get; set; }
 
     [ForeignKey("IdItem")]
     [InverseProperty("TownBankItems")]
-    public virtual Item IdItemNavigation { get; set; }
+    public virtual Item IdItemNavigation { get; set; } = null!;
 
     [ForeignKey("IdLastUpdateInfo")]
     [InverseProperty("TownBankItems")]
-    public virtual LastUpdateInfo IdLastUpdateInfoNavigation { get; set; }
+    public virtual LastUpdateInfo IdLastUpdateInfoNavigation { get; set; } = null!;
 
     [ForeignKey("IdTown")]
     [InverseProperty("TownBankItems")]
-    public virtual Town IdTownNavigation { get; set; }
+    public virtual Town IdTownNavigation { get; set; } = null!;
 }

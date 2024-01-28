@@ -1,4 +1,5 @@
-﻿using MyHordesOptimizerApi.Models;
+﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Models;
 
 namespace MyHordesOptimizerApi.Providers.Interfaces
 {
@@ -8,6 +9,6 @@ namespace MyHordesOptimizerApi.Providers.Interfaces
         int UserId { get; set; }
         string UserName { get; set; }
 
-        LastUpdateInfo GenerateLastUpdateInfo();
+        LastUpdateInfoDto GenerateLastUpdateInfo();
     }
 }

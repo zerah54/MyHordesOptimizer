@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper.EquivalencyExpression;
 using Common.Core.Repository.Impl;
 using Common.Core.Repository.Interfaces;
 using Discord.Interactions;
@@ -16,10 +17,9 @@ using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Controllers.ActionFillters;
 using MyHordesOptimizerApi.DiscordBot.Services;
-using MyHordesOptimizerApi.MappingProfiles;
-using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Impl;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Repository;
 using MyHordesOptimizerApi.Repository.Impl;
 using MyHordesOptimizerApi.Repository.Impl.ExternalTools;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -79,7 +79,11 @@ namespace MyHordesOptimizerApi
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
-            services.AddAutoMapper(Assembly.GetAssembly(this.GetType()));
+            services.AddAutoMapper((serviceProvider, automapper) =>
+            {
+                automapper.AddCollectionMappers();
+                automapper.UseEntityFrameworkCoreModel<MhoContext>(serviceProvider);
+            }, Assembly.GetAssembly(this.GetType()));
 
             // Providers
             services.AddScoped<IUserInfoProvider, UserInfoProvider>();
@@ -144,19 +148,6 @@ namespace MyHordesOptimizerApi
             {
                 logging.LoggingFields = HttpLoggingFields.All | HttpLoggingFields.RequestQuery;
             });
-        }
-
-        protected IMapper BuildAutoMapper()
-        {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<MyHordesMappingProfiles>();
-            });
-
-            var mapper = new Mapper(config);
-            mapper.ConfigurationProvider.AssertConfigurationIsValid();
-
-            return mapper;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using MyHordesOptimizerApi.Models;
-using MyHordesOptimizerApi.Repository.Impl;
+using MyHordesOptimizerApi;
 using MyHordesOptimizerApiIntegrationTests.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);

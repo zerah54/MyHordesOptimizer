@@ -66,3 +66,5 @@ CREATE TABLE ExpeditionPartOrder(
 	FOREIGN KEY(idExpeditionOrder) REFERENCES ExpeditionOrder(idExpeditionOrder),
 	FOREIGN KEY(idExpeditionPart) REFERENCES ExpeditionPart(idExpeditionPart)
 );
+
+ALTER TABLE Users MODIFY UserKey varchar(255) NULL;

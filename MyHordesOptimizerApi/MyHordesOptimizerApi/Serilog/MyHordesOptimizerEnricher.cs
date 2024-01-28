@@ -2,6 +2,7 @@
 using MyHordesOptimizerApi.Providers.Interfaces;
 using Serilog.Core;
 using Serilog.Events;
+using System;
 using System.IO;
 using System.Text.RegularExpressions;
 
@@ -33,14 +34,21 @@ namespace MyHordesOptimizerApi.Serilog
 
                 if (logEvent.Level == LogEventLevel.Warning || logEvent.Level == LogEventLevel.Error)
                 {
-                    var request = HttpContextAccessor.HttpContext.Request;
-                    using var streamReader = new StreamReader(request.Body);
-                    request.Body.Position = 0;
-                    var requestBody = streamReader.ReadToEndAsync().Result;
-                    request.Body.Position = 0;
-                    requestBody = Regex.Replace(requestBody, @"\s+|\\n|\\r", string.Empty);
-                    var bodyProperty = factory.CreateProperty("Body", requestBody);
-                    logEvent.AddPropertyIfAbsent(bodyProperty);
+                    try
+                    {
+                        var request = HttpContextAccessor.HttpContext.Request;
+                        using var streamReader = new StreamReader(request.Body);
+                        request.Body.Position = 0;
+                        var requestBody = streamReader.ReadToEndAsync().Result;
+                        request.Body.Position = 0;
+                        requestBody = Regex.Replace(requestBody, @"\s+|\\n|\\r", string.Empty);
+                        var bodyProperty = factory.CreateProperty("Body", requestBody);
+                        logEvent.AddPropertyIfAbsent(bodyProperty);
+                    }
+                    catch (Exception e)
+                    { 
+                        // Nothing
+                    }
                 }
             }
         }

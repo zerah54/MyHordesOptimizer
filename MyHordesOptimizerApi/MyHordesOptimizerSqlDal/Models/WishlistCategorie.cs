@@ -17,30 +17,29 @@ public partial class WishlistCategorie
     [Column("idUserAuthor", TypeName = "int(11)")]
     public int? IdUserAuthor { get; set; }
 
-    [Required]
     [Column("name")]
     [StringLength(255)]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     [Column("label_fr")]
     [StringLength(255)]
-    public string LabelFr { get; set; }
+    public string? LabelFr { get; set; }
 
     [Column("label_en")]
     [StringLength(255)]
-    public string LabelEn { get; set; }
+    public string? LabelEn { get; set; }
 
     [Column("label_es")]
     [StringLength(255)]
-    public string LabelEs { get; set; }
+    public string? LabelEs { get; set; }
 
     [Column("label_de")]
     [StringLength(255)]
-    public string LabelDe { get; set; }
+    public string? LabelDe { get; set; }
 
     [ForeignKey("IdUserAuthor")]
     [InverseProperty("WishlistCategories")]
-    public virtual User IdUserAuthorNavigation { get; set; }
+    public virtual User? IdUserAuthorNavigation { get; set; }
 
     [ForeignKey("IdCategory")]
     [InverseProperty("IdCategories")]

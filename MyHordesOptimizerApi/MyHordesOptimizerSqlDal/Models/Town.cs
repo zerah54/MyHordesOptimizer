@@ -37,14 +37,14 @@ public partial class Town
     [Column("waterWell", TypeName = "int(11)")]
     public int WaterWell { get; set; }
 
-    [Column("isDoorOpen", TypeName = "bit(1)")]
-    public ulong IsDoorOpen { get; set; }
+    [Column("isDoorOpen")]
+    public bool IsDoorOpen { get; set; }
 
-    [Column("isChaos", TypeName = "bit(1)")]
-    public ulong IsChaos { get; set; }
+    [Column("isChaos")]
+    public bool IsChaos { get; set; }
 
-    [Column("isDevasted", TypeName = "bit(1)")]
-    public ulong IsDevasted { get; set; }
+    [Column("isDevasted")]
+    public bool IsDevasted { get; set; }
 
     [InverseProperty("IdTownNavigation")]
     public virtual ICollection<Expedition> Expeditions { get; set; } = new List<Expedition>();

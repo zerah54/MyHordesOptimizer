@@ -14,42 +14,42 @@ public partial class RuinComplete
 
     [Column("ruinLabel_fr")]
     [StringLength(255)]
-    public string RuinLabelFr { get; set; }
+    public string? RuinLabelFr { get; set; }
 
     [Column("ruinLabel_en")]
     [StringLength(255)]
-    public string RuinLabelEn { get; set; }
+    public string? RuinLabelEn { get; set; }
 
     [Column("ruinLabel_es")]
     [StringLength(255)]
-    public string RuinLabelEs { get; set; }
+    public string? RuinLabelEs { get; set; }
 
     [Column("ruinLabel_de")]
     [StringLength(255)]
-    public string RuinLabelDe { get; set; }
+    public string? RuinLabelDe { get; set; }
 
     [Column("ruinDescription_fr")]
     [StringLength(1000)]
-    public string RuinDescriptionFr { get; set; }
+    public string? RuinDescriptionFr { get; set; }
 
     [Column("ruinDescription_en")]
     [StringLength(1000)]
-    public string RuinDescriptionEn { get; set; }
+    public string? RuinDescriptionEn { get; set; }
 
     [Column("ruinDescription_es")]
     [StringLength(1000)]
-    public string RuinDescriptionEs { get; set; }
+    public string? RuinDescriptionEs { get; set; }
 
     [Column("ruinDescription_de")]
     [StringLength(1000)]
-    public string RuinDescriptionDe { get; set; }
+    public string? RuinDescriptionDe { get; set; }
 
-    [Column("ruinExplorable", TypeName = "bit(1)")]
-    public ulong? RuinExplorable { get; set; }
+    [Column("ruinExplorable")]
+    public bool? RuinExplorable { get; set; }
 
     [Column("ruinImg")]
     [StringLength(255)]
-    public string RuinImg { get; set; }
+    public string? RuinImg { get; set; }
 
     [Column("ruinCamping", TypeName = "int(11)")]
     public int? RuinCamping { get; set; }
@@ -71,11 +71,11 @@ public partial class RuinComplete
 
     [Column("itemUid")]
     [StringLength(255)]
-    public string ItemUid { get; set; }
+    public string? ItemUid { get; set; }
 
     [Column("itemLabel_fr")]
     [StringLength(255)]
-    public string ItemLabelFr { get; set; }
+    public string? ItemLabelFr { get; set; }
 
     [Column("dropProbability")]
     public float? DropProbability { get; set; }

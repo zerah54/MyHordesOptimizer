@@ -13,26 +13,25 @@ public partial class Category
     [Column("idCategory", TypeName = "int(11)")]
     public int IdCategory { get; set; }
 
-    [Required]
     [Column("name")]
     [StringLength(255)]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
     [Column("label_fr")]
     [StringLength(255)]
-    public string LabelFr { get; set; }
+    public string? LabelFr { get; set; }
 
     [Column("label_en")]
     [StringLength(255)]
-    public string LabelEn { get; set; }
+    public string? LabelEn { get; set; }
 
     [Column("label_es")]
     [StringLength(255)]
-    public string LabelEs { get; set; }
+    public string? LabelEs { get; set; }
 
     [Column("label_de")]
     [StringLength(255)]
-    public string LabelDe { get; set; }
+    public string? LabelDe { get; set; }
 
     [Column("ordering", TypeName = "int(11)")]
     public int? Ordering { get; set; }

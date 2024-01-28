@@ -24,11 +24,11 @@ public partial class MapCellComplet
     [Column("y", TypeName = "int(11)")]
     public int? Y { get; set; }
 
-    [Column("isVisitedToday", TypeName = "bit(1)")]
-    public ulong? IsVisitedToday { get; set; }
+    [Column("isVisitedToday")]
+    public bool? IsVisitedToday { get; set; }
 
-    [Column("isNeverVisited", TypeName = "bit(1)")]
-    public ulong? IsNeverVisited { get; set; }
+    [Column("isNeverVisited")]
+    public bool? IsNeverVisited { get; set; }
 
     [Column("dangerLevel", TypeName = "int(11)")]
     public int? DangerLevel { get; set; }
@@ -36,8 +36,8 @@ public partial class MapCellComplet
     [Column("idRuin", TypeName = "int(11)")]
     public int? IdRuin { get; set; }
 
-    [Column("isDryed", TypeName = "bit(1)")]
-    public ulong? IsDryed { get; set; }
+    [Column("isDryed")]
+    public bool? IsDryed { get; set; }
 
     [Column("nbZombie", TypeName = "int(11)")]
     public int? NbZombie { get; set; }
@@ -48,11 +48,11 @@ public partial class MapCellComplet
     [Column("nbHero", TypeName = "int(11)")]
     public int? NbHero { get; set; }
 
-    [Column("isRuinCamped", TypeName = "bit(1)")]
-    public ulong? IsRuinCamped { get; set; }
+    [Column("isRuinCamped")]
+    public bool? IsRuinCamped { get; set; }
 
-    [Column("isRuinDryed", TypeName = "bit(1)")]
-    public ulong? IsRuinDryed { get; set; }
+    [Column("isRuinDryed")]
+    public bool? IsRuinDryed { get; set; }
 
     [Column("nbRuinDig", TypeName = "int(11)")]
     public int? NbRuinDig { get; set; }
@@ -63,11 +63,11 @@ public partial class MapCellComplet
     [Column("maxPotentialRemainingDig", TypeName = "int(11)")]
     public int? MaxPotentialRemainingDig { get; set; }
 
-    [Column("isTown", TypeName = "bit(1)")]
-    public ulong? IsTown { get; set; }
+    [Column("isTown")]
+    public bool? IsTown { get; set; }
 
     [Column("note", TypeName = "text")]
-    public string Note { get; set; }
+    public string? Note { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? LastUpdateDateUpdate { get; set; }
@@ -76,7 +76,7 @@ public partial class MapCellComplet
     public int? LastUpdateInfoUserId { get; set; }
 
     [StringLength(255)]
-    public string LastUpdateInfoUserName { get; set; }
+    public string? LastUpdateInfoUserName { get; set; }
 
     [Column(TypeName = "int(11)")]
     public int TownX { get; set; }
@@ -90,14 +90,14 @@ public partial class MapCellComplet
     [Column(TypeName = "int(11)")]
     public int MapWidth { get; set; }
 
-    [Column("isChaos", TypeName = "bit(1)")]
-    public ulong IsChaos { get; set; }
+    [Column("isChaos")]
+    public bool IsChaos { get; set; }
 
-    [Column("isDevasted", TypeName = "bit(1)")]
-    public ulong IsDevasted { get; set; }
+    [Column("isDevasted")]
+    public bool IsDevasted { get; set; }
 
-    [Column("isDoorOpen", TypeName = "bit(1)")]
-    public ulong IsDoorOpen { get; set; }
+    [Column("isDoorOpen")]
+    public bool IsDoorOpen { get; set; }
 
     [Column("waterWell", TypeName = "int(11)")]
     public int WaterWell { get; set; }
@@ -106,7 +106,7 @@ public partial class MapCellComplet
     public int Day { get; set; }
 
     [StringLength(255)]
-    public string CitizenName { get; set; }
+    public string? CitizenName { get; set; }
 
     [Column(TypeName = "int(11)")]
     public int? CitizenId { get; set; }
@@ -117,8 +117,7 @@ public partial class MapCellComplet
     [Column(TypeName = "int(11)")]
     public int? ItemCount { get; set; }
 
-    [Column(TypeName = "bit(1)")]
-    public ulong? IsItemBroken { get; set; }
+    public bool? IsItemBroken { get; set; }
 
     [Column("totalSucces")]
     [Precision(32, 0)]

@@ -29,5 +29,5 @@ public partial class MapCellDigUpdate
 
     [ForeignKey("IdTown")]
     [InverseProperty("MapCellDigUpdates")]
-    public virtual Town IdTownNavigation { get; set; }
+    public virtual Town IdTownNavigation { get; set; } = null!;
 }

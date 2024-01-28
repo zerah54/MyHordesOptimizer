@@ -13,7 +13,7 @@ public partial class RecipeItemResult
 {
     [Key]
     [Column("recipeName")]
-    public string RecipeName { get; set; }
+    public string RecipeName { get; set; } = null!;
 
     [Key]
     [Column("idItem", TypeName = "int(11)")]
@@ -28,9 +28,9 @@ public partial class RecipeItemResult
 
     [ForeignKey("IdItem")]
     [InverseProperty("RecipeItemResults")]
-    public virtual Item IdItemNavigation { get; set; }
+    public virtual Item IdItemNavigation { get; set; } = null!;
 
     [ForeignKey("RecipeName")]
     [InverseProperty("RecipeItemResults")]
-    public virtual Recipe RecipeNameNavigation { get; set; }
+    public virtual Recipe RecipeNameNavigation { get; set; } = null!;
 }

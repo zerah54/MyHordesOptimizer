@@ -12,14 +12,12 @@ public partial class User
     [Column("idUser", TypeName = "int(11)")]
     public int IdUser { get; set; }
 
-    [Required]
     [Column("name")]
     [StringLength(255)]
-    public string Name { get; set; }
+    public string Name { get; set; } = null!;
 
-    [Column("userKey")]
     [StringLength(255)]
-    public string UserKey { get; set; }
+    public string? UserKey { get; set; }
 
     [InverseProperty("IdUserNavigation")]
     public virtual ICollection<ExpeditionCitizen> ExpeditionCitizens { get; set; } = new List<ExpeditionCitizen>();

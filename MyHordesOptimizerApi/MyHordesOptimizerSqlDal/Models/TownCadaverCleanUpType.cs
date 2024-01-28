@@ -17,9 +17,9 @@ public partial class TownCadaverCleanUpType
 
     [Column("typeName")]
     [StringLength(100)]
-    public string TypeName { get; set; }
+    public string? TypeName { get; set; }
 
     [Column("myHordesApiName")]
     [StringLength(100)]
-    public string MyHordesApiName { get; set; }
+    public string? MyHordesApiName { get; set; }
 }
