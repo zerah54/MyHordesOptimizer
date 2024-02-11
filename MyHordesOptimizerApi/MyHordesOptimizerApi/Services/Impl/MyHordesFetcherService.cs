@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -9,6 +8,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.MappingProfiles.Towns;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -93,22 +93,47 @@ namespace MyHordesOptimizerApi.Services.Impl
                 myHordeMeResponse.Map.LastUpdateInfo = lastUpdate;
 
                 var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
+                var citizens = town.TownCitizens;
+                town.TownCitizens = null;
+                var bankItems = town.TownBankItems;
+                town.TownBankItems = null;
                 var existingTown = DbContext.Towns
                     .Include(town => town.TownCitizens)
-                        .ThenInclude(tc => tc.IdLastUpdateInfoNavigation)
-                        .ThenInclude(tc => tc.IdUserNavigation)
-                    .Include(town => town.TownBankItems)
                     .FirstOrDefault(t => t.IdTown == town.IdTown);
-                if (existingTown == null) // Si la ville est null, il faut créer toutes les cells
+                if (existingTown == null)
                 {
                     //TODO: Cells
+                    // On Crée la ville
                     DbContext.Add(town);
+                    // On crée les citoyen
+                    DbContext.AddRange(citizens);
+                    // On crée la banque
+                    DbContext.AddRange(bankItems);
                     DbContext.SaveChanges();
                 }
                 else
                 {
-                    //existingTown.UpdateNoNullProperties(town);
-                    DbContext.Update(town);
+                    // On met à jour la ville
+                    existingTown.UpdateNoNullProperties(town);
+                    DbContext.Update(existingTown);
+                    // On ajoute une nouvelle banque avec un nouveau lastupdate
+                    DbContext.AddRange(bankItems);
+                    // On maj les citoyen en gardant tout ce qui remonte pas de MH
+                    DbContext.RemoveRange(existingTown.TownCitizens);
+                    foreach (var citizen in existingTown.TownCitizens)
+                    {
+                        foreach(var c in citizens)
+                        {
+                            if(c.IdUser == citizen.IdUser)
+                            {
+                                c.ImportHomeDetail(citizen);
+                                c.ImportHeroicActionDetail(citizen);
+                                c.ImportStatusDetail(citizen);
+                            }                        
+                        }
+                    }
+                    DbContext.AddRange(citizens);
+                    DbContext.SaveChanges();
                 }
 
                 // TODO : Il manque les cadavers ?

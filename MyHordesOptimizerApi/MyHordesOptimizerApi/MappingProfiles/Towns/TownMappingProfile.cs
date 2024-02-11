@@ -36,6 +36,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                         var model = context.Mapper.Map<TownBankItem>(myHordesBank);
                         model.IdLastUpdateInfo = src.Map.LastUpdateInfo.IdLastUpdateInfo;
                         model.IdLastUpdateInfoNavigation = src.Map.LastUpdateInfo;
+                        model.IdTown = src.MapId;
                         results.Add(model);
                     }
                     return results;
@@ -48,6 +49,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                         var model = context.Mapper.Map<TownCitizen>(myHordeCitizen);
                         model.IdLastUpdateInfo = src.Map.LastUpdateInfo.IdLastUpdateInfo;
                         model.IdLastUpdateInfoNavigation = src.Map.LastUpdateInfo;
+                        model.IdTown = src.MapId;
                         results.Add(model);
                     }
                     return results;
@@ -105,7 +107,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.IdLastUpdateInfoStatusNavigation, opt => opt.Ignore())
                 .ForMember(dest => dest.IdTown, opt => opt.Ignore())
                 .ForMember(dest => dest.IdTownNavigation, opt => opt.Ignore())
-                .ForMember(dest => dest.IdUser, opt => opt.Ignore())
+                .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.IdUserNavigation, opt => opt.MapFrom<UserValueResolver>())
                 .ForMember(dest => dest.IsAddict, opt => opt.Ignore())
                 .ForMember(dest => dest.IsArmWounded, opt => opt.Ignore())
