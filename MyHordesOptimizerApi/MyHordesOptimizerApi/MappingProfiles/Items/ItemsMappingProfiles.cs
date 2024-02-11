@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
 using System.Collections.Generic;
 using System.Linq;

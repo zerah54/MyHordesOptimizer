@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
 using AutoMapper.EquivalencyExpression;
-using Microsoft.Extensions.DependencyInjection;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
+using MyHordesOptimizerApi.MappingProfiles.Resolvers.MyHordes;
 using MyHordesOptimizerApi.Models;
-using MyHordesOptimizerApi.Repository;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Towns
 {
@@ -108,7 +105,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.IdTown, opt => opt.Ignore())
                 .ForMember(dest => dest.IdTownNavigation, opt => opt.Ignore())
                 .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.IdUserNavigation, opt => opt.MapFrom<UserValueResolver>())
+                .ForMember(dest => dest.IdUserNavigation, opt => opt.MapFrom<MyHordeCitizenToUserValueResolver>())
                 .ForMember(dest => dest.IsAddict, opt => opt.Ignore())
                 .ForMember(dest => dest.IsArmWounded, opt => opt.Ignore())
                 .ForMember(dest => dest.IsCamper, opt => opt.Ignore())
@@ -154,64 +151,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.UserKey, opt => opt.Ignore())
                 .ForMember(dest => dest.WishlistCategories, opt => opt.Ignore());
 
-        }
-    }
-
-    public class UserValueResolver : IValueResolver<MyHordesCitizen, TownCitizen, User>
-    {
-        protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
-
-        public UserValueResolver(IServiceScopeFactory serviceScopeFactory)
-        {
-            ServiceScopeFactory = serviceScopeFactory;
-        }
-
-        public User Resolve(MyHordesCitizen source, TownCitizen destination, User destMember, ResolutionContext context)
-        {
-            var dbContext = context.GetDbContext();
-            var dbUser = dbContext.Users.FirstOrDefault(x => x.IdUser == source.Id);
-            if (dbUser == null)
-            {
-                var user = new User()
-                {
-                    IdUser = source.Id
-                };
-                dbContext.Add(user);
-            }
-            return dbUser;
-        }
-    }
-
-    static class MessageConversionExtensions
-    {
-        // Key used to acccess time offset parameter within context.
-        static readonly string DbContextKey = "DbContext";
-
-        /// <summary>
-        /// Recovers the custom time offset parameter from the conversion context.
-        /// </summary>
-        /// <param name="context">conversion context</param>
-        /// <returns>Time offset</returns>
-        public static MhoContext GetDbContext(this ResolutionContext context)
-        {
-            if (context.Items.TryGetValue(DbContextKey, out var dbContext))
-            {
-                return (MhoContext)dbContext;
-            }
-
-            throw new InvalidOperationException("dbContext not set.");
-        }
-
-        /// <summary>
-        /// Configures the conversion context with a time offset parameter.
-        /// </summary>
-        /// <param name="options"></param>
-        /// <param name="dbContext"></param>
-        public static IMappingOperationOptions SetDbContext(this IMappingOperationOptions options, MhoContext dbContext)
-        {
-            options.Items[DbContextKey] = dbContext;
-            // return options to support fluent chaining.
-            return options;
         }
     }
 }
