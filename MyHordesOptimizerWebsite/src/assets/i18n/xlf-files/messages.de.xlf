@@ -12,7 +12,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/action.enum.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Restaure l'ensemble des points d'actions</target>
+        <target state="translated">Stellt alle Aktionspunkte wieder her</target>
       </trans-unit>
       <trans-unit id="7883706163024049984" datatype="html">
         <source>Restaure l&apos;ensemble des points d&apos;actions plus un point</source>
@@ -20,7 +20,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/action.enum.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Restaure l'ensemble des points d'actions plus un point</target>
+        <target state="translated">Stellt alle plus einen Aktionspunkt wieder her</target>
       </trans-unit>
       <trans-unit id="3901288124583682317" datatype="html">
         <source>Restaure 4 points d&apos;actions</source>
@@ -28,7 +28,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/action.enum.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Restaure 4 points d'actions</target>
+        <target state="translated">Stellt 4 Aktionspunkte wieder her</target>
       </trans-unit>
       <trans-unit id="7387625377210660866" datatype="html">
         <source>Rend un point d&apos;action à toute personne en ville, dans la limite du nombre maximum de point d&apos;action de chacun. Rend deux points d&apos;action aux citoyens ayant l&apos;état ivre ou l&apos;état drogué</source>
@@ -36,7 +36,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/action.enum.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Rend un point d'action à toute personne en ville, dans la limite du nombre maximum de point d'action de chacun. Rend deux points d'action aux citoyens ayant l'état ivre ou l'état drogué</target>
+        <target state="translated">Gibt jedem Bürger in der Stadt einen Aktionspunkt zurück, bis zur maximalen Anzahl an Aktionspunkten, die jeder hat. Gibt Bürgern mit dem Zustand "Betrunken" oder "Rauschzustand" zwei Aktionspunkte zurück</target>
       </trans-unit>
       <trans-unit id="5265432085520184033" datatype="html">
         <source>Peut être rechargé avec une pile</source>
@@ -44,7 +44,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/action.enum.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Peut être rechargé avec une pile</target>
+        <target state="translated">Kann mit einer Batterie aufgeladen werden</target>
       </trans-unit>
       <trans-unit id="6770677036624635211" datatype="html">
         <source>Sauvetage</source>
@@ -52,7 +52,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Sauvetage</target>
+        <target state="translated">Rettung</target>
       </trans-unit>
       <trans-unit id="3165188886740707100" datatype="html">
         <source>Appareil Photo d&apos;Avant-Guerre</source>
@@ -60,7 +60,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Appareil Photo d'Avant-Guerre</target>
+        <target state="translated">Kamera aus Vorkriegs-Tagen</target>
       </trans-unit>
       <trans-unit id="3396346845090842911" datatype="html">
         <source>Uppercut Sauvage</source>
@@ -68,7 +68,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Uppercut Sauvage</target>
+        <target state="translated">Wildstyle Uppercut</target>
       </trans-unit>
       <trans-unit id="8780270810415322734" datatype="html">
         <source>Second Souffle</source>
@@ -76,7 +76,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Second Souffle</target>
+        <target state="translated">Zweite Lunge</target>
       </trans-unit>
       <trans-unit id="9183541610990237036" datatype="html">
         <source>Trouvaille</source>
@@ -88,7 +88,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="needs-translation">Trouvaille</target>
+        <target state="translated">Fundstück</target>
       </trans-unit>
       <trans-unit id="7615623062914511608" datatype="html">
         <source>Vaincre la Mort</source>
@@ -96,7 +96,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Vaincre la Mort</target>
+        <target state="translated">Den Tod besiegen</target>
       </trans-unit>
       <trans-unit id="1932549665173187929" datatype="html">
         <source>Retour du Héro</source>
@@ -104,7 +104,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Retour du Héro</target>
+        <target state="translated">Die Rückkehr des Helden</target>
       </trans-unit>
       <trans-unit id="349574492903631397" datatype="html">
         <source>Passage en Force</source>
@@ -120,7 +120,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Camaraderie</target>
+        <target state="translated">Freundschaft</target>
       </trans-unit>
       <trans-unit id="4723455336764106717" datatype="html">
         <source>Habitation</source>
@@ -128,7 +128,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="needs-translation">Habitation</target>
+        <target state="translated">Haus</target>
       </trans-unit>
       <trans-unit id="2048685656055115262" datatype="html">
         <source>Alarme rudimentaire</source>
@@ -136,7 +136,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">79</context>
         </context-group>
-        <target state="needs-translation">Alarme rudimentaire</target>
+        <target state="translated">Primitives Alarmsystem</target>
       </trans-unit>
       <trans-unit id="4998798069806963460" datatype="html">
         <source>Rangements</source>
@@ -144,7 +144,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">84</context>
         </context-group>
-        <target state="needs-translation">Rangements</target>
+        <target state="translated">Stauraum</target>
       </trans-unit>
       <trans-unit id="6803021710280014868" datatype="html">
         <source>Gros rideau</source>
@@ -152,7 +152,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Gros rideau</target>
+        <target state="translated">Großer Vorhang</target>
       </trans-unit>
       <trans-unit id="8213871008620391117" datatype="html">
         <source>Renforts</source>
@@ -160,7 +160,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="needs-translation">Renforts</target>
+        <target state="translated">Verstärkung</target>
       </trans-unit>
       <trans-unit id="1272594810711653844" datatype="html">
         <source>Cuisine</source>
@@ -168,7 +168,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">101</context>
         </context-group>
-        <target state="needs-translation">Cuisine</target>
+        <target state="translated">Küche</target>
       </trans-unit>
       <trans-unit id="1463247293350394462" datatype="html">
         <source>Cave-laboratoire</source>
@@ -176,7 +176,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Cave-laboratoire</target>
+        <target state="translated">Hobbylabor</target>
       </trans-unit>
       <trans-unit id="6477064715313307165" datatype="html">
         <source>Coin sieste</source>
@@ -184,7 +184,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">Coin sieste</target>
+        <target state="translated">Ruheecke</target>
       </trans-unit>
       <trans-unit id="7352105174300788792" datatype="html">
         <source>Verrou</source>
@@ -192,7 +192,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">119</context>
         </context-group>
-        <target state="needs-translation">Verrou</target>
+        <target state="translated">Türschloss</target>
       </trans-unit>
       <trans-unit id="7688265553248864164" datatype="html">
         <source>Clôture</source>
@@ -200,7 +200,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">124</context>
         </context-group>
-        <target state="needs-translation">Clôture</target>
+        <target state="translated">Zaun</target>
       </trans-unit>
       <trans-unit id="8263357425236059440" datatype="html">
         <source>Habitant</source>
@@ -208,7 +208,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Habitant</target>
+        <target state="translated">Einwohner</target>
       </trans-unit>
       <trans-unit id="8999093564615496242" datatype="html">
         <source>Fouineur</source>
@@ -216,7 +216,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Fouineur</target>
+        <target state="translated">Buddler</target>
       </trans-unit>
       <trans-unit id="5692239162610982878" datatype="html">
         <source>Éclaireur</source>
@@ -224,7 +224,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Éclaireur</target>
+        <target state="translated">Aufklärer</target>
       </trans-unit>
       <trans-unit id="6969224440581200019" datatype="html">
         <source>Gardien</source>
@@ -232,7 +232,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Gardien</target>
+        <target state="translated">Wächter</target>
       </trans-unit>
       <trans-unit id="6227779130323052819" datatype="html">
         <source>Ermite</source>
@@ -240,7 +240,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Ermite</target>
+        <target state="translated">Einsiedler</target>
       </trans-unit>
       <trans-unit id="6520359063458937943" datatype="html">
         <source>Apprivoiseur</source>
@@ -248,7 +248,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Apprivoiseur</target>
+        <target state="translated">Dompteur</target>
       </trans-unit>
       <trans-unit id="144888502729862279" datatype="html">
         <source>Technicien</source>
@@ -256,7 +256,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Technicien</target>
+        <target state="translated">Techniker</target>
       </trans-unit>
       <trans-unit id="5496259459820058286" datatype="html">
         <source>Ne peut pas être déposé par le chef d&apos;escorte</source>
@@ -264,7 +264,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Ne peut pas être déposé par le chef d'escorte</target>
+        <target state="translated">Kann nicht vom Eskortenführer abgelegt werden</target>
       </trans-unit>
       <trans-unit id="8260511042256310681" datatype="html">
         <source>Sécurise le coffre dans lequel il se trouve</source>
@@ -272,7 +272,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Sécurise le coffre dans lequel il se trouve</target>
+        <target state="translated">Sichert die Truhe, in der es sich befindet</target>
       </trans-unit>
       <trans-unit id="8327474089390088254" datatype="html">
         <source>Peut être trouvé empoisonné</source>
@@ -280,7 +280,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Peut être trouvé empoisonné</target>
+        <target state="translated">Kann vergiftet gefunden werden</target>
       </trans-unit>
       <trans-unit id="3010819442113072629" datatype="html">
         <source>Empêche d&apos;être terrorisé à cause d&apos;un objet</source>
@@ -288,7 +288,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Empêche d'être terrorisé à cause d'un objet</target>
+        <target state="translated">Verhindert, dass man von einem Gegenstand Angststarre erhält</target>
       </trans-unit>
       <trans-unit id="4473485791956023608" datatype="html">
         <source>Trouvaille améliorée</source>
@@ -296,7 +296,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Trouvaille améliorée</target>
+        <target state="translated">Verbessertes Fundstück</target>
       </trans-unit>
       <trans-unit id="5692845604197038843" datatype="html">
         <source>Perdu en cas de bannissement</source>
@@ -304,7 +304,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Perdu en cas de bannissement</target>
+        <target state="translated">Verloren bei Verbannung</target>
       </trans-unit>
       <trans-unit id="2748909889856907502" datatype="html">
         <source>Annule le malus de nuit sur la case une fois posé au sol</source>
@@ -312,7 +312,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Annule le malus de nuit sur la case une fois posé au sol</target>
+        <target state="translated">Annulliert den Nachtmalus auf dem Feld, wenn es auf den Boden gelegt wird</target>
       </trans-unit>
       <trans-unit id="5955173880887946945" datatype="html">
         <source>Désaltère</source>
@@ -320,7 +320,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Désaltère</target>
+        <target state="translated">Durstlöscher</target>
       </trans-unit>
       <trans-unit id="8849931921318150989" datatype="html">
         <source>Compte dans le calcul du bonus de veille donné par l&apos;armurerie</source>
@@ -328,7 +328,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Compte dans le calcul du bonus de veille donné par l'armurerie</target>
+        <target state="translated">Zählt bei der Berechnung des Wachtbonus, welcher von der kleinen Waffenschmiede gegeben wird</target>
       </trans-unit>
       <trans-unit id="1323581807907830212" datatype="html">
         <source>Compte dans le calcul du bonus de veille donné par le magasin suédois</source>
@@ -336,7 +336,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Compte dans le calcul du bonus de veille donné par le magasin suédois</target>
+        <target state="translated">Zählt bei der Berechnung des Wachtbonus, welcher von der schwedischen Schreinerei gegeben wird</target>
       </trans-unit>
       <trans-unit id="84445083220864178" datatype="html">
         <source>Compte dans le calcul du bonus de veille donné par le lance-bête</source>
@@ -344,7 +344,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">47</context>
         </context-group>
-        <target state="needs-translation">Compte dans le calcul du bonus de veille donné par le lance-bête</target>
+        <target state="translated">Zählt bei der Berechnung des Wachtbonus, welcher von dem kleinen Tribok gegeben wird</target>
       </trans-unit>
       <trans-unit id="3303333159113749004" datatype="html">
         <source>Compte dans le calcul du bonus de veille donné par la tourelle lance-eau</source>
@@ -352,7 +352,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="needs-translation">Compte dans le calcul du bonus de veille donné par la tourelle lance-eau</target>
+        <target state="translated">Zählt bei der Berechnung des Wachtbonus, welchen der Schießstand gibt</target>
       </trans-unit>
       <trans-unit id="4813554456449727568" datatype="html">
         <source>Peut être empoisonné</source>
@@ -360,7 +360,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Peut être empoisonné</target>
+        <target state="translated">Kann vergiftet werden</target>
       </trans-unit>
       <trans-unit id="7070606596322847118" datatype="html">
         <source>Peut être cuisiné</source>
@@ -368,7 +368,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">Peut être cuisiné</target>
+        <target state="translated">Kann verkocht werden</target>
       </trans-unit>
       <trans-unit id="1327764723186928694" datatype="html">
         <source>Provisions</source>
