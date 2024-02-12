@@ -408,7 +408,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Objet de défense</target>
+        <target state="translated">Defense Object</target>
       </trans-unit>
       <trans-unit id="7152806231676044539" datatype="html">
         <source>Animal</source>
@@ -416,7 +416,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Animal</target>
+        <target state="translated">Animal</target>
       </trans-unit>
       <trans-unit id="2301212560210971063" datatype="html">
         <source>Décoration</source>
@@ -424,7 +424,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="needs-translation">Décoration</target>
+        <target state="translated">Decoration</target>
       </trans-unit>
       <trans-unit id="4416290763660062288" datatype="html">
         <source/>
