@@ -1,9 +1,10 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Translations;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Services.Interfaces.Translations
 {
     public interface ITranslationService
     {
-        TranslationResultDto GetTranslation(string locale, string sourceString);
+        Task<TranslationResultDto> GetTranslationAsync(string locale, string sourceString);
     }
 }

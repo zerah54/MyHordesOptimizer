@@ -1,0 +1,11 @@
+﻿.mho-editor {
+    .angular-editor-wrapper, .angular-editor-textarea {
+        &:focus, &:focus-visible {
+            outline: none;
+        }
+    }
+
+    .angular-editor-textarea {
+        resize: vertical;
+    }
+}

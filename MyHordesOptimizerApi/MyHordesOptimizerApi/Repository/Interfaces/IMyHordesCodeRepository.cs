@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Ruins;
 using MyHordesOptimizerApi.Data.Wishlist;
 using System.Collections.Generic;
+using MyHordesOptimizerApi.Data.Camping;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
 {
@@ -13,12 +14,14 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         List<MyHordesCategoryCodeModel> GetCategories();
         Dictionary<string, List<string>> GetItemsProperties();
         Dictionary<string, List<string>> GetItemsActions();
-        Dictionary<string, Dictionary<string, int>> GetItemsDropRates();
+        Dictionary<string, Dictionary<string, dynamic[]>> GetItemsDropRates();
         List<MyHordesHerosCapacitiesCodeModel> GetHeroCapacities();
         List<MyHordesCauseOfDeathModel> GetCausesOfDeath();
         List<MyHordesCleanUpTypeModel> GetCleanUpTypes();
         Dictionary<string, MyHordesRecipeCodeModel> GetRecipes();
         List<MyHordesOptimizerWishlistItemCategorie> GetWishlistItemCategories();
         List<MyHordesOptimizerDefaultWishlist> GetDefaultWishlists();
+        MyHordesCampingBonusModel GetCampingBonus();
+        List<MyHordesCampingResultModel> GetCampingResults();
     }
 }

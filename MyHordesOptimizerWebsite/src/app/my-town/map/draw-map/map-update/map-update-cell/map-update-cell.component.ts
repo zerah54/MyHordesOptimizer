@@ -1,20 +1,32 @@
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
+import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
+import { ApiService } from '../../../../../_abstract_model/services/api.service';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
-import { Item } from '../../../../../_abstract_model/types/item.class';
-import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
-import { AutoDestroy } from '../../../../../shared/decorators/autodestroy.decorator';
-import { ApiServices } from '../../../../../_abstract_model/services/api.services';
 import { ItemCountShort } from '../../../../../_abstract_model/types/item-count-short.class';
+import { Item } from '../../../../../_abstract_model/types/item.class';
+import { AutoDestroy } from '../../../../../shared/decorators/autodestroy.decorator';
+import { LastUpdateComponent } from '../../../../../shared/elements/last-update/last-update.component';
+import { ArrayItemDetailsPipe } from '../../../../../shared/pipes/array-item-details.pipe';
+import { ItemDetailsPipe } from '../../../../../shared/pipes/item-details.pipe';
+import { ItemsInBagsPipe } from './items-in-bags.pipe';
 
 @Component({
     selector: 'mho-map-update-cell',
     templateUrl: './map-update-cell.component.html',
     styleUrls: ['./map-update-cell.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule, NgOptimizedImage, MatInputModule, MatCheckboxModule, MatDividerModule, CommonModule, MatMenuModule, LastUpdateComponent, ArrayItemDetailsPipe, ItemDetailsPipe, ItemsInBagsPipe]
 })
 export class MapUpdateCellComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -33,7 +45,7 @@ export class MapUpdateCellComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices, private fb: FormBuilder) {
+    constructor(private api: ApiService, private fb: FormBuilder) {
 
     }
 

@@ -1,16 +1,25 @@
+import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { Ruin } from '../../../../../_abstract_model/types/ruin.class';
-import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
+import { Cell } from '../../../../../_abstract_model/types/cell.class';
+import { Ruin } from '../../../../../_abstract_model/types/ruin.class';
 import { AutoDestroy } from '../../../../../shared/decorators/autodestroy.decorator';
+import { FilterRuinsByKmPipe } from '../../../../../shared/pipes/filter-ruins-by-km.pipe';
 
 @Component({
     selector: 'mho-map-update-ruin',
     templateUrl: './map-update-ruin.component.html',
-    styleUrls: ['./map-update-ruin.component.scss']
+    styleUrls: ['./map-update-ruin.component.scss'],
+    standalone: true,
+    imports: [CommonModule, MatDividerModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, NgOptimizedImage, MatInputModule, MatCheckboxModule, MatListModule, DecimalPipe, FilterRuinsByKmPipe]
 })
 export class MapUpdateRuinComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

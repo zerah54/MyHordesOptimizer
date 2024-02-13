@@ -4,16 +4,19 @@
 .web-spider {
     display: contents;
 
-    > img {
+    .web {
         position: absolute;
-        width: 1000px;
-        height: 1000px;
+        top: 0;
+        right: 0;
         z-index: 2;
-        top: -375px;
-        right: -500px;
-        filter: brightness(10);
-        opacity: 0.25;
         pointer-events: none;
+        overflow: auto;
+
+        > img {
+            filter: brightness(10);
+            opacity: 0.25;
+            translate: 500px -375px;
+        }
     }
 
     /******************** Les araignées ********************/
@@ -25,7 +28,7 @@
         @include border-radius(50%);
         margin: 210px 0 0 0;
         background: #110D04;
-        right: 5%;
+        right: 25px;
         @include animation(spider-move 5s infinite);
         pointer-events: none;
 
@@ -102,37 +105,37 @@
                 @include animation(legs-wriggle-right 1s 0.2s infinite);
             }
 
-            &:nth-of-type(2) {
+            &:nth-of-type(4) {
                 top: 14px;
                 left: -11px;
                 @include animation(legs-wriggle-left 1s 0.8s infinite);
             }
 
-            &:nth-of-type(3) {
+            &:nth-of-type(5) {
                 top: 22px;
                 left: -12px;
                 @include animation(legs-wriggle-left 1s 0.2s infinite);
             }
 
-            &:nth-of-type(4) {
+            &:nth-of-type(6) {
                 top: 31px;
                 left: -10px;
                 @include animation(legs-wriggle-left 1s 0.4s infinite);
             }
 
-            &:nth-of-type(6) {
+            &:nth-of-type(8) {
                 top: 14px;
                 right: -11px;
                 @include animation(legs-wriggle-right 1s 0.4s infinite);
             }
 
-            &:nth-of-type(7) {
+            &:nth-of-type(9) {
                 top: 22px;
                 right: -12px;
                 @include animation(legs-wriggle-right 1s 0.7s infinite);
             }
 
-            &:nth-of-type(8) {
+            &:nth-of-type(10) {
                 top: 31px;
                 right: -10px;
                 @include animation(legs-wriggle-right 1s 0.3s infinite);

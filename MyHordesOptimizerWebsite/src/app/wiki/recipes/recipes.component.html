@@ -2,7 +2,7 @@
     <mat-card-title i18n>Recettes</mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-recipes">
-    <ng-container *ngIf="recipes">
+    @if (recipes) {
         <div>
             <div class="table-filters">
                 <mho-filter (filterChange)="applyFilter($event)"></mho-filter>
@@ -11,49 +11,47 @@
         <div class="mat-elevation-z8">
             <table mat-table [dataSource]="datasource" matSort>
                 <ng-container *ngFor="let column of columns" [matColumnDef]="column.id" [sticky]="column.sticky || false">
-                    <th mat-header-cell *matHeaderCellDef>{{column.header}}</th>
+                    <th mat-header-cell *matHeaderCellDef>{{ column.header }}</th>
                     <td mat-cell *matCellDef="let row">
-                        <ng-container [ngSwitch]="column.id">
-                            <ng-container *ngSwitchCase="'type'">
+                        @switch (column.id) {
+                            @case ('type') {
                                 <div>
-                                    <ng-container *ngIf="row[column.id] === 'Recipe::ManualAnywhere'; else workshop">
-                                        <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" width="16" height="16">
-                                        <ng-container i18n>Action de citoyen</ng-container>
-                                    </ng-container>
-                                    <ng-template #workshop>
+                                    @if (row[column.id] === 'Recipe::ManualAnywhere') {
+                                        <ng-container>
+                                            <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" width="16" height="16">
+                                            <ng-container i18n>Action de citoyen</ng-container>
+                                        </ng-container>
+                                    } @else {
                                         <img [ngSrc]="HORDES_IMG_REPO + 'log/workshop.gif'" width="16" height="16">
-                                        <ng-container *ngIf="row[column.id] === 'Recipe::WorkshopType'" i18n>Atelier
-                                        </ng-container>
-                                        <ng-container *ngIf="row[column.id] === 'Recipe::WorkshopTypeShamanSpecific'"
-                                                      i18n>
-                                            Atelier, Chaman uniquement
-                                        </ng-container>
-                                    </ng-template>
+                                        @if (row[column.id] === 'Recipe::WorkshopType') {
+                                            <ng-container i18n>Atelier</ng-container>
+                                        } @else if (row[column.id] === 'Recipe::WorkshopTypeShamanSpecific') {
+                                            <ng-container i18n>Atelier, Chaman uniquement</ng-container>
+                                        }
+                                    }
                                 </div>
-                            </ng-container>
-
-                            <ng-container *ngSwitchCase="'components'">
+                            }
+                            @case ('components') {
                                 <ng-container *ngFor="let component of row[column.id]">
-                                    <div><img [ngSrc]="HORDES_IMG_REPO + component.img" width="16" height="16">{{component.label[locale]}}
+                                    <div><img [ngSrc]="HORDES_IMG_REPO + component.img" width="16" height="16">{{ component.label[locale] }}
                                     </div>
                                 </ng-container>
-                            </ng-container>
-
-                            <ng-container *ngSwitchCase="'transformation'">
+                            }
+                            @case ('transformation') {
                                 <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_move.gif'" width="16" height="16">
-                            </ng-container>
-
-                            <ng-container *ngSwitchCase="'result'">
+                            }
+                            @case ('result') {
                                 <ng-container *ngFor="let result of row[column.id]">
                                     <div>
                                         <img [ngSrc]="HORDES_IMG_REPO + result.item.img" width="16" height="16">
-                                        {{result.item.label[locale]}}
-                                        <small *ngIf="result.probability !== 1">({{result.probability * 100 |
-                                            number:'1.0-2':locale}}%)</small>
+                                        {{ result.item.label[locale] }}
+                                        @if (result.probability !== 1) {
+                                            <small>({{ result.probability * 100 | number:'1.0-2':locale }}%)</small>
+                                        }
                                     </div>
                                 </ng-container>
-                            </ng-container>
-                        </ng-container>
+                            }
+                        }
                     </td>
                 </ng-container>
 
@@ -62,5 +60,5 @@
                 <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
             </table>
         </div>
-    </ng-container>
+    }
 </mat-card-content>

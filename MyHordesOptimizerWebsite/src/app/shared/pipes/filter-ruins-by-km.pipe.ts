@@ -1,9 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { getTown } from '../utilities/localstorage.util';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
+import { getTown } from '../utilities/localstorage.util';
 
 @Pipe({
-    name: 'filterRuinsByKm'
+    name: 'filterRuinsByKm',
+    standalone: true
 })
 export class FilterRuinsByKmPipe implements PipeTransform {
 

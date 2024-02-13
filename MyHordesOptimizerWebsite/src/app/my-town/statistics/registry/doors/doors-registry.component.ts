@@ -10,7 +10,8 @@ import { Citizen } from '../../../../_abstract_model/types/citizen.class';
     selector: 'mho-registry-doors',
     templateUrl: './doors-registry.component.html',
     styleUrls: ['./doors-registry.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true
 })
 export class DoorsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';

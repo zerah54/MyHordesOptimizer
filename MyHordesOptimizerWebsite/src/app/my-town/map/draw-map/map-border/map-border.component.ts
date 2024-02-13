@@ -4,7 +4,8 @@ import { Cell } from '../../../../_abstract_model/types/cell.class';
 @Component({
     selector: 'mho-map-border',
     templateUrl: './map-border.component.html',
-    styleUrls: ['./map-border.component.scss', '../draw-map.component.scss']
+    styleUrls: ['./map-border.component.scss', '../draw-map.component.scss'],
+    standalone: true
 })
 export class MapBorderComponent {
     @HostBinding('style.display') display: string = 'contents';

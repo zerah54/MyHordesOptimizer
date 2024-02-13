@@ -1,16 +1,23 @@
+import { CommonModule, NgClass } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MatSort } from '@angular/material/sort';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
-import { ApiServices } from '../../../_abstract_model/services/api.services';
-import { DigsServices } from '../../../_abstract_model/services/digs.service';
+import { ApiService } from '../../../_abstract_model/services/api.service';
+import { DigsService } from '../../../_abstract_model/services/digs.service';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
+import { DigComponent } from '../../../shared/elements/dig/dig.component';
+import {
+    HeaderWithNumberPreviousNextFilterComponent
+} from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
+import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
+import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
 import { getTown } from '../../../shared/utilities/localstorage.util';
 
 
@@ -18,7 +25,9 @@ import { getTown } from '../../../shared/utilities/localstorage.util';
     selector: 'mho-citizens-digs',
     templateUrl: './citizens-digs.component.html',
     styleUrls: ['./citizens-digs.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatTableModule, MatSortModule, CommonModule, NgClass, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent, DigComponent, ColumnIdPipe]
 })
 export class CitizensDigsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -54,7 +63,7 @@ export class CitizensDigsComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices, private digs_api: DigsServices) {
+    constructor(private api: ApiService, private digs_api: DigsService) {
 
     }
 

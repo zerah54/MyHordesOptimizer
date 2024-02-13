@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace MyHordesOptimizerApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("DataImport")]
     [BasicAuthentication]
     public class MyHordesDataImportController : AbstractMyHordesOptimizerControllerBase
     {

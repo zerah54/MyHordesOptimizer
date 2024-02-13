@@ -1,41 +1,54 @@
-<mat-card-header>
+<mat-card-header class="mho-probabilities-header">
     <mat-card-title>
         <ng-container i18n>Chances de survie</ng-container>
 
-        <button mat-icon-button (click)="createSimulation()">
+        <button mat-icon-button (click)="createSimulation()" matTooltip="Ajouter une simulation" i18n-matTooltip>
             <mat-icon>add</mat-icon>
         </button>
     </mat-card-title>
+
+    <mat-form-field [appearance]="'outline'" class="no-bottom default-value">
+        <mat-label i18n>Valeur par défaut</mat-label>
+        <input matInput type="number" [min]="0" [max]="100" [(ngModel)]="default_value">
+    </mat-form-field>
 </mat-card-header>
 <mat-card-content>
     <div class="mho-probabilities">
         <div *ngFor="let simulation of simulations; let i = index">
             <div class="header">
                 <div>
-                    <h3 *ngIf="!simulation.editing_title"
-                        (click)="simulation.editing_title = !simulation.editing_title">
-                        {{simulation.title}}
-                    </h3>
-                    <mat-form-field *ngIf="simulation.editing_title" class="short-bottom">
-                        <input matInput [(ngModel)]="simulation.title">
-                        <button mat-icon-button matSuffix
-                                (click)="simulation.editing_title = !simulation.editing_title">
-                            <mat-icon>done</mat-icon>
-                        </button>
-                    </mat-form-field>
+                    @if (!simulation.editing_title) {
+                        <h3 (click)="simulation.editing_title = !simulation.editing_title">
+                            {{ simulation.title }}
+                        </h3>
+                    } @else {
+                        <mat-form-field class="short-bottom">
+                            <input matInput [(ngModel)]="simulation.title">
+                            <button mat-icon-button matSuffix (click)="simulation.editing_title = !simulation.editing_title">
+                                <mat-icon>done</mat-icon>
+                            </button>
+                        </mat-form-field>
+                    }
                     <button mat-icon-button (click)="simulation.show_detail = !simulation.show_detail">
-                        <mat-icon *ngIf="simulation.show_detail">visibility</mat-icon>
-                        <mat-icon *ngIf="!simulation.show_detail">visibility_off</mat-icon>
+                        @if (simulation.show_detail) {
+                            <mat-icon>visibility</mat-icon>
+                        } @else {
+                            <mat-icon>visibility_off</mat-icon>
+                        }
                     </button>
-                    <button mat-icon-button (click)="deleteSimulation(i)" *ngIf="simulation.show_detail">
-                        <mat-icon>delete</mat-icon>
-                    </button>
+                    @if (simulation.show_detail) {
+                        <button mat-icon-button (click)="deleteSimulation(i)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    }
                 </div>
-                <mat-form-field *ngIf="simulation.show_detail" class="short-bottom">
-                    <mat-label i18n>Nombre de personnes</mat-label>
-                    <input matInput type="number" [(ngModel)]="simulation.nb_people"
-                           (ngModelChange)="convertFieldsToChances(simulation)" [min]="1" [max]="40">
-                </mat-form-field>
+                @if (simulation.show_detail) {
+                    <mat-form-field class="short-bottom">
+                        <mat-label i18n>Nombre de personnes</mat-label>
+                        <input matInput type="number" [(ngModel)]="simulation.nb_people" (ngModelChange)="convertFieldsToChances(simulation)"
+                               [min]="1" [max]="40">
+                    </mat-form-field>
+                }
             </div>
             <div class="content">
                 <div class="results">
@@ -48,30 +61,32 @@
                         </thead>
                         <tbody>
                         <tr *ngFor="let result of simulation.result_probabilities; let index = index">
-                            <th>{{index}}</th>
-                            <td>{{result * 100 | number:'1.0-2':locale}}%</td>
+                            <th>{{ index }}</th>
+                            <td>{{ result * 100 | number:'1.0-2':locale }}%</td>
                         </tr>
                         </tbody>
                         <tfoot>
                         <tr>
                             <th colspan="2">
                                 <ng-container i18n>Moyenne</ng-container>
-                                &nbsp;:&nbsp;{{simulation.result_average | number:'1.0-2':locale}}
+                                &nbsp;:&nbsp;{{ simulation.result_average | number:'1.0-2':locale }}
                             </th>
                         </tr>
                         </tfoot>
                     </table>
                 </div>
-                <div class="chances" *ngIf="simulation.show_detail">
-                    <mat-form-field *ngFor="let people of [].constructor(simulation.nb_people); let i = index"
-                                    appearance="outline" class="short-bottom">
-                        <mat-label i18n>Chances de survie</mat-label>
-                        <input matInput type="number" (change)="calculateProbabilities(simulation)"
-                               [(ngModel)]="simulation.current_chances[i]"
-                               [min]="0" [max]="100">
-                        <span matSuffix style="margin-right: 0.5em;">%</span>
-                    </mat-form-field>
-                </div>
+                @if (simulation.show_detail) {
+                    <div class="chances">
+                        <mat-form-field *ngFor="let people of [].constructor(simulation.nb_people); let i = index"
+                                        appearance="outline" class="short-bottom surviving-chance">
+                            <mat-label i18n>Chances de survie</mat-label>
+                            <input matInput type="number" (change)="calculateProbabilities(simulation)"
+                                   [(ngModel)]="simulation.current_chances[i]"
+                                   [min]="0" [max]="100">
+                            <span matSuffix style="margin-right: 0.5em;">%</span>
+                        </mat-form-field>
+                    </div>
+                }
             </div>
         </div>
     </div>

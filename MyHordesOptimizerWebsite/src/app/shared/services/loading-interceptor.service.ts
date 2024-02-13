@@ -1,22 +1,22 @@
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { HttpContextToken, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { LoadingOverlayService } from './loading-overlay.service';
 
-@Injectable()
-export class LoadingInterceptor implements HttpInterceptor {
+export const BYPASS_LOADING: HttpContextToken<boolean> = new HttpContextToken(() => false);
 
-    constructor(private loading_service: LoadingOverlayService) {
+/** Intercepte les appels REST pour afficher un loader */
+export function loadingInterceptor(request: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
+    const loading_service: LoadingOverlayService = inject(LoadingOverlayService);
+    if (!request.context.get(BYPASS_LOADING)) {
+        loading_service.setLoading(true);
     }
-
-    /** Intercepte les appels REST pour afficher un loader */
-    intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-        this.loading_service.setLoading(true);
-        return next.handle(request).pipe(
-            finalize(() => {
-                this.loading_service.setLoading(false);
-            })
-        );
-    }
+    return next(request).pipe(
+        finalize(() => {
+            if (!request.context.get(BYPASS_LOADING)) {
+                loading_service.setLoading(false);
+            }
+        })
+    );
 }

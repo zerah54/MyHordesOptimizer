@@ -1,14 +1,15 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { Property } from '../../../../../_abstract_model/enum/property.enum';
+import { Trash } from '../../../../../_abstract_model/enum/trash.enum';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
-import { MapOptions } from '../../../map.component';
 import { ItemCountShort } from '../../../../../_abstract_model/types/item-count-short.class';
 import { Item } from '../../../../../_abstract_model/types/item.class';
-import { Trash } from '../../../../../_abstract_model/enum/trash.enum';
-import { Property } from '../../../../../_abstract_model/enum/property.enum';
+import { MapOptions } from '../../../map.component';
 
 
 @Pipe({
     name: 'trashValue',
+    standalone: true,
 })
 export class TrashValuePipe implements PipeTransform {
     transform(cell: Cell, option: MapOptions, items: Item[]): number {

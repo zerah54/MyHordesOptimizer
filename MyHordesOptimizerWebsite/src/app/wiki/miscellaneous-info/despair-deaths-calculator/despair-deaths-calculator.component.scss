@@ -1,0 +1,45 @@
+@use 'variables';
+
+.mho-despair-deaths-calculator-title {
+    padding: 0.5em 0.5em 0.5em 1em;
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    &::before {
+        content: unset;
+    }
+
+    > h2 {
+        margin: 0;
+    }
+}
+
+.mho-despair-deaths-calculator {
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+
+    .day {
+        background-color: rgba(0, 0, 0, 0.2);
+        padding: 0.5em;
+        border-radius: 0.5em;
+
+        .day-label {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 0.5em;
+            border-radius: 0.5em;
+            text-align: center;
+        }
+
+        .fields {
+            display: flex;
+            flex-direction: row;
+            gap: 1em;
+            justify-content: space-between;
+        }
+    }
+}

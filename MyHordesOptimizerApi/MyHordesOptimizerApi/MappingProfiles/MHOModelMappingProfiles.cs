@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
@@ -124,6 +125,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IdRuin))
                 .ForMember(dest => dest.Explorable, opt => opt.MapFrom(src => src.RuinExplorable))
                 .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.RuinImg))
+                .ForMember(dest => dest.Capacity, opt => opt.MapFrom(src => src.RuinCapacity))
                 .ForMember(dest => dest.Drops, opt => opt.Ignore());
 
             //HeroSkills
@@ -174,6 +176,11 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.UserKey, opt => opt.Ignore());
+
+            CreateMap<Cadaver, UsersModel>()
+               .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.Id))
+               .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+               .ForMember(dest => dest.UserKey, opt => opt.Ignore());
 
             //TownCitizen
             CreateMap<Citizen, TownCitizenModel>()
@@ -607,6 +614,26 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.X))
                 .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.Y))
                 .ForMember(dest => dest.ZoneRegen, opt => opt.Ignore());
+
+            CreateMap<CampingParametersDto, CampingParametersModel>()
+                .ForMember(dest => dest.TownType, opt => opt.MapFrom(src => src.TownType))
+                .ForMember(dest => dest.Job, opt => opt.MapFrom(src => src.Job))
+                .ForMember(dest => dest.Distance, opt => opt.MapFrom(src => src.Distance))
+                .ForMember(dest => dest.Campings, opt => opt.MapFrom(src => src.Campings))
+                .ForMember(dest => dest.ProCamper, opt => opt.MapFrom(src => src.ProCamper))
+                .ForMember(dest => dest.HiddenCampers, opt => opt.MapFrom(src => src.HiddenCampers))
+                .ForMember(dest => dest.Objects, opt => opt.MapFrom(src => src.Objects))
+                .ForMember(dest => dest.Vest, opt => opt.MapFrom(src => src.Vest))
+                .ForMember(dest => dest.Tomb, opt => opt.MapFrom(src => src.Tomb))
+                .ForMember(dest => dest.Zombies, opt => opt.MapFrom(src => src.Zombies))
+                .ForMember(dest => dest.Night, opt => opt.MapFrom(src => src.Night))
+                .ForMember(dest => dest.Devastated, opt => opt.MapFrom(src => src.Devastated))
+                .ForMember(dest => dest.Phare, opt => opt.MapFrom(src => src.Phare))
+                .ForMember(dest => dest.Improve, opt => opt.MapFrom(src => src.Improve))
+                .ForMember(dest => dest.ObjectImprove, opt => opt.MapFrom(src => src.ObjectImprove))
+                .ForMember(dest => dest.RuinBonus, opt => opt.MapFrom(src => src.RuinBonus))
+                .ForMember(dest => dest.RuinBuryCount, opt => opt.MapFrom(src => src.RuinBuryCount))
+                .ForMember(dest => dest.RuinCapacity, opt => opt.MapFrom(src => src.RuinCapacity));
         }
 
         private List<string> GetStatusIcons(TownCitizenBagItemCompletModel src)

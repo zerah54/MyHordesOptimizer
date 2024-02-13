@@ -1,6 +1,6 @@
 import { TownDetailsDTO } from '../dto/town-details.dto';
 import { CommonModel } from './_common.class';
-import { TownType } from './_types';
+import { TownTypeId } from './_types';
 
 export class TownDetails extends CommonModel<TownDetailsDTO> {
     public town_id!: number;
@@ -10,7 +10,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
     public town_max_y!: number;
     public is_devaste!: boolean;
     public day!: number;
-    public town_type!: TownType;
+    public town_type!: TownTypeId;
 
     constructor(dto?: TownDetailsDTO) {
         super();

@@ -5,6 +5,7 @@ import { MapOptions } from '../../../map.component';
 
 @Pipe({
     name: 'digLevel',
+    standalone: true,
 })
 export class DigLevelPipe implements PipeTransform {
     transform(cell: Cell, option: MapOptions): number {

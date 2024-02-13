@@ -1,11 +1,16 @@
+import { CommonModule, DatePipe, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, Input } from '@angular/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import * as moment from 'moment';
+import { Moment } from 'moment';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 
 @Component({
     selector: 'mho-last-update',
     templateUrl: './last-update.component.html',
-    styleUrls: ['./last-update.component.scss']
+    styleUrls: ['./last-update.component.scss'],
+    standalone: true,
+    imports: [CommonModule, NgTemplateOutlet, NgOptimizedImage, MatTooltipModule, DatePipe]
 })
 export class LastUpdateComponent {
     @HostBinding('style.display') display: string = 'contents';
@@ -14,7 +19,7 @@ export class LastUpdateComponent {
     @Input() thresholds!: [number, number, number, number];
     @Input() hideDetails: boolean = false;
 
-    public moment: moment.Moment = moment();
+    public moment: Moment = moment();
 
 }
 

@@ -1,8 +1,13 @@
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { DigsServices } from '../../../_abstract_model/services/digs.service';
+import { DigsService } from '../../../_abstract_model/services/digs.service';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { AutoDestroy } from '../../decorators/autodestroy.decorator';
@@ -12,7 +17,9 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 @Component({
     selector: 'mho-dig',
     templateUrl: './dig.component.html',
-    styleUrls: ['./dig.component.scss']
+    styleUrls: ['./dig.component.scss'],
+    standalone: true,
+    imports: [CommonModule, MatDividerModule, NgOptimizedImage, FormsModule, MatButtonModule, MatTooltipModule]
 })
 export class DigComponent {
     @HostBinding('style.display') display: string = 'contents';
@@ -49,7 +56,7 @@ export class DigComponent {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private digs_api: DigsServices, private dialog: MatDialog) {
+    constructor(private digs_api: DigsService, private dialog: MatDialog) {
     }
 
     protected deleteDig(dig_to_delete: Dig): void {

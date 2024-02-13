@@ -1,20 +1,27 @@
+import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatCardModule } from '@angular/material/card';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
-import { ApiServices } from '../../_abstract_model/services/api.services';
+import { ApiService } from '../../_abstract_model/services/api.service';
 import { Item } from '../../_abstract_model/types/item.class';
 import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item.class';
 import { Recipe } from '../../_abstract_model/types/recipe.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
+import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { normalizeString } from '../../shared/utilities/string.utils';
 
 @Component({
     selector: 'mho-recipes',
     templateUrl: './recipes.component.html',
-    styleUrls: ['./recipes.component.scss']
+    styleUrls: ['./recipes.component.scss'],
+    standalone: true,
+    imports: [MatCardModule, CommonModule, FilterFieldComponent, MatTableModule, MatSortModule, NgOptimizedImage, DecimalPipe, ColumnIdPipe]
 })
 export class RecipesComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -38,7 +45,7 @@ export class RecipesComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiService) {
     }
 
     ngOnInit(): void {

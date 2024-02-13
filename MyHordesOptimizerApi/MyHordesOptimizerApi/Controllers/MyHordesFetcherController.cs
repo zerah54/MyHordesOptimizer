@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
@@ -6,17 +7,15 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MyHordesOptimizerApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Fetcher")]
     public class MyHordesFetcherController : AbstractMyHordesOptimizerControllerBase
     {
-
         private readonly IMyHordesFetcherService _myHordesFetcherService;
 
         public MyHordesFetcherController(ILogger<MyHordesFetcherController> logger,
@@ -33,26 +32,6 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var items = _myHordesFetcherService.GetItems(townId).ToList();
             return items;
-        }
-
-        [HttpGet]
-        [Route("Me")]
-        public ActionResult<SimpleMe> GetMe(string userKey)
-        {
-            try
-            {
-                if (string.IsNullOrWhiteSpace(userKey))
-                {
-                    return BadRequest($"{nameof(userKey)} cannot be empty");
-                }
-                UserKeyProvider.UserKey = userKey;
-                var me = _myHordesFetcherService.GetSimpleMe();
-                return me;
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.ToString());
-            }
         }
 
         [HttpGet]
@@ -89,12 +68,13 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Bank")]
-        public ActionResult<BankWrapper> GetBank(string userKey)
+        public ActionResult<BankLastUpdate> GetBank(string userKey)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
+
             UserKeyProvider.UserKey = userKey;
             var bank = _myHordesFetcherService.GetBank();
             return bank;
@@ -103,16 +83,18 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Citizens")]
-        public ActionResult<CitizensWrapper> GetCitizens(int? townId, int? userId)
+        public ActionResult<CitizensLastUpdate> GetCitizens(int? townId, int? userId)
         {
             if (!townId.HasValue)
             {
                 return BadRequest($"{nameof(townId)} cannot be empty");
             }
+
             if (!userId.HasValue)
             {
                 return BadRequest($"{nameof(userId)} cannot be empty");
             }
+
             UserKeyProvider.UserId = userId.Value;
             var citizens = _myHordesFetcherService.GetCitizens(townId.Value);
             return citizens;
@@ -120,9 +102,9 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Ruins")]
-        public ActionResult<IEnumerable<MyHordesOptimizerRuin>> GetRuins()
+        public ActionResult<IEnumerable<MyHordesOptimizerRuin>> GetRuins(int? townId)
         {
-            var ruins = _myHordesFetcherService.GetRuins().ToList();
+            var ruins = _myHordesFetcherService.GetRuins(townId).ToList();
             return ruins;
         }
 
@@ -134,6 +116,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(townId)} cannot be empty");
             }
+
             var map = _myHordesFetcherService.GetMap(townId.Value);
             return map;
         }
@@ -146,6 +129,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(townId)} cannot be empty");
             }
+
             var digs = _myHordesFetcherService.GetMapDigs(townId.Value).ToList();
             return digs;
         }
@@ -153,20 +137,24 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("MapDigs")]
-        public ActionResult<List<MyHordesOptimizerMapDigDto>> CreaterOrUpdateMapDig([FromQuery] int? townId, [FromQuery] int? userId, [FromBody] List<MyHordesOptimizerMapDigDto> requests)
+        public ActionResult<List<MyHordesOptimizerMapDigDto>> CreaterOrUpdateMapDig([FromQuery] int? townId,
+            [FromQuery] int? userId, [FromBody] List<MyHordesOptimizerMapDigDto> requests)
         {
             if (!userId.HasValue)
             {
                 return BadRequest($"{nameof(userId)} cannot be empty");
             }
+
             if (!userId.HasValue)
             {
                 return BadRequest($"{nameof(townId)} cannot be empty");
             }
+
             if (requests == null || !requests.Any() || (requests.Any(x => x.CellId == 0) && townId == null))
             {
                 return BadRequest($"{nameof(townId)} cannot be empty when no cellId is provided");
             }
+
             UserKeyProvider.UserId = userId.Value;
             var dto = _myHordesFetcherService.CreateOrUpdateMapDigs(townId, userId.Value, requests);
             return Ok(dto);
@@ -174,20 +162,24 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpDelete]
         [Route("MapDigs")]
-        public ActionResult<LastUpdateInfo> CreaterOrUpdateMapDig([FromQuery] int? idCell, [FromQuery] int? diggerId, [FromQuery] int? day)
+        public ActionResult<LastUpdateInfo> CreaterOrUpdateMapDig([FromQuery] int? idCell, [FromQuery] int? diggerId,
+            [FromQuery] int? day)
         {
             if (!idCell.HasValue)
             {
                 return BadRequest($"{nameof(idCell)} cannot be empty");
             }
+
             if (!diggerId.HasValue)
             {
                 return BadRequest($"{nameof(diggerId)} cannot be empty");
             }
+
             if (!day.HasValue)
             {
                 return BadRequest($"{nameof(day)} cannot be empty");
             }
+
             _myHordesFetcherService.DeleteMapDigs(idCell.Value, diggerId.Value, day.Value);
             return Ok();
         }
@@ -200,6 +192,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(townId)} cannot be empty");
             }
+
             var updates = _myHordesFetcherService.GetMapUpdates(townId.Value).ToList();
             return updates;
         }

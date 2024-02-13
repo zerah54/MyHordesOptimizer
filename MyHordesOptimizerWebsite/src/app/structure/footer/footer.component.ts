@@ -1,25 +1,23 @@
-import { Component, HostBinding, ViewChild, ViewEncapsulation } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, HostBinding, inject, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatToolbar } from '@angular/material/toolbar';
-import { Title } from '@angular/platform-browser';
+import { MatToolbar, MatToolbarModule } from '@angular/material/toolbar';
 import { ThanksComponent } from '../../thanks/thanks.component';
 
 @Component({
     selector: 'mho-footer',
     templateUrl: './footer.component.html',
     styleUrls: ['./footer.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatToolbarModule, NgTemplateOutlet]
 })
 export class FooterComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
 
-    public title: string = '';
-
-    public constructor(private title_service: Title, private dialog: MatDialog) {
-        this.title = this.title_service.getTitle();
-    }
+    private dialog: MatDialog = inject(MatDialog);
 
     public openThanks(): void {
         this.dialog.open(ThanksComponent, {

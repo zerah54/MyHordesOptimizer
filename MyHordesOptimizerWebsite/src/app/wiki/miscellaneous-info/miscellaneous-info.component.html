@@ -3,43 +3,30 @@
 </mat-card-header>
 <mat-card-content class="mho-miscellaneous-info">
     <div class="container">
-        <!-- Morts par désespoir -->
-        <ng-container *ngTemplateOutlet="card; context: {$implicit: despair_deaths.data, rows: despair_death_columns, header: 'Morts par désespoir'}">
-        </ng-container>
+        <ng-container *ngFor="let misc_card of misc">
+            <mat-card class="card">
+                <mat-card-header class="card-header">
+                    <mat-card-title>
+                        {{ misc_card.header }}
+                    </mat-card-title>
+                    @if (misc_card.header_action) {
+                        <button mat-icon-button (click)="misc_card.header_action.action()">
+                            <mat-icon>{{ misc_card.header_action.icon }}</mat-icon>
+                        </button>
+                    }
+                </mat-card-header>
+                <mat-card-content class="content">
+                    <table mat-table [dataSource]="misc_card.table">
 
-        <!-- Attaque théorique -->
-        <ng-container *ngTemplateOutlet="card; context: {$implicit: theorical_attack.data, rows: theorical_attack_columns, header: 'Attaque théorique'}">
-        </ng-container>
+                        <ng-container *ngFor="let column of misc_card.columns">
+                            <mat-text-column [headerText]="column.header" [name]="column.id"></mat-text-column>
+                        </ng-container>
 
-        <!-- Chances de réussite du manuel -->
-        <ng-container
-            *ngTemplateOutlet="card; context: {$implicit: survivalist_book_chances.data, rows: survivalist_book_chances_columns, header: 'Manuel des ermites'}">
-        </ng-container>
-
-        <!-- Points d'âme -->
-        <ng-container *ngTemplateOutlet="card; context: {$implicit: soul_points.data, rows: soul_points_columns, header: 'Points d\'âme'}">
-        </ng-container>
-
-        <!-- Points clean -->
-        <ng-container *ngTemplateOutlet="card; context: {$implicit: clean_points.data, rows: clean_points_columns, header: 'Points clean'}">
+                        <tr mat-header-row *matHeaderRowDef="misc_card.columns | ids; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: misc_card.columns | ids;" [class.today]="row | isTodayMiscRow:misc_card:my_town"></tr>
+                    </table>
+                </mat-card-content>
+            </mat-card>
         </ng-container>
     </div>
 </mat-card-content>
-
-<ng-template #card let-data let-rows=rows let-header=header>
-    <mat-card class="card">
-        <mat-card-header class="card-header">
-            <mat-card-title>{{header}}</mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="content">
-            <div class="title">
-                <h5 *ngFor="let column of data">{{column['header']}}</h5>
-            </div>
-            <div class="columns">
-                <div class="col" *ngFor="let col of data; let col_index = index" style="flex: 1; gap:0.5em; align-items: center;">
-                    <div class="cell" *ngFor="let row of rows; let row_index = index">{{data[col_index][row_index]}}</div>
-                </div>
-            </div>
-        </mat-card-content>
-    </mat-card>
-</ng-template>

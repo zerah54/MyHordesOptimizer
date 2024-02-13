@@ -1,9 +1,16 @@
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, Input, Output, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
     selector: 'mho-header-with-number-filter',
     templateUrl: './header-with-number-filter.component.html',
-    styleUrls: ['./header-with-number-filter.component.scss']
+    styleUrls: ['./header-with-number-filter.component.scss'],
+    standalone: true,
+    imports: [CommonModule, MatIconModule, MatFormFieldModule, MatInputModule, FormsModule]
 })
 export class HeaderWithNumberFilterComponent {
     @HostBinding('style.display') display: string = 'contents';

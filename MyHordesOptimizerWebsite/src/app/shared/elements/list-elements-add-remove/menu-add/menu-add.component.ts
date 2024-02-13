@@ -1,5 +1,8 @@
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Output, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MatMenu } from '@angular/material/menu';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatMenu, MatMenuModule } from '@angular/material/menu';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 
@@ -9,11 +12,20 @@ import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
     styleUrls: ['./menu-add.component.scss'],
     encapsulation: ViewEncapsulation.None,
     exportAs: 'menuAdd',
+    standalone: true,
+    imports: [
+        MatMenuModule,
+        MatFormFieldModule,
+        MatInputModule,
+        CommonModule,
+        CommonModule,
+        NgOptimizedImage,
+    ],
 })
 export class MenuAddComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @ViewChild(MatMenu, {static: true}) menu!: MatMenu;
+    @ViewChild(MatMenu, { static: true }) menu!: MatMenu;
 
     @Output() add: EventEmitter<number | string> = new EventEmitter();
 

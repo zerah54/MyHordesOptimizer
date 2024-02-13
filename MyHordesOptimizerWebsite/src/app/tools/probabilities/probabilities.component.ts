@@ -1,18 +1,30 @@
-import {AfterViewInit, Component, HostBinding} from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { AfterViewInit, Component, HostBinding, ViewEncapsulation } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import * as moment from 'moment';
 
 @Component({
     selector: 'mho-probabilities',
     templateUrl: './probabilities.component.html',
-    styleUrls: ['./probabilities.component.scss']
+    styleUrls: ['./probabilities.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, MatFormFieldModule, MatInputModule, FormsModule, CommonModule, DecimalPipe]
 })
 export class ProbabilitiesComponent implements AfterViewInit {
     @HostBinding('style.display') display: string = 'contents';
 
     public simulations: Simulation[] = [
-        {nb_people: 1, current_chances: [0], result_probabilities: [], title: $localize`Simulation 1`, editing_title: false, show_detail: true}
+        { nb_people: 1, current_chances: [0], result_probabilities: [], title: $localize`Simulation 1`, editing_title: false, show_detail: true }
     ];
 
+    public default_value: number = 0;
     public readonly locale: string = moment.locale();
 
     public ngAfterViewInit(): void {
@@ -42,7 +54,7 @@ export class ProbabilitiesComponent implements AfterViewInit {
         if (simulation.current_chances.length > simulation.nb_people) {
             simulation.current_chances = simulation.current_chances.slice(0, simulation.nb_people);
         } else if (simulation.current_chances.length < simulation.nb_people) {
-            const add_chances: number[] = new Array(simulation.nb_people - simulation.current_chances.length).fill(0);
+            const add_chances: number[] = new Array(simulation.nb_people - simulation.current_chances.length).fill(this.default_value);
             simulation.current_chances = simulation.current_chances.concat(add_chances);
         }
         this.calculateProbabilities(simulation);

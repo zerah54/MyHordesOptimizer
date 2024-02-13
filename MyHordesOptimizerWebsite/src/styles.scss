@@ -2,10 +2,16 @@
 @use 'tables';
 @use 'scrollbars';
 
+* {
+    div[data-lastpass-icon-root] {
+        display: none;
+    }
+}
 
 html,
 body {
-    height: 100%;
+    height: 100dvh;
+    width: 100dvw;
 }
 
 body {
@@ -13,6 +19,8 @@ body {
     font-family: Roboto, "Helvetica Neue", sans-serif;
     color: variables.$primary;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -62,10 +70,6 @@ body {
         .mat-mdc-form-field-bottom-align {
             height: 1em;
         }
-    }
-
-    .mdc-text-field--filled:not(.mdc-text-field--disabled) {
-        background-color: variables.$card-background-color !important;
     }
 }
 

@@ -1,3 +1,4 @@
+import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, Input } from '@angular/core';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -7,11 +8,15 @@ import { Town } from '../../../_abstract_model/types/town.class';
 import { groupBy } from '../../../shared/utilities/array.util';
 import { getUserId } from '../../../shared/utilities/localstorage.util';
 import { MapOptions } from '../map.component';
+import { MapBorderComponent } from './map-border/map-border.component';
+import { MapCellComponent } from './map-cell/map-cell.component';
 
 @Component({
     selector: 'mho-draw-map',
     templateUrl: './draw-map.component.html',
-    styleUrls: ['./draw-map.component.scss']
+    styleUrls: ['./draw-map.component.scss'],
+    standalone: true,
+    imports: [CommonModule, NgTemplateOutlet, MapBorderComponent, MapCellComponent]
 })
 export class DrawMapComponent {
     @HostBinding('style.display') display: string = 'contents';

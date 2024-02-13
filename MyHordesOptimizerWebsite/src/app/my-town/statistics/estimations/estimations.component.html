@@ -10,56 +10,96 @@
             <button mat-raised-button [color]="'accent'" (click)="saveEstimations()" i18n>Enregistrer</button>
         </div>
     </div>
-    <div class="tables" *ngIf="estimations">
-        <table>
-            <caption i18n>Attaque du jour</caption>
-            <tr>
-                <th i18n>Qualité</th>
-                <th i18n>Min</th>
-                <th i18n>Max</th>
-            </tr>
-            <tr *ngFor="let percent of tdg_values">
-                <th>{{percent}}%</th>
-                <td>
-                    <mat-form-field appearance="outline" class="no-bottom">
-                        <input matInput type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].min"
-                               (paste)="pasteFromMH($event, estimations.estim['_' + percent])">
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field appearance="outline" class="no-bottom">
-                        <input matInput type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].max"
-                               (paste)="pasteFromMH($event, estimations.estim['_' + percent])">
-                    </mat-form-field>
-                </td>
-            </tr>
-        </table>
-        <table>
-            <caption i18n>Attaque du lendemain</caption>
-            <tr>
-                <th i18n>Qualité</th>
-                <th i18n>Min</th>
-                <th i18n>Max</th>
-            </tr>
-            <tr *ngFor="let percent of planif_values">
-                <th>{{percent}}%</th>
-                <td>
-                    <mat-form-field appearance="outline" class="no-bottom">
-                        <input matInput type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].min"
-                               (paste)="pasteFromMH($event, estimations.planif['_' + percent])">
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field appearance="outline" class="no-bottom">
-                        <input matInput type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].max"
-                               (paste)="pasteFromMH($event, estimations.planif['_' + percent])">
-                    </mat-form-field>
-                </td>
-            </tr>
-        </table>
-        <div class="canvas">
-            <canvas #todayCanvas></canvas>
-            <canvas #tomorrowCanvas></canvas>
+    @if (estimations) {
+        <div class="tables">
+            <table>
+                <caption i18n>Attaque du jour (J{{ selected_day }})</caption>
+                <tr>
+                    <th i18n>Qualité</th>
+                    <th i18n>Min</th>
+                    <th i18n>Max</th>
+                </tr>
+                <tr *ngFor="let percent of tdg_values">
+                    <th>{{ percent }}%</th>
+                    <td>
+                        <mat-form-field appearance="outline" class="no-bottom">
+                            <input matInput type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].min"
+                                   (paste)="pasteFromMH($event, estimations.estim['_' + percent], true)">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field appearance="outline" class="no-bottom">
+                            <input matInput type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].max"
+                                   (paste)="pasteFromMH($event, estimations.estim['_' + percent], false)">
+                        </mat-form-field>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <caption i18n>Attaque du lendemain (J{{ selected_day + 1 }})</caption>
+                <tr>
+                    <th i18n>Qualité</th>
+                    <th i18n>Min</th>
+                    <th i18n>Max</th>
+                </tr>
+                <tr *ngFor="let percent of planif_values">
+                    <th>{{ percent }}%</th>
+                    <td>
+                        <mat-form-field appearance="outline" class="no-bottom">
+                            <input matInput type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].min"
+                                   (paste)="pasteFromMH($event, estimations.planif['_' + percent], true)">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field appearance="outline" class="no-bottom">
+                            <input matInput type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].max"
+                                   (paste)="pasteFromMH($event, estimations.planif['_' + percent], false)">
+                        </mat-form-field>
+                    </td>
+                </tr>
+            </table>
+            <!--        <div class="canvas">-->
+            <!--            <canvas #todayCanvas></canvas>-->
+            <!--            <canvas #tomorrowCanvas></canvas>-->
+            <!--        </div>-->
+
+            <mat-accordion class="canvas">
+                <mat-expansion-panel class="mat-elevation-z8" [expanded]="step === 0" (opened)="setStep(0)">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title i18n>Attaque du jour (J{{ selected_day }})</mat-panel-title>
+                        @if (today_calculated_attack) {
+                            <mat-panel-description>
+                                <small>
+                                    <ng-container i18n>Attaque J{{ selected_day }} calculée (par Apofoo)</ng-container>
+                                    &nbsp;:&nbsp;
+                                    <span style="white-space: nowrap">[{{ today_calculated_attack.min }} - {{ today_calculated_attack.max }}]</span>
+                                </small>
+                            </mat-panel-description>
+                        }
+                    </mat-expansion-panel-header>
+                    <div style="position: relative; height: 400px;">
+                        <canvas #todayCanvas></canvas>
+                    </div>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel class="mat-elevation-z8" [expanded]="step === 1" (opened)="setStep(1)">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title i18n>Attaque du lendemain (J{{ selected_day + 1 }})</mat-panel-title>
+                        @if (tomorrow_calculated_attack) {
+                            <mat-panel-description>
+                                <small>
+                                    <ng-container i18n>Attaque J{{ selected_day + 1 }} calculée (par Apofoo)</ng-container>
+                                    &nbsp;:&nbsp;
+                                    <span style="white-space: nowrap">[{{ tomorrow_calculated_attack.min }} - {{ tomorrow_calculated_attack.max }}]</span>
+                                </small>
+                            </mat-panel-description>
+                        }
+                    </mat-expansion-panel-header>
+                    <div style="position: relative; height: 400px;">
+                        <canvas #tomorrowCanvas></canvas>
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
         </div>
-    </div>
+    }
 </div>

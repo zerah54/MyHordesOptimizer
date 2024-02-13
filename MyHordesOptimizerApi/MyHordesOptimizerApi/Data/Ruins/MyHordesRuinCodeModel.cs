@@ -24,9 +24,12 @@ namespace MyHordesOptimizerApi.Data.Ruins
         public int Chance { get; set; }
 
         [JsonProperty("drops")]
-        public IDictionary<string, int> Drops { get; set; }
+        public IDictionary<string, dynamic[]> Drops { get; set; }
 
         [JsonProperty("desc")]
         public string Desc { get; set; }
+
+        [JsonProperty("capacity")]
+        public int Capacity { get; set; }
     }
 }

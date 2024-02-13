@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@main
 
       - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '6.0'
           include-prerelease: true
@@ -25,7 +25,10 @@ jobs:
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
-      - name: dotnet publish
+      - name: dotnet publish sinks
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
+
+      - name: dotnet publish api
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
 
       - name: Upload artifact for deployment job
@@ -54,9 +57,8 @@ jobs:
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
-          app-name: 'MyHordesOptimizerApi'
-          slot-name: 'deployment'
+          app-name: MyHordesOptimizerApi
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_46612d33e3fc456283a3700e421f4a93 }}
           package: .

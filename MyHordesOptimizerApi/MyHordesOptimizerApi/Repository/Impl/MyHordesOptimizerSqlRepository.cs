@@ -412,7 +412,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #region Bank
 
-        public void PutBank(int townId, BankWrapper bank)
+        public void PutBank(int townId, BankLastUpdate bank)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -434,7 +434,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             sw.Stop();
         }
 
-        public BankWrapper GetBank(int townId)
+        public BankLastUpdate GetBank(int townId)
         {
             var query = @$"SELECT idTown AS TownId
                                  ,item.idItem AS ItemId
@@ -480,7 +480,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
             if (!townBankItem.Any())
             {
-                return new BankWrapper();
+                return new BankLastUpdate();
             }
             var mostRecent = townBankItem.Max(x => x.LastUpdateDateUpdate);
             townBankItem = townBankItem.Where(x => x.LastUpdateDateUpdate == mostRecent);
@@ -495,7 +495,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 item.Actions = new List<string>(bankItemCompletAssocie.Select(x => x.ActionName).Distinct());
                 bankItemComplet.Item = item;
             });
-            var bankWrapper = new BankWrapper()
+            var bankWrapper = new BankLastUpdate()
             {
                 LastUpdateInfo = Mapper.Map<LastUpdateInfo>(townBankItem.First()),
                 Bank = banksItems
@@ -530,7 +530,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
         }
 
-        public WishListWrapper GetWishList(int townId)
+        public WishListLastUpdate GetWishList(int townId)
         {
             var query = @"SELECT twi.idTown AS TownId
                                  ,item.idItem AS ItemId
@@ -587,7 +587,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 item.Actions = new List<string>(wishListItemCompletAssocie.Select(x => x.ActionName).Distinct());
                 wishListItemComplet.Item = item;
             });
-            var wishlistWrapper = new WishListWrapper()
+            var wishlistWrapper = new WishListLastUpdate()
             {
                 LastUpdateInfo = Mapper.Map<LastUpdateInfo>(townWishlistItem.FirstOrDefault()),
                 WishList = wishListItem.GroupBy(x => x.ZoneXPa).ToDictionary(g => g.Key, g => g.ToList())
@@ -672,13 +672,13 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         #region Citizens
 
-        public void PatchCitizen(int townId, CitizensWrapper wrapper)
+        public void PatchCitizen(int townId, CitizensLastUpdate wrapper)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
             var userIds = wrapper.Citizens.Select(x => x.Id).ToList();
             var existingUsers = connection.Query<UsersModel>("SELECT * FROM Users WHERE idUser IN @UserIds", new { UserIds = userIds });
-            //  var insertBuilder = new StringBuilder("INSERT INTO User(idUser,name,userKey) VALUES ");
+
             foreach (var citizen in wrapper.Citizens)
             {
                 var userModel = Mapper.Map<UsersModel>(citizen);
@@ -693,6 +693,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                     connection.Insert(userModel);
                 }
             }
+
             var lastUpdateInfo = Mapper.Map<LastUpdateInfoModel>(wrapper.LastUpdateInfo);
             var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
                                                                    VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
@@ -726,7 +727,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
         }
 
-        public CitizensWrapper GetCitizens(int townId)
+        public CitizensLastUpdate GetCitizens(int townId)
         {
             var query = $@"SELECT tc.idTown AS TownId
                                   ,citizen.idUser AS CitizenId
@@ -863,7 +864,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 item.Properties = matchingItemComplet.Where(i => !string.IsNullOrEmpty(i.PropertyName)).Select(i => i.PropertyName).Distinct();
             }
 
-            var citizenWrapper = new CitizensWrapper()
+            var citizenWrapper = new CitizensLastUpdate()
             {
                 LastUpdateInfo = Mapper.Map<LastUpdateInfo>(citizens.FirstOrDefault()),
                 Citizens = Mapper.Map<IEnumerable<Citizen>>(citizens.Distinct(new CitizenIdComparer())).ToList()
@@ -890,7 +891,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return citizenWrapper;
         }
 
-        public void PatchCadaver(int townId, CadaversWrapper wrapper)
+        public void PatchCadaver(int townId, CadaversLastUpdate wrapper)
         {
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
@@ -899,7 +900,52 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var idLastUpdateInfo = connection.ExecuteScalar<int>(@"INSERT INTO LastUpdateInfo(dateUpdate, idUser)
                                                                    VALUES (@DateUpdate, @IdUser); SELECT LAST_INSERT_ID()", new { DateUpdate = lastUpdateInfo.DateUpdate, IdUser = lastUpdateInfo.IdUser });
 
-            var existings = connection.Query(@"SELECT tca.idCadaver,
+            var userIds = wrapper.Cadavers.Select(x => x.Id).ToList();
+            var existingUsers = connection.Query<UsersModel>("SELECT * FROM Users WHERE idUser IN @UserIds", new { UserIds = userIds });
+
+            foreach (var cadaver in wrapper.Cadavers)
+            {
+                // Il se pourrait qu'un cadavre n'ait pas de user si la personne est déjà morte quand l'update est fait
+                var userModel = Mapper.Map<UsersModel>(cadaver);
+                var existingUser = existingUsers.FirstOrDefault(x => x.IdUser == cadaver.Id);
+                if (existingUser != null && existingUser.Name != cadaver.Name)
+                {
+                    // On devrait pas souvent faire des updates, alors on est pas obliger de bulk
+                    connection.Execute("UPDATE Users SET name = @Name WHERE idUser = @UserId", new { Name = userModel.Name, UserId = userModel.IdUser });
+                }
+                else if (existingUser == null)
+                {
+                    connection.Insert(userModel);
+                }
+            }
+
+            // Il se pourrait que l'on ait des cadavres sans citizen précédemment créé. On va le faire ici.
+            var existings = connection.Query("SELECT idUser, idBag FROM TownCitizen WHERE idTown = @IdTown", new { IdTown = townId });
+            var cadaverCitizenModels = Mapper.Map<IEnumerable<TownCadaverModel>>(wrapper.Cadavers).ToList();
+            cadaverCitizenModels.ForEach(x => { x.IdLastUpdateInfo = idLastUpdateInfo; });
+
+            var cadaverCitizenToCreate = cadaverCitizenModels.Where(x => !existings.Any(existing => existing.idUser == x.IdCitizen)).ToList();
+
+            foreach (var cadaverCitizen in cadaverCitizenToCreate)
+            {
+                connection.Execute(@"INSERT INTO TownCitizen ( idUser,
+                                                               idTown,
+                                                               idLastUpdateInfo,
+                                                               avatar )
+                                                      VALUES ( @IdUser,
+                                                               @IdTown,
+                                                               @IdLastUpdateInfo,
+                                                               @Avatar )",
+                                                    new
+                                                    {
+                                                        IdLastUpdateInfo = cadaverCitizen.IdLastUpdateInfo,
+                                                        IdTown = townId,
+                                                        IdUser = cadaverCitizen.IdCitizen,
+                                                        Avatar = cadaverCitizen.Avatar
+                                                    });
+            }
+
+            existings = connection.Query(@"SELECT tca.idCadaver,
                                                       tca.idCitizen,
                                                       tca.cleanUp
                                                  FROM TownCadaver tca,
@@ -1012,9 +1058,9 @@ namespace MyHordesOptimizerApi.Repository.Impl
             connection.Close();
         }
 
-        public CadaversWrapper GetCadavers(int townId)
+        public CadaversLastUpdate GetCadavers(int townId)
         {
-            var citizenWrapper = new CadaversWrapper();
+            var citizenWrapper = new CadaversLastUpdate();
 
             return citizenWrapper;
         }
@@ -1099,10 +1145,9 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public IEnumerable<MyHordesOptimizerRuin> GetRuins()
         {
-            var items = GetItems();
             using var connection = new MySqlConnection(Configuration.ConnectionString);
             connection.Open();
-            var ruinsComplet = connection.Query<RuinCompletModel>(@"SELECT idRuin
+            var allRuinsComplet = connection.Query<RuinCompletModel>(@"SELECT idRuin
                                                                   ,ruinLabel_fr AS RuinLabelFr
                                                                   ,ruinLabel_en AS RuinLabelEn
                                                                   ,ruinLabel_es AS RuinLabelEs
@@ -1117,6 +1162,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                                                   ,ruinMinDist
                                                                   ,ruinMaxDist
                                                                   ,ruinChance
+                                                                  ,ruinCapacity
                                                                   ,idItem
                                                                   ,itemUid
                                                                   ,itemLabel_fr AS ItemLabelFr
@@ -1124,7 +1170,13 @@ namespace MyHordesOptimizerApi.Repository.Impl
                                                                   ,dropWeight
                                                               FROM RuinComplete");
             connection.Close();
+            var allRuins = EnrichRuinsComplet(allRuinsComplet);
+            return allRuins;
+        }
 
+        private IEnumerable<MyHordesOptimizerRuin> EnrichRuinsComplet(IEnumerable<RuinCompletModel> ruinsComplet)
+        {
+            var items = GetItems();
             var ruins = Mapper.Map<IEnumerable<MyHordesOptimizerRuin>>(ruinsComplet.Distinct(new RuinIdComparer()));
             foreach (var ruin in ruins)
             {
@@ -1144,6 +1196,40 @@ namespace MyHordesOptimizerApi.Repository.Impl
                 }
             }
             return ruins;
+        }
+
+        public IEnumerable<MyHordesOptimizerRuin> GetTownRuin(int idTown)
+        {
+            using var connection = new MySqlConnection(Configuration.ConnectionString);
+            connection.Open();
+            var allRuinsComplet = connection.Query<RuinCompletModel>(@"SELECT rc.idRuin
+                                                                  ,ruinLabel_fr AS RuinLabelFr
+                                                                  ,ruinLabel_en AS RuinLabelEn
+                                                                  ,ruinLabel_es AS RuinLabelEs
+                                                                  ,ruinLabel_de AS RuinLabelDe
+                                                                  ,ruinDescription_fr AS RuinDescriptionFr
+                                                                  ,ruinDescription_en AS RuinDescriptionEn
+                                                                  ,ruinDescription_es AS RuinDescriptionEs
+                                                                  ,ruinDescription_de AS RuinDescriptionDe
+                                                                  ,ruinExplorable
+                                                                  ,ruinImg
+                                                                  ,ruinCamping
+                                                                  ,ruinMinDist
+                                                                  ,ruinMaxDist
+                                                                  ,ruinChance
+                                                                  ,ruinCapacity
+                                                                  ,idItem
+                                                                  ,itemUid
+                                                                  ,itemLabel_fr AS ItemLabelFr
+                                                                  ,dropProbability
+                                                                  ,dropWeight
+                                                              FROM RuinComplete rc
+                                                              INNER JOIN MapCell mc ON mc.idRuin = rc.idRuin
+                                                              WHERE mc.idTown = @IdTown
+                                                              AND mc.idRuin IS NOT NULL;", new { IdTown = idTown });
+            connection.Close();
+            var allRuins = EnrichRuinsComplet(allRuinsComplet);
+            return allRuins;
         }
 
         #endregion

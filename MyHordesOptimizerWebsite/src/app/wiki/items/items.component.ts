@@ -1,17 +1,27 @@
+import { CommonModule } from '@angular/common';
 import { Component, HostBinding, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { ApiServices } from '../../_abstract_model/services/api.services';
-import { Item } from '../../_abstract_model/types/item.class';
-import { normalizeString } from '../../shared/utilities/string.utils';
-import { Property } from '../../_abstract_model/enum/property.enum';
 import { Action } from '../../_abstract_model/enum/action.enum';
+import { Property } from '../../_abstract_model/enum/property.enum';
+import { ApiService } from '../../_abstract_model/services/api.service';
+import { Item } from '../../_abstract_model/types/item.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
+import { ItemComponent } from '../../shared/elements/item/item.component';
+import { SelectComponent } from '../../shared/elements/select/select.component';
+import { ItemsGroupByCategory } from '../../shared/pipes/items-group-by-category.pipe';
+import { normalizeString } from '../../shared/utilities/string.utils';
 
 @Component({
     selector: 'mho-items',
     templateUrl: './items.component.html',
-    styleUrls: ['./items.component.scss']
+    styleUrls: ['./items.component.scss'],
+    standalone: true,
+    imports: [MatCardModule, CommonModule, FilterFieldComponent, MatFormFieldModule, SelectComponent, FormsModule, ItemComponent, ItemsGroupByCategory]
 })
 export class ItemsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -33,7 +43,7 @@ export class ItemsComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiServices) {
+    constructor(private api: ApiService) {
 
     }
 

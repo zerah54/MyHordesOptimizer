@@ -1,13 +1,18 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { Component, ElementRef, EventEmitter, HostBinding, Input, OnDestroy, Optional, Output, Self, ViewChild, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NgControl, UntypedFormControl, ValidationErrors, Validator, Validators } from '@angular/forms';
-import { MatOption } from '@angular/material/core';
-import { MatFormField, MatFormFieldControl } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import { MatSelect } from '@angular/material/select';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatOption, MatOptionModule } from '@angular/material/core';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormField, MatFormFieldControl, MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInput, MatInputModule } from '@angular/material/input';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { Subject } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { normalizeString } from '../../utilities/string.utils';
+import { IconPipe } from './icon.pipe';
 import { LabelPipe } from './label.pipe';
 
 @Component({
@@ -21,7 +26,9 @@ import { LabelPipe } from './label.pipe';
             multi: true,
             useExisting: SelectComponent
         }
-    ]
+    ],
+    standalone: true,
+    imports: [MatSelectModule, CommonModule, MatChipsModule, MatIconModule, NgTemplateOutlet, MatFormFieldModule, MatInputModule, MatDividerModule, MatOptionModule, NgOptimizedImage, LabelPipe, IconPipe]
 })
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -38,12 +45,14 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     @Input() multiple: boolean = false;
     @Input() bindLabel!: string;
+    @Input() noLabel: boolean = false;
     @Input() bindIcon!: string;
-    @Input() moreInfo!: (element: string | T) => string;
+    @Input() moreInfo?: (element: string | T) => string;
     @Input() emptyOption: boolean = false;
     //current form control input. helpful in validating and accessing form control
     @Input() form_control: AbstractControl = new UntypedFormControl();
-
+    @Input() clearable: boolean = false;
+    @Input() searchable: boolean = true;
 
     @Input() set options(options: (T | string)[]) {
         this.displayed_options = [...options];
@@ -98,7 +107,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
-    private complete_options: (T | string)[] = [];
+    protected complete_options: (T | string)[] = [];
     //The internal data model for form control value access
     private innerValue: T | string | T[] | string[] | undefined = undefined;
     /** errors for the form control will be stored in this array */

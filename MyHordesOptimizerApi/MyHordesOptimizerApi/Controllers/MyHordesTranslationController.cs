@@ -4,11 +4,12 @@ using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Translations;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Translation")]
     public class MyHordesTranslationController : AbstractMyHordesOptimizerControllerBase
     {
         protected ITranslationService TranslationService { get; set; }
@@ -20,7 +21,7 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpGet]
-        public ActionResult<TranslationResultDto> GetTranslation(string locale, string sourceString)
+        public async Task<ActionResult<TranslationResultDto>> GetTranslation(string locale, string sourceString)
         {
             if (string.IsNullOrWhiteSpace(locale))
             {
@@ -30,7 +31,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(sourceString)} cannot be empty");
             }
-            var translationResult = TranslationService.GetTranslation(locale, sourceString);
+            var translationResult = await TranslationService.GetTranslationAsync(locale, sourceString);
             return translationResult;
         }
     }

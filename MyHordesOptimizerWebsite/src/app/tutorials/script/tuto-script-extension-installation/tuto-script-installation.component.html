@@ -1,0 +1,28 @@
+<mat-card-header>
+    <mat-card-title>
+        {{ title }}
+        <button mat-icon-button [matMenuTriggerFor]="shareMenu" matTooltip="Choisir le mode de partage" i18n-matTooltip>
+            <mat-icon>share</mat-icon>
+        </button>
+        <mat-menu #shareMenu>
+            <div mat-menu-item i18n (click)="copyUrl()">
+                Copier l'URL
+            </div>
+            <div mat-menu-item i18n (click)="shareForum()">
+                Copier au format forum
+            </div>
+        </mat-menu>
+    </mat-card-title>
+</mat-card-header>
+<mat-card-content class="mho-tuto-script-installation">
+    <div>
+        <h3 i18n>Installation de l'extension de navigateur</h3>
+        <mho-accordion [items]="tuto_extension_items"></mho-accordion>
+        <p i18n>{{ extension_final_text }}</p>
+    </div>
+    <div>
+        <h3 i18n>Installation du script</h3>
+        <mho-accordion [items]="tuto_script_items"></mho-accordion>
+        <p i18n>{{ script_final_text }}</p>
+    </div>
+</mat-card-content>

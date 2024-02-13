@@ -50,6 +50,14 @@
         "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
       }
     },
+    "mse": {
+      "name": "em-ergebnisse",
+      "description": "Die unterschiedlichen möglichen Ergebnisse bei der Einnahme eines Etikettenloses Medikament",
+      "private-msg": {
+        "name": "private-nachricht",
+        "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+      }
+    },
     "discord-cheat-sheet": {
       "name": "discord-gestaltung",
       "description": "Liste der Discord-Shaping-Verknüpfungen",
@@ -122,5 +130,13 @@
   "instructions": {
     "name": "anweisungen",
     "description": "Machen Sie Ihre Anweisungen deutlich sichtbar und länger"
+  },
+  "suggestion": {
+    "name": "anweisungen",
+    "description": "Posten Sie einen Vorschlag in unserem Vorschlagsfeld"
+  },
+  "bug": {
+    "name": "bug",
+    "description": "Melde einen Fehler"
   }
 }

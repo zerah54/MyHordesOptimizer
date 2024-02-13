@@ -1,0 +1,4 @@
+﻿<angular-editor class="mho-editor" [config]="editorConfig"
+                [(ngModel)]="sanitized_content" (ngModelChange)="updateValue($event);"
+                (focusin)="onFocusIn()" (focusout)="onFocusOut($event)" [disabled]="disabled">
+</angular-editor>

@@ -1,10 +1,11 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Item } from '../../_abstract_model/types/item.class';
 import { ItemCountShort } from '../../_abstract_model/types/item-count-short.class';
+import { Item } from '../../_abstract_model/types/item.class';
 
 
 @Pipe({
     name: 'itemDetails',
+    standalone: true,
 })
 export class ItemDetailsPipe implements PipeTransform {
     transform(item: ItemCountShort, all_items: Item[]): Item | undefined {

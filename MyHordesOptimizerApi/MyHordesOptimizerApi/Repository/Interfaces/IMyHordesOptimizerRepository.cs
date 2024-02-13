@@ -38,20 +38,20 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         void PatchRecipeComponents(string recipeName, IEnumerable<string> componentUids);
         void PatchRecipeResults(IEnumerable<RecipeItemResultModel> results);
 
-        void PutBank(int townId, BankWrapper bank);
-        BankWrapper GetBank(int townId);
+        void PutBank(int townId, BankLastUpdate bank);
+        BankLastUpdate GetBank(int townId);
 
-        void PatchCitizen(int townId, CitizensWrapper citizens);
+        void PatchCitizen(int townId, CitizensLastUpdate citizens);
         void PatchCitizenDetail(TownCitizenDetailModel citizenDetail);
-        CitizensWrapper GetCitizens(int townId);
+        CitizensLastUpdate GetCitizens(int townId);
         void UpdateCitizenLocation(int townId, int x, int y, IEnumerable<int> citizenId, int lastUpdateInfoId);
 
-        void PatchCadaver(int townId, CadaversWrapper cadavers);
-        CadaversWrapper GetCadavers(int townId);
+        void PatchCadaver(int townId, CadaversLastUpdate cadavers);
+        CadaversLastUpdate GetCadavers(int townId);
 
         void AddItemToWishlist(int townId, int itemId, int userId, int zoneXPa);
         void PutWishList(int townId, int userId, IEnumerable<TownWishlistItemModel> items);
-        WishListWrapper GetWishList(int townId);
+        WishListLastUpdate GetWishList(int townId);
         void PatchWishlistCategories(List<WishlistCategorieModel> categories);
         void PatchWishlistItemCategories(List<WishlistCategorieItemModel> itemsCategorie);
         IEnumerable<WishlistCategorieCompletModel> GetWishListCategories();
@@ -61,6 +61,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
 
         void PatchRuins(IEnumerable<MyHordesOptimizerRuin> jsonRuins);
         IEnumerable<MyHordesOptimizerRuin> GetRuins();
+        IEnumerable<MyHordesOptimizerRuin> GetTownRuin(int value);
 
         void PatchCategories(IEnumerable<CategoryModel> categories);
         IEnumerable<CategoryModel> GetCategories();

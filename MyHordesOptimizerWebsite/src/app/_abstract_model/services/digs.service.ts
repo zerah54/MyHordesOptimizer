@@ -6,11 +6,11 @@ import { getTown, getUserId } from '../../shared/utilities/localstorage.util';
 import { DigDTO } from '../dto/dig.dto';
 import { dtoToModelArray, modelToDtoArray } from '../types/_common.class';
 import { Dig } from '../types/dig.class';
-import { GlobalServices } from './global.services';
+import { GlobalService } from './global.service';
 
 
-@Injectable()
-export class DigsServices extends GlobalServices {
+@Injectable({ providedIn: 'root' })
+export class DigsService extends GlobalService {
 
     constructor(_http: HttpClient, private snackbar: SnackbarService) {
         super(_http);
@@ -18,7 +18,7 @@ export class DigsServices extends GlobalServices {
 
     public getDigs(): Observable<Dig[]> {
         return new Observable((sub: Subscriber<Dig[]>) => {
-            super.get<DigDTO[]>(this.API_URL + `/myhordesfetcher/MapDigs?townId=${getTown()?.town_id}`)
+            super.get<DigDTO[]>(this.API_URL + `/Fetcher/MapDigs?townId=${getTown()?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<DigDTO[]>) => {
                         let digs: Dig[] = dtoToModelArray(Dig, response.body);
@@ -38,7 +38,7 @@ export class DigsServices extends GlobalServices {
 
     public deleteDig(dig: Dig): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.delete<void>(this.API_URL + `/myhordesfetcher/MapDigs?idCell=${dig.cell_id}&diggerId=${dig.digger_id}&day=${dig.day}`)
+            super.delete<void>(this.API_URL + `/Fetcher/MapDigs?idCell=${dig.cell_id}&diggerId=${dig.digger_id}&day=${dig.day}`)
                 .subscribe({
                     next: () => {
                         this.snackbar.successSnackbar($localize`La fouille a bien été supprimée`);
@@ -53,7 +53,7 @@ export class DigsServices extends GlobalServices {
 
     public updateDig(digs: Dig[]): Observable<Dig[]> {
         return new Observable((sub: Subscriber<Dig[]>) => {
-            super.post<DigDTO[]>(this.API_URL + `/myhordesfetcher/MapDigs?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(modelToDtoArray(digs)))
+            super.post<DigDTO[]>(this.API_URL + `/Fetcher/MapDigs?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(modelToDtoArray(digs)))
                 .subscribe({
                     next: (response: DigDTO[]) => {
                         this.snackbar.successSnackbar($localize`La fouille a bien été mise à jour`);

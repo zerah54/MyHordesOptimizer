@@ -5,9 +5,13 @@
         display: flex;
         flex-wrap: wrap;
 
-        table {
+        .list {
             flex: 1;
             min-width: 400px;
+
+            table {
+                width: 100%;
+            }
         }
 
         .charts {

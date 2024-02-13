@@ -1,12 +1,16 @@
 <div class="list-element-add-remove">
-    <div *ngIf="label && label !== ''" class="label">
-        {{label}}
+    @if (label && label !== '') {
+        <div class="label">
+            {{ label }}
 
-        <div class="add-remove">
-            <ng-container *ngTemplateOutlet="buttonRemove"></ng-container>
-            <ng-container *ngTemplateOutlet="buttonAdd"></ng-container>
+            @if (!readonly) {
+                <div class="add-remove">
+                    <ng-container *ngTemplateOutlet="buttonRemove"></ng-container>
+                    <ng-container *ngTemplateOutlet="buttonAdd"></ng-container>
+                </div>
+            }
         </div>
-    </div>
+    }
     <div class="editable-container">
         <div class="list">
             <ng-container *ngFor="let item of currentList">
@@ -15,10 +19,12 @@
                      style="cursor: pointer" width="16" height="16">
             </ng-container>
         </div>
-        <div class="add-remove" *ngIf="!label">
-            <ng-container *ngTemplateOutlet="buttonAdd"></ng-container>
-            <ng-container *ngTemplateOutlet="buttonRemove"></ng-container>
-        </div>
+        @if (!label && !readonly) {
+            <div class="add-remove">
+                <ng-container *ngTemplateOutlet="buttonAdd"></ng-container>
+                <ng-container *ngTemplateOutlet="buttonRemove"></ng-container>
+            </div>
+        }
     </div>
 </div>
 
@@ -27,9 +33,10 @@
          [matMenuTriggerData]="{menuLabel: addLabel, list: completeList}" width="16" height="16">
 </ng-template>
 <ng-template #buttonRemove>
-    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_less.gif'" *ngIf="currentList.length > 0"
-         [matMenuTriggerFor]="menuRemove.menu"
-         [matMenuTriggerData]="{menuLabel: removeLabel, list: currentList, emptyLabel: emptyLabel}" width="16" height="16">
+    @if (currentList.length > 0) {
+        <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_less.gif'" [matMenuTriggerFor]="menuRemove.menu"
+             [matMenuTriggerData]="{menuLabel: removeLabel, list: currentList, emptyLabel: emptyLabel}" width="16" height="16">
+    }
 </ng-template>
 
 <mho-menu-add #menuAdd="menuAdd" (add)="add.next($event);"></mho-menu-add>
@@ -44,9 +51,10 @@
     </div>
     <div class="items">
         <ng-container *ngFor="let item of completeList">
-            <img *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1"
-                [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id)"
-                [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
+            @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
+                <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id)"
+                     [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
+            }
         </ng-container>
     </div>
 </mat-menu>
@@ -59,11 +67,10 @@
     </div>
     <div class="items">
         <ng-container *ngFor="let item of currentList">
-            <ng-container
-                *ngIf="searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1">
+            @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
                 <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="remove.next(item.id)"
                     [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
-            </ng-container>
+            }
         </ng-container>
     </div>
     <div mat-menu-item class="empty-bag" (click)="empty.next()">

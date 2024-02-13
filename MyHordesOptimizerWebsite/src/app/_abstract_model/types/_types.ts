@@ -1,8 +1,6 @@
-import { ComponentType } from '@angular/cdk/portal';
 import { ModuleWithProviders, Type } from '@angular/core';
 
 export type Modules = Type<unknown>[] | ModuleWithProviders<unknown>[];
-export type Components = ComponentType<unknown>[] | Type<unknown>[];
 
 export interface ToolsToUpdate {
     isBigBrothHordes: 'none' | 'cell' | 'api';
@@ -17,4 +15,4 @@ export interface Dictionary<T> {
     [key: string | number]: T;
 }
 
-export type TownType = 'RNE' | 'RE' | 'PANDE';
+export type TownTypeId = 'RNE' | 'RE' | 'PANDE';

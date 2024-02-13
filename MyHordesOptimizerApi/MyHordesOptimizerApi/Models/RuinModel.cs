@@ -37,5 +37,7 @@ namespace MyHordesOptimizerApi.Models
         public int MaxDist { get; set; }
         [Column("chance")]
         public int Chance { get; set; }
+        [Column("capacity")]
+        public int Capacity { get; set; }
     }
 }

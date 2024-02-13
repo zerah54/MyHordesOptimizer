@@ -1,60 +1,64 @@
-<div class="mho-citizens-digs" *ngIf="citizen_info">
-    <table mat-table [dataSource]="datasource" matSort>
+@if (citizen_info) {
+    <div class="mho-citizens-digs">
+        <table mat-table [dataSource]="datasource" matSort>
 
-        <ng-container *ngFor="let column of columns; trackBy: trackByColumnId" [matColumnDef]="column.id" [sticky]="column.sticky || false">
-            <th mat-header-cell *matHeaderCellDef [ngClass]="[column.id, column.class || '']">
-                <ng-container [ngSwitch]="column.id">
-                    <mho-header-with-select-filter *ngSwitchCase="'avatar_name'" [header]="column.header"
-                                                   [(filterValue)]="filters.citizen"
-                                                   (filterValueChange)="citizen_filter_change.next()"
-                                                   [options]="citizen_info.citizens" [bindLabel]="'name'">
-                    </mho-header-with-select-filter>
-                    <mho-header-with-number-previous-next-filter class="previous-next" *ngSwitchCase="'today_digs'"
-                                                                 [header]="column.header"
-                                                                 [(filterValue)]="filters.selected_day"
-                                                                 (filterValueChange)="citizen_filter_change.next()"
-                                                                 [min]="1" [max]="current_day">
-                    </mho-header-with-number-previous-next-filter>
-                </ng-container>
-            </th>
+            <ng-container *ngFor="let column of columns; trackBy: trackByColumnId" [matColumnDef]="column.id" [sticky]="column.sticky || false">
+                <th mat-header-cell *matHeaderCellDef [ngClass]="[column.id, column.class || '']">
+                    @switch (column.id) {
+                        @case ('avatar_name') {
+                            <mho-header-with-select-filter [header]="column.header"
+                                                           [(filterValue)]="filters.citizen"
+                                                           (filterValueChange)="citizen_filter_change.next()"
+                                                           [options]="citizen_info.citizens" [bindLabel]="'name'">
+                            </mho-header-with-select-filter>
+                        }
+                        @case ('previous-next') {
+                            <mho-header-with-number-previous-next-filter class="previous-next"
+                                                                         [header]="column.header"
+                                                                         [(filterValue)]="filters.selected_day"
+                                                                         (filterValueChange)="citizen_filter_change.next()"
+                                                                         [min]="1" [max]="current_day">
+                            </mho-header-with-number-previous-next-filter>
+                        }
+                    }
+                </th>
 
-            <td mat-cell *matCellDef="let row" [ngClass]="[column.id, column.class || '']">
-                <ng-container [ngSwitch]="column.id">
-                    <ng-container *ngSwitchCase="'avatar_name'">
-                        <img *ngIf="row.citizen.avatar && row.citizen.avatar !== 'False'" [src]="row.citizen.avatar"
-                             width="100">
-                        <div>{{row.citizen.name}}</div>
-                    </ng-container>
-                    <ng-container *ngSwitchCase="'today_digs'">
-                        <div class="digs">
-                            <mho-dig [dig]="undefined" [citizen]="row.citizen" [day]="current_day"
-                                     [digsMode]="'creation'"
-                                     (deletedDig)="deletedDig($event)" (updatedDig)="updatedDig($event)"></mho-dig>
-                            <mho-dig *ngFor="let dig of row.digs" [dig]="dig" [citizen]="row.citizen"
-                                     [day]="current_day" [digsMode]="'update'"
-                                     (deletedDig)="deletedDig($event)" (updatedDig)="updatedDig($event)"></mho-dig>
-                        </div>
-                    </ng-container>
-                </ng-container>
-            </td>
-        </ng-container>
+                <td mat-cell *matCellDef="let row" [ngClass]="[column.id, column.class || '']">
+                    @switch (column.id) {
+                        @case ('avatar_name') {
+                            @if (row.citizen.avatar && row.citizen.avatar !== 'False') {
+                                <img [src]="row.citizen.avatar" width="100">
+                            }
+                            <div>{{ row.citizen.name }}</div>
+                        }
+                        @case ('today_digs') {
+                            <div class="digs">
+                                <mho-dig [dig]="undefined" [citizen]="row.citizen" [day]="current_day"
+                                         [digsMode]="'creation'"
+                                         (deletedDig)="deletedDig($event)" (updatedDig)="updatedDig($event)"></mho-dig>
+                                <mho-dig *ngFor="let dig of row.digs" [dig]="dig" [citizen]="row.citizen"
+                                         [day]="current_day" [digsMode]="'update'"
+                                         (deletedDig)="deletedDig($event)" (updatedDig)="updatedDig($event)"></mho-dig>
+                            </div>
+                        }
+                    }
+                </td>
+            </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
-        <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
-        <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->
+            <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
+            <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->
 
-        <!-- Row shown when there is no matching data. -->
-        <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell" colspan="6">
-                <ng-container
-                    *ngIf="filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== ''; else emptyTable">
-                    <ng-container i18n>Aucun objet ne correspond au filtre "{{filterInput.nativeElement.value}}"
-                    </ng-container>
-                </ng-container>
-                <ng-template #emptyTable>
-                    <ng-container i18n>La liste est vide</ng-container>
-                </ng-template>
-            </td>
-        </tr>
-    </table>
-</div>
+            <!-- Row shown when there is no matching data. -->
+            <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" colspan="6">
+                    @if (filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== '') {
+                        <ng-container i18n>Aucun objet ne correspond au filtre "{{ filterInput.nativeElement.value }}"</ng-container>
+                    } @else {
+                        <ng-container i18n>La liste est vide</ng-container>
+                    }
+                </td>
+            </tr>
+        </table>
+    </div>
+}

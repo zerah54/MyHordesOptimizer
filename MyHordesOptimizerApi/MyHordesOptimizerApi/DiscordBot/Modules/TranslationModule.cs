@@ -35,7 +35,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
         {
             try
             {
-                var completeTranslation = _translationService.GetTranslation(locale.ToString().ToLower(), searchValue);
+                var completeTranslation = await _translationService.GetTranslationAsync(locale.ToString().ToLower(), searchValue);
 
                 var hasExactResponse = completeTranslation.Translations
                     .Exists((translation) => translation.Key.IsExactMatch);
@@ -111,7 +111,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             }
             catch (Exception e)
             {
-                _logger.LogWarning(e.ToString(), e);
+                _logger.LogError(e.ToString(), e);
                 await RespondAsync(
                     $"Une erreur s'est produite lors de la récupération des traductions\n```{e.Message}```",
                     ephemeral: true);

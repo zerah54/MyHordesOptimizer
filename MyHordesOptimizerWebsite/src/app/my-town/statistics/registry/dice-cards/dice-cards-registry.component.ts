@@ -1,15 +1,19 @@
+import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
-import { MatTabChangeEvent } from '@angular/material/tabs';
+import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Entry } from '../../../../_abstract_model/interfaces';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { CitizenUseDiceOrCardsPipe } from './dice-cards.pipe';
 
 @Component({
     selector: 'mho-registry-dice-cards',
     templateUrl: './dice-cards-registry.component.html',
     styleUrls: ['./dice-cards-registry.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatTabsModule, NgOptimizedImage, NgTemplateOutlet, CommonModule, CitizenUseDiceOrCardsPipe]
 })
 export class DiceCardsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';

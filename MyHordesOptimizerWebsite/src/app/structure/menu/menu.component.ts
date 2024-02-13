@@ -1,6 +1,13 @@
-import { DOCUMENT } from '@angular/common';
-import { Component, HostBinding, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { CommonModule, DOCUMENT, NgClass, NgTemplateOutlet } from '@angular/common';
+import { Component, HostBinding, inject, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavContainer } from '@angular/material/sidenav';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import * as moment from 'moment';
 import { environment } from '../../../environments/environment';
 import { Theme } from '../../_abstract_model/interfaces';
@@ -12,12 +19,16 @@ import { getTown } from '../../shared/utilities/localstorage.util';
     selector: 'mho-menu',
     templateUrl: './menu.component.html',
     styleUrls: ['./menu.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatListModule, CommonModule, NgTemplateOutlet, MatDividerModule, MatButtonModule, MatMenuModule, MatIconModule, RouterLinkActive, RouterLink, NgClass, MatTooltipModule]
 })
 export class MenuComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input({ required: true }) sidenavContainer!: MatSidenavContainer;
+
+    public charts_theming_service: ChartsThemingService = inject(ChartsThemingService);
 
     public themes: Theme[] = [
         { label: $localize`Par défaut`, class: '' },
@@ -79,29 +90,48 @@ export class MenuComponent implements OnInit {
         },
         {
             label: $localize`Outils`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
-                { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true },
+                { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
                 { label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true },
             ]
         },
         {
             label: $localize`Wiki`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
-                { label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: (): boolean => true },
+                { label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
                 { label: $localize`Recettes`, path: 'wiki/recipes', displayed: true, lvl: 1, authorized: (): boolean => true },
                 { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: true, lvl: 1, authorized: (): boolean => true },
-                { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: (): boolean => true },
-                { label: $localize`Informations diverses`, path: 'wiki/miscellaneous-info', displayed: true, lvl: 1, authorized: (): boolean => true }
+                { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
+                {
+                    label: $localize`Informations diverses`,
+                    path: 'wiki/miscellaneous-info',
+                    displayed: true,
+                    lvl: 1,
+                    authorized: (): boolean => true,
+                    spoil: true
+                }
             ]
         },
         {
             label: $localize`Tutoriels`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
                 {
-                    label: $localize`Script`, displayed: false, lvl: 1, authorized: (): boolean => true, expanded: false, children: [
-                        { label: $localize`Installation`, path: 'tutorials/script/installation', displayed: false, lvl: 2, authorized: (): boolean => true },
-                        { label: $localize`Outils`, path: 'tutorials/script/tools', displayed: false, lvl: 2, authorized: (): boolean => true },
-                        { label: $localize`Wiki`, path: 'tutorials/script/wiki', displayed: false, lvl: 2, authorized: (): boolean => true },
-                        { label: $localize`Outils Externes`, path: 'tutorials/script/external-tools', displayed: false, lvl: 2, authorized: (): boolean => true },
-                        { label: $localize`Affichage`, path: 'tutorials/script/display', displayed: false, lvl: 2, authorized: (): boolean => true },
-                        { label: $localize`Notifications`, path: 'tutorials/script/alerts', displayed: false, lvl: 2, authorized: (): boolean => true },
+                    label: $localize`Script / Extension`, displayed: false, lvl: 1, authorized: (): boolean => true, expanded: false, children: [
+                        {
+                            label: $localize`Installation`,
+                            path: 'tutorials/script-extension/installation',
+                            displayed: false,
+                            lvl: 2,
+                            authorized: (): boolean => true
+                        },
+                        { label: $localize`Outils`, path: 'tutorials/script-extension/tools', displayed: false, lvl: 2, authorized: (): boolean => true },
+                        { label: $localize`Wiki`, path: 'tutorials/script-extension/wiki', displayed: false, lvl: 2, authorized: (): boolean => true },
+                        {
+                            label: $localize`Outils Externes`,
+                            path: 'tutorials/script-extension/external-tools',
+                            displayed: false,
+                            lvl: 2,
+                            authorized: (): boolean => true
+                        },
+                        { label: $localize`Affichage`, path: 'tutorials/script-extension/display', displayed: false, lvl: 2, authorized: (): boolean => true },
+                        { label: $localize`Notifications`, path: 'tutorials/script-extension/alerts', displayed: false, lvl: 2, authorized: (): boolean => true },
                     ]
                 },
                 {
@@ -118,8 +148,7 @@ export class MenuComponent implements OnInit {
         }
     ];
 
-    constructor(@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document,
-                private charts_theming_service: ChartsThemingService) {
+    constructor(@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document) {
 
     }
 
@@ -173,6 +202,7 @@ export class MenuComponent implements OnInit {
     }
 
     private isInTown(): boolean {
+        if (!environment.production) return true;
         const town: TownDetails | null = getTown();
         if (!town) return false;
         return town.town_id !== null && town.town_id !== undefined && town.town_id !== 0;
@@ -187,32 +217,22 @@ export class MenuComponent implements OnInit {
 
     private defineThemes(): void {
         /** Noël */
-        if (moment().isSameOrAfter(moment(`01-12-${moment().year()} 00:00:00`, 'DD-MM-YYYY HH:mm:ss'))
-            && moment().isSameOrBefore(moment(`25-12-${moment().year()} 23:59:59`, 'DD-MM-YYYY HH:mm:ss'))) {
+        if (this.isNoel()) {
             this.themes.push({ label: $localize`Noël`, class: 'noel' });
             this.themes.splice(0, 1);
-            if (this.selected_theme?.class === '' || !this.selected_theme) {
-                setTimeout(() => {
-                    this.changeTheme(this.themes[this.themes.length - 1]);
-                });
-            }
-        } else if (this.selected_theme?.class === 'noel' || !this.selected_theme) {
+            this.useEventTheme();
+        } else if (this.isNothing() && (this.selected_theme?.class === 'noel' || !this.selected_theme)) {
             setTimeout(() => {
                 this.changeTheme(this.themes[0]);
             });
         }
 
         /** Halloween */
-        if (moment().isSameOrAfter(moment(`15-10-${moment().year()} 00:00:00`, 'DD-MM-YYYY HH:mm:ss'))
-            && moment().isSameOrBefore(moment(`01-11-${moment().year()} 23:59:59`, 'DD-MM-YYYY HH:mm:ss'))) {
+        if (this.isHalloween()) {
             this.themes.push({ label: $localize`Halloween`, class: 'halloween' });
             this.themes.splice(0, 1);
-            if (this.selected_theme?.class === '' || !this.selected_theme) {
-                setTimeout(() => {
-                    this.changeTheme(this.themes[this.themes.length - 1]);
-                });
-            }
-        } else if (this.selected_theme?.class === 'halloween' || !this.selected_theme) {
+            this.useEventTheme();
+        } else if (this.isNothing() && (this.selected_theme?.class === 'halloween' || !this.selected_theme)) {
             setTimeout(() => {
                 this.changeTheme(this.themes[0]);
             });
@@ -225,6 +245,29 @@ export class MenuComponent implements OnInit {
 
         this.charts_theming_service.defineColorsWithTheme(this.selected_theme);
     }
+
+    private isNoel(): boolean {
+        return moment().isSameOrAfter(moment(`01-12-${moment().year()} 00:00:00`, 'DD-MM-YYYY HH:mm:ss'))
+            && moment().isSameOrBefore(moment(`25-12-${moment().year()} 23:59:59`, 'DD-MM-YYYY HH:mm:ss'));
+    }
+
+    private isHalloween(): boolean {
+        return moment().isSameOrAfter(moment(`15-10-${moment().year()} 00:00:00`, 'DD-MM-YYYY HH:mm:ss'))
+            && moment().isSameOrBefore(moment(`01-11-${moment().year()} 23:59:59`, 'DD-MM-YYYY HH:mm:ss'));
+    }
+
+    private isNothing(): boolean {
+        return !this.isNoel() && !this.isHalloween();
+    }
+
+    private useEventTheme(): void {
+        this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
+        if (this.selected_theme?.class === '' || !this.selected_theme) {
+            setTimeout(() => {
+                this.changeTheme(this.themes[this.themes.length - 1]);
+            });
+        }
+    }
 }
 
 interface SidenavLinks {
@@ -235,6 +278,7 @@ interface SidenavLinks {
     displayed: boolean;
     authorized: () => boolean;
     expanded?: boolean;
+    spoil?: boolean;
 }
 
 interface Language {

@@ -1,83 +1,102 @@
-<li [ngClass]="['mho-item', display_mode, forceOpen ? 'force-open' : '']" *ngIf="item">
-    <div [class.broken]="item.is_broken">
-        <div class="title-part" (click)="toggleAdvancedMode()">
-            <div class="item_title">
-                <div class="item_img">
-                    <img [src]="HORDES_IMG_REPO + item.img">
-                    <span class="item_count" *ngIf="item.bank_count && item.bank_count > 1">{{item.bank_count}}</span>
+@if (item) {
+    <li [ngClass]="['mho-item', display_mode, forceOpen ? 'force-open' : '']">
+        <div [class.broken]="item.is_broken">
+            <div class="title-part" (click)="toggleAdvancedMode()">
+                <div class="item_title">
+                    <div class="item_img">
+                        <img [src]="HORDES_IMG_REPO + item.img">
+                        @if (item.bank_count && item.bank_count > 1) {
+                            <span class="item_count">{{ item.bank_count }}</span>
+                        }
+                    </div>
+                    <span class="item_label">{{ item.label[locale] }}
+                        @if (item.is_broken) {
+                            &nbsp;(
+                            <ng-container i18n>Cassé</ng-container>
+                            )
+                        }
+                    </span>
                 </div>
-                <span class="item_label">{{item.label[locale]}}
-                    <ng-container *ngIf="item?.is_broken">&nbsp;(<ng-container i18n>Cassé</ng-container>)</ng-container>
-                </span>
+                @if (town && town.town_id && item.wishlist_count === 0) {
+                    <div class="add_to_wishlist">
+                        <button mat-icon-button type="button" (click)="$event.stopPropagation(); addItemToWishlist(item)">
+                            <img [ngSrc]="HORDES_IMG_REPO + 'item/item_cart.gif'" width="16" height="16">
+                        </button>
+                    </div>
+                }
             </div>
-            <div class="add_to_wishlist" *ngIf="item.wishlist_count === 0">
-                <button mat-icon-button type="button"
-                        (click)="$event.stopPropagation(); addItemToWishlist(item)">
-                    <img [ngSrc]="HORDES_IMG_REPO + 'item/item_cart.gif'" width="16" height="16">
-                </button>
-            </div>
+            @if (display_mode === 'advanced') {
+                <div class="advanced-part">
+                    <div>{{ item.description[locale] }}</div>
+
+                    @if (item.drop_rate_praf > 0 || item.drop_rate_not_praf > 0) {
+                        <mat-divider></mat-divider>
+                        @if (item.drop_rate_praf > 0) {
+                            <div>
+                                <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone praf</ng-container>
+                                {{ item.drop_rate_praf * 100 | number:'1.0-2':locale }}%
+                            </div>
+                        }
+                        @if (item.drop_rate_not_praf > 0) {
+                            <div>
+                                <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone non-praf</ng-container>
+                                {{ item.drop_rate_not_praf * 100 | number:'1.0-2':locale }}%
+                            </div>
+                        }
+                    }
+
+                    @if (item.recipes.length > 0) {
+                        <mat-divider></mat-divider>
+                        <div *ngFor="let recipe of item.recipes">
+                            <mho-recipe [recipe]="recipe"></mho-recipe>
+                        </div>
+                    }
+
+                    @if (item.deco || item.guard || item.is_heaver) {
+                        <mat-divider></mat-divider>
+                        @if (item.deco) {
+                            <div>
+                                <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
+                                <ng-container i18n>Objet de décoration</ng-container>&nbsp;(+{{ item.deco }})
+                            </div>
+                        }
+                        @if (item.guard) {
+                            <div>
+                                <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
+                                <ng-container i18n>Arme de veille</ng-container>&nbsp;(+{{ item.guard }})
+                            </div>
+                        }
+                        @if (item.is_heaver) {
+                            <div>
+                                <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
+                                <ng-container i18n>Objet encombrant</ng-container>
+                            </div>
+                        }
+                    }
+
+                    @if (item.properties && item.properties.length > 0) {
+                        <mat-divider></mat-divider>
+                        <div *ngFor="let property of item.properties">
+                            @if (property) {
+                                @if (property.value.img && property.value.img !== '') {
+                                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">{{ property.value.label }}
+                                }
+                            }
+                        </div>
+                    }
+
+                    @if (item.actions && item.actions.length > 0) {
+                        <mat-divider></mat-divider>
+                        <div *ngFor="let action of item.actions">
+                            @if (action) {
+                                @if (action.value.img && action.value.img !== '') {
+                                    <img [ngSrc]="HORDES_IMG_REPO + action.value.img" width="16" height="16">{{ action.value.label }}
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            }
         </div>
-        <div *ngIf="display_mode === 'advanced'" class="advanced-part">
-            <ng-container>
-                <div>{{item.description[locale]}}</div>
-            </ng-container>
-
-            <ng-container *ngIf="item.drop_rate_praf > 0 || item.drop_rate_not_praf > 0">
-                <mat-divider></mat-divider>
-                <div *ngIf="item.drop_rate_praf > 0">
-                    <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone praf</ng-container>
-                    {{item.drop_rate_praf * 100 | number:'1.0-2':locale}}%
-                </div>
-                <div *ngIf="item.drop_rate_not_praf > 0">
-                    <ng-container i18n>Taux d'obtention en cas de fouille réussie sur une zone non-praf</ng-container>
-                    {{item.drop_rate_not_praf * 100 | number:'1.0-2':locale}}%
-                </div>
-            </ng-container>
-
-            <ng-container *ngIf="item.recipes.length > 0">
-                <mat-divider></mat-divider>
-                <div *ngFor="let recipe of item.recipes">
-                    <mho-recipe [recipe]="recipe"></mho-recipe>
-                </div>
-            </ng-container>
-
-            <ng-container *ngIf="item.deco || item.guard || item.is_heaver">
-                <mat-divider></mat-divider>
-                <div *ngIf="item.deco">
-                    <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
-                    <ng-container i18n>Objet de décoration</ng-container>&nbsp;(+{{item.deco}})
-                </div>
-                <div *ngIf="item.guard">
-                    <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
-                    <ng-container i18n>Arme de veille</ng-container>&nbsp;(+{{item.guard}})
-                </div>
-                <div *ngIf="item.is_heaver">
-                    <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
-                    <ng-container i18n>Objet encombrant</ng-container>
-                </div>
-            </ng-container>
-
-            <ng-container
-                *ngIf="item.properties && item.properties.length > 0">
-                <mat-divider></mat-divider>
-                <div *ngFor="let property of item.properties">
-                    <ng-container *ngIf="property">
-                        <img *ngIf="property.value.img && property.value.img !== ''"
-                             [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">{{property.value.label}}
-                    </ng-container>
-                </div>
-            </ng-container>
-
-            <ng-container
-                *ngIf="item.actions && item.actions.length > 0">
-                <mat-divider></mat-divider>
-                <div *ngFor="let action of item.actions">
-                    <ng-container *ngIf="action">
-                        <img *ngIf="action.value.img && action.value.img !== ''"
-                             [ngSrc]="HORDES_IMG_REPO + action.value.img" width="16" height="16">{{action.value.label}}
-                    </ng-container>
-                </div>
-            </ng-container>
-        </div>
-    </div>
-</li>
+    </li>
+}

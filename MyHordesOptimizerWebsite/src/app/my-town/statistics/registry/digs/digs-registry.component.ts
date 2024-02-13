@@ -1,4 +1,7 @@
+import { CommonModule } from '@angular/common';
 import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import * as moment from 'moment';
 import { Moment } from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
@@ -7,13 +10,18 @@ import { Entry } from '../../../../_abstract_model/interfaces';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../_abstract_model/types/dig.class';
+import { DigComponent } from '../../../../shared/elements/dig/dig.component';
+import { SelectComponent } from '../../../../shared/elements/select/select.component';
 import { getTown } from '../../../../shared/utilities/localstorage.util';
+import { CitizenForDigPipe, CitizenNotInDigListPipe } from './citizen-for-dig.pipe';
 
 @Component({
     selector: 'mho-registry-digs',
     templateUrl: './digs-registry.component.html',
     styleUrls: ['./digs-registry.component.scss'],
-    encapsulation: ViewEncapsulation.None
+    encapsulation: ViewEncapsulation.None,
+    standalone: true,
+    imports: [MatFormFieldModule, SelectComponent, FormsModule, CommonModule, DigComponent, CitizenForDigPipe, CitizenNotInDigListPipe]
 })
 export class DigsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';
@@ -40,7 +48,7 @@ export class DigsRegistryComponent {
                     const nb_minutes_for_dig: 90 | 120 = citizen.job?.key === JobEnum.SCAVENGER.key ? 90 : 120;
                     /** Les heures d'arrivée du citoyen sur la case */
                     const citizen_arrivals: Entry[] = arrivals.filter((arrival: Entry): boolean => arrival.entry.indexOf(citizen.name) > -1);
-                    const citizen_last_arrival: string = citizen_arrivals[0].hour;
+                    const citizen_last_arrival: string = citizen_arrivals[0]?.hour;
 
                     const failed_digs: number = registry
                         .filter((entry: Entry): boolean => this.failed_digs_keywords.some((failed_digs_keyword: string) => entry.entry.indexOf(failed_digs_keyword) > -1))

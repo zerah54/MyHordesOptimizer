@@ -1,12 +1,16 @@
 .mho-map-update-title {
-    padding: 1em 1em 0.5em;
+    padding: 0.5em 0.5em 0.5em 1em;
     display: flex;
     justify-content: space-between;
     gap: 1em;
     align-items: center;
     flex-wrap: nowrap;
 
-    >h1 {
+    &::before {
+        content: unset;
+    }
+
+    > h1 {
         margin: 0;
     }
 }
@@ -23,7 +27,7 @@
     }
 
     .mho-tab-group {
-        max-height: calc(65vh - 70px);
+        max-height: calc(65dvh - 70px);
     }
 
     .mho-cell-note {

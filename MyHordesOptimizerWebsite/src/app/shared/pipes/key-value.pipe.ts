@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'customKeyValue',
+    standalone: true,
 })
 export class CustomKeyValuePipe<T> implements PipeTransform {
     transform(map: Map<string, T>): {key: string, value: T}[] {

@@ -1,9 +1,10 @@
 import * as moment from 'moment';
+import { Moment } from 'moment';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
 import { CommonModel } from './_common.class';
 
 export class UpdateInfo extends CommonModel<UpdateInfoDTO> {
-    public update_time!: moment.Moment;
+    public update_time!: Moment;
     public user_id!: string;
     public username!: string;
     public userkey!: string;

@@ -1,5 +1,21 @@
 @use 'variables';
 
+.mho-probabilities-header {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    justify-content: space-between;
+    align-items: center;
+
+    .mat-mdc-form-field.default-value {
+        .mat-mdc-form-field-infix {
+            padding-top: 8px;
+            padding-bottom: 8px;
+            min-height: unset;
+        }
+    }
+}
+
 .mho-probabilities {
     display: flex;
     flex-wrap: wrap;
@@ -64,6 +80,16 @@
             td {
                 text-align: right;
             }
+        }
+    }
+
+    .mat-mdc-form-field.surviving-chance {
+        width: 175px;
+
+        .mat-mdc-form-field-infix {
+            padding-top: 8px;
+            padding-bottom: 8px;
+            min-height: unset;
         }
     }
 }
