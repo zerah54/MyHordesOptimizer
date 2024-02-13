@@ -88,7 +88,7 @@
                 </context-group>
             </trans-unit>
             <trans-unit id="1932549665173187929" datatype="html">
-                <source>Retour du Héro</source>
+                <source>Retour du Héros</source>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
                     <context context-type="linenumber">25</context>

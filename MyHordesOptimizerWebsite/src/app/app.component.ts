@@ -61,8 +61,16 @@ export class AppComponent implements OnInit {
 
         this.authentication_api.getMe()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe(() => {
-                this.ready = true;
+            .subscribe({
+                next: () => {
+                    this.ready = true;
+                },
+                error: () => {
+                    this.ready = true;
+                },
+                complete: () => {
+                    this.ready = true;
+                }
             });
     }
 
