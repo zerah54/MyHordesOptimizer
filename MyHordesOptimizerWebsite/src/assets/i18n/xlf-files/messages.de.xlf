@@ -322,37 +322,37 @@
         </context-group>
         <target state="final">Durstlöscher</target>
       </trans-unit>
-      <trans-unit id="8849931921318150989" datatype="html">
+      <trans-unit id="8849931921318150989" datatype="html" approved="yes">
         <source>Compte dans le calcul du bonus de veille donné par l&apos;armurerie</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="translated">Zählt bei der Berechnung des Wachtbonus, welcher von der kleinen Waffenschmiede gegeben wird</target>
+        <target state="final">Zählt bei der Berechnung des Wachtbonus, welcher von der kleinen Waffenschmiede gegeben wird</target>
       </trans-unit>
-      <trans-unit id="1323581807907830212" datatype="html">
+      <trans-unit id="1323581807907830212" datatype="html" approved="yes">
         <source>Compte dans le calcul du bonus de veille donné par le magasin suédois</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="translated">Zählt bei der Berechnung des Wachtbonus, welcher von der schwedischen Schreinerei gegeben wird</target>
+        <target state="final">Zählt bei der Berechnung des Wachtbonus, welcher von der schwedischen Schreinerei gegeben wird</target>
       </trans-unit>
-      <trans-unit id="84445083220864178" datatype="html">
+      <trans-unit id="84445083220864178" datatype="html" approved="yes">
         <source>Compte dans le calcul du bonus de veille donné par le lance-bête</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">47</context>
         </context-group>
-        <target state="translated">Zählt bei der Berechnung des Wachtbonus, welcher von dem kleinen Tribok gegeben wird</target>
+        <target state="final">Zählt bei der Berechnung des Wachtbonus, welcher von dem kleinen Tribok gegeben wird</target>
       </trans-unit>
-      <trans-unit id="3303333159113749004" datatype="html">
+      <trans-unit id="3303333159113749004" datatype="html" approved="yes">
         <source>Compte dans le calcul du bonus de veille donné par la tourelle lance-eau</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="translated">Zählt bei der Berechnung des Wachtbonus, welchen der Schießstand gibt</target>
+        <target state="final">Zählt bei der Berechnung des Wachtbonus, welchen der Schießstand gibt</target>
       </trans-unit>
       <trans-unit id="4813554456449727568" datatype="html" approved="yes">
         <source>Peut être empoisonné</source>
@@ -370,45 +370,45 @@
         </context-group>
         <target state="final">Kann verkocht werden</target>
       </trans-unit>
-      <trans-unit id="1327764723186928694" datatype="html">
+      <trans-unit id="1327764723186928694" datatype="html" approved="yes">
         <source>Provisions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="translated">Grundnahrungsmittel</target>
+        <target state="final">Grundnahrungsmittel</target>
       </trans-unit>
-      <trans-unit id="6713813306186507025" datatype="html">
+      <trans-unit id="6713813306186507025" datatype="html" approved="yes">
         <source>Pharmacie</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="translated">Apotheke</target>
+        <target state="final">Apotheke</target>
       </trans-unit>
-      <trans-unit id="9187731843021502220" datatype="html">
+      <trans-unit id="9187731843021502220" datatype="html" approved="yes">
         <source>Arme</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="translated">Waffe</target>
+        <target state="final">Waffe</target>
       </trans-unit>
-      <trans-unit id="8487168000877643051" datatype="html">
+      <trans-unit id="8487168000877643051" datatype="html" approved="yes">
         <source>Ressource</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="translated">Ressource</target>
+        <target state="final">Ressource</target>
       </trans-unit>
-      <trans-unit id="2016944012945209299" datatype="html">
+      <trans-unit id="2016944012945209299" datatype="html" approved="yes">
         <source>Objet de défense</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="translated">Verteidigungsgegenstand</target>
+        <target state="final">Verteidigungsgegenstand</target>
       </trans-unit>
       <trans-unit id="7152806231676044539" datatype="html">
         <source>Animal</source>
@@ -1025,7 +1025,7 @@
         </context-group>
         <target state="needs-translation">Améliorations</target>
       </trans-unit>
-      <trans-unit id="6373263061828099513" datatype="html">
+      <trans-unit id="6373263061828099513" datatype="html" approved="yes">
         <source>Citoyens</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens.component.html</context>
@@ -1059,9 +1059,9 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="translated">Bürger</target>
+        <target state="final">Bürger</target>
       </trans-unit>
-      <trans-unit id="8895761088455718364" datatype="html">
+      <trans-unit id="8895761088455718364" datatype="html" approved="yes">
         <source>Fouilles</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens.component.ts</context>
@@ -1079,17 +1079,17 @@
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="translated">Grabungen</target>
+        <target state="final">Grabungen</target>
       </trans-unit>
-      <trans-unit id="6351937635910938762" datatype="html">
+      <trans-unit id="6351937635910938762" datatype="html" approved="yes">
         <source>Disponibilités</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="translated">Verfügbarkeit</target>
+        <target state="final">Verfügbarkeit</target>
       </trans-unit>
-      <trans-unit id="5977326848564608050" datatype="html">
+      <trans-unit id="5977326848564608050" datatype="html" approved="yes">
         <source>Expéditions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
@@ -1103,41 +1103,41 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="translated">Expeditionen</target>
+        <target state="final">Expeditionen</target>
       </trans-unit>
-      <trans-unit id="2986159287834234807" datatype="html">
+      <trans-unit id="2986159287834234807" datatype="html" approved="yes">
         <source>N</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/compass-rose/compass-rose.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">N</target>
+        <target state="final">N</target>
       </trans-unit>
-      <trans-unit id="2566834560864089198" datatype="html">
+      <trans-unit id="2566834560864089198" datatype="html" approved="yes">
         <source>E</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/compass-rose/compass-rose.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="translated">O</target>
+        <target state="final">O</target>
       </trans-unit>
-      <trans-unit id="3457078116249609297" datatype="html">
+      <trans-unit id="3457078116249609297" datatype="html" approved="yes">
         <source>O</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/compass-rose/compass-rose.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="translated">W</target>
+        <target state="final">W</target>
       </trans-unit>
-      <trans-unit id="3251116876185403930" datatype="html">
+      <trans-unit id="3251116876185403930" datatype="html" approved="yes">
         <source>S</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/compass-rose/compass-rose.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="translated">S</target>
+        <target state="final">S</target>
       </trans-unit>
-      <trans-unit id="5407759070423985131" datatype="html">
+      <trans-unit id="5407759070423985131" datatype="html" approved="yes">
         <source>Ville</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-cell-details/map-cell-details.component.html</context>
@@ -1147,9 +1147,9 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="translated">Stadt</target>
+        <target state="final">Stadt</target>
       </trans-unit>
-      <trans-unit id="3012908712486845984" datatype="html">
+      <trans-unit id="3012908712486845984" datatype="html" approved="yes">
         <source>Désert</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-cell-details/map-cell-details.component.html</context>
@@ -1159,9 +1159,9 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="translated">Wüste</target>
+        <target state="final">Wüste</target>
       </trans-unit>
-      <trans-unit id="3020302862287038294" datatype="html">
+      <trans-unit id="3020302862287038294" datatype="html" approved="yes">
         <source>points</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-cell-details/map-cell-details.component.html</context>
@@ -1171,23 +1171,23 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="translated">Punkte</target>
+        <target state="final">Punkte</target>
       </trans-unit>
-      <trans-unit id="5420612892699041713" datatype="html">
+      <trans-unit id="5420612892699041713" datatype="html" approved="yes">
         <source>Zone épuisée</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="translated">Leere Zone</target>
+        <target state="final">Leere Zone</target>
       </trans-unit>
-      <trans-unit id="6781966251152970619" datatype="html">
+      <trans-unit id="6781966251152970619" datatype="html" approved="yes">
         <source>Liste des objets</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="translated">Liste der Gegenstände</target>
+        <target state="final">Liste der Gegenstände</target>
       </trans-unit>
       <trans-unit id="4289069287229748145" datatype="html">
         <source>Liste des objets en sacs</source>
@@ -3125,7 +3125,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">44,45</context>
         </context-group>
-        <target state="translated">(Bonus : <x id="INTERPOLATION" equiv-text="{{bonus['zombie_with_vest']}}"/> par zombie au lieu de <x id="INTERPOLATION_1" equiv-text="{{bonus['zombie_without_vest']}}"/>)</target>
+        <target state="needs-translation">(Bonus : <x id="INTERPOLATION" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale }}"/>)</target>
       </trans-unit>
       <trans-unit id="7954001980226848388" datatype="html">
         <source>Campeur professionnel</source>
@@ -3161,7 +3161,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">100</context>
         </context-group>
-        <target state="translated">(Bonus : <x id="INTERPOLATION" equiv-text="{{bonus['tomb']}}"/>)</target>
+        <target state="needs-translation">(Bonus : <x id="INTERPOLATION" equiv-text="{{ bonus.tomb | campingDisplayBonus:display_bonus_ap:locale }}"/>)</target>
       </trans-unit>
       <trans-unit id="3231213779188554984" datatype="html">
         <source>Nombre de campings déjà effectués</source>
@@ -3208,7 +3208,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">169</context>
         </context-group>
-        <target state="translated">Bonus : x<x id="INTERPOLATION" equiv-text="{{bonus['camping_objects_in_inventory']}}"/>
+        <target state="needs-translation">Bonus : x<x id="INTERPOLATION" equiv-text="{{ bonus.camp_items | campingDisplayBonus:display_bonus_ap:locale }}"/>
                 </target>
       </trans-unit>
       <trans-unit id="560884417072143682" datatype="html">
@@ -3242,7 +3242,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">147</context>
         </context-group>
-        <target state="translated">Bonus : <x id="INTERPOLATION" equiv-text="{{ configuration_form.get('town')?.value['id'] === 'pande'                             ? (configuration_form.get('pro')?.value                                     ? (configuration_form.get('campings')?.value &gt; 9 ? campings['pande']['pro'][9] : campings['pande']['pro'][configuration_form.get('campings')?.value])                                     : (configuration_form.get('campings')?.value &gt; 9 ? campings['pande']['nonpro'][9] : campings['pande']['nonpro'][configuration_form.get('campings')?.value])                             )                             : (configuration_form.get('pro')?.value                                     ? (configuration_form.get('campings')?.value &gt; 9 ? campings['normal']['pro'][9] : campings['normal']['pro'][configuration_form.get('campings')?.value])                                     : (configuration_form.get('campings')?.value &gt; 9 ? campings['normal']['nonpro'][9] : campings['normal']['nonpro'][configuration_form.get('campings')?.value])                             )                             }}"/>
+        <target state="needs-translation">Bonus : <x id="INTERPOLATION" equiv-text="{{ configuration_form.get('town')?.value['bonus'] | campingDisplayBonus:display_bonus_ap:locale }}"/>
                 </target>
       </trans-unit>
       <trans-unit id="5596519199501316309" datatype="html">
@@ -3347,8 +3347,8 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">178</context>
         </context-group>
-        <target state="translated">
-                    <x id="INTERPOLATION" equiv-text="{{ display_bonus_ap ? 'Nombre' : 'Pourcentage' }}"/> total d'améliotations sur la case</target>
+        <target state="needs-translation">
+<x id="INTERPOLATION" equiv-text="{{ display_bonus_ap ? 'Nombre' : 'Pourcentage' }}"/> total d'améliotations sur la case</target>
       </trans-unit>
       <trans-unit id="223574208640189770" datatype="html">
         <source>Bonus : x1</source>
@@ -3705,8 +3705,8 @@ Une fois activée, si vous êtes dans le désert et que votre attente d&apos;esc
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">31,32</context>
         </context-group>
-        <target state="translated">Dans l'interface, vous pouvez cocher l'option "Demander confirmation avant de quitter la page", ce qui activera la fonctionnalité.
-                Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l'onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.</target>
+        <target state="needs-translation">Dans l'interface, vous pouvez cocher l'option "Demander confirmation avant de quitter la page", ce qui activera la fonctionnalité.
+Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l'onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.</target>
       </trans-unit>
       <trans-unit id="4945794230367496950" datatype="html">
         <source>Avertissement en cas d&apos;inactivité</source>
@@ -3723,8 +3723,8 @@ Une fois activée, si vous êtes dans le désert et que votre attente d&apos;esc
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">35,36</context>
         </context-group>
-        <target state="translated">Dans l'interface, vous pouvez cocher l'option "Me notifier si je suis inactif depuis 5 minutes sur la page", ce qui activera la fonctionnalité.
-                Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.</target>
+        <target state="needs-translation">Dans l'interface, vous pouvez cocher l'option "Me notifier si je suis inactif depuis 5 minutes sur la page", ce qui activera la fonctionnalité.
+Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.</target>
       </trans-unit>
       <trans-unit id="2315492892193612031" datatype="html">
         <source>Notification à la fin de la fouille</source>
@@ -3829,13 +3829,13 @@ Dans le désert, les objets dans le sac ou au sol également présents dans la l
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">45,52</context>
         </context-group>
-        <target state="translated">En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l'atelier.
-                Cette liste contient des informations de priorité, de quantité en banque, de quantité dans les sacs, de quantité totale requise, et de quantité manquante.
-                &lt;br /&gt;&lt;br /&gt;
-                La liste de courses dans l'atelier ne présentera que les éléments pouvant obtenus à l'atelier.
-                Celle dans le désert affichera tous les éléments sans distinction.
-                &lt;br /&gt;&lt;br /&gt;
-                Dans le désert, les objets dans le sac ou au sol également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l'élément.
+        <target state="needs-translation">En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l'atelier.
+Cette liste contient des informations de priorité, de quantité en banque, de quantité dans les sacs, de quantité totale requise, et de quantité manquante.
+&lt;br /&gt;&lt;br /&gt;
+La liste de courses dans l'atelier ne présentera que les éléments pouvant obtenus à l'atelier.
+Celle dans le désert affichera tous les éléments sans distinction.
+&lt;br /&gt;&lt;br /&gt;
+Dans le désert, les objets dans le sac ou au sol également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l'élément.
                 </target>
       </trans-unit>
       <trans-unit id="4423220166056863975" datatype="html">
@@ -3853,8 +3853,8 @@ Il compte le nombre de zombies qui ont été tués sur la case depuis la derniè
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">56,57</context>
         </context-group>
-        <target state="translated">En cochant cette option, un nouvel encart apparaitra sous la carte dans l'Outre-Monde.
-                Il compte le nombre de zombies qui ont été tués sur la case depuis la dernière attaque, et calcule le nombre de zombies qui vont mourir de désespoir lors de la prochaine attaque.</target>
+        <target state="needs-translation">En cochant cette option, un nouvel encart apparaitra sous la carte dans l'Outre-Monde.
+Il compte le nombre de zombies qui ont été tués sur la case depuis la dernière attaque, et calcule le nombre de zombies qui vont mourir de désespoir lors de la prochaine attaque.</target>
       </trans-unit>
       <trans-unit id="6560590152891649669" datatype="html">
         <source>Affichage de l&apos;outil de traduction</source>
@@ -3891,8 +3891,8 @@ Cette option va montrer combien de pa manquent pour que le chantier ne risque pa
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">67,68</context>
         </context-group>
-        <target state="translated">En pandémonium, les chantiers subissent des dégats lors de l'attaque.
-                Cette option va montrer combien de pa manquent pour que le chantier ne risque pas d'être détruit lors de la prochaine attaque.</target>
+        <target state="needs-translation">En pandémonium, les chantiers subissent des dégats lors de l'attaque.
+Cette option va montrer combien de pa manquent pour que le chantier ne risque pas d'être détruit lors de la prochaine attaque.</target>
       </trans-unit>
       <trans-unit id="7507912867004115839" datatype="html">
         <source>Prédictions de camping dans les informations du secteur</source>
@@ -3910,9 +3910,9 @@ Certaines informations, comme par exemple le type de ville, ne sont pas visibles
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">72,74</context>
         </context-group>
-        <target state="translated">En cochant cette option, vous verrez apparaitre un nouvel encart dans les informations du secteur de votre case.
-                Cet encart vous permettra de saisir diverses informations pour calculer vos chances de survie sur cette case.
-                Certaines informations, comme par exemple le type de ville, ne sont pas visibles car elles sont déjà pré-renseignées et tiennent compte de votre ville actuelle.</target>
+        <target state="needs-translation">En cochant cette option, vous verrez apparaitre un nouvel encart dans les informations du secteur de votre case.
+Cet encart vous permettra de saisir diverses informations pour calculer vos chances de survie sur cette case.
+Certaines informations, comme par exemple le type de ville, ne sont pas visibles car elles sont déjà pré-renseignées et tiennent compte de votre ville actuelle.</target>
       </trans-unit>
       <trans-unit id="5457236869945529467" datatype="html">
         <source>Informations diverses issues de MyHordes Optimizer</source>
@@ -3929,8 +3929,8 @@ Quand cette option est cochée, la note associée s&apos;affiche sur votre case 
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">78,79</context>
         </context-group>
-        <target state="translated">Sur la carte du site de MyHordes Optimizer, vous pouvez saisir des notes sur chaque case.
-                Quand cette option est cochée, la note associée s'affiche sur votre case quand vous vous déplacez dans l'Outre-Monde.</target>
+        <target state="needs-translation">Sur la carte du site de MyHordes Optimizer, vous pouvez saisir des notes sur chaque case.
+Quand cette option est cochée, la note associée s'affiche sur votre case quand vous vous déplacez dans l'Outre-Monde.</target>
       </trans-unit>
       <trans-unit id="3270416149746032956" datatype="html">
         <source>Affiche les estimations enregistrées sur la page de la tour de guet</source>
@@ -3979,8 +3979,8 @@ Le compteur dans MyHordes tient compte des minutes &quot;glissantes&quot;, il su
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">91,92</context>
         </context-group>
-        <target state="translated">Quand cette option est cochée, un compteur qui liste vos prises en banque est ajouté aux pages de banque et puits.
-                Le compteur dans MyHordes tient compte des minutes "glissantes", il suffit donc d'attendre qu'une ligne disparaisse pour pouvoir prendre de nouveau un objet en banque.</target>
+        <target state="needs-translation">Quand cette option est cochée, un compteur qui liste vos prises en banque est ajouté aux pages de banque et puits.
+Le compteur dans MyHordes tient compte des minutes "glissantes", il suffit donc d'attendre qu'une ligne disparaisse pour pouvoir prendre de nouveau un objet en banque.</target>
       </trans-unit>
       <trans-unit id="7972524927973029550" datatype="html">
         <source>Ouvre automatiquement le menu &quot;Utiliser un objet de mon sac&quot;</source>
@@ -4013,8 +4013,8 @@ Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par 
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">100,101</context>
         </context-group>
-        <target state="translated">En cochant cette option, deux autres options représentant les options d'escorte dans l'Outre-Monde seront disponibles.
-                Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.</target>
+        <target state="needs-translation">En cochant cette option, deux autres options représentant les options d'escorte dans l'Outre-Monde seront disponibles.
+Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.</target>
       </trans-unit>
       <trans-unit id="8248895111587460156" datatype="html">
         <source>Outils externes</source>
@@ -4064,18 +4064,18 @@ Vous rendez également accessibles d&apos;autres options de mise à jour avancé
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">29,41</context>
         </context-group>
-        <target state="translated">
-                En cochant l'option "Mettre à jour MyHordesOptimizer", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de MyHordes Optimizer se fera automatiquement.
-                Vous rendez également accessibles d'autres options de mise à jour avancées.
-                &lt;ul&gt;
-                &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à MyHordes Optimizer.&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Détail de mon sac et de ceux de mon escorte :&lt;/strong&gt; Enregistre le contenu de votre sac ainsi que ceux de vos escortés&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre vos différents états (rassasié, soif, etc... Attention : n'enregistre pas l'état goule)&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Entregistrer les fouilles réussies :&lt;/strong&gt; Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte dédiée&lt;/li&gt;
-                &lt;/ul&gt;
+        <target state="needs-translation">
+En cochant l'option "Mettre à jour MyHordesOptimizer", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de MyHordes Optimizer se fera automatiquement.
+Vous rendez également accessibles d'autres options de mise à jour avancées.
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à MyHordes Optimizer.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Détail de mon sac et de ceux de mon escorte :&lt;/strong&gt; Enregistre le contenu de votre sac ainsi que ceux de vos escortés&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre vos différents états (rassasié, soif, etc... Attention : n'enregistre pas l'état goule)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Entregistrer les fouilles réussies :&lt;/strong&gt; Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte dédiée&lt;/li&gt;
+&lt;/ul&gt;
                 </target>
       </trans-unit>
       <trans-unit id="762928771016494268" datatype="html">
@@ -4101,15 +4101,15 @@ Vous rendez également accessibles d&apos;autres options de mise à jour avancé
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">44,53</context>
         </context-group>
-        <target state="translated">En cochant l'option "Mettre à jour Gest'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de Gest'Hordes se fera automatiquement.
-                Vous rendez également accessibles d'autres options de mise à jour avancées.
-                &lt;ul&gt;
-                &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à Gest'Hordes.&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
-                &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre l'état clair&lt;/li&gt;
-                &lt;/ul&gt;
+        <target state="needs-translation">En cochant l'option "Mettre à jour Gest'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de Gest'Hordes se fera automatiquement.
+Vous rendez également accessibles d'autres options de mise à jour avancées.
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à Gest'Hordes.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre l'état clair&lt;/li&gt;
+&lt;/ul&gt;
                 </target>
       </trans-unit>
       <trans-unit id="4957168085124746094" datatype="html">
@@ -4260,13 +4260,13 @@ Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">40,46</context>
         </context-group>
-        <target state="translated">&lt;ul&gt;
-                &lt;li&gt;Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox ;&lt;/li&gt;
-                &lt;li&gt;Rechercher l'extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li&gt;
-                &lt;li&gt;Installer l'extension pour Chrome ;&lt;/li&gt;
-                &lt;li&gt;Cliquer sur le <x id="PH" equiv-text="this.download_link"/> ;&lt;/li&gt;
-                &lt;li&gt;Confirmer l'installation dans la page qui se sera ouverte.&lt;/li&gt;
-                &lt;/ul&gt;</target>
+        <target state="needs-translation">&lt;ul&gt;
+&lt;li&gt;Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox ;&lt;/li&gt;
+&lt;li&gt;Rechercher l'extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li&gt;
+&lt;li&gt;Installer l'extension pour Chrome ;&lt;/li&gt;
+&lt;li&gt;Cliquer sur le <x id="PH" equiv-text="this.download_link"/> ;&lt;/li&gt;
+&lt;li&gt;Confirmer l'installation dans la page qui se sera ouverte.&lt;/li&gt;
+&lt;/ul&gt;</target>
       </trans-unit>
       <trans-unit id="6674940684074453217" datatype="html">
         <source>iOS</source>
