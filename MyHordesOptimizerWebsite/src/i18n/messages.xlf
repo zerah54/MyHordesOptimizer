@@ -87,7 +87,7 @@
                     <context context-type="linenumber">24</context>
                 </context-group>
             </trans-unit>
-            <trans-unit id="1932549665173187929" datatype="html">
+            <trans-unit id="629897095092910129" datatype="html">
                 <source>Retour du Héros</source>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
@@ -2826,59 +2826,35 @@
                     <context context-type="linenumber">43</context>
                 </context-group>
             </trans-unit>
-            <trans-unit id="7437726437653769525" datatype="html">
-                <source>(Bonus : <x id="INTERPOLATION" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale }}"/>)</source>
+            <trans-unit id="1294130363465211657" datatype="html">
+                <source>(<x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
+<x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{
+                                        bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale
+                                    }}"/>)</source>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">44,45</context>
+                    <context context-type="linenumber">44,46</context>
                 </context-group>
             </trans-unit>
             <trans-unit id="7954001980226848388" datatype="html">
                 <source>Campeur professionnel</source>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">50</context>
+                    <context context-type="linenumber">51</context>
                 </context-group>
             </trans-unit>
             <trans-unit id="8079361333376398985" datatype="html">
                 <source>Tombe</source>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">54</context>
-                </context-group>
-            </trans-unit>
-            <trans-unit id="8372867068304562984" datatype="html">
-                <source>(Bonus : <x id="INTERPOLATION" equiv-text="{{ bonus.tomb | campingDisplayBonus:display_bonus_ap:locale }}"/>)</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
                     <context context-type="linenumber">55</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">90</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">95</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">100</context>
                 </context-group>
             </trans-unit>
             <trans-unit id="3231213779188554984" datatype="html">
                 <source>Nombre de campings déjà effectués</source>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">58</context>
-                </context-group>
-            </trans-unit>
-            <trans-unit id="4023148096467147798" datatype="html">
-                <source>Bonus : <x id="INTERPOLATION" equiv-text="{{ calculateNbCampingsChance(+campings.value, proCamper.checked, configuration_form.get(&apos;town&apos;)?.value[&apos;id&apos;] === &apos;PANDE&apos;) | campingDisplayBonus:display_bonus_ap:locale }}"/>
-                </source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">62,63</context>
+                    <context context-type="linenumber">59</context>
                 </context-group>
             </trans-unit>
             <trans-unit id="3915433859665099927" datatype="html">
@@ -2886,26 +2862,6 @@
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
                     <context context-type="linenumber">66</context>
-                </context-group>
-            </trans-unit>
-            <trans-unit id="5144075962741844228" datatype="html">
-                <source>Bonus : x<x id="INTERPOLATION" equiv-text="{{ bonus.camp_items | campingDisplayBonus:display_bonus_ap:locale }}"/>
-                </source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">69</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">139</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">162</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">169</context>
                 </context-group>
             </trans-unit>
             <trans-unit id="560884417072143682" datatype="html">
@@ -2920,22 +2876,6 @@
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
                     <context context-type="linenumber">80</context>
-                </context-group>
-            </trans-unit>
-            <trans-unit id="2358016939898298278" datatype="html">
-                <source>Bonus : <x id="INTERPOLATION" equiv-text="{{ configuration_form.get(&apos;town&apos;)?.value[&apos;bonus&apos;] | campingDisplayBonus:display_bonus_ap:locale }}"/>
-                </source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">85</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">115</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">147</context>
                 </context-group>
             </trans-unit>
             <trans-unit id="5596519199501316309" datatype="html">
@@ -3030,13 +2970,6 @@
                     <context context-type="linenumber">178</context>
                 </context-group>
             </trans-unit>
-            <trans-unit id="223574208640189770" datatype="html">
-                <source>Bonus : x1</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">184</context>
-                </context-group>
-            </trans-unit>
             <trans-unit id="2902261471051690112" datatype="html">
                 <source>Résultat</source>
                 <context-group purpose="location">
@@ -3090,11 +3023,18 @@
                     <context context-type="linenumber">66</context>
                 </context-group>
             </trans-unit>
+            <trans-unit id="4379616016375089599" datatype="html">
+                <source>Bonus : </source>
+                <context-group purpose="location">
+                    <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+                    <context context-type="linenumber">68</context>
+                </context-group>
+            </trans-unit>
             <trans-unit id="61672744151027488" datatype="html">
                 <source>Le lien a bien été copié</source>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-                    <context context-type="linenumber">163</context>
+                    <context context-type="linenumber">165</context>
                 </context-group>
                 <context-group purpose="location">
                     <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
