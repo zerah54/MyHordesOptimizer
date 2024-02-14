@@ -98,7 +98,7 @@
         </context-group>
         <target state="needs-translation">Vaincre la Mort</target>
       </trans-unit>
-      <trans-unit id="629897095092910129" datatype="html">
+      <trans-unit id="1932549665173187929" datatype="html">
         <source>Retour du Héros</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
