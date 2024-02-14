@@ -292,19 +292,6 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .Include(recipe => recipe.RecipeItemResults)
                     .ThenInclude(item => item.IdItemNavigation)
                 .ToList();
-            models.ForEach(recipe =>
-            {
-                recipe.RecipeItemComponents.ToList().ForEach(ric =>
-                {
-                    ric.IdItemNavigation.RecipeItemComponents.Clear();
-                    ric.IdItemNavigation.RecipeItemResults.Clear();
-                });
-                recipe.RecipeItemResults.ToList().ForEach(rir =>
-                {
-                    rir.IdItemNavigation.RecipeItemResults.Clear();
-                    rir.IdItemNavigation.RecipeItemComponents.Clear();
-                });
-            });
             var dtos = Mapper.Map<List<ItemRecipeDto>>(models);
             return dtos;
         }

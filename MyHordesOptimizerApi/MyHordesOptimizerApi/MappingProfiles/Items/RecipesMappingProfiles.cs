@@ -11,20 +11,20 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
     {
         public RecipesMappingProfiles()
         {
-            CreateMap<RecipeItemComponent, ItemRecipeDto>()
-                .ForMember(dest => dest.Actions, opt => opt.MapFrom(src => new Dictionary<string, string>()
+            CreateMap<Recipe, ItemRecipeDto>()
+                 .ForMember(dest => dest.Actions, opt => opt.MapFrom(src => new Dictionary<string, string>()
                 {
-                    { "fr", src.RecipeNameNavigation.ActionFr },
-                    { "en", src.RecipeNameNavigation.ActionEn },
-                    { "es", src.RecipeNameNavigation.ActionEs },
-                    { "de", src.RecipeNameNavigation.ActionDe }
+                    { "fr", src.ActionFr },
+                    { "en", src.ActionEn },
+                    { "es", src.ActionEs },
+                    { "de", src.ActionDe }
                 }))
-                .ForMember(dest => dest.Components, opt => opt.MapFrom(src => src.RecipeNameNavigation.RecipeItemComponents.Select(ric => ric.IdItemNavigation)))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.RecipeName))
+                .ForMember(dest => dest.Components, opt => opt.MapFrom(src => src.RecipeItemComponents.Select(ric => ric.IdItemNavigation)))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Result, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
                     var results = new List<ItemResultDto>();
-                    foreach (var rir in src.RecipeNameNavigation.RecipeItemResults)
+                    foreach (var rir in src.RecipeItemResults)
                     {
                         var item = context.Mapper.Map<ItemWithoutRecipeDto>(rir.IdItemNavigation);
                         results.Add(new ItemResultDto()
@@ -36,7 +36,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                     }
                     return results;
                 }))
-                .ForMember(dest => dest.Type, opt => opt.MapFrom<string>(src => src.RecipeNameNavigation.Type));
+                .ForMember(dest => dest.Type, opt => opt.MapFrom<string>(src => src.Type));
         }
     }
 }

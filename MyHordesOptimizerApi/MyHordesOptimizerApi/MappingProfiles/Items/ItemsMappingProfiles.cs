@@ -62,7 +62,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .Include<Item, ItemDto>();
 
             CreateMap<Item, ItemDto>()
-                .ForMember(dest => dest.Recipes, opt => opt.MapFrom(src => src.RecipeItemComponents));
+                .ForMember(dest => dest.Recipes, opt => opt.MapFrom(src => src.RecipeItemComponents.Select(ric => ric.RecipeNameNavigation)));
         }
     }
 }
