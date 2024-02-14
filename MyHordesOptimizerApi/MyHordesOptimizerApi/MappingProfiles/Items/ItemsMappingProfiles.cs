@@ -11,7 +11,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
     {
         public ItemsMappingProfiles()
         {
-            CreateMap<Item, ItemDto>()
+            CreateMap<Item, ItemWithoutRecipeDto>()
                 .ForMember(dest => dest.Actions, opt => opt.MapFrom(src => src.ActionNames.Select(action => action.Name)))
                 .ForMember(dest => dest.BankCount, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
@@ -47,7 +47,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                     { "de", src.LabelDe }
                 }))
                 .ForMember(dest => dest.Properties, opt => opt.MapFrom(src => src.PropertyNames.Select(prop => prop.Name)))
-                .ForMember(dest => dest.Recipes, opt => opt.MapFrom(src => src.RecipeItemComponents))
                 .ForMember(dest => dest.Uid, opt => opt.MapFrom(src => src.Uid))
                 .ForMember(dest => dest.WishListCount, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
@@ -59,7 +58,11 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                     {
                         return src.TownWishListItems.First().Count;
                     }
-                }));
+                }))
+                .Include<Item, ItemDto>();
+
+            CreateMap<Item, ItemDto>()
+                .ForMember(dest => dest.Recipes, opt => opt.MapFrom(src => src.RecipeItemComponents));
         }
     }
 }

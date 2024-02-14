@@ -64,19 +64,7 @@ namespace MyHordesOptimizerApi.Services.Impl
               .Include(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId))
               .Include(item => item.TownWishListItems.Where(wishListItem => wishListItem.IdTown == townId))
               .ToList();
-            items.ForEach(item =>
-            {
-                item.RecipeItemComponents.ToList().ForEach(ric =>
-                {
-                    ric.IdItemNavigation.RecipeItemComponents.Clear();
-                    ric.IdItemNavigation.RecipeItemResults.Clear();
-                });
-                item.RecipeItemResults.ToList().ForEach(rir =>
-                {
-                    rir.IdItemNavigation.RecipeItemResults.Clear();
-                    rir.IdItemNavigation.RecipeItemComponents.Clear();
-                });
-            });
+
             var itemsDto = Mapper.Map<List<ItemDto>>(items);
             return itemsDto;
         }
