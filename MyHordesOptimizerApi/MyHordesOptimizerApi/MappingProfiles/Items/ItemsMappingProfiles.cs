@@ -21,7 +21,13 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                     }
                     else
                     {
-                        return src.TownBankItems.First().Count;
+                        // On compte le nombre d'item total (cassé et pas cassé) pour la dernière maj de la banque
+                        var max = src.TownBankItems.GroupBy(tbi => tbi.IdLastUpdateInfo)            
+                        .OrderByDescending(g => g.Key)
+                        .First()
+                        .Key;
+                        var count = src.TownBankItems.Where(tbi => tbi.IdItem == src.IdItem && tbi.IdLastUpdateInfo == max).Sum(tbi => tbi.Count);
+                        return count;
                     }
                 }))
                 .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.IdCategoryNavigation))
@@ -63,6 +69,12 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
 
             CreateMap<Item, ItemDto>()
                 .ForMember(dest => dest.Recipes, opt => opt.MapFrom(src => src.RecipeItemComponents.Select(ric => ric.RecipeNameNavigation)));
+
+            CreateMap<TownBankItem, BankItemDto>()
+                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
+                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
+                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src.IdItemNavigation))
+                .ForMember(dest => dest.WishListCount, opt => opt.MapFrom(src => src.IdItemNavigation.TownWishListItems.Count));
         }
     }
 }

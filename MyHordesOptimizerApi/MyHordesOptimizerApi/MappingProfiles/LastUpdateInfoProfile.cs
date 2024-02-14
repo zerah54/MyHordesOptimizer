@@ -10,33 +10,38 @@ namespace MyHordesOptimizerApi.MappingProfiles
         public LastUpdateInfoProfile()
         {
             CreateMap<LastUpdateInfoDto, LastUpdateInfo>()
-                .ForMember(dest => dest.DateUpdate, opt => opt.MapFrom(src => src.UpdateTime))
-                .ForMember(dest => dest.Expeditions, opt => opt.Ignore())
-                .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
-                .ForMember(dest => dest.IdUser, opt => opt.Ignore())
-                .ForMember(dest => dest.IdUserNavigation, opt => opt.MapFrom(src => src))
-                .ForMember(dest => dest.MapCellDigs, opt => opt.Ignore())
-                .ForMember(dest => dest.MapCells, opt => opt.Ignore())
-                .ForMember(dest => dest.TownBankItems, opt => opt.Ignore())
-                .ForMember(dest => dest.TownCadavers, opt => opt.Ignore())
-                .ForMember(dest => dest.TownCitizenIdLastUpdateInfoGhoulStatusNavigations, opt => opt.Ignore())
-                .ForMember(dest => dest.TownCitizenIdLastUpdateInfoHeroicActionNavigations, opt => opt.Ignore())
-                .ForMember(dest => dest.TownCitizenIdLastUpdateInfoHomeNavigations, opt => opt.Ignore())
-                .ForMember(dest => dest.TownCitizenIdLastUpdateInfoNavigations, opt => opt.Ignore())
-                .ForMember(dest => dest.TownCitizenIdLastUpdateInfoStatusNavigations, opt => opt.Ignore())
-                .ForMember(dest => dest.TownEstimations, opt => opt.Ignore());
+                .ForMember(model => model.DateUpdate, opt => opt.MapFrom(src => src.UpdateTime))
+                .ForMember(model => model.Expeditions, opt => opt.Ignore())
+                .ForMember(model => model.IdLastUpdateInfo, opt => opt.Ignore())
+                .ForMember(model => model.IdUser, opt => opt.Ignore())
+                .ForMember(model => model.IdUserNavigation, opt => opt.MapFrom(src => src))
+                .ForMember(model => model.MapCellDigs, opt => opt.Ignore())
+                .ForMember(model => model.MapCells, opt => opt.Ignore())
+                .ForMember(model => model.TownBankItems, opt => opt.Ignore())
+                .ForMember(model => model.TownCadavers, opt => opt.Ignore())
+                .ForMember(model => model.TownCitizenIdLastUpdateInfoGhoulStatusNavigations, opt => opt.Ignore())
+                .ForMember(model => model.TownCitizenIdLastUpdateInfoHeroicActionNavigations, opt => opt.Ignore())
+                .ForMember(model => model.TownCitizenIdLastUpdateInfoHomeNavigations, opt => opt.Ignore())
+                .ForMember(model => model.TownCitizenIdLastUpdateInfoNavigations, opt => opt.Ignore())
+                .ForMember(model => model.TownCitizenIdLastUpdateInfoStatusNavigations, opt => opt.Ignore())
+                .ForMember(model => model.TownEstimations, opt => opt.Ignore());
+
+            CreateMap<LastUpdateInfo, LastUpdateInfoDto>()  
+                .ForMember(dto => dto.UserId, opt => opt.MapFrom(model => model.IdUser))    
+                .ForMember(dto => dto.UserName, opt => opt.MapFrom(model => model.IdUserNavigation.Name))
+                .ForMember(dto => dto.UpdateTime, opt => opt.MapFrom(model => model.DateUpdate));
 
             CreateMap<LastUpdateInfoDto, User>()
                 .EqualityComparison((dto, model) => dto.UserId == model.IdUser)
-                .ForMember(dest => dest.ExpeditionCitizens, opt => opt.Ignore())
-                .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.UserId))
-                .ForMember(dest => dest.LastUpdateInfos, opt => opt.Ignore())
-                .ForMember(dest => dest.MapCellDigs, opt => opt.Ignore())
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UserName))
-                .ForMember(dest => dest.TownCadavers, opt => opt.Ignore())
-                .ForMember(dest => dest.TownCitizens, opt => opt.Ignore())
-                .ForMember(dest => dest.UserKey, opt => opt.Ignore())
-                .ForMember(dest => dest.WishlistCategories, opt => opt.Ignore());
+                .ForMember(user => user.ExpeditionCitizens, opt => opt.Ignore())
+                .ForMember(user => user.IdUser, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(user => user.LastUpdateInfos, opt => opt.Ignore())
+                .ForMember(user => user.MapCellDigs, opt => opt.Ignore())
+                .ForMember(user => user.Name, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(user => user.TownCadavers, opt => opt.Ignore())
+                .ForMember(user => user.TownCitizens, opt => opt.Ignore())
+                .ForMember(user => user.UserKey, opt => opt.Ignore())
+                .ForMember(user => user.WishlistCategories, opt => opt.Ignore());
         }
     }
 }

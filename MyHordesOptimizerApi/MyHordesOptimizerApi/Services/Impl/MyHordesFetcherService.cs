@@ -298,34 +298,50 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public BankLastUpdateDto GetBank()
         {
-            //var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
-            //var town = Mapper.Map<Town>(myHordeMeResponse.Map);
+            var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
+            
+            // Enregistrer en base
+            using var transaction = DbContext.Database.BeginTransaction();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo()));
+            DbContext.SaveChanges();
+            var lastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.Entity.IdLastUpdateInfo);
+            myHordeMeResponse.Map.LastUpdateInfo = lastUpdate;
+            var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
+            DbContext.AddRange(town.TownBankItems);
+            DbContext.SaveChanges();
+            transaction.Commit();
 
-            //// Enregistrer en base
-            //MyHordesOptimizerRepository.PutBank(town.Id, town.Bank);
-            //town = MyHordesOptimizerRepository.GetTown(town.Id);
-            //var recipes = MyHordesOptimizerRepository.GetRecipes().ToList();
-            //var bankWrapper = town.Bank;
-
-            //if (town.WishList != null && town.WishList.WishList != null)
-            //{
-            //    var wishListItems = town.WishList.WishList.Values.SelectMany(x => x).ToList();
-            //    foreach (var bankItem in bankWrapper.Bank)
-            //    {
-            //        var wishlistItem = wishListItems.FirstOrDefault(x => x.Item.Id == bankItem.Item.Id);
-            //        if (wishlistItem != null)
-            //        {
-            //            bankItem.WishListCount = wishlistItem.Count;
-            //        }
-            //        else
-            //        {
-            //            bankItem.WishListCount = 0;
-            //        }
-            //    }
-            //}
-            //bankWrapper.Bank.ForEach(bankItem => bankItem.Item.Recipes = recipes.GetRecipeForItem(bankItem.Item.Id));
-            //return bankWrapper;
-            return null;
+            var townModel = DbContext.Towns
+                .Include(town => town.TownBankItems)
+                  .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
+                      .ThenInclude(item => item.IdCategoryNavigation)
+                .Include(town => town.TownBankItems)
+                  .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
+                      .ThenInclude(item => item.PropertyNames)
+                .Include(town => town.TownBankItems)
+                 .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
+                      .ThenInclude(item => item.ActionNames)
+                .Include(town => town.TownBankItems)
+                  .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
+                      .ThenInclude(item => item.RecipeItemComponents)
+                         .ThenInclude(recipe => recipe.RecipeNameNavigation)
+                         .ThenInclude(recipe => recipe.RecipeItemResults)
+                .Include(town => town.TownBankItems)
+                    .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
+                .Include(town => town.TownBankItems)
+                    .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
+                        .ThenInclude(item => item.TownWishListItems.Where(wishListItem => wishListItem.IdTown == town.IdTown))
+                .Include(town => town.TownBankItems)
+                    .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
+                        .ThenInclude(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == town.IdTown))
+                .Where(townBankItem => townBankItem.IdTown == town.IdTown)
+                .First();
+            var dtos = Mapper.Map<List<BankItemDto>>(townModel.TownBankItems);
+            return new BankLastUpdateDto()
+            {
+                Bank = dtos,
+                LastUpdateInfo = Mapper.Map<LastUpdateInfoDto>(lastUpdate)
+            };
         }
 
         public CitizensLastUpdateDto GetCitizens(int townId)

@@ -183,14 +183,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
             //   .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
             //   .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
 
-            //TownBankItem
-            CreateMap<BankItemDto, TownBankItem>()
-                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Item.Id))
-                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
-                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
-                .ForMember(dest => dest.IdTown, opt => opt.Ignore())
-                .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore());
-
             //TownCadaver
             CreateMap<CadaverDto, TownCadaver>()
                 .ForMember(dest => dest.IdCadaver, opt => opt.Ignore())
