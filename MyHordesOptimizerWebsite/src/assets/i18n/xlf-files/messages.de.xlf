@@ -98,7 +98,7 @@
         </context-group>
         <target state="final">Den Tod besiegen</target>
       </trans-unit>
-      <trans-unit id="1932549665173187929" datatype="html">
+      <trans-unit id="629897095092910129" datatype="html">
         <source>Retour du Héros</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
@@ -3119,19 +3119,21 @@
         </context-group>
         <target state="needs-translation">Tenue de camouflage</target>
       </trans-unit>
-      <trans-unit id="7437726437653769525" datatype="html">
-        <source>(Bonus : <x id="INTERPOLATION" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale }}"/>)</source>
+      <trans-unit id="1294130363465211657" datatype="html">
+        <source>(<x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
+<x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">44,45</context>
+          <context context-type="linenumber">44,46</context>
         </context-group>
-        <target state="translated">(Bonus : <x id="INTERPOLATION" equiv-text="{{bonus['zombie_with_vest']}}"/> par zombie au lieu de <x id="INTERPOLATION_1" equiv-text="{{bonus['zombie_without_vest']}}"/>)</target>
+        <target state="translated">(<x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
+                    <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>)</target>
       </trans-unit>
       <trans-unit id="7954001980226848388" datatype="html">
         <source>Campeur professionnel</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">50</context>
+          <context context-type="linenumber">51</context>
         </context-group>
         <target state="needs-translation">Campeur professionnel</target>
       </trans-unit>
@@ -3139,47 +3141,17 @@
         <source>Tombe</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">54</context>
-        </context-group>
-        <target state="needs-translation">Tombe</target>
-      </trans-unit>
-      <trans-unit id="8372867068304562984" datatype="html">
-        <source>(Bonus : <x id="INTERPOLATION" equiv-text="{{ bonus.tomb | campingDisplayBonus:display_bonus_ap:locale }}"/>)</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">90</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">95</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">100</context>
-        </context-group>
-        <target state="translated">(Bonus : <x id="INTERPOLATION" equiv-text="{{bonus['tomb']}}"/>)</target>
+        <target state="needs-translation">Tombe</target>
       </trans-unit>
       <trans-unit id="3231213779188554984" datatype="html">
         <source>Nombre de campings déjà effectués</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">58</context>
+          <context context-type="linenumber">59</context>
         </context-group>
         <target state="needs-translation">Nombre de campings déjà effectués</target>
-      </trans-unit>
-      <trans-unit id="4023148096467147798" datatype="html">
-        <source>Bonus : <x id="INTERPOLATION" equiv-text="{{ calculateNbCampingsChance(+campings.value, proCamper.checked, configuration_form.get(&apos;town&apos;)?.value[&apos;id&apos;] === &apos;PANDE&apos;) | campingDisplayBonus:display_bonus_ap:locale }}"/>
-                </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">62,63</context>
-        </context-group>
-        <target state="needs-translation">Bonus : <x id="INTERPOLATION" equiv-text="{{ calculateNbCampingsChance(+campings.value, proCamper.checked, configuration_form.get('town')?.value['id'] === 'PANDE') | campingDisplayBonus:display_bonus_ap:locale }}"/>
-                </target>
       </trans-unit>
       <trans-unit id="3915433859665099927" datatype="html">
         <source>Nombre de pelures de peau et de toiles de tentes dans le sac</source>
@@ -3188,28 +3160,6 @@
           <context context-type="linenumber">66</context>
         </context-group>
         <target state="needs-translation">Nombre de pelures de peau et de toiles de tentes dans le sac</target>
-      </trans-unit>
-      <trans-unit id="5144075962741844228" datatype="html">
-        <source>Bonus : x<x id="INTERPOLATION" equiv-text="{{ bonus.camp_items | campingDisplayBonus:display_bonus_ap:locale }}"/>
-                </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">69</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">139</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">162</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">169</context>
-        </context-group>
-        <target state="translated">Bonus : x<x id="INTERPOLATION" equiv-text="{{bonus['camping_objects_in_inventory']}}"/>
-                </target>
       </trans-unit>
       <trans-unit id="560884417072143682" datatype="html">
         <source>La ville</source>
@@ -3226,24 +3176,6 @@
           <context context-type="linenumber">80</context>
         </context-group>
         <target state="needs-translation">Type de ville</target>
-      </trans-unit>
-      <trans-unit id="2358016939898298278" datatype="html">
-        <source>Bonus : <x id="INTERPOLATION" equiv-text="{{ configuration_form.get(&apos;town&apos;)?.value[&apos;bonus&apos;] | campingDisplayBonus:display_bonus_ap:locale }}"/>
-                </source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">85</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">115</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">147</context>
-        </context-group>
-        <target state="translated">Bonus : <x id="INTERPOLATION" equiv-text="{{ configuration_form.get('town')?.value['id'] === 'pande'                             ? (configuration_form.get('pro')?.value                                     ? (configuration_form.get('campings')?.value &gt; 9 ? campings['pande']['pro'][9] : campings['pande']['pro'][configuration_form.get('campings')?.value])                                     : (configuration_form.get('campings')?.value &gt; 9 ? campings['pande']['nonpro'][9] : campings['pande']['nonpro'][configuration_form.get('campings')?.value])                             )                             : (configuration_form.get('pro')?.value                                     ? (configuration_form.get('campings')?.value &gt; 9 ? campings['normal']['pro'][9] : campings['normal']['pro'][configuration_form.get('campings')?.value])                                     : (configuration_form.get('campings')?.value &gt; 9 ? campings['normal']['nonpro'][9] : campings['normal']['nonpro'][configuration_form.get('campings')?.value])                             )                             }}"/>
-                </target>
       </trans-unit>
       <trans-unit id="5596519199501316309" datatype="html">
         <source>Nuit</source>
@@ -3350,14 +3282,6 @@
         <target state="needs-translation">
 <x id="INTERPOLATION" equiv-text="{{ display_bonus_ap ? 'Nombre' : 'Pourcentage' }}"/> total d'améliotations sur la case</target>
       </trans-unit>
-      <trans-unit id="223574208640189770" datatype="html">
-        <source>Bonus : x1</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-          <context context-type="linenumber">184</context>
-        </context-group>
-        <target state="needs-translation">Bonus : x1</target>
-      </trans-unit>
       <trans-unit id="2902261471051690112" datatype="html">
         <source>Résultat</source>
         <context-group purpose="location">
@@ -3418,11 +3342,19 @@
         </context-group>
         <target state="needs-translation">Il faut en soustraire 3 après chaque attaque</target>
       </trans-unit>
+      <trans-unit id="4379616016375089599" datatype="html">
+        <source>Bonus : </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+        <target state="needs-translation">Bonus : </target>
+      </trans-unit>
       <trans-unit id="61672744151027488" datatype="html">
         <source>Le lien a bien été copié</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-          <context context-type="linenumber">163</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
