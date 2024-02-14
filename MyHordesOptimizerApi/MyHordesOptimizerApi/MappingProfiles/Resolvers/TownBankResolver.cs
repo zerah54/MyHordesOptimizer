@@ -30,7 +30,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers
             //    foreach (var bankItem in source.City.Bank)
             //    {
             //        var item = items.First(x => x.IdItem == bankItem.Id);
-            //        var destinationBankItem = new BankItemDto()
+            //        var destinationBankItem = new StackableItemDto()
             //        {
             //            Item = context.Mapper.Map<ItemDto>(item),
             //            Count = bankItem.Count,

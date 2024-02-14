@@ -68,3 +68,13 @@ CREATE TABLE ExpeditionPartOrder(
 );
 
 ALTER TABLE Users MODIFY UserKey varchar(255) NULL;
+
+ALTER TABLE BagItem
+ADD CONSTRAINT BagItem_fk_bag 
+FOREIGN KEY (idBag) 
+REFERENCES Bag(idBag);
+
+ALTER TABLE Bag
+ADD CONSTRAINT BagItem_fk_lastupdate
+FOREIGN KEY (idLastUpdateInfo) 
+REFERENCES LastUpdateInfo(idLastUpdateInfo);

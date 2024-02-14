@@ -8,7 +8,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions
     {
         public int? Id { get; set; }
         public int? IdUser { get; set; }
-        public List<BagItemDto> Items { get; set; }
+        public List<StackableItemDto> Items { get; set; }
         public List<ExpeditionOrderDto> Order { get; set; }
         public bool Preinscrit { get; set; }
         public string? PreinscritJob { get; set; }

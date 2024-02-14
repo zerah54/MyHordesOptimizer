@@ -26,6 +26,10 @@ public partial class BagItem
     [Column("isBroken")]
     public bool? IsBroken { get; set; }
 
+    [ForeignKey("IdBag")]
+    [InverseProperty("BagItems")]
+    public virtual Bag IdBagNavigation { get; set; } = null!;
+
     [ForeignKey("IdItem")]
     [InverseProperty("BagItems")]
     public virtual Item IdItemNavigation { get; set; } = null!;

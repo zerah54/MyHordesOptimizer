@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MyHordesOptimizerApi.Models;
 
 [Table("Bag")]
+[Index("IdLastUpdateInfo", Name = "BagItem_fk_lastupdate")]
 public partial class Bag
 {
     [Key]
@@ -15,6 +16,13 @@ public partial class Bag
 
     [Column("idLastUpdateInfo", TypeName = "int(11)")]
     public int? IdLastUpdateInfo { get; set; }
+
+    [InverseProperty("IdBagNavigation")]
+    public virtual ICollection<BagItem> BagItems { get; set; } = new List<BagItem>();
+
+    [ForeignKey("IdLastUpdateInfo")]
+    [InverseProperty("Bags")]
+    public virtual LastUpdateInfo? IdLastUpdateInfoNavigation { get; set; }
 
     [InverseProperty("IdBagNavigation")]
     public virtual ICollection<TownCitizen> TownCitizens { get; set; } = new List<TownCitizen>();

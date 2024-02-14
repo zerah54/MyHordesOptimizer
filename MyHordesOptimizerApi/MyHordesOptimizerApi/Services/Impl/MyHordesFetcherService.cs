@@ -336,7 +336,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                         .ThenInclude(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == town.IdTown))
                 .Where(townBankItem => townBankItem.IdTown == town.IdTown)
                 .First();
-            var dtos = Mapper.Map<List<BankItemDto>>(townModel.TownBankItems);
+            var dtos = Mapper.Map<List<StackableItemDto>>(townModel.TownBankItems);
             return new BankLastUpdateDto()
             {
                 Bank = dtos,
@@ -348,7 +348,28 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             //var citizens = MyHordesOptimizerRepository.GetCitizens(townId);
             //return citizens;
-            return null;
+            var models = DbContext.TownCitizens
+                .Include(townCitizen => townCitizen.IdBagNavigation)
+                    .ThenInclude(bag => bag.BagItems)
+                        .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                .Include(townCitizen => townCitizen.IdBagNavigation)
+                    .ThenInclude(bagItem => bagItem.IdLastUpdateInfoNavigation)
+                        .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                .Include(townCitizen => townCitizen.IdLastUpdateInfoNavigation)
+                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                .Include(townCitizen => townCitizen.IdLastUpdateInfoGhoulStatusNavigation)
+                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                .Include(townCitizen => townCitizen.IdLastUpdateInfoHeroicActionNavigation)
+                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                .Include(townCitizen => townCitizen.IdLastUpdateInfoHomeNavigation)
+                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                .Include(townCitizen => townCitizen.IdLastUpdateInfoStatusNavigation)
+                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                .Include(lastUpdate => lastUpdate.IdUserNavigation)
+                .Where(townCitizen => townCitizen.IdTown == townId)
+                .ToList();
+            var dtos = Mapper.Map<CitizensLastUpdateDto>(models);
+            return dtos;
         }
 
         public IEnumerable<MyHordesOptimizerRuinDto> GetRuins(int? townId)

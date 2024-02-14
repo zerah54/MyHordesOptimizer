@@ -2,7 +2,7 @@
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
-    public class BankItemDto
+    public class StackableItemDto
     {
         public ItemDto Item { get; set; }
         public bool IsBroken { get; set; }

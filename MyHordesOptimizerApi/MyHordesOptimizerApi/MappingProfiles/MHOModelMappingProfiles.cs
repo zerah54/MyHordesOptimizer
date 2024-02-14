@@ -80,11 +80,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
             //   .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
             //   .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.ItemCount));
 
-            //CreateMap<IEnumerable<TownCitizenBagItemCompletModel>, BagDto>()
-            //    .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src))
-            //    .ForMember(dest => dest.LastUpdateInfo, opt => { opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = GetBagLastUpdateDateWithNullCheck(src).Value, UserName = GetBagLastUpdateUserNameWithNullCheck(src) }); opt.PreCondition(src => GetBagLastUpdateDateWithNullCheck(src).HasValue); })
-            //    .ForMember(dest => dest.IdBag, opt => opt.MapFrom(src => GetBagIdWithNullCheck(src)));
-
             // Ruins
             CreateMap<MyHordesOptimizerRuinDto, Ruin>()
                 .ForMember(dest => dest.IdRuin, opt => opt.MapFrom(src => src.Id))
@@ -223,7 +218,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
             //    .ForMember(dest => dest.IdCleanUpType, opt => opt.MapFrom(src => src.Type.Id))
             //    .ForMember(dest => dest.IdUserCleanUp, opt => opt.MapFrom(src => src.CitizenCleanUp.Id));
 
-            //CreateMap<IGrouping<BankItemCompletKeyModel, BankItemCompletModel>, BankItemDto>()
+            //CreateMap<IGrouping<BankItemCompletKeyModel, BankItemCompletModel>, StackableItemDto>()
             //    .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.First().BankCount))
             //    .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.First().BankIsBroken))
             //    .ForMember(dest => dest.Item, opt => opt.MapFrom(src => new Item() { Id = src.Key.ItemId }));
@@ -565,104 +560,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.Y))
                 .ForMember(dest => dest.ZoneRegen, opt => opt.Ignore());
         }
-
-        //private List<string> GetStatusIcons(TownCitizenBagItemCompletModel src)
-        //{
-        //    var result = new List<string>();
-        //    if (src.IsCleanBody.HasValue && src.IsCleanBody.Value)
-        //    {
-        //        result.Add(StatusValue.CleanBody.GetDescription());
-        //    }
-        //    if (src.IsCamper.HasValue && src.IsCamper.Value)
-        //    {
-        //        result.Add(StatusValue.Camper.GetDescription());
-        //    }
-        //    if (src.IsAddict.HasValue && src.IsAddict.Value)
-        //    {
-        //        result.Add(StatusValue.Addict.GetDescription());
-        //    }
-        //    if (src.IsDrugged.HasValue && src.IsDrugged.Value)
-        //    {
-        //        result.Add(StatusValue.Drugged.GetDescription());
-        //    }
-        //    if (src.IsDrunk.HasValue && src.IsDrunk.Value)
-        //    {
-        //        result.Add(StatusValue.Drunk.GetDescription());
-        //    }
-        //    if (src.IsGhoul.HasValue && src.IsGhoul.Value)
-        //    {
-        //        result.Add(StatusValue.Ghoul.GetDescription());
-        //    }
-        //    if (src.IsQuenched.HasValue && src.IsQuenched.Value)
-        //    {
-        //        result.Add(StatusValue.Quenched.GetDescription());
-        //    }
-        //    if (src.IsConvalescent.HasValue && src.IsConvalescent.Value)
-        //    {
-        //        result.Add(StatusValue.Convalescent.GetDescription());
-        //    }
-        //    if (src.IsSated.HasValue && src.IsSated.Value)
-        //    {
-        //        result.Add(StatusValue.Sated.GetDescription());
-        //    }
-        //    if (src.IsCheatingDeathActive.HasValue && src.IsCheatingDeathActive.Value)
-        //    {
-        //        result.Add(StatusValue.CheatingDeathActive.GetDescription());
-        //    }
-        //    if (src.IsHangOver.HasValue && src.IsHangOver.Value)
-        //    {
-        //        result.Add(StatusValue.HangOver.GetDescription());
-        //    }
-        //    if (src.IsImmune.HasValue && src.IsImmune.Value)
-        //    {
-        //        result.Add(StatusValue.Immune.GetDescription());
-        //    }
-        //    if (src.IsInfected.HasValue && src.IsInfected.Value)
-        //    {
-        //        result.Add(StatusValue.Infected.GetDescription());
-        //    }
-        //    if (src.IsTerrorised.HasValue && src.IsTerrorised.Value)
-        //    {
-        //        result.Add(StatusValue.Terrorised.GetDescription());
-        //    }
-        //    if (src.IsThirsty.HasValue && src.IsThirsty.Value)
-        //    {
-        //        result.Add(StatusValue.Thirsty.GetDescription());
-        //    }
-        //    if (src.IsDesy.HasValue && src.IsDesy.Value)
-        //    {
-        //        result.Add(StatusValue.Desy.GetDescription());
-        //    }
-        //    if (src.IsTired.HasValue && src.IsTired.Value)
-        //    {
-        //        result.Add(StatusValue.Tired.GetDescription());
-        //    }
-        //    if (src.IsHeadWounded.HasValue && src.IsHeadWounded.Value)
-        //    {
-        //        result.Add(StatusValue.HeadWounded.GetDescription());
-        //    }
-        //    if (src.IsHandWounded.HasValue && src.IsHandWounded.Value)
-        //    {
-        //        result.Add(StatusValue.HandWounded.GetDescription());
-        //    }
-        //    if (src.IsArmWounded.HasValue && src.IsArmWounded.Value)
-        //    {
-        //        result.Add(StatusValue.ArmWounded.GetDescription());
-        //    }
-        //    if (src.IsLegWounded.HasValue && src.IsLegWounded.Value)
-        //    {
-        //        result.Add(StatusValue.LegWounded.GetDescription());
-        //    }
-        //    if (src.IsEyeWounded.HasValue && src.IsEyeWounded.Value)
-        //    {
-        //        result.Add(StatusValue.EyeWounded.GetDescription());
-        //    }
-        //    if (src.IsFootWounded.HasValue && src.IsFootWounded.Value)
-        //    {
-        //        result.Add(StatusValue.FootWounded.GetDescription());
-        //    }
-        //    return result;
-        //}
 
         //private DateTime? GetBagLastUpdateDateWithNullCheck(IEnumerable<TownCitizenBagItemCompletModel> src)
         //{

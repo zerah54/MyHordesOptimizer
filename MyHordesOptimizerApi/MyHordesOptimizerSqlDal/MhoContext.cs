@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Models;
 using Action = MyHordesOptimizerApi.Models.Action;
+
 namespace MyHordesOptimizerApi;
 
 public partial class MhoContext : DbContext
@@ -104,6 +107,10 @@ public partial class MhoContext : DbContext
             entity.HasKey(e => e.IdBag).HasName("PRIMARY");
 
             entity.Property(e => e.IdLastUpdateInfo).HasDefaultValueSql("'NULL'");
+
+            entity.HasOne(d => d.IdLastUpdateInfoNavigation).WithMany(p => p.Bags)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("BagItem_fk_lastupdate");
         });
 
         modelBuilder.Entity<BagItem>(entity =>
@@ -112,6 +119,10 @@ public partial class MhoContext : DbContext
 
             entity.Property(e => e.Count).HasDefaultValueSql("'NULL'");
             entity.Property(e => e.IsBroken).HasDefaultValueSql("b'0'");
+
+            entity.HasOne(d => d.IdBagNavigation).WithMany(p => p.BagItems)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("BagItem_fk_bag");
 
             entity.HasOne(d => d.IdItemNavigation).WithMany(p => p.BagItems)
                 .OnDelete(DeleteBehavior.Restrict)

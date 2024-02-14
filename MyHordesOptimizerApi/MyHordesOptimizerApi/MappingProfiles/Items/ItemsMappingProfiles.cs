@@ -70,11 +70,17 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
             CreateMap<Item, ItemDto>()
                 .ForMember(dest => dest.Recipes, opt => opt.MapFrom(src => src.RecipeItemComponents.Select(ric => ric.RecipeNameNavigation)));
 
-            CreateMap<TownBankItem, BankItemDto>()
+            CreateMap<TownBankItem, StackableItemDto>()
                 .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
                 .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
                 .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src.IdItemNavigation))
                 .ForMember(dest => dest.WishListCount, opt => opt.MapFrom(src => src.IdItemNavigation.TownWishListItems.Count));
+
+            CreateMap<BagItem, StackableItemDto>()
+               .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
+               .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
+               .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src.IdItemNavigation))
+               .ForMember(dest => dest.WishListCount, opt => opt.Ignore());
         }
     }
 }

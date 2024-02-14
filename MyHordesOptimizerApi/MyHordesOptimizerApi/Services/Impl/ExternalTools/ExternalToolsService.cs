@@ -692,7 +692,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
                     foreach (var item in bag.Objects)
                     {
-                        var citizenItem = new BagItemDto()
+                        var citizenItem = new StackableItemDto()
                         {
                             Count = item.Count,
                             IsBroken = item.IsBroken
@@ -718,7 +718,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             //citizen.Bag.IdBag = bagId;
             foreach (var item in bag)
             {
-                var citizenItem = new BagItemDto()
+                var citizenItem = new StackableItemDto()
                 {
                     Count = item.Count,
                     IsBroken = item.IsBroken

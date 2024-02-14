@@ -474,7 +474,7 @@
 //            townBankItem = townBankItem.Where(x => x.LastUpdateDateUpdate == mostRecent);
 //            var group = townBankItem.GroupBy(x => new BankItemCompletKeyModel(x)).ToList();
 
-//            var banksItems = Mapper.Map<IEnumerable<BankItemDto>>(group).ToList();
+//            var banksItems = Mapper.Map<IEnumerable<StackableItemDto>>(group).ToList();
 //            banksItems.ForEach(bankItemComplet =>
 //            {
 //                IEnumerable<BankItemCompletModel> bankItemCompletAssocie = townBankItem.Where(x => x.ItemId == bankItemComplet.Item.Id && x.BankIsBroken == bankItemComplet.IsBroken);

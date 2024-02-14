@@ -21,6 +21,9 @@ public partial class LastUpdateInfo
     public int? IdUser { get; set; }
 
     [InverseProperty("IdLastUpdateInfoNavigation")]
+    public virtual ICollection<Bag> Bags { get; set; } = new List<Bag>();
+
+    [InverseProperty("IdLastUpdateInfoNavigation")]
     public virtual ICollection<Expedition> Expeditions { get; set; } = new List<Expedition>();
 
     [ForeignKey("IdUser")]
