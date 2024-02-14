@@ -3189,7 +3189,7 @@
         </context-group>
         <target state="needs-translation">Nombre de pelures de peau et de toiles de tentes dans le sac</target>
       </trans-unit>
-      <trans-unit id="5144075962741844228" datatype="html">
+      <trans-unit id="5144075962741844228" datatype="html" approved="yes">
         <source>Bonus : x<x id="INTERPOLATION" equiv-text="{{ bonus.camp_items | campingDisplayBonus:display_bonus_ap:locale }}"/>
                 </source>
         <context-group purpose="location">
@@ -3208,8 +3208,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">169</context>
         </context-group>
-        <target state="translated">Bonus : x<x id="INTERPOLATION" equiv-text="{{bonus['camping_objects_in_inventory']}}"/>
-                </target>
+        <target state="final">Bonus: x<x id="INTERPOLATION" equiv-text="{{bonus['camping_objects_in_inventory']}}"/></target>
       </trans-unit>
       <trans-unit id="560884417072143682" datatype="html">
         <source>La ville</source>
