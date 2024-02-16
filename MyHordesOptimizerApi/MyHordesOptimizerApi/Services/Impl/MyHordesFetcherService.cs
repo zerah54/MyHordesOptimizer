@@ -346,8 +346,6 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public CitizensLastUpdateDto GetCitizens(int townId)
         {
-            //var citizens = MyHordesOptimizerRepository.GetCitizens(townId);
-            //return citizens;
             var models = DbContext.TownCitizens
                 .Include(townCitizen => townCitizen.IdBagNavigation)
                     .ThenInclude(bag => bag.BagItems)
@@ -376,15 +374,44 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             if (townId.HasValue)
             {
+                var models = DbContext.MapCells
+                     .Where(cell => cell.IdTown == townId)
+                     .Include(mapCell => mapCell.IdRuinNavigation)
+                      .ThenInclude(ruin => ruin.RuinItemDrops)
+                       .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
+                          .ThenInclude(item => item.ActionNames)
+                     .Include(mapCell => mapCell.IdRuinNavigation)
+                      .ThenInclude(ruin => ruin.RuinItemDrops)
+                       .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
+                          .ThenInclude(item => item.PropertyNames)
+                     .Include(mapCell => mapCell.IdRuinNavigation)
+                      .ThenInclude(ruin => ruin.RuinItemDrops)
+                       .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
+                          .ThenInclude(item => item.IdCategoryNavigation)
+                     .Select(cell => cell.IdRuinNavigation)
+                     .ToList();
                 //var ruins = MyHordesOptimizerRepository.GetTownRuin(townId.Value);
                 //return ruins;
-                return null;
+                var dtos = Mapper.Map<List<MyHordesOptimizerRuinDto>>(models);
+                return dtos;
             }
             else
             {
                 //var ruins = MyHordesOptimizerRepository.GetRuins();
                 //return ruins;
-                return null;
+                var models = DbContext.Ruins
+                   .Include(ruin => ruin.RuinItemDrops)
+                     .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
+                        .ThenInclude(item => item.ActionNames)
+                   .Include(ruin => ruin.RuinItemDrops)
+                     .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
+                        .ThenInclude(item => item.PropertyNames)
+                   .Include(ruin => ruin.RuinItemDrops)
+                     .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
+                        .ThenInclude(item => item.IdCategoryNavigation)
+                   .ToList();
+                var dtos = Mapper.Map<List<MyHordesOptimizerRuinDto>>(models);
+                return dtos;
             }
         }
 

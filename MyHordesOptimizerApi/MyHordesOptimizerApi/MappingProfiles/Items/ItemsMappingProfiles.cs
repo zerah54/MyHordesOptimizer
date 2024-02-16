@@ -81,6 +81,11 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src.IdItemNavigation))
                .ForMember(dest => dest.WishListCount, opt => opt.Ignore());
+
+            CreateMap<RuinItemDrop, ItemResultDto>()
+                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src.IdItemNavigation))
+                .ForMember(dest => dest.Probability, opt => opt.MapFrom(src => src.Probability))
+                .ForMember(dest => dest.Weight, opt => opt.MapFrom(src => src.Weight));
         }
     }
 }
