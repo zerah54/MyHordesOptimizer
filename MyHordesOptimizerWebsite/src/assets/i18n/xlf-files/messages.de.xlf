@@ -104,7 +104,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/heroic-action.enum.ts</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Retour du Héros</target>
+        <target state="translated">Rückkehr des Helden</target>
       </trans-unit>
       <trans-unit id="349574492903631397" datatype="html">
         <source>Passage en Force</source>
@@ -416,7 +416,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Animal</target>
+        <target state="translated">Tier</target>
       </trans-unit>
       <trans-unit id="2301212560210971063" datatype="html">
         <source>Décoration</source>
@@ -424,7 +424,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="needs-translation">Décoration</target>
+        <target state="translated">Dekoration</target>
       </trans-unit>
       <trans-unit id="4416290763660062288" datatype="html">
         <source/>
@@ -523,7 +523,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/trash.enum.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Décharge piégée</target>
+        <target state="translated">Waffenabfall</target>
       </trans-unit>
       <trans-unit id="2506782854894297765" datatype="html">
         <source>Décharge blindée</source>
@@ -531,7 +531,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/trash.enum.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Décharge blindée</target>
+        <target state="translated">Rüstungsabfall</target>
       </trans-unit>
       <trans-unit id="7651090437124612338" datatype="html">
         <source>Appâts odorants</source>
@@ -539,7 +539,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/trash.enum.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Appâts odorants</target>
+        <target state="translated">Biomüll</target>
       </trans-unit>
       <trans-unit id="2537395172119379784" datatype="html">
         <source>Déchardes de bois</source>
@@ -547,7 +547,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/trash.enum.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Déchardes de bois</target>
+        <target state="translated">Holzabfall</target>
       </trans-unit>
       <trans-unit id="4607980340102435580" datatype="html">
         <source>Ferraillerie</source>
@@ -555,7 +555,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/trash.enum.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Ferraillerie</target>
+        <target state="translated">Metallabfall</target>
       </trans-unit>
       <trans-unit id="3800212309465725426" datatype="html">
         <source>Enclos</source>
@@ -563,7 +563,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/trash.enum.ts</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Enclos</target>
+        <target state="translated">Tierabfall</target>
       </trans-unit>
       <trans-unit id="4324278734280268890" datatype="html">
         <source>Non défini</source>
@@ -571,7 +571,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-depot.enum.ts</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="needs-translation">Non défini</target>
+        <target state="translated">Nicht definiert</target>
       </trans-unit>
       <trans-unit id="5382458688695417420" datatype="html">
         <source>Banque</source>
@@ -603,7 +603,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">Banque</target>
+        <target state="translated">Bank</target>
       </trans-unit>
       <trans-unit id="4169579143978188553" datatype="html">
         <source>Zone de rapatriement</source>
@@ -611,7 +611,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-depot.enum.ts</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Zone de rapatriement</target>
+        <target state="translated">Rücksprungzone</target>
       </trans-unit>
       <trans-unit id="8648912876673109537" datatype="html">
         <source>Ne pas ramener</source>
@@ -623,7 +623,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">Ne pas ramener</target>
+        <target state="translated">Nicht mitbringen</target>
       </trans-unit>
       <trans-unit id="5559973343890533582" datatype="html">
         <source>Non définie</source>
@@ -639,7 +639,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Non définie</target>
+        <target state="translated">Nicht angegeben</target>
       </trans-unit>
       <trans-unit id="955710000640596255" datatype="html">
         <source>Basse</source>
@@ -651,7 +651,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">Basse</target>
+        <target state="translated">Niedrig</target>
       </trans-unit>
       <trans-unit id="4819076195461123852" datatype="html">
         <source>Moyenne</source>
@@ -671,7 +671,7 @@
           <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="needs-translation">Moyenne</target>
+        <target state="translated">Mittel</target>
       </trans-unit>
       <trans-unit id="7453572823482729445" datatype="html">
         <source>Haute</source>
@@ -683,7 +683,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">Haute</target>
+        <target state="translated">Hoch</target>
       </trans-unit>
       <trans-unit id="2789207481544807989" datatype="html">
         <source>Nord</source>
@@ -691,7 +691,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Nord</target>
+        <target state="translated">Norden</target>
       </trans-unit>
       <trans-unit id="7445167327968420930" datatype="html">
         <source>Nord-Est</source>
@@ -699,7 +699,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Nord-Est</target>
+        <target state="translated">Nordosten</target>
       </trans-unit>
       <trans-unit id="6101095852391728628" datatype="html">
         <source>Est</source>
@@ -707,7 +707,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">14</context>
         </context-group>
-        <target state="needs-translation">Est</target>
+        <target state="translated">Osten</target>
       </trans-unit>
       <trans-unit id="5360507263221140991" datatype="html">
         <source>Sud-Est</source>
@@ -715,7 +715,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Sud-Est</target>
+        <target state="translated">Südosten</target>
       </trans-unit>
       <trans-unit id="650568627310891497" datatype="html">
         <source>Sud</source>
@@ -723,7 +723,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Sud</target>
+        <target state="translated">Süden</target>
       </trans-unit>
       <trans-unit id="3790572682369173368" datatype="html">
         <source>Sud-Ouest</source>
@@ -731,7 +731,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Sud-Ouest</target>
+        <target state="translated">Südwesten</target>
       </trans-unit>
       <trans-unit id="5671386105172434248" datatype="html">
         <source>Ouest</source>
@@ -739,7 +739,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Ouest</target>
+        <target state="translated">Westen</target>
       </trans-unit>
       <trans-unit id="9019892187269718023" datatype="html">
         <source>Nord-Ouest</source>
@@ -747,7 +747,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/zone-regen.enum.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Nord-Ouest</target>
+        <target state="translated">Nordwesten</target>
       </trans-unit>
       <trans-unit id="5538525584308970360" datatype="html">
         <source>Les outils externes ont bien été mis à jour</source>
@@ -755,7 +755,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/services/api.service.ts</context>
           <context context-type="linenumber">127</context>
         </context-group>
-        <target state="needs-translation">Les outils externes ont bien été mis à jour</target>
+        <target state="translated">Externe Tools wurden erfolgreich aktualisiert</target>
       </trans-unit>
       <trans-unit id="5937107716887714291" datatype="html">
         <source>La cellule a bien été modifiée</source>
@@ -771,7 +771,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/services/digs.service.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">La fouille a bien été supprimée</target>
+        <target state="translated">Die Grabung wurde erfolgreich entfernt</target>
       </trans-unit>
       <trans-unit id="5126997801267803550" datatype="html">
         <source>La fouille a bien été mise à jour</source>
@@ -779,7 +779,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/services/digs.service.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">La fouille a bien été mise à jour</target>
+        <target state="translated">Die Grabung wurde erfolgreich gespeichert</target>
       </trans-unit>
       <trans-unit id="4239682992533392472" datatype="html">
         <source>La liste de courses a bien été enregistrée</source>
@@ -787,7 +787,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/services/wishlist.service.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation">La liste de courses a bien été enregistrée</target>
+        <target state="translated">Die Einkaufsliste wurde erfolgreich gespeichert</target>
       </trans-unit>
       <trans-unit id="5161390510505382530" datatype="html">
         <source>L&apos;objet <x id="PH" equiv-text="item.label[this.locale]"/> a bien été ajouté à la liste de courses</source>
