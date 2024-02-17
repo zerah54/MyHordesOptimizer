@@ -3,6 +3,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Bag;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
 {
     public class CitizenMappingProfile : Profile
     {
-        public CitizenMappingProfile() 
+        public CitizenMappingProfile()
         {
             CreateMap<List<TownCitizen>, CitizensLastUpdateDto>()
                 .ForMember(dto => dto.LastUpdateInfo, opt => opt.MapFrom(list => list.First().IdLastUpdateInfoNavigation))
@@ -54,6 +55,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.BagItems))
                 .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => src.IdLastUpdateInfoNavigation))
                 .ForMember(dest => dest.IdBag, opt => opt.MapFrom(src => src.IdBag));
+
             CreateMap<TownCitizen, CitizenHomeValueDto>()
                 .ForMember(dest => dest.ChestLevel, opt => opt.MapFrom(src => src.ChestLevel))
                 .ForMember(dest => dest.HasAlarm, opt => opt.MapFrom(src => src.HasAlarm))
@@ -99,7 +101,13 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dest => dest.HasRescue, opt => opt.MapFrom(src => src.HasRescue))
                 .ForMember(dest => dest.HasSecondWind, opt => opt.MapFrom(src => src.HasSecondWind))
                 .ForMember(dest => dest.HasUppercut, opt => opt.MapFrom(src => src.HasUppercut));
+
+            CreateMap<TownCitizen, CellCitizenDto>()
+                .ForMember(cellCitizenDto => cellCitizenDto.Id, opt => opt.MapFrom(townCitizen => townCitizen.IdUser))
+                .ForMember(cellCitizenDto => cellCitizenDto.Name, opt => opt.MapFrom(townCitizen => townCitizen.IdUserNavigation.Name));
         }
+
+        #region private helpers
 
         private List<string> GetStatusIcons(TownCitizen src)
         {
@@ -198,5 +206,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
             }
             return result;
         }
+        #endregion
     }
 }

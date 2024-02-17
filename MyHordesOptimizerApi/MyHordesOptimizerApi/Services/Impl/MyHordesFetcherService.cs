@@ -390,15 +390,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                           .ThenInclude(item => item.IdCategoryNavigation)
                      .Select(cell => cell.IdRuinNavigation)
                      .ToList();
-                //var ruins = MyHordesOptimizerRepository.GetTownRuin(townId.Value);
-                //return ruins;
                 var dtos = Mapper.Map<List<MyHordesOptimizerRuinDto>>(models);
                 return dtos;
             }
             else
             {
-                //var ruins = MyHordesOptimizerRepository.GetRuins();
-                //return ruins;
                 var models = DbContext.Ruins
                    .Include(ruin => ruin.RuinItemDrops)
                      .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
@@ -417,28 +413,26 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public MyHordesOptimizerMapDto GetMap(int townId)
         {
-            //var models = MyHordesOptimizerRepository.GetCells(townId);
-
-            //var distinct = models.Distinct(new CellIdComparer());
-            //var map = Mapper.Map<MyHordesOptimizerMapDto>(distinct);
-
-            //var items = models.Where(x => x.ItemId.HasValue).Distinct(new ItemIdComparer());
-            //foreach (var recipe in items)
-            //{
-            //    var cellItem = Mapper.Map<CellItemDto>(recipe);
-            //    map.Cells.Single(cell => cell.CellId == recipe.IdCell).Items.Add(cellItem);
-            //}
-
-            //var citizens = models.Where(x => x.CitizenId.HasValue);
-            //var distinctCitizens = citizens.Distinct(new CitizenIdComparer());
-            //foreach (var citizen in distinctCitizens)
-            //{
-            //    var cellCitizen = Mapper.Map<CellCitizenDto>(citizen);
-            //    map.Cells.Single(cell => cell.CellId == citizen.IdCell).Citizens.Add(cellCitizen);
-            //}
-
-            //return map;
-            return null;
+            var model = DbContext.Towns         
+                .Where(cell => cell.IdTown == townId)
+                .Include(town => town.MapCells)
+                    .ThenInclude(mapCell => mapCell.MapCellItems)
+                        .ThenInclude(mapCellItem => mapCellItem.IdItemNavigation)
+                        .AsSplitQuery()
+                .Include(town => town.MapCells)
+                    .ThenInclude(mapCell => mapCell.IdLastUpdateInfoNavigation)
+                        .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                        .AsSplitQuery()
+                .Include(town => town.TownCitizens)
+                    .ThenInclude(townCitizen => townCitizen.IdUserNavigation)
+                    .AsSplitQuery()
+                .Include(town => town.MapCells)
+                    .ThenInclude(mapCell => mapCell.MapCellDigs)
+                    .AsSplitQuery()
+                .AsNoTracking()
+                .FirstOrDefault();
+            var dto = Mapper.Map<MyHordesOptimizerMapDto>(model);
+            return dto;
         }
 
         public IEnumerable<MyHordesOptimizerMapDigDto> GetMapDigs(int townId)

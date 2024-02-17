@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,6 +87,11 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src.IdItemNavigation))
                 .ForMember(dest => dest.Probability, opt => opt.MapFrom(src => src.Probability))
                 .ForMember(dest => dest.Weight, opt => opt.MapFrom(src => src.Weight));
+
+            CreateMap<MapCellItem, CellItemDto>()
+                .ForMember(dto => dto.IsItemBroken, opt => opt.MapFrom(src => src.IsBroken))
+                .ForMember(dto => dto.ItemCount, opt => opt.MapFrom(src => src.Count))
+                .ForMember(dto => dto.ItemId, opt => opt.MapFrom(src => src.IdItem));
         }
     }
 }
