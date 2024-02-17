@@ -803,7 +803,7 @@
           <context context-type="sourcefile">src/app/my-town/bank/bank.component.html</context>
           <context context-type="linenumber">3</context>
         </context-group>
-        <target state="needs-translation">Affichage condensé</target>
+        <target state="translated">Komprimierte Darstellung</target>
       </trans-unit>
       <trans-unit id="5333122727224525647" datatype="html">
         <source>Chercher des objets par propriétés</source>
@@ -815,7 +815,7 @@
           <context context-type="sourcefile">src/app/wiki/items/items.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Chercher des objets par propriétés</target>
+        <target state="translated">Objekte nach Eigenschaften durchsuchen</target>
       </trans-unit>
       <trans-unit id="2054864067473892671" datatype="html">
         <source>Chantiers</source>
@@ -831,7 +831,7 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">Chantiers</target>
+        <target state="translated">Konstruktionen</target>
       </trans-unit>
       <trans-unit id="4273156925314176058" datatype="html">
         <source>Campings</source>
@@ -847,7 +847,7 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">Campings</target>
+        <target state="translated">Campings</target>
       </trans-unit>
       <trans-unit id="2249728535850867744" datatype="html">
         <source>Aucun objet ne correspond au filtre &quot;<x id="INTERPOLATION" equiv-text="{{ filterInput.nativeElement.value }}"/>&quot;</source>
@@ -895,7 +895,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">182</context>
         </context-group>
-        <target state="needs-translation">La liste est vide</target>
+        <target state="translated">Die Liste ist leer</target>
       </trans-unit>
       <trans-unit id="8297073205000664921" datatype="html">
         <source>Citoyen</source>
@@ -915,7 +915,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">Citoyen</target>
+        <target state="translated">Bürger</target>
       </trans-unit>
       <trans-unit id="7060072837623661429" datatype="html">
         <source>Fouilles du jour</source>
@@ -923,7 +923,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Fouilles du jour</target>
+        <target state="translated">Heutige Ausgrabungen</target>
       </trans-unit>
       <trans-unit id="6779466566977517049" datatype="html">
         <source>Disponibilités du jour</source>
@@ -931,7 +931,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-dispo/citizens-dispo.component.ts</context>
           <context context-type="linenumber">50</context>
         </context-group>
-        <target state="needs-translation">Disponibilités du jour</target>
+        <target state="translated">Heutige Verfügbarkeit</target>
       </trans-unit>
       <trans-unit id="7945783910888141498" datatype="html">
         <source>États</source>
@@ -943,7 +943,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="needs-translation">États</target>
+        <target state="translated">Status</target>
       </trans-unit>
       <trans-unit id="4739884131356753082" datatype="html">
         <source>Ajouter aux états</source>
@@ -951,7 +951,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Ajouter aux états</target>
+        <target state="translated">Status hinzufügen</target>
       </trans-unit>
       <trans-unit id="6864416921116271532" datatype="html">
         <source>Retirer des états</source>
@@ -959,7 +959,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Retirer des états</target>
+        <target state="translated">Status entfernen</target>
       </trans-unit>
       <trans-unit id="7332767872103966167" datatype="html">
         <source>Vider les états</source>
@@ -967,7 +967,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Vider les états</target>
+        <target state="translated">Status zurücksetzen</target>
       </trans-unit>
       <trans-unit id="7287080792595569200" datatype="html">
         <source>Sac</source>
@@ -979,7 +979,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-citizens/map-update-citizens.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Sac</target>
+        <target state="translated">Rucksack</target>
       </trans-unit>
       <trans-unit id="6019139638926667991" datatype="html">
         <source>Ajouter au sac</source>
@@ -987,7 +987,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Ajouter au sac</target>
+        <target state="translated">Zum Rucksack hinzufügen</target>
       </trans-unit>
       <trans-unit id="6402922979065903259" datatype="html">
         <source>Retirer du sac</source>
@@ -995,7 +995,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">Retirer du sac</target>
+        <target state="translated">Aus dem Rucksack entfernen</target>
       </trans-unit>
       <trans-unit id="6195148584287059509" datatype="html">
         <source>Vider le sac</source>
@@ -1003,7 +1003,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Vider le sac</target>
+        <target state="translated">Rucksack leeren</target>
       </trans-unit>
       <trans-unit id="713605071826573828" datatype="html">
         <source>Actions héroïques</source>
@@ -1011,7 +1011,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Actions héroïques</target>
+        <target state="translated">Heldentaten</target>
       </trans-unit>
       <trans-unit id="165011294537677821" datatype="html">
         <source>Améliorations</source>
@@ -1023,7 +1023,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="needs-translation">Améliorations</target>
+        <target state="translated">Ausbauten</target>
       </trans-unit>
       <trans-unit id="6373263061828099513" datatype="html" approved="yes">
         <source>Citoyens</source>
@@ -1195,7 +1195,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Liste des objets en sacs</target>
+        <target state="translated">Liste der Gegenstände in Rucksäcken</target>
       </trans-unit>
       <trans-unit id="8529616953243398296" datatype="html">
         <source>Ajouter un objet</source>
@@ -1211,7 +1211,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Ajouter un objet</target>
+        <target state="translated">Gegenstand hinzufügen</target>
       </trans-unit>
       <trans-unit id="8620934575209945498" datatype="html">
         <source>Supprimer un objet</source>
@@ -1219,7 +1219,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
           <context context-type="linenumber">93</context>
         </context-group>
-        <target state="needs-translation">Supprimer un objet</target>
+        <target state="translated">Gegenstand entfernen</target>
       </trans-unit>
       <trans-unit id="5210423582442777517" datatype="html">
         <source>Retirer tous les objets</source>
@@ -1227,7 +1227,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Retirer tous les objets</target>
+        <target state="translated">Alle Gegenstände entfernen</target>
       </trans-unit>
       <trans-unit id="1434854699604569130" datatype="html">
         <source>Ajouter un citoyen</source>
@@ -1239,7 +1239,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-digs/map-update-digs.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Ajouter un citoyen</target>
+        <target state="translated">Bürger hinzufügen</target>
       </trans-unit>
       <trans-unit id="3420757244733292611" datatype="html">
         <source>Fouilles réussies</source>
@@ -1251,7 +1251,7 @@
           <context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Fouilles réussies</target>
+        <target state="translated">Erfolgreiche Ausgrabungen</target>
       </trans-unit>
       <trans-unit id="818238533540258128" datatype="html">
         <source>Fouilles totales</source>
@@ -1263,7 +1263,7 @@
           <context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation">Fouilles totales</target>
+        <target state="translated">Ausgrabungen insgesamt</target>
       </trans-unit>
       <trans-unit id="3182705520281939075" datatype="html">
         <source>Bonus en camping</source>
@@ -1279,7 +1279,7 @@
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Bonus en camping</target>
+        <target state="translated">Campingbonus</target>
       </trans-unit>
       <trans-unit id="2698599537427262917" datatype="html">
         <source>Bâtiment vide</source>
@@ -1287,7 +1287,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Bâtiment vide</target>
+        <target state="translated">Gebäude leer</target>
       </trans-unit>
       <trans-unit id="7969447827855107408" datatype="html">
         <source>Plans inhabituels sortis</source>
@@ -1303,7 +1303,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Plans rares sortis</target>
+        <target state="translated">Ungewöhnliche Pläne gefunden</target>
       </trans-unit>
       <trans-unit id="1165067646815460527" datatype="html">
         <source>Plans très rares sortis</source>
@@ -1311,7 +1311,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Plans très rares sortis</target>
+        <target state="translated">Seltene Pläne gefunden</target>
       </trans-unit>
       <trans-unit id="5187389962742892218" datatype="html">
         <source>Liste des bâtiments possibles</source>
@@ -1319,7 +1319,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Liste des bâtiments possibles</target>
+        <target state="translated">Sehr seltene Pläne gefunden</target>
       </trans-unit>
       <trans-unit id="2012623995194870112" datatype="html">
         <source>Cellule</source>
@@ -1327,7 +1327,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Cellule</target>
+        <target state="translated">Zone</target>
       </trans-unit>
       <trans-unit id="4574043683605876869" datatype="html">
         <source>Bâtiment</source>
