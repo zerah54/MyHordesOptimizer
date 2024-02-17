@@ -1295,7 +1295,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="needs-translation">Plans inhabituels sortis</target>
+        <target state="translated">Ungewöhnliche Pläne gefunden</target>
       </trans-unit>
       <trans-unit id="5407619717083968805" datatype="html">
         <source>Plans rares sortis</source>
@@ -1303,7 +1303,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="translated">Ungewöhnliche Pläne gefunden</target>
+        <target state="translated">Seltene Pläne gefunden</target>
       </trans-unit>
       <trans-unit id="1165067646815460527" datatype="html">
         <source>Plans très rares sortis</source>
@@ -1311,7 +1311,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="translated">Seltene Pläne gefunden</target>
+        <target state="translated">Sehr seltene Pläne gefunden</target>
       </trans-unit>
       <trans-unit id="5187389962742892218" datatype="html">
         <source>Liste des bâtiments possibles</source>
@@ -1961,7 +1961,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Prises dans le puits</target>
+        <target state="translated">Aus dem Brunnen genommen</target>
       </trans-unit>
       <trans-unit id="6979945454590589971" datatype="html">
         <source>Entrées / Sorties</source>
@@ -1969,7 +1969,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Entrées / Sorties</target>
+        <target state="translated">Eingänge / Ausgänge</target>
       </trans-unit>
       <trans-unit id="6806022574374286744" datatype="html">
         <source>Vider le champ</source>
@@ -1977,7 +1977,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Vider le champ</target>
+        <target state="translated">Feld leeren</target>
       </trans-unit>
       <trans-unit id="6303237973918422932" datatype="html">
         <source>{VAR_PLURAL, plural, =0 {ration prise} =1 {ration prise} other {rations prises}}</source>
@@ -2009,7 +2009,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">95</context>
         </context-group>
-        <target state="needs-translation">Jour</target>
+        <target state="translated">Tag</target>
       </trans-unit>
       <trans-unit id="4328738626502194147" datatype="html">
         <source>Direction</source>
@@ -2017,7 +2017,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Direction</target>
+        <target state="translated">Richtung</target>
       </trans-unit>
       <trans-unit id="1163439985107240214" datatype="html">
         <source>Niveau</source>
@@ -2025,7 +2025,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Niveau</target>
+        <target state="translated">Level</target>
       </trans-unit>
       <trans-unit id="3877095303685712752" datatype="html">
         <source>Taux</source>
@@ -2033,7 +2033,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Taux</target>
+        <target state="translated">Rate</target>
       </trans-unit>
       <trans-unit id="9104606150638849284" datatype="html">
         <source>Direction des regénérations</source>
@@ -2041,7 +2041,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Direction des regénérations</target>
+        <target state="translated">Richtung der Regeneration</target>
       </trans-unit>
       <trans-unit id="9119183608655124664" datatype="html">
         <source>Droite</source>
@@ -2049,7 +2049,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="needs-translation">Droite</target>
+        <target state="translated">Gerade</target>
       </trans-unit>
       <trans-unit id="1575744069418173844" datatype="html">
         <source>Diagonale</source>
@@ -2057,7 +2057,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
           <context context-type="linenumber">117</context>
         </context-group>
-        <target state="needs-translation">Diagonale</target>
+        <target state="translated">Diagonal</target>
       </trans-unit>
       <trans-unit id="6355589699962619386" datatype="html">
         <source>Axe des regénérations</source>
@@ -2065,7 +2065,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
           <context context-type="linenumber">127</context>
         </context-group>
-        <target state="needs-translation">Axe des regénérations</target>
+        <target state="translated">Achse der Regeneration</target>
       </trans-unit>
       <trans-unit id="866656223631702865" datatype="html">
         <source>Estimations</source>
@@ -2073,7 +2073,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/statistics.component.ts</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Estimations</target>
+        <target state="translated">Abschätzung</target>
       </trans-unit>
       <trans-unit id="1713820069440865328" datatype="html">
         <source>Scrutateur</source>
@@ -2081,7 +2081,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/statistics.component.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Scrutateur</target>
+        <target state="translated">Forschungsturm</target>
       </trans-unit>
       <trans-unit id="7730918363143562137" datatype="html">
         <source>Registre</source>
@@ -2089,7 +2089,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/statistics.component.ts</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Registre</target>
+        <target state="translated">Register</target>
       </trans-unit>
       <trans-unit id="909114780120402669" datatype="html">
         <source>Import / Export</source>
@@ -2097,7 +2097,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">10</context>
         </context-group>
-        <target state="needs-translation">Import / Export</target>
+        <target state="translated">Import / Export</target>
       </trans-unit>
       <trans-unit id="1130012359476776162" datatype="html">
         <source>Mode édition</source>
@@ -2105,7 +2105,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">13</context>
         </context-group>
-        <target state="needs-translation">Mode édition</target>
+        <target state="translated">Bearbeitungsmodus</target>
       </trans-unit>
       <trans-unit id="5956461158010502750" datatype="html">
         <source>Enregistrer dans un fichier Excel</source>
@@ -2113,7 +2113,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Enregistrer dans un fichier Excel</target>
+        <target state="translated">In eine Excel-Datei speichern</target>
       </trans-unit>
       <trans-unit id="6569703909800181758" datatype="html">
         <source>Importer depuis un fichier Excel</source>
@@ -2121,7 +2121,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Importer depuis un fichier Excel</target>
+        <target state="translated">Aus einer Excel-Datei importieren</target>
       </trans-unit>
       <trans-unit id="1229846018197621216" datatype="html">
         <source>Objet encombrant</source>
@@ -2133,7 +2133,7 @@
           <context context-type="sourcefile">src/app/shared/elements/item/item.component.html</context>
           <context context-type="linenumber">72</context>
         </context-group>
-        <target state="needs-translation">Objet encombrant</target>
+        <target state="translated">Sperriger Gegenstand</target>
       </trans-unit>
       <trans-unit id="1852619184802693518" datatype="html">
         <source>Objet à signaler</source>
@@ -2141,7 +2141,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">Objet à signaler</target>
+        <target state="translated">Zu meldender Gegenstand</target>
       </trans-unit>
       <trans-unit id="515657175878356073" datatype="html">
         <source>Zone de ramassage</source>
@@ -2149,7 +2149,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">213</context>
         </context-group>
-        <target state="needs-translation">Zone de ramassage</target>
+        <target state="translated">Sammelzone</target>
       </trans-unit>
       <trans-unit id="291877573183684359" datatype="html">
         <source>Objet</source>
@@ -2157,7 +2157,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">73</context>
         </context-group>
-        <target state="needs-translation">Objet</target>
+        <target state="translated">Gegenstand</target>
       </trans-unit>
       <trans-unit id="4434386636143018239" datatype="html">
         <source>Priorité</source>
@@ -2169,7 +2169,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">114</context>
         </context-group>
-        <target state="needs-translation">Priorité</target>
+        <target state="translated">Priorität</target>
       </trans-unit>
       <trans-unit id="8217045774850995170" datatype="html">
         <source>Dépôt</source>
