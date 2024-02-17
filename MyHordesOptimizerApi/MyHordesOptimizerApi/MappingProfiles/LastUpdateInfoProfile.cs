@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using AutoMapper.EquivalencyExpression;
+using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
+using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {
@@ -37,7 +40,18 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(user => user.IdUser, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(user => user.LastUpdateInfos, opt => opt.Ignore())
                 .ForMember(user => user.MapCellDigs, opt => opt.Ignore())
-                .ForMember(user => user.Name, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(user => user.Name, opt => opt.MapFrom((dto, model, srcMember, context) =>
+                {
+                    var name = dto.UserName;
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        var dbContext = context.GetDbContext();
+                        var user = dbContext.Users.AsNoTracking()
+                        .First(x => x.IdUser == dto.UserId);
+                        name = user.Name;
+                    }
+                    return name;
+                }))
                 .ForMember(user => user.TownCadavers, opt => opt.Ignore())
                 .ForMember(user => user.TownCitizens, opt => opt.Ignore())
                 .ForMember(user => user.UserKey, opt => opt.Ignore())

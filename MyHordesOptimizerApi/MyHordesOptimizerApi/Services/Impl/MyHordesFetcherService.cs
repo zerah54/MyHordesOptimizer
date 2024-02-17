@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Discord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -299,7 +298,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         public BankLastUpdateDto GetBank()
         {
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
-            
+
             // Enregistrer en base
             using var transaction = DbContext.Database.BeginTransaction();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo()));
@@ -413,7 +412,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public MyHordesOptimizerMapDto GetMap(int townId)
         {
-            var model = DbContext.Towns         
+            var model = DbContext.Towns
                 .Where(cell => cell.IdTown == townId)
                 .Include(town => town.MapCells)
                     .ThenInclude(mapCell => mapCell.MapCellItems)
@@ -454,31 +453,37 @@ namespace MyHordesOptimizerApi.Services.Impl
             return dtos;
         }
 
-        public List<MyHordesOptimizerMapDigDto> CreateOrUpdateMapDigs(int? townId, int userId, List<MyHordesOptimizerMapDigDto> requests)
+        public List<MyHordesOptimizerMapDigDto> CreateOrUpdateMapDigs(int townId, int userId, List<MyHordesOptimizerMapDigDto> requests)
         {
-            //var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            //var idLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
-            //var model = new List<MapCellDig>();
-            //foreach (var request in requests)
-            //{
-            //    var model = Mapper.Map<MapCellDig>(request);
-            //    model.IdLastUpdateInfo = idLastUpdateInfo;
-            //    if (model.IdCell == 0)
-            //    {
-            //        var existingCell = MyHordesOptimizerRepository.GetCell(townId.Value, request.X, request.Y);
-            //        model.IdCell = existingCell.IdCell;
-            //    }
-            //    model.Add(model);
-            //}
-            //MyHordesOptimizerRepository.PatchMapCellDig(model);
-            //var results = new List<MapCellDig>();
-            //foreach (var model in model)
-            //{
-            //    results.Add(MyHordesOptimizerRepository.GetCellDigs(model.IdCell, model.IdUser, model.Day));
-            //}
-            //var dtos = Mapper.Map<List<MyHordesOptimizerMapDigDto>>(results);
-            //return dtos;
-            return null;
+            using var transaction = DbContext.Database.BeginTransaction();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(DbContext)));
+            DbContext.SaveChanges();
+            var models = Mapper.Map<List<MapCellDig>>(requests, opt =>
+            {
+                opt.SetLastUpdateInfoId(newLastUpdate.Entity.IdLastUpdateInfo);
+                opt.SetDbContext(DbContext);
+                opt.SetTownIdKey(townId);
+            });
+            var toAdd = new List<MapCellDig>();
+            var toUpdate = new List<MapCellDig>();
+            foreach(var model in models)
+            {
+                if(DbContext.MapCellDigs.Any(x => x.IdCell == model.IdCell && x.IdUser == model.IdUser && x.Day == model.Day))
+                {
+                    toUpdate.Add(model);
+                }
+                else
+                {
+                    toAdd.Add(model);
+                }
+            }
+            DbContext.AddRange(toAdd);
+            DbContext.UpdateRange(toUpdate);
+            DbContext.SaveChanges();
+            transaction.Commit();
+
+            var dtos = Mapper.Map<List<MyHordesOptimizerMapDigDto>>(models);
+            return dtos;
         }
 
         public void DeleteMapDigs(int idCell, int diggerId, int day)

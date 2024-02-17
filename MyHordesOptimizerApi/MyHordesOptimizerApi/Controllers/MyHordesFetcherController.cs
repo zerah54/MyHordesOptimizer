@@ -156,7 +156,7 @@ namespace MyHordesOptimizerApi.Controllers
             }
 
             UserKeyProvider.UserId = userId.Value;
-            var dto = _myHordesFetcherService.CreateOrUpdateMapDigs(townId, userId.Value, requests);
+            var dto = _myHordesFetcherService.CreateOrUpdateMapDigs(townId.Value, userId.Value, requests);
             return Ok(dto);
         }
 
