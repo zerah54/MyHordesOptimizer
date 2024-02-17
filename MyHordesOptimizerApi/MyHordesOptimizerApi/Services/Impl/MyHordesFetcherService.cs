@@ -488,7 +488,10 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public void DeleteMapDigs(int idCell, int diggerId, int day)
         {
-            //MyHordesOptimizerRepository.DeleteMapCellDig(idCell, diggerId, day);
+            var models = DbContext.MapCellDigs.Where(x => x.IdCell == idCell && x.IdUser == diggerId && x.Day == day)
+                .ToList();
+            DbContext.RemoveRange(models);
+            DbContext.SaveChanges();
         }
 
         public IEnumerable<MyHordesOptimizerMapUpdateDto> GetMapUpdates(int townId)
