@@ -437,17 +437,28 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public IEnumerable<MyHordesOptimizerMapDigDto> GetMapDigs(int townId)
         {
-            //var models = MyHordesOptimizerRepository.GetCellsDigs(townId);
-            //var dtos = Mapper.Map<IEnumerable<MyHordesOptimizerMapDigDto>>(models);
-            //return dtos;
-            return null;
+            var model = DbContext.Towns
+                .Where(town => town.IdTown == townId)
+                .Include(town => town.MapCells)
+                    .ThenInclude(mapCell => mapCell.MapCellDigs)
+                        .ThenInclude(digs => digs.IdUserNavigation)
+                        .AsSplitQuery()
+                .Include(town => town.MapCells)
+                    .ThenInclude(mapCell => mapCell.MapCellDigs)
+                        .ThenInclude(digs => digs.IdLastUpdateInfoNavigation)
+                            .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                            .AsSplitQuery()
+                .AsNoTracking()
+                .First();
+            var dtos = Mapper.Map<List<MyHordesOptimizerMapDigDto>>(model);
+            return dtos;
         }
 
         public List<MyHordesOptimizerMapDigDto> CreateOrUpdateMapDigs(int? townId, int userId, List<MyHordesOptimizerMapDigDto> requests)
         {
             //var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             //var idLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
-            //var models = new List<MapCellDig>();
+            //var model = new List<MapCellDig>();
             //foreach (var request in requests)
             //{
             //    var model = Mapper.Map<MapCellDig>(request);
@@ -457,11 +468,11 @@ namespace MyHordesOptimizerApi.Services.Impl
             //        var existingCell = MyHordesOptimizerRepository.GetCell(townId.Value, request.X, request.Y);
             //        model.IdCell = existingCell.IdCell;
             //    }
-            //    models.Add(model);
+            //    model.Add(model);
             //}
-            //MyHordesOptimizerRepository.PatchMapCellDig(models);
+            //MyHordesOptimizerRepository.PatchMapCellDig(model);
             //var results = new List<MapCellDig>();
-            //foreach (var model in models)
+            //foreach (var model in model)
             //{
             //    results.Add(MyHordesOptimizerRepository.GetCellDigs(model.IdCell, model.IdUser, model.Day));
             //}
@@ -477,8 +488,8 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public IEnumerable<MyHordesOptimizerMapUpdateDto> GetMapUpdates(int townId)
         {
-            //var models = MyHordesOptimizerRepository.GetMapUpdates(townId);
-            //var dtos = Mapper.Map<IEnumerable<MyHordesOptimizerMapUpdateDto>>(models);
+            //var model = MyHordesOptimizerRepository.GetMapUpdates(townId);
+            //var dtos = Mapper.Map<IEnumerable<MyHordesOptimizerMapUpdateDto>>(model);
             //return dtos;
             return null;
         }

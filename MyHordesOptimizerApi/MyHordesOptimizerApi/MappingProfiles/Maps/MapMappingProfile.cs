@@ -55,6 +55,20 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                 .ForMember(dto => dto.X, opt => opt.MapFrom(model => model.X))
                 .ForMember(dto => dto.Y, opt => opt.MapFrom(model => model.Y))
                 .ForMember(dto => dto.ZoneRegen, opt => { opt.MapFrom(src => ((RegenDirectionEnum)src.ZoneRegen.Value).GetDescription()); opt.PreCondition(src => src.ZoneRegen.HasValue); });
+
+            CreateMap<Town, List<MyHordesOptimizerMapDigDto>>()
+                    .ConvertUsing<TownToMapDigDto>();
+            CreateMap<MapCellDig, MyHordesOptimizerMapDigDto>()
+                .ForMember(dto => dto.CellId, opt => opt.MapFrom(model => model.IdCell))
+                .ForMember(dto => dto.Day, opt => opt.MapFrom(model => model.Day))
+                .ForMember(dto => dto.DiggerId, opt => opt.MapFrom(model => model.IdUser))
+                .ForMember(dto => dto.DiggerName, opt => opt.MapFrom(model => model.IdUserNavigation.Name))
+                .ForMember(dto => dto.LastUpdateInfo, opt => opt.MapFrom(model => model.IdLastUpdateInfoNavigation))
+                .ForMember(dto => dto.NbSucces, opt => opt.MapFrom(model => model.NbSucces))
+                .ForMember(dto => dto.NbTotalDig, opt => opt.MapFrom(model => model.NbTotalDig))
+                .ForMember(dto => dto.X, opt => opt.Ignore())
+                .ForMember(dto => dto.Y, opt => opt.Ignore());
+
         }
 
         private class TownToCellsDto : ITypeConverter<Town, List<MyHordesOptimizerCellDto>>
@@ -75,6 +89,25 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                     cellDto.DisplayY = town.Y - mapCell.Y;
                     cellDto.TotalSucces = mapCell.MapCellDigs.Where(digs => digs.IdCell == mapCell.IdCell).Sum(digs => digs.NbSucces);
                     results.Add(cellDto);
+                }
+                return results;
+            }
+        }
+
+        private class TownToMapDigDto : ITypeConverter<Town, List<MyHordesOptimizerMapDigDto>>
+        {
+            public List<MyHordesOptimizerMapDigDto> Convert(Town town, List<MyHordesOptimizerMapDigDto> destination, ResolutionContext context)
+            {
+                var results = new List<MyHordesOptimizerMapDigDto>();
+                foreach (var mapCell in town.MapCells)
+                {
+                    var digDtos = context.Mapper.Map<List<MyHordesOptimizerMapDigDto>>(mapCell.MapCellDigs);
+                    digDtos.ForEach(dig =>
+                    {
+                        dig.X = mapCell.X;
+                        dig.Y = mapCell.Y;
+                    });
+                    results.AddRange(digDtos);
                 }
                 return results;
             }
