@@ -2313,7 +2313,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">263</context>
         </context-group>
-        <target state="needs-translation">Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=<x id="PH" equiv-text="environment.website_url"/>my-town/wishlist]ce lien[/link]</target>
+        <target state="translated">Diese Liste wurde von der MyHordes Optimizer-Website generiert. Du kannst sie finden, indem du [link=<x id="PH" equiv-text="environment.website_url"/>my-town/wishlist]anklickst[/link]</target>
       </trans-unit>
       <trans-unit id="7155393620333942058" datatype="html" approved="yes">
         <source>Liste de course</source>
@@ -2450,8 +2450,7 @@
           <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Mis à jour par <x id="INTERPOLATION" equiv-text="{{ lastUpdateInfo.username }}"/> <x id="INTERPOLATION_1" equiv-text="{{ lastUpdateInfo.update_time.fromNow() }}"/>
-                </target>
+        <target state="translated">Aktualisiert von <x id="INTERPOLATION" equiv-text="{{ lastUpdateInfo.username }}"/> <x id="INTERPOLATION_1" equiv-text="{{ lastUpdateInfo.update_time.fromNow() }}"/>                </target>
       </trans-unit>
       <trans-unit id="3130710248919896495" datatype="html" approved="yes">
         <source>Jamais mis à jour</source>
@@ -2471,7 +2470,7 @@
           <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Mis à jour par <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo?.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo?.update_time?.fromNow()}}"/> (<x id="INTERPOLATION_2" equiv-text="{{lastUpdateInfo?.update_time?.toDate() | date:'medium'}}"/>)</target>
+        <target state="translated">Aktualisiert von <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo?.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo?.update_time?.fromNow()}}"/> (<x id="INTERPOLATION_2" equiv-text="{{lastUpdateInfo?.update_time?.toDate() | date:'medium'}}"/>)</target>
       </trans-unit>
       <trans-unit id="5829380065548494521" datatype="html" approved="yes">
         <source>Rechercher</source>
@@ -2496,7 +2495,7 @@
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> et <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
+        <target state="translated">Entwickelt von <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> und <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
       </trans-unit>
       <trans-unit id="3400027835914346369" datatype="html" approved="yes">
@@ -2526,7 +2525,7 @@
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">17,18</context>
         </context-group>
-        <target state="needs-translation">Ce site n'est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
+        <target state="translated">Diese Seite kein Teil von <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> oder <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
       </trans-unit>
       <trans-unit id="239352375316430833" datatype="html">
@@ -2536,7 +2535,7 @@
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">20,21</context>
         </context-group>
-        <target state="needs-translation">Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
+        <target state="translated">Einige grafische Elemente gehören zu <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> oder <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
       </trans-unit>
       <trans-unit id="3984780497725315833" datatype="html" approved="yes">
@@ -2597,7 +2596,7 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.html</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="needs-translation">Cette page peut contenir des spoils de la saison 16</target>
+        <target state="translated">Diese Seite kann Spoiler zu Season 16 enthalten</target>
       </trans-unit>
       <trans-unit id="1687689412386216543" datatype="html">
         <source>Par défaut</source>
@@ -2605,7 +2604,7 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Par défaut</target>
+        <target state="translated">Standard</target>
       </trans-unit>
       <trans-unit id="5786363460327756403" datatype="html">
         <source>Rose</source>
