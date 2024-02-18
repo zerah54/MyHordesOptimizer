@@ -795,7 +795,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/services/wishlist.service.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="needs-translation">L'objet <x id="PH" equiv-text="item.label[this.locale]"/> a bien été ajouté à la liste de courses</target>
+        <target state="translated">Der Gegenstand <x id="PH" equiv-text="item.label[this.locale]"/> wurde erfolgreich zur Einkaufsliste hinzugefügt</target>
       </trans-unit>
       <trans-unit id="7491144287113751802" datatype="html" approved="yes">
         <source>Affichage condensé</source>
@@ -871,7 +871,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">180</context>
         </context-group>
-        <target state="needs-translation">Aucun objet ne correspond au filtre "<x id="INTERPOLATION" equiv-text="{{ filterInput.nativeElement.value }}"/>"</target>
+        <target state="translated">Kein Gegenstand entspricht dem Filter "<x id="INTERPOLATION" equiv-text="{{ filterInput.nativeElement.value }}"/>"</target>
       </trans-unit>
       <trans-unit id="8265078634979801865" datatype="html" approved="yes">
         <source>La liste est vide</source>
@@ -1699,7 +1699,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">Attaque du jour (J<x id="INTERPOLATION" equiv-text="{{ selected_day }}"/>)</target>
+        <target state="translated">Angriff des Tages (T<x id="INTERPOLATION" equiv-text="{{ selected_day }}"/>)</target>
       </trans-unit>
       <trans-unit id="2806568446192626314" datatype="html" approved="yes">
         <source>Qualité</source>
@@ -1747,7 +1747,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
           <context context-type="linenumber">87</context>
         </context-group>
-        <target state="needs-translation">Attaque du lendemain (J<x id="INTERPOLATION" equiv-text="{{ selected_day + 1 }}"/>)</target>
+        <target state="translated">Angriff des nächsten Tages (T<x id="INTERPOLATION" equiv-text="{{ selected_day + 1 }}"/>)</target>
       </trans-unit>
       <trans-unit id="3167198928570165301" datatype="html">
         <source>Attaque J<x id="INTERPOLATION" equiv-text="{{ selected_day }}"/> calculée (par Apofoo)</source>
@@ -1759,7 +1759,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="needs-translation">Attaque J<x id="INTERPOLATION" equiv-text="{{ selected_day }}"/> calculée (par Apofoo)</target>
+        <target state="translated">Angriff T<x id="INTERPOLATION" equiv-text="{{ selected_day }}"/> berechnet (von Apofoo)</target>
       </trans-unit>
       <trans-unit id="5556258391635461081" datatype="html">
         <source>Attaque du jour</source>
@@ -1811,7 +1811,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
           <context context-type="linenumber">241</context>
         </context-group>
-        <target state="needs-translation">Attaque J<x id="PH" equiv-text="day"/> calculée (By Apofoo) - Min</target>
+        <target state="translated">Angriff T<x id="PH" equiv-text="day"/> berechnet (von Apofoo) - Min</target>
       </trans-unit>
       <trans-unit id="7401290140750106881" datatype="html">
         <source>Attaque J<x id="PH" equiv-text="day"/> calculée (By Apofoo) - Max</source>
@@ -1819,7 +1819,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
           <context context-type="linenumber">250</context>
         </context-group>
-        <target state="needs-translation">Attaque J<x id="PH" equiv-text="day"/> calculée (By Apofoo) - Max</target>
+        <target state="translated">Angriff T<x id="PH" equiv-text="day"/> berechnet (von Apofoo) - Min</target>
       </trans-unit>
       <trans-unit id="7758495672392792727" datatype="html">
         <source>Attaque J<x id="PH" equiv-text="day"/> calculée (By Apofoo) (beta) - Min</source>
@@ -1827,7 +1827,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
           <context context-type="linenumber">259</context>
         </context-group>
-        <target state="needs-translation">Attaque J<x id="PH" equiv-text="day"/> calculée (By Apofoo) (beta) - Min</target>
+        <target state="translated">Angriff T<x id="PH" equiv-text="day"/> berechnet (von Apofoo) (beta) - Min</target>
       </trans-unit>
       <trans-unit id="918761619835352377" datatype="html">
         <source>Attaque J<x id="PH" equiv-text="day"/> calculée (By Apofoo) (beta) - Max</source>
@@ -1835,7 +1835,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
           <context context-type="linenumber">269</context>
         </context-group>
-        <target state="needs-translation">Attaque J<x id="PH" equiv-text="day"/> calculée (By Apofoo) (beta) - Max</target>
+        <target state="translated">Angriff T<x id="PH" equiv-text="day"/> berechnet (von Apofoo) (beta) - Max</target>
       </trans-unit>
       <trans-unit id="7065021988584818620" datatype="html" approved="yes">
         <source>Estimation de l&apos;attaque - Min</source>
