@@ -39,5 +39,15 @@ namespace MyHordesOptimizerApi.Extensions
                 }
             }
         }
+
+        public static void UpdateAllProperties<T>(this T objectToUpdate, T objectToCopy)
+        {
+            foreach (var toProp in typeof(T).GetProperties())
+            {
+                var fromProp = typeof(T).GetProperty(toProp.Name);
+                var toValue = fromProp.GetValue(objectToCopy, null);
+                toProp.SetValue(objectToUpdate, toValue, null);
+            }
+        }
     }
 }

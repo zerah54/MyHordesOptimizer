@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
@@ -27,6 +28,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         protected readonly IMapper Mapper;
 
         protected readonly ILogger<MyHordesImportService> Logger;
+        protected MhoContext DbContext { get; set; }
+
 
         public MyHordesImportService(IServiceScopeFactory serviceScopeFactory,
             IWebApiRepository webApiRepository,
@@ -34,7 +37,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             IMyHordesApiRepository myHordesJsonApiRepository,
             IMyHordesCodeRepository myHordesCodeRepository,
             IMapper mapper,
-            ILogger<MyHordesImportService> logger)
+            ILogger<MyHordesImportService> logger,
+            MhoContext dbContext)
         {
             ServiceScopeFactory = serviceScopeFactory;
             WebApiRepository = webApiRepository;
@@ -43,6 +47,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             MyHordesCodeRepository = myHordesCodeRepository;
             Mapper = mapper;
             Logger = logger;
+            DbContext = dbContext;
         }
 
 
@@ -86,7 +91,22 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 capacitie.DescriptionEs = spanishTrads[capacitie.DescriptionDe];
             }
 
-            //MyHordesOptimizerRepository.PatchHeroSkill(capacities);
+            var comparer = EqualityComparerFactory.Create<HeroSkill>(heroSkill => heroSkill.Name.GetHashCode(), (a, b) => a.Name == b.Name);
+
+            var heroSkills = DbContext.HeroSkills.ToList();
+            var toRemove = heroSkills.Except(capacities, comparer);
+            DbContext.RemoveRange(toRemove);
+            var toAdd = capacities.Except(heroSkills, comparer);
+            DbContext.AddRange(toAdd);
+            var toUpdate = heroSkills.Intersect(capacities, comparer);
+            foreach (var heroSkill in toUpdate)
+            {
+                var updatedHeroSkill = capacities.Where(c => c.Name == heroSkill.Name).First();
+                heroSkill.UpdateAllProperties(updatedHeroSkill);
+                DbContext.Update(heroSkill);
+            }
+
+            DbContext.SaveChanges();
         }
 
         #endregion
