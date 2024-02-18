@@ -496,10 +496,10 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public IEnumerable<MyHordesOptimizerMapUpdateDto> GetMapUpdates(int townId)
         {
-            //var model = MyHordesOptimizerRepository.GetMapUpdates(townId);
-            //var dtos = Mapper.Map<IEnumerable<MyHordesOptimizerMapUpdateDto>>(model);
-            //return dtos;
-            return null;
+            var models = DbContext.MapCellDigUpdates.Where(x => x.IdTown == townId)
+                .ToList();
+            var dtos = Mapper.Map<List<MyHordesOptimizerMapUpdateDto>>(models);
+            return dtos;
         }
 
         #region Private helpers

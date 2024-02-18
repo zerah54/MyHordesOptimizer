@@ -69,6 +69,13 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                 .ForMember(dto => dto.X, opt => opt.Ignore())
                 .ForMember(dto => dto.Y, opt => opt.Ignore());
 
+            CreateMap<MapCellDigUpdate, MyHordesOptimizerMapUpdateDto>()
+                .ForMember(dest => dest.Day, opt => opt.MapFrom(src => src.Day))
+                .ForMember(dest => dest.DirectionRegen, opt => opt.MapFrom(src => ((RegenDirectionEnum)src.DirectionRegen).GetDescription()))
+                .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => src.IdTown))
+                .ForMember(dest => dest.LevelRegen, opt => opt.MapFrom(src => src.LevelRegen))
+                .ForMember(dest => dest.TauxRegen, opt => opt.MapFrom(src => src.TauxRegen));
+
         }
 
         private class TownToCellsDto : ITypeConverter<Town, List<MyHordesOptimizerCellDto>>

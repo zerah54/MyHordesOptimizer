@@ -534,9 +534,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IdCell, opt => opt.MapFrom(src => src.CellId))
                 .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.DiggerId));
 
-            CreateMap<MapCellDigUpdate, MyHordesOptimizerMapUpdateDto>()
-                .ForMember(dest => dest.DirectionRegen, opt => opt.MapFrom(src => ((RegenDirectionEnum)src.DirectionRegen).GetDescription()));
-
             CreateMap<MyHordesOptimizerCellUpdateDto, MapCell>()
                 .ForMember(dest => dest.AveragePotentialRemainingDig, opt => opt.Ignore())
                 .ForMember(dest => dest.DangerLevel, opt => opt.Ignore())
