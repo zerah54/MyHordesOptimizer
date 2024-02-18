@@ -1928,7 +1928,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/registry/doors/doors-registry.component.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="needs-translation">Sortie n°<x id="PH" equiv-text="index + 1"/>
+        <target state="translated">Ausgang Nr.<x id="PH" equiv-text="index + 1"/>
                 </target>
       </trans-unit>
       <trans-unit id="2365273625237440349" datatype="html" approved="yes">
@@ -2612,7 +2612,7 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Rose</target>
+        <target state="translated">Pink</target>
       </trans-unit>
       <trans-unit id="4843074552222243213" datatype="html">
         <source>Brun</source>
@@ -2620,7 +2620,7 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Brun</target>
+        <target state="translated">Braun</target>
       </trans-unit>
       <trans-unit id="6038281835621310494" datatype="html">
         <source>Outils</source>
