@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
+using MyHordesOptimizerApi.MappingProfiles.Converters;
 using MyHordesOptimizerApi.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Items
 {
@@ -92,6 +95,38 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dto => dto.IsItemBroken, opt => opt.MapFrom(src => src.IsBroken))
                 .ForMember(dto => dto.ItemCount, opt => opt.MapFrom(src => src.Count))
                 .ForMember(dto => dto.ItemId, opt => opt.MapFrom(src => src.IdItem));
+
+            CreateMap<KeyValuePair<string, MyHordesItem>, Item>()
+                .ForMember(dest => dest.ActionNames, opt => opt.Ignore())
+                .ForMember(dest => dest.BagItems, opt => opt.Ignore())
+                .ForMember(dest => dest.Deco, opt => opt.MapFrom(src => src.Value.Deco))
+                .ForMember(dest => dest.DefaultWishlistItems, opt => opt.Ignore())
+                .ForMember(dest => dest.DescriptionDe, opt => opt.MapFrom(src => src.Value.Description["de"]))
+                .ForMember(dest => dest.DescriptionEn, opt => opt.MapFrom(src => src.Value.Description["en"]))
+                .ForMember(dest => dest.DescriptionEs, opt => opt.MapFrom(src => src.Value.Description["es"]))
+                .ForMember(dest => dest.DescriptionFr, opt => opt.MapFrom(src => src.Value.Description["fr"]))
+                .ForMember(dest => dest.DropRateNotPraf, opt => opt.Ignore())
+                .ForMember(dest => dest.DropRatePraf, opt => opt.Ignore())
+                .ForMember(dest => dest.ExpeditionBags, opt => opt.Ignore())
+                .ForMember(dest => dest.Guard, opt => opt.MapFrom(src => src.Value.Guard))
+                .ForMember(dest => dest.IdCategories, opt => opt.Ignore())
+                .ForMember(dest => dest.IdCategory, opt => opt.ConvertUsing<DeutchNameToCategoryIdConverter, string>(src => src.Value.Category["de"]))
+                .ForMember(dest => dest.IdCategoryNavigation, opt => opt.Ignore())
+                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Value.Id))
+                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => Regex.Replace(src.Value.Img, @"(.*)\.(.*)\.(.*)", "$1.$3")))
+                .ForMember(dest => dest.IsHeaver, opt => opt.MapFrom(src => src.Value.Heavy))
+                .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Value.Label["de"]))
+                .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Value.Label["en"]))
+                .ForMember(dest => dest.LabelEs, opt => opt.MapFrom(src => src.Value.Label["es"]))
+                .ForMember(dest => dest.LabelFr, opt => opt.MapFrom(src => src.Value.Label["fr"]))
+                .ForMember(dest => dest.MapCellItems, opt => opt.Ignore())
+                .ForMember(dest => dest.PropertyNames, opt => opt.Ignore())
+                .ForMember(dest => dest.RecipeItemComponents, opt => opt.Ignore())
+                .ForMember(dest => dest.RecipeItemResults, opt => opt.Ignore())
+                .ForMember(dest => dest.RuinItemDrops, opt => opt.Ignore())
+                .ForMember(dest => dest.TownBankItems, opt => opt.Ignore())
+                .ForMember(dest => dest.TownWishListItems, opt => opt.Ignore())
+                .ForMember(dest => dest.Uid, opt => opt.MapFrom(src => src.Key));
         }
     }
 }

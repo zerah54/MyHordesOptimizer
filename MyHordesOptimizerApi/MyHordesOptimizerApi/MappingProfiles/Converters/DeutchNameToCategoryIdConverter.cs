@@ -14,7 +14,9 @@ namespace MyHordesOptimizerApi.MappingProfiles.Converters
         public DeutchNameToCategoryIdConverter(IServiceScopeFactory serviceScopeFactory)
         {
             ServiceScopeFactory = serviceScopeFactory;
-            //_categories = MyHordesOptimizerRepository.GetCategories().ToList();
+            using var scope = ServiceScopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            _categories = dbContext.Categories.ToList();
         }
 
         public int? Convert(string sourceMember, ResolutionContext context)

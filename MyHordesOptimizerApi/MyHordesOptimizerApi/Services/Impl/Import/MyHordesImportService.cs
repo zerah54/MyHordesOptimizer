@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Common.Core.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
@@ -10,11 +11,11 @@ using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
+using Action = MyHordesOptimizerApi.Models.Action;
 
 namespace MyHordesOptimizerApi.Services.Impl.Import
 {
@@ -96,7 +97,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             Patch(heroSkills, capacities, comparer);
         }
 
-        private void Patch<T>(List<T> fromDbEntities, List<T> updatedEntities, IEqualityComparer<T> comparer) where T: class
+        private void Patch<T>(List<T> fromDbEntities, List<T> updatedEntities, IEqualityComparer<T> comparer) where T : class
         {
             var toRemove = fromDbEntities.Except(updatedEntities, comparer);
             DbContext.RemoveRange(toRemove);
@@ -163,8 +164,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         public async Task ImportItemsAsync()
         {
+            using var transaction = DbContext.Database.BeginTransaction();
             // Récupération des items
             var myHordesItems = MyHordesApiRepository.GetItems();
+
             var mhoItems = Mapper.Map<List<Item>>(myHordesItems);
             // Enrichissement avec les droprates
             var droprates = MyHordesCodeRepository.GetItemsDropRates();
@@ -184,7 +187,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 if (listOfPrafDrops.TryGetValue(item.Uid, out var dropWeight))
                 {
-                    item.DropRatePraf = Convert.ToInt32(dropWeight[0]) / totalWeightPraf;
+                    item.DropRatePraf = Convert.ToSingle(Convert.ToInt32(dropWeight[0]) / totalWeightPraf);
                 }
                 else
                 {
@@ -195,40 +198,60 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 if (listOfNotPrafDrops.TryGetValue(item.Uid, out var dropWeight))
                 {
-                    item.DropRateNotPraf = Convert.ToInt32(dropWeight[0]) / totalWeightNotPraf;
+                    item.DropRateNotPraf = Convert.ToSingle(Convert.ToInt32(dropWeight[0]) / totalWeightNotPraf);
                 }
                 else
                 {
                     item.DropRateNotPraf = 0;
                 }
             });
-            //MyHordesOptimizerRepository.PatchItems(mhoItems);
+
+            var itemComparer = EqualityComparerFactory.Create<Item>(item => item.IdItem.GetHashCode(), (a, b) => a.IdItem == b.IdItem);
+            var existingItems = DbContext.Items.ToList();
+            Patch(existingItems, mhoItems, itemComparer);
+            existingItems = DbContext.Items.ToList();
 
             // Récupération des properties
             var codeItemsProperty = MyHordesCodeRepository.GetItemsProperties();
             var allProperties = codeItemsProperty.Values.ToList().SelectMany(list => list).Distinct().ToList();
-            //MyHordesOptimizerRepository.PatchProperties(allProperties);
 
-            //MyHordesOptimizerRepository.DeleteAllPropertiesItem();
-            foreach (var kvp in codeItemsProperty)
+            var itemByProperty = new Dictionary<string, List<Item>>();
+            foreach (var kvp in codeItemsProperty) // On reverse la map pour pouvoir patch les properties
             {
                 var itemUid = kvp.Key;
                 var properties = kvp.Value;
-                //MyHordesOptimizerRepository.PatchPropertiesItem(itemUid, properties);
+                foreach (var prop in properties)
+                {
+                    Func<Item, bool> predicate = item => item.Uid == itemUid;
+                    PopulateMapFromSourceBasedOnPredicate(map: itemByProperty, src: existingItems, key: prop, predicate: predicate);
+                }
             }
+            var propertiesFromDb = DbContext.Properties.ToList();
+            var updatedProperties = itemByProperty.Select(kvp => propertiesFromDb.FirstOrDefault(prop => prop.Name == kvp.Key, new Property() { Name = kvp.Key, IdItems = kvp.Value }))
+                .ToList();
+            var propertyComparer = EqualityComparerFactory.Create<Property>(prop => prop.Name.GetHashCode(), (a, b) => a.Name == b.Name);
+            Patch(propertiesFromDb, updatedProperties, propertyComparer);
 
             // Récupération des actions
             var codeItemsActions = MyHordesCodeRepository.GetItemsActions();
             var allActions = codeItemsActions.Values.ToList().SelectMany(list => list).Distinct().ToList();
-            //MyHordesOptimizerRepository.PatchActions(allActions);
 
-            //MyHordesOptimizerRepository.DeleteAllActionsItem();
-            foreach (var kvp in codeItemsActions)
+            var itemByAction = new Dictionary<string, List<Item>>();
+            foreach (var kvp in codeItemsActions) // On reverse la map pour pouvoir patch les actions
             {
                 var itemUid = kvp.Key;
                 var actions = kvp.Value;
-                //MyHordesOptimizerRepository.PatchActionsItem(itemUid, actions);
+                foreach (var action in actions)
+                {
+                    Func<Item, bool> predicate = item => item.Uid == itemUid;
+                    PopulateMapFromSourceBasedOnPredicate(map: itemByAction, src: existingItems, key: action, predicate: predicate);
+                }
             }
+            var actionsFromDb = DbContext.Actions.ToList();
+            var updatedActions = itemByAction.Select(kvp => actionsFromDb.FirstOrDefault(action => action.Name == kvp.Key, new Action() { Name = kvp.Key, IdItems = kvp.Value }))
+                .ToList();
+            var actionComparer = EqualityComparerFactory.Create<Action>(action => action.Name.GetHashCode(), (a, b) => a.Name == b.Name);
+            Patch(actionsFromDb, updatedActions, actionComparer);
 
             //Récupération des recipes
             var codeItemRecipes = MyHordesCodeRepository.GetRecipes();
@@ -253,15 +276,28 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     recipe.ActionEs = spanishTrads[recipe.ActionDe];
                 }
             }
-            //MyHordesOptimizerRepository.PatchRecipes(mhoRecipes);
-            //MyHordesOptimizerRepository.DeleteAllRecipeComponents();
-            //MyHordesOptimizerRepository.DeleteAllRecipeResults();
+            var recipesFromDb = DbContext.Recipes.ToList();
+            var recipeComparer = EqualityComparerFactory.Create<Recipe>(recipe => recipe.Name.GetHashCode(), (a, b) => a.Name == b.Name);
+            Patch(recipesFromDb, mhoRecipes, recipeComparer);
+
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemComponent");
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemResult");
             foreach (var kvp in codeItemRecipes)
             {
                 var recipeName = kvp.Key;
                 var componentUids = kvp.Value.In;
-                //MyHordesOptimizerRepository.PatchRecipeComponents(recipeName, componentUids);
-                try
+                var grouping = componentUids.GroupBy(x => x).Select(x => new { Count = x.Count(), Uid = x.Key });
+                foreach (var group in grouping) // On add les recipes components
+                {
+                    var newRecipeComponent = new RecipeItemComponent()
+                    {
+                        Count = group.Count,
+                        IdItemNavigation = existingItems.Single(item => item.Uid == group.Uid),
+                        RecipeName = recipeName
+                    };
+                    DbContext.Add(newRecipeComponent);
+                }
+                try // On add les recipes results
                 {
                     var resultsObjects = kvp.Value.Out;
                     var results = new List<RecipeItemResult>();
@@ -295,14 +331,30 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     }
                     results.ForEach(x => { if (x.Probability != 1) x.Probability = (float)x.Weight / totalWeight; });
                     //MyHordesOptimizerRepository.PatchRecipeResults(results);
+                    DbContext.RecipeItemResults.AddRange(results);
                 }
                 catch (Exception e)
                 {
                     Logger.LogError(e, $"Erreur lors de l'enregistrement des réulstats de la recette {recipeName}");
                 }
             }
+            DbContext.SaveChanges();
+            transaction.Commit();
+        }
 
-            // Récupération des droprates dans l'OM
+        private static void PopulateMapFromSourceBasedOnPredicate<T>(Dictionary<string, List<T>> map, List<T> src, string key, Func<T, bool> predicate) where T : class
+        {
+            if (map.TryGetValue(key, out var items))
+            {
+                if (!items.Any(predicate))
+                {
+                    items.AddRange(src.Where(predicate));
+                }
+            }
+            else
+            {
+                map[key] = new List<T>(src.Where(predicate));
+            }
         }
 
         #endregion
@@ -409,13 +461,13 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             //var existingCategories = Mapper.Map<List<WishlistCategorie>>(wishlistCategories);
 
             //var itemsCategorie = new List<WishlistCategorie>();
-            //foreach (var category in wishlistCategories)
+            //foreach (var item in wishlistCategories)
             //{
-            //    foreach (var item in category.Items)
+            //    foreach (var item in item.Items)
             //    {
             //        itemsCategorie.Add(new WishlistCategorie()
             //        {
-            //            IdCategory = category.Id,
+            //            IdCategory = item.Id,
             //            IdItem = item
             //        });
             //    }
