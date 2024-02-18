@@ -6,7 +6,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations
     {
 
         [JsonProperty("day")]
-        public int? Day { get; set; }
+        public int Day { get; set; }
 
         [JsonProperty("estim")]
         public EstimationsDto Estim { get; set; }

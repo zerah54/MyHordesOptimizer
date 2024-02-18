@@ -462,7 +462,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 opt.SetLastUpdateInfoId(newLastUpdate.Entity.IdLastUpdateInfo);
                 opt.SetDbContext(DbContext);
-                opt.SetTownIdKey(townId);
+                opt.SetTownId(townId);
             });
             var toAdd = new List<MapCellDig>();
             var toUpdate = new List<MapCellDig>();

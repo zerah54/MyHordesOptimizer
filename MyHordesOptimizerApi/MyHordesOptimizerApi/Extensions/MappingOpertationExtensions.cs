@@ -80,7 +80,7 @@ namespace MyHordesOptimizerApi.Extensions
             throw new InvalidOperationException("townId not set.");
         }
 
-        public static IMappingOperationOptions SetTownIdKey(this IMappingOperationOptions options, int townId)
+        public static IMappingOperationOptions SetTownId(this IMappingOperationOptions options, int townId)
         {
             options.Items[TownIdKey] = townId;
             // return options to support fluent chaining.

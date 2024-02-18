@@ -74,7 +74,7 @@ namespace MyHordesOptimizerApi.Controllers
             }
 
             var estimations = EstimationService.GetEstimations(townId.Value, day.Value);
-            return Ok(estimations.ToJson());
+            return Ok(estimations);
         }
 
         [HttpGet]
