@@ -4161,7 +4161,7 @@ Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Ordinateur</target>
+        <target state="translated">Computer</target>
       </trans-unit>
       <trans-unit id="3328878747241354904" datatype="html">
         <source>Il faut d&apos;abord installer l&apos;application de gestion des scripts de votre choix. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le <x id="PH" equiv-text="this.download_link"/>, qui lancera la procédure d&apos;installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.</source>
@@ -4425,7 +4425,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">Zombies tués</target>
+        <target state="translated">Zombies getötet</target>
       </trans-unit>
       <trans-unit id="35950385564752964" datatype="html">
         <source>Jour J</source>
@@ -4535,7 +4535,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Débordement</target>
+        <target state="translated">Überlauf</target>
       </trans-unit>
       <trans-unit id="5213071458731006944" datatype="html">
         <source>Ancien débordement maximum</source>
