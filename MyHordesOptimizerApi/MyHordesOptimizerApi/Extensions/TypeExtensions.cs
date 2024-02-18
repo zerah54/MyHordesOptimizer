@@ -1,6 +1,8 @@
-﻿using MyHordesOptimizerApi.Models;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using MyHordesOptimizerApi.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
@@ -40,13 +42,17 @@ namespace MyHordesOptimizerApi.Extensions
             }
         }
 
-        public static void UpdateAllProperties<T>(this T objectToUpdate, T objectToCopy)
+        public static void UpdateAllButKeysProperties<T>(this T objectToUpdate, T objectToCopy)
         {
             foreach (var toProp in typeof(T).GetProperties())
             {
                 var fromProp = typeof(T).GetProperty(toProp.Name);
-                var toValue = fromProp.GetValue(objectToCopy, null);
-                toProp.SetValue(objectToUpdate, toValue, null);
+                var keyAttr = fromProp.GetCustomAttribute<KeyAttribute>();
+                if(keyAttr == null) // Si c'est pas une key, on maj la propertie
+                {
+                    var toValue = fromProp.GetValue(objectToCopy, null);
+                    toProp.SetValue(objectToUpdate, toValue, null);
+                }             
             }
         }
     }

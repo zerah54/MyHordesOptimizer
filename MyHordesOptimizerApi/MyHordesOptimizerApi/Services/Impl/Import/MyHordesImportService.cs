@@ -102,7 +102,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             foreach (var heroSkill in toUpdate)
             {
                 var updatedHeroSkill = capacities.Where(c => c.Name == heroSkill.Name).First();
-                heroSkill.UpdateAllProperties(updatedHeroSkill);
+                heroSkill.UpdateAllButKeysProperties(updatedHeroSkill);
                 DbContext.Update(heroSkill);
             }
 
@@ -391,7 +391,22 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 category.LabelEs = spanishTrads[category.LabelDe];
             }
 
-            //MyHordesOptimizerRepository.PatchCategories(categories);
+            var comparer = EqualityComparerFactory.Create<Category>(category => category.Name.GetHashCode(), (a, b) => a.Name == b.Name);
+
+            var existingCategories = DbContext.Categories.ToList();
+            var toRemove = existingCategories.Except(categories, comparer);
+            DbContext.RemoveRange(toRemove);
+            var toAdd = categories.Except(existingCategories, comparer);
+            DbContext.AddRange(toAdd);
+            var toUpdate = existingCategories.Intersect(categories, comparer);
+            foreach (var categorie in toUpdate)
+            {
+                var updatedCategories = categories.Where(c => c.Name == categorie.Name).First();
+                categorie.UpdateAllButKeysProperties(updatedCategories);
+                DbContext.Update(categorie);
+            }
+
+            DbContext.SaveChanges();
         }
 
         #endregion
@@ -401,7 +416,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         public void ImportWishlistCategorie()
         {
             //var wishlistCategories = MyHordesCodeRepository.GetWishlistItemCategories();
-            //var categories = Mapper.Map<List<WishlistCategorie>>(wishlistCategories);
+            //var existingCategories = Mapper.Map<List<WishlistCategorie>>(wishlistCategories);
 
             //var itemsCategorie = new List<WishlistCategorie>();
             //foreach (var category in wishlistCategories)
@@ -416,7 +431,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             //    }
             //}
 
-            //MyHordesOptimizerRepository.PatchWishlistCategories(categories);
+            //MyHordesOptimizerRepository.PatchWishlistCategories(existingCategories);
             //MyHordesOptimizerRepository.PatchWishlistItemCategories(itemsCategorie);
         }
 
