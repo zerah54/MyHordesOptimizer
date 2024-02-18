@@ -2589,7 +2589,7 @@
           <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Déconnexion</target>
+        <target state="translated">Ausloggen</target>
       </trans-unit>
       <trans-unit id="494050536795475082" datatype="html">
         <source>Cette page peut contenir des spoils de la saison 16</source>
@@ -3842,9 +3842,9 @@ Certaines informations, comme par exemple le type de ville, ne sont pas visibles
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">72,74</context>
         </context-group>
-        <target state="needs-translation">En cochant cette option, vous verrez apparaitre un nouvel encart dans les informations du secteur de votre case.
-Cet encart vous permettra de saisir diverses informations pour calculer vos chances de survie sur cette case.
-Certaines informations, comme par exemple le type de ville, ne sont pas visibles car elles sont déjà pré-renseignées et tiennent compte de votre ville actuelle.</target>
+        <target state="translated">Wenn du diese Option anklickst, erscheint eine neue Box in den Sektorinformationen deines Feldes.
+In diese Box kannst du verschiedene Informationen eingeben, um deine Überlebenschancen in dieser Zone zu berechnen.
+Einige Informationen, wie z. B. der Stadttyp, sind nicht sichtbar, da sie bereits voreingetragen sind und deine aktuelle Stadt berücksichtigen.</target>
       </trans-unit>
       <trans-unit id="5457236869945529467" datatype="html">
         <source>Informations diverses issues de MyHordes Optimizer</source>
@@ -3852,7 +3852,7 @@ Certaines informations, comme par exemple le type de ville, ne sont pas visibles
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Informations diverses issues de MyHordes Optimizer</target>
+        <target state="translated">Verschiedene Informationen aus MyHordes Optimizer</target>
       </trans-unit>
       <trans-unit id="2973411733509838510" datatype="html">
         <source>Sur la carte du site de MyHordes Optimizer, vous pouvez saisir des notes sur chaque case.
@@ -3861,8 +3861,8 @@ Quand cette option est cochée, la note associée s&apos;affiche sur votre case 
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">78,79</context>
         </context-group>
-        <target state="needs-translation">Sur la carte du site de MyHordes Optimizer, vous pouvez saisir des notes sur chaque case.
-Quand cette option est cochée, la note associée s'affiche sur votre case quand vous vous déplacez dans l'Outre-Monde.</target>
+        <target state="translated">Auf der Sitemap von MyHordes Optimizer kannst du für jede Zone eine Notiz eingeben.
+Wenn diese Option angekreuzt ist, wird die zugehörige Notiz auf deiner Zone angezeigt, wenn du dich in der Außenwelt bewegst.</target>
       </trans-unit>
       <trans-unit id="3270416149746032956" datatype="html">
         <source>Affiche les estimations enregistrées sur la page de la tour de guet</source>
@@ -3878,7 +3878,7 @@ Quand cette option est cochée, la note associée s'affiche sur votre case quand
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">Quand cette option est cochée, un nouvel encart apparait sur la page de la tour de guet, permettant de consulter, enregistrer et copier les valeurs des estimations.</target>
+        <target state="translated">Wenn diese Option aktiviert ist, erscheint auf der Seite des Wachturms ein neuer Bereich, in dem Sie die Abschätzungen einsehen, speichern und kopieren können.</target>
       </trans-unit>
       <trans-unit id="7074994221428603078" datatype="html">
         <source>Ajoute un bouton permettant de copier le contenu du registre</source>
@@ -3976,7 +3976,7 @@ Si vous avez l'un des outils en question ouvert dans votre navigateur, alors la 
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">MyHordes Optimizer</target>
+        <target state="translated">MyHordes Optimizer</target>
       </trans-unit>
       <trans-unit id="6242771464223017856" datatype="html">
         <source>
@@ -4016,7 +4016,7 @@ Vous rendez également accessibles d'autres options de mise à jour avancées.
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Gest'Hordes</target>
+        <target state="translated">Gest'Hordes</target>
       </trans-unit>
       <trans-unit id="4415272569817655484" datatype="html">
         <source>En cochant l&apos;option &quot;Mettre à jour Gest&apos;Hordes&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils externes&quot;, la mise à jour de Gest&apos;Hordes se fera automatiquement.
@@ -4050,7 +4050,7 @@ Vous rendez également accessibles d'autres options de mise à jour avancées.
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="needs-translation">BigBroth'Hordes</target>
+        <target state="translated">BigBroth'Hordes</target>
       </trans-unit>
       <trans-unit id="6260241287022545999" datatype="html">
         <source>En cochant l&apos;option &quot;Mettre à jour BigBroth&apos;Hordes&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils externes&quot;, la mise à jour de BigBroth&apos;Hordes se fera automatiquement.</source>
@@ -4066,7 +4066,7 @@ Vous rendez également accessibles d'autres options de mise à jour avancées.
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="needs-translation">Fata Morgana</target>
+        <target state="translated">Fata Morgana</target>
       </trans-unit>
       <trans-unit id="4368997949772733392" datatype="html">
         <source>En cochant l&apos;option &quot;Mettre à jour Fata Morgana&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils externes&quot;, la mise à jour de Fata Morgana se fera automatiquement.</source>
@@ -4178,7 +4178,7 @@ Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Android</target>
+        <target state="translated">Android</target>
       </trans-unit>
       <trans-unit id="4519018646004234371" datatype="html">
         <source>&lt;ul&gt;
@@ -4206,7 +4206,7 @@ Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="needs-translation">iOS</target>
+        <target state="translated">iOS</target>
       </trans-unit>
       <trans-unit id="4825738638801021695" datatype="html">
         <source>&lt;ul&gt;
@@ -4588,7 +4588,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">125</context>
         </context-group>
-        <target state="needs-translation">Jours validés</target>
+        <target state="translated">Gültige Tage</target>
       </trans-unit>
       <trans-unit id="19231624547333208" datatype="html">
         <source>Points d&apos;âmes gagnés</source>
@@ -4596,7 +4596,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
-        <target state="needs-translation">Points d'âmes gagnés</target>
+        <target state="translated">Verdiente Seelenpunkte</target>
       </trans-unit>
       <trans-unit id="4453660283289554845" datatype="html">
         <source>Points clean</source>
@@ -4604,7 +4604,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Points clean</target>
+        <target state="translated">Clean Punkte</target>
       </trans-unit>
       <trans-unit id="3460935719519128493" datatype="html">
         <source>Points clean gagnés</source>
@@ -4612,7 +4612,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="needs-translation">Points clean gagnés</target>
+        <target state="translated">Gewonnene Clean-Punkte</target>
       </trans-unit>
       <trans-unit id="3435963616715084719" datatype="html">
         <source>Action de citoyen</source>
@@ -4620,7 +4620,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Action de citoyen</target>
+        <target state="translated">Bürgeraktion</target>
       </trans-unit>
       <trans-unit id="6743161373003242548" datatype="html">
         <source>Atelier</source>
@@ -4628,7 +4628,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Atelier</target>
+        <target state="translated">Werkstatt</target>
       </trans-unit>
       <trans-unit id="7788061501151326787" datatype="html">
         <source>Atelier, Chaman uniquement</source>
@@ -4636,7 +4636,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Atelier, Chaman uniquement</target>
+        <target state="translated">Werkstatt, nur Schamanen</target>
       </trans-unit>
       <trans-unit id="8924763758161915362" datatype="html">
         <source>Type de recette</source>
@@ -4644,7 +4644,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Type de recette</target>
+        <target state="translated">Rezepttyp</target>
       </trans-unit>
       <trans-unit id="227324654937703789" datatype="html">
         <source>Composants</source>
@@ -4652,7 +4652,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Composants</target>
+        <target state="translated">Komponenten</target>
       </trans-unit>
       <trans-unit id="4280305830543989718" datatype="html">
         <source>Nom du bâtiment</source>
@@ -4660,7 +4660,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">Nom du bâtiment</target>
+        <target state="translated">Gebäudename</target>
       </trans-unit>
       <trans-unit id="7533053521139949104" datatype="html">
         <source>Distance minimum</source>
@@ -4668,7 +4668,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Distance minimum</target>
+        <target state="translated">Mindestentfernung</target>
       </trans-unit>
       <trans-unit id="3656199934377633082" datatype="html">
         <source>Distance maximum</source>
@@ -4676,7 +4676,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="needs-translation">Distance maximum</target>
+        <target state="translated">Maximalentfernung</target>
       </trans-unit>
       <trans-unit id="7965672989392672913" datatype="html">
         <source>Capacité</source>
@@ -4684,7 +4684,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="needs-translation">Capacité</target>
+        <target state="translated">Kapazität</target>
       </trans-unit>
     </body>
   </file>
