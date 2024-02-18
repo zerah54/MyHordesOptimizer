@@ -10,6 +10,7 @@ using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -90,22 +91,24 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 capacitie.DescriptionEn = englishTrads[capacitie.DescriptionDe];
                 capacitie.DescriptionEs = spanishTrads[capacitie.DescriptionDe];
             }
-
-            var comparer = EqualityComparerFactory.Create<HeroSkill>(heroSkill => heroSkill.Name.GetHashCode(), (a, b) => a.Name == b.Name);
-
             var heroSkills = DbContext.HeroSkills.ToList();
-            var toRemove = heroSkills.Except(capacities, comparer);
+            var comparer = EqualityComparerFactory.Create<HeroSkill>(heroSkill => heroSkill.Name.GetHashCode(), (a, b) => a.Name == b.Name);
+            Patch(heroSkills, capacities, comparer);
+        }
+
+        private void Patch<T>(List<T> fromDbEntities, List<T> updatedEntities, IEqualityComparer<T> comparer) where T: class
+        {
+            var toRemove = fromDbEntities.Except(updatedEntities, comparer);
             DbContext.RemoveRange(toRemove);
-            var toAdd = capacities.Except(heroSkills, comparer);
+            var toAdd = updatedEntities.Except(fromDbEntities, comparer);
             DbContext.AddRange(toAdd);
-            var toUpdate = heroSkills.Intersect(capacities, comparer);
+            var toUpdate = fromDbEntities.Intersect(updatedEntities, comparer);
             foreach (var heroSkill in toUpdate)
             {
-                var updatedHeroSkill = capacities.Where(c => c.Name == heroSkill.Name).First();
+                var updatedHeroSkill = updatedEntities.Where(entity => comparer.Equals(entity, heroSkill)).First();
                 heroSkill.UpdateAllButKeysProperties(updatedHeroSkill);
                 DbContext.Update(heroSkill);
             }
-
             DbContext.SaveChanges();
         }
 
@@ -392,21 +395,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             }
 
             var comparer = EqualityComparerFactory.Create<Category>(category => category.Name.GetHashCode(), (a, b) => a.Name == b.Name);
-
             var existingCategories = DbContext.Categories.ToList();
-            var toRemove = existingCategories.Except(categories, comparer);
-            DbContext.RemoveRange(toRemove);
-            var toAdd = categories.Except(existingCategories, comparer);
-            DbContext.AddRange(toAdd);
-            var toUpdate = existingCategories.Intersect(categories, comparer);
-            foreach (var categorie in toUpdate)
-            {
-                var updatedCategories = categories.Where(c => c.Name == categorie.Name).First();
-                categorie.UpdateAllButKeysProperties(updatedCategories);
-                DbContext.Update(categorie);
-            }
-
-            DbContext.SaveChanges();
+            Patch(existingCategories, categories, comparer);
         }
 
         #endregion

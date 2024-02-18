@@ -47,7 +47,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Items")]
-        public ActionResult ImportItems(string userKey)
+        public async Task<ActionResult> ImportItemsAsync(string userKey)
         {
             if (string.IsNullOrEmpty(userKey))
             {
@@ -55,7 +55,7 @@ namespace MyHordesOptimizerApi.Controllers
             }
 
             UserKeyProvider.UserKey = userKey;
-            MyHordesImportService.ImportItemsAsync();
+            await MyHordesImportService.ImportItemsAsync();
             return Ok();
         }
 
