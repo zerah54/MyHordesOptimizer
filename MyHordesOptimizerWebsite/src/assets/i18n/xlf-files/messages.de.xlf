@@ -1985,7 +1985,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/registry/well/well-registry.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =0 {ration prise} =1 {ration prise} other {rations prises}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =0 {Rationen genommen} =1 {Ration genommen} other {Rationen genommen}}</target>
       </trans-unit>
       <trans-unit id="2316658858794336931" datatype="html" approved="yes">
         <source>Jour</source>
@@ -3072,7 +3072,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Copier le lien de la simulation</target>
+        <target state="translated">Link zur Simulation kopieren</target>
       </trans-unit>
       <trans-unit id="826911519411311233" datatype="html">
         <source>Dans ma ville</source>
@@ -3125,8 +3125,8 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">44,46</context>
         </context-group>
-        <target state="needs-translation">(<x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
-<x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>)</target>
+        <target state="translated">(<x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
+<x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> pro Zombie statt <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>)</target>
       </trans-unit>
       <trans-unit id="7954001980226848388" datatype="html">
         <source>Campeur professionnel</source>
@@ -3134,7 +3134,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Campeur professionnel</target>
+        <target state="translated">Proficamper</target>
       </trans-unit>
       <trans-unit id="8079361333376398985" datatype="html" approved="yes">
         <source>Tombe</source>
@@ -3278,8 +3278,8 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">178</context>
         </context-group>
-        <target state="needs-translation">
-<x id="INTERPOLATION" equiv-text="{{ display_bonus_ap ? 'Nombre' : 'Pourcentage' }}"/> total d'améliotations sur la case</target>
+        <target state="translated">
+<x id="INTERPOLATION" equiv-text="{{ display_bonus_ap ? 'Nombre' : 'Pourcentage' }}"/> Gesamtausbauten auf der Zone</target>
       </trans-unit>
       <trans-unit id="2902261471051690112" datatype="html" approved="yes">
         <source>Résultat</source>
@@ -3711,7 +3711,7 @@ Wenn Sie sich in der Wüste befinden und Ihre Eskorte nicht aktiviert ist oder S
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Navigation rapide vers le chantier recommandé</target>
+        <target state="translated">Schnelle Navigation zur empfohlenen Konstruktion</target>
       </trans-unit>
       <trans-unit id="4909203228847004040" datatype="html">
         <source>Dans l&apos;interface, vous pouvez cocher le bouton &quot;Navigation rapide vers le chantier recommandé&quot;, ce qui activera la fonctionnalité de navigation rapide.
@@ -3720,8 +3720,8 @@ Il s&apos;agit simplement, lorsqu&apos;il existe un chantier recommandé, de pou
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">36,37</context>
         </context-group>
-        <target state="needs-translation">Dans l'interface, vous pouvez cocher le bouton "Navigation rapide vers le chantier recommandé", ce qui activera la fonctionnalité de navigation rapide.
-Il s'agit simplement, lorsqu'il existe un chantier recommandé, de pouvoir cliquer dessus pour être automatiquement redirigé vers la ligne du chantier dans la liste.</target>
+        <target state="translated">In der Benutzeroberfläche kannst du die Einstellung "Schnellnavigation zur empfohlenen Konstruktion" anhaken, wodurch die Funktion der Schnellnavigation aktiviert wird.
+Wenn die Funktion aktiviert ist, und es eine empfohlene Baustelle gibt, kannst du auf die Empfehlung klicken, um automatisch zu der Zeile mit der Konstruktion in der Liste weitergeleitet zu werden.</target>
       </trans-unit>
       <trans-unit id="766908157360687970" datatype="html">
         <source>Champs de recherches supplémentaires</source>
