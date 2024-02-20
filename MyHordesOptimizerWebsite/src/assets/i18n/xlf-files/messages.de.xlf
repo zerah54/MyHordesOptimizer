@@ -3729,7 +3729,7 @@ Wenn die Funktion aktiviert ist, und es eine empfohlene Baustelle gibt, kannst d
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Champs de recherches supplémentaires</target>
+        <target state="translated">Weitere Suchfelder</target>
       </trans-unit>
       <trans-unit id="2719168518138811288" datatype="html">
         <source>En cochant cette option, vous pourrez choisir des champs de recherches à afficher dans votre interface. Sont actuellement disponibles : un champ de recherche sur la liste des chantiers, un champ de recherche dans les destinataires d&apos;un message dans sa maison, un champ de recherche sur les entrées du registre.</source>
@@ -3737,7 +3737,7 @@ Wenn die Funktion aktiviert ist, und es eine empfohlene Baustelle gibt, kannst d
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">En cochant cette option, vous pourrez choisir des champs de recherches à afficher dans votre interface. Sont actuellement disponibles : un champ de recherche sur la liste des chantiers, un champ de recherche dans les destinataires d'un message dans sa maison, un champ de recherche sur les entrées du registre.</target>
+        <target state="translated">Wenn du diese Option ankreuzt, kannst du Suchfelder auswählen, die in deiner Benutzeroberfläche angezeigt werden sollen. Derzeit sind verfügbar: ein Suchfeld auf der Liste der Konstruktionen, ein Suchfeld in den Empfängern einer Nachricht in seinem Haus, ein Suchfeld in den Einträgen des Registers.</target>
       </trans-unit>
       <trans-unit id="1707430487871050147" datatype="html">
         <source>Affichage de la liste de courses dans la page</source>
@@ -3745,7 +3745,7 @@ Wenn die Funktion aktiviert ist, und es eine empfohlene Baustelle gibt, kannst d
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Affichage de la liste de courses dans la page</target>
+        <target state="translated">Anzeige der Einkaufsliste auf der Seite</target>
       </trans-unit>
       <trans-unit id="6585471270280067151" datatype="html">
         <source>En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l&apos;atelier.
@@ -3760,13 +3760,13 @@ Dans le désert, les objets dans le sac ou au sol également présents dans la l
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">45,52</context>
         </context-group>
-        <target state="needs-translation">En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l'atelier.
-Cette liste contient des informations de priorité, de quantité en banque, de quantité dans les sacs, de quantité totale requise, et de quantité manquante.
+        <target state="translated">Wenn du diese Option ankreuzt, wird die Einkaufsliste angezeigt, wenn du dich in der Wüste oder in der Werkstatt befindest.
+Diese Liste enthält Informationen über die Priorität, die Menge in der Bank, die Menge in den Rucksächen, die benötigte Gesamtmenge und die fehlende Menge.
 &lt;br /&gt;&lt;br /&gt;
-La liste de courses dans l'atelier ne présentera que les éléments pouvant obtenus à l'atelier.
-Celle dans le désert affichera tous les éléments sans distinction.
+Die Einkaufsliste in der Werkstatt zeigt nur die Dinge an, die in der Werkstatt erzeugt werden können.
+Die in der Wüste zeigt alle Elemente ohne Einschränkung an.
 &lt;br /&gt;&lt;br /&gt;
-Dans le désert, les objets dans le sac ou au sol également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l'élément.
+In der Wüste werden Gegenstände in dem Rucksack oder auf dem Boden, die auch auf der Einkaufsliste stehen, mit einem Rand versehen, dessen Farbe die Priorität des Gegenstands angibt.
                 </target>
       </trans-unit>
       <trans-unit id="4423220166056863975" datatype="html">
@@ -3784,8 +3784,8 @@ Il compte le nombre de zombies qui ont été tués sur la case depuis la derniè
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">56,57</context>
         </context-group>
-        <target state="needs-translation">En cochant cette option, un nouvel encart apparaitra sous la carte dans l'Outre-Monde.
-Il compte le nombre de zombies qui ont été tués sur la case depuis la dernière attaque, et calcule le nombre de zombies qui vont mourir de désespoir lors de la prochaine attaque.</target>
+        <target state="translated">Wenn du diese Option ankreuzt, erscheint unter der Karte in der Außenwelt ein neuer Kasten.
+Er zählt die Anzahl der Zombies, die seit dem letzten Angriff auf dem Feld getötet wurden, und berechnet die Anzahl der Zombies, die beim nächsten Angriff an Abwanderung sterben werden.</target>
       </trans-unit>
       <trans-unit id="6560590152891649669" datatype="html">
         <source>Affichage de l&apos;outil de traduction</source>
@@ -3803,9 +3803,9 @@ Le texte doit impérativement être un texte de MyHordes, puisque nous allons en
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">61,63</context>
         </context-group>
-        <target state="needs-translation">En cochant cette option, un outil de traduction s'affichera dans l'interface.
-Vous pourrez désormais sélectionner une langue d'origine, puis saisir le texte à rechercher dans les autres langues.
-Le texte doit impérativement être un texte de MyHordes, puisque nous allons en chercher la traduction dans les fichiers de traduction du jeu.</target>
+        <target state="translated">Wenn du diese Option ankreuzt, wird ein Übersetzungstool auf der Benutzeroberfläche angezeigt.
+Du kannst nun eine Quellsprache auswählen und dann den Text eingeben, nach dem in den anderen Sprachen gesucht werden soll.
+Der Text muss unbedingt ein Text aus MyHordes sein, da die Übersetzung in den Übersetzungsdateien des Spiels gesucht wird.</target>
       </trans-unit>
       <trans-unit id="1297848596101851474" datatype="html">
         <source>Afficher les PA manquants pour réparer les chantiers</source>
@@ -3813,7 +3813,7 @@ Le texte doit impérativement être un texte de MyHordes, puisque nous allons en
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">Afficher les PA manquants pour réparer les chantiers</target>
+        <target state="translated">Fehlende AP anzeigen, um Konstruktionen zu reparieren</target>
       </trans-unit>
       <trans-unit id="3348452797437339338" datatype="html">
         <source>En pandémonium, les chantiers subissent des dégats lors de l&apos;attaque.
@@ -3822,8 +3822,8 @@ Cette option va montrer combien de pa manquent pour que le chantier ne risque pa
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">67,68</context>
         </context-group>
-        <target state="needs-translation">En pandémonium, les chantiers subissent des dégats lors de l'attaque.
-Cette option va montrer combien de pa manquent pour que le chantier ne risque pas d'être détruit lors de la prochaine attaque.</target>
+        <target state="translated">In Pandämonium nehmen die Konstruktionen beim Angriff Schaden.
+Diese Option wird zeigen, wie viele AP fehlen, damit die Konstruktion nicht Gefahr läuft, beim nächsten Angriff zerstört zu werden.</target>
       </trans-unit>
       <trans-unit id="7507912867004115839" datatype="html">
         <source>Prédictions de camping dans les informations du secteur</source>
@@ -3831,7 +3831,7 @@ Cette option va montrer combien de pa manquent pour que le chantier ne risque pa
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="needs-translation">Prédictions de camping dans les informations du secteur</target>
+        <target state="translated">Campingrechner im Campingmenü</target>
       </trans-unit>
       <trans-unit id="6315178546308171300" datatype="html">
         <source>En cochant cette option, vous verrez apparaitre un nouvel encart dans les informations du secteur de votre case.
@@ -3869,7 +3869,7 @@ Wenn diese Option angekreuzt ist, wird die zugehörige Notiz auf deiner Zone ang
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">Affiche les estimations enregistrées sur la page de la tour de guet</target>
+        <target state="translated">Zeigt die auf der Wachturmseite gespeicherten Schätzungen an</target>
       </trans-unit>
       <trans-unit id="2873411537721466808" datatype="html">
         <source>Quand cette option est cochée, un nouvel encart apparait sur la page de la tour de guet, permettant de consulter, enregistrer et copier les valeurs des estimations.</source>
@@ -3885,7 +3885,7 @@ Wenn diese Option angekreuzt ist, wird die zugehörige Notiz auf deiner Zone ang
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Ajoute un bouton permettant de copier le contenu du registre</target>
+        <target state="translated">Fügt eine Schaltfläche zum Kopieren des Inhalts des Registers hinzu</target>
       </trans-unit>
       <trans-unit id="591360380545013114" datatype="html">
         <source>Quand cette option est cochée, sur chaque regitre un bouton est ajouté permettant d&apos;en copier le contenu.</source>
@@ -3995,18 +3995,17 @@ Vous rendez également accessibles d&apos;autres options de mise à jour avancé
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">29,41</context>
         </context-group>
-        <target state="needs-translation">
-En cochant l'option "Mettre à jour MyHordesOptimizer", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de MyHordes Optimizer se fera automatiquement.
-Vous rendez également accessibles d'autres options de mise à jour avancées.
+        <target state="translated">
+Wenn du die Option "MyHordesOptimizer aktualisieren" ankreuzt, wird MyHordes Optimizer automatisch aktualisiert, wenn du auf die Schaltfläche "Externe Tools aktualisieren" klickst.
+Das macht auch andere erweiterte Aktualisierungsoptionen zugänglich.
 &lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à MyHordes Optimizer.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Détail de mon sac et de ceux de mon escorte :&lt;/strong&gt; Enregistre le contenu de votre sac ainsi que ceux de vos escortés&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre vos différents états (rassasié, soif, etc... Attention : n'enregistre pas l'état goule)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Entregistrer les fouilles réussies :&lt;/strong&gt; Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte dédiée&lt;/li&gt;
-&lt;/ul&gt;
+&lt;li&gt;&lt;strong&gt;Anzahl der getöteten Zombies:&lt;/strong&gt; Speichert die Anzahl der getöteten Zombies auf der Zone&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Aktualisierung in zerstörter Stadt:&lt;/strong&gt; Wenn die Stadt zerstört ist, werden Informationen aus der Zone abgerufen, um sie an MyHordes Optimizer zu senden.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Heldentaten:&lt;/strong&gt; Speichert die verfügbaren / verwendeten Heldentaten&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Hausverbesserungen:&lt;/strong&gt; Speichert Informationen über dein Haus&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Details zu meinem Rucksack und den Rucksäcken meiner Eskorte:&lt;/strong&gt; Speichert den Inhalt deines Rucksacks und den Inhalt der Rucksäcke deiner Eskorte&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Status:&lt;/strong&gt; Speichert deine verschiedenen Statuswerte (satt, durstig, etc... Achtung: Speichert nicht den Ghul-Status)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Erfolgreiche Grabungen aufzeichnen:&lt;/strong&gt; Zeichnet erfolgreiche Grabungen auf, um Statistiken über die Grabungen in einer speziellen Karte wiederzugeben&lt;/li&gt;&lt;/ul&gt;
                 </target>
       </trans-unit>
       <trans-unit id="762928771016494268" datatype="html">
@@ -4032,14 +4031,14 @@ Vous rendez également accessibles d&apos;autres options de mise à jour avancé
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">44,53</context>
         </context-group>
-        <target state="needs-translation">En cochant l'option "Mettre à jour Gest'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de Gest'Hordes se fera automatiquement.
-Vous rendez également accessibles d'autres options de mise à jour avancées.
+        <target state="translated">Wenn du die Option "Gest'Hordes aktualisieren" ankreuzt, wird Gest'Hordes automatisch aktualisiert, wenn du auf die Schaltfläche "Externe Tools aktualisieren" klickst.
+Das macht auch andere Aktualisierungsoptionen zugänglich.
 &lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à Gest'Hordes.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre l'état clair&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Anzahl der getöteten Zombies :&lt;/strong&gt; Zeichnet die Anzahl der getöteten Zombies auf der Zone auf&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Update in zerstörter Stadt :&lt;/strong&gt;Wenn die Stadt zerstört ist, werden die Zoneninformationen gesammelt, um sie an Gest'Hordes zu schicken.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Heldentaten :&lt;/strong&gt; Zeichnet verfügbare / verwendete Heldentaten auf&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Hausverbesserungen :&lt;/strong&gt; Speichert Informationen über dein Haus&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Status :&lt;/strong&gt; Speichert die aktuellen Statuswerte&lt;/li&gt;
 &lt;/ul&gt;
                 </target>
       </trans-unit>
@@ -4057,7 +4056,7 @@ Vous rendez également accessibles d'autres options de mise à jour avancées.
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">En cochant l'option "Mettre à jour BigBroth'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de BigBroth'Hordes se fera automatiquement.</target>
+        <target state="translated">Wenn du die Option "BigBroth'Hordes aktualisieren" ankreuzt, wird BigBroth'Hordes automatisch aktualisiert, wenn du auf die Schaltfläche "Externe Tools aktualisieren" klickst.</target>
       </trans-unit>
       <trans-unit id="7465509859706491373" datatype="html">
         <source>Fata Morgana</source>
@@ -4073,7 +4072,7 @@ Vous rendez également accessibles d'autres options de mise à jour avancées.
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">En cochant l'option "Mettre à jour Fata Morgana", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de Fata Morgana se fera automatiquement.</target>
+        <target state="translated">Wenn du die Option "Fata Morgana aktualisieren" ankreuzt, wird Fata Morgana automatisch aktualisiert, wenn du auf die Schaltfläche "Externe Tools aktualisieren" klickst.</target>
       </trans-unit>
       <trans-unit id="8653823422692107742" datatype="html">
         <source>Affichage des cartes issues des outils externes</source>
@@ -4095,13 +4094,13 @@ Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">64,70</context>
         </context-group>
-        <target state="needs-translation">
-Depuis l'interface, vous pouvez cocher une option permettant d'afficher des cartes directement dans MyHordes.
-Une fois cette option cochée, vous trouverez dans les différents outils externes des boutons pour "copier" une carte, que ce soit une carte de la ville ou une carte de ruine. Une fois la carte copiée, il suffit de retourner dans MyHordes et de cliquer sur l'icône de carte pour pouvoir consulter la carte dans une fenêtre qui peut être déplacée et redimensionnée.
+        <target state="translated">
+In der Benutzeroberfläche kannst du eine Option ankreuzen, mit der Karten direkt in MyHordes angezeigt werden können.
+Sobald du diese Option angekreuzt hast, findest du in den verschiedenen externen Tools Schaltflächen, mit denen du eine Karte "kopieren" kannst, sei es eine Stadtkarte oder eine Ruinenkarte. Sobald du die Karte kopiert hast, musst du nur zu MyHordes zurückkehren und auf das Kartensymbol klicken, um die Karte in einem Fenster betrachten zu können, welches verschoben und in der Größe verändert werden kann.
 &lt;br /&gt;&lt;br /&gt;
-Pour les cartes de BBH et de GH, vous pourrez voir votre emplacement sur la carte. La visibilité des expéditions n'est pas encore prise en compte.
+Bei den Karten von BBH und GH kannst du deinen Standort auf der Karte sehen. Die Anzeige von Expeditionen wird noch nicht unterstützt.
 &lt;br /&gt;&lt;br /&gt;
-Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur une des cases, ce qui fait se déplacer un point sur la carte.</target>
+Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der Zonen klickst, woraufhin sich ein Punkt auf der Karte bewegt.</target>
       </trans-unit>
       <trans-unit id="4837569632527779523" datatype="html">
         <source>Installation de l&apos;extension de navigateur</source>
@@ -4141,7 +4140,7 @@ Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">&lt;a color="accent" href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js" target="_blank"&gt;lien de téléchargement du script&lt;/a&gt;</target>
+        <target state="translated">&lt;a color="accent" href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js" target="_blank"&gt;Link zum Herunterladen des Skripts&lt;/a&gt;</target>
       </trans-unit>
       <trans-unit id="7256766747290396124" datatype="html">
         <source>&lt;a color=&quot;accent&quot; href=&quot;<x id="PH" equiv-text="this.firefox_link_href"/>&quot; target=&quot;_blank&quot;&gt;page de l&apos;extension&lt;/a&gt;</source>
@@ -4191,12 +4190,12 @@ Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">40,46</context>
         </context-group>
-        <target state="needs-translation">&lt;ul&gt;
-&lt;li&gt;Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox ;&lt;/li&gt;
-&lt;li&gt;Rechercher l'extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li&gt;
-&lt;li&gt;Installer l'extension pour Chrome ;&lt;/li&gt;
-&lt;li&gt;Cliquer sur le <x id="PH" equiv-text="this.download_link"/> ;&lt;/li&gt;
-&lt;li&gt;Confirmer l'installation dans la page qui se sera ouverte.&lt;/li&gt;
+        <target state="translated">&lt;ul&gt;
+&lt;li&gt;Installiere einen Browser, welcher Erweiterungen akzeptiert, wie z. B. Kiwi Browser oder Firefox ;&lt;/li&gt;
+&lt;li&gt;Öffne in der Symbolleiste des Browsers die Skripting-Erweiterung deiner Wahl. Es gibt mehrere davon, z. B. Tampermonkey oder Violentmonkey ;&lt;/li&gt;
+&lt;li&gt;Installiere die Erweiterung für Chrome ;&lt;/li&gt;
+&lt;li&gt;Klicke auf den <x id="PH" equiv-text="this.download_link"/> ;&lt;/li&gt;
+&lt;li&gt;Bestätige die Installation auf der Seite, die sich geöffnet hat.&lt;/li&gt;
 &lt;/ul&gt;</target>
       </trans-unit>
       <trans-unit id="6674940684074453217" datatype="html">
