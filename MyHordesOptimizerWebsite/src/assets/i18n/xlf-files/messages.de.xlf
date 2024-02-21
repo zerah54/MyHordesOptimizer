@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file source-language="fr" datatype="plaintext" original="ng2.template" target-language="de">
     <body>
@@ -1297,21 +1297,21 @@
         </context-group>
         <target state="final">Ungewöhnliche Pläne gefunden</target>
       </trans-unit>
-      <trans-unit id="5407619717083968805" datatype="html">
+      <trans-unit id="5407619717083968805" datatype="html" approved="yes">
         <source>Plans rares sortis</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="translated">Seltene Pläne gefunden</target>
+        <target state="final">Seltene Pläne gefunden</target>
       </trans-unit>
-      <trans-unit id="1165067646815460527" datatype="html">
+      <trans-unit id="1165067646815460527" datatype="html" approved="yes">
         <source>Plans très rares sortis</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="translated">Sehr seltene Pläne gefunden</target>
+        <target state="final">Sehr seltene Pläne gefunden</target>
       </trans-unit>
       <trans-unit id="5187389962742892218" datatype="html" approved="yes">
         <source>Liste des bâtiments possibles</source>
@@ -1437,13 +1437,13 @@
         </context-group>
         <target state="final">Verteidigungswert</target>
       </trans-unit>
-      <trans-unit id="9122415907873847234" datatype="html">
+      <trans-unit id="9122415907873847234" datatype="html" approved="yes">
         <source>Afficher les zones du scrutateur</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">47</context>
         </context-group>
-        <target state="translated">Zonen in Himmelsrichtung anzeigen</target>
+        <target state="final">Zonen in Himmelsrichtung anzeigen</target>
       </trans-unit>
       <trans-unit id="2046490270137592735" datatype="html" approved="yes">
         <source>Afficher les zones en distance</source>
@@ -1493,7 +1493,7 @@
         </context-group>
         <target state="translated">AP</target>
       </trans-unit>
-      <trans-unit id="7649141370266521403" datatype="html">
+      <trans-unit id="7649141370266521403" datatype="html" approved="yes">
         <source>Aller / Retour</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
@@ -1503,7 +1503,7 @@
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">88</context>
         </context-group>
-        <target state="translated">Hin- und Rückweg</target>
+        <target state="final">Hin- und Rückweg</target>
       </trans-unit>
       <trans-unit id="70397346439942337" datatype="html" approved="yes">
         <source>Ajouter</source>
@@ -1761,13 +1761,13 @@
         </context-group>
         <target state="final">Angriff T<x id="INTERPOLATION" equiv-text="{{ selected_day }}"/> berechnet (von Apofoo)</target>
       </trans-unit>
-      <trans-unit id="5556258391635461081" datatype="html">
+      <trans-unit id="5556258391635461081" datatype="html" approved="yes">
         <source>Attaque du jour</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
           <context context-type="linenumber">155</context>
         </context-group>
-        <target state="translated">Heutige Abschätzung</target>
+        <target state="final">Angriff des Tages</target>
       </trans-unit>
       <trans-unit id="7684105598309210468" datatype="html" approved="yes">
         <source>Attaque du lendemain</source>
@@ -2187,13 +2187,13 @@
         </context-group>
         <target state="final">Rucksäcke</target>
       </trans-unit>
-      <trans-unit id="3891399276441992819" datatype="html">
+      <trans-unit id="3891399276441992819" datatype="html" approved="yes">
         <source>Stock souhaité</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">79</context>
         </context-group>
-        <target state="translated">Gewünschte Menge</target>
+        <target state="final">Gewünschter Vorrat</target>
       </trans-unit>
       <trans-unit id="5281938868222344363" datatype="html" approved="yes">
         <source>Quantité manquante</source>
@@ -2582,13 +2582,13 @@
         </context-group>
         <target state="final">ID für externe Anwendungen</target>
       </trans-unit>
-      <trans-unit id="6446192435648820310" datatype="html">
+      <trans-unit id="6446192435648820310" datatype="html" approved="yes">
         <source>Déconnexion</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="translated">Ausloggen</target>
+        <target state="final">Abmelden</target>
       </trans-unit>
       <trans-unit id="494050536795475082" datatype="html" approved="yes">
         <source>Cette page peut contenir des spoils de la saison 16</source>
@@ -2966,7 +2966,7 @@
         </context-group>
         <target state="final">Benachrichtigungen</target>
       </trans-unit>
-      <trans-unit id="3793819955692174765" datatype="html">
+      <trans-unit id="3793819955692174765" datatype="html" approved="yes">
         <source>Site</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
@@ -2976,7 +2976,7 @@
           <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="translated">Website</target>
+        <target state="final">Web-Seite</target>
       </trans-unit>
       <trans-unit id="3556482685302387015" datatype="html" approved="yes">
         <source>Première utilisation</source>
@@ -4124,17 +4124,6 @@ Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der 
         </context-group>
         <target state="translated">
 <x id="INTERPOLATION" equiv-text="{{ extension_final_text }}"/>
-                </source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
-                    <context context-type="linenumber">21</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
-                    <context context-type="linenumber">26</context>
-                </context-group>
-                <target state="needs-translation">
-                    <x id="INTERPOLATION" equiv-text="{{ extension_final_text }}"/>
                 </target>
       </trans-unit>
       <trans-unit id="7228219696199470616" datatype="html" approved="yes">
@@ -4265,7 +4254,7 @@ Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der 
         </context-group>
         <target state="final">Firefox</target>
       </trans-unit>
-      <trans-unit id="3369809985401596025" datatype="html">
+      <trans-unit id="3369809985401596025" datatype="html" approved="yes">
         <source>Rendez-vous sur la <x id="PH" equiv-text="this.firefox_extension_link"/> pour l&apos;installer.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
@@ -4275,7 +4264,7 @@ Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der 
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="translated">Gehe auf <x id="PH" equiv-text="this.firefox_extension_link"/> um es zu installieren.</target>
+        <target state="final">Gehe auf <x id="PH" equiv-text="this.firefox_extension_link"/> um es zu installieren.</target>
       </trans-unit>
       <trans-unit id="4645690492252065749" datatype="html" approved="yes">
         <source>Chrome</source>
@@ -4285,13 +4274,13 @@ Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der 
         </context-group>
         <target state="final">Chrome</target>
       </trans-unit>
-      <trans-unit id="5960214076877261704" datatype="html">
+      <trans-unit id="5960214076877261704" datatype="html" approved="yes">
         <source>Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses fonctionnalités.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="translated">Nachdem du das Skript installiert hast, musst du die Seite des Spiels neu laden. Du wirst dann eine neue Schaltfläche oben auf Ihrer MyHordes-Seite sehen. Beim Mouseover öffnet sich ein Fenster, das Zugriff auf die Optionen des Skripts und einige seiner Funktionen bietet.</target>
+        <target state="final">Nachdem Sie das Skript installiert haben, müssen Sie die Seite des Spiels aktualisieren. Sie werden dann eine neue Schaltfläche oben auf Ihrer MyHordes-Seite sehen. Beim Mouseover öffnet sich ein Fenster, das Zugriff auf die Optionen des Skripts und einige seiner Funktionen bietet.</target>
       </trans-unit>
       <trans-unit id="5406368064653547314" datatype="html" approved="yes">
         <source>Une fois l&apos;extension installée, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses fonctionnalités.</source>
@@ -4523,21 +4512,21 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
         </context-group>
         <target state="final">Theoretischer Angriff</target>
       </trans-unit>
-      <trans-unit id="2156842490958660553" datatype="html">
+      <trans-unit id="2156842490958660553" datatype="html" approved="yes">
         <source>Minimum théorique</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="translated">Theoretisches Minimum</target>
+        <target state="final">Theoretisches Minimum</target>
       </trans-unit>
-      <trans-unit id="3293715381875250565" datatype="html">
+      <trans-unit id="3293715381875250565" datatype="html" approved="yes">
         <source>Maximum théorique</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="translated">Theoretisches Maximum</target>
+        <target state="final">Theoretisches Maximum</target>
       </trans-unit>
       <trans-unit id="5670260346776362636" datatype="html" approved="yes">
         <source>Débordement</source>
