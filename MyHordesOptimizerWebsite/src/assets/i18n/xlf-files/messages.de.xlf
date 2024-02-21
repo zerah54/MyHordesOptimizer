@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
   <file source-language="fr" datatype="plaintext" original="ng2.template" target-language="de">
     <body>
@@ -4124,6 +4124,17 @@ Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der 
         </context-group>
         <target state="translated">
 <x id="INTERPOLATION" equiv-text="{{ extension_final_text }}"/>
+                </source>
+                <context-group purpose="location">
+                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
+                    <context context-type="linenumber">21</context>
+                </context-group>
+                <context-group purpose="location">
+                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
+                    <context context-type="linenumber">26</context>
+                </context-group>
+                <target state="needs-translation">
+                    <x id="INTERPOLATION" equiv-text="{{ extension_final_text }}"/>
                 </target>
       </trans-unit>
       <trans-unit id="7228219696199470616" datatype="html" approved="yes">

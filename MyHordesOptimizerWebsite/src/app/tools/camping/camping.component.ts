@@ -64,6 +64,8 @@ export class CampingComponent implements OnInit {
     public readonly locale: string = moment.locale();
     public readonly help_ruins: string = $localize`La liste est impactée par la distance choisie`;
     public readonly help_amelio: string = $localize`Il faut en soustraire 3 après chaque attaque`;
+    // eslint-disable-next-line no-irregular-whitespace
+    public readonly bonus_string: string = $localize`Bonus : `;
 
     public readonly jobs: JobEnum[] = JobEnum.getAllValues();
     public readonly JOB_SCOUT: JobEnum = JobEnum.SCOUT;
@@ -182,7 +184,7 @@ export class CampingComponent implements OnInit {
             }
 
             const bonus: string = formatNumber(this.display_bonus_ap ? (ruin.camping / 5) : (ruin.camping), this.locale, '1.0-2') + (this.display_bonus_ap ? '' : '%');
-            const bonus_html: string = `<small i18n>Bonus&nbsp;:&nbsp;${bonus}</small>`;
+            const bonus_html: string = `<small>${this.bonus_string}${bonus}</small>`;
 
             return capacity_html + bonus_html;
         }
@@ -192,7 +194,7 @@ export class CampingComponent implements OnInit {
         if (typeof town_type === 'string') {
             return town_type;
         } else {
-            return `<small i18n>Bonus&nbsp;:&nbsp;${formatNumber(this.display_bonus_ap ? (town_type.bonus / 5) : (town_type.bonus), this.locale, '1.0-2')}${this.display_bonus_ap ? '' : '%'}</small>`;
+            return `<small>${this.bonus_string}${formatNumber(this.display_bonus_ap ? (town_type.bonus / 5) : (town_type.bonus), this.locale, '1.0-2')}${this.display_bonus_ap ? '' : '%'}</small>`;
         }
     }
 
