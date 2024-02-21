@@ -2541,1241 +2541,1218 @@
                 </context-group>
                 <target state="needs-translation">Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;>"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;>"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a>"/>
                 </target>
-            </trans-unit>
-            <trans-unit id="3984780497725315833" datatype="html">
-                <source>Mettre à jour les outils externes</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-                    <context context-type="linenumber">12</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-                    <context context-type="linenumber">15</context>
-                </context-group>
-                <target state="needs-translation">Mettre à jour les outils externes</target>
-            </trans-unit>
-            <trans-unit id="7919452934138804929" datatype="html">
-                <source>Se connecter</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-                    <context context-type="linenumber">22</context>
-                </context-group>
-                <target state="needs-translation">Se connecter</target>
-            </trans-unit>
-            <trans-unit id="6636912229609448537" datatype="html">
-                <source>Utilisateur inconnu</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-                    <context context-type="linenumber">26</context>
-                </context-group>
-                <target state="needs-translation">Utilisateur inconnu</target>
-            </trans-unit>
-            <trans-unit id="4322254668478976610" datatype="html">
-                <source>Identifiant d'app externe</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-                    <context context-type="linenumber">34</context>
-                </context-group>
-                <target state="needs-translation">Identifiant d'app externe</target>
-            </trans-unit>
-            <trans-unit id="5925476828699666766" datatype="html">
-                <source>Identifiant externe pour les app</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-                    <context context-type="linenumber">35</context>
-                </context-group>
-                <target state="needs-translation">Identifiant externe pour les app</target>
-            </trans-unit>
-            <trans-unit id="6446192435648820310" datatype="html">
-                <source>Déconnexion</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
-                    <context context-type="linenumber">42</context>
-                </context-group>
-                <target state="needs-translation">Déconnexion</target>
-            </trans-unit>
-            <trans-unit id="494050536795475082" datatype="html">
-                <source>Cette page peut contenir des spoils de la saison 16</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.html</context>
-                    <context context-type="linenumber">75</context>
-                </context-group>
-                <target state="needs-translation">Cette page peut contenir des spoils de la saison 16</target>
-            </trans-unit>
-            <trans-unit id="1687689412386216543" datatype="html">
-                <source>Par défaut</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">34</context>
-                </context-group>
-                <target state="needs-translation">Par défaut</target>
-            </trans-unit>
-            <trans-unit id="5786363460327756403" datatype="html">
-                <source>Rose</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">35</context>
-                </context-group>
-                <target state="needs-translation">Rose</target>
-            </trans-unit>
-            <trans-unit id="4843074552222243213" datatype="html">
-                <source>Brun</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">36</context>
-                </context-group>
-                <target state="needs-translation">Brun</target>
-            </trans-unit>
-            <trans-unit id="6038281835621310494" datatype="html">
-                <source>Outils</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">92</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">124</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/tools.routes.ts</context>
-                    <context context-type="linenumber">7</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/tools.routes.ts</context>
-                    <context context-type="linenumber">11</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
-                    <context context-type="linenumber">28</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">41</context>
-                </context-group>
-                <target state="needs-translation">Outils</target>
-            </trans-unit>
-            <trans-unit id="2287398703048181232" datatype="html">
-                <source>Camping</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">93</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">3</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/tools.routes.ts</context>
-                    <context context-type="linenumber">7</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
-                    <context context-type="linenumber">36</context>
-                </context-group>
-                <target state="needs-translation">Camping</target>
-            </trans-unit>
-            <trans-unit id="8628521144156217897" datatype="html">
-                <source>Chances de survie</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">94</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
-                    <context context-type="linenumber">3</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
-                    <context context-type="linenumber">82</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/tools.routes.ts</context>
-                    <context context-type="linenumber">11</context>
-                </context-group>
-                <target state="needs-translation">Chances de survie</target>
-            </trans-unit>
-            <trans-unit id="9108179050199310445" datatype="html">
-                <source>Wiki</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">98</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">125</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
-                    <context context-type="linenumber">28</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">46</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
-                    <context context-type="linenumber">13</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
-                    <context context-type="linenumber">15</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
-                    <context context-type="linenumber">16</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
-                    <context context-type="linenumber">17</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
-                    <context context-type="linenumber">18</context>
-                </context-group>
-                <target state="needs-translation">Wiki</target>
-            </trans-unit>
-            <trans-unit id="1087900872515566478" datatype="html">
-                <source>Objets</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">99</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
-                    <context context-type="linenumber">31</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/items/items.component.html</context>
-                    <context context-type="linenumber">2</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
-                    <context context-type="linenumber">63</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
-                    <context context-type="linenumber">16</context>
-                </context-group>
-                <target state="needs-translation">Objets</target>
-            </trans-unit>
-            <trans-unit id="530325689928281558" datatype="html">
-                <source>Recettes</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">100</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
-                    <context context-type="linenumber">36</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
-                    <context context-type="linenumber">2</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
-                    <context context-type="linenumber">17</context>
-                </context-group>
-                <target state="needs-translation">Recettes</target>
-            </trans-unit>
-            <trans-unit id="1327848898002802119" datatype="html">
-                <source>Pouvoirs</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">101</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
-                    <context context-type="linenumber">40</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.html</context>
-                    <context context-type="linenumber">2</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
-                    <context context-type="linenumber">15</context>
-                </context-group>
-                <target state="needs-translation">Pouvoirs</target>
-            </trans-unit>
-            <trans-unit id="8819719048481824214" datatype="html">
-                <source>Bâtiments</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">102</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
-                    <context context-type="linenumber">44</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.html</context>
-                    <context context-type="linenumber">3</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
-                    <context context-type="linenumber">18</context>
-                </context-group>
-                <target state="needs-translation">Bâtiments</target>
-            </trans-unit>
-            <trans-unit id="3057503085450181091" datatype="html">
-                <source>Informations diverses</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">104</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.html</context>
-                    <context context-type="linenumber">2</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
-                    <context context-type="linenumber">13</context>
-                </context-group>
-                <target state="needs-translation">Informations diverses</target>
-            </trans-unit>
-            <trans-unit id="5212877493927146920" datatype="html">
-                <source>Tutoriels</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">114</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">21</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">26</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">31</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">36</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">41</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">46</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">55</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">64</context>
-                </context-group>
-                <target state="needs-translation">Tutoriels</target>
-            </trans-unit>
-            <trans-unit id="6304154521414539936" datatype="html">
-                <source>Script / Extension</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">116</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
-                    <context context-type="linenumber">28</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">21</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">26</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">31</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">36</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">41</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">46</context>
-                </context-group>
-                <target state="needs-translation">Script / Extension</target>
-            </trans-unit>
-            <trans-unit id="7419787782755641631" datatype="html">
-                <source>Installation</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">118</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">144</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">36</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">64</context>
-                </context-group>
-                <target state="needs-translation">Installation</target>
-            </trans-unit>
-            <trans-unit id="2065447039528822131" datatype="html">
-                <source>Outils Externes</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">127</context>
-                </context-group>
-                <target state="needs-translation">Outils Externes</target>
-            </trans-unit>
-            <trans-unit id="3342946597539953688" datatype="html">
-                <source>Affichage</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">133</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
-                    <context context-type="linenumber">28</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">26</context>
-                </context-group>
-                <target state="needs-translation">Affichage</target>
-            </trans-unit>
-            <trans-unit id="5851560788527570644" datatype="html">
-                <source>Notifications</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">134</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
-                    <context context-type="linenumber">27</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">21</context>
-                </context-group>
-                <target state="needs-translation">Notifications</target>
-            </trans-unit>
-            <trans-unit id="3793819955692174765" datatype="html">
-                <source>Site</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">138</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">55</context>
-                </context-group>
-                <target state="needs-translation">Site</target>
-            </trans-unit>
-            <trans-unit id="3556482685302387015" datatype="html">
-                <source>Première utilisation</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">139</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">55</context>
-                </context-group>
-                <target state="needs-translation">Première utilisation</target>
-            </trans-unit>
-            <trans-unit id="3098981611680291534" datatype="html">
-                <source>Bot Discord</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">143</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
-                    <context context-type="linenumber">64</context>
-                </context-group>
-                <target state="needs-translation">Bot Discord</target>
-            </trans-unit>
-            <trans-unit id="5737526992758767493" datatype="html">
-                <source>Noël</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">221</context>
-                </context-group>
-                <target state="needs-translation">Noël</target>
-            </trans-unit>
-            <trans-unit id="8180162587413296657" datatype="html">
-                <source>Halloween</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
-                    <context context-type="linenumber">232</context>
-                </context-group>
-                <target state="needs-translation">Halloween</target>
-            </trans-unit>
-            <trans-unit id="5344623683730509987" datatype="html">
-                <source>Un grand merci à Renack, sans qui ni le script ni le site n'existeraient puisqu'il a fait tout le backend !</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-                    <context context-type="linenumber">12</context>
-                </context-group>
-                <target state="needs-translation">Un grand merci à Renack, sans qui ni le script ni le site n'existeraient puisqu'il a fait tout le backend !</target>
-            </trans-unit>
-            <trans-unit id="3079822284604019418" datatype="html">
-                <source>Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-                    <context context-type="linenumber">15</context>
-                </context-group>
-                <target state="needs-translation">Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.</target>
-            </trans-unit>
-            <trans-unit id="7508106374158857656" datatype="html">
-                <source>Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l'ergonomie du site.</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-                    <context context-type="linenumber">18</context>
-                </context-group>
-                <target state="needs-translation">Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l'ergonomie du site.</target>
-            </trans-unit>
-            <trans-unit id="9186323945331905549" datatype="html">
-                <source>Merci également aux traducteurs qui rendent l'internationalisation possible.</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-                    <context context-type="linenumber">21</context>
-                </context-group>
-                <target state="needs-translation">Merci également aux traducteurs qui rendent l'internationalisation possible.</target>
-            </trans-unit>
-            <trans-unit id="4780379749037907519" datatype="html">
-                <source>Merci à Argo qui a assuré à la perfection - assistée de Katt - le rôle de responsable des relations avec l'équipe de développement du jeu, et sans qui l'idée de faire du script un site ne serait pas née. </source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-                    <context context-type="linenumber">24,27</context>
-                </context-group>
-                <target state="needs-translation">Merci à Argo qui a assuré à la perfection - assistée de Katt - le rôle de responsable des relations avec l'équipe de développement du jeu, et sans qui l'idée de faire du script un site ne serait pas née. </target>
-            </trans-unit>
-            <trans-unit id="1639188178441316344" datatype="html">
-                <source>Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités. </source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
-                    <context context-type="linenumber">30,32</context>
-                </context-group>
-                <target state="needs-translation">Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités. </target>
-            </trans-unit>
-            <trans-unit id="611594206241884293" datatype="html">
-                <source>Copier le lien de la simulation</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">4</context>
-                </context-group>
-                <target state="needs-translation">Copier le lien de la simulation</target>
-            </trans-unit>
-            <trans-unit id="826911519411311233" datatype="html">
-                <source>Dans ma ville</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">11</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.html</context>
-                    <context context-type="linenumber">9</context>
-                </context-group>
-                <target state="needs-translation">Dans ma ville</target>
-            </trans-unit>
-            <trans-unit id="6487260431971357562" datatype="html">
-                <source>Bonus en équivalent PA</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">15</context>
-                </context-group>
-                <target state="needs-translation">Bonus en équivalent PA</target>
-            </trans-unit>
-            <trans-unit id="4328907410933636413" datatype="html">
-                <source>Le citoyen</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">33</context>
-                </context-group>
-                <target state="needs-translation">Le citoyen</target>
-            </trans-unit>
-            <trans-unit id="5833055296319952035" datatype="html">
-                <source>Métier</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">36</context>
-                </context-group>
-                <target state="needs-translation">Métier</target>
-            </trans-unit>
-            <trans-unit id="452066521029087062" datatype="html">
-                <source>Tenue de camouflage</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">43</context>
-                </context-group>
-                <target state="needs-translation">Tenue de camouflage</target>
-            </trans-unit>
-            <trans-unit id="1294130363465211657" datatype="html">
-                <source>(<x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
-<x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{
-                                        bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale
-                                    }}"/>)</source>
-                <target state="new">(<x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
-                    <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{
-                                        bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale
-                                    }}"/>)</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">44,46</context>
-                </context-group>
-            </trans-unit>
-
-            <trans-unit id="7954001980226848388" datatype="html">
-                <source>Campeur professionnel</source>
-
-                <target state="needs-translation">Campeur professionnel</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">51</context>
-                </context-group>
-            </trans-unit>
-            <trans-unit id="8079361333376398985" datatype="html">
-                <source>Tombe</source>
-
-                <target state="needs-translation">Tombe</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">55</context>
-                </context-group>
-            </trans-unit>
-
-            <trans-unit id="3231213779188554984" datatype="html">
-                <source>Nombre de campings déjà effectués</source>
-
-                <target state="needs-translation">Nombre de campings déjà effectués</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">59</context>
-                </context-group>
-            </trans-unit>
-
-            <trans-unit id="3915433859665099927" datatype="html">
-                <source>Nombre de pelures de peau et de toiles de tentes dans le sac</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">66</context>
-                </context-group>
-                <target state="needs-translation">Nombre de pelures de peau et de toiles de tentes dans le sac</target>
-            </trans-unit>
-
-            <trans-unit id="560884417072143682" datatype="html">
-                <source>La ville</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">77</context>
-                </context-group>
-                <target state="needs-translation">La ville</target>
-            </trans-unit>
-            <trans-unit id="2205198219410592279" datatype="html">
-                <source>Type de ville</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">80</context>
-                </context-group>
-                <target state="needs-translation">Type de ville</target>
-            </trans-unit>
-
-            <trans-unit id="5596519199501316309" datatype="html">
-                <source>Nuit</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">89</context>
-                </context-group>
-                <target state="needs-translation">Nuit</target>
-            </trans-unit>
-            <trans-unit id="5745500004130467995" datatype="html">
-                <source>Ville dévastée</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">94</context>
-                </context-group>
-                <target state="needs-translation">Ville dévastée</target>
-            </trans-unit>
-            <trans-unit id="3246864206079397926" datatype="html">
-                <source>Phare</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">99</context>
-                </context-group>
-                <target state="needs-translation">Phare</target>
-            </trans-unit>
-            <trans-unit id="4122043223946991758" datatype="html">
-                <source>Le bâtiment</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">108</context>
-                </context-group>
-                <target state="needs-translation">Le bâtiment</target>
-            </trans-unit>
-            <trans-unit id="7523060874803429510" datatype="html">
-                <source>Distance de la ville (en km)</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">111</context>
-                </context-group>
-                <target state="needs-translation">Distance de la ville (en km)</target>
-            </trans-unit>
-            <trans-unit id="1342160137926124174" datatype="html">
-                <source>Nombre de tas</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">129</context>
-                </context-group>
-                <target state="needs-translation">Nombre de tas</target>
-            </trans-unit>
-            <trans-unit id="2420553302076927639" datatype="html">
-                <source>Nombre de zombies sur la case</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">135</context>
-                </context-group>
-                <target state="needs-translation">Nombre de zombies sur la case</target>
-            </trans-unit>
-            <trans-unit id="7014743875484323339" datatype="html">
-                <source>Nombre de campeurs déjà cachés sur la case</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">143</context>
-                </context-group>
-                <target state="needs-translation">Nombre de campeurs déjà cachés sur la case</target>
-            </trans-unit>
-            <trans-unit id="1759876158817324985" datatype="html">
-                <source>Nombre d'améliorations simples faites sur la case</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">159</context>
-                </context-group>
-                <target state="needs-translation">Nombre d'améliorations simples faites sur la case</target>
-            </trans-unit>
-            <trans-unit id="1569331568164081073" datatype="html">
-                <source>Nombre d'objets de défense installés sur la case</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">166</context>
-                </context-group>
-                <target state="needs-translation">Nombre d'objets de défense installés sur la case</target>
-            </trans-unit>
-            <trans-unit id="4837777735310918701" datatype="html">
-                <source>Et</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">173</context>
-                </context-group>
-                <target state="needs-translation">Et</target>
-            </trans-unit>
-            <trans-unit id="8497259045466557566" datatype="html">
-                <source>Ou</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">174</context>
-                </context-group>
-                <target state="needs-translation">Ou</target>
-            </trans-unit>
-            <trans-unit id="7193094326883081286" datatype="html">
-                <source>
-<x id="INTERPOLATION" equiv-text="{{ display_bonus_ap ? 'Nombre' : 'Pourcentage' }}"/> total d'améliotations sur la case</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">178</context>
-                </context-group>
-                <target state="needs-translation">
-                    <x id="INTERPOLATION" equiv-text="{{ display_bonus_ap ? 'Nombre' : 'Pourcentage' }}"/> total d'améliotations sur la case</target>
-            </trans-unit>
-
-            <trans-unit id="2902261471051690112" datatype="html">
-                <source>Résultat</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">193</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context>
-                    <context context-type="linenumber">43</context>
-                </context-group>
-                <target state="needs-translation">Résultat</target>
-            </trans-unit>
-            <trans-unit id="3441654073279757119" datatype="html">
-                <source>Chances de survie : </source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
-                    <context context-type="linenumber">196</context>
-                </context-group>
-                <target state="needs-translation">Chances de survie : </target>
-            </trans-unit>
-            <trans-unit id="6003110979058162782" datatype="html">
-                <source>Petite carte</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-                    <context context-type="linenumber">52</context>
-                </context-group>
-                <target state="needs-translation">Petite carte</target>
-            </trans-unit>
-            <trans-unit id="3774627028364286981" datatype="html">
-                <source>Région éloignée</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-                    <context context-type="linenumber">53</context>
-                </context-group>
-                <target state="needs-translation">Région éloignée</target>
-            </trans-unit>
-            <trans-unit id="3131499204058979166" datatype="html">
-                <source>Pandémonium</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-                    <context context-type="linenumber">54</context>
-                </context-group>
-                <target state="needs-translation">Pandémonium</target>
-            </trans-unit>
-            <trans-unit id="4068382494466269539" datatype="html">
-                <source>La liste est impactée par la distance choisie</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-                    <context context-type="linenumber">65</context>
-                </context-group>
-                <target state="needs-translation">La liste est impactée par la distance choisie</target>
-            </trans-unit>
-            <trans-unit id="5726959518724330123" datatype="html">
-                <source>Il faut en soustraire 3 après chaque attaque</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-                    <context context-type="linenumber">66</context>
-                </context-group>
-                <target state="needs-translation">Il faut en soustraire 3 après chaque attaque</target>
-            </trans-unit>
-            <trans-unit id="4379616016375089599" datatype="html">
-                <source>Bonus : </source>
-                <target state="new">Bonus : </target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-                    <context context-type="linenumber">68</context>
-                </context-group>
-            </trans-unit>
-            <trans-unit id="61672744151027488" datatype="html">
-                <source>Le lien a bien été copié</source>
-
-
-
-
-
-
-
-
-
-                <target state="needs-translation">Le lien a bien été copié</target>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
-                    <context context-type="linenumber">165</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
-                    <context context-type="linenumber">37</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
-                    <context context-type="linenumber">54</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
-                    <context context-type="linenumber">111</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
-                    <context context-type="linenumber">80</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
-                    <context context-type="linenumber">87</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
-                    <context context-type="linenumber">47</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
-                    <context context-type="linenumber">55</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
-                    <context context-type="linenumber">32</context>
-                </context-group>
-            </trans-unit>
-            <trans-unit id="9012164453173268999" datatype="html">
-                <source>Ajouter une simulation</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
-                    <context context-type="linenumber">5</context>
-                </context-group>
-                <target state="needs-translation">Ajouter une simulation</target>
-            </trans-unit>
-            <trans-unit id="4675002084672510417" datatype="html">
-                <source>Valeur par défaut</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
-                    <context context-type="linenumber">11</context>
-                </context-group>
-                <target state="needs-translation">Valeur par défaut</target>
-            </trans-unit>
-            <trans-unit id="980939234227251011" datatype="html">
-                <source>Nombre de personnes</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
-                    <context context-type="linenumber">47</context>
-                </context-group>
-                <target state="needs-translation">Nombre de personnes</target>
-            </trans-unit>
-            <trans-unit id="789097210155389951" datatype="html">
-                <source>Nombre de morts</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
-                    <context context-type="linenumber">58</context>
-                </context-group>
-                <target state="needs-translation">Nombre de morts</target>
-            </trans-unit>
-            <trans-unit id="8007458421319879300" datatype="html">
-                <source>Probabilité</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
-                    <context context-type="linenumber">59</context>
-                </context-group>
-                <target state="needs-translation">Probabilité</target>
-            </trans-unit>
-            <trans-unit id="7745390044882644493" datatype="html">
-                <source>Simulation 1</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.ts</context>
-                    <context context-type="linenumber">24</context>
-                </context-group>
-                <target state="needs-translation">Simulation 1</target>
-            </trans-unit>
-            <trans-unit id="4635453384629622126" datatype="html">
-                <source>Simulation</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.ts</context>
-                    <context context-type="linenumber">41</context>
-                </context-group>
-                <target state="needs-translation">Simulation</target>
-            </trans-unit>
-            <trans-unit id="880920713849004233" datatype="html">
-                <source>Choisir le mode de partage</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.html</context>
-                    <context context-type="linenumber">4</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.html</context>
-                    <context context-type="linenumber">4</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.html</context>
-                    <context context-type="linenumber">4</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.html</context>
-                    <context context-type="linenumber">4</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
-                    <context context-type="linenumber">4</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.html</context>
-                    <context context-type="linenumber">4</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.html</context>
-                    <context context-type="linenumber">4</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.html</context>
-                    <context context-type="linenumber">4</context>
-                </context-group>
-                <target state="needs-translation">Choisir le mode de partage</target>
-            </trans-unit>
-            <trans-unit id="4689365071310497816" datatype="html">
-                <source> Copier l'URL </source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.html</context>
-                    <context context-type="linenumber">8,10</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.html</context>
-                    <context context-type="linenumber">8,10</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.html</context>
-                    <context context-type="linenumber">8,10</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.html</context>
-                    <context context-type="linenumber">8,10</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
-                    <context context-type="linenumber">8,10</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.html</context>
-                    <context context-type="linenumber">8,10</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.html</context>
-                    <context context-type="linenumber">8,10</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.html</context>
-                    <context context-type="linenumber">8,10</context>
-                </context-group>
-                <target state="needs-translation"> Copier l'URL </target>
-            </trans-unit>
-            <trans-unit id="3885539050798710089" datatype="html">
-                <source> Copier au format forum </source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.html</context>
-                    <context context-type="linenumber">11,13</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.html</context>
-                    <context context-type="linenumber">11,13</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.html</context>
-                    <context context-type="linenumber">11,13</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.html</context>
-                    <context context-type="linenumber">11,13</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
-                    <context context-type="linenumber">11,13</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.html</context>
-                    <context context-type="linenumber">11,13</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.html</context>
-                    <context context-type="linenumber">11,13</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.html</context>
-                    <context context-type="linenumber">11,13</context>
-                </context-group>
-                <target state="needs-translation"> Copier au format forum </target>
-            </trans-unit>
-            <trans-unit id="670567962320357766" datatype="html">
-                <source>Installation du Bot sur un serveur Discord</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
-                    <context context-type="linenumber">26</context>
-                </context-group>
-                <target state="needs-translation">Installation du Bot sur un serveur Discord</target>
-            </trans-unit>
-            <trans-unit id="3466830193215925553" datatype="html">
-                <source>&lt;a color="accent" href="https://discord.com/api/oauth2/authorize?client_id=1140035117746765914&amp;permissions=277025459200&amp;scope=bot" target="_blank">lien d'installation du bot&lt;/a></source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
-                    <context context-type="linenumber">27</context>
-                </context-group>
-                <target state="needs-translation">&lt;a color="accent" href="https://discord.com/api/oauth2/authorize?client_id=1140035117746765914&amp;permissions=277025459200&amp;scope=bot" target="_blank">lien d'installation du bot&lt;/a></target>
-            </trans-unit>
-            <trans-unit id="5339734629980782531" datatype="html">
-                <source>Vous devez être propriétaire ou avoir les droits d'administration sur le serveur Discord sur lequel vous voulez inviter le Bot.</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
-                    <context context-type="linenumber">28</context>
-                </context-group>
-                <target state="needs-translation">Vous devez être propriétaire ou avoir les droits d'administration sur le serveur Discord sur lequel vous voulez inviter le Bot.</target>
-            </trans-unit>
-            <trans-unit id="5124083784940231527" datatype="html">
-                <source>En cliquant sur le <x id="PH" equiv-text="this.download_link"/>, vous serez redirigé vers une page d'installation.</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
-                    <context context-type="linenumber">29</context>
-                </context-group>
-                <target state="needs-translation">En cliquant sur le <x id="PH" equiv-text="this.download_link"/>, vous serez redirigé vers une page d'installation.</target>
-            </trans-unit>
-            <trans-unit id="8564269404291712463" datatype="html">
-                <source>Le texte a bien été copié</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
-                    <context context-type="linenumber">49</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
-                    <context context-type="linenumber">66</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
-                    <context context-type="linenumber">123</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
-                    <context context-type="linenumber">94</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
-                    <context context-type="linenumber">107</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
-                    <context context-type="linenumber">59</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
-                    <context context-type="linenumber">67</context>
-                </context-group>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
-                    <context context-type="linenumber">44</context>
-                </context-group>
-                <target state="needs-translation">Le texte a bien été copié</target>
-            </trans-unit>
-            <trans-unit id="8862266483474333992" datatype="html">
-                <source>Avertissement en cas de fermeture de la page</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
-                    <context context-type="linenumber">31</context>
-                </context-group>
-                <target state="needs-translation">Avertissement en cas de fermeture de la page</target>
-            </trans-unit>
-            <trans-unit id="8074080674635417281" datatype="html">
-                <source>Dans l'interface, vous pouvez cocher l'option "Demander confirmation avant de quitter la page", ce qui activera la fonctionnalité.
-Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l'onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
-                    <context context-type="linenumber">31,32</context>
-                </context-group>
-                <target state="needs-translation">Dans l'interface, vous pouvez cocher l'option "Demander confirmation avant de quitter la page", ce qui activera la fonctionnalité.
-                Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l'onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.</target>
-            </trans-unit>
-            <trans-unit id="4945794230367496950" datatype="html">
-                <source>Avertissement en cas d'inactivité</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
-                    <context context-type="linenumber">35</context>
-                </context-group>
-                <target state="needs-translation">Avertissement en cas d'inactivité</target>
-            </trans-unit>
-            <trans-unit id="6792041599839954174" datatype="html">
-                <source>Dans l'interface, vous pouvez cocher l'option "Me notifier si je suis inactif depuis 5 minutes sur la page", ce qui activera la fonctionnalité.
-Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
-                    <context context-type="linenumber">35,36</context>
-                </context-group>
-                <target state="needs-translation">Dans l'interface, vous pouvez cocher l'option "Me notifier si je suis inactif depuis 5 minutes sur la page", ce qui activera la fonctionnalité.
-                Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.</target>
-            </trans-unit>
-            <trans-unit id="2315492892193612031" datatype="html">
-                <source>Notification à la fin de la fouille</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
-                    <context context-type="linenumber">39</context>
-                </context-group>
-                <target state="needs-translation">Notification à la fin de la fouille</target>
-            </trans-unit>
-            <trans-unit id="7818305627564977561" datatype="html">
-                <source>Si vous cochez l'option "Me notifier à la fin de la fouille", vous recevrez une notification de votre navigateur quelques secondes avant la fin de votre fouille à condition que votre navigateur soit toujours ouvert sur la page du désert.</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
-                    <context context-type="linenumber">40</context>
-                </context-group>
-                <target state="needs-translation">Si vous cochez l'option "Me notifier à la fin de la fouille", vous recevrez une notification de votre navigateur quelques secondes avant la fin de votre fouille à condition que votre navigateur soit toujours ouvert sur la page du désert.</target>
-            </trans-unit>
-            <trans-unit id="276294021269970234" datatype="html">
-                <source>Notification de nouveau message</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
-                    <context context-type="linenumber">43</context>
-                </context-group>
-                <target state="needs-translation">Notification de nouveau message</target>
-            </trans-unit>
-            <trans-unit id="5382715354383267703" datatype="html">
-                <source>Si vous cochez l'option "MMe notifier si je reçois un nouveau message", vous recevrez une notification de votre navigateur lors d'un changement dans votre compteur de messages reçus.</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
-                    <context context-type="linenumber">44</context>
-                </context-group>
-                <target state="needs-translation">Si vous cochez l'option "MMe notifier si je reçois un nouveau message", vous recevrez une notification de votre navigateur lors d'un changement dans votre compteur de messages reçus.</target>
-            </trans-unit>
-            <trans-unit id="7620507202018349855" datatype="html">
-                <source>Affichage des tooltips détaillés</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
-                    <context context-type="linenumber">32</context>
-                </context-group>
-                <target state="needs-translation">Affichage des tooltips détaillés</target>
-            </trans-unit>
-            <trans-unit id="5795663998729072574" datatype="html">
-                <source>Modifie les tooltips natifs de l'application pour afficher en plus la liste des recettes dans lesquelles l'objet survolé apparait ainsi que quelques informations complémentaires (nombre de points d'action rendus par un aliment par exemple).</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
-                    <context context-type="linenumber">33</context>
-                </context-group>
-                <target state="needs-translation">Modifie les tooltips natifs de l'application pour afficher en plus la liste des recettes dans lesquelles l'objet survolé apparait ainsi que quelques informations complémentaires (nombre de points d'action rendus par un aliment par exemple).</target>
-            </trans-unit>
-            <trans-unit id="4983139637604038278" datatype="html">
-                <source>Navigation rapide vers le chantier recommandé</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
-                    <context context-type="linenumber">36</context>
-                </context-group>
-                <target state="needs-translation">Navigation rapide vers le chantier recommandé</target>
-            </trans-unit>
-            <trans-unit id="4909203228847004040" datatype="html">
-                <source>Dans l'interface, vous pouvez cocher le bouton "Navigation rapide vers le chantier recommandé", ce qui activera la fonctionnalité de navigation rapide.
-Il s'agit simplement, lorsqu'il existe un chantier recommandé, de pouvoir cliquer dessus pour être automatiquement redirigé vers la ligne du chantier dans la liste.</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
-                    <context context-type="linenumber">36,37</context>
-                </context-group>
-                <target state="needs-translation">Dans l'interface, vous pouvez cocher le bouton "Navigation rapide vers le chantier recommandé", ce qui activera la fonctionnalité de navigation rapide.
-                Il s'agit simplement, lorsqu'il existe un chantier recommandé, de pouvoir cliquer dessus pour être automatiquement redirigé vers la ligne du chantier dans la liste.</target>
-            </trans-unit>
-            <trans-unit id="766908157360687970" datatype="html">
-                <source>Champs de recherches supplémentaires</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
-                    <context context-type="linenumber">40</context>
-                </context-group>
-                <target state="needs-translation">Champs de recherches supplémentaires</target>
-            </trans-unit>
-            <trans-unit id="2719168518138811288" datatype="html">
-                <source>En cochant cette option, vous pourrez choisir des champs de recherches à afficher dans votre interface. Sont actuellement disponibles : un champ de recherche sur la liste des chantiers, un champ de recherche dans les destinataires d'un message dans sa maison, un champ de recherche sur les entrées du registre.</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
-                    <context context-type="linenumber">41</context>
-                </context-group>
-                <target state="needs-translation">En cochant cette option, vous pourrez choisir des champs de recherches à afficher dans votre interface. Sont actuellement disponibles : un champ de recherche sur la liste des chantiers, un champ de recherche dans les destinataires d'un message dans sa maison, un champ de recherche sur les entrées du registre.</target>
-            </trans-unit>
-            <trans-unit id="1707430487871050147" datatype="html">
-                <source>Affichage de la liste de courses dans la page</source>
-                <context-group purpose="location">
-                    <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
-                    <context context-type="linenumber">44</context>
-                </context-group>
-                <target state="needs-translation">Affichage de la liste de courses dans la page</target>
-            </trans-unit>
-            <trans-unit id="6585471270280067151" datatype="html">
-                <source>En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l'atelier.
+      </trans-unit>
+      <trans-unit id="3984780497725315833" datatype="html">
+        <source>Mettre à jour les outils externes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <target state="needs-translation">Mettre à jour les outils externes</target>
+      </trans-unit>
+      <trans-unit id="7919452934138804929" datatype="html">
+        <source>Se connecter</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <target state="needs-translation">Se connecter</target>
+      </trans-unit>
+      <trans-unit id="6636912229609448537" datatype="html">
+        <source>Utilisateur inconnu</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <target state="needs-translation">Utilisateur inconnu</target>
+      </trans-unit>
+      <trans-unit id="4322254668478976610" datatype="html">
+        <source>Identifiant d&apos;app externe</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <target state="needs-translation">Identifiant d'app externe</target>
+      </trans-unit>
+      <trans-unit id="5925476828699666766" datatype="html">
+        <source>Identifiant externe pour les app</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <target state="needs-translation">Identifiant externe pour les app</target>
+      </trans-unit>
+      <trans-unit id="6446192435648820310" datatype="html">
+        <source>Déconnexion</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/header/header.component.html</context>
+          <context context-type="linenumber">42</context>
+        </context-group>
+        <target state="needs-translation">Déconnexion</target>
+      </trans-unit>
+      <trans-unit id="494050536795475082" datatype="html">
+        <source>Cette page peut contenir des spoils de la saison 16</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.html</context>
+          <context context-type="linenumber">75</context>
+        </context-group>
+        <target state="needs-translation">Cette page peut contenir des spoils de la saison 16</target>
+      </trans-unit>
+      <trans-unit id="1687689412386216543" datatype="html">
+        <source>Par défaut</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+        <target state="needs-translation">Par défaut</target>
+      </trans-unit>
+      <trans-unit id="5786363460327756403" datatype="html">
+        <source>Rose</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <target state="needs-translation">Rose</target>
+      </trans-unit>
+      <trans-unit id="4843074552222243213" datatype="html">
+        <source>Brun</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <target state="needs-translation">Brun</target>
+      </trans-unit>
+      <trans-unit id="6038281835621310494" datatype="html">
+        <source>Outils</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">92</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">124</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/tools.routes.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/tools.routes.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <target state="needs-translation">Outils</target>
+      </trans-unit>
+      <trans-unit id="2287398703048181232" datatype="html">
+        <source>Camping</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">93</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/tools.routes.ts</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <target state="needs-translation">Camping</target>
+      </trans-unit>
+      <trans-unit id="8628521144156217897" datatype="html">
+        <source>Chances de survie</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
+          <context context-type="linenumber">82</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/tools.routes.ts</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <target state="needs-translation">Chances de survie</target>
+      </trans-unit>
+      <trans-unit id="9108179050199310445" datatype="html">
+        <source>Wiki</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">98</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">125</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <target state="needs-translation">Wiki</target>
+      </trans-unit>
+      <trans-unit id="1087900872515566478" datatype="html">
+        <source>Objets</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/items/items.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <target state="needs-translation">Objets</target>
+      </trans-unit>
+      <trans-unit id="530325689928281558" datatype="html">
+        <source>Recettes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">100</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+        <target state="needs-translation">Recettes</target>
+      </trans-unit>
+      <trans-unit id="1327848898002802119" datatype="html">
+        <source>Pouvoirs</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">101</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <target state="needs-translation">Pouvoirs</target>
+      </trans-unit>
+      <trans-unit id="8819719048481824214" datatype="html">
+        <source>Bâtiments</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">102</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <target state="needs-translation">Bâtiments</target>
+      </trans-unit>
+      <trans-unit id="3057503085450181091" datatype="html">
+        <source>Informations diverses</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">104</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <target state="needs-translation">Informations diverses</target>
+      </trans-unit>
+      <trans-unit id="5212877493927146920" datatype="html">
+        <source>Tutoriels</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">114</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+        <target state="needs-translation">Tutoriels</target>
+      </trans-unit>
+      <trans-unit id="6304154521414539936" datatype="html">
+        <source>Script / Extension</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">116</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <target state="needs-translation">Script / Extension</target>
+      </trans-unit>
+      <trans-unit id="7419787782755641631" datatype="html">
+        <source>Installation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">118</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">144</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+        <target state="needs-translation">Installation</target>
+      </trans-unit>
+      <trans-unit id="2065447039528822131" datatype="html">
+        <source>Outils Externes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">127</context>
+        </context-group>
+        <target state="needs-translation">Outils Externes</target>
+      </trans-unit>
+      <trans-unit id="3342946597539953688" datatype="html">
+        <source>Affichage</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">133</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <target state="needs-translation">Affichage</target>
+      </trans-unit>
+      <trans-unit id="5851560788527570644" datatype="html">
+        <source>Notifications</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">134</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <target state="needs-translation">Notifications</target>
+      </trans-unit>
+      <trans-unit id="3793819955692174765" datatype="html">
+        <source>Site</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">138</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <target state="needs-translation">Site</target>
+      </trans-unit>
+      <trans-unit id="3556482685302387015" datatype="html">
+        <source>Première utilisation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">139</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <target state="needs-translation">Première utilisation</target>
+      </trans-unit>
+      <trans-unit id="3098981611680291534" datatype="html">
+        <source>Bot Discord</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">143</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
+          <context context-type="linenumber">64</context>
+        </context-group>
+        <target state="needs-translation">Bot Discord</target>
+      </trans-unit>
+      <trans-unit id="5737526992758767493" datatype="html">
+        <source>Noël</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">221</context>
+        </context-group>
+        <target state="needs-translation">Noël</target>
+      </trans-unit>
+      <trans-unit id="8180162587413296657" datatype="html">
+        <source>Halloween</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
+          <context context-type="linenumber">232</context>
+        </context-group>
+        <target state="needs-translation">Halloween</target>
+      </trans-unit>
+      <trans-unit id="5344623683730509987" datatype="html">
+        <source>Un grand merci à Renack, sans qui ni le script ni le site n&apos;existeraient puisqu&apos;il a fait tout le backend !</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <target state="needs-translation">Un grand merci à Renack, sans qui ni le script ni le site n'existeraient puisqu'il a fait tout le backend !</target>
+      </trans-unit>
+      <trans-unit id="3079822284604019418" datatype="html">
+        <source>Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <target state="needs-translation">Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.</target>
+      </trans-unit>
+      <trans-unit id="7508106374158857656" datatype="html">
+        <source>Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l&apos;ergonomie du site.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <target state="needs-translation">Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l'ergonomie du site.</target>
+      </trans-unit>
+      <trans-unit id="9186323945331905549" datatype="html">
+        <source>Merci également aux traducteurs qui rendent l&apos;internationalisation possible.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <target state="needs-translation">Merci également aux traducteurs qui rendent l'internationalisation possible.</target>
+      </trans-unit>
+      <trans-unit id="4780379749037907519" datatype="html">
+        <source>Merci à Argo qui a assuré à la perfection - assistée de Katt - le rôle de responsable des relations avec l&apos;équipe de développement du jeu, et sans qui l&apos;idée de faire du script un site ne serait pas née. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
+          <context context-type="linenumber">24,27</context>
+        </context-group>
+        <target state="needs-translation">Merci à Argo qui a assuré à la perfection - assistée de Katt - le rôle de responsable des relations avec l'équipe de développement du jeu, et sans qui l'idée de faire du script un site ne serait pas née. </target>
+      </trans-unit>
+      <trans-unit id="1639188178441316344" datatype="html">
+        <source>Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités. </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
+          <context context-type="linenumber">30,32</context>
+        </context-group>
+        <target state="needs-translation">Merci enfin à aracime, notre plus grand et notre meilleur supporter, mais aussi à tous les membres du Théâtre Implacable qui ont testé et nous ont fait leurs retours sur les fonctionnalités. </target>
+      </trans-unit>
+      <trans-unit id="611594206241884293" datatype="html">
+        <source>Copier le lien de la simulation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <target state="needs-translation">Copier le lien de la simulation</target>
+      </trans-unit>
+      <trans-unit id="826911519411311233" datatype="html">
+        <source>Dans ma ville</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <target state="needs-translation">Dans ma ville</target>
+      </trans-unit>
+      <trans-unit id="6487260431971357562" datatype="html">
+        <source>Bonus en équivalent PA</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <target state="needs-translation">Bonus en équivalent PA</target>
+      </trans-unit>
+      <trans-unit id="4328907410933636413" datatype="html">
+        <source>Le citoyen</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <target state="needs-translation">Le citoyen</target>
+      </trans-unit>
+      <trans-unit id="5833055296319952035" datatype="html">
+        <source>Métier</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <target state="needs-translation">Métier</target>
+      </trans-unit>
+      <trans-unit id="452066521029087062" datatype="html">
+        <source>Tenue de camouflage</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <target state="needs-translation">Tenue de camouflage</target>
+      </trans-unit>
+      <trans-unit id="1294130363465211657" datatype="html">
+        <source>(<x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
+<x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">44,46</context>
+        </context-group>
+        <target state="translated">(<x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
+                    <x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>)</target>
+      </trans-unit>
+      <trans-unit id="7954001980226848388" datatype="html">
+        <source>Campeur professionnel</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <target state="needs-translation">Campeur professionnel</target>
+      </trans-unit>
+      <trans-unit id="8079361333376398985" datatype="html">
+        <source>Tombe</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <target state="needs-translation">Tombe</target>
+      </trans-unit>
+      <trans-unit id="3231213779188554984" datatype="html">
+        <source>Nombre de campings déjà effectués</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+        <target state="needs-translation">Nombre de campings déjà effectués</target>
+      </trans-unit>
+      <trans-unit id="3915433859665099927" datatype="html">
+        <source>Nombre de pelures de peau et de toiles de tentes dans le sac</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+        <target state="needs-translation">Nombre de pelures de peau et de toiles de tentes dans le sac</target>
+      </trans-unit>
+      <trans-unit id="560884417072143682" datatype="html">
+        <source>La ville</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">77</context>
+        </context-group>
+        <target state="needs-translation">La ville</target>
+      </trans-unit>
+      <trans-unit id="2205198219410592279" datatype="html">
+        <source>Type de ville</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+        <target state="needs-translation">Type de ville</target>
+      </trans-unit>
+      <trans-unit id="5596519199501316309" datatype="html">
+        <source>Nuit</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">89</context>
+        </context-group>
+        <target state="needs-translation">Nuit</target>
+      </trans-unit>
+      <trans-unit id="5745500004130467995" datatype="html">
+        <source>Ville dévastée</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+        <target state="needs-translation">Ville dévastée</target>
+      </trans-unit>
+      <trans-unit id="3246864206079397926" datatype="html">
+        <source>Phare</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">99</context>
+        </context-group>
+        <target state="needs-translation">Phare</target>
+      </trans-unit>
+      <trans-unit id="4122043223946991758" datatype="html">
+        <source>Le bâtiment</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">108</context>
+        </context-group>
+        <target state="needs-translation">Le bâtiment</target>
+      </trans-unit>
+      <trans-unit id="7523060874803429510" datatype="html">
+        <source>Distance de la ville (en km)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+        <target state="needs-translation">Distance de la ville (en km)</target>
+      </trans-unit>
+      <trans-unit id="1342160137926124174" datatype="html">
+        <source>Nombre de tas</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">129</context>
+        </context-group>
+        <target state="needs-translation">Nombre de tas</target>
+      </trans-unit>
+      <trans-unit id="2420553302076927639" datatype="html">
+        <source>Nombre de zombies sur la case</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">135</context>
+        </context-group>
+        <target state="needs-translation">Nombre de zombies sur la case</target>
+      </trans-unit>
+      <trans-unit id="7014743875484323339" datatype="html">
+        <source>Nombre de campeurs déjà cachés sur la case</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">143</context>
+        </context-group>
+        <target state="needs-translation">Nombre de campeurs déjà cachés sur la case</target>
+      </trans-unit>
+      <trans-unit id="1759876158817324985" datatype="html">
+        <source>Nombre d&apos;améliorations simples faites sur la case</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">159</context>
+        </context-group>
+        <target state="needs-translation">Nombre d'améliorations simples faites sur la case</target>
+      </trans-unit>
+      <trans-unit id="1569331568164081073" datatype="html">
+        <source>Nombre d&apos;objets de défense installés sur la case</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">166</context>
+        </context-group>
+        <target state="needs-translation">Nombre d'objets de défense installés sur la case</target>
+      </trans-unit>
+      <trans-unit id="4837777735310918701" datatype="html">
+        <source>Et</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">173</context>
+        </context-group>
+        <target state="needs-translation">Et</target>
+      </trans-unit>
+      <trans-unit id="8497259045466557566" datatype="html">
+        <source>Ou</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">174</context>
+        </context-group>
+        <target state="needs-translation">Ou</target>
+      </trans-unit>
+      <trans-unit id="7193094326883081286" datatype="html">
+        <source><x id="INTERPOLATION" equiv-text="{{ display_bonus_ap ? &apos;Nombre&apos; : &apos;Pourcentage&apos; }}"/> total d&apos;améliotations sur la case</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">178</context>
+        </context-group>
+        <target state="needs-translation">
+<x id="INTERPOLATION" equiv-text="{{ display_bonus_ap ? 'Nombre' : 'Pourcentage' }}"/> total d'améliotations sur la case</target>
+      </trans-unit>
+      <trans-unit id="2902261471051690112" datatype="html">
+        <source>Résultat</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">193</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <target state="needs-translation">Résultat</target>
+      </trans-unit>
+      <trans-unit id="3441654073279757119" datatype="html">
+        <source>Chances de survie : </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
+          <context context-type="linenumber">196</context>
+        </context-group>
+        <target state="needs-translation">Chances de survie : </target>
+      </trans-unit>
+      <trans-unit id="6003110979058162782" datatype="html">
+        <source>Petite carte</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+        <target state="needs-translation">Petite carte</target>
+      </trans-unit>
+      <trans-unit id="3774627028364286981" datatype="html">
+        <source>Région éloignée</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+        <target state="needs-translation">Région éloignée</target>
+      </trans-unit>
+      <trans-unit id="3131499204058979166" datatype="html">
+        <source>Pandémonium</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+        <target state="needs-translation">Pandémonium</target>
+      </trans-unit>
+      <trans-unit id="4068382494466269539" datatype="html">
+        <source>La liste est impactée par la distance choisie</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+        <target state="needs-translation">La liste est impactée par la distance choisie</target>
+      </trans-unit>
+      <trans-unit id="5726959518724330123" datatype="html">
+        <source>Il faut en soustraire 3 après chaque attaque</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+        <target state="needs-translation">Il faut en soustraire 3 après chaque attaque</target>
+      </trans-unit>
+      <trans-unit id="4379616016375089599" datatype="html">
+        <source>Bonus : </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">68</context>
+        </context-group>
+        <target state="needs-translation">Bonus : </target>
+      </trans-unit>
+      <trans-unit id="61672744151027488" datatype="html">
+        <source>Le lien a bien été copié</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
+          <context context-type="linenumber">165</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
+          <context context-type="linenumber">80</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
+          <context context-type="linenumber">87</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <target state="needs-translation">Le lien a bien été copié</target>
+      </trans-unit>
+      <trans-unit id="9012164453173268999" datatype="html">
+        <source>Ajouter une simulation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <target state="needs-translation">Ajouter une simulation</target>
+      </trans-unit>
+      <trans-unit id="4675002084672510417" datatype="html">
+        <source>Valeur par défaut</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+        <target state="needs-translation">Valeur par défaut</target>
+      </trans-unit>
+      <trans-unit id="980939234227251011" datatype="html">
+        <source>Nombre de personnes</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+        <target state="needs-translation">Nombre de personnes</target>
+      </trans-unit>
+      <trans-unit id="789097210155389951" datatype="html">
+        <source>Nombre de morts</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+        <target state="needs-translation">Nombre de morts</target>
+      </trans-unit>
+      <trans-unit id="8007458421319879300" datatype="html">
+        <source>Probabilité</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+        <target state="needs-translation">Probabilité</target>
+      </trans-unit>
+      <trans-unit id="7745390044882644493" datatype="html">
+        <source>Simulation 1</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.ts</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+        <target state="needs-translation">Simulation 1</target>
+      </trans-unit>
+      <trans-unit id="4635453384629622126" datatype="html">
+        <source>Simulation</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <target state="needs-translation">Simulation</target>
+      </trans-unit>
+      <trans-unit id="880920713849004233" datatype="html">
+        <source>Choisir le mode de partage</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <target state="needs-translation">Choisir le mode de partage</target>
+      </trans-unit>
+      <trans-unit id="4689365071310497816" datatype="html">
+        <source> Copier l&apos;URL </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.html</context>
+          <context context-type="linenumber">8,10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.html</context>
+          <context context-type="linenumber">8,10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.html</context>
+          <context context-type="linenumber">8,10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.html</context>
+          <context context-type="linenumber">8,10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
+          <context context-type="linenumber">8,10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.html</context>
+          <context context-type="linenumber">8,10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.html</context>
+          <context context-type="linenumber">8,10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.html</context>
+          <context context-type="linenumber">8,10</context>
+        </context-group>
+        <target state="needs-translation"> Copier l'URL </target>
+      </trans-unit>
+      <trans-unit id="3885539050798710089" datatype="html">
+        <source> Copier au format forum </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.html</context>
+          <context context-type="linenumber">11,13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.html</context>
+          <context context-type="linenumber">11,13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.html</context>
+          <context context-type="linenumber">11,13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.html</context>
+          <context context-type="linenumber">11,13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
+          <context context-type="linenumber">11,13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.html</context>
+          <context context-type="linenumber">11,13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.html</context>
+          <context context-type="linenumber">11,13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.html</context>
+          <context context-type="linenumber">11,13</context>
+        </context-group>
+        <target state="needs-translation"> Copier au format forum </target>
+      </trans-unit>
+      <trans-unit id="670567962320357766" datatype="html">
+        <source>Installation du Bot sur un serveur Discord</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+        <target state="needs-translation">Installation du Bot sur un serveur Discord</target>
+      </trans-unit>
+      <trans-unit id="3466830193215925553" datatype="html">
+        <source>&lt;a color=&quot;accent&quot; href=&quot;https://discord.com/api/oauth2/authorize?client_id=1140035117746765914&amp;permissions=277025459200&amp;scope=bot&quot; target=&quot;_blank&quot;&gt;lien d&apos;installation du bot&lt;/a&gt;</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+        <target state="needs-translation">&lt;a color="accent" href="https://discord.com/api/oauth2/authorize?client_id=1140035117746765914&amp;permissions=277025459200&amp;scope=bot" target="_blank"&gt;lien d'installation du bot&lt;/a&gt;</target>
+      </trans-unit>
+      <trans-unit id="5339734629980782531" datatype="html">
+        <source>Vous devez être propriétaire ou avoir les droits d&apos;administration sur le serveur Discord sur lequel vous voulez inviter le Bot.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
+          <context context-type="linenumber">28</context>
+        </context-group>
+        <target state="needs-translation">Vous devez être propriétaire ou avoir les droits d'administration sur le serveur Discord sur lequel vous voulez inviter le Bot.</target>
+      </trans-unit>
+      <trans-unit id="5124083784940231527" datatype="html">
+        <source>En cliquant sur le <x id="PH" equiv-text="this.download_link"/>, vous serez redirigé vers une page d&apos;installation.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
+        <target state="needs-translation">En cliquant sur le <x id="PH" equiv-text="this.download_link"/>, vous serez redirigé vers une page d'installation.</target>
+      </trans-unit>
+      <trans-unit id="8564269404291712463" datatype="html">
+        <source>Le texte a bien été copié</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
+          <context context-type="linenumber">66</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
+          <context context-type="linenumber">123</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
+          <context context-type="linenumber">107</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
+          <context context-type="linenumber">67</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Le texte a bien été copié</target>
+      </trans-unit>
+      <trans-unit id="8862266483474333992" datatype="html">
+        <source>Avertissement en cas de fermeture de la page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
+          <context context-type="linenumber">31</context>
+        </context-group>
+        <target state="needs-translation">Avertissement en cas de fermeture de la page</target>
+      </trans-unit>
+      <trans-unit id="8074080674635417281" datatype="html">
+        <source>Dans l&apos;interface, vous pouvez cocher l&apos;option &quot;Demander confirmation avant de quitter la page&quot;, ce qui activera la fonctionnalité.
+Une fois activée, si vous êtes dans le désert et que votre attente d&apos;escorte n&apos;est pas activée, ou si vous n&apos;avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l&apos;onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
+          <context context-type="linenumber">31,32</context>
+        </context-group>
+        <target state="needs-translation">Dans l'interface, vous pouvez cocher l'option "Demander confirmation avant de quitter la page", ce qui activera la fonctionnalité.
+Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l'onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.</target>
+      </trans-unit>
+      <trans-unit id="4945794230367496950" datatype="html">
+        <source>Avertissement en cas d&apos;inactivité</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
+          <context context-type="linenumber">35</context>
+        </context-group>
+        <target state="needs-translation">Avertissement en cas d'inactivité</target>
+      </trans-unit>
+      <trans-unit id="6792041599839954174" datatype="html">
+        <source>Dans l&apos;interface, vous pouvez cocher l&apos;option &quot;Me notifier si je suis inactif depuis 5 minutes sur la page&quot;, ce qui activera la fonctionnalité.
+Une fois activée, si vous êtes dans le désert et que votre attente d&apos;escorte n&apos;est pas activée, ou si vous n&apos;avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
+          <context context-type="linenumber">35,36</context>
+        </context-group>
+        <target state="needs-translation">Dans l'interface, vous pouvez cocher l'option "Me notifier si je suis inactif depuis 5 minutes sur la page", ce qui activera la fonctionnalité.
+Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.</target>
+      </trans-unit>
+      <trans-unit id="2315492892193612031" datatype="html">
+        <source>Notification à la fin de la fouille</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
+          <context context-type="linenumber">39</context>
+        </context-group>
+        <target state="needs-translation">Notification à la fin de la fouille</target>
+      </trans-unit>
+      <trans-unit id="7818305627564977561" datatype="html">
+        <source>Si vous cochez l&apos;option &quot;Me notifier à la fin de la fouille&quot;, vous recevrez une notification de votre navigateur quelques secondes avant la fin de votre fouille à condition que votre navigateur soit toujours ouvert sur la page du désert.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <target state="needs-translation">Si vous cochez l'option "Me notifier à la fin de la fouille", vous recevrez une notification de votre navigateur quelques secondes avant la fin de votre fouille à condition que votre navigateur soit toujours ouvert sur la page du désert.</target>
+      </trans-unit>
+      <trans-unit id="276294021269970234" datatype="html">
+        <source>Notification de nouveau message</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+        <target state="needs-translation">Notification de nouveau message</target>
+      </trans-unit>
+      <trans-unit id="5382715354383267703" datatype="html">
+        <source>Si vous cochez l&apos;option &quot;MMe notifier si je reçois un nouveau message&quot;, vous recevrez une notification de votre navigateur lors d&apos;un changement dans votre compteur de messages reçus.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Si vous cochez l'option "MMe notifier si je reçois un nouveau message", vous recevrez une notification de votre navigateur lors d'un changement dans votre compteur de messages reçus.</target>
+      </trans-unit>
+      <trans-unit id="7620507202018349855" datatype="html">
+        <source>Affichage des tooltips détaillés</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
+          <context context-type="linenumber">32</context>
+        </context-group>
+        <target state="needs-translation">Affichage des tooltips détaillés</target>
+      </trans-unit>
+      <trans-unit id="5795663998729072574" datatype="html">
+        <source>Modifie les tooltips natifs de l&apos;application pour afficher en plus la liste des recettes dans lesquelles l&apos;objet survolé apparait ainsi que quelques informations complémentaires (nombre de points d&apos;action rendus par un aliment par exemple).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
+          <context context-type="linenumber">33</context>
+        </context-group>
+        <target state="needs-translation">Modifie les tooltips natifs de l'application pour afficher en plus la liste des recettes dans lesquelles l'objet survolé apparait ainsi que quelques informations complémentaires (nombre de points d'action rendus par un aliment par exemple).</target>
+      </trans-unit>
+      <trans-unit id="4983139637604038278" datatype="html">
+        <source>Navigation rapide vers le chantier recommandé</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+        <target state="needs-translation">Navigation rapide vers le chantier recommandé</target>
+      </trans-unit>
+      <trans-unit id="4909203228847004040" datatype="html">
+        <source>Dans l&apos;interface, vous pouvez cocher le bouton &quot;Navigation rapide vers le chantier recommandé&quot;, ce qui activera la fonctionnalité de navigation rapide.
+Il s&apos;agit simplement, lorsqu&apos;il existe un chantier recommandé, de pouvoir cliquer dessus pour être automatiquement redirigé vers la ligne du chantier dans la liste.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
+          <context context-type="linenumber">36,37</context>
+        </context-group>
+        <target state="needs-translation">Dans l'interface, vous pouvez cocher le bouton "Navigation rapide vers le chantier recommandé", ce qui activera la fonctionnalité de navigation rapide.
+Il s'agit simplement, lorsqu'il existe un chantier recommandé, de pouvoir cliquer dessus pour être automatiquement redirigé vers la ligne du chantier dans la liste.</target>
+      </trans-unit>
+      <trans-unit id="766908157360687970" datatype="html">
+        <source>Champs de recherches supplémentaires</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+        <target state="needs-translation">Champs de recherches supplémentaires</target>
+      </trans-unit>
+      <trans-unit id="2719168518138811288" datatype="html">
+        <source>En cochant cette option, vous pourrez choisir des champs de recherches à afficher dans votre interface. Sont actuellement disponibles : un champ de recherche sur la liste des chantiers, un champ de recherche dans les destinataires d&apos;un message dans sa maison, un champ de recherche sur les entrées du registre.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
+          <context context-type="linenumber">41</context>
+        </context-group>
+        <target state="needs-translation">En cochant cette option, vous pourrez choisir des champs de recherches à afficher dans votre interface. Sont actuellement disponibles : un champ de recherche sur la liste des chantiers, un champ de recherche dans les destinataires d'un message dans sa maison, un champ de recherche sur les entrées du registre.</target>
+      </trans-unit>
+      <trans-unit id="1707430487871050147" datatype="html">
+        <source>Affichage de la liste de courses dans la page</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
+          <context context-type="linenumber">44</context>
+        </context-group>
+        <target state="needs-translation">Affichage de la liste de courses dans la page</target>
+      </trans-unit>
+      <trans-unit id="6585471270280067151" datatype="html">
+        <source>En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l&apos;atelier.
 Cette liste contient des informations de priorité, de quantité en banque, de quantité dans les sacs, de quantité totale requise, et de quantité manquante.
 &lt;br />&lt;br />
 La liste de courses dans l'atelier ne présentera que les éléments pouvant obtenus à l'atelier.
