@@ -1922,8 +1922,7 @@
         <target state="final">Haben nicht gespielt</target>
       </trans-unit>
       <trans-unit id="4111861165243506614" datatype="html" approved="yes">
-        <source>Sortie n°<x id="PH" equiv-text="index + 1"/>
-                </source>
+        <source>Sortie n°<x id="PH" equiv-text="index + 1"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/doors/doors-registry.component.ts</context>
           <context context-type="linenumber">52</context>
@@ -2444,8 +2443,7 @@
         <target state="final">Wächterwaffe</target>
       </trans-unit>
       <trans-unit id="8559558498834606319" datatype="html" approved="yes">
-        <source>Mis à jour par <x id="INTERPOLATION" equiv-text="{{ lastUpdateInfo.username }}"/> <x id="INTERPOLATION_1" equiv-text="{{ lastUpdateInfo.update_time.fromNow() }}"/>
-                </source>
+        <source>Mis à jour par <x id="INTERPOLATION" equiv-text="{{ lastUpdateInfo.username }}"/> <x id="INTERPOLATION_1" equiv-text="{{ lastUpdateInfo.update_time.fromNow() }}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
           <context context-type="linenumber">20</context>
@@ -2489,8 +2487,7 @@
         <target state="final">Dies ist ein Pflichtfeld</target>
       </trans-unit>
       <trans-unit id="2974950606230121476" datatype="html" approved="yes">
-        <source>Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> et <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
-                </source>
+        <source>Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> et <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">4,5</context>
@@ -2519,8 +2516,7 @@
         <target state="final">Besonderen Dank an</target>
       </trans-unit>
       <trans-unit id="5186837657495593523" datatype="html" approved="yes">
-        <source>Ce site n&apos;est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
-                </source>
+        <source>Ce site n&apos;est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">17,18</context>
@@ -2529,8 +2525,7 @@
                 </target>
       </trans-unit>
       <trans-unit id="239352375316430833" datatype="html" approved="yes">
-        <source>Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
-                </source>
+        <source>Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">20,21</context>
@@ -3119,8 +3114,7 @@
         <target state="final">Tarnanzug</target>
       </trans-unit>
       <trans-unit id="1294130363465211657" datatype="html" approved="yes">
-        <source>(<x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/>
-<x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>)</source>
+        <source>(<x id="INTERPOLATION" equiv-text="{{ bonus_string }}"/><x id="INTERPOLATION_1" equiv-text="{{ bonus.zombie_vest | campingDisplayBonus:display_bonus_ap:locale }}"/> par zombie au lieu de <x id="INTERPOLATION_2" equiv-text="{{                                         bonus.zombie_no_vest | campingDisplayBonus:display_bonus_ap:locale                                     }}"/>)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">44,46</context>
@@ -3631,7 +3625,7 @@
       </trans-unit>
       <trans-unit id="8074080674635417281" datatype="html" approved="yes">
         <source>Dans l&apos;interface, vous pouvez cocher l&apos;option &quot;Demander confirmation avant de quitter la page&quot;, ce qui activera la fonctionnalité.
-Une fois activée, si vous êtes dans le désert et que votre attente d&apos;escorte n&apos;est pas activée, ou si vous n&apos;avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l&apos;onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.</source>
+                Une fois activée, si vous êtes dans le désert et que votre attente d&apos;escorte n&apos;est pas activée, ou si vous n&apos;avez pas relâché votre escorte, alors au moment de fermer la fenêtre ou l&apos;onglet vous verrez apparaitre un avertissement demandant de confirmer votre action.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">31,32</context>
@@ -3649,7 +3643,7 @@ Wenn die Funktion aktiviert ist und Sie sich in der Wüste befinden und Ihre Esk
       </trans-unit>
       <trans-unit id="6792041599839954174" datatype="html" approved="yes">
         <source>Dans l&apos;interface, vous pouvez cocher l&apos;option &quot;Me notifier si je suis inactif depuis 5 minutes sur la page&quot;, ce qui activera la fonctionnalité.
-Une fois activée, si vous êtes dans le désert et que votre attente d&apos;escorte n&apos;est pas activée, ou si vous n&apos;avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.</source>
+                Une fois activée, si vous êtes dans le désert et que votre attente d&apos;escorte n&apos;est pas activée, ou si vous n&apos;avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">35,36</context>
@@ -3715,7 +3709,7 @@ Wenn Sie sich in der Wüste befinden und Ihre Eskorte nicht aktiviert ist oder S
       </trans-unit>
       <trans-unit id="4909203228847004040" datatype="html" approved="yes">
         <source>Dans l&apos;interface, vous pouvez cocher le bouton &quot;Navigation rapide vers le chantier recommandé&quot;, ce qui activera la fonctionnalité de navigation rapide.
-Il s&apos;agit simplement, lorsqu&apos;il existe un chantier recommandé, de pouvoir cliquer dessus pour être automatiquement redirigé vers la ligne du chantier dans la liste.</source>
+                Il s&apos;agit simplement, lorsqu&apos;il existe un chantier recommandé, de pouvoir cliquer dessus pour être automatiquement redirigé vers la ligne du chantier dans la liste.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">36,37</context>
@@ -3749,13 +3743,13 @@ Wenn die Funktion aktiviert ist, und es eine empfohlene Baustelle gibt, kannst d
       </trans-unit>
       <trans-unit id="6585471270280067151" datatype="html" approved="yes">
         <source>En cochant cette option, la liste de courses apparaitra lorsque vous vous trouverez dans le desert ou dans l&apos;atelier.
-Cette liste contient des informations de priorité, de quantité en banque, de quantité dans les sacs, de quantité totale requise, et de quantité manquante.
-&lt;br /&gt;&lt;br /&gt;
-La liste de courses dans l&apos;atelier ne présentera que les éléments pouvant obtenus à l&apos;atelier.
-Celle dans le désert affichera tous les éléments sans distinction.
-&lt;br /&gt;&lt;br /&gt;
-Dans le désert, les objets dans le sac ou au sol également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l&apos;élément.
-                </source>
+        Cette liste contient des informations de priorité, de quantité en banque, de quantité dans les sacs, de quantité totale requise, et de quantité manquante.
+        &lt;br /&gt;&lt;br /&gt;
+        La liste de courses dans l&apos;atelier ne présentera que les éléments pouvant obtenus à l&apos;atelier.
+        Celle dans le désert affichera tous les éléments sans distinction.
+        &lt;br /&gt;&lt;br /&gt;
+        Dans le désert, les objets dans le sac ou au sol également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l&apos;élément.
+        </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">45,52</context>
@@ -3779,7 +3773,7 @@ In der Wüste werden Gegenstände in dem Rucksack oder auf dem Boden, die auch a
       </trans-unit>
       <trans-unit id="7274539193871812426" datatype="html" approved="yes">
         <source>En cochant cette option, un nouvel encart apparaitra sous la carte dans l&apos;Outre-Monde.
-Il compte le nombre de zombies qui ont été tués sur la case depuis la dernière attaque, et calcule le nombre de zombies qui vont mourir de désespoir lors de la prochaine attaque.</source>
+                Il compte le nombre de zombies qui ont été tués sur la case depuis la dernière attaque, et calcule le nombre de zombies qui vont mourir de désespoir lors de la prochaine attaque.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">56,57</context>
@@ -3797,8 +3791,8 @@ Er zählt die Anzahl der Zombies, die seit dem letzten Angriff auf dem Feld get�
       </trans-unit>
       <trans-unit id="2308604582849473977" datatype="html" approved="yes">
         <source>En cochant cette option, un outil de traduction s&apos;affichera dans l&apos;interface.
-Vous pourrez désormais sélectionner une langue d&apos;origine, puis saisir le texte à rechercher dans les autres langues.
-Le texte doit impérativement être un texte de MyHordes, puisque nous allons en chercher la traduction dans les fichiers de traduction du jeu.</source>
+                Vous pourrez désormais sélectionner une langue d&apos;origine, puis saisir le texte à rechercher dans les autres langues.
+                Le texte doit impérativement être un texte de MyHordes, puisque nous allons en chercher la traduction dans les fichiers de traduction du jeu.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">61,63</context>
@@ -3817,7 +3811,7 @@ Der Text muss unbedingt ein Text aus MyHordes sein, da die Übersetzung in den �
       </trans-unit>
       <trans-unit id="3348452797437339338" datatype="html" approved="yes">
         <source>En pandémonium, les chantiers subissent des dégats lors de l&apos;attaque.
-Cette option va montrer combien de pa manquent pour que le chantier ne risque pas d&apos;être détruit lors de la prochaine attaque.</source>
+                Cette option va montrer combien de pa manquent pour que le chantier ne risque pas d&apos;être détruit lors de la prochaine attaque.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">67,68</context>
@@ -3835,8 +3829,8 @@ Diese Option wird zeigen, wie viele AP fehlen, damit die Konstruktion nicht Gefa
       </trans-unit>
       <trans-unit id="6315178546308171300" datatype="html" approved="yes">
         <source>En cochant cette option, vous verrez apparaitre un nouvel encart dans les informations du secteur de votre case.
-Cet encart vous permettra de saisir diverses informations pour calculer vos chances de survie sur cette case.
-Certaines informations, comme par exemple le type de ville, ne sont pas visibles car elles sont déjà pré-renseignées et tiennent compte de votre ville actuelle.</source>
+                Cet encart vous permettra de saisir diverses informations pour calculer vos chances de survie sur cette case.
+                Certaines informations, comme par exemple le type de ville, ne sont pas visibles car elles sont déjà pré-renseignées et tiennent compte de votre ville actuelle.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">72,74</context>
@@ -3855,7 +3849,7 @@ Einige Informationen, wie z. B. der Stadttyp, sind nicht sichtbar, da sie bereit
       </trans-unit>
       <trans-unit id="2973411733509838510" datatype="html" approved="yes">
         <source>Sur la carte du site de MyHordes Optimizer, vous pouvez saisir des notes sur chaque case.
-Quand cette option est cochée, la note associée s&apos;affiche sur votre case quand vous vous déplacez dans l&apos;Outre-Monde.</source>
+               Quand cette option est cochée, la note associée s&apos;affiche sur votre case quand vous vous déplacez dans l&apos;Outre-Monde.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">78,79</context>
@@ -3905,7 +3899,7 @@ Wenn diese Option angekreuzt ist, wird die zugehörige Notiz auf deiner Zone ang
       </trans-unit>
       <trans-unit id="7180506722526896911" datatype="html" approved="yes">
         <source>Quand cette option est cochée, un compteur qui liste vos prises en banque est ajouté aux pages de banque et puits.
-Le compteur dans MyHordes tient compte des minutes &quot;glissantes&quot;, il suffit donc d&apos;attendre qu&apos;une ligne disparaisse pour pouvoir prendre de nouveau un objet en banque.</source>
+                Le compteur dans MyHordes tient compte des minutes &quot;glissantes&quot;, il suffit donc d&apos;attendre qu&apos;une ligne disparaisse pour pouvoir prendre de nouveau un objet en banque.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">91,92</context>
@@ -3939,7 +3933,7 @@ Der Zähler in MyHordes berücksichtigt "gleitende" Minuten, du musst also nur w
       </trans-unit>
       <trans-unit id="943685066173622187" datatype="html" approved="yes">
         <source>En cochant cette option, deux autres options représentant les options d&apos;escorte dans l&apos;Outre-Monde seront disponibles.
-Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.</source>
+                Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">100,101</context>
@@ -3961,7 +3955,7 @@ So kannst du auswählen, welche Optionen standardmäßig aktiviert oder deaktivi
       </trans-unit>
       <trans-unit id="2917108141392126070" datatype="html" approved="yes">
         <source>Une des fonctionnalités du script est de permettre la mise à jour de plusieurs outils externes en un seul clic depuis le site de MyHordes. Pour ce faire, il faut activer les options associées dans la liste des options de MyHordes Optimizer.
-Si vous avez l&apos;un des outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.</source>
+    Si vous avez l&apos;un des outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">24,25</context>
@@ -3979,18 +3973,18 @@ Wenn du eine der entsprechenden Anwendungen in deinem Browser geöffnet hast, da
       </trans-unit>
       <trans-unit id="6242771464223017856" datatype="html" approved="yes">
         <source>
-En cochant l&apos;option &quot;Mettre à jour MyHordesOptimizer&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils externes&quot;, la mise à jour de MyHordes Optimizer se fera automatiquement.
-Vous rendez également accessibles d&apos;autres options de mise à jour avancées.
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à MyHordes Optimizer.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Détail de mon sac et de ceux de mon escorte :&lt;/strong&gt; Enregistre le contenu de votre sac ainsi que ceux de vos escortés&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre vos différents états (rassasié, soif, etc... Attention : n&apos;enregistre pas l&apos;état goule)&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Entregistrer les fouilles réussies :&lt;/strong&gt; Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte dédiée&lt;/li&gt;
-&lt;/ul&gt;
-                </source>
+            En cochant l&apos;option &quot;Mettre à jour MyHordesOptimizer&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils externes&quot;, la mise à jour de MyHordes Optimizer se fera automatiquement.
+            Vous rendez également accessibles d&apos;autres options de mise à jour avancées.
+            &lt;ul&gt;
+                &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à MyHordes Optimizer.&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Détail de mon sac et de ceux de mon escorte :&lt;/strong&gt; Enregistre le contenu de votre sac ainsi que ceux de vos escortés&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre vos différents états (rassasié, soif, etc... Attention : n&apos;enregistre pas l&apos;état goule)&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Entregistrer les fouilles réussies :&lt;/strong&gt; Enregistre les fouilles réussies pour restituer des statistiques sur les fouilles dans une carte dédiée&lt;/li&gt;
+            &lt;/ul&gt;
+        </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">29,41</context>
@@ -4018,15 +4012,15 @@ Das macht auch andere erweiterte Aktualisierungsoptionen zugänglich.
       </trans-unit>
       <trans-unit id="4415272569817655484" datatype="html" approved="yes">
         <source>En cochant l&apos;option &quot;Mettre à jour Gest&apos;Hordes&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils externes&quot;, la mise à jour de Gest&apos;Hordes se fera automatiquement.
-Vous rendez également accessibles d&apos;autres options de mise à jour avancées.
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à Gest&apos;Hordes.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre l&apos;état clair&lt;/li&gt;
-&lt;/ul&gt;
-                </source>
+            Vous rendez également accessibles d&apos;autres options de mise à jour avancées.
+            &lt;ul&gt;
+                &lt;li&gt;&lt;strong&gt;Nombre de zombies tués :&lt;/strong&gt; Enregistre le nombre de zombies tués sur la case&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Mise à jour en ville dévastée :&lt;/strong&gt; Lorsque la ville est dévastée, récupère les informations sur la case pour les envoyer à Gest&apos;Hordes.&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Actions héroïques :&lt;/strong&gt; Enregistre les actions héroïques disponibles / utilisées&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;Améliorations de la maison :&lt;/strong&gt; Enregistre les informations concernant votre maison&lt;/li&gt;
+                &lt;li&gt;&lt;strong&gt;États :&lt;/strong&gt; Enregistre l&apos;état clair&lt;/li&gt;
+            &lt;/ul&gt;
+        </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">44,53</context>
@@ -4084,12 +4078,12 @@ Das macht auch andere Aktualisierungsoptionen zugänglich.
       </trans-unit>
       <trans-unit id="2813621706949242739" datatype="html" approved="yes">
         <source>
-Depuis l&apos;interface, vous pouvez cocher une option permettant d&apos;afficher des cartes directement dans MyHordes.
-Une fois cette option cochée, vous trouverez dans les différents outils externes des boutons pour &quot;copier&quot; une carte, que ce soit une carte de la ville ou une carte de ruine. Une fois la carte copiée, il suffit de retourner dans MyHordes et de cliquer sur l&apos;icône de carte pour pouvoir consulter la carte dans une fenêtre qui peut être déplacée et redimensionnée.
-&lt;br /&gt;&lt;br /&gt;
-Pour les cartes de BBH et de GH, vous pourrez voir votre emplacement sur la carte. La visibilité des expéditions n&apos;est pas encore prise en compte.
-&lt;br /&gt;&lt;br /&gt;
-Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur une des cases, ce qui fait se déplacer un point sur la carte.</source>
+            Depuis l&apos;interface, vous pouvez cocher une option permettant d&apos;afficher des cartes directement dans MyHordes.
+            Une fois cette option cochée, vous trouverez dans les différents outils externes des boutons pour &quot;copier&quot; une carte, que ce soit une carte de la ville ou une carte de ruine. Une fois la carte copiée, il suffit de retourner dans MyHordes et de cliquer sur l&apos;icône de carte pour pouvoir consulter la carte dans une fenêtre qui peut être déplacée et redimensionnée.
+            &lt;br /&gt;&lt;br /&gt;
+            Pour les cartes de BBH et de GH, vous pourrez voir votre emplacement sur la carte. La visibilité des expéditions n&apos;est pas encore prise en compte.
+            &lt;br /&gt;&lt;br /&gt;
+            Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur une des cases, ce qui fait se déplacer un point sur la carte.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">64,70</context>
@@ -4117,10 +4111,6 @@ Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der 
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
           <context context-type="linenumber">21</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
-          <context context-type="linenumber">26</context>
         </context-group>
         <target state="translated">
 <x id="INTERPOLATION" equiv-text="{{ extension_final_text }}"/>
@@ -4180,12 +4170,12 @@ Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der 
       </trans-unit>
       <trans-unit id="4519018646004234371" datatype="html" approved="yes">
         <source>&lt;ul&gt;
-&lt;li&gt;Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox ;&lt;/li&gt;
-&lt;li&gt;Rechercher l&apos;extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li&gt;
-&lt;li&gt;Installer l&apos;extension pour Chrome ;&lt;/li&gt;
-&lt;li&gt;Cliquer sur le <x id="PH" equiv-text="this.download_link"/> ;&lt;/li&gt;
-&lt;li&gt;Confirmer l&apos;installation dans la page qui se sera ouverte.&lt;/li&gt;
-&lt;/ul&gt;</source>
+                &lt;li&gt;Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox ;&lt;/li&gt;
+                &lt;li&gt;Rechercher l&apos;extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;&lt;/li&gt;
+                &lt;li&gt;Installer l&apos;extension pour Chrome ;&lt;/li&gt;
+                &lt;li&gt;Cliquer sur le <x id="PH" equiv-text="this.download_link"/> ;&lt;/li&gt;
+                &lt;li&gt;Confirmer l&apos;installation dans la page qui se sera ouverte.&lt;/li&gt;
+            &lt;/ul&gt;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">40,46</context>
@@ -4208,22 +4198,22 @@ Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der 
       </trans-unit>
       <trans-unit id="4825738638801021695" datatype="html" approved="yes">
         <source>&lt;ul&gt;
-&lt;li&gt;Télécharger l’application &quot;UserScripts&quot; ;&lt;/li&gt;
-&lt;li&gt;Aller dans &quot;Fichiers&quot; ;&lt;/li&gt;
-&lt;li&gt;Créer un dossier que l’on appellera &quot;UserScripts&quot; (ou autre mais c’est pour mieux s’y retrouver) ;&lt;/li&gt;
-&lt;li&gt;Ouvrir l’application &quot;UserScripts&quot; ;&lt;/li&gt;
-&lt;li&gt;Appuyer sur &quot;Set Userscripts Directory&quot; ;&lt;/li&gt;
-&lt;li&gt;Sélectionner le dossier précédemment créé et valider ;&lt;/li&gt;
-&lt;li&gt;Enregistrer le fichier disponible sur le <x id="PH" equiv-text="this.download_link"/> (ou via un appui long sur le lien, peut être);&lt;/li&gt;
-&lt;li&gt;Déplacer le fichier dans le dossier créé ;&lt;/li&gt;
-&lt;li&gt;Aller sur Safari ;&lt;/li&gt;
-&lt;li&gt;Appuyer sur le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt;
-&lt;li&gt;Cliquer sur &quot;Gérer les extensions&quot; ;&lt;/li&gt;
-&lt;li&gt;Activer &quot;Userscripts&quot; ;&lt;/li&gt;
-&lt;li&gt;Appuyer sur le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt;
-&lt;li&gt;Cliquer sur &quot;Userscripts&quot; ;&lt;/li&gt;
-&lt;li&gt;Vérifier que &quot;MyHordes Optimizer&quot; est bien activé.&lt;/li&gt;
-&lt;/ul&gt;</source>
+                &lt;li&gt;Télécharger l’application &quot;UserScripts&quot; ;&lt;/li&gt;
+                &lt;li&gt;Aller dans &quot;Fichiers&quot; ;&lt;/li&gt;
+                &lt;li&gt;Créer un dossier que l’on appellera &quot;UserScripts&quot; (ou autre mais c’est pour mieux s’y retrouver) ;&lt;/li&gt;
+                &lt;li&gt;Ouvrir l’application &quot;UserScripts&quot; ;&lt;/li&gt;
+                &lt;li&gt;Appuyer sur &quot;Set Userscripts Directory&quot; ;&lt;/li&gt;
+                &lt;li&gt;Sélectionner le dossier précédemment créé et valider ;&lt;/li&gt;
+                &lt;li&gt;Enregistrer le fichier disponible sur le <x id="PH" equiv-text="this.download_link"/> (ou via un appui long sur le lien, peut être);&lt;/li&gt;
+                &lt;li&gt;Déplacer le fichier dans le dossier créé ;&lt;/li&gt;
+                &lt;li&gt;Aller sur Safari ;&lt;/li&gt;
+                &lt;li&gt;Appuyer sur le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt;
+                &lt;li&gt;Cliquer sur &quot;Gérer les extensions&quot; ;&lt;/li&gt;
+                &lt;li&gt;Activer &quot;Userscripts&quot; ;&lt;/li&gt;
+                &lt;li&gt;Appuyer sur le &quot;Aa&quot; dans la barre de recherche ;&lt;/li&gt;
+                &lt;li&gt;Cliquer sur &quot;Userscripts&quot; ;&lt;/li&gt;
+                &lt;li&gt;Vérifier que &quot;MyHordes Optimizer&quot; est bien activé.&lt;/li&gt;
+            &lt;/ul&gt;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">49,65</context>
@@ -4292,7 +4282,7 @@ Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der 
       </trans-unit>
       <trans-unit id="317837542560103324" datatype="html" approved="yes">
         <source>Affiche la liste des objets de la banque et leur quantité.&lt;br /&gt;&lt;br /&gt;
-Si vous êtes incarnés, les objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.</source>
+                Si vous êtes incarnés, les objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
           <context context-type="linenumber">32,33</context>
@@ -4310,7 +4300,7 @@ Wenn du eingeloggt bist, folgt auf Gegenstände, die nicht auf der Einkaufsliste
       </trans-unit>
       <trans-unit id="8845542294305545291" datatype="html" approved="yes">
         <source>Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur sujet).&lt;br /&gt;&lt;br /&gt;
-Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.</source>
+                Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d&apos;un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
           <context context-type="linenumber">32,33</context>
@@ -4435,8 +4425,7 @@ Wenn du eingeloggt bist, wird hinter Gegenständen, die sich nicht auf der Einka
         <target state="final">Tag X</target>
       </trans-unit>
       <trans-unit id="8038317280482097296" datatype="html" approved="yes">
-        <source>Jour J + <x id="PH" equiv-text="i"/>
-                </source>
+        <source>Jour J + <x id="PH" equiv-text="i"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.ts</context>
           <context context-type="linenumber">57</context>
