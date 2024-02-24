@@ -457,8 +457,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         public void ImportWishlistCategorie()
         {
-            //var wishlistCategories = MyHordesCodeRepository.GetWishlistItemCategories();
-            //var existingCategories = Mapper.Map<List<WishlistCategorie>>(wishlistCategories);
+            var wishlistCategories = MyHordesCodeRepository.GetWishlistItemCategories();
+            var models = Mapper.Map<List<WishlistCategorie>>(wishlistCategories, opt => opt.SetDbContext(DbContext));
 
             //var itemsCategorie = new List<WishlistCategorie>();
             //foreach (var item in wishlistCategories)
@@ -473,8 +473,14 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             //    }
             //}
 
-            //MyHordesOptimizerRepository.PatchWishlistCategories(existingCategories);
+            //MyHordesOptimizerRepository.PatchWishlistCategories(models);
             //MyHordesOptimizerRepository.PatchWishlistItemCategories(itemsCategorie);
+
+            var wishListCategoriesFromDb = DbContext.WishlistCategories
+                .Include(wishListCategorie => wishListCategorie.IdItems)
+                .ToList();
+            var wishListCategoryComparer = EqualityComparerFactory.Create<WishlistCategorie>(wlc => wlc.IdCategory.GetHashCode(), (a, b) => a.IdCategory == b.IdCategory);
+            Patch(wishListCategoriesFromDb, models, wishListCategoryComparer);
         }
 
         public void ImportDefaultWishlists()

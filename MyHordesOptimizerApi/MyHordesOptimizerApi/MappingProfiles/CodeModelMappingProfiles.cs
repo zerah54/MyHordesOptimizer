@@ -68,15 +68,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.ActionEn, opt => opt.Ignore());
 
 
-            CreateMap<MyHordesOptimizerWishlistItemCategorie, WishlistCategorie>()
-                .ForMember(dest => dest.IdCategory, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.IdUserAuthor, opt => opt.Ignore())
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name["fr"]))
-                .ForMember(dest => dest.LabelFr, opt => opt.MapFrom(src => src.Name["fr"]))
-                .ForMember(dest => dest.LabelEs, opt => opt.MapFrom(src => src.Name["es"]))
-                .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Name["en"]))
-                .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Name["de"]));
-
             CreateMap<MyHordesCampingBonusModel, CampingBonusDto>()
                 .ForMember(dest => dest.Tomb, opt => opt.MapFrom(src => src.Tomb))
                 .ForMember(dest => dest.Pande, opt => opt.MapFrom(src => src.Pande))
