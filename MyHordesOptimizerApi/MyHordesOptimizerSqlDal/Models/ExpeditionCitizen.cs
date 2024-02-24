@@ -10,6 +10,7 @@ namespace MyHordesOptimizerApi.Models;
 [Index("IdExpeditionBag", Name = "idExpeditionBag")]
 [Index("IdExpeditionPart", Name = "idExpeditionPart")]
 [Index("IdUser", Name = "idUser")]
+[Index("PreinscritHeroic", Name = "preinscritHeroic")]
 public partial class ExpeditionCitizen
 {
     [Key]
@@ -33,7 +34,6 @@ public partial class ExpeditionCitizen
     public string? PreinscritJob { get; set; }
 
     [Column("preinscritHeroic")]
-    [StringLength(255)]
     public string? PreinscritHeroic { get; set; }
 
     [Column("pdc", TypeName = "int(11)")]
@@ -53,6 +53,10 @@ public partial class ExpeditionCitizen
     [ForeignKey("IdUser")]
     [InverseProperty("ExpeditionCitizens")]
     public virtual User? IdUserNavigation { get; set; }
+
+    [ForeignKey("PreinscritHeroic")]
+    [InverseProperty("ExpeditionCitizens")]
+    public virtual HeroSkill? PreinscritHeroicNavigation { get; set; }
 
     [ForeignKey("IdExpeditionCitizen")]
     [InverseProperty("IdExpeditionCitizens")]

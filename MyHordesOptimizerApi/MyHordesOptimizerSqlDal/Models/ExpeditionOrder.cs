@@ -20,11 +20,11 @@ public partial class ExpeditionOrder
     [Column("text")]
     public string? Text { get; set; }
 
-    [Column("isDone")]
-    public bool? IsDone { get; set; }
-
     [Column("position", TypeName = "int(11)")]
     public int Position { get; set; }
+
+    [Column("isDone")]
+    public bool? IsDone { get; set; }
 
     [ForeignKey("IdExpeditionOrder")]
     [InverseProperty("IdExpeditionOrders")]

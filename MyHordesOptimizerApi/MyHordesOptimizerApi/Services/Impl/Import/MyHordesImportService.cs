@@ -104,11 +104,11 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var toAdd = updatedEntities.Except(fromDbEntities, comparer);
             DbContext.AddRange(toAdd);
             var toUpdate = fromDbEntities.Intersect(updatedEntities, comparer);
-            foreach (var heroSkill in toUpdate)
+            foreach (var update in toUpdate)
             {
-                var updatedHeroSkill = updatedEntities.Where(entity => comparer.Equals(entity, heroSkill)).First();
-                heroSkill.UpdateAllButKeysProperties(updatedHeroSkill);
-                DbContext.Update(heroSkill);
+                var updatedHeroSkill = updatedEntities.Where(entity => comparer.Equals(entity, update)).First();
+                update.UpdateAllButKeysProperties(updatedHeroSkill);
+                DbContext.Update(update);
             }
             DbContext.SaveChanges();
         }
@@ -366,54 +366,45 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         #region Ruins
 
         public void ImportRuins()
-        {
-            var jsonApiResult = MyHordesApiRepository.GetRuins();
-            var jsonRuins = Mapper.Map<List<MyHordesOptimizerRuinDto>>(jsonApiResult);
+        {       
+            var ruinsFromMyHordes = MyHordesApiRepository.GetRuins();
+            var ruinModels = Mapper.Map<List<Ruin>>(ruinsFromMyHordes);
 
-            var codeResult = MyHordesCodeRepository.GetRuins();
+            var ruinsFromCode = MyHordesCodeRepository.GetRuins();
+            var ruins = Mapper.Map<List<Ruin>>(ruinsFromCode);
 
-            Logger.LogDebug($"codeResult {codeResult}");
-
-            var codeRuins = Mapper.Map<List<MyHordesOptimizerRuinDto>>(codeResult);
-
-            Logger.LogDebug($"codeRuins {codeResult}");
-
-            //var items = MyHordesOptimizerRepository.GetItems();
-
-            foreach (var ruin in jsonRuins)
+            foreach (var ruinModel in ruinModels)
             {
-                var miror = codeRuins.FirstOrDefault(x => x.Img == ruin.Img);
-                var codeRuin = codeResult.Values.FirstOrDefault(x => x.Icon == ruin.Img);
-                if (miror != null)
+                if (ruinsFromCode.TryGetValue(ruinModel.Img, out var ruinFromCode))
                 {
                     var totalWeight = 0;
-                    foreach (var drop in codeRuin.Drops)
+                    foreach (var drop in ruinFromCode.Drops)
                     {
                         totalWeight += Convert.ToInt32(drop.Value[0]);
-                        //var item = items.FirstOrDefault(x => x.Uid == drop.Key);
-                        miror.Drops.Add(new ItemResultDto()
+                        var item = DbContext.Items.Single(x => x.Uid == drop.Key);
+                        ruinModel.RuinItemDrops.Add(new RuinItemDrop()
                         {
-                            //Item = Mapper.Map<ItemDto>(item),
+                            IdItem = item.IdItem,
                             Weight = Convert.ToInt32(drop.Value[0])
                         });
                     }
-                    miror.Drops.ForEach(x => x.Probability = (double)x.Weight / totalWeight);
-                    ruin.HydrateMyHordesCodeValues(miror);
+                    ruinModel.RuinItemDrops.ToList().ForEach(x => x.Probability = (float?)x.Weight / totalWeight);
+                    ruinModel.Camping = ruinFromCode.Camping;
+                    ruinModel.Capacity = ruinFromCode.Capacity;
+                    ruinModel.Chance = ruinFromCode.Chance;
+                    ruinModel.MaxDist = ruinFromCode.MaxDist;
+                    ruinModel.MinDist = ruinFromCode.MinDist;
                 }
             }
 
-            // Enregistrer dans firebase
-            jsonRuins.Add(new MyHordesOptimizerRuinDto()
+            ruinModels.Add(new Ruin()
             {
-                Id = -1,
+                IdRuin = -1,
                 Camping = 15,
-                Label = new Dictionary<string, string>()
-                {
-                      { "fr", "Bâtiment non déterré" },
-                      { "en", "Buried building" },
-                      { "de", "Verschüttete Ruine" },
-                      { "es", "Sector inexplotable" }
-                },
+                LabelFr = "Bâtiment non déterré",
+                LabelEn = "Buried building",
+                LabelEs = "Sector inexplotable",
+                LabelDe = "Verschüttete Ruine",
                 Chance = 0,
                 Explorable = false,
                 Img = "burried",
@@ -421,7 +412,12 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 MaxDist = 1000,
                 Capacity = 0
             });
-            //MyHordesOptimizerRepository.PatchRuins(jsonRuins);
+
+            var ruinsFromDb = DbContext.Ruins
+                .Include(ruin => ruin.RuinItemDrops)
+                .ToList();
+            var ruinComparer = EqualityComparerFactory.Create<Ruin>(ruin => ruin.IdRuin.GetHashCode(), (a, b) => a.IdRuin == b.IdRuin);
+            Patch(ruinsFromDb, ruinModels, ruinComparer);
         }
 
         #endregion

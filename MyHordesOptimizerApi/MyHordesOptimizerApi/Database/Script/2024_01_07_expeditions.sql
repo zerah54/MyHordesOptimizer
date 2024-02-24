@@ -78,3 +78,11 @@ ALTER TABLE Bag
 ADD CONSTRAINT BagItem_fk_lastupdate
 FOREIGN KEY (idLastUpdateInfo) 
 REFERENCES LastUpdateInfo(idLastUpdateInfo);
+
+ALTER TABLE RuinItemDrop
+drop CONSTRAINT RuinItemDrop_ibfk_1;
+ALTER TABLE RuinItemDrop
+ADD CONSTRAINT RuinItemDrop_ibfk_1
+    FOREIGN KEY (Idruin)
+    REFERENCES Ruin(Idruin)
+    ON DELETE CASCADE;

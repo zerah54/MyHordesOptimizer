@@ -45,4 +45,7 @@ public partial class HeroSkill
 
     [Column("nbUses", TypeName = "int(11)")]
     public int? NbUses { get; set; }
+
+    [InverseProperty("PreinscritHeroicNavigation")]
+    public virtual ICollection<ExpeditionCitizen> ExpeditionCitizens { get; set; } = new List<ExpeditionCitizen>();
 }

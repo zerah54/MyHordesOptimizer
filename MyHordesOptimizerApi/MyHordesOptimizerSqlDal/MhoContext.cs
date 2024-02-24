@@ -223,7 +223,7 @@ public partial class MhoContext : DbContext
 
             entity.HasOne(d => d.IdExpeditionBagNavigation).WithMany(p => p.ExpeditionCitizens)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("ExpeditionCitizen_ibfk_3");
+                .HasConstraintName("ExpeditionCitizen_ibfk_4");
 
             entity.HasOne(d => d.IdExpeditionPartNavigation).WithMany(p => p.ExpeditionCitizens)
                 .OnDelete(DeleteBehavior.Restrict)
@@ -232,6 +232,10 @@ public partial class MhoContext : DbContext
             entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.ExpeditionCitizens)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("ExpeditionCitizen_ibfk_2");
+
+            entity.HasOne(d => d.PreinscritHeroicNavigation).WithMany(p => p.ExpeditionCitizens)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("ExpeditionCitizen_ibfk_3");
         });
 
         modelBuilder.Entity<ExpeditionOrder>(entity =>
@@ -674,9 +678,7 @@ public partial class MhoContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("RuinItemDrop_ibfk_2");
 
-            entity.HasOne(d => d.IdRuinNavigation).WithMany(p => p.RuinItemDrops)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("RuinItemDrop_ibfk_1");
+            entity.HasOne(d => d.IdRuinNavigation).WithMany(p => p.RuinItemDrops).HasConstraintName("RuinItemDrop_ibfk_1");
         });
 
         modelBuilder.Entity<Town>(entity =>
@@ -922,7 +924,7 @@ public partial class MhoContext : DbContext
 
             entity.Property(e => e.Count).HasDefaultValueSql("'NULL'");
             entity.Property(e => e.Depot).HasDefaultValueSql("'NULL'");
-            entity.Property(e => e.Priority).HasDefaultValueSql("'0'");
+            entity.Property(e => e.Priority).HasDefaultValueSql("'NULL'");
             entity.Property(e => e.ShouldSignal).HasDefaultValueSql("b'0'");
 
             entity.HasOne(d => d.IdItemNavigation).WithMany(p => p.TownWishListItems)

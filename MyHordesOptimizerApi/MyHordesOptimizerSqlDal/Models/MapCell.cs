@@ -10,7 +10,6 @@ namespace MyHordesOptimizerApi.Models;
 [Index("IdLastUpdateInfo", Name = "idLastUpdateInfo")]
 [Index("IdRuin", Name = "idRuin")]
 [Index("IdTown", "X", "Y", Name = "idTown", IsUnique = true)]
-[Index("IdTown", "X", "Y", Name = "idTown_2", IsUnique = true)]
 public partial class MapCell
 {
     [Key]

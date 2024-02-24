@@ -65,42 +65,11 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.Description, opt => { opt.MapFrom(src => src.Job.Desc.ToMhoDictionnary()); opt.Condition(src => src.Job != null); });
 
 
-            CreateMap<KeyValuePair<string, MyHordesApiRuinDto>, MyHordesOptimizerRuinDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Value.Id))
-                .ForMember(dest => dest.Label, opt => opt.MapFrom(src => src.Value.Name))
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Value.Desc))
-                .ForMember(dest => dest.Explorable, opt => opt.MapFrom(src => src.Value.Explorable))
-                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => GetNameIdFromImg(src.Value.Img)))
-                .ForMember(dest => dest.Camping, opt => opt.Ignore())
-                .ForMember(dest => dest.MinDist, opt => opt.Ignore())
-                .ForMember(dest => dest.MaxDist, opt => opt.Ignore())
-                .ForMember(dest => dest.Chance, opt => opt.Ignore())
-                .ForMember(dest => dest.Drops, opt => opt.Ignore());
-
-            CreateMap<KeyValuePair<string, MyHordesRuinCodeModel>, MyHordesOptimizerRuinDto>()
-                .ForMember(dest => dest.Camping, opt => opt.MapFrom(src => src.Value.Camping))
-                .ForMember(dest => dest.MinDist, opt => opt.MapFrom(src => src.Value.MinDist))
-                .ForMember(dest => dest.MaxDist, opt => opt.MapFrom(src => src.Value.MaxDist))
-                .ForMember(dest => dest.Chance, opt => opt.MapFrom(src => src.Value.Chance))
-                .ForMember(dest => dest.Capacity, opt => opt.MapFrom(src => src.Value.Capacity))
-                .ForMember(dest => dest.Drops, opt => opt.Ignore())
-                .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.Value.Icon))
-                .ForMember(dest => dest.Label, opt => opt.Ignore())
-                .ForMember(dest => dest.Description, opt => opt.Ignore())
-                .ForMember(dest => dest.Explorable, opt => opt.Ignore())
-                .ForMember(dest => dest.Id, opt => opt.Ignore());
-
             CreateMap<MyHordesZoneItem, UpdateObjectDto>()
                 .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.Broken))
                 .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id));
 
-        }
-
-        private object GetNameIdFromImg(string img)
-        {
-            var sub = img.Substring(img.IndexOf("/") + 1);
-            return sub.Split(".")[0];
         }
     }
 }

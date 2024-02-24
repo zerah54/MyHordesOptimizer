@@ -1,4 +1,5 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
+using MyHordesOptimizerApi.Models;
 using System;
 using System.Collections.Generic;
 
@@ -22,15 +23,15 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 
         #region CodeValues
 
-        public int Camping { get; set; }
+        public int? Camping { get; set; }
 
-        public int MinDist { get; set; }
+        public int? MinDist { get; set; }
 
-        public int MaxDist { get; set; }
+        public int? MaxDist { get; set; }
 
-        public int Chance { get; set; }
+        public int? Chance { get; set; }
         
-        public int Capacity { get; set; }
+        public int? Capacity { get; set; }
 
         public List<ItemResultDto> Drops { get; set; }
 
@@ -39,16 +40,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public MyHordesOptimizerRuinDto()
         {
             Drops = new List<ItemResultDto>();
-        }
-
-        internal void HydrateMyHordesCodeValues(MyHordesOptimizerRuinDto miror)
-        {
-            Camping = miror.Camping;
-            MinDist = miror.MinDist;
-            MaxDist = miror.MaxDist;
-            Chance = miror.Chance;
-            Drops = miror.Drops;
-            Capacity = miror.Capacity;
         }
     }
 }
