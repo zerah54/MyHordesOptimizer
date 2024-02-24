@@ -460,22 +460,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var wishlistCategories = MyHordesCodeRepository.GetWishlistItemCategories();
             var models = Mapper.Map<List<WishlistCategorie>>(wishlistCategories, opt => opt.SetDbContext(DbContext));
 
-            //var itemsCategorie = new List<WishlistCategorie>();
-            //foreach (var item in wishlistCategories)
-            //{
-            //    foreach (var item in item.Items)
-            //    {
-            //        itemsCategorie.Add(new WishlistCategorie()
-            //        {
-            //            IdCategory = item.Id,
-            //            IdItem = item
-            //        });
-            //    }
-            //}
-
-            //MyHordesOptimizerRepository.PatchWishlistCategories(models);
-            //MyHordesOptimizerRepository.PatchWishlistItemCategories(itemsCategorie);
-
             var wishListCategoriesFromDb = DbContext.WishlistCategories
                 .Include(wishListCategorie => wishListCategorie.IdItems)
                 .ToList();
@@ -485,7 +469,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         public void ImportDefaultWishlists()
         {
-            var wishlistCategories = MyHordesCodeRepository.GetWishlistItemCategories();
             var defaultWishlists = MyHordesCodeRepository.GetDefaultWishlists();
 
             var modeles = new List<DefaultWishlistItem>();
@@ -511,13 +494,15 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 }
                 foreach (var categorie in wishlist.Categories)
                 {
-                    var wishlistCategorie = wishlistCategories.Single(x => x.Id == categorie.CategorieId);
-                    foreach (var itemId in wishlistCategorie.Items)
+                    var wishlistCategorie = DbContext.WishlistCategories
+                        .Include(wlc => wlc.IdItems)
+                        .Single(x => x.IdCategory == categorie.CategorieId);
+                    foreach (var item in wishlistCategorie.IdItems)
                     {
                         modeles.Add(new DefaultWishlistItem()
                         {
                             IdDefaultWishlist = wishlist.Id,
-                            IdItem = itemId,
+                            IdItem = item.IdItem,
                             Name = wishlist.Name["fr"],
                             LabelFr = wishlist.Name["fr"],
                             LabelEn = wishlist.Name["en"],
@@ -530,8 +515,12 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     }
                 }
             }
-
-            //MyHordesOptimizerRepository.PatchDefaultWishlistItems(modeles);
+            var modelsFromDb = DbContext.DefaultWishlistItems
+                .ToList();
+            var defaultWishlistItemComparer = EqualityComparerFactory.Create<DefaultWishlistItem>(dwi => HashCode.Combine(dwi.IdDefaultWishlist, dwi.IdItem),
+                (a, b) => a.IdDefaultWishlist == b.IdDefaultWishlist 
+                && a.IdItem == b.IdItem);
+            Patch(modelsFromDb, modeles, defaultWishlistItemComparer);
         }
 
         #endregion
