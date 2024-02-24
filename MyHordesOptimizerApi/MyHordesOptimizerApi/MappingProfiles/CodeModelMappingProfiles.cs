@@ -52,10 +52,10 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.DescriptionEn, opt => opt.Ignore())
                 .ForMember(dest => dest.DescriptionEs, opt => opt.Ignore());
 
-            //CreateMap<MyHordesCleanUpTypeModel, CleanUpType>()
-            //    .ForMember(dest => dest.IdType, opt => opt.MapFrom(src => src.Id))
-            //    .ForMember(dest => dest.TypeName, opt => opt.MapFrom(src => src.Name))
-            //    .ForMember(dest => dest.MyHordesApiName, opt => opt.MapFrom(src => src.MyHordesApiName));
+            CreateMap<MyHordesCleanUpTypeModel, TownCadaverCleanUpType>()
+                .ForMember(dest => dest.IdType, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.TypeName, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.MyHordesApiName, opt => opt.MapFrom(src => src.MyHordesApiName));
 
             CreateMap<KeyValuePair<string, MyHordesRecipeCodeModel>, Recipe>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Key))

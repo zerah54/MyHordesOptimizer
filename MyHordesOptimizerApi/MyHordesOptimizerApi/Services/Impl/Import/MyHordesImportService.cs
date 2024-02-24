@@ -142,7 +142,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 causeOfDeath.DescriptionEs = spanishTrads[causeOfDeath.DescriptionDe];
             }
 
-            //MyHordesOptimizerRepository.PatchCauseOfDeath(causesOfDeaths);
+            var causeOfDeathsFromDb = DbContext.CauseOfDeaths.ToList();
+            var comparer = EqualityComparerFactory.Create<CauseOfDeath>(causeOfDeath => causeOfDeath.Dtype.GetHashCode(), (a, b) => a.Dtype == b.Dtype);
+            Patch(causeOfDeathsFromDb, causesOfDeaths, comparer);
         }
 
         #endregion
@@ -155,7 +157,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
             var cleanUpTypes = Mapper.Map<List<TownCadaverCleanUpType>>(codeResult);
 
-            //MyHordesOptimizerRepository.PatchCleanUpType(cleanUpTypes);
+            var cleanUpTypesFromDb = DbContext.TownCadaverCleanUpTypes.ToList();
+            var comparer = EqualityComparerFactory.Create<TownCadaverCleanUpType>(cleanUpType => cleanUpType.IdType.GetHashCode(), (a, b) => a.IdType == b.IdType);
+            Patch(cleanUpTypesFromDb, cleanUpTypes, comparer);
         }
 
         #endregion
