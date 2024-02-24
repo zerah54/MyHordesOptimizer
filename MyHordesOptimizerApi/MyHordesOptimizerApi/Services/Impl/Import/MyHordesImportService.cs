@@ -106,8 +106,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var toUpdate = fromDbEntities.Intersect(updatedEntities, comparer);
             foreach (var update in toUpdate)
             {
-                var updatedHeroSkill = updatedEntities.Where(entity => comparer.Equals(entity, update)).First();
-                update.UpdateAllButKeysProperties(updatedHeroSkill);
+                var updatedEntity = updatedEntities.Where(entity => comparer.Equals(entity, update)).First();
+                update.UpdateAllButKeysProperties(updatedEntity);
                 DbContext.Update(update);
             }
             DbContext.SaveChanges();

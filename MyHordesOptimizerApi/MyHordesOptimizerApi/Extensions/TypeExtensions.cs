@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using MyHordesOptimizerApi.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -17,7 +15,7 @@ namespace MyHordesOptimizerApi.Extensions
             foreach (var propertie in type.GetProperties())
             {
                 var attr = propertie.GetCustomAttributes().FirstOrDefault(attr => attr is ColumnAttribute) as ColumnAttribute;
-                if(attr != null)
+                if (attr != null)
                 {
                     dico.Add(attr.Name, x => propertie.GetValue(x));
                 }
@@ -48,11 +46,29 @@ namespace MyHordesOptimizerApi.Extensions
             {
                 var fromProp = typeof(T).GetProperty(toProp.Name);
                 var keyAttr = fromProp.GetCustomAttribute<KeyAttribute>();
-                if(keyAttr == null) // Si c'est pas une key, on maj la propertie
+                var inverseAttr = fromProp.GetCustomAttribute<InversePropertyAttribute>();
+                var isInversedPropKey = false;
+                if (inverseAttr != null)
+                {
+                    var foreignKeys = fromProp.GetCustomAttributes<ForeignKeyAttribute>();
+                    foreach(var foreignKey in foreignKeys)
+                    {
+                        var foreignKeyProp = typeof(T).GetProperty(foreignKey.Name);
+                        if(foreignKeyProp != null)
+                        {
+                            if (foreignKeyProp.GetCustomAttribute<KeyAttribute>() != null)
+                            {
+                                isInversedPropKey = true; break;
+                            }
+                        }                     
+                    }
+                  
+                }
+                if (keyAttr == null && !isInversedPropKey) // Si c'est pas une key ou si c'est une pas une propriété de navigation d'une foreignkey, on maj la propertie
                 {
                     var toValue = fromProp.GetValue(objectToCopy, null);
                     toProp.SetValue(objectToUpdate, toValue, null);
-                }             
+                }
             }
         }
     }
