@@ -943,7 +943,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="needs-translation">États</target>
+        <target state="translated">Status</target>
       </trans-unit>
       <trans-unit id="4739884131356753082" datatype="html">
         <source>Ajouter aux états</source>
@@ -979,7 +979,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-citizens/map-update-citizens.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Sac</target>
+        <target state="translated">Bag</target>
       </trans-unit>
       <trans-unit id="6019139638926667991" datatype="html">
         <source>Ajouter au sac</source>
@@ -1003,7 +1003,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Vider le sac</target>
+        <target state="translated">Empty your rucksack</target>
       </trans-unit>
       <trans-unit id="713605071826573828" datatype="html">
         <source>Actions héroïques</source>
@@ -1059,7 +1059,7 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation">Citoyens</target>
+        <target state="translated">Citizens</target>
       </trans-unit>
       <trans-unit id="8895761088455718364" datatype="html">
         <source>Fouilles</source>
@@ -1079,7 +1079,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Fouilles</target>
+        <target state="translated">Searches</target>
       </trans-unit>
       <trans-unit id="6351937635910938762" datatype="html">
         <source>Disponibilités</source>
@@ -1087,7 +1087,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Disponibilités</target>
+        <target state="translated">Availabilities</target>
       </trans-unit>
       <trans-unit id="5977326848564608050" datatype="html">
         <source>Expéditions</source>
