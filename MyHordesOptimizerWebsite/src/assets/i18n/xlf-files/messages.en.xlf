@@ -3802,7 +3802,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">Afficher les PA manquants pour réparer les chantiers</target>
+        <target state="translated">Show missing AP to repair sites</target>
       </trans-unit>
       <trans-unit id="3348452797437339338" datatype="html">
         <source>En pandémonium, les chantiers subissent des dégats lors de l&apos;attaque.
@@ -3964,7 +3964,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">MyHordes Optimizer</target>
+        <target state="translated">MyHordes Optimizer</target>
       </trans-unit>
       <trans-unit id="6242771464223017856" datatype="html">
         <source>
@@ -4062,7 +4062,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">En cochant l'option "Mettre à jour Fata Morgana", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de Fata Morgana se fera automatiquement.</target>
+        <target state="translated">By checking the "Update Fata Morgana" option, when you click the "Update external tools" button, Fata Morgana will be updated automatically.</target>
       </trans-unit>
       <trans-unit id="8653823422692107742" datatype="html">
         <source>Affichage des cartes issues des outils externes</source>
@@ -4116,7 +4116,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Installation du script</target>
+        <target state="translated">Script Installation</target>
       </trans-unit>
       <trans-unit id="7652739331763386041" datatype="html">
         <source>&lt;a color=&quot;accent&quot; href=&quot;https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js&quot; target=&quot;_blank&quot;&gt;lien de téléchargement du script&lt;/a&gt;</source>
@@ -4144,7 +4144,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Ordinateur</target>
+        <target state="translated">Computer</target>
       </trans-unit>
       <trans-unit id="3328878747241354904" datatype="html">
         <source>Il faut d&apos;abord installer l&apos;application de gestion des scripts de votre choix. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le <x id="PH" equiv-text="this.download_link"/>, qui lancera la procédure d&apos;installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.</source>
@@ -4160,7 +4160,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Android</target>
+        <target state="translated">Android</target>
       </trans-unit>
       <trans-unit id="4519018646004234371" datatype="html">
         <source>&lt;ul&gt;
@@ -4188,7 +4188,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="needs-translation">iOS</target>
+        <target state="translated">iOS</target>
       </trans-unit>
       <trans-unit id="4825738638801021695" datatype="html">
         <source>&lt;ul&gt;
@@ -4236,7 +4236,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Firefox</target>
+        <target state="translated">Firefox</target>
       </trans-unit>
       <trans-unit id="3369809985401596025" datatype="html">
         <source>Rendez-vous sur la <x id="PH" equiv-text="this.firefox_extension_link"/> pour l&apos;installer.</source>
@@ -4256,7 +4256,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">Chrome</target>
+        <target state="translated">Chrome</target>
       </trans-unit>
       <trans-unit id="5960214076877261704" datatype="html">
         <source>Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses fonctionnalités.</source>
@@ -4264,7 +4264,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="needs-translation">Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.</target>
+        <target state="translated">Once the script has been installed, you will need to refresh the game's page. You will see a new button at the top of your MyHordes page. On hover, a window is displayed, giving access to the script's options and some of its functionalities.</target>
       </trans-unit>
       <trans-unit id="5406368064653547314" datatype="html">
         <source>Une fois l&apos;extension installée, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses fonctionnalités.</source>
@@ -4272,7 +4272,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">79</context>
         </context-group>
-        <target state="needs-translation">Une fois l'extension installée, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s'affiche, donnant accès aux options du script ainsi qu'à certaines de ses fonctionnalités.</target>
+        <target state="translated">Once the extension has been installed, you will have to refresh the game page. You will see a new button at the top of your MyHordes page. On hover, a window is displayed, giving access to the script's options and some of its functionalities.</target>
       </trans-unit>
       <trans-unit id="317837542560103324" datatype="html">
         <source>Affiche la liste des objets de la banque et leur quantité.&lt;br /&gt;&lt;br /&gt;
@@ -4308,7 +4308,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Affiche la liste de toutes les recettes de l'application.</target>
+        <target state="translated">Shows a list of all the recipes in the app.</target>
       </trans-unit>
       <trans-unit id="1998145900290430095" datatype="html">
         <source>Présente tout simplement la liste des pouvoirs héros, leur description et le nombre de jours avant obtention.</source>
@@ -4356,7 +4356,7 @@
           <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Pouvoir</target>
+        <target state="translated">Power</target>
       </trans-unit>
       <trans-unit id="7031255060364978694" datatype="html">
         <source>Jours héros nécessaires</source>
@@ -4364,7 +4364,7 @@
           <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="needs-translation">Jours héros nécessaires</target>
+        <target state="translated">Required hero days</target>
       </trans-unit>
       <trans-unit id="4902817035128594900" datatype="html">
         <source>Description</source>
@@ -4376,7 +4376,7 @@
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation">Description</target>
+        <target state="translated">Description</target>
       </trans-unit>
       <trans-unit id="1571726687849162861" datatype="html">
         <source>Calculateur de morts par désespoir</source>
@@ -4392,7 +4392,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Zombies sur la case</target>
+        <target state="translated">Zombies in the square</target>
       </trans-unit>
       <trans-unit id="8743554684450521804" datatype="html">
         <source>Zombies morts dans la nuit</source>
@@ -4408,7 +4408,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">Zombies tués</target>
+        <target state="translated">Zombies Killed</target>
       </trans-unit>
       <trans-unit id="35950385564752964" datatype="html">
         <source>Jour J</source>
@@ -4416,7 +4416,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Jour J</target>
+        <target state="translated">D-Day</target>
       </trans-unit>
       <trans-unit id="8038317280482097296" datatype="html">
         <source>Jour J + <x id="PH" equiv-text="i"/></source>
@@ -4448,7 +4448,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/max-active-calculator/max-active-calculator.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Nombre de citoyens en ville</target>
+        <target state="translated">Number of citizens in town</target>
       </trans-unit>
       <trans-unit id="4189949534181490308" datatype="html">
         <source>Débordement maximum</source>
@@ -4460,7 +4460,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">Débordement maximum</target>
+        <target state="translated">Maximum overflow</target>
       </trans-unit>
       <trans-unit id="6606510916077285969" datatype="html">
         <source>Morts par désespoir</source>
@@ -4516,7 +4516,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Débordement</target>
+        <target state="translated">Overflow</target>
       </trans-unit>
       <trans-unit id="5213071458731006944" datatype="html">
         <source>Ancien débordement maximum</source>
@@ -4532,7 +4532,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="needs-translation">Manuel des ermites</target>
+        <target state="translated">Survival book</target>
       </trans-unit>
       <trans-unit id="7450812290161126696" datatype="html">
         <source>Chances de réussite du manuel</source>
@@ -4556,7 +4556,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">108</context>
         </context-group>
-        <target state="needs-translation">Points d'âme</target>
+        <target state="translated">Soul points</target>
       </trans-unit>
       <trans-unit id="4045290552180803882" datatype="html">
         <source>Jours validés</source>
@@ -4576,7 +4576,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
-        <target state="needs-translation">Points d'âmes gagnés</target>
+        <target state="translated">Soul points earned</target>
       </trans-unit>
       <trans-unit id="4453660283289554845" datatype="html">
         <source>Points clean</source>
@@ -4584,7 +4584,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Points clean</target>
+        <target state="translated">Clean points</target>
       </trans-unit>
       <trans-unit id="3460935719519128493" datatype="html">
         <source>Points clean gagnés</source>
@@ -4592,7 +4592,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="needs-translation">Points clean gagnés</target>
+        <target state="translated">Clean points earned</target>
       </trans-unit>
       <trans-unit id="3435963616715084719" datatype="html">
         <source>Action de citoyen</source>
@@ -4600,7 +4600,7 @@
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Action de citoyen</target>
+        <target state="translated">Citizen action</target>
       </trans-unit>
       <trans-unit id="6743161373003242548" datatype="html">
         <source>Atelier</source>
@@ -4608,7 +4608,7 @@
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Atelier</target>
+        <target state="translated">Workshop</target>
       </trans-unit>
       <trans-unit id="7788061501151326787" datatype="html">
         <source>Atelier, Chaman uniquement</source>
@@ -4616,7 +4616,7 @@
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">Atelier, Chaman uniquement</target>
+        <target state="translated">Workshop, Shaman only</target>
       </trans-unit>
       <trans-unit id="8924763758161915362" datatype="html">
         <source>Type de recette</source>
@@ -4624,7 +4624,7 @@
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Type de recette</target>
+        <target state="translated">Type of recipe</target>
       </trans-unit>
       <trans-unit id="227324654937703789" datatype="html">
         <source>Composants</source>
@@ -4640,7 +4640,7 @@
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">Nom du bâtiment</target>
+        <target state="translated">Ruin name</target>
       </trans-unit>
       <trans-unit id="7533053521139949104" datatype="html" approved="yes">
         <source>Distance minimum</source>
