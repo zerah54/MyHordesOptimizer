@@ -1241,7 +1241,7 @@
         </context-group>
         <target state="final">Add Citizen</target>
       </trans-unit>
-      <trans-unit id="3420757244733292611" datatype="html">
+      <trans-unit id="3420757244733292611" datatype="html" approved="yes">
         <source>Fouilles réussies</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-digs/map-update-digs.component.html</context>
@@ -1251,9 +1251,9 @@
           <context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context>
           <context context-type="linenumber">52</context>
         </context-group>
-        <target state="translated">Successful excavations</target>
+        <target state="final">Successful excavations</target>
       </trans-unit>
-      <trans-unit id="818238533540258128" datatype="html">
+      <trans-unit id="818238533540258128" datatype="html" approved="yes">
         <source>Fouilles totales</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-digs/map-update-digs.component.html</context>
@@ -1263,7 +1263,7 @@
           <context context-type="sourcefile">src/app/shared/elements/dig/dig.component.html</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="translated">Total excavations</target>
+        <target state="final">Total excavations</target>
       </trans-unit>
       <trans-unit id="3182705520281939075" datatype="html" approved="yes">
         <source>Bonus en camping</source>
@@ -2485,13 +2485,13 @@
         </context-group>
         <target state="final">This field is required</target>
       </trans-unit>
-      <trans-unit id="2974950606230121476" datatype="html">
+      <trans-unit id="2974950606230121476" datatype="html" approved="yes">
         <source>Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> et <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="translated">Developed by <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> and <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
+        <target state="final">Developed by <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> and <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
       </trans-unit>
       <trans-unit id="3400027835914346369" datatype="html" approved="yes">
         <source>Discord</source>
@@ -3281,13 +3281,13 @@
         </context-group>
         <target state="final">Result</target>
       </trans-unit>
-      <trans-unit id="3441654073279757119" datatype="html">
+      <trans-unit id="3441654073279757119" datatype="html" approved="yes">
         <source>Chances de survie : </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">196</context>
         </context-group>
-        <target state="translated">Survival Chances:</target>
+        <target state="final">Survival Chances: </target>
       </trans-unit>
       <trans-unit id="6003110979058162782" datatype="html" approved="yes">
         <source>Petite carte</source>
@@ -3329,13 +3329,13 @@
         </context-group>
         <target state="needs-translation">Il faut en soustraire 3 après chaque attaque</target>
       </trans-unit>
-      <trans-unit id="4379616016375089599" datatype="html">
+      <trans-unit id="4379616016375089599" datatype="html" approved="yes">
         <source>Bonus : </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
           <context context-type="linenumber">68</context>
         </context-group>
-        <target state="translated">Bonus : </target>
+        <target state="final">Bonus: </target>
       </trans-unit>
       <trans-unit id="61672744151027488" datatype="html" approved="yes">
         <source>Le lien a bien été copié</source>
@@ -3557,13 +3557,13 @@
         </context-group>
         <target state="needs-translation">&lt;a color="accent" href="https://discord.com/api/oauth2/authorize?client_id=1140035117746765914&amp;permissions=277025459200&amp;scope=bot" target="_blank"&gt;lien d'installation du bot&lt;/a&gt;</target>
       </trans-unit>
-      <trans-unit id="5339734629980782531" datatype="html">
+      <trans-unit id="5339734629980782531" datatype="html" approved="yes">
         <source>Vous devez être propriétaire ou avoir les droits d&apos;administration sur le serveur Discord sur lequel vous voulez inviter le Bot.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/discord-bot/tuto-discord-bot-installation/tuto-discord-bot-installation.component.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="translated">You must own or have admin rights on the Discord server you want to invite the bot to.</target>
+        <target state="final">You must own or have admin rights on the Discord server you want to invite the bot to.</target>
       </trans-unit>
       <trans-unit id="5124083784940231527" datatype="html">
         <source>En cliquant sur le <x id="PH" equiv-text="this.download_link"/>, vous serez redirigé vers une page d&apos;installation.</source>
@@ -3645,29 +3645,29 @@
         <target state="needs-translation">Dans l'interface, vous pouvez cocher l'option "Me notifier si je suis inactif depuis 5 minutes sur la page", ce qui activera la fonctionnalité.
                 Une fois activée, si vous êtes dans le désert et que votre attente d'escorte n'est pas activée, ou si vous n'avez pas relâché votre escorte, alors au bout de 5 minutes sans actios sur la page une notification de navigateur vous avertira.</target>
       </trans-unit>
-      <trans-unit id="2315492892193612031" datatype="html">
+      <trans-unit id="2315492892193612031" datatype="html" approved="yes">
         <source>Notification à la fin de la fouille</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">Notification at the end of the search</target>
+        <target state="final">Notification at the end of the search</target>
       </trans-unit>
-      <trans-unit id="7818305627564977561" datatype="html">
+      <trans-unit id="7818305627564977561" datatype="html" approved="yes">
         <source>Si vous cochez l&apos;option &quot;Me notifier à la fin de la fouille&quot;, vous recevrez une notification de votre navigateur quelques secondes avant la fin de votre fouille à condition que votre navigateur soit toujours ouvert sur la page du désert.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="translated">If you check the "Notify me at the end of the search", you will receive a notification from your browser a few seconds before the end of your search, provided that your browser is still open on the desert page.</target>
+        <target state="final">If you check the "Notify me at the end of the search", you will receive a notification from your browser a few seconds before the end of your search, provided that your browser is still open on the desert page.</target>
       </trans-unit>
-      <trans-unit id="276294021269970234" datatype="html">
+      <trans-unit id="276294021269970234" datatype="html" approved="yes">
         <source>Notification de nouveau message</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="translated">New message notification</target>
+        <target state="final">New message notification</target>
       </trans-unit>
       <trans-unit id="5382715354383267703" datatype="html">
         <source>Si vous cochez l&apos;option &quot;MMe notifier si je reçois un nouveau message&quot;, vous recevrez une notification de votre navigateur lors d&apos;un changement dans votre compteur de messages reçus.</source>
@@ -3677,13 +3677,13 @@
         </context-group>
         <target state="needs-translation">Si vous cochez l'option "MMe notifier si je reçois un nouveau message", vous recevrez une notification de votre navigateur lors d'un changement dans votre compteur de messages reçus.</target>
       </trans-unit>
-      <trans-unit id="7620507202018349855" datatype="html">
+      <trans-unit id="7620507202018349855" datatype="html" approved="yes">
         <source>Affichage des tooltips détaillés</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">Show detailed tooltips</target>
+        <target state="final">Show detailed tooltips</target>
       </trans-unit>
       <trans-unit id="5795663998729072574" datatype="html">
         <source>Modifie les tooltips natifs de l&apos;application pour afficher en plus la liste des recettes dans lesquelles l&apos;objet survolé apparait ainsi que quelques informations complémentaires (nombre de points d&apos;action rendus par un aliment par exemple).</source>
@@ -3711,13 +3711,13 @@
         <target state="needs-translation">Dans l'interface, vous pouvez cocher le bouton "Navigation rapide vers le chantier recommandé", ce qui activera la fonctionnalité de navigation rapide.
                 Il s'agit simplement, lorsqu'il existe un chantier recommandé, de pouvoir cliquer dessus pour être automatiquement redirigé vers la ligne du chantier dans la liste.</target>
       </trans-unit>
-      <trans-unit id="766908157360687970" datatype="html">
+      <trans-unit id="766908157360687970" datatype="html" approved="yes">
         <source>Champs de recherches supplémentaires</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="translated">Additional search fields</target>
+        <target state="final">Additional search fields</target>
       </trans-unit>
       <trans-unit id="2719168518138811288" datatype="html">
         <source>En cochant cette option, vous pourrez choisir des champs de recherches à afficher dans votre interface. Sont actuellement disponibles : un champ de recherche sur la liste des chantiers, un champ de recherche dans les destinataires d&apos;un message dans sa maison, un champ de recherche sur les entrées du registre.</source>
@@ -3757,13 +3757,13 @@
         Dans le désert, les objets dans le sac ou au sol également présents dans la liste de course se verront attribuer une bordure dont la couleur indique la priorité de l'élément.
         </target>
       </trans-unit>
-      <trans-unit id="4423220166056863975" datatype="html">
+      <trans-unit id="4423220166056863975" datatype="html" approved="yes">
         <source>Affichage du nombre de zombies tués sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="translated">Display the number of zombies killed on the square</target>
+        <target state="final">Display the number of zombies killed on the square</target>
       </trans-unit>
       <trans-unit id="7274539193871812426" datatype="html">
         <source>En cochant cette option, un nouvel encart apparaitra sous la carte dans l&apos;Outre-Monde.
@@ -3795,13 +3795,13 @@
                 Vous pourrez désormais sélectionner une langue d'origine, puis saisir le texte à rechercher dans les autres langues.
                 Le texte doit impérativement être un texte de MyHordes, puisque nous allons en chercher la traduction dans les fichiers de traduction du jeu.</target>
       </trans-unit>
-      <trans-unit id="1297848596101851474" datatype="html">
+      <trans-unit id="1297848596101851474" datatype="html" approved="yes">
         <source>Afficher les PA manquants pour réparer les chantiers</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-display/tuto-script-display.component.ts</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="translated">Show missing AP to repair sites</target>
+        <target state="final">Show missing AP to repair sites</target>
       </trans-unit>
       <trans-unit id="3348452797437339338" datatype="html">
         <source>En pandémonium, les chantiers subissent des dégats lors de l&apos;attaque.
@@ -3935,7 +3935,7 @@
         <target state="needs-translation">En cochant cette option, deux autres options représentant les options d'escorte dans l'Outre-Monde seront disponibles.
                 Vous pourrez ainsi choisir quelles options vous voulez voir cochées ou non par défaut quand vous activez votre escorte.</target>
       </trans-unit>
-      <trans-unit id="8248895111587460156" datatype="html">
+      <trans-unit id="8248895111587460156" datatype="html" approved="yes">
         <source>Outils externes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
@@ -3945,7 +3945,7 @@
           <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="translated">External tools</target>
+        <target state="final">External tools</target>
       </trans-unit>
       <trans-unit id="2917108141392126070" datatype="html">
         <source>Une des fonctionnalités du script est de permettre la mise à jour de plusieurs outils externes en un seul clic depuis le site de MyHordes. Pour ce faire, il faut activer les options associées dans la liste des options de MyHordes Optimizer.
@@ -3957,13 +3957,13 @@
         <target state="needs-translation">Une des fonctionnalités du script est de permettre la mise à jour de plusieurs outils externes en un seul clic depuis le site de MyHordes. Pour ce faire, il faut activer les options associées dans la liste des options de MyHordes Optimizer.
     Si vous avez l'un des outils en question ouvert dans votre navigateur, alors la prochaine fois que vous naviguerez vers son onglet celui-ci sera automatiquement rafraîchi.</target>
       </trans-unit>
-      <trans-unit id="9052701380908438701" datatype="html">
+      <trans-unit id="9052701380908438701" datatype="html" approved="yes">
         <source>MyHordes Optimizer</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="translated">MyHordes Optimizer</target>
+        <target state="final">MyHordes Optimizer</target>
       </trans-unit>
       <trans-unit id="6242771464223017856" datatype="html">
         <source>
@@ -3997,13 +3997,13 @@
             &lt;/ul&gt;
         </target>
       </trans-unit>
-      <trans-unit id="762928771016494268" datatype="html">
+      <trans-unit id="762928771016494268" datatype="html" approved="yes">
         <source>Gest&apos;Hordes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="translated">Gest'Hordes</target>
+        <target state="final">Gest'Hordes</target>
       </trans-unit>
       <trans-unit id="4415272569817655484" datatype="html">
         <source>En cochant l&apos;option &quot;Mettre à jour Gest&apos;Hordes&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils externes&quot;, la mise à jour de Gest&apos;Hordes se fera automatiquement.
@@ -4031,13 +4031,13 @@
             &lt;/ul&gt;
         </target>
       </trans-unit>
-      <trans-unit id="4957168085124746094" datatype="html">
+      <trans-unit id="4957168085124746094" datatype="html" approved="yes">
         <source>BigBroth&apos;Hordes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="translated">BigBroth'Hordes</target>
+        <target state="final">BigBroth'Hordes</target>
       </trans-unit>
       <trans-unit id="6260241287022545999" datatype="html">
         <source>En cochant l&apos;option &quot;Mettre à jour BigBroth&apos;Hordes&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils externes&quot;, la mise à jour de BigBroth&apos;Hordes se fera automatiquement.</source>
@@ -4047,21 +4047,21 @@
         </context-group>
         <target state="needs-translation">En cochant l'option "Mettre à jour BigBroth'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de BigBroth'Hordes se fera automatiquement.</target>
       </trans-unit>
-      <trans-unit id="7465509859706491373" datatype="html">
+      <trans-unit id="7465509859706491373" datatype="html" approved="yes">
         <source>Fata Morgana</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="translated">Fata Morgana</target>
+        <target state="final">Fata Morgana</target>
       </trans-unit>
-      <trans-unit id="4368997949772733392" datatype="html">
+      <trans-unit id="4368997949772733392" datatype="html" approved="yes">
         <source>En cochant l&apos;option &quot;Mettre à jour Fata Morgana&quot;, quand vous cliquerez sur le bouton &quot;Mettre à jour les outils externes&quot;, la mise à jour de Fata Morgana se fera automatiquement.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-external-tools/tuto-script-external-tools.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="translated">By checking the "Update Fata Morgana" option, when you click the "Update external tools" button, Fata Morgana will be updated automatically.</target>
+        <target state="final">By checking the "Update Fata Morgana" option, when you click the "Update external tools" button, Fata Morgana will be updated automatically.</target>
       </trans-unit>
       <trans-unit id="8653823422692107742" datatype="html">
         <source>Affichage des cartes issues des outils externes</source>
@@ -4109,13 +4109,13 @@
         </context-group>
         <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{ extension_final_text }}"/></target>
       </trans-unit>
-      <trans-unit id="7228219696199470616" datatype="html">
+      <trans-unit id="7228219696199470616" datatype="html" approved="yes">
         <source>Installation du script</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="translated">Script Installation</target>
+        <target state="final">Script Installation</target>
       </trans-unit>
       <trans-unit id="7652739331763386041" datatype="html">
         <source>&lt;a color=&quot;accent&quot; href=&quot;https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js&quot; target=&quot;_blank&quot;&gt;lien de téléchargement du script&lt;/a&gt;</source>
@@ -4137,13 +4137,13 @@
         </context-group>
         <target state="needs-translation">&lt;a color="accent" href="<x id="PH" equiv-text="this.firefox_link_href"/>" target="_blank"&gt;page de l'extension&lt;/a&gt;</target>
       </trans-unit>
-      <trans-unit id="3896108995934638823" datatype="html">
+      <trans-unit id="3896108995934638823" datatype="html" approved="yes">
         <source>Ordinateur</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="translated">Computer</target>
+        <target state="final">Computer</target>
       </trans-unit>
       <trans-unit id="3328878747241354904" datatype="html">
         <source>Il faut d&apos;abord installer l&apos;application de gestion des scripts de votre choix. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le <x id="PH" equiv-text="this.download_link"/>, qui lancera la procédure d&apos;installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.</source>
@@ -4153,13 +4153,13 @@
         </context-group>
         <target state="needs-translation">Il faut d'abord installer l'application de gestion des scripts de votre choix. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le <x id="PH" equiv-text="this.download_link"/>, qui lancera la procédure d'installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.</target>
       </trans-unit>
-      <trans-unit id="4743341466695708276" datatype="html">
+      <trans-unit id="4743341466695708276" datatype="html" approved="yes">
         <source>Android</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="translated">Android</target>
+        <target state="final">Android</target>
       </trans-unit>
       <trans-unit id="4519018646004234371" datatype="html">
         <source>&lt;ul&gt;
@@ -4181,13 +4181,13 @@
                 &lt;li&gt;Confirmer l'installation dans la page qui se sera ouverte.&lt;/li&gt;
             &lt;/ul&gt;</target>
       </trans-unit>
-      <trans-unit id="6674940684074453217" datatype="html">
+      <trans-unit id="6674940684074453217" datatype="html" approved="yes">
         <source>iOS</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">49</context>
         </context-group>
-        <target state="translated">iOS</target>
+        <target state="final">iOS</target>
       </trans-unit>
       <trans-unit id="4825738638801021695" datatype="html">
         <source>&lt;ul&gt;
@@ -4229,13 +4229,13 @@
                 &lt;li&gt;Vérifier que "MyHordes Optimizer" est bien activé.&lt;/li&gt;
             &lt;/ul&gt;</target>
       </trans-unit>
-      <trans-unit id="6543376695619197030" datatype="html">
+      <trans-unit id="6543376695619197030" datatype="html" approved="yes">
         <source>Firefox</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="translated">Firefox</target>
+        <target state="final">Firefox</target>
       </trans-unit>
       <trans-unit id="3369809985401596025" datatype="html">
         <source>Rendez-vous sur la <x id="PH" equiv-text="this.firefox_extension_link"/> pour l&apos;installer.</source>
@@ -4249,29 +4249,29 @@
         </context-group>
         <target state="needs-translation">Rendez-vous sur la <x id="PH" equiv-text="this.firefox_extension_link"/> pour l'installer.</target>
       </trans-unit>
-      <trans-unit id="4645690492252065749" datatype="html">
+      <trans-unit id="4645690492252065749" datatype="html" approved="yes">
         <source>Chrome</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="translated">Chrome</target>
+        <target state="final">Chrome</target>
       </trans-unit>
-      <trans-unit id="5960214076877261704" datatype="html">
+      <trans-unit id="5960214076877261704" datatype="html" approved="yes">
         <source>Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses fonctionnalités.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="translated">Once the script has been installed, you will need to refresh the game's page. You will see a new button at the top of your MyHordes page. On hover, a window is displayed, giving access to the script's options and some of its functionalities.</target>
+        <target state="final">Once the script has been installed, you will need to refresh the game's page. You will see a new button at the top of your MyHordes page. On hover, a window is displayed, giving access to the script's options and some of its functionalities.</target>
       </trans-unit>
-      <trans-unit id="5406368064653547314" datatype="html">
+      <trans-unit id="5406368064653547314" datatype="html" approved="yes">
         <source>Une fois l&apos;extension installée, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses fonctionnalités.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">79</context>
         </context-group>
-        <target state="translated">Once the extension has been installed, you will have to refresh the game page. You will see a new button at the top of your MyHordes page. On hover, a window is displayed, giving access to the script's options and some of its functionalities.</target>
+        <target state="final">Once the extension has been installed, you will have to refresh the game page. You will see a new button at the top of your MyHordes page. On hover, a window is displayed, giving access to the script's options and some of its functionalities.</target>
       </trans-unit>
       <trans-unit id="317837542560103324" datatype="html">
         <source>Affiche la liste des objets de la banque et leur quantité.&lt;br /&gt;&lt;br /&gt;
@@ -4301,13 +4301,13 @@
         <target state="needs-translation">Affiche la liste de tous les objets existant dans MyHordes (ainsi que des informations complémentaires à leur sujet).&lt;br /&gt;&lt;br /&gt;
                 Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont suivis d'un bouton présentant un caddie. Un clic sur ce bouton les ajoute à la liste de courses.</target>
       </trans-unit>
-      <trans-unit id="6739215722471437099" datatype="html">
+      <trans-unit id="6739215722471437099" datatype="html" approved="yes">
         <source>Affiche la liste de toutes les recettes de l&apos;application.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-wiki/tuto-script-wiki.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="translated">Shows a list of all the recipes in the app.</target>
+        <target state="final">Shows a list of all the recipes in the app.</target>
       </trans-unit>
       <trans-unit id="1998145900290430095" datatype="html">
         <source>Présente tout simplement la liste des pouvoirs héros, leur description et le nombre de jours avant obtention.</source>
@@ -4349,23 +4349,23 @@
         </context-group>
         <target state="needs-translation">L'identifiant externe pour les applications se trouve sur le site de MyHordes, dans la page de votre âme, onglet "Avancé". Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.</target>
       </trans-unit>
-      <trans-unit id="814524093468498547" datatype="html">
+      <trans-unit id="814524093468498547" datatype="html" approved="yes">
         <source>Pouvoir</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="translated">Power</target>
+        <target state="final">Power</target>
       </trans-unit>
-      <trans-unit id="7031255060364978694" datatype="html">
+      <trans-unit id="7031255060364978694" datatype="html" approved="yes">
         <source>Jours héros nécessaires</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="translated">Required hero days</target>
+        <target state="final">Required hero days</target>
       </trans-unit>
-      <trans-unit id="4902817035128594900" datatype="html">
+      <trans-unit id="4902817035128594900" datatype="html" approved="yes">
         <source>Description</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/hero-skills/hero-skills.component.ts</context>
@@ -4375,7 +4375,7 @@
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="translated">Description</target>
+        <target state="final">Description</target>
       </trans-unit>
       <trans-unit id="1571726687849162861" datatype="html">
         <source>Calculateur de morts par désespoir</source>
@@ -4385,13 +4385,13 @@
         </context-group>
         <target state="needs-translation">Calculateur de morts par désespoir</target>
       </trans-unit>
-      <trans-unit id="6332610342442382860" datatype="html">
+      <trans-unit id="6332610342442382860" datatype="html" approved="yes">
         <source>Zombies sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="translated">Zombies in the square</target>
+        <target state="final">Zombies in the square</target>
       </trans-unit>
       <trans-unit id="8743554684450521804" datatype="html">
         <source>Zombies morts dans la nuit</source>
@@ -4401,13 +4401,13 @@
         </context-group>
         <target state="needs-translation">Zombies morts dans la nuit</target>
       </trans-unit>
-      <trans-unit id="1703925095210020999" datatype="html">
+      <trans-unit id="1703925095210020999" datatype="html" approved="yes">
         <source>Zombies tués</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="translated">Zombies Killed</target>
+        <target state="final">Zombies killed</target>
       </trans-unit>
       <trans-unit id="35950385564752964" datatype="html">
         <source>Jour J</source>
@@ -4441,15 +4441,15 @@
         </context-group>
         <target state="needs-translation">Le débordement dépend du jour et du nombre de citoyens en vie. Il dépend peut être également du nombre de citoyens présents en ville.</target>
       </trans-unit>
-      <trans-unit id="5757378082117611724" datatype="html">
+      <trans-unit id="5757378082117611724" datatype="html" approved="yes">
         <source>Nombre de citoyens en ville</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/max-active-calculator/max-active-calculator.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="translated">Number of citizens in town</target>
+        <target state="final">Number of citizens in town</target>
       </trans-unit>
-      <trans-unit id="4189949534181490308" datatype="html">
+      <trans-unit id="4189949534181490308" datatype="html" approved="yes">
         <source>Débordement maximum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/max-active-calculator/max-active-calculator.component.ts</context>
@@ -4459,15 +4459,15 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="translated">Maximum overflow</target>
+        <target state="final">Maximum overflow</target>
       </trans-unit>
-      <trans-unit id="6606510916077285969" datatype="html">
+      <trans-unit id="6606510916077285969" datatype="html" approved="yes">
         <source>Morts par désespoir</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="translated">Deaths by despair</target>
+        <target state="final">Deaths by despair</target>
       </trans-unit>
       <trans-unit id="5956852334684853126" datatype="html">
         <source>Zombies morts sur la case depuis la dernière attaque</source>
@@ -4509,13 +4509,13 @@
         </context-group>
         <target state="needs-translation">Maximum théorique</target>
       </trans-unit>
-      <trans-unit id="5670260346776362636" datatype="html">
+      <trans-unit id="5670260346776362636" datatype="html" approved="yes">
         <source>Débordement</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="translated">Overflow</target>
+        <target state="final">Overflow</target>
       </trans-unit>
       <trans-unit id="5213071458731006944" datatype="html">
         <source>Ancien débordement maximum</source>
@@ -4525,13 +4525,13 @@
         </context-group>
         <target state="needs-translation">Ancien débordement maximum</target>
       </trans-unit>
-      <trans-unit id="8181758232132799956" datatype="html">
+      <trans-unit id="8181758232132799956" datatype="html" approved="yes">
         <source>Manuel des ermites</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">92</context>
         </context-group>
-        <target state="translated">Survival book</target>
+        <target state="final">Survival book</target>
       </trans-unit>
       <trans-unit id="7450812290161126696" datatype="html">
         <source>Chances de réussite du manuel</source>
@@ -4549,13 +4549,13 @@
         </context-group>
         <target state="needs-translation">Chances de réussite du manuel en ville dévastée</target>
       </trans-unit>
-      <trans-unit id="1275317502767727996" datatype="html">
+      <trans-unit id="1275317502767727996" datatype="html" approved="yes">
         <source>Points d&apos;âme</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">108</context>
         </context-group>
-        <target state="translated">Soul points</target>
+        <target state="final">Soul points</target>
       </trans-unit>
       <trans-unit id="4045290552180803882" datatype="html">
         <source>Jours validés</source>
@@ -4569,61 +4569,61 @@
         </context-group>
         <target state="needs-translation">Jours validés</target>
       </trans-unit>
-      <trans-unit id="19231624547333208" datatype="html">
+      <trans-unit id="19231624547333208" datatype="html" approved="yes">
         <source>Points d&apos;âmes gagnés</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">112</context>
         </context-group>
-        <target state="translated">Soul points earned</target>
+        <target state="final">Soul points earned</target>
       </trans-unit>
-      <trans-unit id="4453660283289554845" datatype="html">
+      <trans-unit id="4453660283289554845" datatype="html" approved="yes">
         <source>Points clean</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="translated">Clean points</target>
+        <target state="final">Clean points</target>
       </trans-unit>
-      <trans-unit id="3460935719519128493" datatype="html">
+      <trans-unit id="3460935719519128493" datatype="html" approved="yes">
         <source>Points clean gagnés</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">126</context>
         </context-group>
-        <target state="translated">Clean points earned</target>
+        <target state="final">Clean points earned</target>
       </trans-unit>
-      <trans-unit id="3435963616715084719" datatype="html">
+      <trans-unit id="3435963616715084719" datatype="html" approved="yes">
         <source>Action de citoyen</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="translated">Citizen action</target>
+        <target state="final">Citizen action</target>
       </trans-unit>
-      <trans-unit id="6743161373003242548" datatype="html">
+      <trans-unit id="6743161373003242548" datatype="html" approved="yes">
         <source>Atelier</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="translated">Workshop</target>
+        <target state="final">Workshop</target>
       </trans-unit>
-      <trans-unit id="7788061501151326787" datatype="html">
+      <trans-unit id="7788061501151326787" datatype="html" approved="yes">
         <source>Atelier, Chaman uniquement</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.html</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="translated">Workshop, Shaman only</target>
+        <target state="final">Workshop, Shaman only</target>
       </trans-unit>
-      <trans-unit id="8924763758161915362" datatype="html">
+      <trans-unit id="8924763758161915362" datatype="html" approved="yes">
         <source>Type de recette</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="translated">Type of recipe</target>
+        <target state="final">Type of recipe</target>
       </trans-unit>
       <trans-unit id="227324654937703789" datatype="html">
         <source>Composants</source>
@@ -4633,13 +4633,13 @@
         </context-group>
         <target state="needs-translation">Composants</target>
       </trans-unit>
-      <trans-unit id="4280305830543989718" datatype="html">
+      <trans-unit id="4280305830543989718" datatype="html" approved="yes">
         <source>Nom du bâtiment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="translated">Ruin name</target>
+        <target state="final">Ruin name</target>
       </trans-unit>
       <trans-unit id="7533053521139949104" datatype="html" approved="yes">
         <source>Distance minimum</source>
