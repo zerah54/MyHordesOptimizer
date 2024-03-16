@@ -170,13 +170,13 @@
         </context-group>
         <target state="final">Kitchen</target>
       </trans-unit>
-      <trans-unit id="1463247293350394462" datatype="html">
+      <trans-unit id="1463247293350394462" datatype="html" approved="yes">
         <source>Cave-laboratoire</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/home.enum.ts</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="translated">Laboratory</target>
+        <target state="final">Laboratory</target>
       </trans-unit>
       <trans-unit id="6477064715313307165" datatype="html" approved="yes">
         <source>Coin sieste</source>
@@ -202,13 +202,13 @@
         </context-group>
         <target state="final">Fence</target>
       </trans-unit>
-      <trans-unit id="8263357425236059440" datatype="html">
+      <trans-unit id="8263357425236059440" datatype="html" approved="yes">
         <source>Habitant</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/job.enum.ts</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="translated">Resident</target>
+        <target state="final">Resident</target>
       </trans-unit>
       <trans-unit id="8999093564615496242" datatype="html" approved="yes">
         <source>Fouineur</source>
@@ -274,13 +274,13 @@
         </context-group>
         <target state="needs-translation">Sécurise le coffre dans lequel il se trouve</target>
       </trans-unit>
-      <trans-unit id="8327474089390088254" datatype="html">
+      <trans-unit id="8327474089390088254" datatype="html" approved="yes">
         <source>Peut être trouvé empoisonné</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="translated">Can be found poisoned</target>
+        <target state="final">Can be found poisoned</target>
       </trans-unit>
       <trans-unit id="3010819442113072629" datatype="html">
         <source>Empêche d&apos;être terrorisé à cause d&apos;un objet</source>
@@ -290,13 +290,13 @@
         </context-group>
         <target state="needs-translation">Empêche d'être terrorisé à cause d'un objet</target>
       </trans-unit>
-      <trans-unit id="4473485791956023608" datatype="html">
+      <trans-unit id="4473485791956023608" datatype="html" approved="yes">
         <source>Trouvaille améliorée</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">38</context>
         </context-group>
-        <target state="translated">Lucky find</target>
+        <target state="final">Lucky find</target>
       </trans-unit>
       <trans-unit id="5692845604197038843" datatype="html">
         <source>Perdu en cas de bannissement</source>
@@ -354,21 +354,21 @@
         </context-group>
         <target state="needs-translation">Compte dans le calcul du bonus de veille donné par la tourelle lance-eau</target>
       </trans-unit>
-      <trans-unit id="4813554456449727568" datatype="html">
+      <trans-unit id="4813554456449727568" datatype="html" approved="yes">
         <source>Peut être empoisonné</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="translated">Can be poisoned</target>
+        <target state="final">Can be poisoned</target>
       </trans-unit>
-      <trans-unit id="7070606596322847118" datatype="html">
+      <trans-unit id="7070606596322847118" datatype="html" approved="yes">
         <source>Peut être cuisiné</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">56</context>
         </context-group>
-        <target state="translated">Can be cooked</target>
+        <target state="final">Can be cooked</target>
       </trans-unit>
       <trans-unit id="1327764723186928694" datatype="html">
         <source>Provisions</source>
@@ -565,13 +565,13 @@
         </context-group>
         <target state="needs-translation">Enclos</target>
       </trans-unit>
-      <trans-unit id="4324278734280268890" datatype="html">
+      <trans-unit id="4324278734280268890" datatype="html" approved="yes">
         <source>Non défini</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-depot.enum.ts</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="translated">Undefined</target>
+        <target state="final">Undefined</target>
       </trans-unit>
       <trans-unit id="5382458688695417420" datatype="html" approved="yes">
         <source>Banque</source>
@@ -873,7 +873,7 @@
         </context-group>
         <target state="needs-translation">Aucun objet ne correspond au filtre "<x id="INTERPOLATION" equiv-text="{{ filterInput.nativeElement.value }}"/>"</target>
       </trans-unit>
-      <trans-unit id="8265078634979801865" datatype="html">
+      <trans-unit id="8265078634979801865" datatype="html" approved="yes">
         <source>La liste est vide</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-digs/citizens-digs.component.html</context>
@@ -895,7 +895,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">182</context>
         </context-group>
-        <target state="translated">List is empty</target>
+        <target state="final">List is empty</target>
       </trans-unit>
       <trans-unit id="8297073205000664921" datatype="html" approved="yes">
         <source>Citoyen</source>
@@ -933,7 +933,7 @@
         </context-group>
         <target state="needs-translation">Disponibilités du jour</target>
       </trans-unit>
-      <trans-unit id="7945783910888141498" datatype="html">
+      <trans-unit id="7945783910888141498" datatype="html" approved="yes">
         <source>États</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
@@ -943,7 +943,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="translated">Status</target>
+        <target state="final">Status</target>
       </trans-unit>
       <trans-unit id="4739884131356753082" datatype="html">
         <source>Ajouter aux états</source>
@@ -1005,15 +1005,15 @@
         </context-group>
         <target state="translated">Empty your rucksack</target>
       </trans-unit>
-      <trans-unit id="713605071826573828" datatype="html">
+      <trans-unit id="713605071826573828" datatype="html" approved="yes">
         <source>Actions héroïques</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="translated">Heroic actions</target>
+        <target state="final">Heroic actions</target>
       </trans-unit>
-      <trans-unit id="165011294537677821" datatype="html">
+      <trans-unit id="165011294537677821" datatype="html" approved="yes">
         <source>Améliorations</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.ts</context>
@@ -1023,9 +1023,9 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="translated">Upgrades</target>
+        <target state="final">Upgrades</target>
       </trans-unit>
-      <trans-unit id="6373263061828099513" datatype="html">
+      <trans-unit id="6373263061828099513" datatype="html" approved="yes">
         <source>Citoyens</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens.component.html</context>
@@ -1059,9 +1059,9 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="translated">Citizens</target>
+        <target state="final">Citizens</target>
       </trans-unit>
-      <trans-unit id="8895761088455718364" datatype="html">
+      <trans-unit id="8895761088455718364" datatype="html" approved="yes">
         <source>Fouilles</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens.component.ts</context>
@@ -1079,17 +1079,17 @@
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="translated">Searches</target>
+        <target state="final">Searches</target>
       </trans-unit>
-      <trans-unit id="6351937635910938762" datatype="html">
+      <trans-unit id="6351937635910938762" datatype="html" approved="yes">
         <source>Disponibilités</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens.component.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="translated">Availabilities</target>
+        <target state="final">Availabilities</target>
       </trans-unit>
-      <trans-unit id="5977326848564608050" datatype="html">
+      <trans-unit id="5977326848564608050" datatype="html" approved="yes">
         <source>Expéditions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
@@ -1103,41 +1103,41 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="translated">Expeditions</target>
+        <target state="final">Expeditions</target>
       </trans-unit>
-      <trans-unit id="2986159287834234807" datatype="html">
+      <trans-unit id="2986159287834234807" datatype="html" approved="yes">
         <source>N</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/compass-rose/compass-rose.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="translated">N</target>
+        <target state="final">N</target>
       </trans-unit>
-      <trans-unit id="2566834560864089198" datatype="html">
+      <trans-unit id="2566834560864089198" datatype="html" approved="yes">
         <source>E</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/compass-rose/compass-rose.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="translated">E</target>
+        <target state="final">E</target>
       </trans-unit>
-      <trans-unit id="3457078116249609297" datatype="html">
+      <trans-unit id="3457078116249609297" datatype="html" approved="yes">
         <source>O</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/compass-rose/compass-rose.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="translated">W</target>
+        <target state="final">W</target>
       </trans-unit>
-      <trans-unit id="3251116876185403930" datatype="html">
+      <trans-unit id="3251116876185403930" datatype="html" approved="yes">
         <source>S</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/compass-rose/compass-rose.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
-        <target state="translated">S</target>
+        <target state="final">S</target>
       </trans-unit>
-      <trans-unit id="5407759070423985131" datatype="html">
+      <trans-unit id="5407759070423985131" datatype="html" approved="yes">
         <source>Ville</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-cell-details/map-cell-details.component.html</context>
@@ -1147,9 +1147,9 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context>
           <context context-type="linenumber">6</context>
         </context-group>
-        <target state="translated">Town</target>
+        <target state="final">Town</target>
       </trans-unit>
-      <trans-unit id="3012908712486845984" datatype="html">
+      <trans-unit id="3012908712486845984" datatype="html" approved="yes">
         <source>Désert</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-cell-details/map-cell-details.component.html</context>
@@ -1159,9 +1159,9 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="translated">Desert</target>
+        <target state="final">Desert</target>
       </trans-unit>
-      <trans-unit id="3020302862287038294" datatype="html">
+      <trans-unit id="3020302862287038294" datatype="html" approved="yes">
         <source>points</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-cell-details/map-cell-details.component.html</context>
@@ -1171,23 +1171,23 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="translated">points</target>
+        <target state="final">points</target>
       </trans-unit>
-      <trans-unit id="5420612892699041713" datatype="html">
+      <trans-unit id="5420612892699041713" datatype="html" approved="yes">
         <source>Zone épuisée</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="translated">Depleted zone</target>
+        <target state="final">Depleted zone</target>
       </trans-unit>
-      <trans-unit id="6781966251152970619" datatype="html">
+      <trans-unit id="6781966251152970619" datatype="html" approved="yes">
         <source>Liste des objets</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="translated">Items list</target>
+        <target state="final">Items list</target>
       </trans-unit>
       <trans-unit id="4289069287229748145" datatype="html">
         <source>Liste des objets en sacs</source>
@@ -1221,13 +1221,13 @@
         </context-group>
         <target state="final">Delete Item</target>
       </trans-unit>
-      <trans-unit id="5210423582442777517" datatype="html">
+      <trans-unit id="5210423582442777517" datatype="html" approved="yes">
         <source>Retirer tous les objets</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-cell/map-update-cell.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="translated">Remove all item</target>
+        <target state="final">Remove all item</target>
       </trans-unit>
       <trans-unit id="1434854699604569130" datatype="html" approved="yes">
         <source>Ajouter un citoyen</source>
@@ -1265,7 +1265,7 @@
         </context-group>
         <target state="translated">Total excavations</target>
       </trans-unit>
-      <trans-unit id="3182705520281939075" datatype="html">
+      <trans-unit id="3182705520281939075" datatype="html" approved="yes">
         <source>Bonus en camping</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
@@ -1279,15 +1279,15 @@
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="translated">Camping bonus</target>
+        <target state="final">Camping bonus</target>
       </trans-unit>
-      <trans-unit id="2698599537427262917" datatype="html">
+      <trans-unit id="2698599537427262917" datatype="html" approved="yes">
         <source>Bâtiment vide</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update-ruin/map-update-ruin.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">Empty ruin</target>
+        <target state="final">Empty ruin</target>
       </trans-unit>
       <trans-unit id="7969447827855107408" datatype="html">
         <source>Plans inhabituels sortis</source>
@@ -1329,7 +1329,7 @@
         </context-group>
         <target state="needs-translation">Cellule</target>
       </trans-unit>
-      <trans-unit id="4574043683605876869" datatype="html">
+      <trans-unit id="4574043683605876869" datatype="html" approved="yes">
         <source>Bâtiment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context>
@@ -1339,15 +1339,15 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">119</context>
         </context-group>
-        <target state="translated">Ruin</target>
+        <target state="final">Ruin</target>
       </trans-unit>
-      <trans-unit id="8104421162933956065" datatype="html">
+      <trans-unit id="8104421162933956065" datatype="html" approved="yes">
         <source>Notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context>
           <context context-type="linenumber">39</context>
         </context-group>
-        <target state="translated">Notes</target>
+        <target state="final">Notes</target>
       </trans-unit>
       <trans-unit id="6487452749579257385" datatype="html">
         <source>Carte des fouilles</source>
@@ -1381,21 +1381,21 @@
         </context-group>
         <target state="needs-translation">Type de carte</target>
       </trans-unit>
-      <trans-unit id="3425367071066107827" datatype="html">
+      <trans-unit id="3425367071066107827" datatype="html" approved="yes">
         <source>Danger</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="translated">Danger</target>
+        <target state="final">Danger</target>
       </trans-unit>
-      <trans-unit id="1639488378691279565" datatype="html">
+      <trans-unit id="1639488378691279565" datatype="html" approved="yes">
         <source>Décharge</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="translated">Dump</target>
+        <target state="final">Dump</target>
       </trans-unit>
       <trans-unit id="5557109916159305360" datatype="html">
         <source>Fouilles restantes</source>
@@ -1405,13 +1405,13 @@
         </context-group>
         <target state="needs-translation">Fouilles restantes</target>
       </trans-unit>
-      <trans-unit id="4174451733672669864" datatype="html">
+      <trans-unit id="4174451733672669864" datatype="html" approved="yes">
         <source>Maximum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">32</context>
         </context-group>
-        <target state="translated">Maximum</target>
+        <target state="final">Maximum</target>
       </trans-unit>
       <trans-unit id="392591506297072679" datatype="html">
         <source>Mode d&apos;affichage</source>
@@ -1421,13 +1421,13 @@
         </context-group>
         <target state="needs-translation">Mode d'affichage</target>
       </trans-unit>
-      <trans-unit id="267923422419323222" datatype="html">
+      <trans-unit id="267923422419323222" datatype="html" approved="yes">
         <source>Nombre d&apos;objets</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="translated">Number Of Items</target>
+        <target state="final">Number of items</target>
       </trans-unit>
       <trans-unit id="8364958810283495875" datatype="html">
         <source>Défense apportée</source>
@@ -1461,13 +1461,13 @@
         </context-group>
         <target state="needs-translation">Ajouter une zone</target>
       </trans-unit>
-      <trans-unit id="1779552786277618671" datatype="html">
+      <trans-unit id="1779552786277618671" datatype="html" approved="yes">
         <source>Distance</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="translated">Distance</target>
+        <target state="final">Distance</target>
       </trans-unit>
       <trans-unit id="4998616682175982835" datatype="html" approved="yes">
         <source>Unité</source>
@@ -1525,7 +1525,7 @@
         </context-group>
         <target state="needs-translation">Aller simple</target>
       </trans-unit>
-      <trans-unit id="2881179225572512277" datatype="html">
+      <trans-unit id="2881179225572512277" datatype="html" approved="yes">
         <source>Ma ville</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/my-town.routes.ts</context>
@@ -1591,9 +1591,9 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="translated">My town</target>
+        <target state="final">My town</target>
       </trans-unit>
-      <trans-unit id="268108544779646824" datatype="html">
+      <trans-unit id="268108544779646824" datatype="html" approved="yes">
         <source>Veilles</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/my-town.routes.ts</context>
@@ -1607,9 +1607,9 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">76</context>
         </context-group>
-        <target state="translated">Watches</target>
+        <target state="final">Watches</target>
       </trans-unit>
-      <trans-unit id="5909537349952143751" datatype="html">
+      <trans-unit id="5909537349952143751" datatype="html" approved="yes">
         <source>Statistiques</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/my-town.routes.ts</context>
@@ -1635,7 +1635,7 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="translated">Stats</target>
+        <target state="final">Stats</target>
       </trans-unit>
       <trans-unit id="8100821574049291929" datatype="html">
         <source>Liste de courses</source>
