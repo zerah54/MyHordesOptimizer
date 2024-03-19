@@ -66,6 +66,8 @@ export class CampingComponent implements OnInit {
     public readonly help_amelio: string = $localize`Il faut en soustraire 3 après chaque attaque`;
     // eslint-disable-next-line no-irregular-whitespace
     public readonly bonus_string: string = $localize`Bonus : `;
+    // eslint-disable-next-line no-irregular-whitespace
+    public readonly capacity_string: string = $localize`Capacité : `;
 
     public readonly jobs: JobEnum[] = JobEnum.getAllValues();
     public readonly JOB_SCOUT: JobEnum = JobEnum.SCOUT;
@@ -180,7 +182,7 @@ export class CampingComponent implements OnInit {
 
             let capacity_html: string = '';
             if (ruin.id !== -1000) {
-                capacity_html = `<small i18n>Capacité&nbsp;:&nbsp;${capacity}</small>&nbsp;/&nbsp;`;
+                capacity_html = `<small>${this.capacity_string}&nbsp;:&nbsp;${capacity}</small>&nbsp;/&nbsp;`;
             }
 
             const bonus: string = formatNumber(this.display_bonus_ap ? (ruin.camping / 5) : (ruin.camping), this.locale, '1.0-2') + (this.display_bonus_ap ? '' : '%');

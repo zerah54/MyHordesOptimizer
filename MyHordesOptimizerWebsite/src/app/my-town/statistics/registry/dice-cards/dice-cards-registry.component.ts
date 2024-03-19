@@ -19,6 +19,7 @@ export class DiceCardsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input({ required: true }) completeCitizenList!: CitizenInfo;
+    @Input({ required: true }) displayPseudo!: 'simple' | 'id_mh';
 
     @Input({ required: true }) set registry(registry: Entry[] | undefined) {
         if (registry) {

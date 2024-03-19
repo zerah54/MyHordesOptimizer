@@ -94,6 +94,10 @@ export class Citizen extends CommonModel<CitizenDTO> {
         };
     }
 
+    public getTag(): string {
+        return `@${this.name}:${this.id}`;
+    }
+
     protected dtoToModel(dto?: CitizenDTO): void {
         if (dto) {
             this.avatar = dto.avatar;

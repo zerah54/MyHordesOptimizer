@@ -2,6 +2,7 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -24,7 +25,7 @@ import { WellRegistryComponent } from './well/well-registry.component';
     styleUrls: ['./registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatFormFieldModule, MatInputModule, FormsModule, CommonModule, MatButtonModule, MatTooltipModule, NgOptimizedImage, DiceCardsRegistryComponent, DigsRegistryComponent, BankDiffRegistryComponent, WellRegistryComponent, DoorsRegistryComponent]
+    imports: [MatFormFieldModule, MatInputModule, FormsModule, CommonModule, MatButtonModule, MatTooltipModule, NgOptimizedImage, DiceCardsRegistryComponent, DigsRegistryComponent, BankDiffRegistryComponent, WellRegistryComponent, DoorsRegistryComponent, MatButtonToggleModule]
 })
 export class RegistryComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -37,6 +38,7 @@ export class RegistryComponent implements OnInit {
 
     public complete_citizen_list!: CitizenInfo;
     public complete_items_list!: Item[];
+    public display_pseudo: 'simple' | 'id_mh' = 'simple';
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */

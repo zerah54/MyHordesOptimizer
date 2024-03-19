@@ -1,50 +1,66 @@
 @use 'variables';
 
 .mho-registry {
-    display: flex;
-    flex-wrap: wrap;
     height: 100%;
 
-    .registry-paste {
-        margin-top: 1em;
-        min-width: 400px;
-        max-width: 500px;
-        height: calc(100% - 1em);
-        font-size: 12px;
+    .display-pseudo-mode {
+        text-align: right;
+    }
 
-        .mat-mdc-form-field-flex {
+    .form {
+        display: flex;
+        flex-wrap: wrap;
+        height: calc(100% - var(--mat-standard-button-toggle-height));
+
+        .form-content {
+            min-width: 400px;
+            max-width: 500px;
             height: 100%;
 
-            .mat-mdc-form-field-infix {
-                height: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
 
-                textarea {
+            .registry-paste {
+                font-size: 12px;
+                height: 100%;
+                width: calc(100% - 50px);
+
+                .mat-mdc-form-field-flex {
                     height: 100%;
-                    resize: none;
+
+                    .mat-mdc-form-field-infix {
+                        height: 100%;
+
+                        textarea {
+                            height: 100%;
+                            resize: none;
+                        }
+                    }
+                }
+            }
+
+            .actions {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                width: 50px;
+
+                .mat-mdc-icon-button {
+                    --mdc-icon-button-icon-size: 16;
+
+                    &.active {
+                        background-color: variables.$item_color;
+                    }
                 }
             }
         }
-    }
 
-    .actions {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        width: 50px;
-
-        .mat-mdc-icon-button {
-            --mdc-icon-button-icon-size: 16;
-
-            &.active {
-                background-color: variables.$item_color;
-            }
+        .result {
+            flex: 1;
+            height: 100%;
+            overflow: auto;
+            min-width: 400px;
         }
-    }
-
-    .result {
-        flex: 1;
-        height: 100%;
-        overflow: auto;
-        min-width: 400px;
     }
 }

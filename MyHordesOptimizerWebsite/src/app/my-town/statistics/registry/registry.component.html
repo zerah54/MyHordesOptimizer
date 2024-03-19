@@ -1,66 +1,76 @@
 <div class="mho-registry">
-    <mat-form-field appearance="outline" class="registry-paste no-bottom">
-        <mat-label i18n>Coller le contenu du registre à analyser</mat-label>
-        <textarea matInput [(ngModel)]="registry" (ngModelChange)="readLogs(this.display_mode)"></textarea>
-    </mat-form-field>
-    @if (registry && registry !== '') {
-        <div class="actions">
-            <div class="start">
-                <button mat-icon-button [class.active]="display_mode === 'plays'" (click)="readLogs('plays')"
-                        matTooltip="Dés / Cartes" matTooltipPosition="before" i18n-matTooltip>
-                    <img [ngSrc]="HORDES_IMG_REPO + 'item/item_game_box.gif'" width="16" height="16"
-                         [disableOptimizedSrcset]="true">
-                </button>
-                <button [class.active]="display_mode === 'bank_diff'" mat-icon-button (click)="readLogs('bank_diff')"
-                        matTooltip="Différenciel de la banque" matTooltipPosition="before" i18n-matTooltip>
-                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/home.gif'" width="16" height="16" [disableOptimizedSrcset]="true">
-                </button>
-                <button [class.active]="display_mode === 'well'" mat-icon-button (click)="readLogs('well')"
-                        matTooltip="Prises dans le puits" matTooltipPosition="before" i18n-matTooltip>
-                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_well.gif'" width="16" height="16"
-                         [disableOptimizedSrcset]="true">
-                </button>
-                <button [class.active]="display_mode === 'digs'" mat-icon-button (click)="readLogs('digs')"
-                        matTooltip="Fouilles" matTooltipPosition="before" i18n-matTooltip>
-                    <img [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" width="16" height="16"
-                         [disableOptimizedSrcset]="true">
-                </button>
-                <button [class.active]="display_mode === 'doors'" mat-icon-button (click)="readLogs('doors')"
-                        matTooltip="Entrées / Sorties" matTooltipPosition="before" i18n-matTooltip>
-                    <img [ngSrc]="HORDES_IMG_REPO + 'log/door_open.gif'" width="16" height="16" [disableOptimizedSrcset]="true">
-                </button>
-            </div>
-            <div class="end">
-                <button mat-icon-button (click)="registry = undefined; registry_entries = undefined; display_mode = undefined"
-                        matTooltip="Vider le champ" matTooltipPosition="before" i18n-matTooltip>
-                    <img [ngSrc]="HORDES_IMG_REPO + 'emotes/trash.gif'" width="16" height="16">
-                </button>
-            </div>
+    <div class="display-pseudo-mode">
+        <mat-button-toggle-group [(ngModel)]="display_pseudo" name="fontStyle" aria-label="Font Style">
+            <mat-button-toggle value="simple">Pseudo</mat-button-toggle>
+            <mat-button-toggle value="mh_id">Identifiant MyHordes</mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
+    <div class="form">
+        <div class="form-content">
+            <mat-form-field appearance="outline" class="registry-paste no-bottom">
+                <mat-label i18n>Coller le contenu du registre à analyser</mat-label>
+                <textarea matInput [(ngModel)]="registry" (ngModelChange)="readLogs(this.display_mode)"></textarea>
+            </mat-form-field>
+            @if (registry && registry !== '') {
+                <div class="actions">
+                    <div class="start">
+                        <button mat-icon-button [class.active]="display_mode === 'plays'" (click)="readLogs('plays')"
+                                matTooltip="Dés / Cartes" matTooltipPosition="before" i18n-matTooltip>
+                            <img [ngSrc]="HORDES_IMG_REPO + 'item/item_game_box.gif'" width="16" height="16"
+                                 [disableOptimizedSrcset]="true">
+                        </button>
+                        <button [class.active]="display_mode === 'bank_diff'" mat-icon-button (click)="readLogs('bank_diff')"
+                                matTooltip="Différenciel de la banque" matTooltipPosition="before" i18n-matTooltip>
+                            <img [ngSrc]="HORDES_IMG_REPO + 'icons/home.gif'" width="16" height="16" [disableOptimizedSrcset]="true">
+                        </button>
+                        <button [class.active]="display_mode === 'well'" mat-icon-button (click)="readLogs('well')"
+                                matTooltip="Prises dans le puits" matTooltipPosition="before" i18n-matTooltip>
+                            <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_well.gif'" width="16" height="16"
+                                 [disableOptimizedSrcset]="true">
+                        </button>
+                        <button [class.active]="display_mode === 'digs'" mat-icon-button (click)="readLogs('digs')"
+                                matTooltip="Fouilles" matTooltipPosition="before" i18n-matTooltip>
+                            <img [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" width="16" height="16"
+                                 [disableOptimizedSrcset]="true">
+                        </button>
+                        <button [class.active]="display_mode === 'doors'" mat-icon-button (click)="readLogs('doors')"
+                                matTooltip="Entrées / Sorties" matTooltipPosition="before" i18n-matTooltip>
+                            <img [ngSrc]="HORDES_IMG_REPO + 'log/door_open.gif'" width="16" height="16" [disableOptimizedSrcset]="true">
+                        </button>
+                    </div>
+                    <div class="end">
+                        <button mat-icon-button (click)="registry = undefined; registry_entries = undefined; display_mode = undefined"
+                                matTooltip="Vider le champ" matTooltipPosition="before" i18n-matTooltip>
+                            <img [ngSrc]="HORDES_IMG_REPO + 'emotes/trash.gif'" width="16" height="16">
+                        </button>
+                    </div>
+                </div>
+            }
         </div>
-    }
-    <div class="result">
-        @switch (display_mode) {
-            @case ('plays') {
-                <mho-registry-dice-cards [completeCitizenList]="complete_citizen_list"
-                                         [registry]="registry_entries"></mho-registry-dice-cards>
+        <div class="result">
+            @switch (display_mode) {
+                @case ('plays') {
+                    <mho-registry-dice-cards [completeCitizenList]="complete_citizen_list"
+                                             [registry]="registry_entries" [displayPseudo]="display_pseudo"></mho-registry-dice-cards>
+                }
+                @case ('digs') {
+                    <mho-registry-digs [completeCitizenList]="complete_citizen_list"
+                                       [registry]="registry_entries" [displayPseudo]="display_pseudo"></mho-registry-digs>
+                }
+                @case ('bank_diff') {
+                    <mho-registry-bank-diff [completeCitizenList]="complete_citizen_list"
+                                            [completeItemsList]="complete_items_list"
+                                            [registry]="registry_entries" [displayPseudo]="display_pseudo"></mho-registry-bank-diff>
+                }
+                @case ('well') {
+                    <mho-registry-well [completeCitizenList]="complete_citizen_list"
+                                       [registry]="registry_entries" [displayPseudo]="display_pseudo"></mho-registry-well>
+                }
+                @case ('doors') {
+                    <mho-registry-doors [completeCitizenList]="complete_citizen_list"
+                                        [registry]="registry_entries" [displayPseudo]="display_pseudo"></mho-registry-doors>
+                }
             }
-            @case ('digs') {
-                <mho-registry-digs [completeCitizenList]="complete_citizen_list"
-                                   [registry]="registry_entries"></mho-registry-digs>
-            }
-            @case ('bank_diff') {
-                <mho-registry-bank-diff [completeCitizenList]="complete_citizen_list"
-                                        [completeItemsList]="complete_items_list"
-                                        [registry]="registry_entries"></mho-registry-bank-diff>
-            }
-            @case ('well') {
-                <mho-registry-well [completeCitizenList]="complete_citizen_list"
-                                   [registry]="registry_entries"></mho-registry-well>
-            }
-            @case ('doors') {
-                <mho-registry-doors [completeCitizenList]="complete_citizen_list"
-                                    [registry]="registry_entries"></mho-registry-doors>
-            }
-        }
+        </div>
     </div>
 </div>

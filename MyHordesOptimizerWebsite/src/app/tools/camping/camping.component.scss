@@ -53,22 +53,7 @@
             .or {
                 text-align: center;
                 margin-bottom: 1em;
-
-                .mat-button-toggle-group {
-                    --mat-standard-button-toggle-divider-color: #{variables.$primary};
-                    --mat-standard-button-toggle-background-color: variables.$card-background-color;
-
-                    .mat-button-toggle-label-content {
-                        line-height: 42px !important;
-                    }
-
-                    .mat-button-toggle-checked {
-                        background-color: variables.$item_color;
-                    }
-                }
             }
-
-
         }
     }
 }

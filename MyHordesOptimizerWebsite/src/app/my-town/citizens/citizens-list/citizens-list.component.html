@@ -75,7 +75,8 @@
                                                         <mat-label>{{ action.element.value.label }}</mat-label>
                                                         <mat-select [(ngModel)]="action.value" (ngModelChange)="updateActions(action, $event, row.id)">
                                                             <mat-option *ngFor="let option of action.element.value.options"
-                                                                        [value]="option">{{ option }}
+                                                                        [value]="option">
+                                                                {{ option }}
                                                             </mat-option>
                                                         </mat-select>
                                                     </mat-form-field>
