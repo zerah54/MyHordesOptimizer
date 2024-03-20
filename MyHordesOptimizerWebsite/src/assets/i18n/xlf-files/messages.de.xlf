@@ -1394,13 +1394,13 @@
         </context-group>
         <target state="final">km</target>
       </trans-unit>
-      <trans-unit id="3229995205437916259" datatype="html">
+      <trans-unit id="3229995205437916259" datatype="html" approved="yes">
         <source>PA</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">PA</target>
+        <target state="final">AP</target>
       </trans-unit>
       <trans-unit id="7649141370266521403" datatype="html" approved="yes">
         <source>Aller / Retour</source>
@@ -2402,14 +2402,14 @@
         </context-group>
         <target state="final">Dies ist ein Pflichtfeld</target>
       </trans-unit>
-      <trans-unit id="3497151032813605747" datatype="html">
+      <trans-unit id="3497151032813605747" datatype="html" approved="yes">
         <source>Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> et <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> et <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
+        <target state="final">Entwickelt von <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> und <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
       </trans-unit>
       <trans-unit id="3288296146842467237" datatype="html" approved="yes">
@@ -3255,13 +3255,13 @@
         </context-group>
         <target state="final">Bonus : </target>
       </trans-unit>
-      <trans-unit id="200672681652977109" datatype="html">
+      <trans-unit id="200672681652977109" datatype="html" approved="yes">
         <source>Capacité : </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Capacité : </target>
+        <target state="final">Kapazität : </target>
       </trans-unit>
       <trans-unit id="61672744151027488" datatype="html" approved="yes">
         <source>Le lien a bien été copié</source>
@@ -3587,13 +3587,13 @@ Une fois activée, si vous êtes dans le désert et que votre attente d&apos;esc
         </context-group>
         <target state="final">Benachrichtigung über eine neu Nachricht</target>
       </trans-unit>
-      <trans-unit id="2181607041018842906" datatype="html">
+      <trans-unit id="2181607041018842906" datatype="html" approved="yes">
         <source>Si vous cochez l&apos;option &quot;Me notifier si je reçois un nouveau message&quot;, vous recevrez une notification de votre navigateur lors d&apos;un changement dans votre compteur de messages reçus.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-alerts/tuto-script-alerts.component.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Si vous cochez l'option "Me notifier si je reçois un nouveau message", vous recevrez une notification de votre navigateur lors d'un changement dans votre compteur de messages reçus.</target>
+        <target state="final">Wenn Sie die Option "Mich benachrichtigen, wenn ich eine neue Nachricht erhalte" ankreuzen, erhalten Sie von Ihrem Browser eine Benachrichtigung, wenn sich Ihr Zähler der empfangenen Nachrichten ändert.</target>
       </trans-unit>
       <trans-unit id="7620507202018349855" datatype="html" approved="yes">
         <source>Affichage des tooltips détaillés</source>
@@ -3976,13 +3976,13 @@ Pour la carte de la ruine, vous pouvez simuler votre emplacement en cliquant sur
                 &lt;br /&gt;&lt;br /&gt;
                 Auf der Ruinenkarte kannst du deinen Standort simulieren, indem du auf eine der Zonen klickst, woraufhin sich ein Punkt auf der Karte bewegt.</target>
       </trans-unit>
-      <trans-unit id="6182420806915713502" datatype="html">
+      <trans-unit id="6182420806915713502" datatype="html" approved="yes">
         <source>Copier l&apos;URL</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Copier l'URL</target>
+        <target state="final">URL kopieren</target>
       </trans-unit>
       <trans-unit id="4837569632527779523" datatype="html" approved="yes">
         <source>Installation de l&apos;extension de navigateur</source>
