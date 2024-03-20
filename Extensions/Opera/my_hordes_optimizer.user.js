@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.4.0
+// @version      1.0.5.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,9 +32,10 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Le bouton pour ajouter un objet à la liste de courses n'apparait désormais plus sur les objets de l'outil Banque \n`
-    + `[Correctif] L'erreur de "CloneInto" devrait être (enfin) corrigée \n`
-    + `[Correctif] Le wiki des recettes est de nouveau accessible dans l'extension \n`;
+    + `[Correctif] La première prise en banque ne compte de nouveau plus dans l'anti-abus \n\n`
+    + `[Correctif] Traductions \n`
+    + `[Nouveauté] Champs de recherche sur la page de décharge \n`
+    + `[Nouveauté] Affichage du % de voracité sur la jauge\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -109,6 +110,7 @@ const mho_header_space_id = 'mho-header-space'
 const mho_display_map_id = 'mho-display-map';
 const mho_search_building_field_id = 'mho-search-building-field';
 const mho_search_recipient_field_id = 'mho-search-recipient-field';
+const mho_search_dump_field_id = 'mho-search-dump-field';
 const mho_search_registry_field_id = 'mho-search-registry-field';
 const mho_display_translate_input_id = 'mho-display-translate-input';
 const mho_watchtower_estim_id = 'mho-watchtower-estim';
@@ -580,6 +582,12 @@ const texts = {
         fr: `Tout cocher`,
         de: `Alle überprüfen`,
         es: `Comprobar todo`
+    },
+    calculated_attack: {
+        en: `Calculated`,
+        fr: `Calculée`,
+        de: `Berechnet`,
+        es: `Calculado`
     }
 };
 
@@ -1316,6 +1324,15 @@ let params_categories = [
                         }
                     },
                     {
+                        id: `display_search_field_dump`,
+                        label: {
+                            en: `Search for an object in the landfill`,
+                            fr: `Rechercher un objet de la décharge`,
+                            de: `Suchen Sie nach einem Objekt auf der Mülldeponie`,
+                            es: `Buscar un objeto en el vertedero`
+                        }
+                    },
+                    {
                         id: `display_search_field_registry`,
                         label: {
                             en: `Search the registry`,
@@ -1413,10 +1430,10 @@ let params_categories = [
             {
                 id: `display_estimations_on_watchtower`,
                 label: {
-                    en: `TODO`,
+                    en: `Shows estimates saved on the watchtower page`,
                     fr: `Affiche les estimations enregistrées sur la page de la tour de guet`,
-                    de: `TODO`,
-                    es: `TODO`
+                    de: `Zeigt auf der Watchtower-Seite gespeicherte Schätzungen an`,
+                    es: `Muestra estimaciones guardadas en la página de la torre de vigilancia`
                 },
             },
             {
@@ -1431,10 +1448,10 @@ let params_categories = [
             {
                 id: `display_anti_abuse`,
                 label: {
-                    en: `TODO`,
+                    en: `Displays a counter to manage anti-abuse`,
                     fr: `Affiche un compteur pour gérer l'anti-abus`,
-                    de: `TODO`,
-                    es: `TODO`
+                    de: `Zeigt einen Zähler zur Verwaltung der Missbrauchsbekämpfung an`,
+                    es: `Muestra un contador para gestionar anti-abuso`
                 },
             },
             {
@@ -1449,31 +1466,40 @@ let params_categories = [
             {
                 id: `default_escort_options`,
                 label: {
-                    en: `TODO`,
+                    en: `Set default escort options`,
                     fr: `Définir des options d'escorte par défaut`,
-                    de: `TODO`,
-                    es: `TODO`
+                    de: `Legen Sie Standard-Escort-Optionen fest`,
+                    es: `Establecer opciones de acompañamiento predeterminadas`
                 },
                 children: [
                     {
                         id: `default_escort_force_return`,
                         label: {
-                            en: `TODO`,
+                            en: `Don't allow my escort to take me further away from the town`,
                             fr: `Interdire au chef d'escorte de m'éloigner de la ville`,
-                            de: `TODO`,
-                            es: `TODO`
+                            de: `Ich will auf direktem Weg zurück zur Stadt`,
+                            es: `Prohibir al jefe de la escolta alejarme del pueblo`
                         },
                     },
                     {
                         id: `default_escort_allow_rucksack`,
                         label: {
-                            en: `TODO`,
+                            en: `Allow the objects in my rucksack to be viewed and used`,
                             fr: `Permettre de voir et de manipuler les objets de mon sac`,
-                            de: `TODO`,
-                            es: `TODO`
+                            de: `Zugriff auf meinen Rucksack zulassen`,
+                            es: `Permitir ver y manipular los objetos en mi mochila`
                         },
                     }
                 ]
+            },
+            {
+                id: `display_ghoul_voracity_percent`,
+                label: {
+                    en: `Shows the percentage on the voracity gauge`,
+                    fr: `Affiche le pourcentage sur la jauge de voracité`,
+                    de: `Zeigt den Prozentsatz der Unersättlichkeitsanzeige an`,
+                    es: `Muestra el porcentaje en el indicador de voracidad`
+                },
             }
             // {
             //     id: `block_users`,
@@ -1743,20 +1769,24 @@ function pageIsAmelio() {
     return document.URL.indexOf('town/house/build') > -1;
 }
 
-
 /** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
 function pageIsWatchtower() {
     return document.URL.indexOf('town/watchtower') > -1;
 }
 
-/** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
+/** @return {boolean}    true si la page de l'utilisateur est la page du puit */
 function pageIsWell() {
     return document.URL.indexOf('town/well') > -1;
 }
 
-/** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
+/** @return {boolean}    true si la page de l'utilisateur est la page de la banque */
 function pageIsBank() {
     return document.URL.indexOf('town/bank') > -1;
+}
+
+/** @return {boolean}    true si la page de l'utilisateur est la page de la décharge */
+function pageIsDump() {
+    return document.URL.indexOf('town/dump') > -1;
 }
 
 /** @return {boolean}    true si la page de l'utilisateur est la liste des citoyens */
@@ -1924,7 +1954,7 @@ function getScriptInfo() {
             }
         }
     }
-    return;
+
 }
 
 function getStorageItem(key) {
@@ -1948,7 +1978,7 @@ function getStorageItem(key) {
                 }
             }
         }
-        return;
+
     })
 }
 
@@ -1970,7 +2000,7 @@ function setStorageItem(key, value) {
             }
         }
     }
-    return;
+
 }
 
 function createNotification(content) {
@@ -2011,7 +2041,7 @@ function createNotification(content) {
             }
         }
     }
-    return;
+
 }
 
 function isTouchScreen() {
@@ -2125,6 +2155,7 @@ function initOptionsWithoutLoginNeeded() {
     automaticallyOpenBag();
     addCopyRegisterButton();
     changeDefaultEscortOptions();
+    displayGhoulVoracityPercent();
     // blockUsersPosts();
     count_pending_notifications = document.querySelector('#postbox-new-msg-counter')?.innerText;
 }
@@ -4046,6 +4077,7 @@ function displaySearchFields() {
         displaySearchFieldOnBuildings();
         displaySearchFieldOnRecipientList();
         displaySearchFieldOnRegistry();
+        displaySearchFieldOnDump();
         hideCompletedBuildings();
     }
 }
@@ -4209,6 +4241,104 @@ function displaySearchFieldOnRecipientList() {
 
             search_field_container.appendChild(header_mho_img);
             recipients.insertBefore(search_field_container, recipients.firstElementChild);
+        }
+    } else if (search_field) {
+        search_field.parentElement.remove();
+    }
+}
+
+
+/** Si l'option associée est activée, affiche un champ de recherche sur la page de la décharge */
+function displaySearchFieldOnDump() {
+    let search_field = document.getElementById(mho_search_dump_field_id);
+    if (mho_parameters.display_search_field_dump && pageIsDump()) {
+        if (search_field) return;
+
+        let main_content = document.querySelector('.town-main-content');
+        if (main_content) {
+            let table = main_content.querySelector('.row-table');
+            if (table) {
+                let filterFunction = (name_search_field, can_be_dump_field, can_be_recovered_field) => {
+                    let items_list = Array.from(table.querySelectorAll('.row:not(.header)') || []);
+                    items_list.forEach((item) => {
+                        let item_label = item.querySelector('span.icon img');
+                        let item_counts = item_label.parentElement.parentElement.nextElementSibling.querySelector('span')?.innerHTML.split('<br>');
+                        let item_bank_count = +item_counts[0].replace(/\D*/, '');
+                        let item_dump_count = +item_counts[1].replace(/\D*/, '');
+
+                        let is_search_in_string = normalizeString(item_label.getAttribute('alt')).indexOf(normalizeString(name_search_field.value)) > -1;
+                        let can_be_recovered = can_be_recovered_field.checked && item_dump_count > 0;
+                        let can_be_dump = can_be_dump_field.checked && item_bank_count > 0;
+
+                        if (is_search_in_string && (can_be_dump || can_be_recovered)) {
+                            item.classList.remove('hidden');
+                        } else {
+                            item.classList.add('hidden');
+                        }
+                    });
+                }
+
+                let search_field_container = document.createElement('div');
+                search_field_container.setAttribute('style', ' display: flex; flex-wrap: wrap; gap: 0.5em;');
+                search_field_container.id = mho_search_dump_field_id;
+
+                search_field = document.createElement('input');
+                search_field.type = 'text';
+                search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_dump').label);
+                search_field.classList.add('inline');
+                search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
+
+                search_field_container.appendChild(search_field);
+
+                let can_be_dumped = document.createElement('div');
+                search_field_container.appendChild(can_be_dumped);
+
+                let can_be_dumped_input = document.createElement('input');
+                can_be_dumped_input.type = 'checkbox';
+                can_be_dumped_input.id = 'can_be_dumped';
+                can_be_dumped_input.checked = true;
+                can_be_dumped.appendChild(can_be_dumped_input);
+
+                let can_be_dumped_label = document.createElement('label');
+                can_be_dumped_label.innerText = 'Peut être jeté';
+                can_be_dumped_label.htmlFor = 'can_be_dumped';
+                can_be_dumped.appendChild(can_be_dumped_label);
+
+                let can_be_recovered = document.createElement('div');
+                search_field_container.appendChild(can_be_recovered);
+
+                let can_be_recovered_input = document.createElement('input');
+                can_be_recovered_input.type = 'checkbox';
+                can_be_recovered_input.id = 'can_be_recovered';
+                can_be_recovered_input.checked = true;
+                can_be_recovered.appendChild(can_be_recovered_input);
+
+                let can_be_recovered_label = document.createElement('label');
+                can_be_recovered_label.innerText = 'Peut être récupéré';
+                can_be_recovered_label.htmlFor = 'can_be_recovered';
+                can_be_recovered.appendChild(can_be_recovered_label);
+
+                search_field.addEventListener('keyup', (event) => {
+                    filterFunction(search_field, can_be_dumped_input, can_be_recovered_input);
+                });
+
+                can_be_dumped_input.addEventListener('change', (event) => {
+                    filterFunction(search_field, can_be_dumped_input, can_be_recovered_input);
+                });
+
+                can_be_recovered.addEventListener('change', (event) => {
+                    filterFunction(search_field, can_be_dumped_input, can_be_recovered_input);
+                });
+
+                let header_mho_img = document.createElement('img');
+                header_mho_img.src = mh_optimizer_icon;
+                header_mho_img.style.height = '24px';
+                header_mho_img.style.position = 'absolute';
+                header_mho_img.style.left = '16px';
+
+                search_field_container.appendChild(header_mho_img);
+                main_content.insertBefore(search_field_container, table);
+            }
         }
     } else if (search_field) {
         search_field.parentElement.remove();
@@ -6128,7 +6258,7 @@ function displayEstimationsOnWatchtower() {
             };
             let createCalculatedAttackRow = (calculated_attack) => {
                 let estim_values_block_title_calculated_text = ``;
-                estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>Calculé (Apofoo)</b><div><span>${calculated_attack.min}</span> - <span>${calculated_attack.max}</span></div></div>`;
+                estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>${getI18N(texts.calculated_attack)} (Apofoo)</b><div><span>${calculated_attack.min}</span> - <span>${calculated_attack.max}</span></div></div>`;
 
                 return estim_values_block_title_calculated_text;
             }
@@ -6563,7 +6693,7 @@ function displayAntiAbuseCounter() {
                 });
 
             } else if (pageIsWell()) {
-                let btn = document.querySelector('button[data-fetch-method="get"]');/*[data-fetch-confirm]*/
+                let btn = document.querySelector('button[data-fetch-method="get"][data-fetch-confirm]');
                 btn?.addEventListener('click', (event) => {
                     document.addEventListener('mh-navigation-complete', () => {
                         controller.abort();
@@ -7089,6 +7219,17 @@ function changeDefaultEscortOptions() {
                 }
             }, {once: true});
         });
+    }
+}
+
+function displayGhoulVoracityPercent() {
+    if (mho_parameters.display_ghoul_voracity_percent) {
+        let ghoul_voracity_node = document.querySelector('.status-ghoul');
+
+        if (!ghoul_voracity_node) return;
+
+        let voracite = ghoul_voracity_node.querySelector('.ghoul-hunger-bar').style.width;
+        ghoul_voracity_node.firstChild.textContent = ghoul_voracity_node.firstChild.textContent.replace(':\n', `: ${voracite}\n`);
     }
 }
 
