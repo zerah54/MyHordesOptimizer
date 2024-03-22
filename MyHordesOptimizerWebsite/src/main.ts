@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference types="@angular/localize" />
+
 import '@angular/localize/init';
 import 'zone.js';
 
