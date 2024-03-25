@@ -26,7 +26,7 @@ export class TutoScriptExternalToolsComponent {
 
     public readonly tuto_script_items: AccordionItem[] = [
         {
-            title: $localize`MyHordes Optimizer`, content: $localize`
+            title: 'MyHordes Optimizer', content: $localize`
             En cochant l'option "Mettre à jour MyHordesOptimizer", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de MyHordes Optimizer se fera automatiquement.
             Vous rendez également accessibles d'autres options de mise à jour avancées.
             <ul>
@@ -41,7 +41,7 @@ export class TutoScriptExternalToolsComponent {
         `
         },
         {
-            title: $localize`Gest'Hordes`, content: $localize`En cochant l'option "Mettre à jour Gest'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de Gest'Hordes se fera automatiquement.
+            title: 'Gest\'Hordes', content: $localize`En cochant l'option "Mettre à jour Gest'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de Gest'Hordes se fera automatiquement.
             Vous rendez également accessibles d'autres options de mise à jour avancées.
             <ul>
                 <li><strong>Nombre de zombies tués :</strong> Enregistre le nombre de zombies tués sur la case</li>
@@ -53,11 +53,11 @@ export class TutoScriptExternalToolsComponent {
         `
         },
         {
-            title: $localize`BigBroth'Hordes`,
+            title: 'BigBroth\'Hordes',
             content: $localize`En cochant l'option "Mettre à jour BigBroth'Hordes", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de BigBroth'Hordes se fera automatiquement.`
         },
         {
-            title: $localize`Fata Morgana`,
+            title: 'Fata Morgana',
             content: $localize`En cochant l'option "Mettre à jour Fata Morgana", quand vous cliquerez sur le bouton "Mettre à jour les outils externes", la mise à jour de Fata Morgana se fera automatiquement.`
         },
         {

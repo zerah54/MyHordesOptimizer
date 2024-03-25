@@ -2,7 +2,7 @@
     <mat-card-title i18n>Recettes</mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-recipes">
-    <ng-container *ngIf="recipes">
+    @if (recipes) {
         <div>
             <div class="table-filters">
                 <mho-filter (filterChange)="applyFilter($event)"></mho-filter>
@@ -16,19 +16,19 @@
                         @switch (column.id) {
                             @case ('type') {
                                 <div>
-                                    <ng-container *ngIf="row[column.id] === 'Recipe::ManualAnywhere'; else workshop">
-                                        <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" width="16" height="16">
-                                        <ng-container i18n>Action de citoyen</ng-container>
-                                    </ng-container>
-                                    <ng-template #workshop>
+                                    @if (row[column.id] === 'Recipe::ManualAnywhere') {
+                                        <ng-container>
+                                            <img [ngSrc]="HORDES_IMG_REPO + 'log/citizen.gif'" width="16" height="16">
+                                            <ng-container i18n>Action de citoyen</ng-container>
+                                        </ng-container>
+                                    } @else {
                                         <img [ngSrc]="HORDES_IMG_REPO + 'log/workshop.gif'" width="16" height="16">
-                                        <ng-container *ngIf="row[column.id] === 'Recipe::WorkshopType'" i18n>Atelier
-                                        </ng-container>
-                                        <ng-container *ngIf="row[column.id] === 'Recipe::WorkshopTypeShamanSpecific'"
-                                                      i18n>
-                                            Atelier, Chaman uniquement
-                                        </ng-container>
-                                    </ng-template>
+                                        @if (row[column.id] === 'Recipe::WorkshopType') {
+                                            <ng-container i18n>Atelier</ng-container>
+                                        } @else if (row[column.id] === 'Recipe::WorkshopTypeShamanSpecific') {
+                                            <ng-container i18n>Atelier, Chaman uniquement</ng-container>
+                                        }
+                                    }
                                 </div>
                             }
                             @case ('components') {
@@ -45,10 +45,9 @@
                                     <div>
                                         <img [ngSrc]="HORDES_IMG_REPO + result.item.img" width="16" height="16">
                                         {{ result.item.label[locale] }}
-                                        <small *ngIf="result.probability !== 1">({{
-                                                result.probability * 100 |
-                                                    number:'1.0-2':locale
-                                            }}%)</small>
+                                        @if (result.probability !== 1) {
+                                            <small>({{ result.probability * 100 | number:'1.0-2':locale }}%)</small>
+                                        }
                                     </div>
                                 </ng-container>
                             }
@@ -61,5 +60,5 @@
                 <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
             </table>
         </div>
-    </ng-container>
+    }
 </mat-card-content>

@@ -2,9 +2,9 @@
     <mat-card-title i18n>Statistiques</mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-stats">
-    <nav mat-tab-nav-bar mat-stretch-tabs="false" mat-align-tabs="start" [tabPanel]="panel">
+    <nav mat-tab-nav-bar [mat-stretch-tabs]="false" mat-align-tabs="start" [tabPanel]="panel">
         <a mat-tab-link *ngFor="let link of links" [routerLink]="[link.link]" [active]="router.url === link.link">
-            {{link.label}}
+            {{ link.label }}
         </a>
     </nav>
 

@@ -1,53 +1,62 @@
-<div class="dig" *ngIf="current_dig">
-    <div class="card-header" *ngIf="digsMode === 'registry'">
-        {{citizen.name}}
-        <mat-divider></mat-divider>
-    </div>
-    <div class="positions" *ngIf="digsMode !== 'creation' || updated_dig; else shouldCreate">
-        <img [ngSrc]="HORDES_IMG_REPO + 'emotes/explo.gif'" width="16" height="16">
-        <ng-container i18n>Position</ng-container>&nbsp;:&nbsp;
+@if (current_dig) {
+    <div class="dig">
+        @if (digsMode === 'registry') {
+            <div class="card-header">
+                {{ citizen.name }}
+                <mat-divider></mat-divider>
+            </div>
+        }
+        @if (digsMode !== 'creation' || updated_dig) {
+            <div class="positions">
+                <img [ngSrc]="HORDES_IMG_REPO + 'emotes/explo.gif'" width="16" height="16">
+                <ng-container i18n>Position</ng-container>&nbsp;:&nbsp;
 
-        <ng-container *ngIf="updated_dig && digsMode !== 'update'; else uneditablePosition">
-            <input [(ngModel)]="updated_dig.x">/<input [(ngModel)]="updated_dig.y">
-        </ng-container>
-        <ng-template #uneditablePosition>
-            {{current_dig.x}}/{{current_dig.y}}
-        </ng-template>
-    </div>
-    <ng-container *ngIf="updated_dig; else noUpdate">
-        <div class="values">
+                @if (updated_dig && digsMode !== 'update') {
+                    <input [(ngModel)]="updated_dig.x">/<input [(ngModel)]="updated_dig.y">
+                } @else {
+                    {{ current_dig.x }}/{{ current_dig.y }}
+                }
+            </div>
+        } @else {
+            <button mat-icon-button (click)="changeDigToUpdate(citizen)">
+                <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_more2.gif'" matTooltip="Ajouter" i18n-matTooltip width="16" height="16">
+            </button>
+        }
+
+        @if (updated_dig) {
+            <div class="values">
         <span class="success">
             <img [ngSrc]="HORDES_IMG_REPO + 'icons/done.png'" width="16" height="16">
             <input [(ngModel)]="updated_dig.nb_success">
         </span>
-            &nbsp;/&nbsp;
-            <span class="total">
+                &nbsp;/&nbsp;
+                <span class="total">
             <input [(ngModel)]="updated_dig.nb_total_dig">
             <img [ngSrc]="HORDES_IMG_REPO + '/icons/small_gather.gif'" width="16" height="16">
         </span>
-        </div>
-        <mat-divider></mat-divider>
-        <div class="actions">
-            <button mat-icon-button (click)="updateDig()">
-                <img [ngSrc]="HORDES_IMG_REPO + 'icons/done.png'" matTooltip="Enregistrer" i18n-matTooltip width="16" height="16">
-            </button>
-            <button mat-icon-button *ngIf="digsMode !== 'registry'" (click)="updated_dig = undefined">
-                <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_remove.gif'" matTooltip="Annuler" i18n-matTooltip width="16" height="16">
-            </button>
-        </div>
-    </ng-container>
-    <ng-template #noUpdate>
-        <ng-container *ngIf="digsMode === 'update'">
+            </div>
+            <mat-divider></mat-divider>
+            <div class="actions">
+                <button mat-icon-button (click)="updateDig()">
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/done.png'" matTooltip="Enregistrer" i18n-matTooltip width="16" height="16">
+                </button>
+                @if (digsMode !== 'registry') {
+                    <button mat-icon-button (click)="updated_dig = undefined">
+                        <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_remove.gif'" matTooltip="Annuler" i18n-matTooltip width="16" height="16">
+                    </button>
+                }
+            </div>
+        } @else if (digsMode === 'update') {
             <div class="values">
-                <span class="success">
-                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/done.png'" width="16" height="16" matTooltip="Fouilles réussies" i18n-matTooltip>
-                    {{current_dig.nb_success}}
-                </span>
+            <span class="success">
+                <img [ngSrc]="HORDES_IMG_REPO + 'icons/done.png'" width="16" height="16" matTooltip="Fouilles réussies" i18n-matTooltip>
+                {{ current_dig.nb_success }}
+            </span>
                 &nbsp;/&nbsp;
                 <span class="total">
-                    {{current_dig.nb_total_dig}}
+                {{ current_dig.nb_total_dig }}
                     <img [ngSrc]="HORDES_IMG_REPO + '/icons/small_gather.gif'" width="16" height="16" matTooltip="Fouilles totales" i18n-matTooltip>
-                </span>
+            </span>
             </div>
             <mat-divider></mat-divider>
             <div class="actions">
@@ -60,11 +69,6 @@
                     </button>
                 </ng-container>
             </div>
-        </ng-container>
-    </ng-template>
-    <ng-template #shouldCreate>
-        <button mat-icon-button (click)="changeDigToUpdate(citizen)">
-            <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_more2.gif'" matTooltip="Ajouter" i18n-matTooltip width="16" height="16">
-        </button>
-    </ng-template>
-</div>
+        }
+    </div>
+}

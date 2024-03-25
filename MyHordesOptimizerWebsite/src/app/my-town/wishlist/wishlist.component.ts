@@ -163,6 +163,13 @@ export class WishlistComponent implements OnInit {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((wishlist_info: WishlistInfo): void => {
                 this.wishlist_info = wishlist_info;
+                this.wishlist_info.wishlist_items.forEach((zone: WishlistItem[]) => {
+                    zone.forEach((item_in_zone: WishlistItem) => {
+                        const item: Item = <Item>this.items.find((_item: Item): boolean => _item.id === item_in_zone.item.id);
+                        item_in_zone.bank_count = item?.bank_count;
+                        item_in_zone.item.bank_count = item?.bank_count;
+                    });
+                });
                 this.datasource.data = [...<WishlistItem[]>wishlist_info.wishlist_items.get(this.selected_tab_key) || this.wishlist_info.wishlist_items.get('0') || []];
             });
     }

@@ -9,9 +9,11 @@
                     <mat-card-title>
                         {{ misc_card.header }}
                     </mat-card-title>
-                    <button mat-icon-button *ngIf="misc_card.header_action" (click)="misc_card.header_action.action()">
-                        <mat-icon>{{ misc_card.header_action.icon }}</mat-icon>
-                    </button>
+                    @if (misc_card.header_action) {
+                        <button mat-icon-button (click)="misc_card.header_action.action()">
+                            <mat-icon>{{ misc_card.header_action.icon }}</mat-icon>
+                        </button>
+                    }
                 </mat-card-header>
                 <mat-card-content class="content">
                     <table mat-table [dataSource]="misc_card.table">

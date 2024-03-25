@@ -10,33 +10,32 @@ import { normalizeString } from '../../../../shared/utilities/string.utils';
     standalone: true,
 })
 export class CitizenUseDiceOrCardsPipe implements PipeTransform {
-    transform(entries: Entry[], complete_citizen_list: CitizenInfo, reverse?: boolean): string[] {
-        const citizen_for_entry: string[] = [];
-        let citizen_to_write: string[] = [];
+    transform(entries: Entry[], complete_citizen_list: CitizenInfo, display_pseudo: 'simple' | 'id_mh', reverse?: boolean): string[] {
+        const citizen_for_entry: Citizen[] = [];
+        let citizen_to_write: Citizen[] = [];
 
         entries.forEach((entry: Entry): void => {
             const citizen: Citizen | undefined = complete_citizen_list.citizens.find((citizen: Citizen): boolean => entry.entry?.indexOf(citizen.name) > -1);
-            if (citizen && !citizen_for_entry.some((citizen_in_list: string): boolean => citizen_in_list === citizen.name)) {
-                citizen_for_entry.push(citizen.name);
+            if (citizen && !citizen_for_entry.some((citizen_in_list: Citizen): boolean => citizen_in_list.id === citizen.id)) {
+                citizen_for_entry.push(citizen);
             }
         });
 
         if (reverse) {
             citizen_to_write = complete_citizen_list.citizens
                 .filter((citizen: Citizen) => {
-                    return !citizen_for_entry.some((citizen_in_list: string): boolean => citizen_in_list === citizen.name);
-                })
-                .map((citizen: Citizen) => {
-                    return citizen.name;
+                    return !citizen_for_entry.some((citizen_in_list: Citizen): boolean => citizen_in_list.id === citizen.id);
                 });
         } else {
             citizen_to_write = citizen_for_entry;
         }
 
-        citizen_to_write = citizen_to_write.sort((citizen_a: string, citizen_b: string) => {
-            return normalizeString(citizen_a).localeCompare(normalizeString(citizen_b));
+        citizen_to_write = citizen_to_write.sort((citizen_a: Citizen, citizen_b: Citizen) => {
+            return normalizeString(citizen_a.name).localeCompare(normalizeString(citizen_b.name));
         });
-        return citizen_to_write;
+        return citizen_to_write.map((citizen: Citizen) => {
+            return display_pseudo === 'simple' ? citizen.name : citizen.getTag();
+        });
 
     }
 }

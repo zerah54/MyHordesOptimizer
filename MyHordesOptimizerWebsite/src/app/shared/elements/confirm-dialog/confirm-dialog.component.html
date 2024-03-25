@@ -1,8 +1,10 @@
-<h1 mat-dialog-title *ngIf="data.title">{{data.title}}</h1>
+@if (data.title) {
+    <h1 mat-dialog-title>{{ data.title }}</h1>
+}
 <div mat-dialog-content>
-  {{data.text}}
+    {{ data.text }}
 </div>
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="false" i18n>Annuler</button>
-  <button mat-button [mat-dialog-close]="true" cdkFocusInitial i18n>Valider</button>
+    <button mat-button [mat-dialog-close]="false" i18n>Annuler</button>
+    <button mat-button [mat-dialog-close]="true" cdkFocusInitial i18n>Valider</button>
 </div>

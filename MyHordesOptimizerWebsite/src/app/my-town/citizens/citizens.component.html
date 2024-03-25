@@ -2,11 +2,13 @@
     <mat-card-title i18n>Citoyens</mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-citizens">
-    <nav mat-tab-nav-bar mat-stretch-tabs="false" mat-align-tabs="start" [tabPanel]="panel">
+    <nav mat-tab-nav-bar [mat-stretch-tabs]="false" mat-align-tabs="start" [tabPanel]="panel">
         <ng-container *ngFor="let link of links">
-            <a mat-tab-link [routerLink]="[link.path]" [active]="router.url === link.path" *ngIf="link.displayed">
-                {{link.label}}
-            </a>
+            @if (link.displayed) {
+                <a mat-tab-link [routerLink]="[link.path]" [active]="router.url === link.path">
+                    {{ link.label }}
+                </a>
+            }
         </ng-container>
     </nav>
 

@@ -47,7 +47,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     @Input() bindLabel!: string;
     @Input() noLabel: boolean = false;
     @Input() bindIcon!: string;
-    @Input() moreInfo!: (element: string | T) => string;
+    @Input() moreInfo?: (element: string | T) => string;
     @Input() emptyOption: boolean = false;
     //current form control input. helpful in validating and accessing form control
     @Input() form_control: AbstractControl = new UntypedFormControl();
@@ -107,7 +107,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
-    private complete_options: (T | string)[] = [];
+    protected complete_options: (T | string)[] = [];
     //The internal data model for form control value access
     private innerValue: T | string | T[] | string[] | undefined = undefined;
     /** errors for the form control will be stored in this array */

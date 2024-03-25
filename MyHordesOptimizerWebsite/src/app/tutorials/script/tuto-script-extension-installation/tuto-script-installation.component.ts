@@ -37,7 +37,7 @@ export class TutoScriptInstallationComponent {
             content: $localize`Il faut d'abord installer l'application de gestion des scripts de votre choix. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey. Ensuite, il suffit de cliquer sur le ${this.download_link}, qui lancera la procédure d'installation. Enfin, il faudra confirmer dans la page qui se sera ouverte.`
         },
         {
-            title: $localize`Android`, content: $localize`<ul>
+            title: 'Android', content: $localize`<ul>
                 <li>Installer un navigateur acceptant les extensions, tel que Kiwi Browser ou Firefox ;</li>
                 <li>Rechercher l'extension de gestion des scripts de votre choix dans la barre de recherche de ce navigateur. Il en existe plusieurs, comme par exemple Tampermonkey ou Violentmonkey ;</li>
                 <li>Installer l'extension pour Chrome ;</li>
@@ -46,7 +46,7 @@ export class TutoScriptInstallationComponent {
             </ul>`
         },
         {
-            title: $localize`iOS`, content: $localize`<ul>
+            title: 'iOS', content: $localize`<ul>
                 <li>Télécharger l’application "UserScripts" ;</li>
                 <li>Aller dans "Fichiers" ;</li>
                 <li>Créer un dossier que l’on appellera "UserScripts" (ou autre mais c’est pour mieux s’y retrouver) ;</li>
@@ -67,11 +67,11 @@ export class TutoScriptInstallationComponent {
     ];
     public readonly tuto_extension_items: AccordionItem[] = [
         {
-            title: $localize`Firefox`,
+            title: 'Firefox',
             content: $localize`Rendez-vous sur la ${this.firefox_extension_link} pour l'installer.`
         },
         {
-            title: $localize`Chrome`,
+            title: 'Chrome',
             content: $localize`Rendez-vous sur la ${this.chrome_extension_link} pour l'installer.`
         }
     ];

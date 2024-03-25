@@ -1,5 +1,16 @@
 @use 'variables';
 
+.mho-ruins-header {
+    justify-content: space-between;
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+
 .mho-ruins {
     table {
         width: 100%;

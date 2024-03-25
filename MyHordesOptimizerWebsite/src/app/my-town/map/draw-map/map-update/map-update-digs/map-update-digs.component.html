@@ -1,48 +1,52 @@
-<div class="mho-map-update-digs" *ngIf="digs">
-    <mho-header-with-number-previous-next-filter class="previous-next" [(filterValue)]="selected_day" [min]="1" [max]="current_day">
-    </mho-header-with-number-previous-next-filter>
+@if (digs) {
+    <div class="mho-map-update-digs">
+        <mho-header-with-number-previous-next-filter class="previous-next" [(filterValue)]="selected_day" [min]="1" [max]="current_day">
+        </mho-header-with-number-previous-next-filter>
 
-    <table>
-        <thead>
-        <th>
-            <button mat-button [matMenuTriggerFor]="addCitizenMenu"
-                    *ngIf="(allCitizens | notInListCitizenDig:digs).length > 0" i18n>Ajouter un citoyen
-            </button>
-        </th>
-        <th i18n>Fouilles réussies</th>
-        <th i18n>Fouilles totales</th>
-        <th></th>
-        </thead>
-        <tbody>
-        <tr *ngFor="let displayed_dig of digs | digsPerDay:selected_day">
-            <th class="name">
-                {{displayed_dig.digger_name}}
+        <table>
+            <thead>
+            <th>
+                @if ((allCitizens | notInListCitizenDig:digs).length > 0) {
+                    <button mat-button [matMenuTriggerFor]="addCitizenMenu">
+                        <ng-container i18n>Ajouter un citoyen</ng-container>
+                    </button>
+                }
             </th>
-            <td class="success">
-                <mat-form-field class="no-bottom">
-                    <input matInput type="number" [(ngModel)]="displayed_dig.nb_success">
-                </mat-form-field>
-            </td>
-            <td class="total">
-                <mat-form-field class="no-bottom">
-                    <input matInput type="number" [(ngModel)]="displayed_dig.nb_total_dig">
-                </mat-form-field>
-            </td>
-            <td class="remove">
-                <button mat-icon-button (click)="removeCitizen(displayed_dig.digger_id)">
-                    <mat-icon>close</mat-icon>
-                </button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            <th i18n>Fouilles réussies</th>
+            <th i18n>Fouilles totales</th>
+            <th></th>
+            </thead>
+            <tbody>
+            <tr *ngFor="let displayed_dig of digs | digsPerDay:selected_day">
+                <th class="name">
+                    {{ displayed_dig.digger_name }}
+                </th>
+                <td class="success">
+                    <mat-form-field class="no-bottom">
+                        <input matInput type="number" [(ngModel)]="displayed_dig.nb_success">
+                    </mat-form-field>
+                </td>
+                <td class="total">
+                    <mat-form-field class="no-bottom">
+                        <input matInput type="number" [(ngModel)]="displayed_dig.nb_total_dig">
+                    </mat-form-field>
+                </td>
+                <td class="remove">
+                    <button mat-icon-button (click)="removeCitizen(displayed_dig.digger_id)">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-    <mat-menu #addCitizenMenu="matMenu">
-        <mat-list class="mho-add-citizen-list">
-            <mat-list-item *ngFor="let citizen of (allCitizens | notInListCitizenDig:digs)"
-                           (click)="addCitizen(citizen)">
-                <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{citizen.name}}
-            </mat-list-item>
-        </mat-list>
-    </mat-menu>
-</div>
+        <mat-menu #addCitizenMenu="matMenu">
+            <mat-list class="mho-add-citizen-list">
+                <mat-list-item *ngFor="let citizen of (allCitizens | notInListCitizenDig:digs)"
+                               (click)="addCitizen(citizen)">
+                    <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{ citizen.name }}
+                </mat-list-item>
+            </mat-list>
+        </mat-menu>
+    </div>
+}

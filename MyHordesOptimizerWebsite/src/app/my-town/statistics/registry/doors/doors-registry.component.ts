@@ -19,6 +19,7 @@ export class DoorsRegistryComponent {
     @ViewChild('doorsCanvas') doors_canvas!: ElementRef;
 
     @Input({ required: true }) completeCitizenList!: CitizenInfo;
+    @Input({ required: true }) displayPseudo!: 'simple' | 'id_mh';
 
     @Input({ required: true }) set registry(registry: Entry[] | undefined) {
         if (registry) {
