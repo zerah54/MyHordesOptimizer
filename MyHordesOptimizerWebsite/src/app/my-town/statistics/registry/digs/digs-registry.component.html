@@ -1,16 +1,17 @@
 <div class="digs">
     <div class="header">
-        <h2>Jour {{current_day}}</h2>
+        <h2>Jour {{ current_day }}</h2>
         <mat-form-field (click)="$event.stopPropagation()" class="no-bottom">
-            <mho-select [options]="completeCitizenList | citizenNotInDigList:digs" [bindLabel]="'name'" [ngModel]="''" (ngModelChange)="addCitizen($event)">
+            <mho-select [options]="completeCitizenList | citizenNotInDigList:digs" [bindLabel]="'name'" [ngModel]="''"
+                        (ngModelChange)="addCitizen($event)">
             </mho-select>
         </mat-form-field>
     </div>
     <div class="rows">
         <div class="row" *ngFor="let dig of digs">
-            <ng-container *ngIf="(dig | citizenForDig:completeCitizenList) as citizen">
+            @if (dig | citizenForDig:completeCitizenList; as citizen) {
                 <mho-dig [dig]="dig" [digsMode]="'registry'" [citizen]="citizen" [day]="dig.day"></mho-dig>
-            </ng-container>
+            }
         </div>
     </div>
 </div>

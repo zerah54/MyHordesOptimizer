@@ -3,44 +3,43 @@
         <mat-icon>menu</mat-icon>
     </button>
     <img [ngSrc]="'assets/img/logo/logo_mho_64x64.png'" height="48" width="48" priority>
-    <div class="title">{{is_gt_xs ? 'MyHordes Optimizer' : 'MHO'}}</div>
-    <!-- <span *ngIf="!external_app_id_field_value"> -->
+    <div class="title">{{ is_gt_xs ? 'MyHordes Optimizer' : 'MHO' }}</div>
     <span class="spacer"></span>
-    <ng-container *ngIf="saved_external_app_id && is_in_town">
-        <button mat-button *ngIf="is_gt_xs" [color]="'accent'" (click)="updateExternalTools()">
-            <mat-icon>send</mat-icon>
-            <ng-container i18n>Mettre à jour les outils externes</ng-container>
-        </button>
-        <button mat-icon-button *ngIf="!is_gt_xs" [color]="'accent'" (click)="updateExternalTools()" matTooltip="Mettre à jour les outils externes"
-                i18n-matTooltip>
-            <mat-icon>send</mat-icon>
-        </button>
-    </ng-container>
+    @if (saved_external_app_id && is_in_town) {
+        @if (is_gt_xs) {
+            <button mat-button [color]="'accent'" (click)="updateExternalTools()">
+                <mat-icon>send</mat-icon>
+                <ng-container i18n>Mettre à jour les outils externes</ng-container>
+            </button>
+        } @else {
+            <button mat-icon-button [color]="'accent'" (click)="updateExternalTools()" matTooltip="Mettre à jour les outils externes" i18n-matTooltip>
+                <mat-icon>send</mat-icon>
+            </button>
+        }
+    }
     <button mat-button class="profil-button" [matMenuTriggerFor]="userMenu">
-        <ng-container
-            *ngIf="saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === ''; else noAppId"
-            i18n>Se connecter
-        </ng-container>
-        <ng-template #noAppId>
-            <ng-container *ngIf="me && me.username && me.username !== ''; else wrongUser">{{me.username}}</ng-container>
-            <ng-template #wrongUser>
-                <ng-container i18n>Utilisateur inconnu</ng-container>
-            </ng-template>
-        </ng-template>
+        @if (saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === '') {
+            <ng-container i18n>Se connecter</ng-container>
+        } @else if (me && me.username && me.username !== '') {
+            {{ me.username }}
+        } @else {
+            <ng-container i18n>Utilisateur inconnu</ng-container>
+        }
     </button>
 
     <mat-menu #userMenu="matMenu">
-        <div mat-menu-item *ngIf="!saved_external_app_id" (click)="$event.stopPropagation()">
-            <mat-form-field class="external-app-id-input" class="no-bottom">
-                <mat-label for="external-app-id" i18n>Identifiant d'app externe</mat-label>
-                <input id="external-app-id" matInput type="text" placeholder="Identifiant externe pour les app"
-                       i18n-placeholder [(ngModel)]="external_app_id_field_value">
-                <button matSuffix mat-icon-button (click)="saveExternalAppId();"
-                        [disabled]="!external_app_id_field_value">
-                    <mat-icon>check</mat-icon>
-                </button>
-            </mat-form-field>
-        </div>
-        <div mat-menu-item *ngIf="saved_external_app_id" (click)="disconnect()" i18n>Déconnexion</div>
+        @if (!saved_external_app_id) {
+            <div mat-menu-item (click)="$event.stopPropagation()">
+                <mat-form-field class="external-app-id-input no-bottom">
+                    <mat-label i18n>Identifiant d'app externe</mat-label>
+                    <input matInput type="text" placeholder="Identifiant externe pour les app" i18n-placeholder [(ngModel)]="external_app_id_field_value">
+                    <button matSuffix mat-icon-button (click)="saveExternalAppId();" [disabled]="!external_app_id_field_value">
+                        <mat-icon>check</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+        } @else {
+            <div mat-menu-item (click)="disconnect()" i18n>Déconnexion</div>
+        }
     </mat-menu>
 </mat-toolbar>

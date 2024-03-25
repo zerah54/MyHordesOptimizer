@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.0
+// @version      1.0.6.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,14 +32,19 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `Cette version contient des changements techniques importants. Pour cette raison, il faudra peut être remettre en place toutes vos options.`
-    + `[amélioration] Ajout d'une option sur chaque outil externe pour choisir si on souhaite qu'il soit rafraîchi au changement d'onglet ou non. Si vous comptiez sur cette fonctionnalité qui était déjà en place, n'oubliez pas d'aller l'activer dans les options. \n\n`
-    + `[correctif] Corrige le problème de chargement intempestif bloquant MyHordes.`;
+    + `[Correctif] Affichage et enregistrement des estimations de la tour de guet dans l'extension Firefox \n\n`
+    + `[Nouveauté] Ajout de liens vers les profils externes dans la popup d'un utilisateur \n\n`
+    + `[Amélioration] Plus besoin d'appuyer sur Entrée pour démarrer une traduction, elle se lancera automatiquement à chaque recherche de plus de 2 lettres \n`
+    + `[Amélioration] Indicateur visuel sur le bouton de copie du registre quand la copie est effectuée \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
 const is_mh_beta = document.URL.indexOf('staging') >= 0;
 const website = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
+
+const gest_hordes_url = 'https://gest-hordes2.eragaming.fr';
+const big_broth_hordes_url = 'https://bbh.fred26.fr';
+const fata_morgana_url = 'https://bbh.fred26.fr';
 
 const gm_bbh_updated_key = 'MHO_bbh_updated';
 const gm_gh_updated_key = 'MHO_gh_updated';
@@ -109,6 +114,7 @@ const mho_header_space_id = 'mho-header-space'
 const mho_display_map_id = 'mho-display-map';
 const mho_search_building_field_id = 'mho-search-building-field';
 const mho_search_recipient_field_id = 'mho-search-recipient-field';
+const mho_search_dump_field_id = 'mho-search-dump-field';
 const mho_search_registry_field_id = 'mho-search-registry-field';
 const mho_display_translate_input_id = 'mho-display-translate-input';
 const mho_watchtower_estim_id = 'mho-watchtower-estim';
@@ -574,6 +580,30 @@ const texts = {
         fr: `Fouilles maximum restantes`,
         de: `Maximal verbleibende Ausgrabungen`,
         es: `Máximas excavaciones restantes`
+    },
+    check_all: {
+        en: `Check all`,
+        fr: `Tout cocher`,
+        de: `Alle überprüfen`,
+        es: `Comprobar todo`
+    },
+    calculated_attack: {
+        en: `Calculated`,
+        fr: `Calculée`,
+        de: `Berechnet`,
+        es: `Calculado`
+    },
+    external_profiles: {
+        en: `External profiles`,
+        fr: `Profils externes`,
+        de: `Externe Profile`,
+        es: `Perfiles externos`,
+    },
+    external_links: {
+        en: `External links`,
+        fr: `Liens externes`,
+        de: `Externe Links`,
+        es: `Enlaces externos`,
     }
 };
 
@@ -1310,6 +1340,15 @@ let params_categories = [
                         }
                     },
                     {
+                        id: `display_search_field_dump`,
+                        label: {
+                            en: `Search for an object in the landfill`,
+                            fr: `Rechercher un objet de la décharge`,
+                            de: `Suchen Sie nach einem Objekt auf der Mülldeponie`,
+                            es: `Buscar un objeto en el vertedero`
+                        }
+                    },
+                    {
                         id: `display_search_field_registry`,
                         label: {
                             en: `Search the registry`,
@@ -1407,10 +1446,10 @@ let params_categories = [
             {
                 id: `display_estimations_on_watchtower`,
                 label: {
-                    en: `TODO`,
+                    en: `Shows estimates saved on the watchtower page`,
                     fr: `Affiche les estimations enregistrées sur la page de la tour de guet`,
-                    de: `TODO`,
-                    es: `TODO`
+                    de: `Zeigt auf der Watchtower-Seite gespeicherte Schätzungen an`,
+                    es: `Muestra estimaciones guardadas en la página de la torre de vigilancia`
                 },
             },
             {
@@ -1425,10 +1464,10 @@ let params_categories = [
             {
                 id: `display_anti_abuse`,
                 label: {
-                    en: `TODO`,
+                    en: `Displays a counter to manage anti-abuse`,
                     fr: `Affiche un compteur pour gérer l'anti-abus`,
-                    de: `TODO`,
-                    es: `TODO`
+                    de: `Zeigt einen Zähler zur Verwaltung der Missbrauchsbekämpfung an`,
+                    es: `Muestra un contador para gestionar anti-abuso`
                 },
             },
             {
@@ -1443,31 +1482,49 @@ let params_categories = [
             {
                 id: `default_escort_options`,
                 label: {
-                    en: `TODO`,
+                    en: `Set default escort options`,
                     fr: `Définir des options d'escorte par défaut`,
-                    de: `TODO`,
-                    es: `TODO`
+                    de: `Legen Sie Standard-Escort-Optionen fest`,
+                    es: `Establecer opciones de acompañamiento predeterminadas`
                 },
                 children: [
                     {
                         id: `default_escort_force_return`,
                         label: {
-                            en: `TODO`,
+                            en: `Don't allow my escort to take me further away from the town`,
                             fr: `Interdire au chef d'escorte de m'éloigner de la ville`,
-                            de: `TODO`,
-                            es: `TODO`
+                            de: `Ich will auf direktem Weg zurück zur Stadt`,
+                            es: `Prohibir al jefe de la escolta alejarme del pueblo`
                         },
                     },
                     {
                         id: `default_escort_allow_rucksack`,
                         label: {
-                            en: `TODO`,
+                            en: `Allow the objects in my rucksack to be viewed and used`,
                             fr: `Permettre de voir et de manipuler les objets de mon sac`,
-                            de: `TODO`,
-                            es: `TODO`
+                            de: `Zugriff auf meinen Rucksack zulassen`,
+                            es: `Permitir ver y manipular los objetos en mi mochila`
                         },
                     }
                 ]
+            },
+            {
+                id: `display_ghoul_voracity_percent`,
+                label: {
+                    en: `Shows the percentage on the voracity gauge`,
+                    fr: `Affiche le pourcentage sur la jauge de voracité`,
+                    de: `Zeigt den Prozentsatz der Unersättlichkeitsanzeige an`,
+                    es: `Muestra el porcentaje en el indicador de voracidad`
+                },
+            },
+            {
+                id: `display_external_links`,
+                label: {
+                    en: `Shows links to external profiles`,
+                    fr: `Affiche des liens vers les profils externes`,
+                    de: `Zeigt Links zu externen Profilen an`,
+                    es: `Muestra enlaces a perfiles externos`
+                },
             }
             // {
             //     id: `block_users`,
@@ -1737,20 +1794,24 @@ function pageIsAmelio() {
     return document.URL.indexOf('town/house/build') > -1;
 }
 
-
 /** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
 function pageIsWatchtower() {
     return document.URL.indexOf('town/watchtower') > -1;
 }
 
-/** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
+/** @return {boolean}    true si la page de l'utilisateur est la page du puit */
 function pageIsWell() {
     return document.URL.indexOf('town/well') > -1;
 }
 
-/** @return {boolean}    true si la page de l'utilisateur est la page de la tour de guet */
+/** @return {boolean}    true si la page de l'utilisateur est la page de la banque */
 function pageIsBank() {
     return document.URL.indexOf('town/bank') > -1;
+}
+
+/** @return {boolean}    true si la page de l'utilisateur est la page de la décharge */
+function pageIsDump() {
+    return document.URL.indexOf('town/dump') > -1;
 }
 
 /** @return {boolean}    true si la page de l'utilisateur est la liste des citoyens */
@@ -1771,6 +1832,11 @@ function pageIsDesert() {
 /** @return {boolean}    true si la page de l'utilisateur est la page du forum */
 function pageIsForum() {
     return document.URL.indexOf('forum') > -1;
+}
+
+/** @return {boolean}    true si la page de l'utilisateur est une âme */
+function pageIsSoul() {
+    return document.URL.indexOf('soul') > -1;
 }
 
 /** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */
@@ -1882,20 +1948,26 @@ function getErrorFromApi(error) {
 }
 
 function isScriptVersionLastVersion(display_error) {
-    const current_script_version = getScriptInfo().version;
-    const base_script_version = parameters?.find((param) => param.name === 'ScriptVersion')?.value;
+    try {
+        GM_info.script;
 
-    const comparison_regex = /(\d+)/g;
-    const splitted_current = current_script_version.match(comparison_regex);
-    const splitted_base = base_script_version.match(comparison_regex);
+        const current_script_version = getScriptInfo().version;
+        const base_script_version = parameters?.find((param) => param.name === 'ScriptVersion')?.value;
 
-    return splitted_base.every((part, index) => {
-        const is_ok = !splitted_current[index] || splitted_current[index] >= part;
-        if (display_error && !is_ok) {
-            addError(`<div>${getI18N(api_texts.error_version_startup).replace('$your_version$', current_script_version).replace('$recent_version$', base_script_version)}</div><small>${getI18N(api_texts.update_script)}</small>`);
-        }
-        return is_ok;
-    });
+        const comparison_regex = /(\d+)/g;
+        const splitted_current = current_script_version.match(comparison_regex);
+        const splitted_base = base_script_version.match(comparison_regex);
+
+        return splitted_base.every((part, index) => {
+            const is_ok = !splitted_current[index] || splitted_current[index] >= part;
+            if (display_error && !is_ok) {
+                addError(`<div>${getI18N(api_texts.error_version_startup).replace('$your_version$', current_script_version).replace('$recent_version$', base_script_version)}</div><small>${getI18N(api_texts.update_script)}</small>`);
+            }
+            return is_ok;
+        });
+    } catch (error) {
+        return true;
+    }
 }
 
 function getScriptInfo() {
@@ -1912,7 +1984,7 @@ function getScriptInfo() {
             }
         }
     }
-    return;
+
 }
 
 function getStorageItem(key) {
@@ -1936,7 +2008,7 @@ function getStorageItem(key) {
                 }
             }
         }
-        return;
+
     })
 }
 
@@ -1958,7 +2030,7 @@ function setStorageItem(key, value) {
             }
         }
     }
-    return;
+
 }
 
 function createNotification(content) {
@@ -1999,7 +2071,7 @@ function createNotification(content) {
             }
         }
     }
-    return;
+
 }
 
 function isTouchScreen() {
@@ -2111,8 +2183,11 @@ function initOptionsWithoutLoginNeeded() {
     displayCampingPredict();
     displayAntiAbuseCounter();
     automaticallyOpenBag();
-    addCopyRegisterButton();
+    addCopyRegistryButton();
     changeDefaultEscortOptions();
+    displayGhoulVoracityPercent();
+    addExternalLinksToProfiles();
+    // addExternalLinksToTowns();
     // blockUsersPosts();
     count_pending_notifications = document.querySelector('#postbox-new-msg-counter')?.innerText;
 }
@@ -2169,12 +2244,18 @@ function createSelectWithSearch() {
     options.setAttribute('style', 'position: absolute; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
 
     input.addEventListener('keyup', (event) => {
-        if (event.key === 'Enter') {
+        let temp_input = input.value.replace(/\W*/gm, '');
+        if (temp_input.length > 2) {
             options.classList.remove('hidden');
+        } else if (!options.classList.contains('hidden')) {
+            options.classList.add('hidden');
         }
     });
+
     close.addEventListener('click', () => {
-        options.classList.add('hidden');
+        if (!options.classList.contains('hidden')) {
+            options.classList.add('hidden');
+        }
         input.value = '';
     });
     select_complete.appendChild(options);
@@ -2370,8 +2451,31 @@ function createParams(content) {
     content.appendChild(categories_container);
 
     let params_title = document.createElement('h5');
-    params_title.innerText = getI18N(texts.parameters_section_label);
+    params_title.style.display = 'flex';
+    params_title.style.justifyContent = 'space-between';
     categories_container.appendChild(params_title);
+
+    let params_title_text = document.createElement('span');
+    params_title_text.innerText = getI18N(texts.parameters_section_label);
+    params_title.appendChild(params_title_text);
+
+    let params_title_select_all = document.createElement('a');
+    params_title_select_all.innerText = getI18N(texts.check_all);
+    params_title_select_all.style.cursor = 'pointer';
+    params_title.appendChild(params_title_select_all);
+
+    params_title_select_all.addEventListener('click', () => {
+        let first_level_checkboxes = Array.from(categories_container.querySelectorAll('input.mho-first-level-param[type=checkbox]:not(:checked)'));
+        first_level_checkboxes.forEach((checkbox) => {
+            checkbox.click();
+        })
+        setTimeout(() => {
+            let second_level_checkboxes = Array.from(categories_container.querySelectorAll('input.mho-second-level-param[type=checkbox]:not(:checked)'));
+            second_level_checkboxes.forEach((checkbox) => {
+                checkbox.click();
+            })
+        })
+    });
 
     let categories_list = document.createElement('ul');
     categories_container.appendChild(categories_list);
@@ -2409,6 +2513,7 @@ function createParams(content) {
             let param_input = document.createElement('input');
             param_input.type = 'checkbox';
             param_input.id = param.id + '_input';
+            param_input.classList.add('mho-first-level-param');
             param_input.checked = mho_parameters && mho_parameters[param.id] ? mho_parameters[param.id] : false;
             param_input_div.appendChild(param_input);
 
@@ -2487,6 +2592,7 @@ function createParams(content) {
                     let child_param_input = document.createElement('input');
                     child_param_input.type = 'checkbox';
                     child_param_input.id = param_child.id + '_input';
+                    child_param_input.classList.add('mho-second-level-param');
                     child_param_input.checked = mho_parameters && mho_parameters[param_child.id] ? mho_parameters[param_child.id] : false;
                     child_input_div.appendChild(child_param_input);
 
@@ -3305,7 +3411,7 @@ function displayCamping() {
             conf.ruin = $event.srcElement.value;
             let current_ruin = all_ruins.find((_current_ruin) => +_current_ruin.id === +conf.ruin);
 
-            conf.ruinBonus = current_ruin.chance;
+            conf.ruinBonus = current_ruin.camping;
             conf.ruinCapacity = current_ruin.capacity;
 
             let digs_field = document.querySelector('#digs-field');
@@ -3956,7 +4062,7 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
                 if (response.mapResponseDto.bigBrothHordesStatus.toLowerCase() === 'ok') setStorageItem(gm_bbh_updated_key, true);
                 if (response.mapResponseDto.gestHordesApiStatus.toLowerCase() === 'ok' || response.mapResponseDto.gestHordesCellsStatus.toLowerCase() === 'ok') setStorageItem(gm_gh_updated_key, true);
                 if (response.mapResponseDto.fataMorganaStatus.toLowerCase() === 'ok') setStorageItem(gm_fata_updated_key, true);
-                if (response.mapResponseDto.MhoApiStatus.toLowerCase() === 'ok') setStorageItem(gm_mho_updated_key, true);
+                if (response.mapResponseDto.mhoApiStatus.toLowerCase() === 'ok') setStorageItem(gm_mho_updated_key, true);
 
                 let tools_fail = [];
                 let response_items = Object.keys(response).map((key) => {
@@ -3979,7 +4085,8 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
                     console.error(`Erreur lors de la mise à jour de l'un des outils`, response);
                 }
             })
-            .catch(() => {
+            .catch((error) => {
+                console.error(`Erreur lors de la mise à jour de l'un des outils`, error);
                 update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}professions/death.gif" height="16">`;
                 status.innerHTML = getI18N(texts.update_external_tools_fail_btn_label);
             });
@@ -4008,6 +4115,7 @@ function displaySearchFields() {
         displaySearchFieldOnBuildings();
         displaySearchFieldOnRecipientList();
         displaySearchFieldOnRegistry();
+        displaySearchFieldOnDump();
         hideCompletedBuildings();
     }
 }
@@ -4171,6 +4279,104 @@ function displaySearchFieldOnRecipientList() {
 
             search_field_container.appendChild(header_mho_img);
             recipients.insertBefore(search_field_container, recipients.firstElementChild);
+        }
+    } else if (search_field) {
+        search_field.parentElement.remove();
+    }
+}
+
+
+/** Si l'option associée est activée, affiche un champ de recherche sur la page de la décharge */
+function displaySearchFieldOnDump() {
+    let search_field = document.getElementById(mho_search_dump_field_id);
+    if (mho_parameters.display_search_field_dump && pageIsDump()) {
+        if (search_field) return;
+
+        let main_content = document.querySelector('.town-main-content');
+        if (main_content) {
+            let table = main_content.querySelector('.row-table');
+            if (table) {
+                let filterFunction = (name_search_field, can_be_dump_field, can_be_recovered_field) => {
+                    let items_list = Array.from(table.querySelectorAll('.row:not(.header)') || []);
+                    items_list.forEach((item) => {
+                        let item_label = item.querySelector('span.icon img');
+                        let item_counts = item_label.parentElement.parentElement.nextElementSibling.querySelector('span')?.innerHTML.split('<br>');
+                        let item_bank_count = +item_counts[0].replace(/\D*/, '');
+                        let item_dump_count = +item_counts[1].replace(/\D*/, '');
+
+                        let is_search_in_string = normalizeString(item_label.getAttribute('alt')).indexOf(normalizeString(name_search_field.value)) > -1;
+                        let can_be_recovered = can_be_recovered_field.checked && item_dump_count > 0;
+                        let can_be_dump = can_be_dump_field.checked && item_bank_count > 0;
+
+                        if (is_search_in_string && (can_be_dump || can_be_recovered)) {
+                            item.classList.remove('hidden');
+                        } else {
+                            item.classList.add('hidden');
+                        }
+                    });
+                }
+
+                let search_field_container = document.createElement('div');
+                search_field_container.setAttribute('style', ' display: flex; flex-wrap: wrap; gap: 0.5em;');
+                search_field_container.id = mho_search_dump_field_id;
+
+                search_field = document.createElement('input');
+                search_field.type = 'text';
+                search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_dump').label);
+                search_field.classList.add('inline');
+                search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
+
+                search_field_container.appendChild(search_field);
+
+                let can_be_dumped = document.createElement('div');
+                search_field_container.appendChild(can_be_dumped);
+
+                let can_be_dumped_input = document.createElement('input');
+                can_be_dumped_input.type = 'checkbox';
+                can_be_dumped_input.id = 'can_be_dumped';
+                can_be_dumped_input.checked = true;
+                can_be_dumped.appendChild(can_be_dumped_input);
+
+                let can_be_dumped_label = document.createElement('label');
+                can_be_dumped_label.innerText = 'Peut être jeté';
+                can_be_dumped_label.htmlFor = 'can_be_dumped';
+                can_be_dumped.appendChild(can_be_dumped_label);
+
+                let can_be_recovered = document.createElement('div');
+                search_field_container.appendChild(can_be_recovered);
+
+                let can_be_recovered_input = document.createElement('input');
+                can_be_recovered_input.type = 'checkbox';
+                can_be_recovered_input.id = 'can_be_recovered';
+                can_be_recovered_input.checked = true;
+                can_be_recovered.appendChild(can_be_recovered_input);
+
+                let can_be_recovered_label = document.createElement('label');
+                can_be_recovered_label.innerText = 'Peut être récupéré';
+                can_be_recovered_label.htmlFor = 'can_be_recovered';
+                can_be_recovered.appendChild(can_be_recovered_label);
+
+                search_field.addEventListener('keyup', (event) => {
+                    filterFunction(search_field, can_be_dumped_input, can_be_recovered_input);
+                });
+
+                can_be_dumped_input.addEventListener('change', (event) => {
+                    filterFunction(search_field, can_be_dumped_input, can_be_recovered_input);
+                });
+
+                can_be_recovered.addEventListener('change', (event) => {
+                    filterFunction(search_field, can_be_dumped_input, can_be_recovered_input);
+                });
+
+                let header_mho_img = document.createElement('img');
+                header_mho_img.src = mh_optimizer_icon;
+                header_mho_img.style.height = '24px';
+                header_mho_img.style.position = 'absolute';
+                header_mho_img.style.left = '16px';
+
+                search_field_container.appendChild(header_mho_img);
+                main_content.insertBefore(search_field_container, table);
+            }
         }
     } else if (search_field) {
         search_field.parentElement.remove();
@@ -4579,7 +4785,7 @@ function displayAdvancedTooltips() {
                 tooltip_loading.style.left = '8px';
                 tooltip_loading.style.top = '0';
                 tooltip_container.querySelector('h1').appendChild(tooltip_loading);
-                tooltip_loading.src = `${repo_img_hordes_url}anims/loading.gif`;
+                tooltip_loading.src = `${repo_img_hordes_url}anims/loading_wheel.gif`;
             } else {
                 tooltip_loading.style.display = 'inline';
             }
@@ -4778,14 +4984,17 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.innerHTML = `Ressource`;
             break;
         case 'flash_photo_1':
+            item_action.classList.add(`mho-item-tag-large`);
             var fail_1 = Math.round(60 / 90 * 100);
             item_action.innerHTML = `${100 - fail_1}% de chances de pouvoir fuir pendant 30 secondes`;
             break;
         case 'flash_photo_2':
+            item_action.classList.add(`mho-item-tag-large`);
             var fail_2 = Math.round(30 / 90 * 100);
             item_action.innerHTML = `${100 - fail_2}% de chances de pouvoir fuir pendant 60 secondes`;
             break;
         case 'flash_photo_3':
+            item_action.classList.add(`mho-item-tag-large`);
             var fail_3 = 1;
             item_action.innerHTML = `Succès : ${100 - fail_3}% de chances de pouvoir fuir pendant 120 secondes`;
             break;
@@ -5838,7 +6047,8 @@ function displayTranslateTool() {
         let block_to_display = mho_display_translate_input_div.lastElementChild;
         block_to_display.setAttribute('style', 'float: right; z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
         input.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
+            let temp_input = input.value.replace(/\W*/gm, '');
+            if (temp_input.length > 2) {
                 getTranslation(input.value, select.value).then((response) => {
 
                     block_to_display.innerHTML = '';
@@ -6074,18 +6284,10 @@ function displayEstimationsOnWatchtower() {
             const current_estimation_percent_read = watchtower_estim_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '');
             const current_estimation_percent = current_estimation_percent_read !== undefined && current_estimation_percent_read !== null ? +current_estimation_percent_read : (watchtower_estim_block_prediction ? 100 : undefined);
 
-            // console.log('watchtower_estim_block', watchtower_estim_block);
-            // console.log('watchtower_estim_block_prediction', watchtower_estim_block_prediction);
-            // console.log('current_estimation_percent', current_estimation_percent);
-
             const watchtower_planif_block = watchtower_estim_block.nextElementSibling;
             const watchtower_planif_block_prediction = watchtower_planif_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
             const current_planif_percent_read = watchtower_planif_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '')
             const current_planif_percent = current_planif_percent_read !== undefined && current_planif_percent_read !== null ? +current_planif_percent_read : (watchtower_planif_block_prediction ? 100 : undefined);
-
-            // console.log('watchtower_planif_block', watchtower_planif_block);
-            // console.log('watchtower_planif_block_prediction', watchtower_planif_block_prediction);
-            // console.log('current_planif_percent', current_planif_percent);
 
             let createEstimationRow = (value, is_new_estimation, estimation, type) => {
                 return `<b style="color: #afb3cf; opacity: .8;">[${value}%]</b>
@@ -6095,15 +6297,22 @@ function displayEstimationsOnWatchtower() {
             };
             let createCalculatedAttackRow = (calculated_attack) => {
                 let estim_values_block_title_calculated_text = ``;
-                estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>Calculé (Apofoo)</b><div><span>${calculated_attack.min}</span> - <span>${calculated_attack.max}</span></div></div>`;
+                estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>${getI18N(texts.calculated_attack)} (Apofoo)</b><div><span>${calculated_attack.min}</span> - <span>${calculated_attack.max}</span></div></div>`;
 
                 return estim_values_block_title_calculated_text;
             }
 
             let updateEstimationRow = (estimations, percent, type) => {
                 if (!estimations.estimations[type][`_${percent}`]) {
-                    estimations.estimations[type][`_${percent}`] = {min: null, max: null};
+                    /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
+                    let estimations_workaround_estim = {...estimations.estimations};
+                    let estimations_workaround_type = {...estimations_workaround_estim[type]};
+                    let estimations_workaround_type_percent = {min: null, max: null};
+                    estimations_workaround_type[`_${percent}`] = {...estimations_workaround_type_percent};
+                    estimations_workaround_estim[type] = {...estimations_workaround_type};
+                    estimations.estimations = {...estimations_workaround_estim};
                 }
+
                 let estimation = estimations.estimations[type][`_${percent}`];
                 let main = document.querySelector(`#${mho_watchtower_estim_id}`);
                 let row = main.querySelector(`#${type}_${percent}`);
@@ -6138,6 +6347,7 @@ function displayEstimationsOnWatchtower() {
             }
 
             getEstimations().then((estimations) => {
+                estimations = {...estimations};
                 estim_block = document.createElement('div');
                 estim_block.style.marginTop = '1em';
                 estim_block.style.padding = '0.25em';
@@ -6280,7 +6490,14 @@ function displayEstimationsOnWatchtower() {
                     } : undefined;
 
                     if (!estimations.estimations.estim['_' + value]) {
-                        estimations.estimations.estim['_' + value] = {min: null, max: null};
+                        /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
+                        let new_estimations = {...estimations};
+                        let new_estimations_estimations = {...new_estimations.estimations};
+                        let new_estimations_estimations_estim = {...new_estimations_estimations.estim};
+                        new_estimations_estimations_estim['_' + value] = {min: null, max: null};
+                        new_estimations_estimations.estim = {...new_estimations_estimations_estim};
+                        new_estimations.estimations = {...new_estimations_estimations};
+                        estimations = {...new_estimations};
                     }
                     let value_block = document.createElement('div');
                     value_block.style.display = 'flex';
@@ -6330,8 +6547,16 @@ function displayEstimationsOnWatchtower() {
                             max: estimations.estimations.planif['_' + value].max
                         } : undefined;
 
+
                         if (!estimations.estimations.planif['_' + value]) {
-                            estimations.estimations.planif['_' + value] = {min: null, max: null};
+                            /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
+                            let new_estimations = {...estimations};
+                            let new_estimations_estimations = {...new_estimations.estimations};
+                            let new_estimations_estimations_planif = {...new_estimations_estimations.planif};
+                            new_estimations_estimations_planif['_' + value] = {min: null, max: null};
+                            new_estimations_estimations.planif = {...new_estimations_estimations_planif};
+                            new_estimations.estimations = {...new_estimations_estimations};
+                            estimations = {...new_estimations};
                         }
 
                         let value_block = document.createElement('div');
@@ -6530,7 +6755,7 @@ function displayAntiAbuseCounter() {
                 });
 
             } else if (pageIsWell()) {
-                let btn = document.querySelector('button[data-fetch-method="get"]');/*[data-fetch-confirm]*/
+                let btn = document.querySelector('button[data-fetch-method="get"][data-fetch-confirm]');
                 btn?.addEventListener('click', (event) => {
                     document.addEventListener('mh-navigation-complete', () => {
                         controller.abort();
@@ -6810,7 +7035,7 @@ function displayCampingPredict() {
                     conf.ruin = $event.srcElement.value;
                     let current_ruin = all_ruins.find((_current_ruin) => +_current_ruin.id === +conf.ruin);
 
-                    conf.ruinBonus = current_ruin.chance;
+                    conf.ruinBonus = current_ruin.camping;
                     conf.ruinCapacity = current_ruin.capacity;
 
                     let digs_field = document.querySelector('#digs-field');
@@ -6976,17 +7201,22 @@ function displayCampingPredict() {
     }, 500);
 }
 
-function addCopyRegisterButton() {
+function addCopyRegistryButton() {
     if (mho_parameters.copy_registry) {
         let logs = document.querySelector('hordes-log');
         let logs_complete_links = document.querySelector('log-complete-link');
         let copy_button = document.querySelector(`#${mho_copy_logs_id}`);
+
+        let createCopyRegistryButtonContent = (value) => {
+            return `<div style="display: flex; gap: 0.5em; align-items: center;"><img src="${mh_optimizer_icon}" style="width: 16px !important;">${value}</div>`;
+        }
+
         if (logs && !copy_button && !logs_complete_links) {
             let title = logs.parentElement.previousElementSibling;
             let copy_button = document.createElement('a');
             title.appendChild(copy_button);
 
-            copy_button.innerHTML = `<div style="display: flex; gap: 0.5em; align-items: center;"><img src="${mh_optimizer_icon}" style="width: 16px !important;">⧉</div>`;
+            copy_button.innerHTML = createCopyRegistryButtonContent('⧉');
             copy_button.id = mho_copy_logs_id;
             copy_button.style.backgroundColor = 'rgba(62,36,23,.75)';
             copy_button.style.borderRadius = '6px';
@@ -7005,6 +7235,10 @@ function addCopyRegisterButton() {
 
                 let final_text = soft_entries.join('\n');
                 copyToClipboard(final_text);
+                copy_button.innerHTML = createCopyRegistryButtonContent(`<img src="${repo_img_hordes_url}icons/done.png">`);
+                setTimeout(() => {
+                    copy_button.innerHTML = createCopyRegistryButtonContent('⧉');
+                }, 5000)
             });
             if (title) {
                 if (title.tagName.toLowerCase() === 'H5'.toLowerCase()) {
@@ -7056,6 +7290,132 @@ function changeDefaultEscortOptions() {
                 }
             }, {once: true});
         });
+    }
+}
+
+function displayGhoulVoracityPercent() {
+    if (mho_parameters.display_ghoul_voracity_percent) {
+        let ghoul_voracity_node = document.querySelector('.status-ghoul');
+
+        if (!ghoul_voracity_node) return;
+
+        let voracite = ghoul_voracity_node.querySelector('.ghoul-hunger-bar').style.width;
+        ghoul_voracity_node.firstChild.textContent = ghoul_voracity_node.firstChild.textContent.replace(':\n', `: ${voracite}\n`);
+    }
+}
+
+function addExternalLinksToProfiles() {
+    if (mho_parameters.display_external_links) {
+        let user_tooltip = document.querySelector('#user-tooltip');
+        if (user_tooltip) {
+            let user_id = user_tooltip.querySelector('[x-friend-id]').getAttribute('x-friend-id');
+            let dash_separators = user_tooltip.querySelectorAll('hr.dashed');
+            let last_separator = Array.from(dash_separators).pop();
+            let link_color = window.getComputedStyle(user_tooltip.querySelector('.link')).getPropertyValue('color');
+
+            let new_separator = document.createElement('hr');
+            new_separator.classList.add('dashed');
+            last_separator.parentNode.insertBefore(new_separator, last_separator.nextSibling);
+
+            let new_part = document.createElement('div');
+            new_part.classList.add('link-blocks');
+            last_separator.parentNode.insertBefore(new_part, last_separator.nextSibling);
+
+            let new_part_title = document.createElement('div');
+            new_part_title.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 16px; margin-right: 0.5em;">${getI18N(texts.external_profiles)}`;
+            new_part_title.style.marginBottom = '0.5em';
+            new_part_title.style.textAlign = 'left';
+            new_part_title.style.color = link_color;
+            new_part.appendChild(new_part_title);
+
+            let bbh_link = document.createElement('a');
+            bbh_link.classList.add('link-block');
+            bbh_link.href = `${big_broth_hordes_url}/?pg=user&uid=5-${user_id}`;
+            new_part.appendChild(bbh_link);
+
+            let bbh_img = document.createElement('img');
+            bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
+            bbh_link.appendChild(bbh_img);
+
+            let bbh_br = document.createElement('br');
+            bbh_link.appendChild(bbh_br);
+
+            let bbh_title = document.createElement('text');
+            bbh_title.innerHTML = `BigBroth'\nHordes`;
+            bbh_link.appendChild(bbh_title);
+
+            let gh_link = document.createElement('a');
+            gh_link.classList.add('link-block');
+            gh_link.href = `${gest_hordes_url}/ame/${user_id}`;
+            new_part.appendChild(gh_link);
+
+            let gh_img = document.createElement('img');
+            gh_img.src = `${repo_img_url}external-tools/gh.gif`;
+            gh_link.appendChild(gh_img);
+
+            let gh_br = document.createElement('br');
+            gh_link.appendChild(gh_br);
+
+            let gh_title = document.createElement('text');
+            gh_title.innerText = `Gest'Hordes`;
+            gh_link.appendChild(gh_title);
+
+            let empty_link = document.createElement('div');
+            empty_link.classList.add('link-block', 'empty');
+            new_part.appendChild(empty_link);
+        }
+    }
+}
+
+function addExternalLinksToTowns() {
+    if (mho_parameters.display_external_links && pageIsSoul()) {
+        let town_history = document.querySelector('.town-history');
+
+        if (!town_history) return;
+
+        let table_header = town_history.querySelector('.row-flex.header');
+
+        if (!table_header) return;
+
+        let new_cell_header = document.createElement('div');
+        new_cell_header.classList.add('cell', 'padded', 'rw-2', 'center');
+        new_cell_header.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 16px; margin-right: 0.25em;">${getI18N(texts.external_links)}`;
+        table_header.appendChild(new_cell_header);
+
+        let table_rows_container = town_history.querySelector('.town-container');
+
+        let table_rows = table_rows_container.querySelectorAll('.row-flex.stretch');
+        if (table_rows && table_rows.length > 0) {
+            Array.from(table_rows).forEach((table_row) => {
+                let town_id = table_row.querySelector('[data-town-id]').getAttribute('data-town-id');
+
+                let new_cell = document.createElement('div');
+                new_cell.classList.add('cell', 'padded', 'rw-2', 'center');
+                new_cell.style.borderBottom = '1px solid #7e4d2a';
+                new_cell.style.borderLeft = '1px solid #7e4d2a';
+                new_cell.style.display = 'flex';
+                new_cell.style.gap = '0.25em';
+                new_cell.style.alignItems = 'flex-start';
+                new_cell.style.justifyContent = 'space-around';
+                table_row.appendChild(new_cell);
+
+                let bbh_link = document.createElement('a');
+                bbh_link.href = `${big_broth_hordes_url}/?cid=5-${town_id}`;
+                new_cell.appendChild(bbh_link);
+
+                let bbh_img = document.createElement('img');
+                bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
+                bbh_link.appendChild(bbh_img);
+
+                let gh_link = document.createElement('a');
+                gh_link.href = `${gest_hordes_url}/carte/${town_id}`;
+                new_cell.appendChild(gh_link);
+
+                let gh_img = document.createElement('img');
+                gh_img.src = `${repo_img_url}external-tools/gh.gif`
+                gh_link.appendChild(gh_img);
+            });
+        }
     }
 }
 
@@ -7711,7 +8071,12 @@ function createStyles() {
 
     let hidden = '.mho-hidden {'
         + 'display: none !important;'
-        + '}'
+        + '}';
+
+    let item_tag = `.mho-item-tag-large {`
+        + `min-height: 18px;`
+        + `height: unset !important;`
+        + `}`;
 
 
     let css = params_style + btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
@@ -7725,7 +8090,7 @@ function createStyles() {
         + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
         + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
         + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
-        + citizen_list_more_info_header_content + hidden;
+        + citizen_list_more_info_header_content + hidden + item_tag;
 
     let style = document.createElement('style');
 
@@ -7926,56 +8291,56 @@ function getGHRuin() {
 
                                 let img_path = cell.querySelector('.ruineCarte')?.firstElementChild.href.baseVal.replace(/^(.*)#/, '');
                                 switch (img_path) {
-                                    case 'ruineCarte_0':
-                                        new_cell.borders = '0101';
+                                    case 'ruineCarte_16':
+                                        new_cell.borders = 'exit';
                                         break;
-                                    case 'ruineCarte_1':
-                                        new_cell.borders = '1010';
-                                        break;
-                                    case 'ruineCarte_2':
-                                        new_cell.borders = '1100';
-                                        break;
-                                    case 'ruineCarte_3':
-                                        new_cell.borders = '0110';
-                                        break;
-                                    case 'ruineCarte_4':
-                                        new_cell.borders = '1001';
-                                        break;
-                                    case 'ruineCarte_5':
-                                        new_cell.borders = '0011';
-                                        break;
-                                    case 'ruineCarte_6':
+                                    case 'ruineCarte_15':
                                         new_cell.borders = '1111';
                                         break;
                                     case 'ruineCarte_7':
-                                        new_cell.borders = '0111';
-                                        break;
-                                    case 'ruineCarte_8':
-                                        new_cell.borders = '1101';
-                                        break;
-                                    case 'ruineCarte_9':
                                         new_cell.borders = '1110';
                                         break;
-                                    case 'ruineCarte_10':
-                                        new_cell.borders = '1011';
-                                        break;
                                     case 'ruineCarte_11':
-                                        new_cell.borders = '1000';
+                                        new_cell.borders = '1101';
                                         break;
-                                    case 'ruineCarte_12':
-                                        new_cell.borders = '0100';
+                                    case 'ruineCarte_3':
+                                        new_cell.borders = '1100';
                                         break;
                                     case 'ruineCarte_13':
-                                        new_cell.borders = '0001';
+                                        new_cell.borders = '1011';
+                                        break;
+                                    case 'ruineCarte_5':
+                                        new_cell.borders = '1010'; // ?
+                                        break;
+                                    case 'ruineCarte_18':
+                                        new_cell.borders = '1010'; // ?
+                                        break;
+                                    case 'ruineCarte_9':
+                                        new_cell.borders = '1001';
+                                        break;
+                                    case 'ruineCarte_1':
+                                        new_cell.borders = '1000';
                                         break;
                                     case 'ruineCarte_14':
+                                        new_cell.borders = '0111';
+                                        break;
+                                    case 'ruineCarte_6':
+                                        new_cell.borders = '0110';
+                                        break;
+                                    case 'ruineCarte_10':
+                                        new_cell.borders = '0101';
+                                        break;
+                                    case 'ruineCarte_2':
+                                        new_cell.borders = '0100';
+                                        break;
+                                    case 'ruineCarte_12':
+                                        new_cell.borders = '0011';
+                                        break;
+                                    case 'ruineCarte_4':
                                         new_cell.borders = '0010';
                                         break;
-                                    case 'ruineCarte_15':
-                                        new_cell.borders = 'exit';
-                                        break;
-                                    case 'ruineCarte_17':
-                                        new_cell.borders = '1010';
+                                    case 'ruineCarte_8':
+                                        new_cell.borders = '0001';
                                         break;
                                     default:
                                         new_cell.borders = '0000';
@@ -8545,6 +8910,7 @@ function getBank() {
                 let bank = [];
                 response.bank.forEach((bank_item) => {
                     bank_item.item.broken = bank_item.isBroken;
+                    bank_item.item.wishListCount = bank_item.wishListCount;
                     bank.push(bank_item.item);
                 });
                 bank = bank.sort((item_a, item_b) => {
@@ -8577,10 +8943,11 @@ function getWishlist() {
                 }
             })
             .then((response) => {
-                for (let key in response.wishList) {
-                    let wishlist_zone = response.wishList[key];
-                    wishlist_zone = Object.keys(wishlist_zone)
-                        .map((item_key) => wishlist_zone[item_key])
+                let new_wishlist = {...response};
+                let new_wishlist_wishlist = {};
+                for (let key in new_wishlist.wishList) {
+                    let wishlist_zone = Object.keys(new_wishlist.wishList[key])
+                        .map((item_key) => new_wishlist.wishList[key][item_key])
                         .map((item) => {
                             if (item.priority < 0) {
                                 item.priority_main = -1;
@@ -8599,9 +8966,10 @@ function getWishlist() {
                     wishlist_zone.forEach((item) => {
                         item.item.img = fixMhCompiledImg(item.item.img);
                     });
-                    response.wishList[key] = cloneInto(wishlist_zone);
+                    new_wishlist_wishlist[key] = [...wishlist_zone];
                 }
-                wishlist = response;
+                new_wishlist.wishList = new_wishlist_wishlist;
+                wishlist = new_wishlist;
                 resolve(wishlist);
             })
             .catch((error) => {
@@ -9017,6 +9385,7 @@ function updateExternalTools() {
                 }
             })
             .then((response) => {
+                getItems();
                 getMap();
                 resolve(response);
             })
@@ -9100,10 +9469,12 @@ function getRecipes() {
                     }
                 })
                 .then((response) => {
-                    recipes = response.map((recipe) => {
-                        recipe.type = action_types.find((type) => type.id === recipe.type);
-                        return recipe;
-                    })
+                    let new_recipes = response
+                        .map((recipe) => {
+                            let new_recipe = {...recipe};
+                            new_recipe.type = action_types.find((type) => type.id === new_recipe.type);
+                            return new_recipe;
+                        })
                         .sort((a, b) => {
                             if (a.type.ordering > b.type.ordering) {
                                 return 1;
@@ -9113,6 +9484,7 @@ function getRecipes() {
                                 return -1;
                             }
                         });
+                    recipes = new_recipes;
                     resolve(recipes);
                 })
                 .catch((error) => {
@@ -9223,13 +9595,20 @@ function getApofooAttackCalculation(day, beta) {
 function saveEstimations(estim_value, planif_value) {
     return new Promise((resolve, reject) => {
         getEstimations().then((estimations) => {
-            let new_estimations = estimations.estimations;
+            let new_estimations = {...estimations.estimations};
             if (estim_value && estim_value.value && (estim_value.value.min || estim_value.value.max)) {
-                new_estimations.estim['_' + estim_value.percent] = estim_value.value;
+                /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
+                let new_estimations_workaround_estim = {...new_estimations.estim};
+                new_estimations_workaround_estim['_' + estim_value.percent] = {...estim_value.value};
+                new_estimations.estim = {...new_estimations_workaround_estim};
             }
             if (planif_value && planif_value.value && (planif_value.value.min || planif_value.value.max)) {
-                new_estimations.planif['_' + planif_value.percent] = planif_value.value;
+                /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
+                let new_estimations_workaround_planif = {...new_estimations.planif};
+                new_estimations_workaround_planif['_' + planif_value.percent] = {...planif_value.value};
+                new_estimations.planif = {...new_estimations_workaround_planif};
             }
+
             fetcher(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails.townId}&userId=${mh_user.id}`, {
                 method: 'POST',
                 body: JSON.stringify(new_estimations),
@@ -9277,7 +9656,9 @@ function calculateCamping(camping_parameters) {
             })
             .then((camping_result) => {
                 let result = document.querySelector('#camping-result');
-                result.innerText = result ? `${getI18N(camping_result.label)} (${camping_result.boundedProbability}%)` : '';
+                if (result) {
+                    result.innerText = result ? `${getI18N(camping_result.label)} (${camping_result.boundedProbability}%)` : '';
+                }
                 resolve(camping_result);
             })
             .catch((error) => {
@@ -9379,7 +9760,7 @@ function getApiKey() {
 //     MAIN FUNCTION     //
 ///////////////////////////
 (function () {
-    if (document.URL.startsWith('https://bbh.fred26.fr/') || document.URL.startsWith('https://gest-hordes2.eragaming.fr/') || document.URL.startsWith('https://fatamorgana.md26.eu/') || document.URL.startsWith('https://myhordes-optimizer.web.app/')) {
+    if (document.URL.startsWith(big_broth_hordes_url) || document.URL.startsWith(gest_hordes_url) || document.URL.startsWith(fata_morgana_url) || document.URL.startsWith(website)) {
         let current_key;
         let map_block_id;
         let ruin_block_id;
@@ -9387,28 +9768,28 @@ function getApiKey() {
         let block_copy_ruin_button;
         let source;
 
-        if (document.URL.startsWith('https://bbh.fred26.fr/')) {
+        if (document.URL.startsWith(big_broth_hordes_url)) {
             current_key = gm_bbh_updated_key;
             map_block_id = 'carte';
             ruin_block_id = 'plan';
             block_copy_map_button = 'ul_infos_1';
             block_copy_ruin_button = 'cl1';
             source = 'bbh';
-        } else if (document.URL.startsWith('https://gest-hordes2.eragaming.fr/')) {
+        } else if (document.URL.startsWith(gest_hordes_url)) {
             current_key = gm_gh_updated_key;
             map_block_id = 'zoneCarte';
             ruin_block_id = 'carteRuine';
             block_copy_map_button = 'zoneInfoVilleAutre';
             block_copy_ruin_button = 'menuRuine';
             source = 'gh';
-        } else if (document.URL.startsWith('https://fatamorgana.md26.eu/')) {
+        } else if (document.URL.startsWith(fata_morgana_url)) {
             current_key = gm_fata_updated_key;
             map_block_id = 'map';
             ruin_block_id = 'ruinmap';
             block_copy_map_button = 'modeBar';
             block_copy_ruin_button = 'modeBar';
             source = 'fm';
-        } else if (document.URL.startsWith('https://myhordes-optimizer.web.app/')) {
+        } else if (document.URL.startsWith(website)) {
             current_key = gm_mho_updated_key;
             source = 'mho';
         }

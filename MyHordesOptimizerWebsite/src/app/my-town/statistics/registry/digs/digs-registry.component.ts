@@ -27,6 +27,7 @@ export class DigsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input({ required: true }) completeCitizenList!: CitizenInfo;
+    @Input({ required: true }) displayPseudo!: 'simple' | 'id_mh';
 
     @Input({ required: true }) set registry(registry: Entry[] | undefined) {
         this.current_day = getTown()?.day || 1;

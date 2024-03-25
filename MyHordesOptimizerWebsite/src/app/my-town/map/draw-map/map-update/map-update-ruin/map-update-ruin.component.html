@@ -1,65 +1,75 @@
-<div class="mho-map-update-ruin" *ngIf="ruin">
-    <ng-container>
-        <div [innerHTML]="ruin.description[locale]"></div>
-        <br/>
-        <div>
-            <ng-container i18n>Bonus en camping</ng-container>&nbsp;:&nbsp;{{ruin.camping}}</div>
-    </ng-container>
-    <ng-container>
-        <mat-divider></mat-divider>
-        <form [formGroup]="cell_form">
-            <div class="ruin-info">
-                <ng-container *ngIf="!ruin.explorable; else ruinDrops">
-                    <mat-form-field class="nb-digs" *ngIf="+cell.ruin_id < 0">
-                        <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" width="16" height="16">
-                        <input matInput formControlName="nb_ruin_dig"></mat-form-field>
-                    <mat-checkbox *ngIf="cell.ruin_id > -1" formControlName="is_ruin_dryed">
-                        <ng-container i18n>Bâtiment vide</ng-container>
-                    </mat-checkbox>
-                    <!--                    <mat-form-field appearance="outline">
-                                            <mat-label i18n>Fouilles réussies</mat-label>
-                                            <input matInput type="number" formControlName="nb_ruin_success">
-                                        </mat-form-field>-->
+@if (ruin) {
+    <div class="mho-map-update-ruin">
+        <ng-container>
+            <div [innerHTML]="ruin.description[locale]"></div>
+            <br/>
+            <div>
+                <ng-container i18n>Bonus en camping</ng-container>&nbsp;:&nbsp;{{ ruin.camping }}
+            </div>
+        </ng-container>
+
+        <ng-container>
+            <mat-divider></mat-divider>
+            <form [formGroup]="cell_form">
+                <div class="ruin-info">
+                    @if (!ruin.explorable) {
+                        @if (+cell.ruin_id < 0) {
+                            <mat-form-field class="nb-digs">
+                                <img matPrefix [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" width="16" height="16">
+                                <input matInput formControlName="nb_ruin_dig">
+                            </mat-form-field>
+                        } @else {
+                            <mat-checkbox formControlName="is_ruin_dryed">
+                                <ng-container i18n>Bâtiment vide</ng-container>
+                            </mat-checkbox>
+                        }
+                        <!--                    <mat-form-field appearance="outline">
+                                                <mat-label i18n>Fouilles réussies</mat-label>
+                                                <input matInput type="number" formControlName="nb_ruin_success">
+                                            </mat-form-field>-->
+                    } @else {
+                        <mat-form-field appearance="outline">
+                            <mat-label i18n>Plans inhabituels sortis</mat-label>
+                            <input matInput type="number" formControlName="nb_eruin_yellow">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label i18n>Plans rares sortis</mat-label>
+                            <input matInput type="number" formControlName="nb_eruin_blue">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label i18n>Plans très rares sortis</mat-label>
+                            <input matInput type="number" formControlName="nb_eruin_violet">
+                        </mat-form-field>
+                    }
+                </div>
+            </form>
+        </ng-container>
+        @if (ruin.drops && ruin.drops.length > 0) {
+            <mat-divider></mat-divider>
+            <div class="drops">
+                <div *ngFor="let drop of ruin.drops">
+                    <img [ngSrc]="HORDES_IMG_REPO + drop.item.img" width="16" height="16">
+                    {{ drop.item.label[locale] }}
+                    <small>&nbsp;({{ drop.probability * 100 | number:'1.0-2':locale }}%)</small>
+                </div>
+            </div>
+        }
+        @if (ruin.id === -1) {
+            <mat-divider></mat-divider>
+            <h4 i18n>Liste des bâtiments possibles</h4>
+            <mat-list>
+                <ng-container *ngFor="let ruin of (allRuins | filterRuinsByKm:cell.nb_km)">
+                    @if (ruin.id > -1) {
+                        <mat-list-item>
+                            <span matListItemTitle>{{ ruin.label[locale] }}</span>
+                            <span matListItemLine>
+                                <ng-container i18n>Bonus en camping</ng-container>
+                                &nbsp;:&nbsp;{{ ruin.camping }}
+                            </span>
+                        </mat-list-item>
+                    }
                 </ng-container>
-                <ng-template #ruinDrops>
-                    <mat-form-field appearance="outline">
-                        <mat-label i18n>Plans inhabituels sortis</mat-label>
-                        <input matInput type="number" formControlName="nb_eruin_yellow">
-                    </mat-form-field>
-                    <mat-form-field appearance="outline">
-                        <mat-label i18n>Plans rares sortis</mat-label>
-                        <input matInput type="number" formControlName="nb_eruin_blue">
-                    </mat-form-field>
-                    <mat-form-field appearance="outline">
-                        <mat-label i18n>Plans très rares sortis</mat-label>
-                        <input matInput type="number" formControlName="nb_eruin_violet">
-                    </mat-form-field>
-                </ng-template>
-            </div>
-        </form>
-    </ng-container>
-    <ng-container *ngIf="ruin.drops && ruin.drops.length > 0">
-        <mat-divider></mat-divider>
-        <div class="drops">
-            <div *ngFor="let drop of ruin.drops">
-                <img [ngSrc]="HORDES_IMG_REPO + drop.item.img" width="16" height="16">
-                {{drop.item.label[locale]}}
-                <small>&nbsp;({{drop.probability * 100 | number:'1.0-2':locale}}%)</small>
-            </div>
-        </div>
-    </ng-container>
-    <ng-container *ngIf="ruin.id === -1">
-        <mat-divider></mat-divider>
-        <h4 i18n>Liste des bâtiments possibles</h4>
-        <mat-list>
-            <ng-container *ngFor="let ruin of (allRuins | filterRuinsByKm:cell.nb_km)">
-                <mat-list-item *ngIf="ruin.id > -1">
-                    <span matListItemTitle>{{ruin.label[locale]}}</span>
-                    <span matListItemLine>
-                        <ng-container i18n>Bonus en camping</ng-container>
-                        &nbsp;:&nbsp;{{ruin.camping}}</span>
-                </mat-list-item>
-            </ng-container>
-        </mat-list>
-    </ng-container>
-</div>
+            </mat-list>
+        }
+    </div>
+}

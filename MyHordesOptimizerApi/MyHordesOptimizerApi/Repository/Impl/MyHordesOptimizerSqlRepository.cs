@@ -698,8 +698,8 @@
 //            foreach (var citizenToUpdate in townCitizenModelsToUpdate)
 //            {
 //                citizenToUpdate.IdBag = existings.Single(existing => existing.idUser == citizenToUpdate.IdUser).idBag;
-//                connection.Execute(@"UPDATE TownCitizen 
-//                                     SET HomeMessage = @HomeMessage, JobName = @JobName, JobUID = @JobUID, Avatar = @Avatar, PositionX = @PositionX, PositionY = @PositionY, IsGhost = @IsGhost, Dead = @Dead, IdLastUpdateInfo = @IdLastUpdateInfo 
+//                connection.Execute(@"UPDATE TownCitizen
+//                                     SET HomeMessage = @HomeMessage, JobName = @JobName, JobUID = @JobUID, Avatar = @Avatar, PositionX = @PositionX, PositionY = @PositionY, IsGhost = @IsGhost, Dead = @Dead, IdLastUpdateInfo = @IdLastUpdateInfo
 //                                     WHERE IdTown = @IdTown AND IdUser = @IdUser", new { HomeMessage = citizenToUpdate.HomeMessage, JobName = citizenToUpdate.JobName, JobUID = citizenToUpdate.JobUID, Avatar = citizenToUpdate.Avatar, PositionX = citizenToUpdate.PositionX, PositionY = citizenToUpdate.PositionY, IsGhost = citizenToUpdate.IsGhost, Dead = citizenToUpdate.Dead, IdLastUpdateInfo = citizenToUpdate.IdLastUpdateInfo, IdTown = townId, IdUser = citizenToUpdate.IdUser });
 //            }
 
@@ -818,20 +818,20 @@
 //                                  ,ghoulLui.dateUpdate AS GhoulStatusLastUpdateDateUpdate
 //                              FROM TownCitizen tc
 //                              INNER JOIN Users citizen ON citizen.idUser = tc.idUser
-//                              INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = tc.idLastUpdateInfo 
+//                              INNER JOIN LastUpdateInfo lui ON lui.idLastUpdateInfo = tc.idLastUpdateInfo
 //                              INNER JOIN Users userUpdater ON userUpdater.idUser = lui.idUser
 //                              LEFT JOIN Bag bag ON bag.idBag = tc.idBag
-//                              LEFT JOIN LastUpdateInfo bagLui ON bagLui.idLastUpdateInfo = bag.idLastUpdateInfo 
+//                              LEFT JOIN LastUpdateInfo bagLui ON bagLui.idLastUpdateInfo = bag.idLastUpdateInfo
 //                              LEFT JOIN Users bagLuiUser ON bagLuiUser.idUser = bagLui.idUser
 //                              LEFT JOIN BagItem bi on bi.idBag = bag.idBag
 //                              LEFT JOIN ItemComplet i ON i.idItem = bi.idItem
-//                              LEFT JOIN LastUpdateInfo heroicActionLui ON heroicActionLui.idLastUpdateInfo = tc.idLastUpdateInfoHeroicAction 
+//                              LEFT JOIN LastUpdateInfo heroicActionLui ON heroicActionLui.idLastUpdateInfo = tc.idLastUpdateInfoHeroicAction
 //                              LEFT JOIN Users heroicActionLuiUser ON heroicActionLuiUser.idUser = heroicActionLui.idUser
-//                              LEFT JOIN LastUpdateInfo homeLui ON homeLui.idLastUpdateInfo = tc.idLastUpdateInfoHome 
+//                              LEFT JOIN LastUpdateInfo homeLui ON homeLui.idLastUpdateInfo = tc.idLastUpdateInfoHome
 //                              LEFT JOIN Users homeLuiUser ON homeLuiUser.idUser = homeLui.idUser
-//                              LEFT JOIN LastUpdateInfo statusLui ON statusLui.idLastUpdateInfo = tc.idLastUpdateInfoStatus 
+//                              LEFT JOIN LastUpdateInfo statusLui ON statusLui.idLastUpdateInfo = tc.idLastUpdateInfoStatus
 //                              LEFT JOIN Users statusLuiUser ON statusLuiUser.idUser = statusLui.idUser
-//                              LEFT JOIN LastUpdateInfo ghoulLui ON ghoulLui.idLastUpdateInfo = tc.idLastUpdateInfoGhoulStatus 
+//                              LEFT JOIN LastUpdateInfo ghoulLui ON ghoulLui.idLastUpdateInfo = tc.idLastUpdateInfoGhoulStatus
 //                              LEFT JOIN Users ghoulLuiUser ON ghoulLuiUser.idUser = ghoulLui.idUser
 //                              LEFT JOIN TownCadaver tca ON tca.idCadaver = tc.idCadaver
 //                              LEFT JOIN TownCadaverCleanUp cleanUp ON cleanUp.idCleanUp = tca.cleanUp
@@ -1018,7 +1018,7 @@
 
 //            foreach (var cadaver in townCadaversModelsToUpdate)
 //            {
-//                connection.Execute(@"UPDATE TownCadaverCleanUp 
+//                connection.Execute(@"UPDATE TownCadaverCleanUp
 //                                            SET idUserCleanUp = @IdUserCleanUp,
 //                                                idCleanUpType = @IdCleanUpType
 //                                          WHERE idCleanUp = @IdCleanUp",
@@ -1595,7 +1595,7 @@
 //        {
 //            using var connection = new MySqlConnection(Configuration.ConnectionString);
 //            connection.Open();
-//            var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCellComplet 
+//            var cells = connection.Query<MapCellCompletModel>(@"SELECT * FROM MapCellComplet
 //                                                                WHERE idTown = @idtown", new { idTown = townId });
 //            connection.Close();
 //            return cells;
@@ -1623,7 +1623,7 @@
 //            connection.Open();
 //            var digs = connection.Query<MapCellDigCompletModel>(@"SELECT mcd.idCell AS CellId
 //	                                                              ,mcd.idUser AS DiggerId
-//                                                                  ,mcd.day 
+//                                                                  ,mcd.day
 //                                                                  ,mcd.nbSucces
 //                                                                  ,mcd.nbTotalDig
 //                                                                  ,mc.x
@@ -1648,7 +1648,7 @@
 //            connection.Open();
 //            var dig = connection.QuerySingleOrDefault<MapCellDigCompletModel>(@"SELECT mcd.idCell AS CellId
 //	                                                              ,mcd.idUser AS DiggerId
-//                                                                  ,mcd.day 
+//                                                                  ,mcd.day
 //                                                                  ,mcd.nbSucces
 //                                                                  ,mcd.nbTotalDig
 //                                                                  ,mc.x
@@ -1738,7 +1738,7 @@
 //            return idLastUpdateInfo;
 //        }
 
-//        #region Estimations 
+//        #region Estimations
 
 //        public void UpdateEstimation(int townId, TownEstimationModel estimation)
 //        {

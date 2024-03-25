@@ -41,7 +41,7 @@ export class TutoScriptAlertsComponent {
         },
         {
             title: $localize`Notification de nouveau message`,
-            content: $localize`Si vous cochez l'option "MMe notifier si je reçois un nouveau message", vous recevrez une notification de votre navigateur lors d'un changement dans votre compteur de messages reçus.`
+            content: $localize`Si vous cochez l'option "Me notifier si je reçois un nouveau message", vous recevrez une notification de votre navigateur lors d'un changement dans votre compteur de messages reçus.`
         },
     ];
 

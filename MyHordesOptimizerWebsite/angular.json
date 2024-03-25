@@ -33,6 +33,7 @@
                             "src/robots.txt"
                         ],
                         "styles": [
+                            "node_modules/material-icons/iconfont/material-icons.css",
                             "node_modules/@fortawesome/fontawesome-free/css/all.css",
                             "src/styles.scss",
                             "src/assets/scss/material-theme/theming.scss"
@@ -52,13 +53,13 @@
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "100mb",
-                                    "maximumError": "500mb"
+                                    "maximumWarning": "1mb",
+                                    "maximumError": "5mb"
                                 },
                                 {
                                     "type": "anyComponentStyle",
-                                    "maximumWarning": "500kb",
-                                    "maximumError": "1mb"
+                                    "maximumWarning": "2kb",
+                                    "maximumError": "4kb"
                                 }
                             ],
                             "fileReplacements": [
@@ -81,13 +82,13 @@
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "100mb",
-                                    "maximumError": "500mb"
+                                    "maximumWarning": "1mb",
+                                    "maximumError": "5mb"
                                 },
                                 {
                                     "type": "anyComponentStyle",
-                                    "maximumWarning": "500kb",
-                                    "maximumError": "1mb"
+                                    "maximumWarning": "2kb",
+                                    "maximumError": "4kb"
                                 }
                             ],
                             "fileReplacements": [
@@ -140,6 +141,7 @@
                             "src/assets/img"
                         ],
                         "styles": [
+                            "node_modules/material-icons/iconfont/material-icons.css",
                             "node_modules/@fortawesome/fontawesome-free/css/all.css",
                             "src/styles.scss"
                         ],

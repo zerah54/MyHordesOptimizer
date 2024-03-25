@@ -1,24 +1,29 @@
 <div class="mho-header-with-filter">
     <div [style.text-align]="textAlign">
-        {{header}}
+        {{ header }}
 
-        <mat-icon class="open-menu-icon" *ngIf="!visible"
-            (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter();">
-            filter_alt
-        </mat-icon>
-
+        @if (!visible) {
+            <mat-icon class="open-menu-icon" (click)="$event.preventDefault(); $event.stopPropagation(); displayFilter();">
+                filter_alt
+            </mat-icon>
+        }
     </div>
-    <ng-container *ngIf="visible">
+
+    @if (visible) {
         <mat-form-field (click)="$event.stopPropagation();" class="short-bottom">
-            <button mat-icon-button matPrefix [disabled]="filterValue === min"
-                (click)="filterValueChange.next(min)"><mat-icon>first_page</mat-icon></button>
-            <button mat-icon-button matPrefix [disabled]="filterValue === min"
-                (click)="filterValueChange.next(+filterValue - 1)"><mat-icon>arrow_back_ios</mat-icon></button>
+            <button mat-icon-button matPrefix [disabled]="filterValue === min" (click)="filterValueChange.next(min)">
+                <mat-icon>first_page</mat-icon>
+            </button>
+            <button mat-icon-button matPrefix [disabled]="filterValue === min" (click)="filterValueChange.next(+filterValue - 1)">
+                <mat-icon>arrow_back_ios</mat-icon>
+            </button>
             <input matInput type="number" [ngModel]="filterValue" (ngModelChange)="filterValueChange.next($event)" [min]="min" [max]="max">
-            <button mat-icon-button matSuffix [disabled]="filterValue === max"
-                (click)="filterValueChange.next(+filterValue + 1)"><mat-icon>arrow_forward_ios</mat-icon></button>
-            <button mat-icon-button matSuffix [disabled]="filterValue === max"
-                (click)="filterValueChange.next(max)"><mat-icon>last_page</mat-icon></button>
+            <button mat-icon-button matSuffix [disabled]="filterValue === max" (click)="filterValueChange.next(+filterValue + 1)">
+                <mat-icon>arrow_forward_ios</mat-icon>
+            </button>
+            <button mat-icon-button matSuffix [disabled]="filterValue === max" (click)="filterValueChange.next(max)">
+                <mat-icon>last_page</mat-icon>
+            </button>
         </mat-form-field>
-    </ng-container>
+    }
 </div>

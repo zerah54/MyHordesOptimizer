@@ -104,7 +104,7 @@ const KITCHEN_LEVEL_DATA: HomeEnumData = {
     options: Array.from({ length: 5 }, (_: unknown, i: number) => i)
 };
 const LAB_LEVEL_DATA: HomeEnumData = {
-    label: $localize`Cave laboratoire`,
+    label: $localize`Cave-laboratoire`,
     img: 'home/lab.gif',
     max_lvl: 4,
     options: Array.from({ length: 5 }, (_: unknown, i: number) => i)
