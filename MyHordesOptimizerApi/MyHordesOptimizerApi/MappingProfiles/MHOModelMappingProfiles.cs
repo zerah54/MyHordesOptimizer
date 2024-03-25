@@ -482,12 +482,6 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.ItemCount, opt => opt.MapFrom(src => src.ItemCount))
                 .ForMember(dest => dest.IsItemBroken, opt => opt.MapFrom(src => src.IsItemBroken));
 
-            CreateMap<CellItemDto, MapCellItem>()
-              .ForMember(dest => dest.IdCell, opt => opt.Ignore())
-              .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.ItemId))
-              .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.ItemCount))
-              .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsItemBroken));
-
             CreateMap<MapCellComplet, CellCitizenDto>()
                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CitizenId))
                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CitizenName));

@@ -94,7 +94,12 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
             CreateMap<MapCellItem, CellItemDto>()
                 .ForMember(dto => dto.IsItemBroken, opt => opt.MapFrom(src => src.IsBroken))
                 .ForMember(dto => dto.ItemCount, opt => opt.MapFrom(src => src.Count))
-                .ForMember(dto => dto.ItemId, opt => opt.MapFrom(src => src.IdItem));
+                .ForMember(dto => dto.ItemId, opt => opt.MapFrom(src => src.IdItem))
+                .ReverseMap()
+                .ForMember(dest => dest.IdCell, opt => opt.Ignore())
+                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.ItemId))
+                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.ItemCount))
+                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsItemBroken));
 
             CreateMap<KeyValuePair<string, MyHordesItem>, Item>()
                 .ForMember(dest => dest.ActionNames, opt => opt.Ignore())

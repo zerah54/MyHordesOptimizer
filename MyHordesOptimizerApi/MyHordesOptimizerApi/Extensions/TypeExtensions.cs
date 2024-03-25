@@ -40,7 +40,7 @@ namespace MyHordesOptimizerApi.Extensions
             }
         }
 
-        public static void UpdateAllButKeysProperties<T>(this T objectToUpdate, T objectToCopy)
+        public static void UpdateAllButKeysProperties<T>(this T objectToUpdate, T objectToCopy, bool ignoreNull = false)
         {
             foreach (var toProp in typeof(T).GetProperties())
             {
@@ -67,7 +67,10 @@ namespace MyHordesOptimizerApi.Extensions
                 if (keyAttr == null && !isInversedPropKey) // Si c'est pas une key ou si c'est une pas une propriété de navigation d'une foreignkey, on maj la propertie
                 {
                     var toValue = fromProp.GetValue(objectToCopy, null);
-                    toProp.SetValue(objectToUpdate, toValue, null);
+                    if(!(ignoreNull && toValue == null))
+                    {
+                        toProp.SetValue(objectToUpdate, toValue, null);
+                    }                
                 }
             }
         }

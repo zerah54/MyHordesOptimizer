@@ -24,7 +24,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Resolvers.MyHordes
             {
                 var user = new User()
                 {
-                    IdUser = source.Id
+                    IdUser = source.Id,
+                    Name = source.Name,
                 };
                 dbContext.Add(user);
             }

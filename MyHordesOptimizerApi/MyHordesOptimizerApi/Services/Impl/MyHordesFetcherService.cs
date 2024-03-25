@@ -73,12 +73,18 @@ namespace MyHordesOptimizerApi.Services.Impl
             var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
             if (myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
             {
+                if (!DbContext.Users.Any(u => u.IdUser == UserInfoProvider.UserId))
+                {
+                    var user = Mapper.Map<User>(myHordeMeResponse);
+                    DbContext.Add(user);
+                    DbContext.SaveChanges();
+                    DbContext.ChangeTracker.Clear();
+                }
                 using var transaction = DbContext.Database.BeginTransaction();
                 var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo()));
                 DbContext.SaveChanges();
                 var lastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.Entity.IdLastUpdateInfo);
                 myHordeMeResponse.Map.LastUpdateInfo = lastUpdate;
-
                 var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
                 var citizens = town.TownCitizens;
                 town.TownCitizens = null;
@@ -466,9 +472,9 @@ namespace MyHordesOptimizerApi.Services.Impl
             });
             var toAdd = new List<MapCellDig>();
             var toUpdate = new List<MapCellDig>();
-            foreach(var model in models)
+            foreach (var model in models)
             {
-                if(DbContext.MapCellDigs.Any(x => x.IdCell == model.IdCell && x.IdUser == model.IdUser && x.Day == model.Day))
+                if (DbContext.MapCellDigs.Any(x => x.IdCell == model.IdCell && x.IdUser == model.IdUser && x.Day == model.Day))
                 {
                     toUpdate.Add(model);
                 }
