@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.5.0
+// @version      1.0.6.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,15 +32,19 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] La première prise en banque ne compte de nouveau plus dans l'anti-abus \n\n`
-    + `[Correctif] Traductions \n`
-    + `[Nouveauté] Champs de recherche sur la page de décharge \n`
-    + `[Nouveauté] Affichage du % de voracité sur la jauge\n`;
+    + `[Correctif] Affichage et enregistrement des estimations de la tour de guet dans l'extension Firefox \n\n`
+    + `[Nouveauté] Ajout de liens vers les profils externes dans la popup d'un utilisateur \n\n`
+    + `[Amélioration] Plus besoin d'appuyer sur Entrée pour démarrer une traduction, elle se lancera automatiquement à chaque recherche de plus de 2 lettres \n`
+    + `[Amélioration] Indicateur visuel sur le bouton de copie du registre quand la copie est effectuée \n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
 const is_mh_beta = document.URL.indexOf('staging') >= 0;
 const website = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
+
+const gest_hordes_url = 'https://gest-hordes2.eragaming.fr';
+const big_broth_hordes_url = 'https://bbh.fred26.fr';
+const fata_morgana_url = 'https://bbh.fred26.fr';
 
 const gm_bbh_updated_key = 'MHO_bbh_updated';
 const gm_gh_updated_key = 'MHO_gh_updated';
@@ -588,6 +592,18 @@ const texts = {
         fr: `Calculée`,
         de: `Berechnet`,
         es: `Calculado`
+    },
+    external_profiles: {
+        en: `External profiles`,
+        fr: `Profils externes`,
+        de: `Externe Profile`,
+        es: `Perfiles externos`,
+    },
+    external_links: {
+        en: `External links`,
+        fr: `Liens externes`,
+        de: `Externe Links`,
+        es: `Enlaces externos`,
     }
 };
 
@@ -1500,6 +1516,15 @@ let params_categories = [
                     de: `Zeigt den Prozentsatz der Unersättlichkeitsanzeige an`,
                     es: `Muestra el porcentaje en el indicador de voracidad`
                 },
+            },
+            {
+                id: `display_external_links`,
+                label: {
+                    en: `Shows links to external profiles`,
+                    fr: `Affiche des liens vers les profils externes`,
+                    de: `Zeigt Links zu externen Profilen an`,
+                    es: `Muestra enlaces a perfiles externos`
+                },
             }
             // {
             //     id: `block_users`,
@@ -1807,6 +1832,11 @@ function pageIsDesert() {
 /** @return {boolean}    true si la page de l'utilisateur est la page du forum */
 function pageIsForum() {
     return document.URL.indexOf('forum') > -1;
+}
+
+/** @return {boolean}    true si la page de l'utilisateur est une âme */
+function pageIsSoul() {
+    return document.URL.indexOf('soul') > -1;
 }
 
 /** @return {boolean}    on doit refresh le user actuel si le jour de la ville est différent du jour précédent */
@@ -2153,9 +2183,11 @@ function initOptionsWithoutLoginNeeded() {
     displayCampingPredict();
     displayAntiAbuseCounter();
     automaticallyOpenBag();
-    addCopyRegisterButton();
+    addCopyRegistryButton();
     changeDefaultEscortOptions();
     displayGhoulVoracityPercent();
+    addExternalLinksToProfiles();
+    // addExternalLinksToTowns();
     // blockUsersPosts();
     count_pending_notifications = document.querySelector('#postbox-new-msg-counter')?.innerText;
 }
@@ -2212,12 +2244,18 @@ function createSelectWithSearch() {
     options.setAttribute('style', 'position: absolute; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
 
     input.addEventListener('keyup', (event) => {
-        if (event.key === 'Enter') {
+        let temp_input = input.value.replace(/\W*/gm, '');
+        if (temp_input.length > 2) {
             options.classList.remove('hidden');
+        } else if (!options.classList.contains('hidden')) {
+            options.classList.add('hidden');
         }
     });
+
     close.addEventListener('click', () => {
-        options.classList.add('hidden');
+        if (!options.classList.contains('hidden')) {
+            options.classList.add('hidden');
+        }
         input.value = '';
     });
     select_complete.appendChild(options);
@@ -6009,7 +6047,8 @@ function displayTranslateTool() {
         let block_to_display = mho_display_translate_input_div.lastElementChild;
         block_to_display.setAttribute('style', 'float: right; z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
         input.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
+            let temp_input = input.value.replace(/\W*/gm, '');
+            if (temp_input.length > 2) {
                 getTranslation(input.value, select.value).then((response) => {
 
                     block_to_display.innerHTML = '';
@@ -6265,8 +6304,15 @@ function displayEstimationsOnWatchtower() {
 
             let updateEstimationRow = (estimations, percent, type) => {
                 if (!estimations.estimations[type][`_${percent}`]) {
-                    estimations.estimations[type][`_${percent}`] = {min: null, max: null};
+                    /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
+                    let estimations_workaround_estim = {...estimations.estimations};
+                    let estimations_workaround_type = {...estimations_workaround_estim[type]};
+                    let estimations_workaround_type_percent = {min: null, max: null};
+                    estimations_workaround_type[`_${percent}`] = {...estimations_workaround_type_percent};
+                    estimations_workaround_estim[type] = {...estimations_workaround_type};
+                    estimations.estimations = {...estimations_workaround_estim};
                 }
+
                 let estimation = estimations.estimations[type][`_${percent}`];
                 let main = document.querySelector(`#${mho_watchtower_estim_id}`);
                 let row = main.querySelector(`#${type}_${percent}`);
@@ -6301,6 +6347,7 @@ function displayEstimationsOnWatchtower() {
             }
 
             getEstimations().then((estimations) => {
+                estimations = {...estimations};
                 estim_block = document.createElement('div');
                 estim_block.style.marginTop = '1em';
                 estim_block.style.padding = '0.25em';
@@ -6443,7 +6490,14 @@ function displayEstimationsOnWatchtower() {
                     } : undefined;
 
                     if (!estimations.estimations.estim['_' + value]) {
-                        estimations.estimations.estim['_' + value] = {min: null, max: null};
+                        /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
+                        let new_estimations = {...estimations};
+                        let new_estimations_estimations = {...new_estimations.estimations};
+                        let new_estimations_estimations_estim = {...new_estimations_estimations.estim};
+                        new_estimations_estimations_estim['_' + value] = {min: null, max: null};
+                        new_estimations_estimations.estim = {...new_estimations_estimations_estim};
+                        new_estimations.estimations = {...new_estimations_estimations};
+                        estimations = {...new_estimations};
                     }
                     let value_block = document.createElement('div');
                     value_block.style.display = 'flex';
@@ -6493,8 +6547,16 @@ function displayEstimationsOnWatchtower() {
                             max: estimations.estimations.planif['_' + value].max
                         } : undefined;
 
+
                         if (!estimations.estimations.planif['_' + value]) {
-                            estimations.estimations.planif['_' + value] = {min: null, max: null};
+                            /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
+                            let new_estimations = {...estimations};
+                            let new_estimations_estimations = {...new_estimations.estimations};
+                            let new_estimations_estimations_planif = {...new_estimations_estimations.planif};
+                            new_estimations_estimations_planif['_' + value] = {min: null, max: null};
+                            new_estimations_estimations.planif = {...new_estimations_estimations_planif};
+                            new_estimations.estimations = {...new_estimations_estimations};
+                            estimations = {...new_estimations};
                         }
 
                         let value_block = document.createElement('div');
@@ -7139,17 +7201,22 @@ function displayCampingPredict() {
     }, 500);
 }
 
-function addCopyRegisterButton() {
+function addCopyRegistryButton() {
     if (mho_parameters.copy_registry) {
         let logs = document.querySelector('hordes-log');
         let logs_complete_links = document.querySelector('log-complete-link');
         let copy_button = document.querySelector(`#${mho_copy_logs_id}`);
+
+        let createCopyRegistryButtonContent = (value) => {
+            return `<div style="display: flex; gap: 0.5em; align-items: center;"><img src="${mh_optimizer_icon}" style="width: 16px !important;">${value}</div>`;
+        }
+
         if (logs && !copy_button && !logs_complete_links) {
             let title = logs.parentElement.previousElementSibling;
             let copy_button = document.createElement('a');
             title.appendChild(copy_button);
 
-            copy_button.innerHTML = `<div style="display: flex; gap: 0.5em; align-items: center;"><img src="${mh_optimizer_icon}" style="width: 16px !important;">⧉</div>`;
+            copy_button.innerHTML = createCopyRegistryButtonContent('⧉');
             copy_button.id = mho_copy_logs_id;
             copy_button.style.backgroundColor = 'rgba(62,36,23,.75)';
             copy_button.style.borderRadius = '6px';
@@ -7168,6 +7235,10 @@ function addCopyRegisterButton() {
 
                 let final_text = soft_entries.join('\n');
                 copyToClipboard(final_text);
+                copy_button.innerHTML = createCopyRegistryButtonContent(`<img src="${repo_img_hordes_url}icons/done.png">`);
+                setTimeout(() => {
+                    copy_button.innerHTML = createCopyRegistryButtonContent('⧉');
+                }, 5000)
             });
             if (title) {
                 if (title.tagName.toLowerCase() === 'H5'.toLowerCase()) {
@@ -7230,6 +7301,121 @@ function displayGhoulVoracityPercent() {
 
         let voracite = ghoul_voracity_node.querySelector('.ghoul-hunger-bar').style.width;
         ghoul_voracity_node.firstChild.textContent = ghoul_voracity_node.firstChild.textContent.replace(':\n', `: ${voracite}\n`);
+    }
+}
+
+function addExternalLinksToProfiles() {
+    if (mho_parameters.display_external_links) {
+        let user_tooltip = document.querySelector('#user-tooltip');
+        if (user_tooltip) {
+            let user_id = user_tooltip.querySelector('[x-friend-id]').getAttribute('x-friend-id');
+            let dash_separators = user_tooltip.querySelectorAll('hr.dashed');
+            let last_separator = Array.from(dash_separators).pop();
+            let link_color = window.getComputedStyle(user_tooltip.querySelector('.link')).getPropertyValue('color');
+
+            let new_separator = document.createElement('hr');
+            new_separator.classList.add('dashed');
+            last_separator.parentNode.insertBefore(new_separator, last_separator.nextSibling);
+
+            let new_part = document.createElement('div');
+            new_part.classList.add('link-blocks');
+            last_separator.parentNode.insertBefore(new_part, last_separator.nextSibling);
+
+            let new_part_title = document.createElement('div');
+            new_part_title.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 16px; margin-right: 0.5em;">${getI18N(texts.external_profiles)}`;
+            new_part_title.style.marginBottom = '0.5em';
+            new_part_title.style.textAlign = 'left';
+            new_part_title.style.color = link_color;
+            new_part.appendChild(new_part_title);
+
+            let bbh_link = document.createElement('a');
+            bbh_link.classList.add('link-block');
+            bbh_link.href = `${big_broth_hordes_url}/?pg=user&uid=5-${user_id}`;
+            new_part.appendChild(bbh_link);
+
+            let bbh_img = document.createElement('img');
+            bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
+            bbh_link.appendChild(bbh_img);
+
+            let bbh_br = document.createElement('br');
+            bbh_link.appendChild(bbh_br);
+
+            let bbh_title = document.createElement('text');
+            bbh_title.innerHTML = `BigBroth'\nHordes`;
+            bbh_link.appendChild(bbh_title);
+
+            let gh_link = document.createElement('a');
+            gh_link.classList.add('link-block');
+            gh_link.href = `${gest_hordes_url}/ame/${user_id}`;
+            new_part.appendChild(gh_link);
+
+            let gh_img = document.createElement('img');
+            gh_img.src = `${repo_img_url}external-tools/gh.gif`;
+            gh_link.appendChild(gh_img);
+
+            let gh_br = document.createElement('br');
+            gh_link.appendChild(gh_br);
+
+            let gh_title = document.createElement('text');
+            gh_title.innerText = `Gest'Hordes`;
+            gh_link.appendChild(gh_title);
+
+            let empty_link = document.createElement('div');
+            empty_link.classList.add('link-block', 'empty');
+            new_part.appendChild(empty_link);
+        }
+    }
+}
+
+function addExternalLinksToTowns() {
+    if (mho_parameters.display_external_links && pageIsSoul()) {
+        let town_history = document.querySelector('.town-history');
+
+        if (!town_history) return;
+
+        let table_header = town_history.querySelector('.row-flex.header');
+
+        if (!table_header) return;
+
+        let new_cell_header = document.createElement('div');
+        new_cell_header.classList.add('cell', 'padded', 'rw-2', 'center');
+        new_cell_header.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 16px; margin-right: 0.25em;">${getI18N(texts.external_links)}`;
+        table_header.appendChild(new_cell_header);
+
+        let table_rows_container = town_history.querySelector('.town-container');
+
+        let table_rows = table_rows_container.querySelectorAll('.row-flex.stretch');
+        if (table_rows && table_rows.length > 0) {
+            Array.from(table_rows).forEach((table_row) => {
+                let town_id = table_row.querySelector('[data-town-id]').getAttribute('data-town-id');
+
+                let new_cell = document.createElement('div');
+                new_cell.classList.add('cell', 'padded', 'rw-2', 'center');
+                new_cell.style.borderBottom = '1px solid #7e4d2a';
+                new_cell.style.borderLeft = '1px solid #7e4d2a';
+                new_cell.style.display = 'flex';
+                new_cell.style.gap = '0.25em';
+                new_cell.style.alignItems = 'flex-start';
+                new_cell.style.justifyContent = 'space-around';
+                table_row.appendChild(new_cell);
+
+                let bbh_link = document.createElement('a');
+                bbh_link.href = `${big_broth_hordes_url}/?cid=5-${town_id}`;
+                new_cell.appendChild(bbh_link);
+
+                let bbh_img = document.createElement('img');
+                bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
+                bbh_link.appendChild(bbh_img);
+
+                let gh_link = document.createElement('a');
+                gh_link.href = `${gest_hordes_url}/carte/${town_id}`;
+                new_cell.appendChild(gh_link);
+
+                let gh_img = document.createElement('img');
+                gh_img.src = `${repo_img_url}external-tools/gh.gif`
+                gh_link.appendChild(gh_img);
+            });
+        }
     }
 }
 
@@ -8105,56 +8291,56 @@ function getGHRuin() {
 
                                 let img_path = cell.querySelector('.ruineCarte')?.firstElementChild.href.baseVal.replace(/^(.*)#/, '');
                                 switch (img_path) {
-                                    case 'ruineCarte_0':
-                                        new_cell.borders = '0101';
+                                    case 'ruineCarte_16':
+                                        new_cell.borders = 'exit';
                                         break;
-                                    case 'ruineCarte_1':
-                                        new_cell.borders = '1010';
-                                        break;
-                                    case 'ruineCarte_2':
-                                        new_cell.borders = '1100';
-                                        break;
-                                    case 'ruineCarte_3':
-                                        new_cell.borders = '0110';
-                                        break;
-                                    case 'ruineCarte_4':
-                                        new_cell.borders = '1001';
-                                        break;
-                                    case 'ruineCarte_5':
-                                        new_cell.borders = '0011';
-                                        break;
-                                    case 'ruineCarte_6':
+                                    case 'ruineCarte_15':
                                         new_cell.borders = '1111';
                                         break;
                                     case 'ruineCarte_7':
-                                        new_cell.borders = '0111';
-                                        break;
-                                    case 'ruineCarte_8':
-                                        new_cell.borders = '1101';
-                                        break;
-                                    case 'ruineCarte_9':
                                         new_cell.borders = '1110';
                                         break;
-                                    case 'ruineCarte_10':
-                                        new_cell.borders = '1011';
-                                        break;
                                     case 'ruineCarte_11':
-                                        new_cell.borders = '1000';
+                                        new_cell.borders = '1101';
                                         break;
-                                    case 'ruineCarte_12':
-                                        new_cell.borders = '0100';
+                                    case 'ruineCarte_3':
+                                        new_cell.borders = '1100';
                                         break;
                                     case 'ruineCarte_13':
-                                        new_cell.borders = '0001';
+                                        new_cell.borders = '1011';
+                                        break;
+                                    case 'ruineCarte_5':
+                                        new_cell.borders = '1010'; // ?
+                                        break;
+                                    case 'ruineCarte_18':
+                                        new_cell.borders = '1010'; // ?
+                                        break;
+                                    case 'ruineCarte_9':
+                                        new_cell.borders = '1001';
+                                        break;
+                                    case 'ruineCarte_1':
+                                        new_cell.borders = '1000';
                                         break;
                                     case 'ruineCarte_14':
+                                        new_cell.borders = '0111';
+                                        break;
+                                    case 'ruineCarte_6':
+                                        new_cell.borders = '0110';
+                                        break;
+                                    case 'ruineCarte_10':
+                                        new_cell.borders = '0101';
+                                        break;
+                                    case 'ruineCarte_2':
+                                        new_cell.borders = '0100';
+                                        break;
+                                    case 'ruineCarte_12':
+                                        new_cell.borders = '0011';
+                                        break;
+                                    case 'ruineCarte_4':
                                         new_cell.borders = '0010';
                                         break;
-                                    case 'ruineCarte_15':
-                                        new_cell.borders = 'exit';
-                                        break;
-                                    case 'ruineCarte_17':
-                                        new_cell.borders = '1010';
+                                    case 'ruineCarte_8':
+                                        new_cell.borders = '0001';
                                         break;
                                     default:
                                         new_cell.borders = '0000';
@@ -9409,13 +9595,20 @@ function getApofooAttackCalculation(day, beta) {
 function saveEstimations(estim_value, planif_value) {
     return new Promise((resolve, reject) => {
         getEstimations().then((estimations) => {
-            let new_estimations = estimations.estimations;
+            let new_estimations = {...estimations.estimations};
             if (estim_value && estim_value.value && (estim_value.value.min || estim_value.value.max)) {
-                new_estimations.estim['_' + estim_value.percent] = estim_value.value;
+                /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
+                let new_estimations_workaround_estim = {...new_estimations.estim};
+                new_estimations_workaround_estim['_' + estim_value.percent] = {...estim_value.value};
+                new_estimations.estim = {...new_estimations_workaround_estim};
             }
             if (planif_value && planif_value.value && (planif_value.value.min || planif_value.value.max)) {
-                new_estimations.planif['_' + planif_value.percent] = planif_value.value;
+                /** Workaround pour définir sur l'extension firefox sans passer par cloneinto */
+                let new_estimations_workaround_planif = {...new_estimations.planif};
+                new_estimations_workaround_planif['_' + planif_value.percent] = {...planif_value.value};
+                new_estimations.planif = {...new_estimations_workaround_planif};
             }
+
             fetcher(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails.townId}&userId=${mh_user.id}`, {
                 method: 'POST',
                 body: JSON.stringify(new_estimations),
@@ -9567,7 +9760,7 @@ function getApiKey() {
 //     MAIN FUNCTION     //
 ///////////////////////////
 (function () {
-    if (document.URL.startsWith('https://bbh.fred26.fr/') || document.URL.startsWith('https://gest-hordes2.eragaming.fr/') || document.URL.startsWith('https://fatamorgana.md26.eu/') || document.URL.startsWith('https://myhordes-optimizer.web.app/')) {
+    if (document.URL.startsWith(big_broth_hordes_url) || document.URL.startsWith(gest_hordes_url) || document.URL.startsWith(fata_morgana_url) || document.URL.startsWith(website)) {
         let current_key;
         let map_block_id;
         let ruin_block_id;
@@ -9575,28 +9768,28 @@ function getApiKey() {
         let block_copy_ruin_button;
         let source;
 
-        if (document.URL.startsWith('https://bbh.fred26.fr/')) {
+        if (document.URL.startsWith(big_broth_hordes_url)) {
             current_key = gm_bbh_updated_key;
             map_block_id = 'carte';
             ruin_block_id = 'plan';
             block_copy_map_button = 'ul_infos_1';
             block_copy_ruin_button = 'cl1';
             source = 'bbh';
-        } else if (document.URL.startsWith('https://gest-hordes2.eragaming.fr/')) {
+        } else if (document.URL.startsWith(gest_hordes_url)) {
             current_key = gm_gh_updated_key;
             map_block_id = 'zoneCarte';
             ruin_block_id = 'carteRuine';
             block_copy_map_button = 'zoneInfoVilleAutre';
             block_copy_ruin_button = 'menuRuine';
             source = 'gh';
-        } else if (document.URL.startsWith('https://fatamorgana.md26.eu/')) {
+        } else if (document.URL.startsWith(fata_morgana_url)) {
             current_key = gm_fata_updated_key;
             map_block_id = 'map';
             ruin_block_id = 'ruinmap';
             block_copy_map_button = 'modeBar';
             block_copy_ruin_button = 'modeBar';
             source = 'fm';
-        } else if (document.URL.startsWith('https://myhordes-optimizer.web.app/')) {
+        } else if (document.URL.startsWith(website)) {
             current_key = gm_mho_updated_key;
             source = 'mho';
         }
