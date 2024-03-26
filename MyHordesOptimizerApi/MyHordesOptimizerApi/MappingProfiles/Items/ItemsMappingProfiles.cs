@@ -2,6 +2,7 @@
 using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.MappingProfiles.Converters;
 using MyHordesOptimizerApi.Models;
@@ -91,15 +92,15 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.Probability, opt => opt.MapFrom(src => src.Probability))
                 .ForMember(dest => dest.Weight, opt => opt.MapFrom(src => src.Weight));
 
-            CreateMap<MapCellItem, CellItemDto>()
-                .ForMember(dto => dto.IsItemBroken, opt => opt.MapFrom(src => src.IsBroken))
-                .ForMember(dto => dto.ItemCount, opt => opt.MapFrom(src => src.Count))
-                .ForMember(dto => dto.ItemId, opt => opt.MapFrom(src => src.IdItem))
+            CreateMap<MapCellItem, UpdateObjectDto>()
+                .ForMember(dto => dto.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
+                .ForMember(dto => dto.Count, opt => opt.MapFrom(src => src.Count))
+                .ForMember(dto => dto.Id, opt => opt.MapFrom(src => src.IdItem))
                 .ReverseMap()
                 .ForMember(dest => dest.IdCell, opt => opt.Ignore())
-                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.ItemId))
-                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.ItemCount))
-                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsItemBroken));
+                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
+                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken));
 
             CreateMap<KeyValuePair<string, MyHordesItem>, Item>()
                 .ForMember(dest => dest.ActionNames, opt => opt.Ignore())

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
@@ -18,7 +19,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         public bool? IsRuinCamped { get; set; }
 
         [JsonProperty("items")]
-        public List<CellItemDto> Items { get; set; }
+        public List<UpdateObjectDto> Items { get; set; }
 
         [JsonProperty("citizens")]
         public List<int> Citizens { get; set; }

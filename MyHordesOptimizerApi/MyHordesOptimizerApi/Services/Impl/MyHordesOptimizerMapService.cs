@@ -1,10 +1,16 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
+using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MyHordesOptimizerApi.Services.Impl
 {
@@ -14,41 +20,56 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
         protected IMapper Mapper { get; private set; }
         protected IUserInfoProvider UserInfoProvider { get; private set; }
+        protected MhoContext DbContext { get; init; }
 
         public MyHordesOptimizerMapService(ILogger<MyHordesOptimizerMapService> logger,
             IServiceScopeFactory serviceScopeFactory,
             IMapper mapper,
-            IUserInfoProvider userInfoProvider)
+            IUserInfoProvider userInfoProvider,
+            MhoContext dbContext)
         {
             Logger = logger;
             ServiceScopeFactory = serviceScopeFactory;
             Mapper = mapper;
             UserInfoProvider = userInfoProvider;
+            DbContext = dbContext;
         }
 
         public LastUpdateInfoDto UpdateCell(int townId, MyHordesOptimizerCellUpdateDto updateRequest)
         {
-            //var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            //var cell = Mapper.Map<MapCell>(updateRequest);
-            //cell.IdTown = townId;
-            //var lastUpdateInfoId = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
-            //cell.IdLastUpdateInfo = lastUpdateInfoId;
+            using var transaction = DbContext.Database.BeginTransaction();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+            DbContext.SaveChanges();
 
-            //var cellItems = Mapper.Map<List<MapCellItem>>(updateRequest.Items);
+            var cell = Mapper.Map<MapCell>(updateRequest);
+            cell.IdTown = townId;
+            cell.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+            if (Convert.ToBoolean(cell.IsDryed)) 
+            { 
+                cell.AveragePotentialRemainingDig = 0; cell.MaxPotentialRemainingDig = 0; 
+            }
+            var cellItems = Mapper.Map<List<MapCellItem>>(updateRequest.Items);
 
-            //var cells = new List<MapCell>() { cell };
-            //cells.ForEach(cell => { if (Convert.ToBoolean(cell.IsDryed)) { cell.AveragePotentialRemainingDig = 0; cell.MaxPotentialRemainingDig = 0; } });
-            //MyHordesOptimizerRepository.PatchMapCell(townId, cells, forceUpdate: true);
+            var cellModel = DbContext.MapCells
+                .Include(cell => cell.MapCellItems)
+                .Single(cell => cell.IdTown == townId && cell.X == updateRequest.X && cell.Y == updateRequest.Y);
 
-            //MyHordesOptimizerRepository.ClearCellItem(cell.IdCell, lastUpdateInfoId);
-            //cellItems.ForEach(cellItem => cellItem.IdCell = cell.IdCell);
-            //MyHordesOptimizerRepository.PatchMapCellItem(townId, cellItems);
+            DbContext.MapCellItems.RemoveRange(cellModel.MapCellItems);
+            DbContext.SaveChanges();
+            cellModel.UpdateAllButKeysProperties(cell, ignoreNull: true);
+            cellModel.MapCellItems = cellItems;
 
-            //MyHordesOptimizerRepository.UpdateCitizenLocation(cell.IdTown.Value, updateRequest.X, updateRequest.Y, updateRequest.Citizens, lastUpdateInfoId);
+            var citizens = DbContext.TownCitizens.Where(x => x.IdTown == townId && updateRequest.Citizens.Contains(x.IdUser)).ToList();
+            citizens.ForEach(citizen =>
+            {
+                citizen.PositionX = updateRequest.X;
+                citizen.PositionY = updateRequest.Y;
+            });
 
-            //return lastUpdateInfo;
-            return null;
-
+            DbContext.SaveChanges();
+            transaction.Commit();
+            return lastUpdateInfoDto;
         }
     }
 }

@@ -477,11 +477,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.DisplayY, opt => opt.MapFrom(src => src.TownY - src.Y))
                 .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { DateUpdate = src.LastUpdateDateUpdate.Value, IdUserNavigation = new User() { Name = src.LastUpdateInfoUserName, IdUser = src.LastUpdateInfoUserId.Value } }));
 
-            CreateMap<MapCellComplet, CellItemDto>()
-                .ForMember(dest => dest.ItemId, opt => opt.MapFrom(src => src.ItemId))
-                .ForMember(dest => dest.ItemCount, opt => opt.MapFrom(src => src.ItemCount))
-                .ForMember(dest => dest.IsItemBroken, opt => opt.MapFrom(src => src.IsItemBroken));
-
+           
             CreateMap<MapCellComplet, CellCitizenDto>()
                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.CitizenId))
                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.CitizenName));
@@ -495,11 +491,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
             CreateMap<Parameter, ParametersDto>()
                 .ReverseMap();
 
-            CreateMap<UpdateObjectDto, MapCellItem>()
-                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
-                .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
-                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.IdCell, opt => opt.Ignore());
+           
 
             //CreateMap<MapCellDigCompletModel, MyHordesOptimizerMapDigDto>()
             //    .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => new LastUpdateInfo() { UpdateTime = src.LastUpdateDateUpdate, UserName = src.LastUpdateInfoUserName, UserId = src.LastUpdateInfoUserId }));
@@ -508,28 +500,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.IdCell, opt => opt.MapFrom(src => src.CellId))
                 .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.DiggerId));
 
-            CreateMap<MyHordesOptimizerCellUpdateDto, MapCell>()
-                .ForMember(dest => dest.AveragePotentialRemainingDig, opt => opt.Ignore())
-                .ForMember(dest => dest.DangerLevel, opt => opt.Ignore())
-                .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
-                .ForMember(dest => dest.IdRuin, opt => opt.Ignore())
-                .ForMember(dest => dest.IdTown, opt => opt.Ignore())
-                .ForMember(dest => dest.IsDryed, opt => opt.MapFrom(src => src.IsDryed))
-                .ForMember(dest => dest.IsNeverVisited, opt => opt.Ignore())
-                .ForMember(dest => dest.IsRuinCamped, opt => opt.MapFrom(src => src.IsRuinCamped))
-                .ForMember(dest => dest.IsRuinDryed, opt => opt.Ignore())
-                .ForMember(dest => dest.IsTown, opt => opt.Ignore())
-                .ForMember(dest => dest.IsVisitedToday, opt => opt.Ignore())
-                .ForMember(dest => dest.MaxPotentialRemainingDig, opt => opt.Ignore())
-                .ForMember(dest => dest.NbHero, opt => opt.Ignore())
-                .ForMember(dest => dest.NbKm, opt => opt.Ignore())
-                .ForMember(dest => dest.NbPa, opt => opt.Ignore())
-                .ForMember(dest => dest.NbRuinDig, opt => opt.Ignore())
-                .ForMember(dest => dest.NbZombie, opt => opt.MapFrom(src => src.NbZombie))
-                .ForMember(dest => dest.NbZombieKilled, opt => opt.MapFrom(src => src.NbZombieKilled))
-                .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.X))
-                .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.Y))
-                .ForMember(dest => dest.ZoneRegen, opt => opt.Ignore());
+           
         }
 
         //private DateTime? GetBagLastUpdateDateWithNullCheck(IEnumerable<TownCitizenBagItemCompletModel> src)

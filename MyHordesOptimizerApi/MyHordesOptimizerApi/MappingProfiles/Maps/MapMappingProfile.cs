@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
@@ -76,6 +77,34 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                 .ForMember(dest => dest.LevelRegen, opt => opt.MapFrom(src => src.LevelRegen))
                 .ForMember(dest => dest.TauxRegen, opt => opt.MapFrom(src => src.TauxRegen));
 
+            CreateMap<MyHordesOptimizerCellUpdateDto, MapCell>()
+               .ForMember(dest => dest.AveragePotentialRemainingDig, opt => opt.Ignore())
+               .ForMember(dest => dest.DangerLevel, opt => opt.Ignore())
+               .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
+               .ForMember(dest => dest.IdRuin, opt => opt.Ignore())
+               .ForMember(dest => dest.IdTown, opt => opt.Ignore())
+               .ForMember(dest => dest.IsDryed, opt => opt.MapFrom(src => src.IsDryed))
+               .ForMember(dest => dest.IsNeverVisited, opt => opt.Ignore())
+               .ForMember(dest => dest.IsRuinCamped, opt => opt.MapFrom(src => src.IsRuinCamped))
+               .ForMember(dest => dest.IsRuinDryed, opt => opt.Ignore())
+               .ForMember(dest => dest.IsTown, opt => opt.Ignore())
+               .ForMember(dest => dest.IsVisitedToday, opt => opt.Ignore())
+               .ForMember(dest => dest.MaxPotentialRemainingDig, opt => opt.Ignore())
+               .ForMember(dest => dest.NbHero, opt => opt.Ignore())
+               .ForMember(dest => dest.NbKm, opt => opt.Ignore())
+               .ForMember(dest => dest.NbPa, opt => opt.Ignore())
+               .ForMember(dest => dest.NbRuinDig, opt => opt.Ignore())
+               .ForMember(dest => dest.NbZombie, opt => opt.MapFrom(src => src.NbZombie))
+               .ForMember(dest => dest.NbZombieKilled, opt => opt.MapFrom(src => src.NbZombieKilled))
+               .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.X))
+               .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.Y))
+               .ForMember(dest => dest.ZoneRegen, opt => opt.Ignore());
+
+            CreateMap<UpdateObjectDto, MapCellItem>()
+               .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
+               .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
+               .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Id))
+               .ForMember(dest => dest.IdCell, opt => opt.Ignore());
         }
 
         private class TownToCellsDto : ITypeConverter<Town, List<MyHordesOptimizerCellDto>>
