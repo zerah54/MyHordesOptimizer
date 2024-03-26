@@ -13,17 +13,17 @@ export class ItemCountShort extends CommonModel<ItemCountShortDTO> {
 
     public modelToDto(): ItemCountShortDTO {
         return {
-            itemCount: this.count,
-            isItemBroken: this.is_broken,
-            itemId: this.item_id
+            count: this.count,
+            isBroken: this.is_broken,
+            id: this.item_id
         };
     }
 
     protected dtoToModel(dto?: ItemCountShortDTO | null | undefined): void {
         if (dto) {
-            this.count = dto.itemCount;
-            this.is_broken = dto.isItemBroken;
-            this.item_id = dto.itemId;
+            this.count = dto.count;
+            this.is_broken = dto.isBroken;
+            this.item_id = dto.id;
         }
     }
 

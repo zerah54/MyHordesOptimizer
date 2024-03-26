@@ -90,9 +90,9 @@ export class MapUpdateCellComponent implements OnInit {
             } else {
                 const item: Item = <Item>this.all_items.find((item: Item) => item.id === item_id);
                 const short_item: ItemCountShort = new ItemCountShort({
-                    isItemBroken: item.is_broken,
-                    itemCount: 1,
-                    itemId: item.id
+                    isBroken: item.is_broken,
+                    count: 1,
+                    id: item.id
                 });
                 cell.items.push(short_item);
                 cell.items = [...cell.items];
