@@ -825,30 +825,41 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         public LastUpdateInfoDto UpdateCitizenHome(int townId, int userId, CitizenHomeValueDto homeDetails)
         {
-            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            //var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            using var scope = ServiceScopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            using var transaction = dbContext.Database.BeginTransaction();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
+            dbContext.SaveChanges();
+
+            var citizen = dbContext.TownCitizens.Single(x => x.IdTown == townId && x.IdUser == userId);
             var citizenDetail = Mapper.Map<TownCitizen>(homeDetails);
-            citizenDetail.IdUser = userId;
-            citizenDetail.IdTown = townId;
-            //citizenDetail.IdLastUpdateInfoHome = homeLastUpdateInfo;
-            //MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
-            //return lastUpdateInfo;
-            return null;
+            citizen.UpdateAllButKeysProperties(citizenDetail, ignoreNull: true);
+            citizen.IdLastUpdateInfoHome = newLastUpdate.IdLastUpdateInfo;
+            dbContext.SaveChanges();
+            transaction.Commit();
+
+            return lastUpdateInfoDto;
         }
 
         #region CitizenStatus
 
         public LastUpdateInfoDto UpdateCitizenStatus(int townId, int userId, List<string> status)
         {
-            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            //var statusLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            using var scope = ServiceScopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            using var transaction = dbContext.Database.BeginTransaction();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
+            dbContext.SaveChanges();
+
+            var citizen = dbContext.TownCitizens.Single(x => x.IdTown == townId && x.IdUser == userId);
             var citizenDetail = GetTownCitizenStatusDetail(status);
-            citizenDetail.IdUser = userId;
-            citizenDetail.IdTown = townId;
-            //citizenDetail.IdLastUpdateInfoStatus = statusLastUpdateInfo;
-            //MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
-            //return lastUpdateInfo;
-            return null;
+            citizen.UpdateAllButKeysProperties(citizenDetail, ignoreNull: true);
+            citizen.IdLastUpdateInfoStatus = newLastUpdate.IdLastUpdateInfo;
+            dbContext.SaveChanges();
+            transaction.Commit();
+            return lastUpdateInfoDto;
         }
 
         private TownCitizen GetTownCitizenStatusDetail(List<string> statusValues)
@@ -961,17 +972,22 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         public LastUpdateInfoDto UpdateGhoulStatus(int townId, int userId, UpdateGhoulStatusDto request)
         {
-            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            //var ghoulStatusLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            using var scope = ServiceScopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            using var transaction = dbContext.Database.BeginTransaction();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
+            dbContext.SaveChanges();
+
+            var citizen = dbContext.TownCitizens.Single(x => x.IdTown == townId && x.IdUser == userId);
             var citizenDetail = new TownCitizen();
-            citizenDetail.IdUser = userId;
-            citizenDetail.IdTown = townId;
-            //citizenDetail.IdLastUpdateInfoGhoulStatus = ghoulStatusLastUpdateInfo;
             citizenDetail.IsGhoul = request.IsGhoul;
             citizenDetail.GhoulVoracity = request.Voracity;
-            //MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
-            //return lastUpdateInfo;
-            return null;
+            citizen.UpdateAllButKeysProperties(citizenDetail, ignoreNull: true);
+            citizen.IdLastUpdateInfoGhoulStatus = newLastUpdate.IdLastUpdateInfo;
+            dbContext.SaveChanges();
+            transaction.Commit();
+            return lastUpdateInfoDto;
         }
         #endregion
 
@@ -979,15 +995,21 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         public LastUpdateInfoDto UpdateCitizenHeroicActions(int townId, int userId, CitizenActionsHeroicValue actionHeroics)
         {
-            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            //var heroicActionLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            using var scope = ServiceScopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            using var transaction = dbContext.Database.BeginTransaction();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
+            dbContext.SaveChanges();
+
+            var citizen = dbContext.TownCitizens.Single(x => x.IdTown == townId && x.IdUser == userId);
             var citizenDetail = Mapper.Map<TownCitizen>(actionHeroics);
-            citizenDetail.IdUser = userId;
-            citizenDetail.IdTown = townId;
-            //citizenDetail.IdLastUpdateInfoHeroicAction = heroicActionLastUpdateInfo;
-            //MyHordesOptimizerRepository.PatchCitizenDetail(citizenDetail: citizenDetail);
-            //return lastUpdateInfo;
-            return null;
+            citizen.UpdateAllButKeysProperties(citizenDetail, ignoreNull: true);
+            citizen.IdLastUpdateInfoHeroicAction = newLastUpdate.IdLastUpdateInfo;
+            dbContext.SaveChanges();
+            transaction.Commit();
+
+            return lastUpdateInfoDto;
         }
 
         private TownCitizen GetHeroicActionCitizenDetail(List<ActionHeroicDto> heroicActions)
