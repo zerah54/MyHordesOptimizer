@@ -488,8 +488,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
             //CreateMap<TownCitizenBagItemCompletModel, CitizenStatusValueDto>();
             //CreateMap<TownCitizenBagItemCompletModel, CitizenActionsHeroicValue>();
 
-            CreateMap<Parameter, ParametersDto>()
-                .ReverseMap();
+          
 
            
 
