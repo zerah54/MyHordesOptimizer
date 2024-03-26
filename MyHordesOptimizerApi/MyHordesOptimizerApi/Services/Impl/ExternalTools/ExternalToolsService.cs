@@ -760,7 +760,6 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(dbContext))).Entity;
                 dbContext.SaveChanges();
 
-                //var bagsId = MyHordesOptimizerRepository.GetCitizenBagsId(townId, bags.Select(x => x.UserId));
                 foreach (var bag in bags)
                 {
                     var citizen = dbContext.TownCitizens
@@ -792,34 +791,39 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             }
         }
 
-        public LastUpdateInfo UpdateCitizenBag(int townId, int userId, List<UpdateObjectDto> bag)
+        public LastUpdateInfoDto UpdateCitizenBag(int townId, int userId, List<UpdateObjectDto> bag)
         {
-            //var bagId = MyHordesOptimizerRepository.GetCitizenBagId(townId, userId);
-            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            var citizen = new CitizenDto();
-            var citizens = new List<CitizenDto>()
-            {
-                citizen
-            };
-            //citizen.Bag.IdBag = bagId;
+            using var scope = ServiceScopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            using var transaction = dbContext.Database.BeginTransaction();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
+            dbContext.SaveChanges();
+
+            var citizen = dbContext.TownCitizens
+                       .Include(x => x.IdBagNavigation)
+                       .ThenInclude(bag => bag.BagItems)
+                       .Single(x => x.IdTown == townId && x.IdUser == userId);
+            dbContext.BagItems.RemoveRange(citizen.IdBagNavigation.BagItems);
+            citizen.IdBagNavigation.BagItems.Clear();
             foreach (var item in bag)
             {
-                var citizenItem = new StackableItemDto()
+                citizen.IdBagNavigation.BagItems.Add(new BagItem()
                 {
                     Count = item.Count,
+                    IdItem = item.Id,
                     IsBroken = item.IsBroken
-                };
-                citizenItem.Item.Id = item.Id;
-                citizen.Bag.Items.Add(citizenItem);
+                });
+                citizen.IdBagNavigation.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
             }
-            //MyHordesOptimizerRepository.PatchCitizenBags(townId, lastUpdateInfo, citizens);
-            //return lastUpdateInfo;
-            return null;
+            dbContext.SaveChanges();
+            transaction.Commit();
+            return lastUpdateInfoDto;
         }
 
         #endregion
 
-        public LastUpdateInfo UpdateCitizenHome(int townId, int userId, CitizenHomeValueDto homeDetails)
+        public LastUpdateInfoDto UpdateCitizenHome(int townId, int userId, CitizenHomeValueDto homeDetails)
         {
             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             //var homeLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
@@ -834,7 +838,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         #region CitizenStatus
 
-        public LastUpdateInfo UpdateCitizenStatus(int townId, int userId, List<string> status)
+        public LastUpdateInfoDto UpdateCitizenStatus(int townId, int userId, List<string> status)
         {
             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             //var statusLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
@@ -955,7 +959,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             return statusDetail;
         }
 
-        public LastUpdateInfo UpdateGhoulStatus(int townId, int userId, UpdateGhoulStatusDto request)
+        public LastUpdateInfoDto UpdateGhoulStatus(int townId, int userId, UpdateGhoulStatusDto request)
         {
             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             //var ghoulStatusLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
@@ -973,7 +977,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
 
         #region CitizenHeroicAction
 
-        public LastUpdateInfo UpdateCitizenHeroicActions(int townId, int userId, CitizenActionsHeroicValue actionHeroics)
+        public LastUpdateInfoDto UpdateCitizenHeroicActions(int townId, int userId, CitizenActionsHeroicValue actionHeroics)
         {
             var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
             //var heroicActionLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
