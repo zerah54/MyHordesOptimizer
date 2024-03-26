@@ -7,7 +7,6 @@ using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.Citizen;
 using MyHordesOptimizerApi.Dtos.ExternalTools.GestHordes.MajCase;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Bag;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
@@ -75,8 +74,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             var fata = updateRequestDto.Map.ToolsToUpdate.IsFataMorgana;
             var mho = updateRequestDto.Map.ToolsToUpdate.IsMyHordesOptimizer;
             LastUpdateInfo newLastUpdate = null;
-            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(mho) 
-                || UpdateRequestMapToolsToUpdateDetailsDto.IsCell(mho) 
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(mho)
+                || UpdateRequestMapToolsToUpdateDetailsDto.IsCell(mho)
                 || updateRequestDto.SuccessedDig != null
                 || updateRequestDto.Amelios?.ToolsToUpdate.IsMyHordesOptimizer == true)
             {
@@ -127,7 +126,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     {
                         using var scope = ServiceScopeFactory.CreateScope();
                         var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
-                        var transaction = dbContext.Database.BeginTransaction();
+                        using var transaction = dbContext.Database.BeginTransaction();
 
                         var me = MyHordesApiRepository.GetMe();
                         var zones = me.Map.Zones;
@@ -138,6 +137,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         var townId = me.Map.Id;
                         var zoneItemX = -1;
                         var zoneItemY = -1;
+                        var allCell = dbContext.MapCells.Where(cell => cell.IdTown == updateRequestDto.TownDetails.TownId)
+                                                        .ToList();
                         foreach (var zone in zones)
                         {
                             int? nbHero = null;
@@ -162,6 +163,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 maxPotentialRemainingDig = 0;
                             }
                             int? type = zone.Building?.Type;
+                            var cellModel = allCell.FirstOrDefault(cell => cell.X == zone.X
+                                                                  && cell.Y == zone.Y);
                             var cell = new MapCell()
                             {
                                 IdTown = townId,
@@ -193,12 +196,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                     {
                                         Count = item.Count,
                                         IdItem = item.Id,
-                                        IsBroken = item.Broken
+                                        IsBroken = item.Broken,
+                                        IdCell = cellModel.IdCell
                                     };
                                     listCellItems.Add(cellItem);
                                 }
                             }
-                            listCells.Add(cell);
+                            cellModel.UpdateAllButKeysProperties(cell, ignoreNull: true);
+                            listCells.Add(cellModel);
                         }
                         if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(mho) && updateRequestDto.Map.Cell != null)
                         {
@@ -230,24 +235,22 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 });
                             }
                         }
-                        var allCell = dbContext.MapCells.Where(cell => cell.IdTown == updateRequestDto.TownDetails.TownId)
-                        .ToList();
                         var mapCellEqualityComaprer = new MapCellEqualityComaprer();
                         foreach (var cellToUpdate in listCells)
                         {
                             var cellModel = allCell.FirstOrDefault(cell => cell.X == cellToUpdate.X
                                                                     && cell.Y == cellToUpdate.Y);
-                            if(cellModel == null)
+                            if (cellModel == null)
                             {
                                 dbContext.Add(cellToUpdate);
                             }
                             else
                             {
-                                if(!mapCellEqualityComaprer.Equals(cellModel, cellToUpdate))
+                                if (!mapCellEqualityComaprer.Equals(cellModel, cellToUpdate))
                                 {
                                     cellModel.UpdateAllButKeysProperties(cellToUpdate);
                                     dbContext.Update(cellModel);
-                                }                        
+                                }
                             }
                         }
                         dbContext.MapCellDigs.RemoveRange(dbContext.MapCellDigs.Where(dig => listCells.Select(x => x.IdCell).Contains(dig.IdCell)));
@@ -263,7 +266,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     {
                         Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.MhoApiStatus = e.Message;
-                    }   
+                    }
                 });
                 tasks.Add(mhoTask);
             }
@@ -321,8 +324,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 {
                     try
                     {
-                        // TODO REMETTRE !!!!
-                        //UpdateBags(townDetails.TownId, updateRequestDto.Bags.Contents);
+                        UpdateBags(townDetails.TownId, updateRequestDto.Bags.Contents);
 
                     }
                     catch (Exception e)
@@ -407,7 +409,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         {
                             using var scope = ServiceScopeFactory.CreateScope();
                             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
-                            var transaction = dbContext.Database.BeginTransaction();
+                            using var transaction = dbContext.Database.BeginTransaction();
                             if (patchHomeMho)
                             {
                                 townCitizenDetail.IdLastUpdateInfoHome = newLastUpdate.IdLastUpdateInfo;
@@ -475,7 +477,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             {
                 using var scope = ServiceScopeFactory.CreateScope();
                 var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
-                var transaction = dbContext.Database.BeginTransaction();
+                using var transaction = dbContext.Database.BeginTransaction();
 
                 var cellDigsToUpdate = new List<MapCellDig>();
                 var realX = updateRequestDto.TownDetails.TownX + successedDig.Cell.X;
@@ -515,7 +517,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         cellDigModel.NbTotalDig = dig.TotalDigs;
                         cellDigModel.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
                         dbContext.Update(cellDigModel);
-                    }  
+                    }
                 }
                 dbContext.SaveChanges();
                 transaction.Commit();
@@ -752,27 +754,41 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         {
             if (bags != null)
             {
+                using var scope = ServiceScopeFactory.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+                using var transaction = dbContext.Database.BeginTransaction();
+                var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(dbContext))).Entity;
+                dbContext.SaveChanges();
+
                 //var bagsId = MyHordesOptimizerRepository.GetCitizenBagsId(townId, bags.Select(x => x.UserId));
-                var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-                var citizens = new List<CitizenDto>();
                 foreach (var bag in bags)
                 {
-                    var citizen = new CitizenDto();
-                    //citizen.Bag.IdBag = bagsId[bag.UserId];
-
+                    var citizen = dbContext.TownCitizens
+                        .Include(x => x.IdBagNavigation)
+                        .ThenInclude(bag => bag.BagItems)
+                        .Single(x => x.IdTown == townId && x.IdUser == bag.UserId);
+                    if (citizen.IdBagNavigation == null)
+                    {
+                        citizen.IdBagNavigation = new Bag()
+                        {
+                            IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo
+                        };
+                    }
+                    dbContext.BagItems.RemoveRange(citizen.IdBagNavigation.BagItems);
+                    citizen.IdBagNavigation.BagItems.Clear();
                     foreach (var item in bag.Objects)
                     {
-                        var citizenItem = new StackableItemDto()
+                        citizen.IdBagNavigation.BagItems.Add(new BagItem()
                         {
                             Count = item.Count,
+                            IdItem = item.Id,
                             IsBroken = item.IsBroken
-                        };
-                        citizenItem.Item.Id = item.Id;
-                        citizen.Bag.Items.Add(citizenItem);
+                        });
+                        citizen.IdBagNavigation.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
                     }
-                    citizens.Add(citizen);
                 }
-                //MyHordesOptimizerRepository.PatchCitizenBags(townId, lastUpdateInfo, citizens);
+                dbContext.SaveChanges();
+                transaction.Commit();
             }
         }
 
