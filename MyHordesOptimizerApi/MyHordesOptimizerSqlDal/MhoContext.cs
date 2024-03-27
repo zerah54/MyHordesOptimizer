@@ -687,6 +687,10 @@ public partial class MhoContext : DbContext
 
             entity.Property(e => e.IdUserWishListUpdater).HasDefaultValueSql("'NULL'");
             entity.Property(e => e.WishlistDateUpdate).HasDefaultValueSql("'NULL'");
+
+            entity.HasOne(d => d.IdUserWishListUpdaterNavigation).WithMany(p => p.Towns)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("Town_fkuserwishlist");
         });
 
         modelBuilder.Entity<TownBankItem>(entity =>

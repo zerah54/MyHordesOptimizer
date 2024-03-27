@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MyHordesOptimizerApi.Models;
 
 [Table("Town")]
+[Index("IdUserWishListUpdater", Name = "Town_fkuserwishlist")]
 public partial class Town
 {
     [Key]
@@ -48,6 +49,10 @@ public partial class Town
 
     [InverseProperty("IdTownNavigation")]
     public virtual ICollection<Expedition> Expeditions { get; set; } = new List<Expedition>();
+
+    [ForeignKey("IdUserWishListUpdater")]
+    [InverseProperty("Towns")]
+    public virtual User? IdUserWishListUpdaterNavigation { get; set; }
 
     [InverseProperty("IdTownNavigation")]
     public virtual ICollection<MapCellDigUpdate> MapCellDigUpdates { get; set; } = new List<MapCellDigUpdate>();
