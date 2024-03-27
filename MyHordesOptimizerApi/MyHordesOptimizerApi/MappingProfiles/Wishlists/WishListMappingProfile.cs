@@ -24,25 +24,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
             CreateMap<int, Item>()
                 .ConvertUsing<IntToItemConverter>();
 
-            CreateMap<IEnumerable<TownWishListItem>, WishListLastUpdateDto>()
-                .ForMember(dto => dto.LastUpdateInfo, opt => opt.MapFrom((src, dest, srcMember, context) =>
-                {
-                    var first = src.FirstOrDefault();
-                    if(first != null)
-                    {
-                        return new LastUpdateInfoDto()
-                        {
-                            //    UpdateTime = first.IdTownNavigation.WishlistDateUpdate.Value,
-                            //    UserName = first.IdTownNavigation.IdUserWishListUpdater
-                        };
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }))
-                .ForMember(dto => dto.WishList, opt => opt.MapFrom(src => src.GroupBy(x => x.ZoneXpa)));
-
             CreateMap<TownWishListItem, WishListItemDto>()
                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
                .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.Depot))
