@@ -86,3 +86,8 @@ ADD CONSTRAINT RuinItemDrop_ibfk_1
     FOREIGN KEY (Idruin)
     REFERENCES Ruin(Idruin)
     ON DELETE CASCADE;
+
+ALTER TABLE Town
+ADD CONSTRAINT Town_fkuserwishlist
+	FOREIGN KEY(idUserWishListUpdater)
+	REFERENCES Users(idUser);

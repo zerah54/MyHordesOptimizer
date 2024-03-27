@@ -58,7 +58,7 @@ namespace MyHordesOptimizerApi.Services.Impl
               .Include(item => item.ActionNames)
               .Include(item => item.RecipeItemComponents)
                   .ThenInclude(recipe => recipe.RecipeNameNavigation)
-                  .ThenInclude(recipe => recipe.RecipeItemResults)
+                      .ThenInclude(recipe => recipe.RecipeItemResults)
               .Include(item => item.RecipeItemResults)
               .Include(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId))
               .Include(item => item.TownWishListItems.Where(wishListItem => wishListItem.IdTown == townId))

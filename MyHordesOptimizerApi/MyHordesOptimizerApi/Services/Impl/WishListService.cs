@@ -1,15 +1,14 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
-using MyHordesOptimizerApi.Extensions.Models;
-using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace MyHordesOptimizerApi.Services.Impl
@@ -22,18 +21,21 @@ namespace MyHordesOptimizerApi.Services.Impl
         protected IMyHordesApiRepository MyHordesJsonApiRepository { get; set; }
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
         protected IMapper Mapper { get; set; }
+        protected MhoContext DbContext { get; init; }
 
         public WishListService(ILogger<MyHordesFetcherService> logger,
             IUserInfoProvider userInfoProvider,
             IMyHordesApiRepository myHordesJsonApiRepository,
             IServiceScopeFactory serviceScopeFactory,
-            IMapper mapper)
+            IMapper mapper,
+            MhoContext context)
         {
             Logger = logger;
             UserInfoProvider = userInfoProvider;
             MyHordesJsonApiRepository = myHordesJsonApiRepository;
             ServiceScopeFactory = serviceScopeFactory;
             Mapper = mapper;
+            DbContext = context;
         }
 
         public WishListLastUpdateDto GetWishList(int townId)
@@ -71,7 +73,37 @@ namespace MyHordesOptimizerApi.Services.Impl
             //wishListItems.ForEach(wishlist => wishlist.Item.Recipes = recipes.GetRecipeForItem(wishlist.Item.Id));
             //Logger.LogInformation($"[GetWishList] Association des recipes : {sw.ElapsedMilliseconds}");
             //return wishList;
-            return null;
+            var wishListItems = DbContext.TownWishListItems
+                .Where(wishList => wishList.IdTown == townId)
+                .Include(wishlist => wishlist.IdItemNavigation)
+                    .ThenInclude(item => item.IdCategoryNavigation)
+                    .AsSplitQuery()
+                .Include(wishlist => wishlist.IdItemNavigation)
+                    .ThenInclude(item => item.PropertyNames)
+                    .AsSplitQuery()
+                .Include(wishlist => wishlist.IdItemNavigation)
+                    .ThenInclude(item => item.ActionNames)
+                    .AsSplitQuery()
+                .Include(wishlist => wishlist.IdItemNavigation)
+                    .ThenInclude(item => item.RecipeItemComponents)
+                        .ThenInclude(recipe => recipe.RecipeNameNavigation)
+                            .ThenInclude(recipe => recipe.RecipeItemResults)
+                            .AsSplitQuery()
+                .Include(wishlist => wishlist.IdItemNavigation)
+                    .ThenInclude(item => item.RecipeItemResults)
+                    .AsSplitQuery()
+                .Include(wishlist => wishlist.IdItemNavigation)
+                    .ThenInclude(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId))
+                    .AsSplitQuery()
+                .Include(wishlist => wishlist.IdTownNavigation)
+                    .ThenInclude(town => town.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId))
+                        .ThenInclude(townCitizen => townCitizen.IdBagNavigation)
+                            .ThenInclude(citizenBag => citizenBag.BagItems)
+                                .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                                .AsSplitQuery()
+                .ToList();
+            var dto = Mapper.Map<WishListLastUpdateDto>(wishListItems);
+            return dto;
         }
 
         public WishListLastUpdateDto PutWishList(int townId, int userId, List<WishListPutResquestDto> wishListPutRequest)
