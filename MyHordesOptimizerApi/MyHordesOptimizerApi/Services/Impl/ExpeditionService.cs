@@ -10,11 +10,14 @@ using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Services.Impl
 {
     public class ExpeditionService : IExpeditionService
     {
+        public static SemaphoreSlim Lock = new SemaphoreSlim(1);
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
         protected IMapper Mapper { get; private set; }
         protected IUserInfoProvider UserInfoProvider { get; private set; }
@@ -34,35 +37,47 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext = dbContext;
         }
 
-        public ExpeditionDto SaveExpedition(ExpeditionDto expeditionDto, int idTown, int day)
+        public async Task<ExpeditionDto> SaveExpeditionAsync(ExpeditionDto expeditionDto, int idTown, int day)
         {
-            using var transaction = DbContext.Database.BeginTransaction();
-            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
-            DbContext.SaveChanges();
-            var expeditionModel = Mapper.Map<Expedition>(expeditionDto);
-            expeditionModel.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
-            expeditionModel.Day = day;
-            expeditionModel.IdTown = idTown;
-            ExpeditionDto result;
-            if (expeditionDto.Id.HasValue)
+            await Lock.WaitAsync();
+            try
             {
-                // Update
-                var modelFromDb = DbContext.Expeditions.Single(expedition => expedition.IdExpedition == expeditionDto.Id);
-                modelFromDb.UpdateAllButKeysProperties(expeditionModel);
-                DbContext.Update(modelFromDb);
-                result = Mapper.Map<ExpeditionDto>(modelFromDb);
-            }
-            else
-            {
-                // Create
-                var newEntity = DbContext.Add(expeditionModel);
+                using var transaction = DbContext.Database.BeginTransaction();
+                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
                 DbContext.SaveChanges();
-                result = Mapper.Map<ExpeditionDto>(newEntity.Entity);
+                var expeditionModel = Mapper.Map<Expedition>(expeditionDto);
+                expeditionModel.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                expeditionModel.Day = day;
+                expeditionModel.IdTown = idTown;
+                ExpeditionDto result;
+                if (expeditionDto.Id.HasValue)
+                {
+                    // Update
+                    var modelFromDb = DbContext.Expeditions.Single(expedition => expedition.IdExpedition == expeditionDto.Id);
+                    modelFromDb.UpdateAllButKeysProperties(expeditionModel);
+                    DbContext.Update(modelFromDb);
+                    result = Mapper.Map<ExpeditionDto>(modelFromDb);
+                }
+                else
+                {
+                    // Create
+                    var newEntity = DbContext.Add(expeditionModel);
+                    DbContext.SaveChanges();
+                    result = Mapper.Map<ExpeditionDto>(newEntity.Entity);
+                }
+                DbContext.SaveChanges();
+                transaction.Commit();
+                return result;
             }
-            DbContext.SaveChanges();
-            transaction.Commit();
-            return result;
+            catch (System.Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                Lock.Release();
+            }            
         }
 
         public List<ExpeditionDto> GetExpeditionsByDay(int townId, int day)

@@ -1,5 +1,6 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Services.Interfaces
 {
@@ -7,6 +8,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces
     {
         void DeleteExpedition(int expeditionId);
         List<ExpeditionDto> GetExpeditionsByDay(int townId, int day);
-        ExpeditionDto SaveExpedition(ExpeditionDto expedition, int idTown, int day);
+        Task<ExpeditionDto> SaveExpeditionAsync(ExpeditionDto expedition, int idTown, int day);
     }
 }

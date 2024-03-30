@@ -24,9 +24,9 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("{townId}/{day}")]
-        public ActionResult<ExpeditionDto> PostExpedition([FromRoute] int townId, [FromRoute] int day, [FromBody] ExpeditionDto expedition)
+        public async Task<ActionResult<ExpeditionDto>> PostExpedition([FromRoute] int townId, [FromRoute] int day, [FromBody] ExpeditionDto expedition)
         {
-            var savedExpedition = ExpeditionService.SaveExpedition(expedition, townId, day);
+            var savedExpedition = await ExpeditionService.SaveExpeditionAsync(expedition, townId, day);
             return Ok(savedExpedition);
         }
 
