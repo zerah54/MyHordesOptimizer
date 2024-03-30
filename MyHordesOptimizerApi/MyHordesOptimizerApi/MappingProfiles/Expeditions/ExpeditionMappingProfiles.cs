@@ -36,7 +36,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ReverseMap()
                 .ForMember(dto => dto.Citizens, opt => opt.MapFrom(model => model.ExpeditionCitizens))
                 .ForMember(dto => dto.Direction, opt => opt.MapFrom(model => model.Direction))
-                .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpedition))
+                .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpeditionPart))
                 .ForMember(dto => dto.Label, opt => opt.MapFrom(model => model.Label))
                 .ForMember(dto => dto.Orders, opt => opt.MapFrom(model => model.IdExpeditionOrders))
                 .ForMember(dto => dto.Path, opt => opt.MapFrom(model => model.Path));

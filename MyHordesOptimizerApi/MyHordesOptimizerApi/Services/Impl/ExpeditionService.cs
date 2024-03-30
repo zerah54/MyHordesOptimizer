@@ -54,9 +54,26 @@ namespace MyHordesOptimizerApi.Services.Impl
                 if (expeditionDto.Id.HasValue)
                 {
                     // Update
-                    var modelFromDb = DbContext.Expeditions.Single(expedition => expedition.IdExpedition == expeditionDto.Id);
+                    var modelFromDb = DbContext.Expeditions
+                        .Where(expedition => expedition.IdExpedition == expeditionDto.Id)
+                        .Include(expedition => expedition.ExpeditionParts)
+                            .ThenInclude(part => part.IdExpeditionOrders)
+                        .Include(expedition => expedition.ExpeditionParts)
+                            .ThenInclude(part => part.ExpeditionCitizens)
+                                .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
+                        .Include(expedition => expedition.ExpeditionParts)
+                            .ThenInclude(part => part.ExpeditionCitizens)
+                                .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionOrders)
+                        .Single();
+
+                    DbContext.ExpeditionOrders.RemoveRange(modelFromDb.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders));
+                    DbContext.ExpeditionOrders.RemoveRange(modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens).SelectMany(citizen => citizen.IdExpeditionOrders));
+                    DbContext.ExpeditionCitizens.RemoveRange(modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens));
+                    DbContext.ExpeditionParts.RemoveRange(modelFromDb.ExpeditionParts);
+
                     modelFromDb.UpdateAllButKeysProperties(expeditionModel);
                     DbContext.Update(modelFromDb);
+                    DbContext.SaveChanges();
                     result = Mapper.Map<ExpeditionDto>(modelFromDb);
                 }
                 else

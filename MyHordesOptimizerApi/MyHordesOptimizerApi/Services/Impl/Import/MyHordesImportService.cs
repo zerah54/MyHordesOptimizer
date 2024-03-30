@@ -97,6 +97,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             Patch(heroSkills, capacities, comparer);
         }
 
+        // TODO : Utiliser la méthode d'extension
         private void Patch<T>(List<T> fromDbEntities, List<T> updatedEntities, IEqualityComparer<T> comparer) where T : class
         {
             var toRemove = fromDbEntities.Except(updatedEntities, comparer);
