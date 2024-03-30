@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
@@ -66,7 +67,17 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public List<ExpeditionDto> GetExpeditionsByDay(int townId, int day)
         {
-            var models = DbContext.Expeditions.Where(expedition => expedition.IdTown == townId && expedition.Day == day).ToList();
+            var models = DbContext.Expeditions
+                .Where(expedition => expedition.IdTown == townId && expedition.Day == day)
+                .Include(expedition => expedition.ExpeditionParts)
+                    .ThenInclude(part => part.IdExpeditionOrders)
+                .Include(expedition => expedition.ExpeditionParts)
+                    .ThenInclude(part => part.ExpeditionCitizens)
+                        .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
+                .Include(expedition => expedition.ExpeditionParts)
+                    .ThenInclude(part => part.ExpeditionCitizens)
+                        .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionOrders)
+                .ToList();
             var dtos = Mapper.Map<List<ExpeditionDto>>(models);
             return dtos;
         }
