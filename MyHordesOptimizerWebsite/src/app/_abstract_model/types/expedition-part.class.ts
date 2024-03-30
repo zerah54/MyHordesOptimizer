@@ -1,11 +1,10 @@
-import { v4 as UUID } from 'uuid';
 import { ExpeditionPartDTO } from '../dto/expedition-part.dto';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { CitizenExpedition } from './citizen-expedition.class';
 import { ExpeditionOrder } from './expedition-order.class';
 
 export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
-    public id: string = UUID();
+    public id!: string;
     public orders!: ExpeditionOrder[];
     public citizens: CitizenExpedition[] = [];
     public path!: string;
