@@ -153,11 +153,11 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public List<WishlistCategorieDto> GetWishListCategories()
         {
-            //var models = MyHordesOptimizerRepository.GetWishListCategories();
-            //var groupping = models.GroupBy(defaultWishListitem => defaultWishListitem.IdCategory);
-            //var dtos = Mapper.Map<List<WishlistCategorieDto>>(groupping);
-            //return dtos;
-            return null;
+            var models = DbContext.WishlistCategories
+                .Include(wshlstCategorie => wshlstCategorie.IdItems)
+                .ToList();
+            var dtos = Mapper.Map<List<WishlistCategorieDto>>(models);
+            return dtos;
         }
 
         public List<WishlistTemplateDto> GetWishListTemplates()

@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
@@ -51,6 +52,13 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
              .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
              .ForMember(dest => dest.ZoneXpa, opt => opt.MapFrom(src => src.ZoneXpa))
              .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count));
+
+            CreateMap<WishlistCategorie, WishlistCategorieDto>()
+                 .ForMember(dest => dest.IdCategory, opt => opt.MapFrom(src => src.IdCategory))
+                 .ForMember(dest => dest.IdUserAuthor, opt => opt.MapFrom(src => src.IdUserAuthor))
+                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                 .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.LabelFr }, { "en", src.LabelEn }, { "es", src.LabelEs }, { "de", src.LabelDe } }))
+                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.IdItems.Select(item => item.IdItem).ToList()));
         }
 
         private class IntToItemConverter : ITypeConverter<int, Item>
