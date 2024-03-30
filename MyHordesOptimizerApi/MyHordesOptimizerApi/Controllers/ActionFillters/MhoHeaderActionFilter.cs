@@ -8,12 +8,12 @@ using System.Text.RegularExpressions;
 
 namespace MyHordesOptimizerApi.Controllers.ActionFillters
 {
-    public class GlobalActionFilter : IActionFilter
+    public class MhoHeaderActionFilter : IActionFilter
     {
         protected readonly IMhoHeadersProvider MhoHeaderProvider;
         protected readonly IConfiguration Configuration;
 
-        public GlobalActionFilter(IMhoHeadersProvider mhoHeaderProvider, IConfiguration configuration)
+        public MhoHeaderActionFilter(IMhoHeadersProvider mhoHeaderProvider, IConfiguration configuration)
         {
             MhoHeaderProvider = mhoHeaderProvider;
             Configuration = configuration;

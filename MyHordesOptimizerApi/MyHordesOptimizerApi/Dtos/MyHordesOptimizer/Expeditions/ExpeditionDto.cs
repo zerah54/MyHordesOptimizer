@@ -6,8 +6,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions
     {
         public int? Id { get; set; }
         public string State { get; set; }
-        public string Label { get; set; }
-        public int MinPdc { get; set; }
-        public List<ExpeditionPartDto> Parts { get; set; }
+        public string? Label { get; set; }
+        public int? MinPdc { get; set; }
+        public List<ExpeditionPartDto>? Parts { get; set; }
     }
 }

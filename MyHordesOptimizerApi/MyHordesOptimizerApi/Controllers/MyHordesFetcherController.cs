@@ -75,7 +75,7 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
 
-            UserKeyProvider.UserKey = userKey;
+            UserInfoProvider.UserKey = userKey;
             var bank = _myHordesFetcherService.GetBank();
             return bank;
         }
@@ -95,7 +95,7 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(userId)} cannot be empty");
             }
 
-            UserKeyProvider.UserId = userId.Value;
+            UserInfoProvider.UserId = userId.Value;
             var citizens = _myHordesFetcherService.GetCitizens(townId.Value);
             return citizens;
         }
@@ -155,7 +155,7 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(townId)} cannot be empty when no cellId is provided");
             }
 
-            UserKeyProvider.UserId = userId.Value;
+            UserInfoProvider.UserId = userId.Value;
             var dto = _myHordesFetcherService.CreateOrUpdateMapDigs(townId.Value, userId.Value, requests);
             return Ok(dto);
         }

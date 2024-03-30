@@ -1,5 +1,4 @@
-﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Bag;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions
@@ -8,8 +7,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions
     {
         public int? Id { get; set; }
         public int? IdUser { get; set; }
-        public List<StackableItemDto> Items { get; set; }
-        public List<ExpeditionOrderDto> Order { get; set; }
+        public List<StackableItemDto>? Items { get; set; }
+        public List<ExpeditionOrderDto>? Order { get; set; }
         public bool Preinscrit { get; set; }
         public string? PreinscritJob { get; set; }
         [JsonProperty("preinscritHeroic")]

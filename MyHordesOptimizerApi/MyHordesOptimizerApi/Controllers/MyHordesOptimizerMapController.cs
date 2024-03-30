@@ -32,7 +32,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(townId)} cannot be empty");
             }
-            UserKeyProvider.UserId = userId.Value;
+            UserInfoProvider.UserId = userId.Value;
             var lastUpdateInfo = _mapService.UpdateCell(townId.Value, updateRequest);
             return lastUpdateInfo;
         }

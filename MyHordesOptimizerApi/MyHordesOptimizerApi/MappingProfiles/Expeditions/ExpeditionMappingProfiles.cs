@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Bag;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
 using MyHordesOptimizerApi.Models;
 
@@ -9,52 +9,87 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
     {
         public ExpeditionMappingProfiles()
         {
-            //CreateMap<ExpeditionDto, Expedition>()
-            //    .ForMember(dest => dest.MinPdc, opt => opt.MapFrom(src => src.MinPdc))
-            //    .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
-            //    .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.State))
-            //    .ForMember(dest => dest.IdExpedition, opt => opt.MapFrom(src => src.Id))
-            //    .ForMember(dest => dest.Day, opt => opt.Ignore())
-            //    .ForMember(dest => dest.IdTown, opt => opt.Ignore())
-            //    .ForMember(dest => dest.Label, opt => opt.MapFrom(src => src.Label))
-            //    .ForMember(dest => dest.Parts, opt => opt.MapFrom(src => src.Parts));
+            CreateMap<ExpeditionDto, Expedition>()
+                .ForMember(model => model.MinPdc, opt => opt.MapFrom(dto => dto.MinPdc))
+                .ForMember(model => model.IdLastUpdateInfo, opt => opt.Ignore())
+                .ForMember(model => model.State, opt => opt.MapFrom(dto => dto.State))
+                .ForMember(model => model.IdExpedition, opt => opt.MapFrom(dto => dto.Id))
+                .ForMember(model => model.Day, opt => opt.Ignore())
+                .ForMember(model => model.IdTown, opt => opt.Ignore())
+                .ForMember(model => model.Label, opt => opt.MapFrom(dto => dto.Label))
+                .ForMember(model => model.ExpeditionParts, opt => opt.MapFrom(dto => dto.Parts))
+                .ReverseMap()
+                .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpedition))
+                .ForMember(dto => dto.Label, opt => opt.MapFrom(model => model.Label))
+                .ForMember(dto => dto.MinPdc, opt => opt.MapFrom(model => model.MinPdc))
+                .ForMember(dto => dto.Parts, opt => opt.MapFrom(model => model.ExpeditionParts))
+                .ForMember(dto => dto.State, opt => opt.MapFrom(model => model.State));
 
-            //CreateMap<ExpeditionPartDto, ExpeditionPart>()
-            //    .ForMember(dest => dest.Path, opt => opt.MapFrom(src => src.Path))
-            //    .ForMember(dest => dest.Label, opt => opt.MapFrom(src => src.Label))
-            //    .ForMember(dest => dest.IdExpeditionPart, opt => opt.Ignore())
-            //    .ForMember(dest => dest.IdExpedition, opt => opt.Ignore())
-            //    .ForMember(dest => dest.Direction, opt => opt.MapFrom(src => src.Direction))
-            //    .ForMember(dest => dest.Orders, opt => opt.MapFrom(src => src.Orders))
-            //    .ForMember(dest => dest.ExpeditionCitizens, opt => opt.MapFrom(src => src.Citizens));
+            CreateMap<ExpeditionPartDto, ExpeditionPart>()
+                .ForMember(model => model.Path, opt => opt.MapFrom(dto => dto.Path))
+                .ForMember(model => model.Label, opt => opt.MapFrom(dto => dto.Label))
+                .ForMember(model => model.IdExpeditionPart, opt => opt.Ignore())
+                .ForMember(model => model.IdExpedition, opt => opt.Ignore())
+                .ForMember(model => model.Direction, opt => opt.MapFrom(dto => dto.Direction))
+                .ForMember(model => model.IdExpeditionOrders, opt => opt.MapFrom(dto => dto.Orders))
+                .ForMember(model => model.ExpeditionCitizens, opt => opt.MapFrom(dto => dto.Citizens))
+                .ReverseMap()
+                .ForMember(dto => dto.Citizens, opt => opt.MapFrom(model => model.ExpeditionCitizens))
+                .ForMember(dto => dto.Direction, opt => opt.MapFrom(model => model.Direction))
+                .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpedition))
+                .ForMember(dto => dto.Label, opt => opt.MapFrom(model => model.Label))
+                .ForMember(dto => dto.Orders, opt => opt.MapFrom(model => model.IdExpeditionOrders))
+                .ForMember(dto => dto.Path, opt => opt.MapFrom(model => model.Path));
 
-            //CreateMap<ExpeditionOrderDto, ExpeditionOrderModel>()
-            //    .ForMember(dest => dest.IdExpeditionOrder, opt => opt.MapFrom(src => src.Id))
-            //    .ForMember(dest => dest.Text, opt => opt.MapFrom(src => src.Text))
-            //    .ForMember(dest => dest.IsDone, opt => opt.MapFrom(src => src.IsDone))
-            //    .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position))
-            //    .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type))
-            //    .ForMember(dest => dest.ExpeditionCitizens, opt => opt.Ignore());
 
-            //CreateMap<ExpeditionCitizenDto, ExpeditionCitizenModel>()
-            //    .ForMember(dest => dest.IdExpeditionCitizen, opt => opt.MapFrom(src => src.Id))
-            //    .ForMember(dest => dest.Pdc, opt => opt.MapFrom(src => src.Pdc))
-            //    .ForMember(dest => dest.PreinscritHeroic, opt => opt.MapFrom(src => src.PreinscritHeroicSkillName))
-            //    .ForMember(dest => dest.IsPreinscrit, opt => opt.MapFrom(src => src.Preinscrit))
-            //    .ForMember(dest => dest.PreinscritJob, opt => opt.MapFrom(src => src.PreinscritJob))
-            //    .ForMember(dest => dest.IdExpeditionBag, opt => opt.Ignore())
-            //    .ForMember(dest => dest.IdExpeditionCitizen, opt => opt.Ignore())
-            //    .ForMember(dest => dest.IdExpeditionPart, opt => opt.Ignore())
-            //    .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.IdUser))
-            //    .ForMember(dest => dest.IsThirsty, opt => opt.MapFrom(src => src.IsThirsty))
-            //    .ForMember(dest => dest.Orders, opt => opt.MapFrom(src => src.Order))
-            //    .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
+            CreateMap<ExpeditionOrderDto, ExpeditionOrder>()
+                .ForMember(model => model.IdExpeditionOrder, opt => opt.MapFrom(dto => dto.Id))
+                .ForMember(model => model.Text, opt => opt.MapFrom(dto => dto.Text))
+                .ForMember(model => model.IsDone, opt => opt.MapFrom(dto => dto.IsDone))
+                .ForMember(model => model.Position, opt => opt.MapFrom(dto => dto.Position))
+                .ForMember(model => model.Type, opt => opt.MapFrom(dto => dto.Type))
+                .ForMember(model => model.IdExpeditionCitizens, opt => opt.Ignore())
+                .ReverseMap()
+                .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpeditionOrder))
+                .ForMember(dto => dto.IsDone, opt => opt.MapFrom(model => model.IsDone))
+                .ForMember(dto => dto.Position, opt => opt.MapFrom(model => model.Position))
+                .ForMember(dto => dto.Text, opt => opt.MapFrom(model => model.Text))
+                .ForMember(dto => dto.Type, opt => opt.MapFrom(model => model.Type));
 
-            //CreateMap<BagItemDto, ExpeditionBagItemModel>()
-            //    .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Item.Id))
-            //    .ForMember(dest => dest.IdExpeditionBag, opt => opt.Ignore())
-            //    .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.IsBroken))
-            //    .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count));
+            CreateMap<ExpeditionCitizenDto, ExpeditionCitizen>()
+                .ForMember(model => model.IdExpeditionCitizen, opt => opt.MapFrom(dto => dto.Id))
+                .ForMember(model => model.Pdc, opt => opt.MapFrom(dto => dto.Pdc))
+                .ForMember(model => model.PreinscritHeroic, opt => opt.MapFrom(dto => dto.PreinscritHeroicSkillName))
+                .ForMember(model => model.IsPreinscrit, opt => opt.MapFrom(dto => dto.Preinscrit))
+                .ForMember(model => model.PreinscritJob, opt => opt.MapFrom(dto => dto.PreinscritJob))
+                .ForMember(model => model.IdExpeditionBag, opt => opt.Ignore())
+                .ForMember(model => model.IdExpeditionCitizen, opt => opt.Ignore())
+                .ForMember(model => model.IdExpeditionPart, opt => opt.Ignore())
+                .ForMember(model => model.IdUser, opt => opt.MapFrom(dto => dto.IdUser))
+                .ForMember(model => model.IsThirsty, opt => opt.MapFrom(dto => dto.IsThirsty))
+                .ForMember(model => model.IdExpeditionOrders, opt => opt.MapFrom(dto => dto.Order))
+                .ForMember(model => model.IdExpeditionBagNavigation, opt => opt.MapFrom(dto => dto.Items))
+                .ReverseMap()
+                .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpeditionCitizen))
+                .ForMember(dto => dto.IdUser, opt => opt.MapFrom(model => model.IdUser))
+                .ForMember(dto => dto.IsThirsty, opt => opt.MapFrom(model => model.IsThirsty))
+                .ForMember(dto => dto.Items, opt => opt.MapFrom(model => model.IdExpeditionBagNavigation))
+                .ForMember(dto => dto.Order, opt => opt.MapFrom(model => model.IdExpeditionOrders))
+                .ForMember(dto => dto.Pdc, opt => opt.MapFrom(model => model.Pdc))
+                .ForMember(dto => dto.Preinscrit, opt => opt.MapFrom(model => model.IsPreinscrit))
+                .ForMember(dto => dto.PreinscritHeroicSkillName, opt => opt.MapFrom(model => model.PreinscritHeroic))
+                .ForMember(dto => dto.PreinscritJob, opt => opt.MapFrom(model => model.PreinscritJob));
+
+            CreateMap<StackableItemDto, ExpeditionBag>()
+                .ForMember(model => model.IdItem, opt => opt.MapFrom(dto => dto.Item.Id))
+                .ForMember(model => model.IdExpeditionBag, opt => opt.Ignore())
+                .ForMember(model => model.IsBroken, opt => opt.MapFrom(dto => dto.IsBroken))
+                .ForMember(model => model.Count, opt => opt.MapFrom(dto => dto.Count))
+                .ReverseMap()
+                .ForMember(dto => dto.Count, opt => opt.MapFrom(model => model.Count))
+                .ForMember(dto => dto.IsBroken, opt => opt.MapFrom(model => model.IsBroken))
+                .ForMember(dto => dto.Item, opt => opt.MapFrom(model => model.IdItemNavigation))
+                .ForMember(dto => dto.WishListCount, opt => opt.Ignore());
         }
     }
 }

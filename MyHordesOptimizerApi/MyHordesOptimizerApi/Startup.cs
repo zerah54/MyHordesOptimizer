@@ -1,7 +1,9 @@
 using AutoMapper;
 using AutoMapper.EquivalencyExpression;
+using Cockpit.Api.Extensions;
 using Common.Core.Repository.Impl;
 using Common.Core.Repository.Interfaces;
+using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Builder;
@@ -11,6 +13,7 @@ using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using MyHordesOptimizerApi.Configuration.Impl;
 using MyHordesOptimizerApi.Configuration.Impl.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
@@ -19,7 +22,6 @@ using MyHordesOptimizerApi.Controllers.ActionFillters;
 using MyHordesOptimizerApi.DiscordBot.Services;
 using MyHordesOptimizerApi.Providers.Impl;
 using MyHordesOptimizerApi.Providers.Interfaces;
-using MyHordesOptimizerApi.Repository;
 using MyHordesOptimizerApi.Repository.Impl;
 using MyHordesOptimizerApi.Repository.Impl.ExternalTools;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -35,9 +37,11 @@ using MyHordesOptimizerApi.Services.Interfaces.Estimations;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 
 namespace MyHordesOptimizerApi
@@ -72,8 +76,9 @@ namespace MyHordesOptimizerApi
             services.AddAuthorization();
             services.AddControllers(config =>
             {
-                config.Filters.Add<GlobalActionFilter>();
+                config.Filters.Add<MhoHeaderActionFilter>();
                 config.Filters.Add<ApiExceptionFilter>();
+                config.Filters.Add<JwtActionFilter>();
             }).AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
@@ -90,7 +95,7 @@ namespace MyHordesOptimizerApi
             services.AddScoped<IMhoHeadersProvider, MhoHeadersProvider>();
 
             // Action filters
-            services.AddScoped<GlobalActionFilter>();
+            services.AddScoped<MhoHeaderActionFilter>();
 
             // Configuration
             services.AddSingleton<IMyHordesApiConfiguration, MyHordesApiConfiguration>();
@@ -148,6 +153,8 @@ namespace MyHordesOptimizerApi
             {
                 logging.LoggingFields = HttpLoggingFields.All | HttpLoggingFields.RequestQuery;
             });
+
+            services.AddBearerAuthentication(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -169,6 +176,7 @@ namespace MyHordesOptimizerApi
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseHttpLogging();

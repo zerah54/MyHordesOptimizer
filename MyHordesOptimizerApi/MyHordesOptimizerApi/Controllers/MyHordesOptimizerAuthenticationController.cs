@@ -32,7 +32,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
-            UserKeyProvider.UserKey = userKey;
+            UserInfoProvider.UserKey = userKey;
             var simpleMe = _myHordesFetcherService.GetSimpleMe();
             var token = _authenticationService.CreateToken(simpleMe);
             return new AuthenticationResponseDto()

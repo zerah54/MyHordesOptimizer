@@ -66,8 +66,15 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
         {
             var models = DbContext.TownEstimations.Where(x => x.Day == day && x.IdTown == townId)
                 .ToList();
-            var dto = Mapper.Map<EstimationRequestDto>(models);
-            return dto;
+            if(models.Any())
+            {
+                var dto = Mapper.Map<EstimationRequestDto>(models);
+                return dto;
+            }
+            else
+            {
+                return new EstimationRequestDto();
+            }                       
         }
     }
 }
