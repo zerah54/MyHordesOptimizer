@@ -114,12 +114,22 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public WishListLastUpdateDto CreateFromTemplate(int townId, int userId, int templateId)
         {
-            //var itemTemplates = MyHordesOptimizerRepository.GetWishListTemplate(templateId);
-            //var items = Mapper.Map<List<TownWishlistItemModel>>(itemTemplates);
-            //MyHordesOptimizerRepository.PutWishList(townId, userId, items);
-            //var wishList = MyHordesOptimizerRepository.GetWishList(townId);
-            //return wishList;
-            return null;
+            using var transaction = DbContext.Database.BeginTransaction();
+            DbContext.TownWishListItems.RemoveRange(DbContext.TownWishListItems.Where(townWishListItem => townWishListItem.IdTown == townId));
+            var templateWishList = DbContext.DefaultWishlistItems.Where(defaultWishListitem => defaultWishListitem.IdDefaultWishlist == templateId)
+                .ToList();
+            var items = Mapper.Map<List<TownWishListItem>>(templateWishList);
+            var town = DbContext.Towns
+               .Where(town => town.IdTown == townId)
+               .Include(town => town.TownWishListItems)
+               .Single();
+            town.TownWishListItems = items;
+            town.IdUserWishListUpdater = userId;
+            town.WishlistDateUpdate = DateTime.UtcNow;
+            DbContext.Update(town);
+            DbContext.SaveChanges();
+            transaction.Commit();
+            return GetWishList(townId);
         }
 
         public void AddItemToWishList(int townId, int userId, int itemId, int zoneXPa)
@@ -130,7 +140,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         public List<WishlistCategorieDto> GetWishListCategories()
         {
             //var models = MyHordesOptimizerRepository.GetWishListCategories();
-            //var groupping = models.GroupBy(x => x.IdCategory);
+            //var groupping = models.GroupBy(defaultWishListitem => defaultWishListitem.IdCategory);
             //var dtos = Mapper.Map<List<WishlistCategorieDto>>(groupping);
             //return dtos;
             return null;
@@ -139,7 +149,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         public List<WishlistTemplateDto> GetWishListTemplates()
         {
             //var models = MyHordesOptimizerRepository.GetWishListTemplates();
-            //var groupping = models.GroupBy(x => x.IdDefaultWishlist);
+            //var groupping = models.GroupBy(defaultWishListitem => defaultWishListitem.IdDefaultWishlist);
             //var dtos = Mapper.Map<List<WishlistTemplateDto>>(groupping);
             //return dtos;
             return null;
