@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc.Razor.TagHelpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace MyHordesOptimizerApi.Services.Impl
 {
@@ -85,7 +85,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                         UpdateTime = wishListItems.First().IdTownNavigation.WishlistDateUpdate.Value
                     },
                     WishList = itemsDto.GroupBy(item => item.ZoneXPa, item => item).ToDictionary(group => group.Key, group => group.ToList())
-            };
+                };
                 return dto;
             }
             else
@@ -96,11 +96,20 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public WishListLastUpdateDto PutWishList(int townId, int userId, List<WishListPutResquestDto> wishListPutRequest)
         {
-            //var items = Mapper.Map<List<TownWishlistItemModel>>(wishListPutRequest);
-            //MyHordesOptimizerRepository.PutWishList(townId, userId, items);
-            //var wishList = MyHordesOptimizerRepository.GetWishList(townId);
-            //return wishList;
-            return null;
+            var items = Mapper.Map<List<TownWishListItem>>(wishListPutRequest);
+            using var transaction = DbContext.Database.BeginTransaction();
+            DbContext.TownWishListItems.RemoveRange(DbContext.TownWishListItems.Where(townWishListItem => townWishListItem.IdTown == townId));
+            var town = DbContext.Towns
+                .Where(town => town.IdTown == townId)
+                .Include(town => town.TownWishListItems)
+                .Single();
+            town.TownWishListItems = items;
+            town.IdUserWishListUpdater = userId;
+            town.WishlistDateUpdate = DateTime.UtcNow;
+            DbContext.Update(town);
+            DbContext.SaveChanges();
+            transaction.Commit();
+            return GetWishList(townId);
         }
 
         public WishListLastUpdateDto CreateFromTemplate(int townId, int userId, int templateId)

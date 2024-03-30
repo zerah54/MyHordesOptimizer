@@ -225,16 +225,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
             //     .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.LastUpdateInfoUserId))
             //     .ForMember(dest => dest.UpdateTime, opt => opt.MapFrom(src => src.LastUpdateDateUpdate))
             //     .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.LastUpdateInfoUserName));
-
-            // Wishlist
-            CreateMap<WishListPutResquestDto, TownWishListItem>()
-                .ForMember(dest => dest.IdTown, opt => opt.Ignore())
-                .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.Depot))
-                .ForMember(dest => dest.ShouldSignal, opt => opt.MapFrom(src => src.ShouldSignal))
-                .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
-                .ForMember(dest => dest.ZoneXpa, opt => opt.MapFrom(src => src.ZoneXPa))
-                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count));
+     
 
             //CreateMap<TownWishlistItemCompletModel, Item>()
             //    .ForMember(dest => dest.Img, opt => opt.MapFrom(src => src.ItemImg))

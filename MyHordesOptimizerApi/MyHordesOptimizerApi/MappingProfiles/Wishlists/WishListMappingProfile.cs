@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MyHordesOptimizerApi.Data.Wishlist;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using System.Collections.Generic;
@@ -33,6 +34,15 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
                .ForMember(dest => dest.BankCount, opt => opt.Ignore())
                .ForMember(dest => dest.IsWorkshop, opt => opt.Ignore())
                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src.IdItemNavigation));
+
+            CreateMap<WishListPutResquestDto, TownWishListItem>()
+              .ForMember(dest => dest.IdTown, opt => opt.Ignore())
+              .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Id))
+              .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.Depot))
+              .ForMember(dest => dest.ShouldSignal, opt => opt.MapFrom(src => src.ShouldSignal))
+              .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
+              .ForMember(dest => dest.ZoneXpa, opt => opt.MapFrom(src => src.ZoneXPa))
+              .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count));
         }
 
         private class IntToItemConverter : ITypeConverter<int, Item>
