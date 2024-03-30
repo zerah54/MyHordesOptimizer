@@ -70,5 +70,12 @@ namespace MyHordesOptimizerApi.Services.Impl
             var dtos = Mapper.Map<List<ExpeditionDto>>(models);
             return dtos;
         }
+
+        public void DeleteExpedition(int expeditionId)
+        {
+            var expedition = DbContext.Expeditions.Single(expedition => expedition.IdExpedition == expeditionId);
+            DbContext.Remove(expedition);
+            DbContext.SaveChanges();
+        }
     }
 }

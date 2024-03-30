@@ -42,7 +42,7 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("{expeditionId}")]
         public async Task<ActionResult> DeleteExpedition([FromRoute] int expeditionId)
         {
-            //TODO
+            ExpeditionService.DeleteExpedition(expeditionId);
             return Ok();
         }
 
