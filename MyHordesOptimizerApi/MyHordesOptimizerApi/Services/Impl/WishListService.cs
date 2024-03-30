@@ -134,7 +134,21 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public void AddItemToWishList(int townId, int userId, int itemId, int zoneXPa)
         {
-            //MyHordesOptimizerRepository.AddItemToWishlist(townId, itemId, userId, zoneXPa);
+            using var transaction = DbContext.Database.BeginTransaction();
+            var town = DbContext.Towns
+             .Where(town => town.IdTown == townId)
+             .Include(town => town.TownWishListItems)
+             .Single();
+            town.TownWishListItems.Add(new TownWishListItem()
+            {
+                ZoneXpa = zoneXPa,
+                IdItem = itemId,
+            });
+            town.IdUserWishListUpdater = userId;
+            town.WishlistDateUpdate = DateTime.UtcNow;
+            DbContext.Update(town);
+            DbContext.SaveChanges();
+            transaction.Commit();
         }
 
         public List<WishlistCategorieDto> GetWishListCategories()
