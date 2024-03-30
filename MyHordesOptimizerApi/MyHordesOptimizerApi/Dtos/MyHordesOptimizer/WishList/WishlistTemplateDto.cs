@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList
 {

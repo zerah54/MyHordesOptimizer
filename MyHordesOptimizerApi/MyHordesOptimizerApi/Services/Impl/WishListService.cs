@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Models;
@@ -162,11 +163,29 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public List<WishlistTemplateDto> GetWishListTemplates()
         {
-            //var models = MyHordesOptimizerRepository.GetWishListTemplates();
-            //var groupping = models.GroupBy(defaultWishListitem => defaultWishListitem.IdDefaultWishlist);
-            //var dtos = Mapper.Map<List<WishlistTemplateDto>>(groupping);
-            //return dtos;
-            return null;
+            var models = DbContext.DefaultWishlistItems.ToList();
+            var templates = models.GroupBy(model => new
+            {
+                model.IdDefaultWishlist,
+                model.IdUserAuthor,
+                Labels = new Dictionary<string, string>() { { "fr", model.LabelFr }, { "en", model.LabelEn }, { "es", model.LabelEs }, { "de", model.LabelDe } },
+                model.Name
+            });
+            var dtos = new List<WishlistTemplateDto>();
+            foreach (var group in templates)
+            {
+                var templateId = group.Key.IdDefaultWishlist;
+                var items = Mapper.Map<List<WishListItemDto>>(group.ToList());
+                dtos.Add(new WishlistTemplateDto()
+                {
+                    IdTemplate = templateId,
+                    IdUserAuthor = group.Key.IdUserAuthor,
+                    Labels = group.Key.Labels,
+                    Name = group.Key.Name,
+                    Items = items
+                });
+            }
+            return dtos;
         }
     }
 }

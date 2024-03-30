@@ -95,26 +95,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.LabelFr, opt => opt.MapFrom(src => src.Label.GetValueOrDefault("fr")))
                 .ForMember(dest => dest.LabelEs, opt => opt.MapFrom(src => src.Label.GetValueOrDefault("es")))
                 .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Label.GetValueOrDefault("en")));
-
-              
-            CreateMap<IGrouping<int, DefaultWishlistItem>, WishlistTemplateDto>()
-               .ForMember(dest => dest.IdTemplate, opt => opt.MapFrom(src => src.First().IdDefaultWishlist))
-               .ForMember(dest => dest.IdUserAuthor, opt => opt.MapFrom(src => src.First().IdUserAuthor))
-               .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.First().Name))
-               .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.First().LabelFr }, { "en", src.First().LabelEn }, { "es", src.First().LabelEs }, { "de", src.First().LabelDe } }))
-               .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.ToList()));
-
-            CreateMap<DefaultWishlistItem, WishListItemDto>()
-                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => new Item() { IdItem = src.IdItem }))
-                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
-                .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.Depot))
-                .ForMember(dest => dest.ShouldSignal, opt => opt.MapFrom(src => src.ShouldSignal))
-                .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
-                .ForMember(dest => dest.BankCount, opt => opt.Ignore())
-                .ForMember(dest => dest.IsWorkshop, opt => opt.Ignore())
-                .ForMember(dest => dest.BagCount, opt => opt.Ignore())
-                .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.Count));
-
+     
             CreateMap<HomeUpgradeDetailsDto, TownCitizen>()
                 .ForMember(dest => dest.Apagcharges, opt => opt.Ignore())
                 .ForMember(dest => dest.ChestLevel, opt => opt.MapFrom(src => src.Chest))
