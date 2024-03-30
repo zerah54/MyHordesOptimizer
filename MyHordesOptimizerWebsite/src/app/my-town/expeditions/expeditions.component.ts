@@ -60,9 +60,7 @@ export class ExpeditionsComponent implements OnInit {
     /** La liste complète des items */
     protected all_items: Item[] = [];
 
-    protected expeditions: Expedition[] = [
-        new Expedition()
-    ];
+    protected expeditions!: Expedition[];
 
     protected copy_expeditions!: Expedition[] | undefined;
 
@@ -83,12 +81,12 @@ export class ExpeditionsComponent implements OnInit {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((items: Item[]) => this.all_items = items);
 
-        this.expedition_service.getExpeditions(this.current_day).subscribe({
-            next: (expeditions: Expedition[]) => {
-                console.log('success');
-                this.expeditions = expeditions;
-            }
-        });
+        this.expedition_service.getExpeditions(this.current_day)
+            .subscribe({
+                next: (expeditions: Expedition[]) => {
+                    this.expeditions = expeditions;
+                }
+            });
     }
 
     /**

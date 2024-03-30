@@ -1,10 +1,9 @@
-import { v4 as UUID } from 'uuid';
 import { ExpeditionDTO } from '../dto/expedition.dto';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { ExpeditionPart } from './expedition-part.class';
 
 export class Expedition extends CommonModel<ExpeditionDTO> {
-    public id: string = UUID();
+    public id!: string;
     public state: 'ready' | 'stop' = 'stop';
     public label!: string;
     public min_pdc!: number;

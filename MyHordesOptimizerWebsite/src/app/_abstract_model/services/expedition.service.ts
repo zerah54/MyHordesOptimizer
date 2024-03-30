@@ -54,7 +54,9 @@ export class ExpeditionService extends GlobalService {
                 .subscribe({
                     next: (response: ExpeditionDTO) => {
                         sub.next(new Expedition(response));
-                        this.snackbar.successSnackbar($localize`L'expédition ${expedition.label} a bien été créée`);
+                        if (!expedition.id) {
+                            this.snackbar.successSnackbar($localize`L'expédition ${expedition.label} a bien été créée`);
+                        }
                     },
                     error: (error: HttpErrorResponse) => {
                         sub.error(error);
