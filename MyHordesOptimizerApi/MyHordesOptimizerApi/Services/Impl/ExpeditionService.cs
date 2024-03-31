@@ -70,22 +70,22 @@ namespace MyHordesOptimizerApi.Services.Impl
                                 .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionOrders)
                         .Single();
 
+                    // On récupère les collections de la db
                     var expeditionsOrderFromDb = modelFromDb.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders).ToList();
                     expeditionsOrderFromDb.AddRange(modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders)));
                     var partFromDb = modelFromDb.ExpeditionParts;
                     var citizenFromDb = modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens).ToList();
-
-                    modelFromDb.UpdateAllButKeysProperties(expeditionModel);
-
+                    // On récupère les mêmes collection du model a update
                     var expeditionsOrderFromDto = expeditionModel.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders).ToList();
                     expeditionsOrderFromDto.AddRange(expeditionModel.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders)));
                     var partFromDto = expeditionModel.ExpeditionParts;
                     var citizenFromDto = expeditionModel.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens).ToList();
-
+                    // On patch les collections
                     DbContext.Patch(expeditionsOrderFromDb, expeditionsOrderFromDto);
                     DbContext.Patch(partFromDb, partFromDto);
                     DbContext.Patch(citizenFromDb, citizenFromDto);
 
+                    modelFromDb.UpdateAllButKeysProperties(expeditionModel);
                     DbContext.Update(modelFromDb);
                     DbContext.SaveChanges();
                     result = Mapper.Map<ExpeditionDto>(modelFromDb);
@@ -156,7 +156,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .Include(citizen => citizen.IdExpeditionOrders)
                     .Include(citizen => citizen.IdExpeditionBagNavigation)
                     .Single();
-                DbContext.ExpeditionOrders.RemoveRange(expeditionCitizenFromDb.IdExpeditionOrders);
+
+                var orderFromDb = expeditionCitizenFromDb.IdExpeditionOrders;
+                var orderFromDto = expeditionCitizenModel.IdExpeditionOrders;
+                DbContext.Patch(orderFromDb, orderFromDto);
+
                 expeditionCitizenFromDb.UpdateAllButKeysProperties(expeditionCitizenModel);
                 DbContext.SaveChanges();
                 result = Mapper.Map<ExpeditionCitizenDto>(expeditionCitizenFromDb);
@@ -202,9 +206,19 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .Include(part => part.ExpeditionCitizens)
                         .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
                     .Single();
-                DbContext.ExpeditionOrders.RemoveRange(expeditionPartFromDb.IdExpeditionOrders);
-                DbContext.ExpeditionOrders.RemoveRange(expeditionPartFromDb.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders));
-                DbContext.ExpeditionCitizens.RemoveRange(expeditionPartFromDb.ExpeditionCitizens);
+
+                // On récupère les collections de la db
+                var orderFromDb = expeditionPartFromDb.IdExpeditionOrders.ToList();
+                orderFromDb.AddRange(expeditionPartFromDb.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders)));
+                var citizenFromDb = expeditionPartFromDb.ExpeditionCitizens;
+                // On récupère les mêmes collection du model a update
+                var orderFromModel = expeditionPartModel.IdExpeditionOrders.ToList();
+                orderFromModel.AddRange(expeditionPartModel.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders)));
+                var citizenFromModel = expeditionPartModel.ExpeditionCitizens;
+                // On patch les collections
+                DbContext.Patch(orderFromDb, orderFromModel);
+                DbContext.Patch(citizenFromDb, citizenFromModel);
+
                 expeditionPartFromDb.UpdateAllButKeysProperties(expeditionPartModel);
                 DbContext.SaveChanges();
                 result = Mapper.Map<ExpeditionPartDto>(expeditionPartFromDb);
