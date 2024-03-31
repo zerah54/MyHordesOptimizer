@@ -56,13 +56,21 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         public async Task ImportAllAsync()
         {
             await ImportHeroSkill();
+            DbContext.ChangeTracker.Clear();
             await ImportCategoriesAsync();
+            DbContext.ChangeTracker.Clear();
             await ImportItemsAsync();
+            DbContext.ChangeTracker.Clear();
             await ImportCauseOfDeath();
+            DbContext.ChangeTracker.Clear();
             ImportCleanUpTypes();
+            DbContext.ChangeTracker.Clear();
             ImportRuins();
+            DbContext.ChangeTracker.Clear();
             ImportWishlistCategorie();
+            DbContext.ChangeTracker.Clear();
             ImportDefaultWishlists();
+            DbContext.ChangeTracker.Clear();
         }
 
         #region HeroSkill
