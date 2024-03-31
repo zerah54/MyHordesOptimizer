@@ -51,23 +51,15 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("{expeditionId}/parts")]
         public async Task<ActionResult<ExpeditionPartDto>> PostExpeditionPart([FromRoute] int expeditionId, [FromBody] ExpeditionPartDto expeditionPart)
         {
-            if (expeditionPart.Id.HasValue)
-            {
-                // Update
-            }
-            else
-            {
-                // Create
-            }
-            //TODO
-            return Ok(null);
+            var expeditionPartResult = await ExpeditionService.SaveExpeditionPartAsync(expeditionId, expeditionPart);
+            return Ok(expeditionPartResult);
         }
 
         [HttpDelete]
         [Route("parts/{expeditionPartId}")]
         public async Task<ActionResult> DeleteExpeditionPart([FromRoute] int expeditionPartId)
         {
-            //TODO
+            ExpeditionService.DeleteExpeditionPart(expeditionPartId);
             return Ok();
         }
 

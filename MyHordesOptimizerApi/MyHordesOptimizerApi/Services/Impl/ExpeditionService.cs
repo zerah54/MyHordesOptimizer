@@ -142,6 +142,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 // Update
                 var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizen.Id.Value)
+                    .Include(citizen => citizen.IdExpeditionOrders)
+                    .Include(citizen => citizen.IdExpeditionBagNavigation)
                     .Single();
                 DbContext.ExpeditionOrders.RemoveRange(expeditionCitizenFromDb.IdExpeditionOrders);
                 expeditionCitizenFromDb.UpdateAllButKeysProperties(expeditionCitizenModel);
@@ -163,6 +165,54 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var expeditionCitizen = DbContext.ExpeditionCitizens.Single(expedition => expedition.IdExpeditionCitizen == expeditionCitizenId);
             DbContext.Remove(expeditionCitizen);
+            DbContext.SaveChanges();
+        }
+
+        #endregion
+
+        #region ExpeditionParts
+
+        public Task<ExpeditionPartDto> SaveExpeditionPartAsync(int expeditionId, ExpeditionPartDto expeditionPart)
+        {
+            using var transaction = DbContext.Database.BeginTransaction();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+            DbContext.SaveChanges();
+            var expeditionPartModel = Mapper.Map<ExpeditionPart>(expeditionPart);
+            expeditionPartModel.IdExpedition = expeditionId;
+            ExpeditionPartDto result;
+            if (expeditionPart.Id.HasValue)
+            {
+                // Update
+                var expeditionPartFromDb = DbContext.ExpeditionParts.Where(part => part.IdExpeditionPart == expeditionPart.Id.Value)
+                    .Include(part => part.IdExpeditionOrders)
+                    .Include(part => part.ExpeditionCitizens)
+                        .ThenInclude(citizen => citizen.IdExpeditionOrders)
+                    .Include(part => part.ExpeditionCitizens)
+                        .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
+                    .Single();
+                DbContext.ExpeditionOrders.RemoveRange(expeditionPartFromDb.IdExpeditionOrders);
+                DbContext.ExpeditionOrders.RemoveRange(expeditionPartFromDb.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders));
+                DbContext.ExpeditionCitizens.RemoveRange(expeditionPartFromDb.ExpeditionCitizens);
+                expeditionPartFromDb.UpdateAllButKeysProperties(expeditionPartModel);
+                DbContext.SaveChanges();
+                result = Mapper.Map<ExpeditionPartDto>(expeditionPartFromDb);
+            }
+            else
+            {
+                // Create
+                var newEntity = DbContext.Add(expeditionPartModel);
+                DbContext.SaveChanges();
+                result = Mapper.Map<ExpeditionPartDto>(newEntity.Entity);
+            }
+            transaction.Commit();
+            return Task.FromResult(result);
+        }
+
+        public void DeleteExpeditionPart(int expeditionPartId)
+        {
+            var expeditionPart = DbContext.ExpeditionParts.Single(part => part.IdExpeditionPart == expeditionPartId);
+            DbContext.Remove(expeditionPart);
             DbContext.SaveChanges();
         }
 
