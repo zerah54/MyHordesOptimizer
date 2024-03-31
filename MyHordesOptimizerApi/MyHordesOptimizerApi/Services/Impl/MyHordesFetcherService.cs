@@ -17,11 +17,14 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Services.Impl
 {
     public class MyHordesFetcherService : IMyHordesFetcherService
     {
+        public static SemaphoreSlim Lock = new SemaphoreSlim(1);
         protected ILogger<MyHordesFetcherService> Logger { get; set; }
         protected IMyHordesApiRepository MyHordesJsonApiRepository { get; set; }
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
@@ -68,204 +71,216 @@ namespace MyHordesOptimizerApi.Services.Impl
             return itemsDto;
         }
 
-        public SimpleMeDto GetSimpleMe()
+        public async Task<SimpleMeDto> GetSimpleMeAsync()
         {
-            var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
-            if (myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
+            await Lock.WaitAsync();
+            try
             {
-                if (!DbContext.Users.Any(u => u.IdUser == UserInfoProvider.UserId))
+                var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
+                if (myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
                 {
-                    var user = Mapper.Map<User>(myHordeMeResponse);
-                    DbContext.Add(user);
-                    DbContext.SaveChanges();
-                    DbContext.ChangeTracker.Clear();
-                }
-                using var transaction = DbContext.Database.BeginTransaction();
-                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo()));
-                DbContext.SaveChanges();
-                var lastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.Entity.IdLastUpdateInfo);
-                myHordeMeResponse.Map.LastUpdateInfo = lastUpdate;
-                var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
-                var citizens = town.TownCitizens;
-                town.TownCitizens = null;
-                var bankItems = town.TownBankItems;
-                town.TownBankItems = null;
-                var existingTown = DbContext.Towns
-                    .Include(town => town.TownCitizens)
-                    .FirstOrDefault(t => t.IdTown == town.IdTown);
-                if (existingTown == null)
-                {
-                    // On Crée la ville
-                    DbContext.Add(town);
-                    // On crée les citoyen
-                    DbContext.AddRange(citizens);
-                    // On crée la banque
-                    DbContext.AddRange(bankItems);
-                    // On crée les cells
-                    var cells = CreateCellsForTown(xVille: myHordeMeResponse.Map.City.X,
-                        yVille: myHordeMeResponse.Map.City.Y,
-                        mapWid: myHordeMeResponse.Map.Wid,
-                        mapHei: myHordeMeResponse.Map.Hei,
-                        townId: town.IdTown,
-                        lastUpdate);
-                    DbContext.AddRange(cells);
-                    DbContext.SaveChanges();
-                }
-                else
-                {
-                    // On met à jour la ville
-                    existingTown.UpdateNoNullProperties(town);
-                    DbContext.Update(existingTown);
-                    // On ajoute une nouvelle banque avec un nouveau lastupdate
-                    DbContext.AddRange(bankItems);
-                    // On maj les citoyen en gardant tout ce qui remonte pas de MH
-                    DbContext.RemoveRange(existingTown.TownCitizens);
-                    foreach (var citizen in existingTown.TownCitizens)
+                    if (!DbContext.Users.Any(u => u.IdUser == UserInfoProvider.UserId))
                     {
-                        foreach (var c in citizens)
-                        {
-                            if (c.IdUser == citizen.IdUser)
-                            {
-                                c.ImportHomeDetail(citizen);
-                                c.ImportHeroicActionDetail(citizen);
-                                c.ImportStatusDetail(citizen);
-                            }
-                        }
+                        var user = Mapper.Map<User>(myHordeMeResponse);
+                        DbContext.Add(user);
+                        DbContext.SaveChanges();
+                        DbContext.ChangeTracker.Clear();
                     }
-                    DbContext.AddRange(citizens);
-                    // On maj les cellsdigs
-                    if (DbContext.MapCellDigUpdates.FirstOrDefault(x => x.IdTown == town.IdTown) == null) // Si on a déjà fait la maj de la regen, il faut pas la refaire
-                    {
-                        var scrutLevel = 0;
-                        var scrut = myHordeMeResponse.Map.City.Buildings.SingleOrDefault(building => building.Id == MyHordesScrutateurConfiguration.Id);
-                        if (scrut != null && scrut.HasLevels.HasValue)
-                        {
-                            scrutLevel = scrut.HasLevels.Value;
-                        }
-                        var regenChance = MyHordesScrutateurConfiguration.Level0;
-                        switch (scrutLevel)
-                        {
-                            case 0:
-                                regenChance = MyHordesScrutateurConfiguration.Level0;
-                                break;
-                            case 1:
-                                regenChance = MyHordesScrutateurConfiguration.Level1;
-                                break;
-                            case 2:
-                                regenChance = MyHordesScrutateurConfiguration.Level2;
-                                break;
-                            case 3:
-                                regenChance = MyHordesScrutateurConfiguration.Level3;
-                                break;
-                            case 4:
-                                regenChance = MyHordesScrutateurConfiguration.Level4;
-                                break;
-                            case 5:
-                                regenChance = MyHordesScrutateurConfiguration.Level5;
-                                break;
-                        }
-                        var cells = DbContext.MapCells.Where(c => c.IdTown == town.IdTown)
-                            .ToList();
-                        RegenDirectionEnum regen = RegenDirectionEnum.All;
-
-                        var dynamicNews = myHordeMeResponse.Map.City.News;
-                        MyHordesNews news = null;
-                        if (dynamicNews.GetType() == typeof(JObject))
-                        {
-                            var jObject = dynamicNews as JObject;
-                            if (jObject != null)
-                            {
-                                news = jObject.ToObject<MyHordesNews>();
-                            }
-                        }
-                        if (news != null && news.RegenDir != null)
-                        {
-                            var regenDirLabel = news.RegenDir.De;
-                            regen = regenDirLabel.GetEnumFromDescription<RegenDirectionEnum>();
-                        }
-                        float averageNbOfItemAdded = ((float)MyHordesScrutateurConfiguration.MinItemAdd + ((float)MyHordesScrutateurConfiguration.MaxItemAdd - (float)MyHordesScrutateurConfiguration.MinItemAdd) / (float)2);
-                        var xVille = myHordeMeResponse.Map.City.X;
-                        var yVille = myHordeMeResponse.Map.City.Y;
-                        foreach (var cell in cells)
-                        {
-                            var xFromTown = cell.X - xVille;
-                            var yFromTown = yVille - cell.Y;
-                            if (!(xFromTown == 0 && yFromTown == 0))
-                            {
-                                if (!cell.NbKm.HasValue)
-                                {
-                                    cell.NbKm = GetCellDistanceInKm(xFromTown, yFromTown);
-                                }
-                                if (!cell.NbPa.HasValue)
-                                {
-                                    cell.NbPa = GetCellDistanceInActionPoint(xFromTown, yFromTown);
-                                }
-                                RegenDirectionEnum cellZone;
-                                if (cell.ZoneRegen.HasValue)
-                                {
-                                    cellZone = (RegenDirectionEnum)cell.ZoneRegen.Value;
-                                }
-                                else
-                                {
-                                    cellZone = GetCellZone(xFromTown, yFromTown);
-                                    cell.ZoneRegen = (int)cellZone;
-                                }
-                                if (cellZone == regen || regen == RegenDirectionEnum.All)
-                                {
-                                    var max = cell.MaxPotentialRemainingDig ?? 0;
-                                    var average = cell.AveragePotentialRemainingDig ?? 0;
-                                    if (max < MyHordesScrutateurConfiguration.MaxItemPerCell)
-                                    {
-                                        var itemToAdd = MyHordesScrutateurConfiguration.MaxItemAdd;
-                                        if (max >= MyHordesScrutateurConfiguration.DigThrottle)
-                                        {
-                                            itemToAdd = Convert.ToInt32(Math.Ceiling(((float)itemToAdd - 1.0) / 2.0));
-                                        }
-                                        if (regen == RegenDirectionEnum.All)
-                                        {
-                                            itemToAdd = 0;
-                                        }
-                                        cell.MaxPotentialRemainingDig = max + itemToAdd;
-                                    }
-
-                                    float averageItemAdd = ((float)regenChance / (float)100) * averageNbOfItemAdded;
-                                    if (average < MyHordesScrutateurConfiguration.MaxItemPerCell)
-                                    {
-                                        if (average >= MyHordesScrutateurConfiguration.DigThrottle)
-                                        {
-                                            averageItemAdd = ((float)regenChance / (float)100) * (float)Math.Ceiling((averageNbOfItemAdded - 1.0) / 2.0);
-                                        }
-                                        if (regen == RegenDirectionEnum.All)
-                                        {
-                                            averageItemAdd = averageItemAdd / (float)8;
-                                        }
-                                        averageItemAdd = (float)Math.Round(averageItemAdd, 3);
-                                        cell.AveragePotentialRemainingDig = average + averageItemAdd;
-                                    }
-                                }
-                            }
-                        }
-                        var mapCellDigUpdate = new MapCellDigUpdate()
-                        {
-                            Day = myHordeMeResponse.Map.Days,
-                            IdTown = town.IdTown,
-                            DirectionRegen = (int)regen,
-                            LevelRegen = scrutLevel,
-                            TauxRegen = regenChance
-                        };
-                        DbContext.Add(mapCellDigUpdate);
-                        DbContext.UpdateRange(cells);
-                    }
+                    using var transaction = DbContext.Database.BeginTransaction();
+                    var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo()));
                     DbContext.SaveChanges();
-                }
+                    var lastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.Entity.IdLastUpdateInfo);
+                    myHordeMeResponse.Map.LastUpdateInfo = lastUpdate;
+                    var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
+                    var citizens = town.TownCitizens;
+                    town.TownCitizens = null;
+                    var bankItems = town.TownBankItems;
+                    town.TownBankItems = null;
+                    var existingTown = DbContext.Towns
+                        .Include(town => town.TownCitizens)
+                        .FirstOrDefault(t => t.IdTown == town.IdTown);
+                    if (existingTown == null)
+                    {
+                        // On Crée la ville
+                        DbContext.Add(town);
+                        // On crée les citoyen
+                        DbContext.AddRange(citizens);
+                        // On crée la banque
+                        DbContext.AddRange(bankItems);
+                        // On crée les cells
+                        var cells = CreateCellsForTown(xVille: myHordeMeResponse.Map.City.X,
+                            yVille: myHordeMeResponse.Map.City.Y,
+                            mapWid: myHordeMeResponse.Map.Wid,
+                            mapHei: myHordeMeResponse.Map.Hei,
+                            townId: town.IdTown,
+                            lastUpdate);
+                        DbContext.AddRange(cells);
+                        DbContext.SaveChanges();
+                    }
+                    else
+                    {
+                        // On met à jour la ville
+                        existingTown.UpdateNoNullProperties(town);
+                        DbContext.Update(existingTown);
+                        // On ajoute une nouvelle banque avec un nouveau lastupdate
+                        DbContext.AddRange(bankItems);
+                        // On maj les citoyen en gardant tout ce qui remonte pas de MH
+                        DbContext.RemoveRange(existingTown.TownCitizens);
+                        foreach (var citizen in existingTown.TownCitizens)
+                        {
+                            foreach (var c in citizens)
+                            {
+                                if (c.IdUser == citizen.IdUser)
+                                {
+                                    c.ImportHomeDetail(citizen);
+                                    c.ImportHeroicActionDetail(citizen);
+                                    c.ImportStatusDetail(citizen);
+                                }
+                            }
+                        }
+                        DbContext.AddRange(citizens);
+                        // On maj les cellsdigs
+                        if (DbContext.MapCellDigUpdates.FirstOrDefault(x => x.IdTown == town.IdTown) == null) // Si on a déjà fait la maj de la regen, il faut pas la refaire
+                        {
+                            var scrutLevel = 0;
+                            var scrut = myHordeMeResponse.Map.City.Buildings.SingleOrDefault(building => building.Id == MyHordesScrutateurConfiguration.Id);
+                            if (scrut != null && scrut.HasLevels.HasValue)
+                            {
+                                scrutLevel = scrut.HasLevels.Value;
+                            }
+                            var regenChance = MyHordesScrutateurConfiguration.Level0;
+                            switch (scrutLevel)
+                            {
+                                case 0:
+                                    regenChance = MyHordesScrutateurConfiguration.Level0;
+                                    break;
+                                case 1:
+                                    regenChance = MyHordesScrutateurConfiguration.Level1;
+                                    break;
+                                case 2:
+                                    regenChance = MyHordesScrutateurConfiguration.Level2;
+                                    break;
+                                case 3:
+                                    regenChance = MyHordesScrutateurConfiguration.Level3;
+                                    break;
+                                case 4:
+                                    regenChance = MyHordesScrutateurConfiguration.Level4;
+                                    break;
+                                case 5:
+                                    regenChance = MyHordesScrutateurConfiguration.Level5;
+                                    break;
+                            }
+                            var cells = DbContext.MapCells.Where(c => c.IdTown == town.IdTown)
+                                .ToList();
+                            RegenDirectionEnum regen = RegenDirectionEnum.All;
 
-                // TODO : Il manque les cadavers ?
-                transaction.Commit();
-                //MyHordesOptimizerRepository.PatchCadaver(town.Id, town.Cadavers);
+                            var dynamicNews = myHordeMeResponse.Map.City.News;
+                            MyHordesNews news = null;
+                            if (dynamicNews.GetType() == typeof(JObject))
+                            {
+                                var jObject = dynamicNews as JObject;
+                                if (jObject != null)
+                                {
+                                    news = jObject.ToObject<MyHordesNews>();
+                                }
+                            }
+                            if (news != null && news.RegenDir != null)
+                            {
+                                var regenDirLabel = news.RegenDir.De;
+                                regen = regenDirLabel.GetEnumFromDescription<RegenDirectionEnum>();
+                            }
+                            float averageNbOfItemAdded = ((float)MyHordesScrutateurConfiguration.MinItemAdd + ((float)MyHordesScrutateurConfiguration.MaxItemAdd - (float)MyHordesScrutateurConfiguration.MinItemAdd) / (float)2);
+                            var xVille = myHordeMeResponse.Map.City.X;
+                            var yVille = myHordeMeResponse.Map.City.Y;
+                            foreach (var cell in cells)
+                            {
+                                var xFromTown = cell.X - xVille;
+                                var yFromTown = yVille - cell.Y;
+                                if (!(xFromTown == 0 && yFromTown == 0))
+                                {
+                                    if (!cell.NbKm.HasValue)
+                                    {
+                                        cell.NbKm = GetCellDistanceInKm(xFromTown, yFromTown);
+                                    }
+                                    if (!cell.NbPa.HasValue)
+                                    {
+                                        cell.NbPa = GetCellDistanceInActionPoint(xFromTown, yFromTown);
+                                    }
+                                    RegenDirectionEnum cellZone;
+                                    if (cell.ZoneRegen.HasValue)
+                                    {
+                                        cellZone = (RegenDirectionEnum)cell.ZoneRegen.Value;
+                                    }
+                                    else
+                                    {
+                                        cellZone = GetCellZone(xFromTown, yFromTown);
+                                        cell.ZoneRegen = (int)cellZone;
+                                    }
+                                    if (cellZone == regen || regen == RegenDirectionEnum.All)
+                                    {
+                                        var max = cell.MaxPotentialRemainingDig ?? 0;
+                                        var average = cell.AveragePotentialRemainingDig ?? 0;
+                                        if (max < MyHordesScrutateurConfiguration.MaxItemPerCell)
+                                        {
+                                            var itemToAdd = MyHordesScrutateurConfiguration.MaxItemAdd;
+                                            if (max >= MyHordesScrutateurConfiguration.DigThrottle)
+                                            {
+                                                itemToAdd = Convert.ToInt32(Math.Ceiling(((float)itemToAdd - 1.0) / 2.0));
+                                            }
+                                            if (regen == RegenDirectionEnum.All)
+                                            {
+                                                itemToAdd = 0;
+                                            }
+                                            cell.MaxPotentialRemainingDig = max + itemToAdd;
+                                        }
+
+                                        float averageItemAdd = ((float)regenChance / (float)100) * averageNbOfItemAdded;
+                                        if (average < MyHordesScrutateurConfiguration.MaxItemPerCell)
+                                        {
+                                            if (average >= MyHordesScrutateurConfiguration.DigThrottle)
+                                            {
+                                                averageItemAdd = ((float)regenChance / (float)100) * (float)Math.Ceiling((averageNbOfItemAdded - 1.0) / 2.0);
+                                            }
+                                            if (regen == RegenDirectionEnum.All)
+                                            {
+                                                averageItemAdd = averageItemAdd / (float)8;
+                                            }
+                                            averageItemAdd = (float)Math.Round(averageItemAdd, 3);
+                                            cell.AveragePotentialRemainingDig = average + averageItemAdd;
+                                        }
+                                    }
+                                }
+                            }
+                            var mapCellDigUpdate = new MapCellDigUpdate()
+                            {
+                                Day = myHordeMeResponse.Map.Days,
+                                IdTown = town.IdTown,
+                                DirectionRegen = (int)regen,
+                                LevelRegen = scrutLevel,
+                                TauxRegen = regenChance
+                            };
+                            DbContext.Add(mapCellDigUpdate);
+                            DbContext.UpdateRange(cells);
+                        }
+                        DbContext.SaveChanges();
+                    }
+
+                    // TODO : Il manque les cadavers ?
+                    transaction.Commit();
+                    //MyHordesOptimizerRepository.PatchCadaver(town.Id, town.Cadavers);
+                }
+                var simpleMe = Mapper.Map<SimpleMeDto>(myHordeMeResponse);
+
+                return simpleMe;
             }
-            var simpleMe = Mapper.Map<SimpleMeDto>(myHordeMeResponse);
-
-            return simpleMe;
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                Lock.Release();
+            }
         }
 
         public IEnumerable<HeroSkillDto> GetHeroSkills()

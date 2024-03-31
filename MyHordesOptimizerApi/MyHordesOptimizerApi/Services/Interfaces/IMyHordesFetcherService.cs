@@ -2,13 +2,14 @@
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Services.Interfaces
 {
     public interface IMyHordesFetcherService
     {
         IEnumerable<ItemDto> GetItems(int? townId);
-        SimpleMeDto GetSimpleMe();
+        Task<SimpleMeDto> GetSimpleMeAsync();
         IEnumerable<HeroSkillDto> GetHeroSkills();
         IEnumerable<CauseOfDeathDto> GetCausesOfDeath();
         IEnumerable<CleanUpTypeDto> GetCleanUpTypes();
