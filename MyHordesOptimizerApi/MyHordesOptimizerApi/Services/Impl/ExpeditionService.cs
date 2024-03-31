@@ -159,6 +159,13 @@ namespace MyHordesOptimizerApi.Services.Impl
             return result;
         }
 
+        public void DeleteExpeditionCitizen(int expeditionCitizenId)
+        {
+            var expeditionCitizen = DbContext.ExpeditionCitizens.Single(expedition => expedition.IdExpeditionCitizen == expeditionCitizenId);
+            DbContext.Remove(expeditionCitizen);
+            DbContext.SaveChanges();
+        }
+
         #endregion
     }
 }

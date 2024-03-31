@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpDelete]
         [Route("{expeditionId}")]
-        public async Task<ActionResult> DeleteExpedition([FromRoute] int expeditionId)
+        public ActionResult DeleteExpedition([FromRoute] int expeditionId)
         {
             ExpeditionService.DeleteExpedition(expeditionId);
             return Ok();
@@ -81,9 +82,9 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpDelete]
         [Route("parts/citizen/{expeditionCitizenId}")]
-        public async Task<ActionResult> DeleteExpeditionCitizen([FromRoute] int expeditionCitizenId)
+        public ActionResult DeleteExpeditionCitizen([FromRoute] int expeditionCitizenId)
         {
-            //TODO
+            ExpeditionService.DeleteExpeditionCitizen(expeditionCitizenId);
             return Ok();
         }
 
