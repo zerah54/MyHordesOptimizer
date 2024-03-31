@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -39,7 +40,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         #region Expeditions
 
-        public async Task<ExpeditionDto> SaveExpeditionAsync(ExpeditionDto expeditionDto, int idTown, int day)
+        public async Task<ExpeditionDto> SaveExpeditionAsync(ExpeditionRequestDto expeditionDto, int idTown, int day)
         {
             await Lock.WaitAsync();
             try
@@ -48,7 +49,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
                 var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
                 DbContext.SaveChanges();
-                var expeditionModel = Mapper.Map<Expedition>(expeditionDto);
+                var expeditionModel = Mapper.Map<Expedition>(expeditionDto, opt => opt.SetDbContext(DbContext));
                 expeditionModel.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
                 expeditionModel.Day = day;
                 expeditionModel.IdTown = idTown;
@@ -129,13 +130,13 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         #region ExpeditionCitizen
 
-        public async Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenDto expeditionCitizen)
+        public async Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenRequestDto expeditionCitizen)
         {
             using var transaction = DbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
             DbContext.SaveChanges();
-            var expeditionCitizenModel = Mapper.Map<ExpeditionCitizen>(expeditionCitizen);
+            var expeditionCitizenModel = Mapper.Map<ExpeditionCitizen>(expeditionCitizen, opt => opt.SetDbContext(DbContext));
             expeditionCitizenModel.IdExpeditionPart = expeditionPartId;
             ExpeditionCitizenDto result;
             if (expeditionCitizen.Id.HasValue)
@@ -172,13 +173,13 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         #region ExpeditionParts
 
-        public Task<ExpeditionPartDto> SaveExpeditionPartAsync(int expeditionId, ExpeditionPartDto expeditionPart)
+        public Task<ExpeditionPartDto> SaveExpeditionPartAsync(int expeditionId, ExpeditionPartRequestDto expeditionPart)
         {
             using var transaction = DbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
             DbContext.SaveChanges();
-            var expeditionPartModel = Mapper.Map<ExpeditionPart>(expeditionPart);
+            var expeditionPartModel = Mapper.Map<ExpeditionPart>(expeditionPart, opt => opt.SetDbContext(DbContext));
             expeditionPartModel.IdExpedition = expeditionId;
             ExpeditionPartDto result;
             if (expeditionPart.Id.HasValue)

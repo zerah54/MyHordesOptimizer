@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -25,7 +26,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("{townId}/{day}")]
-        public async Task<ActionResult<ExpeditionDto>> PostExpedition([FromRoute] int townId, [FromRoute] int day, [FromBody] ExpeditionDto expedition)
+        public async Task<ActionResult<ExpeditionDto>> PostExpedition([FromRoute] int townId, [FromRoute] int day, [FromBody] ExpeditionRequestDto expedition)
         {
             var savedExpedition = await ExpeditionService.SaveExpeditionAsync(expedition, townId, day);
             return Ok(savedExpedition);
@@ -49,7 +50,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("{expeditionId}/parts")]
-        public async Task<ActionResult<ExpeditionPartDto>> PostExpeditionPart([FromRoute] int expeditionId, [FromBody] ExpeditionPartDto expeditionPart)
+        public async Task<ActionResult<ExpeditionPartDto>> PostExpeditionPart([FromRoute] int expeditionId, [FromBody] ExpeditionPartRequestDto expeditionPart)
         {
             var expeditionPartResult = await ExpeditionService.SaveExpeditionPartAsync(expeditionId, expeditionPart);
             return Ok(expeditionPartResult);
@@ -66,7 +67,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("parts/{expeditionPartId}/citizen")]
-        public async Task<ActionResult<ExpeditionCitizenDto>> PostExpeditionCitizen([FromRoute] int expeditionPartId, [FromBody] ExpeditionCitizenDto expeditionCitizen)
+        public async Task<ActionResult<ExpeditionCitizenDto>> PostExpeditionCitizen([FromRoute] int expeditionPartId, [FromBody] ExpeditionCitizenRequestDto expeditionCitizen)
         {
             var returnedExpeditionCitizen = await ExpeditionService.SaveExpeditionCitizenAsync(expeditionPartId, expeditionCitizen);
             return Ok(returnedExpeditionCitizen);
