@@ -209,11 +209,11 @@ namespace MyHordesOptimizerApi.Services.Impl
 
                 // On récupère les collections de la db
                 var orderFromDb = expeditionPartFromDb.IdExpeditionOrders.ToList();
-                orderFromDb.AddRange(expeditionPartFromDb.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders)));
+                orderFromDb.AddRange(expeditionPartFromDb.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders));
                 var citizenFromDb = expeditionPartFromDb.ExpeditionCitizens;
                 // On récupère les mêmes collection du model a update
                 var orderFromModel = expeditionPartModel.IdExpeditionOrders.ToList();
-                orderFromModel.AddRange(expeditionPartModel.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders)));
+                orderFromModel.AddRange(expeditionPartModel.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders));
                 var citizenFromModel = expeditionPartModel.ExpeditionCitizens;
                 // On patch les collections
                 DbContext.Patch(orderFromDb, orderFromModel);
