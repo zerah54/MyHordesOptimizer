@@ -6,16 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyHordesOptimizerApi.Models;
 
-[PrimaryKey("RecipeName", "IdItem")]
-[Table("RecipeItemComponent")]
+[PrimaryKey("IdExpeditionBag", "IdItem")]
+[Table("ExpeditionBagItem")]
 [Index("IdItem", Name = "idItem")]
-public partial class RecipeItemComponent
+public partial class ExpeditionBagItem
 {
     [Key]
-    [Column("recipeName")]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
-    public string RecipeName { get; set; } = null!;
+    [Column("idExpeditionBag", TypeName = "int(11)")]
+    public int IdExpeditionBag { get; set; }
 
     [Key]
     [Column("idItem", TypeName = "int(11)")]
@@ -24,11 +22,15 @@ public partial class RecipeItemComponent
     [Column("count", TypeName = "int(11)")]
     public int? Count { get; set; }
 
-    [ForeignKey("IdItem")]
-    [InverseProperty("RecipeItemComponents")]
-    public virtual Item IdItemNavigation { get; set; } = null!;
+    [Required]
+    [Column("isBroken")]
+    public bool? IsBroken { get; set; }
 
-    [ForeignKey("RecipeName")]
-    [InverseProperty("RecipeItemComponents")]
-    public virtual Recipe RecipeNameNavigation { get; set; } = null!;
+    [ForeignKey("IdExpeditionBag")]
+    [InverseProperty("ExpeditionBagItems")]
+    public virtual ExpeditionBag IdExpeditionBagNavigation { get; set; } = null!;
+
+    [ForeignKey("IdItem")]
+    [InverseProperty("ExpeditionBagItems")]
+    public virtual Item IdItemNavigation { get; set; } = null!;
 }

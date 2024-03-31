@@ -14,6 +14,8 @@ public partial class User
 
     [Column("name")]
     [StringLength(255)]
+    [MySqlCharSet("utf8")]
+    [MySqlCollation("utf8_general_ci")]
     public string Name { get; set; } = null!;
 
     [StringLength(255)]

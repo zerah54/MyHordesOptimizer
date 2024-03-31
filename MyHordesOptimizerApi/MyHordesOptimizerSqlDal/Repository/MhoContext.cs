@@ -17,7 +17,7 @@ namespace MyHordesOptimizerApi
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySQL(Configuration.ConnectionString);
+            optionsBuilder.UseMySql(Configuration.ConnectionString, ServerVersion.AutoDetect(Configuration.ConnectionString));
             optionsBuilder.EnableSensitiveDataLogging(true);
             optionsBuilder.EnableDetailedErrors(true);
             optionsBuilder.UseLoggerFactory(LoggerFactory);

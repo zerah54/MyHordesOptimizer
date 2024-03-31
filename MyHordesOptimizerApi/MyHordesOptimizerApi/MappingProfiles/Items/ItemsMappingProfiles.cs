@@ -113,7 +113,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.DescriptionFr, opt => opt.MapFrom(src => src.Value.Description["fr"]))
                 .ForMember(dest => dest.DropRateNotPraf, opt => opt.Ignore())
                 .ForMember(dest => dest.DropRatePraf, opt => opt.Ignore())
-                .ForMember(dest => dest.ExpeditionBags, opt => opt.Ignore())
                 .ForMember(dest => dest.Guard, opt => opt.MapFrom(src => src.Value.Guard))
                 .ForMember(dest => dest.IdCategories, opt => opt.Ignore())
                 .ForMember(dest => dest.IdCategory, opt => opt.ConvertUsing<DeutchNameToCategoryIdConverter, string>(src => src.Value.Category["de"]))

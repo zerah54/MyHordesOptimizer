@@ -15,6 +15,8 @@ public partial class ExpeditionOrder
 
     [Column("type")]
     [StringLength(255)]
+    [MySqlCharSet("utf8")]
+    [MySqlCollation("utf8_general_ci")]
     public string? Type { get; set; }
 
     [Column("text")]

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MyHordesOptimizerApi.Models;
 
 [Table("ExpeditionPart")]
-[Index("IdExpedition", Name = "idExpedition")]
+[Index("IdExpedition", Name = "ExpeditionPart_ibfk_1")]
 public partial class ExpeditionPart
 {
     [Key]
@@ -19,14 +19,20 @@ public partial class ExpeditionPart
 
     [Column("path")]
     [StringLength(255)]
+    [MySqlCharSet("utf8")]
+    [MySqlCollation("utf8_general_ci")]
     public string? Path { get; set; }
 
     [Column("label")]
     [StringLength(255)]
+    [MySqlCharSet("utf8")]
+    [MySqlCollation("utf8_general_ci")]
     public string? Label { get; set; }
 
     [Column("direction")]
     [StringLength(255)]
+    [MySqlCharSet("utf8")]
+    [MySqlCollation("utf8_general_ci")]
     public string? Direction { get; set; }
 
     [InverseProperty("IdExpeditionPartNavigation")]

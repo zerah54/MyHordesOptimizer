@@ -34,6 +34,8 @@ public partial class TownCitizen
 
     [Column("jobUID")]
     [StringLength(255)]
+    [MySqlCharSet("utf8")]
+    [MySqlCollation("utf8_general_ci")]
     public string? JobUid { get; set; }
 
     [Column("positionX", TypeName = "int(11)")]

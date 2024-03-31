@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Humanizer;
-using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
@@ -23,8 +21,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                     return cell.IdCell;
                 }))
                 .ForMember(model => model.IdLastUpdateInfo, opt => opt.MapFrom((dto, model, srcMember, context) => context.GetLastUpdateInfoId()))
-                //.ForMember(model => model.IdLastUpdateInfo, opt => opt.Ignore())
-                //.ForMember(model => model.IdLastUpdateInfoNavigation, opt => opt.MapFrom(dto => dto.LastUpdateInfo))
+                .ForMember(model => model.IdLastUpdateInfo, opt => opt.Ignore())
+                .ForMember(model => model.IdLastUpdateInfoNavigation, opt => opt.MapFrom(dto => dto.LastUpdateInfo))
                 .ForMember(model => model.IdLastUpdateInfoNavigation, opt => opt.Ignore())
                 .ForMember(model => model.IdUser, opt => opt.MapFrom(dto => dto.DiggerId))
                 .ForMember(model => model.IdUserNavigation, opt => opt.Ignore())

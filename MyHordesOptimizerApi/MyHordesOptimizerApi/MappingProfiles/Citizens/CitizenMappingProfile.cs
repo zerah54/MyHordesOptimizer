@@ -52,9 +52,14 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => src.IdLastUpdateInfoHeroicActionNavigation));
 
             CreateMap<Bag, BagDto>()
-                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.BagItems))
-                .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => src.IdLastUpdateInfoNavigation))
-                .ForMember(dest => dest.IdBag, opt => opt.MapFrom(src => src.IdBag));
+                .ForMember(dto => dto.Items, opt => opt.MapFrom(model => model.BagItems))
+                .ForMember(dto => dto.LastUpdateInfo, opt => opt.MapFrom(model => model.IdLastUpdateInfoNavigation))
+                .ForMember(dto => dto.IdBag, opt => opt.MapFrom(model => model.IdBag))
+                .ReverseMap()
+                .ForMember(model => model.BagItems, opt => opt.MapFrom(dto => dto.Items))
+                .ForMember(model => model.IdLastUpdateInfo, opt => opt.Ignore())
+                .ForMember(model => model.IdLastUpdateInfoNavigation, opt => opt.MapFrom(dto => dto.LastUpdateInfo))
+                .ForMember(model => model.IdBag, opt => opt.MapFrom(dto => dto.IdBag));
 
             CreateMap<TownCitizen, CitizenHomeValueDto>()
                 .ForMember(dest => dest.ChestLevel, opt => opt.MapFrom(src => src.ChestLevel))

@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 namespace MyHordesOptimizerApi.Models;
 
 [Table("ExpeditionCitizen")]
-[Index("IdExpeditionBag", Name = "idExpeditionBag")]
-[Index("IdExpeditionPart", Name = "idExpeditionPart")]
+[Index("IdExpeditionPart", Name = "ExpeditionCitizen_ibfk_1")]
+[Index("IdExpeditionBag", Name = "ExpeditionCitizen_ibfk_4")]
 [Index("IdUser", Name = "idUser")]
 [Index("PreinscritHeroic", Name = "preinscritHeroic")]
 public partial class ExpeditionCitizen
@@ -23,17 +23,18 @@ public partial class ExpeditionCitizen
     [Column("idUser", TypeName = "int(11)")]
     public int? IdUser { get; set; }
 
-    [Column("idExpeditionBag", TypeName = "int(11)")]
-    public int? IdExpeditionBag { get; set; }
-
     [Column("isPreinscrit")]
     public bool IsPreinscrit { get; set; }
 
     [Column("preinscritJob")]
     [StringLength(255)]
+    [MySqlCharSet("utf8")]
+    [MySqlCollation("utf8_general_ci")]
     public string? PreinscritJob { get; set; }
 
     [Column("preinscritHeroic")]
+    [MySqlCharSet("utf8")]
+    [MySqlCollation("utf8_general_ci")]
     public string? PreinscritHeroic { get; set; }
 
     [Column("pdc", TypeName = "int(11)")]
@@ -41,6 +42,9 @@ public partial class ExpeditionCitizen
 
     [Column("isThirsty")]
     public bool? IsThirsty { get; set; }
+
+    [Column("idExpeditionBag", TypeName = "int(11)")]
+    public int? IdExpeditionBag { get; set; }
 
     [ForeignKey("IdExpeditionBag")]
     [InverseProperty("ExpeditionCitizens")]

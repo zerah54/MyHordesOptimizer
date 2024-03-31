@@ -63,7 +63,7 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpDelete]
-        [Route("/parts/{expeditionPartId}")]
+        [Route("parts/{expeditionPartId}")]
         public async Task<ActionResult> DeleteExpeditionPart([FromRoute] int expeditionPartId)
         {
             //TODO
@@ -72,23 +72,15 @@ namespace MyHordesOptimizerApi.Controllers
 
 
         [HttpPost]
-        [Route("/parts/{expeditionPartId}/citizen")]
-        public async Task<ActionResult<ExpeditionCitizenDto>> PostExpeditionCitizen([FromRoute] int expeditionPartId, [FromBody] ExpeditionCitizenDto expeditionPart)
+        [Route("parts/{expeditionPartId}/citizen")]
+        public async Task<ActionResult<ExpeditionCitizenDto>> PostExpeditionCitizen([FromRoute] int expeditionPartId, [FromBody] ExpeditionCitizenDto expeditionCitizen)
         {
-            if (expeditionPart.Id.HasValue)
-            {
-                // Update
-            }
-            else
-            {
-                // Create
-            }
-            //TODO
-            return Ok(null);
+            var returnedExpeditionCitizen = await ExpeditionService.SaveExpeditionCitizenAsync(expeditionPartId, expeditionCitizen);
+            return Ok(returnedExpeditionCitizen);
         }
 
         [HttpDelete]
-        [Route("/parts/citizen/{expeditionCitizenId}")]
+        [Route("parts/citizen/{expeditionCitizenId}")]
         public async Task<ActionResult> DeleteExpeditionCitizen([FromRoute] int expeditionCitizenId)
         {
             //TODO
@@ -96,7 +88,7 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpPost]
-        [Route("/parts/{expeditionPartId}/order")]
+        [Route("parts/{expeditionPartId}/order")]
         public async Task<ActionResult<ExpeditionOrderDto>> PostExpeditionOrder([FromRoute] int expeditionPartId, [FromBody] ExpeditionOrderDto expeditionOrder)
         {
             if (expeditionOrder.Id.HasValue)
@@ -112,7 +104,7 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpDelete]
-        [Route("/parts/order/{expeditionOrderId}")]
+        [Route("parts/order/{expeditionOrderId}")]
         public async Task<ActionResult> DeleteExpeditionOrder([FromRoute] int expeditionOrderId)
         {
             //TODO

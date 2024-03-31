@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 namespace MyHordesOptimizerApi.Models;
 
 [Table("Expedition")]
-[Index("IdLastUpdateInfo", Name = "idLastUpdateInfo")]
-[Index("IdTown", Name = "idTown")]
+[Index("IdTown", Name = "Expedition_ibfk_1")]
+[Index("IdLastUpdateInfo", Name = "Expedition_ibfk_2")]
 public partial class Expedition
 {
     [Key]
@@ -26,10 +26,14 @@ public partial class Expedition
 
     [Column("state")]
     [StringLength(255)]
+    [MySqlCharSet("utf8")]
+    [MySqlCollation("utf8_general_ci")]
     public string? State { get; set; }
 
     [Column("label")]
     [StringLength(255)]
+    [MySqlCharSet("utf8")]
+    [MySqlCollation("utf8_general_ci")]
     public string? Label { get; set; }
 
     [Column("minPdc", TypeName = "int(11)")]

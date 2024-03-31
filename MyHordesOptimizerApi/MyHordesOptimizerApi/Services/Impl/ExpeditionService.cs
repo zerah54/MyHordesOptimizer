@@ -37,6 +37,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext = dbContext;
         }
 
+        #region Expeditions
+
         public async Task<ExpeditionDto> SaveExpeditionAsync(ExpeditionDto expeditionDto, int idTown, int day)
         {
             await Lock.WaitAsync();
@@ -61,6 +63,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                         .Include(expedition => expedition.ExpeditionParts)
                             .ThenInclude(part => part.ExpeditionCitizens)
                                 .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
+                                    .ThenInclude(bag => bag.ExpeditionBagItems)
                         .Include(expedition => expedition.ExpeditionParts)
                             .ThenInclude(part => part.ExpeditionCitizens)
                                 .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionOrders)
@@ -94,7 +97,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             finally
             {
                 Lock.Release();
-            }            
+            }
         }
 
         public List<ExpeditionDto> GetExpeditionsByDay(int townId, int day)
@@ -105,7 +108,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .ThenInclude(part => part.IdExpeditionOrders)
                 .Include(expedition => expedition.ExpeditionParts)
                     .ThenInclude(part => part.ExpeditionCitizens)
-                        .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
+                       .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
+                         .ThenInclude(bag => bag.ExpeditionBagItems)
                 .Include(expedition => expedition.ExpeditionParts)
                     .ThenInclude(part => part.ExpeditionCitizens)
                         .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionOrders)
@@ -120,5 +124,41 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.Remove(expedition);
             DbContext.SaveChanges();
         }
+
+        #endregion
+
+        #region ExpeditionCitizen
+
+        public async Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenDto expeditionCitizen)
+        {
+            using var transaction = DbContext.Database.BeginTransaction();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+            DbContext.SaveChanges();
+            var expeditionCitizenModel = Mapper.Map<ExpeditionCitizen>(expeditionCitizen);
+            expeditionCitizenModel.IdExpeditionPart = expeditionPartId;
+            ExpeditionCitizenDto result;
+            if (expeditionCitizen.Id.HasValue)
+            {
+                // Update
+                var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizen.Id.Value)
+                    .Single();
+                DbContext.ExpeditionOrders.RemoveRange(expeditionCitizenFromDb.IdExpeditionOrders);
+                expeditionCitizenFromDb.UpdateAllButKeysProperties(expeditionCitizenModel);
+                DbContext.SaveChanges();
+                result = Mapper.Map<ExpeditionCitizenDto>(expeditionCitizenFromDb);
+            }
+            else
+            {
+                // Create
+                var newEntity = DbContext.Add(expeditionCitizenModel);
+                DbContext.SaveChanges();
+                result = Mapper.Map<ExpeditionCitizenDto>(newEntity.Entity);
+            }
+            transaction.Commit();
+            return result;
+        }
+
+        #endregion
     }
 }
