@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Reflection;
 
 namespace MyHordesOptimizerApi.Extensions
 {
@@ -29,6 +32,24 @@ namespace MyHordesOptimizerApi.Extensions
             }
 
             return new Comparer<T>(getHashCode, equals);
+        }
+
+        public static IEqualityComparer<T> CreateDefault<T>()
+        {
+            Type type = typeof(T);
+            var keyProperty = type.GetProperties().Single(prop => prop.GetCustomAttribute<KeyAttribute>() != null);
+            return Create<T>(model =>
+            {
+                var hashCode = keyProperty.GetValue(model, null).GetHashCode();
+                return hashCode;
+            },
+            (a, b) =>
+            {
+                var aValue = keyProperty.GetValue(a, null);
+                var bValue = keyProperty.GetValue(b, null);
+                var equal = aValue?.GetHashCode() == bValue?.GetHashCode();
+                return equal;
+            });
         }
 
         private class Comparer<T> : IEqualityComparer<T>

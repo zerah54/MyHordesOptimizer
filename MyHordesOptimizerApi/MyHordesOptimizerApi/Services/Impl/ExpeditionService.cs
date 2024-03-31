@@ -70,12 +70,22 @@ namespace MyHordesOptimizerApi.Services.Impl
                                 .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionOrders)
                         .Single();
 
-                    DbContext.ExpeditionOrders.RemoveRange(modelFromDb.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders));
-                    DbContext.ExpeditionOrders.RemoveRange(modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens).SelectMany(citizen => citizen.IdExpeditionOrders));
-                    DbContext.ExpeditionCitizens.RemoveRange(modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens));
-                    DbContext.ExpeditionParts.RemoveRange(modelFromDb.ExpeditionParts);
+                    var expeditionsOrderFromDb = modelFromDb.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders).ToList();
+                    expeditionsOrderFromDb.AddRange(modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders)));
+                    var partFromDb = modelFromDb.ExpeditionParts;
+                    var citizenFromDb = modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens).ToList();
 
                     modelFromDb.UpdateAllButKeysProperties(expeditionModel);
+
+                    var expeditionsOrderFromDto = expeditionModel.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders).ToList();
+                    expeditionsOrderFromDto.AddRange(expeditionModel.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders)));
+                    var partFromDto = expeditionModel.ExpeditionParts;
+                    var citizenFromDto = expeditionModel.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens).ToList();
+
+                    DbContext.Patch(expeditionsOrderFromDb, expeditionsOrderFromDto);
+                    DbContext.Patch(partFromDb, partFromDto);
+                    DbContext.Patch(citizenFromDb, citizenFromDto);
+
                     DbContext.Update(modelFromDb);
                     DbContext.SaveChanges();
                     result = Mapper.Map<ExpeditionDto>(modelFromDb);

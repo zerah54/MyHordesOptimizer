@@ -5,8 +5,12 @@ namespace MyHordesOptimizerApi.Extensions
 {
     public static class DbContextExtensions
     {
-        public static void Patch<T>(this MhoContext dbContext, ICollection<T> fromDbEntities, ICollection<T> updatedEntities, IEqualityComparer<T> comparer) where T : class
+        public static void Patch<T>(this MhoContext dbContext, ICollection<T> fromDbEntities, ICollection<T> updatedEntities, IEqualityComparer<T> comparer = null) where T : class
         {
+            if (comparer == null)
+            {
+                comparer = EqualityComparerFactory.CreateDefault<T>();
+            }
             var toRemove = fromDbEntities.Except(updatedEntities, comparer);
             dbContext.RemoveRange(toRemove);
             var toAdd = updatedEntities.Except(fromDbEntities, comparer);
