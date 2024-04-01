@@ -318,18 +318,25 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public BankLastUpdateDto GetBank()
         {
-            var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
+            try
+            {
+                var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
 
-            // Enregistrer en base
-            using var transaction = DbContext.Database.BeginTransaction();
-            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo()));
-            DbContext.SaveChanges();
-            var lastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.Entity.IdLastUpdateInfo);
-            myHordeMeResponse.Map.LastUpdateInfo = lastUpdate;
-            var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
-            DbContext.AddRange(town.TownBankItems);
-            DbContext.SaveChanges();
-            transaction.Commit();
+                // Enregistrer en base
+                using var transaction = DbContext.Database.BeginTransaction();
+                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo()));
+                DbContext.SaveChanges();
+                var lastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.Entity.IdLastUpdateInfo);
+                myHordeMeResponse.Map.LastUpdateInfo = lastUpdate;
+                var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
+                DbContext.AddRange(town.TownBankItems);
+                DbContext.SaveChanges();
+                transaction.Commit();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError($"Erreur lors de l'enregistrement de la bank depuis MH : {e}");
+            }
 
             var townModel = DbContext.Towns
                 .Include(town => town.TownBankItems)
