@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
-using MyHordesOptimizerApi.Providers.Impl;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Impl;
 using System.Security.Claims;
+using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 
 namespace MyHordesOptimizerApi.Controllers.ActionFillters
 {
@@ -19,6 +21,7 @@ namespace MyHordesOptimizerApi.Controllers.ActionFillters
             int.TryParse(context?.HttpContext?.User?.FindFirstValue(ClaimTypes.Upn), out var upn);
             UserInfoProvider.UserId = upn;
             UserInfoProvider.UserName = context?.HttpContext?.User?.FindFirstValue(ClaimTypes.Name);
+            UserInfoProvider.TownDetail = context?.HttpContext?.User?.FindFirstValue(MhoClaimsType.Town)?.FromJson<SimpleMeTownDetailDto>();
         }
 
         public void OnActionExecuted(ActionExecutedContext context)

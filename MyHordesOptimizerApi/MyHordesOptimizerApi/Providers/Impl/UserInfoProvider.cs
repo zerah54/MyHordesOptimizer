@@ -1,5 +1,4 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
-using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using System;
 
@@ -15,6 +14,8 @@ namespace MyHordesOptimizerApi.Providers.Impl
 
         private string _userName;
         public string UserName { get => _userName; set => _userName = value; }
+
+        public SimpleMeTownDetailDto TownDetail { get; set; }
 
         public LastUpdateInfoDto GenerateLastUpdateInfo()
         {
