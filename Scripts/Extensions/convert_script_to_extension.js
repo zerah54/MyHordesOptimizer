@@ -49,7 +49,7 @@ async function constructFirefoxManifest(header_data) {
     const name = 'Firefox';
     copySourceFile(name);
     copyLogos(name);
-    let manifest = await generateManifest(header_data);
+    let manifest = await generateManifestV2(header_data);
     manifest.permissions.push('webRequest');
     manifest.background.scripts = ['main.js'];
     writeManifest(manifest, name);
@@ -59,7 +59,7 @@ async function constructChromeManifest(header_data) {
     const name = 'Chrome';
     copySourceFile(name);
     copyLogos(name);
-    let manifest = await generateManifest(header_data);
+    let manifest = await generateManifestV3(header_data);
     manifest.background.service_worker = 'main.js';
     writeManifest(manifest, name);
 }
@@ -68,7 +68,7 @@ async function constructOperaManifest(header_data) {
     const name = 'Opera';
     copySourceFile(name);
     copyLogos(name);
-    let manifest = await generateManifest(header_data);
+    let manifest = await generateManifestV3(header_data);
     manifest.background.service_worker = 'main.js';
     writeManifest(manifest, name);
 }
@@ -122,7 +122,7 @@ async function readIcons() {
     return icons;
 }
 
-async function generateManifest(header_data, icons) {
+async function generateManifestV3(header_data) {
     return {
         manifest_version: 3,
         name: header_data.name,
@@ -143,6 +143,36 @@ async function generateManifest(header_data, icons) {
             'notifications'
         ],
         host_permissions: header_data.connects.filter((url) => url !== '*'),
+        browser_specific_settings: {
+            gecko: {
+                id: "{14876417-17c6-417d-80bb-b18c5b40c366}"
+            }
+        }
+    };
+}
+
+
+async function generateManifestV2(header_data) {
+    return {
+        manifest_version: 2,
+        name: header_data.name,
+        short_name: header_data.short_name,
+        version: header_data.version,
+        description: header_data.description,
+        author: header_data.author,
+        homepage_url: header_data.homepage_url,
+        icons: await readIcons(),
+        background: {},
+        content_scripts: [{
+            matches: header_data.matches,
+            js: [user_script_file_name]
+        }],
+        permissions: [
+            'storage',
+            'clipboardWrite',
+            'notifications',
+            ...header_data.connects.filter((url) => url !== '*')
+        ],
         browser_specific_settings: {
             gecko: {
                 id: "{14876417-17c6-417d-80bb-b18c5b40c366}"
