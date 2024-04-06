@@ -24,6 +24,9 @@ public partial class Expedition
     [Column("day", TypeName = "int(11)")]
     public int? Day { get; set; }
 
+    [Column(TypeName = "int(11)")]
+    public int Position { get; set; }
+
     [Column("state")]
     [StringLength(255)]
     [MySqlCharSet("utf8")]

@@ -17,6 +17,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(dto => dto.Label, opt => opt.MapFrom(model => model.Label))
                 .ForMember(dto => dto.MinPdc, opt => opt.MapFrom(model => model.MinPdc))
                 .ForMember(dto => dto.Parts, opt => opt.MapFrom(model => model.ExpeditionParts))
+                .ForMember(dto => dto.Position, opt => opt.MapFrom(model => model.Position))
                 .ForMember(dto => dto.State, opt => opt.MapFrom(model => model.State));
             CreateMap<ExpeditionRequestDto, Expedition>()
                 .ForMember(model => model.MinPdc, opt => opt.MapFrom(dto => dto.MinPdc))
@@ -29,7 +30,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.ExpeditionParts, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
                     return context.GetDbContext().ExpeditionParts.Where(part => src.PartsId.Contains(part.IdExpeditionPart)).ToList();
-                }));
+                }))
+                .ForMember(model => model.Position, opt => opt.MapFrom(dto => dto.Position));
 
             CreateMap<ExpeditionPart, ExpeditionPartDto>()
                 .ForMember(dto => dto.Citizens, opt => opt.MapFrom(model => model.ExpeditionCitizens))
@@ -37,6 +39,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpeditionPart))
                 .ForMember(dto => dto.Label, opt => opt.MapFrom(model => model.Label))
                 .ForMember(dto => dto.Orders, opt => opt.MapFrom(model => model.IdExpeditionOrders))
+                .ForMember(dto => dto.Position, opt => opt.MapFrom(model => model.Position))
                 .ForMember(dto => dto.Path, opt => opt.MapFrom(model => model.Path));
             CreateMap<ExpeditionPartRequestDto, ExpeditionPart>()
                 .ForMember(model => model.Path, opt => opt.MapFrom(dto => dto.Path))
@@ -51,7 +54,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.ExpeditionCitizens, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
                     return context.GetDbContext().ExpeditionCitizens.Where(citizen => src.CitizensId.Contains(citizen.IdExpeditionCitizen)).ToList();
-                }));
+                }))
+                .ForMember(model => model.Position, opt => opt.MapFrom(dto => dto.Position));
 
 
             CreateMap<ExpeditionOrderDto, ExpeditionOrder>()

@@ -94,7 +94,6 @@ public partial class MhoContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<WishlistCategorie> WishlistCategories { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder

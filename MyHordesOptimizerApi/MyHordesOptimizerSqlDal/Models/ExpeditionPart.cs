@@ -17,6 +17,9 @@ public partial class ExpeditionPart
     [Column("idExpedition", TypeName = "int(11)")]
     public int? IdExpedition { get; set; }
 
+    [Column(TypeName = "int(11)")]
+    public int Position { get; set; }
+
     [Column("path")]
     [StringLength(255)]
     [MySqlCharSet("utf8")]

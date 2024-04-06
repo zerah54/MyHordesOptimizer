@@ -1,0 +1,7 @@
+﻿ALTER TABLE Expedition
+ADD COLUMN Position INT NOT NULL DEFAULT(0)
+AFTER day;
+
+ALTER TABLE ExpeditionPart
+ADD COLUMN Position INT NOT NULL DEFAULT(0)
+AFTER idExpedition;
