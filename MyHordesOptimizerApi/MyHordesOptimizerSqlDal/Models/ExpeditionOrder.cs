@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MyHordesOptimizerApi.Models;
 
 [Table("ExpeditionOrder")]
+[Index("IdExpeditionCitizen", Name = "expedition_order_fk_citizen")]
 public partial class ExpeditionOrder
 {
     [Key]
@@ -28,9 +29,12 @@ public partial class ExpeditionOrder
     [Column("isDone")]
     public bool? IsDone { get; set; }
 
-    [ForeignKey("IdExpeditionOrder")]
-    [InverseProperty("IdExpeditionOrders")]
-    public virtual ICollection<ExpeditionCitizen> IdExpeditionCitizens { get; set; } = new List<ExpeditionCitizen>();
+    [Column("idExpeditionCitizen", TypeName = "int(11)")]
+    public int IdExpeditionCitizen { get; set; }
+
+    [ForeignKey("IdExpeditionCitizen")]
+    [InverseProperty("ExpeditionOrders")]
+    public virtual ExpeditionCitizen IdExpeditionCitizenNavigation { get; set; } = null!;
 
     [ForeignKey("IdExpeditionOrder")]
     [InverseProperty("IdExpeditionOrders")]

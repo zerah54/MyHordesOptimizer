@@ -82,26 +82,26 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpPost]
-        [Route("parts/{expeditionPartId}/order")]
-        public async Task<ActionResult<ExpeditionOrderDto>> PostExpeditionOrder([FromRoute] int expeditionPartId, [FromBody] ExpeditionOrderDto expeditionOrder)
+        [Route("parts/{expeditionPartId}/orders")]
+        public async Task<ActionResult<ExpeditionOrderDto>> PostPartOrders([FromRoute] int expeditionPartId, [FromBody] List<ExpeditionOrderDto> expeditionOrder)
         {
-            if (expeditionOrder.Id.HasValue)
-            {
-                // Update
-            }
-            else
-            {
-                // Create
-            }
-            //TODO
-            return Ok(null);
+            var returnedOrder = await ExpeditionService.SavePartOrdersAsync(expeditionPartId, expeditionOrder);
+            return Ok(returnedOrder);
+        }
+
+        [HttpPost]
+        [Route("citizen/{expeditionCitizenId}/orders")]
+        public async Task<ActionResult<ExpeditionOrderDto>> PostCitizenOrders([FromRoute] int expeditionCitizenId, [FromBody] List<ExpeditionOrderDto> expeditionOrder)
+        {
+            var returnedOrder = await ExpeditionService.SaveCitizenOrdersAsync(expeditionCitizenId, expeditionOrder);
+            return Ok(returnedOrder);
         }
 
         [HttpDelete]
-        [Route("parts/order/{expeditionOrderId}")]
+        [Route("orders/{expeditionOrderId}")]
         public async Task<ActionResult> DeleteExpeditionOrder([FromRoute] int expeditionOrderId)
         {
-            //TODO
+            ExpeditionService.DeleteExpeditionOrder(expeditionOrderId);
             return Ok();
         }
     }

@@ -67,17 +67,17 @@ namespace MyHordesOptimizerApi.Services.Impl
                                     .ThenInclude(bag => bag.ExpeditionBagItems)
                         .Include(expedition => expedition.ExpeditionParts)
                             .ThenInclude(part => part.ExpeditionCitizens)
-                                .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionOrders)
+                                .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
                         .Single();
 
                     // On récupère les collections de la db
                     var expeditionsOrderFromDb = modelFromDb.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders).ToList();
-                    expeditionsOrderFromDb.AddRange(modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders)));
+                    expeditionsOrderFromDb.AddRange(modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders)));
                     var partFromDb = modelFromDb.ExpeditionParts;
                     var citizenFromDb = modelFromDb.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens).ToList();
                     // On récupère les mêmes collection du model a update
                     var expeditionsOrderFromDto = expeditionModel.ExpeditionParts.SelectMany(part => part.IdExpeditionOrders).ToList();
-                    expeditionsOrderFromDto.AddRange(expeditionModel.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders)));
+                    expeditionsOrderFromDto.AddRange(expeditionModel.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders)));
                     var partFromDto = expeditionModel.ExpeditionParts;
                     var citizenFromDto = expeditionModel.ExpeditionParts.SelectMany(part => part.ExpeditionCitizens).ToList();
                     // On patch les collections
@@ -123,7 +123,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                          .ThenInclude(bag => bag.ExpeditionBagItems)
                 .Include(expedition => expedition.ExpeditionParts)
                     .ThenInclude(part => part.ExpeditionCitizens)
-                        .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionOrders)
+                        .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
                 .ToList();
             var dtos = Mapper.Map<List<ExpeditionDto>>(models);
             return dtos;
@@ -156,12 +156,12 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     // Update
                     var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizen.Id.Value)
-                        .Include(citizen => citizen.IdExpeditionOrders)
+                        .Include(citizen => citizen.ExpeditionOrders)
                         .Include(citizen => citizen.IdExpeditionBagNavigation)
                         .Single();
 
-                    var orderFromDb = expeditionCitizenFromDb.IdExpeditionOrders;
-                    var orderFromDto = expeditionCitizenModel.IdExpeditionOrders;
+                    var orderFromDb = expeditionCitizenFromDb.ExpeditionOrders;
+                    var orderFromDto = expeditionCitizenModel.ExpeditionOrders;
                     DbContext.Patch(orderFromDb, orderFromDto);
 
                     expeditionCitizenFromDb.UpdateAllButKeysProperties(expeditionCitizenModel);
@@ -217,18 +217,18 @@ namespace MyHordesOptimizerApi.Services.Impl
                     var expeditionPartFromDb = DbContext.ExpeditionParts.Where(part => part.IdExpeditionPart == expeditionPart.Id.Value)
                         .Include(part => part.IdExpeditionOrders)
                         .Include(part => part.ExpeditionCitizens)
-                            .ThenInclude(citizen => citizen.IdExpeditionOrders)
+                            .ThenInclude(citizen => citizen.ExpeditionOrders)
                         .Include(part => part.ExpeditionCitizens)
                             .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
                         .Single();
 
                     // On récupère les collections de la db
                     var orderFromDb = expeditionPartFromDb.IdExpeditionOrders.ToList();
-                    orderFromDb.AddRange(expeditionPartFromDb.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders));
+                    orderFromDb.AddRange(expeditionPartFromDb.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders));
                     var citizenFromDb = expeditionPartFromDb.ExpeditionCitizens;
                     // On récupère les mêmes collection du model a update
                     var orderFromModel = expeditionPartModel.IdExpeditionOrders.ToList();
-                    orderFromModel.AddRange(expeditionPartModel.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders));
+                    orderFromModel.AddRange(expeditionPartModel.ExpeditionCitizens.SelectMany(citizen => citizen.ExpeditionOrders));
                     var citizenFromModel = expeditionPartModel.ExpeditionCitizens;
                     // On patch les collections
                     DbContext.Patch(orderFromDb, orderFromModel);
@@ -262,6 +262,75 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var expeditionPart = DbContext.ExpeditionParts.Single(part => part.IdExpeditionPart == expeditionPartId);
             DbContext.Remove(expeditionPart);
+            DbContext.SaveChanges();
+        }
+
+        #endregion
+
+        #region Orders
+
+        public async Task<List<ExpeditionOrderDto>> SaveCitizenOrdersAsync(int expeditionCitizenId, List<ExpeditionOrderDto> expeditionOrder)
+        {
+            await Lock.WaitAsync();
+            try
+            {
+                using var transaction = DbContext.Database.BeginTransaction();
+                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+                DbContext.SaveChanges();
+                var expeditionCitizen = DbContext.ExpeditionCitizens
+                    .Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizenId)
+                    .Include(citizen => citizen.ExpeditionOrders)
+                    .Single();
+                var toAdd = expeditionOrder.Where(orderDto => orderDto.Id is null);
+                var toUpdate = expeditionOrder.Where(orderDto => orderDto.Id is not null);
+                var orderModels = new List<ExpeditionOrder>();
+                foreach (var orderDto in toAdd)
+                {
+                    var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
+                    orderModel.IdExpeditionCitizen = expeditionCitizenId;
+                    // Create
+                    var newEntity = DbContext.Add(orderModel);
+                    DbContext.SaveChanges();
+                    var result = newEntity.Entity;
+                    orderModels.Add(result);
+                }
+                foreach (var orderDto in toUpdate)
+                {
+                    // Update
+                    var expeditionOrderFromDb = DbContext.ExpeditionOrders.Where(order => order.IdExpeditionOrder == orderDto.Id)
+                        .Single();
+                    var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
+                    orderModel.IdExpeditionCitizen = expeditionCitizenId;
+                    expeditionOrderFromDb.UpdateAllButKeysProperties(orderModel);
+                    DbContext.SaveChanges();
+                    orderModels.Add(expeditionOrderFromDb);
+                }
+                var orderFromDb = expeditionCitizen.ExpeditionOrders.ToList();
+                DbContext.Patch(orderFromDb, orderModels);
+                transaction.Commit();
+                var results = Mapper.Map<List<ExpeditionOrderDto>>(orderModels);
+                return results;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                Lock.Release();
+            }
+        }
+
+        public async Task<List<ExpeditionOrderDto>> SavePartOrdersAsync(int expeditionPartId, List<ExpeditionOrderDto> expeditionOrder)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void DeleteExpeditionOrder(int expeditionOrderId)
+        {
+            var expeditionOrder = DbContext.ExpeditionOrders.Single(order => order.IdExpeditionOrder == expeditionOrderId);
+            DbContext.Remove(expeditionOrder);
             DbContext.SaveChanges();
         }
 

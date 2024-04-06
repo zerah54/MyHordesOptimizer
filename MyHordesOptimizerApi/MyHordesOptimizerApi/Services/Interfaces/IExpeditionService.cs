@@ -14,5 +14,8 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         void DeleteExpeditionCitizen(int expeditionCitizenId);
         Task<ExpeditionPartDto> SaveExpeditionPartAsync(int expeditionId, ExpeditionPartRequestDto expeditionPart);
         void DeleteExpeditionPart(int expeditionPartId);
+        Task<List<ExpeditionOrderDto>> SaveCitizenOrdersAsync(int expeditionCitizenId, List<ExpeditionOrderDto> expeditionOrder);
+        Task<List<ExpeditionOrderDto>> SavePartOrdersAsync(int expeditionPartId, List<ExpeditionOrderDto> expeditionOrder);
+        void DeleteExpeditionOrder(int expeditionOrderId);
     }
 }

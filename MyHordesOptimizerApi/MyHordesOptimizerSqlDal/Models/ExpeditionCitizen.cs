@@ -46,6 +46,9 @@ public partial class ExpeditionCitizen
     [Column("idExpeditionBag", TypeName = "int(11)")]
     public int? IdExpeditionBag { get; set; }
 
+    [InverseProperty("IdExpeditionCitizenNavigation")]
+    public virtual ICollection<ExpeditionOrder> ExpeditionOrders { get; set; } = new List<ExpeditionOrder>();
+
     [ForeignKey("IdExpeditionBag")]
     [InverseProperty("ExpeditionCitizens")]
     public virtual ExpeditionBag? IdExpeditionBagNavigation { get; set; }
@@ -61,8 +64,4 @@ public partial class ExpeditionCitizen
     [ForeignKey("PreinscritHeroic")]
     [InverseProperty("ExpeditionCitizens")]
     public virtual HeroSkill? PreinscritHeroicNavigation { get; set; }
-
-    [ForeignKey("IdExpeditionCitizen")]
-    [InverseProperty("IdExpeditionCitizens")]
-    public virtual ICollection<ExpeditionOrder> IdExpeditionOrders { get; set; } = new List<ExpeditionOrder>();
 }

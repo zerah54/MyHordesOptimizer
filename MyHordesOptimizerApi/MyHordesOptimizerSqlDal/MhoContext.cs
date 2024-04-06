@@ -94,6 +94,7 @@ public partial class MhoContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<WishlistCategorie> WishlistCategories { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -212,29 +213,7 @@ public partial class MhoContext : DbContext
         {
             entity.HasKey(e => e.IdExpeditionOrder).HasName("PRIMARY");
 
-            entity.HasMany(d => d.IdExpeditionCitizens).WithMany(p => p.IdExpeditionOrders)
-                .UsingEntity<Dictionary<string, object>>(
-                    "ExpeditionCitizenOrder",
-                    r => r.HasOne<ExpeditionCitizen>().WithMany()
-                        .HasForeignKey("IdExpeditionCitizen")
-                        .HasConstraintName("ExpeditionCitizenOrder_ibfk_2"),
-                    l => l.HasOne<ExpeditionOrder>().WithMany()
-                        .HasForeignKey("IdExpeditionOrder")
-                        .HasConstraintName("ExpeditionCitizenOrder_ibfk_1"),
-                    j =>
-                    {
-                        j.HasKey("IdExpeditionOrder", "IdExpeditionCitizen")
-                            .HasName("PRIMARY")
-                            .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-                        j.ToTable("ExpeditionCitizenOrder");
-                        j.HasIndex(new[] { "IdExpeditionCitizen" }, "ExpeditionCitizenOrder_ibfk_2");
-                        j.IndexerProperty<int>("IdExpeditionOrder")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("idExpeditionOrder");
-                        j.IndexerProperty<int>("IdExpeditionCitizen")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("idExpeditionCitizen");
-                    });
+            entity.HasOne(d => d.IdExpeditionCitizenNavigation).WithMany(p => p.ExpeditionOrders).HasConstraintName("expedition_order_fk_citizen");
 
             entity.HasMany(d => d.IdExpeditionParts).WithMany(p => p.IdExpeditionOrders)
                 .UsingEntity<Dictionary<string, object>>(

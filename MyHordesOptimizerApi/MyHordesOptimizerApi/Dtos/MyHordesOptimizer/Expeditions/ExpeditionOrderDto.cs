@@ -7,7 +7,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions
         public int? Id { get; set; }
         public string? Type { get; set; }
         public string? Text { get; set; }
-        [JsonProperty("done")]
         public bool? IsDone { get; set; }
         public int? Position { get; set; }
     }

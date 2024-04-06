@@ -64,7 +64,9 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.IsDone, opt => opt.MapFrom(dto => dto.IsDone))
                 .ForMember(model => model.Position, opt => opt.MapFrom(dto => dto.Position))
                 .ForMember(model => model.Type, opt => opt.MapFrom(dto => dto.Type))
-                .ForMember(model => model.IdExpeditionCitizens, opt => opt.Ignore())
+                .ForMember(model => model.IdExpeditionCitizen, opt => opt.Ignore())
+                .ForMember(model => model.IdExpeditionCitizenNavigation, opt => opt.Ignore())
+                .ForMember(model => model.IdExpeditionParts, opt => opt.Ignore())
                 .ReverseMap()
                 .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpeditionOrder))
                 .ForMember(dto => dto.IsDone, opt => opt.MapFrom(model => model.IsDone))
@@ -77,7 +79,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(dto => dto.IdUser, opt => opt.MapFrom(model => model.IdUser))
                 .ForMember(dto => dto.IsThirsty, opt => opt.MapFrom(model => model.IsThirsty))
                 .ForMember(dto => dto.Bag, opt => opt.MapFrom(model => model.IdExpeditionBagNavigation))
-                .ForMember(dto => dto.Orders, opt => opt.MapFrom(model => model.IdExpeditionOrders))
+                .ForMember(dto => dto.Orders, opt => opt.MapFrom(model => model.ExpeditionOrders))
                 .ForMember(dto => dto.Pdc, opt => opt.MapFrom(model => model.Pdc))
                 .ForMember(dto => dto.Preinscrit, opt => opt.MapFrom(model => model.IsPreinscrit))
                 .ForMember(dto => dto.PreinscritHeroicSkillName, opt => opt.MapFrom(model => model.PreinscritHeroic))
@@ -93,7 +95,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.IdExpeditionPart, opt => opt.Ignore())
                 .ForMember(model => model.IdUser, opt => opt.MapFrom(dto => dto.IdUser))
                 .ForMember(model => model.IsThirsty, opt => opt.MapFrom(dto => dto.IsThirsty))
-                .ForMember(model => model.IdExpeditionOrders, opt => opt.MapFrom((src, dest, srcMember, context) =>
+                .ForMember(model => model.ExpeditionOrders, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
                     return context.GetDbContext().ExpeditionOrders.Where(order => src.OrdersId.Contains(order.IdExpeditionOrder)).ToList();
                 }))
