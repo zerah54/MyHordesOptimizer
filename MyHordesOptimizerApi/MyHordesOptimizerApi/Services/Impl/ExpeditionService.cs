@@ -142,38 +142,50 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenRequestDto expeditionCitizen)
         {
-            using var transaction = DbContext.Database.BeginTransaction();
-            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
-            DbContext.SaveChanges();
-            var expeditionCitizenModel = Mapper.Map<ExpeditionCitizen>(expeditionCitizen, opt => opt.SetDbContext(DbContext));
-            expeditionCitizenModel.IdExpeditionPart = expeditionPartId;
-            ExpeditionCitizenDto result;
-            if (expeditionCitizen.Id.HasValue)
+            await Lock.WaitAsync();
+            try
             {
-                // Update
-                var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizen.Id.Value)
-                    .Include(citizen => citizen.IdExpeditionOrders)
-                    .Include(citizen => citizen.IdExpeditionBagNavigation)
-                    .Single();
-
-                var orderFromDb = expeditionCitizenFromDb.IdExpeditionOrders;
-                var orderFromDto = expeditionCitizenModel.IdExpeditionOrders;
-                DbContext.Patch(orderFromDb, orderFromDto);
-
-                expeditionCitizenFromDb.UpdateAllButKeysProperties(expeditionCitizenModel);
+                using var transaction = DbContext.Database.BeginTransaction();
+                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
                 DbContext.SaveChanges();
-                result = Mapper.Map<ExpeditionCitizenDto>(expeditionCitizenFromDb);
+                var expeditionCitizenModel = Mapper.Map<ExpeditionCitizen>(expeditionCitizen, opt => opt.SetDbContext(DbContext));
+                expeditionCitizenModel.IdExpeditionPart = expeditionPartId;
+                ExpeditionCitizenDto result;
+                if (expeditionCitizen.Id.HasValue)
+                {
+                    // Update
+                    var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizen.Id.Value)
+                        .Include(citizen => citizen.IdExpeditionOrders)
+                        .Include(citizen => citizen.IdExpeditionBagNavigation)
+                        .Single();
+
+                    var orderFromDb = expeditionCitizenFromDb.IdExpeditionOrders;
+                    var orderFromDto = expeditionCitizenModel.IdExpeditionOrders;
+                    DbContext.Patch(orderFromDb, orderFromDto);
+
+                    expeditionCitizenFromDb.UpdateAllButKeysProperties(expeditionCitizenModel);
+                    DbContext.SaveChanges();
+                    result = Mapper.Map<ExpeditionCitizenDto>(expeditionCitizenFromDb);
+                }
+                else
+                {
+                    // Create
+                    var newEntity = DbContext.Add(expeditionCitizenModel);
+                    DbContext.SaveChanges();
+                    result = Mapper.Map<ExpeditionCitizenDto>(newEntity.Entity);
+                }
+                transaction.Commit();
+                return result;
             }
-            else
+            catch (System.Exception)
             {
-                // Create
-                var newEntity = DbContext.Add(expeditionCitizenModel);
-                DbContext.SaveChanges();
-                result = Mapper.Map<ExpeditionCitizenDto>(newEntity.Entity);
+                throw;
             }
-            transaction.Commit();
-            return result;
+            finally
+            {
+                Lock.Release();
+            }
         }
 
         public void DeleteExpeditionCitizen(int expeditionCitizenId)
@@ -187,51 +199,63 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         #region ExpeditionParts
 
-        public Task<ExpeditionPartDto> SaveExpeditionPartAsync(int expeditionId, ExpeditionPartRequestDto expeditionPart)
+        public async Task<ExpeditionPartDto> SaveExpeditionPartAsync(int expeditionId, ExpeditionPartRequestDto expeditionPart)
         {
-            using var transaction = DbContext.Database.BeginTransaction();
-            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
-            DbContext.SaveChanges();
-            var expeditionPartModel = Mapper.Map<ExpeditionPart>(expeditionPart, opt => opt.SetDbContext(DbContext));
-            expeditionPartModel.IdExpedition = expeditionId;
-            ExpeditionPartDto result;
-            if (expeditionPart.Id.HasValue)
+            await Lock.WaitAsync();
+            try
             {
-                // Update
-                var expeditionPartFromDb = DbContext.ExpeditionParts.Where(part => part.IdExpeditionPart == expeditionPart.Id.Value)
-                    .Include(part => part.IdExpeditionOrders)
-                    .Include(part => part.ExpeditionCitizens)
-                        .ThenInclude(citizen => citizen.IdExpeditionOrders)
-                    .Include(part => part.ExpeditionCitizens)
-                        .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
-                    .Single();
-
-                // On récupère les collections de la db
-                var orderFromDb = expeditionPartFromDb.IdExpeditionOrders.ToList();
-                orderFromDb.AddRange(expeditionPartFromDb.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders));
-                var citizenFromDb = expeditionPartFromDb.ExpeditionCitizens;
-                // On récupère les mêmes collection du model a update
-                var orderFromModel = expeditionPartModel.IdExpeditionOrders.ToList();
-                orderFromModel.AddRange(expeditionPartModel.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders));
-                var citizenFromModel = expeditionPartModel.ExpeditionCitizens;
-                // On patch les collections
-                DbContext.Patch(orderFromDb, orderFromModel);
-                DbContext.Patch(citizenFromDb, citizenFromModel);
-
-                expeditionPartFromDb.UpdateAllButKeysProperties(expeditionPartModel);
+                using var transaction = DbContext.Database.BeginTransaction();
+                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
                 DbContext.SaveChanges();
-                result = Mapper.Map<ExpeditionPartDto>(expeditionPartFromDb);
+                var expeditionPartModel = Mapper.Map<ExpeditionPart>(expeditionPart, opt => opt.SetDbContext(DbContext));
+                expeditionPartModel.IdExpedition = expeditionId;
+                ExpeditionPartDto result;
+                if (expeditionPart.Id.HasValue)
+                {
+                    // Update
+                    var expeditionPartFromDb = DbContext.ExpeditionParts.Where(part => part.IdExpeditionPart == expeditionPart.Id.Value)
+                        .Include(part => part.IdExpeditionOrders)
+                        .Include(part => part.ExpeditionCitizens)
+                            .ThenInclude(citizen => citizen.IdExpeditionOrders)
+                        .Include(part => part.ExpeditionCitizens)
+                            .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
+                        .Single();
+
+                    // On récupère les collections de la db
+                    var orderFromDb = expeditionPartFromDb.IdExpeditionOrders.ToList();
+                    orderFromDb.AddRange(expeditionPartFromDb.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders));
+                    var citizenFromDb = expeditionPartFromDb.ExpeditionCitizens;
+                    // On récupère les mêmes collection du model a update
+                    var orderFromModel = expeditionPartModel.IdExpeditionOrders.ToList();
+                    orderFromModel.AddRange(expeditionPartModel.ExpeditionCitizens.SelectMany(citizen => citizen.IdExpeditionOrders));
+                    var citizenFromModel = expeditionPartModel.ExpeditionCitizens;
+                    // On patch les collections
+                    DbContext.Patch(orderFromDb, orderFromModel);
+                    DbContext.Patch(citizenFromDb, citizenFromModel);
+
+                    expeditionPartFromDb.UpdateAllButKeysProperties(expeditionPartModel);
+                    DbContext.SaveChanges();
+                    result = Mapper.Map<ExpeditionPartDto>(expeditionPartFromDb);
+                }
+                else
+                {
+                    // Create
+                    var newEntity = DbContext.Add(expeditionPartModel);
+                    DbContext.SaveChanges();
+                    result = Mapper.Map<ExpeditionPartDto>(newEntity.Entity);
+                }
+                transaction.Commit();
+                return result;
             }
-            else
+            catch (System.Exception)
             {
-                // Create
-                var newEntity = DbContext.Add(expeditionPartModel);
-                DbContext.SaveChanges();
-                result = Mapper.Map<ExpeditionPartDto>(newEntity.Entity);
+                throw;
             }
-            transaction.Commit();
-            return Task.FromResult(result);
+            finally
+            {
+                Lock.Release();
+            }
         }
 
         public void DeleteExpeditionPart(int expeditionPartId)
