@@ -122,6 +122,8 @@ namespace MyHordesOptimizerApi
 
             services.AddSingleton<IGlossaryRepository, GlossaryRepository>();
 
+            services.AddSingleton<ITranslastionRepository, GitlabWebApiTranslationRepository>();
+
             // Services
             services.AddScoped<IMyHordesFetcherService, MyHordesFetcherService>();
             services.AddScoped<IExternalToolsService, ExternalToolsService>();

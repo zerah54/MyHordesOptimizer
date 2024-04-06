@@ -4,17 +4,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
+using MyHordesOptimizerApi.Services.Interfaces.Translations;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using YamlDotNet.Serialization;
 using Action = MyHordesOptimizerApi.Models.Action;
 
 namespace MyHordesOptimizerApi.Services.Impl.Import
@@ -24,6 +23,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
         protected readonly IWebApiRepository WebApiRepository;
         protected readonly IMyHordesTranslationsConfiguration TranslationsConfiguration;
+        protected readonly ITranslationService TranslationService;
 
         protected IMyHordesApiRepository MyHordesApiRepository;
         protected IMyHordesCodeRepository MyHordesCodeRepository;
@@ -38,6 +38,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             IMyHordesTranslationsConfiguration translationsConfiguration,
             IMyHordesApiRepository myHordesJsonApiRepository,
             IMyHordesCodeRepository myHordesCodeRepository,
+            ITranslationService translationService,
             IMapper mapper,
             ILogger<MyHordesImportService> logger,
             MhoContext dbContext)
@@ -47,6 +48,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             TranslationsConfiguration = translationsConfiguration;
             MyHordesApiRepository = myHordesJsonApiRepository;
             MyHordesCodeRepository = myHordesCodeRepository;
+            TranslationService = translationService;
             Mapper = mapper;
             Logger = logger;
             DbContext = dbContext;
@@ -78,27 +80,30 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         public async Task ImportHeroSkill()
         {
             var codeResult = MyHordesCodeRepository.GetHeroCapacities();
-
             var capacities = Mapper.Map<List<HeroSkill>>(codeResult);
 
-            // Traductions
-            var ymlDeserializer = new DeserializerBuilder()
-                .Build();
-            var ymlFr = await WebApiRepository.Get(url: TranslationsConfiguration.GameFrUrl).Content.ReadAsStringAsync();
-            var ymlEn = await WebApiRepository.Get(url: TranslationsConfiguration.GameEnUrl).Content.ReadAsStringAsync();
-            var ymlEs = await WebApiRepository.Get(url: TranslationsConfiguration.GameEsUrl).Content.ReadAsStringAsync();
-
-            var frenchTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlFr);
-            var englishTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlEn);
-            var spanishTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlEs);
+            // Traduction
+            var translations = await TranslationService.GetTranslations();
             foreach (var capacitie in capacities)
             {
-                capacitie.LabelFr = frenchTrads[capacitie.LabelDe];
-                capacitie.LabelEn = englishTrads[capacitie.LabelDe];
-                capacitie.LabelEs = spanishTrads[capacitie.LabelDe];
-                capacitie.DescriptionFr = frenchTrads[capacitie.DescriptionDe];
-                capacitie.DescriptionEn = englishTrads[capacitie.DescriptionDe];
-                capacitie.DescriptionEs = spanishTrads[capacitie.DescriptionDe];
+                capacitie.LabelFr = translations["fr"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(capacitie.LabelDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[capacitie.LabelDe])
+                    .First();
+                capacitie.LabelEn = translations["en"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(capacitie.LabelDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[capacitie.LabelDe])
+                    .First();
+                capacitie.LabelEs = translations["es"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(capacitie.LabelDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[capacitie.LabelDe])
+                    .First();
+                capacitie.DescriptionFr = translations["fr"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(capacitie.DescriptionDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[capacitie.DescriptionDe])
+                    .First();
+                capacitie.DescriptionEn = translations["en"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(capacitie.DescriptionDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[capacitie.DescriptionDe])
+                    .First();
+                capacitie.DescriptionEs = translations["es"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(capacitie.DescriptionDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[capacitie.DescriptionDe])
+                    .First();
             }
             var heroSkills = DbContext.HeroSkills.ToList();
             var comparer = EqualityComparerFactory.Create<HeroSkill>(heroSkill => heroSkill.Name.GetHashCode(), (a, b) => a.Name == b.Name);
@@ -132,23 +137,29 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
             var causesOfDeaths = Mapper.Map<List<CauseOfDeath>>(codeResult);
 
-            // Traductions
-            var ymlDeserializer = new DeserializerBuilder().Build();
-            var ymlFr = await WebApiRepository.Get(url: TranslationsConfiguration.GameFrUrl).Content.ReadAsStringAsync();
-            var ymlEn = await WebApiRepository.Get(url: TranslationsConfiguration.GameEnUrl).Content.ReadAsStringAsync();
-            var ymlEs = await WebApiRepository.Get(url: TranslationsConfiguration.GameEsUrl).Content.ReadAsStringAsync();
-
-            var frenchTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlFr);
-            var englishTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlEn);
-            var spanishTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlEs);
+            // Traduction
+            var translations = await TranslationService.GetTranslations();
             foreach (var causeOfDeath in causesOfDeaths)
             {
-                causeOfDeath.LabelFr = frenchTrads[causeOfDeath.LabelDe];
-                causeOfDeath.LabelEn = englishTrads[causeOfDeath.LabelDe];
-                causeOfDeath.LabelEs = spanishTrads[causeOfDeath.LabelDe];
-                causeOfDeath.DescriptionFr = frenchTrads[causeOfDeath.DescriptionDe];
-                causeOfDeath.DescriptionEn = englishTrads[causeOfDeath.DescriptionDe];
-                causeOfDeath.DescriptionEs = spanishTrads[causeOfDeath.DescriptionDe];
+
+                causeOfDeath.LabelFr = translations["fr"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(causeOfDeath.LabelDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[causeOfDeath.LabelDe])
+                    .First();
+                causeOfDeath.LabelEn = translations["en"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(causeOfDeath.LabelDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[causeOfDeath.LabelDe])
+                    .First();
+                causeOfDeath.LabelEs = translations["es"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(causeOfDeath.LabelDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[causeOfDeath.LabelDe])
+                    .First();
+                causeOfDeath.DescriptionFr = translations["fr"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(causeOfDeath.DescriptionDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[causeOfDeath.DescriptionDe])
+                    .First();
+                causeOfDeath.DescriptionEn = translations["en"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(causeOfDeath.DescriptionDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[causeOfDeath.DescriptionDe])
+                    .First();
+                causeOfDeath.DescriptionEs = translations["es"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(causeOfDeath.DescriptionDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[causeOfDeath.DescriptionDe])
+                    .First();
             }
 
             var causeOfDeathsFromDb = DbContext.CauseOfDeaths.ToList();
@@ -270,23 +281,21 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var codeItemRecipes = MyHordesCodeRepository.GetRecipes();
             var mhoRecipes = Mapper.Map<List<Recipe>>(codeItemRecipes);
 
-            // Traductions
-            var ymlDeserializer = new DeserializerBuilder()
-                .Build();
-            var ymlFr = await WebApiRepository.Get(url: TranslationsConfiguration.ItemFrUrl).Content.ReadAsStringAsync();
-            var ymlEn = await WebApiRepository.Get(url: TranslationsConfiguration.ItemEnUrl).Content.ReadAsStringAsync();
-            var ymlEs = await WebApiRepository.Get(url: TranslationsConfiguration.ItemEsUrl).Content.ReadAsStringAsync();
-
-            var frenchTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlFr);
-            var englishTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlEn);
-            var spanishTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlEs);
+            // Traduction
+            var translations = await TranslationService.GetTranslations();
             foreach (var recipe in mhoRecipes)
             {
                 if (recipe.ActionDe != null)
                 {
-                    recipe.ActionFr = frenchTrads[recipe.ActionDe];
-                    recipe.ActionEn = englishTrads[recipe.ActionDe];
-                    recipe.ActionEs = spanishTrads[recipe.ActionDe];
+                    recipe.ActionFr = translations["fr"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(recipe.ActionDe))
+                        .Select(ymlFileModel => ymlFileModel.Translations[recipe.ActionDe])
+                        .First();
+                    recipe.ActionEn = translations["en"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(recipe.ActionDe))
+                        .Select(ymlFileModel => ymlFileModel.Translations[recipe.ActionDe])
+                        .First();
+                    recipe.ActionEs = translations["es"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(recipe.ActionDe))
+                        .Select(ymlFileModel => ymlFileModel.Translations[recipe.ActionDe])
+                        .First();
                 }
             }
             var recipesFromDb = DbContext.Recipes.ToList();
@@ -375,7 +384,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         #region Ruins
 
         public void ImportRuins()
-        {       
+        {
             var ruinsFromMyHordes = MyHordesApiRepository.GetRuins();
             var ruinModels = Mapper.Map<List<Ruin>>(ruinsFromMyHordes);
 
@@ -438,21 +447,19 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var codeResult = MyHordesCodeRepository.GetCategories();
             var categories = Mapper.Map<List<Category>>(codeResult);
 
-            // Traductions
-            var ymlDeserializer = new DeserializerBuilder()
-                .Build();
-            var ymlFr = await WebApiRepository.Get(url: TranslationsConfiguration.ItemFrUrl).Content.ReadAsStringAsync();
-            var ymlEn = await WebApiRepository.Get(url: TranslationsConfiguration.ItemEnUrl).Content.ReadAsStringAsync();
-            var ymlEs = await WebApiRepository.Get(url: TranslationsConfiguration.ItemEsUrl).Content.ReadAsStringAsync();
-
-            var frenchTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlFr);
-            var englishTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlEn);
-            var spanishTrads = ymlDeserializer.Deserialize<Dictionary<string, string>>(ymlEs);
+            // Traduction
+            var translations = await TranslationService.GetTranslations();
             foreach (var category in categories)
             {
-                category.LabelFr = frenchTrads[category.LabelDe];
-                category.LabelEn = englishTrads[category.LabelDe];
-                category.LabelEs = spanishTrads[category.LabelDe];
+                category.LabelFr = translations["fr"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(category.LabelDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[category.LabelDe])
+                    .First();
+                category.LabelEn = translations["en"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(category.LabelDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[category.LabelDe])
+                    .First();
+                category.LabelEs = translations["es"].Where(ymlFileModel => ymlFileModel.Translations.ContainsKey(category.LabelDe))
+                    .Select(ymlFileModel => ymlFileModel.Translations[category.LabelDe])
+                    .First();
             }
 
             var comparer = EqualityComparerFactory.Create<Category>(category => category.Name.GetHashCode(), (a, b) => a.Name == b.Name);
@@ -527,7 +534,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var modelsFromDb = DbContext.DefaultWishlistItems
                 .ToList();
             var defaultWishlistItemComparer = EqualityComparerFactory.Create<DefaultWishlistItem>(dwi => HashCode.Combine(dwi.IdDefaultWishlist, dwi.IdItem),
-                (a, b) => a.IdDefaultWishlist == b.IdDefaultWishlist 
+                (a, b) => a.IdDefaultWishlist == b.IdDefaultWishlist
                 && a.IdItem == b.IdItem);
             Patch(modelsFromDb, modeles, defaultWishlistItemComparer);
         }
