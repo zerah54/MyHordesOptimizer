@@ -9,6 +9,7 @@ using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -307,7 +308,9 @@ namespace MyHordesOptimizerApi.Services.Impl
                     orderModels.Add(expeditionOrderFromDb);
                 }
                 var orderFromDb = expeditionCitizen.ExpeditionOrders.ToList();
-                DbContext.Patch(orderFromDb, orderModels);
+                var toRemove = orderFromDb.Except(orderModels, EqualityComparerFactory.CreateDefault<ExpeditionOrder>());
+                DbContext.RemoveRange(toRemove);
+                DbContext.SaveChanges();
                 transaction.Commit();
                 var results = Mapper.Map<List<ExpeditionOrderDto>>(orderModels);
                 return results;
@@ -324,7 +327,56 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<List<ExpeditionOrderDto>> SavePartOrdersAsync(int expeditionPartId, List<ExpeditionOrderDto> expeditionOrder)
         {
-            throw new System.NotImplementedException();
+            await Lock.WaitAsync();
+            try
+            {
+                using var transaction = DbContext.Database.BeginTransaction();
+                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+                DbContext.SaveChanges();
+                var expeditionPart = DbContext.ExpeditionParts
+                    .Where(part => part.IdExpeditionPart == expeditionPartId)
+                    .Include(part => part.IdExpeditionOrders)
+                    .Single();
+                var initialOrderFromDb = expeditionPart.IdExpeditionOrders.ToList();
+                var toAdd = expeditionOrder.Where(orderDto => orderDto.Id is null);
+                var toUpdate = expeditionOrder.Where(orderDto => orderDto.Id is not null);
+                var orderModels = new List<ExpeditionOrder>();
+                foreach (var orderDto in toAdd)
+                {
+                    var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
+                    // Create
+                    var newEntity = DbContext.Add(orderModel);
+                    DbContext.SaveChanges();
+                    var result = newEntity.Entity;
+                    orderModels.Add(result);
+                }
+                foreach (var orderDto in toUpdate)
+                {
+                    // Update
+                    var expeditionOrderFromDb = DbContext.ExpeditionOrders.Where(order => order.IdExpeditionOrder == orderDto.Id)
+                        .Single();
+                    var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
+                    expeditionOrderFromDb.UpdateAllButKeysProperties(orderModel);
+                    DbContext.SaveChanges();
+                    orderModels.Add(expeditionOrderFromDb);
+                }
+                var toRemove = initialOrderFromDb.Except(orderModels, EqualityComparerFactory.CreateDefault<ExpeditionOrder>());
+                DbContext.RemoveRange(toRemove);
+                expeditionPart.IdExpeditionOrders = orderModels;
+                DbContext.SaveChanges();
+                transaction.Commit();
+                var results = Mapper.Map<List<ExpeditionOrderDto>>(orderModels);
+                return results;
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                Lock.Release();
+            }
         }
 
         public void DeleteExpeditionOrder(int expeditionOrderId)

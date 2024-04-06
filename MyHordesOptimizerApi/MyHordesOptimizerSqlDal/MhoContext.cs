@@ -213,7 +213,9 @@ public partial class MhoContext : DbContext
         {
             entity.HasKey(e => e.IdExpeditionOrder).HasName("PRIMARY");
 
-            entity.HasOne(d => d.IdExpeditionCitizenNavigation).WithMany(p => p.ExpeditionOrders).HasConstraintName("expedition_order_fk_citizen");
+            entity.HasOne(d => d.IdExpeditionCitizenNavigation).WithMany(p => p.ExpeditionOrders)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("expedition_order_fk_citizen");
 
             entity.HasMany(d => d.IdExpeditionParts).WithMany(p => p.IdExpeditionOrders)
                 .UsingEntity<Dictionary<string, object>>(

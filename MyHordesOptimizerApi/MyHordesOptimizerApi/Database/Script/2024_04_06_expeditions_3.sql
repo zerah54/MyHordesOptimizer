@@ -9,5 +9,5 @@ AFTER idExpedition;
 DROP TABLE ExpeditionCitizenOrder;
 
 ALTER TABLE ExpeditionOrder
-ADD COLUMN idExpeditionCitizen INT NOT NULL,
+ADD COLUMN idExpeditionCitizen INT NULL,
 ADD FOREIGN KEY expedition_order_fk_citizen(idExpeditionCitizen) REFERENCES ExpeditionCitizen(idExpeditionCitizen) ON DELETE CASCADE;

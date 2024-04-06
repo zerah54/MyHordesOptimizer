@@ -30,11 +30,11 @@ public partial class ExpeditionOrder
     public bool? IsDone { get; set; }
 
     [Column("idExpeditionCitizen", TypeName = "int(11)")]
-    public int IdExpeditionCitizen { get; set; }
+    public int? IdExpeditionCitizen { get; set; }
 
     [ForeignKey("IdExpeditionCitizen")]
     [InverseProperty("ExpeditionOrders")]
-    public virtual ExpeditionCitizen IdExpeditionCitizenNavigation { get; set; } = null!;
+    public virtual ExpeditionCitizen? IdExpeditionCitizenNavigation { get; set; }
 
     [ForeignKey("IdExpeditionOrder")]
     [InverseProperty("IdExpeditionOrders")]
