@@ -35,7 +35,7 @@ namespace MyHordesOptimizerApi.Controllers
             }
             UserInfoProvider.UserKey = userKey;
             var simpleMe = await _myHordesFetcherService.GetSimpleMeAsync();
-            var token = _authenticationService.CreateToken(simpleMe);
+            var token = _authenticationService.CreateToken(simpleMe, userKey);
             return new AuthenticationResponseDto()
             {
                 SimpleMe = simpleMe,

@@ -75,8 +75,6 @@ namespace Cockpit.Api.Extensions
 
                     var clone = context.Principal.Clone();
                     var newIdentity = (ClaimsIdentity)clone.Identity;
-                    using var scope = context.HttpContext.RequestServices.CreateScope();
-                    var userInfoProvider = scope.ServiceProvider.GetRequiredService<IUserInfoProvider>();
                     foreach (var tokenClaim in jwtToken.Claims)
                     {
                         newIdentity.AddClaim(tokenClaim);

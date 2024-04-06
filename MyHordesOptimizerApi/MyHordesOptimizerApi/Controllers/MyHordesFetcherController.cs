@@ -69,14 +69,8 @@ namespace MyHordesOptimizerApi.Controllers
         [HttpGet]
         [Route("Bank")]
         [Authorize]
-        public ActionResult<BankLastUpdateDto> GetBank(string userKey)
+        public ActionResult<BankLastUpdateDto> GetBank()
         {
-            if (string.IsNullOrWhiteSpace(userKey))
-            {
-                return BadRequest($"{nameof(userKey)} cannot be empty");
-            }
-
-            UserInfoProvider.UserKey = userKey;
             var bank = _myHordesFetcherService.GetBank();
             return bank;
         }

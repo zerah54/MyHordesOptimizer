@@ -19,7 +19,9 @@ namespace MyHordesOptimizerApi.Controllers.ActionFillters
         public void OnActionExecuting(ActionExecutingContext context)
         {
             int.TryParse(context?.HttpContext?.User?.FindFirstValue(ClaimTypes.Upn), out var upn);
+            var userKey = context?.HttpContext?.User?.FindFirstValue(MhoClaimsType.UserKey);
             UserInfoProvider.UserId = upn;
+            UserInfoProvider.UserKey = userKey;
             UserInfoProvider.UserName = context?.HttpContext?.User?.FindFirstValue(ClaimTypes.Name);
             UserInfoProvider.TownDetail = context?.HttpContext?.User?.FindFirstValue(MhoClaimsType.Town)?.FromJson<SimpleMeTownDetailDto>();
         }

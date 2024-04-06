@@ -29,7 +29,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             MyHordesFetcherService = myHordesFetcherService;
         }
 
-        public TokenDto CreateToken(SimpleMeDto me)
+        public TokenDto CreateToken(SimpleMeDto me, string userKey)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var mySecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.JwtSecret));
@@ -39,7 +39,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                   new Claim(ClaimTypes.Upn, me.Id.ToString()),
                   new Claim(ClaimTypes.Name, me.UserName),
-                  new Claim(MhoClaimsType.Town, me.TownDetails.ToJson())
+                  new Claim(MhoClaimsType.Town, me.TownDetails.ToJson()),
+                  new Claim(MhoClaimsType.UserKey, userKey)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(Configuration.JwtValideTimeInMinute),
                 Issuer = Configuration.JwtIssuer,
@@ -62,5 +63,6 @@ namespace MyHordesOptimizerApi.Services.Impl
     public class MhoClaimsType
     {
         public const string Town = "MHO_Town";
+        public const string UserKey = "MHO_UserKey";
     }
 }
