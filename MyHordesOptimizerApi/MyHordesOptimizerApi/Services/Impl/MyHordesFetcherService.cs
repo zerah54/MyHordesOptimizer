@@ -325,8 +325,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                 using var transaction = DbContext.Database.BeginTransaction();
                 var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo()));
                 DbContext.SaveChanges();
-                var lastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.Entity.IdLastUpdateInfo);
-                myHordeMeResponse.Map.LastUpdateInfo = lastUpdate;
+                var newTownlastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.Entity.IdLastUpdateInfo);
+                myHordeMeResponse.Map.LastUpdateInfo = newTownlastUpdate;
                 var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
                 DbContext.AddRange(town.TownBankItems);
                 DbContext.SaveChanges();
@@ -361,9 +361,6 @@ namespace MyHordesOptimizerApi.Services.Impl
                          .AsSplitQuery()
                 .Include(town => town.TownBankItems)
                     .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
-                    .AsSplitQuery()
-                .Include(town => town.TownBankItems)
-                    .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
                         .ThenInclude(item => item.TownWishListItems.Where(wishListItem => wishListItem.IdTown == townId))
                         .AsSplitQuery()
                 .Include(town => town.TownBankItems)
@@ -375,11 +372,17 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .AsSplitQuery()
                 .Where(townBankItem => townBankItem.IdTown == townId)
                 .First();
-            var dtos = Mapper.Map<List<StackableItemDto>>(townModel.TownBankItems);
+
+            var group = townModel.TownBankItems.GroupBy(townBankItem => townBankItem.IdLastUpdateInfoNavigation)
+                .OrderByDescending(g => g.Key.DateUpdate)
+                .First();
+            var lastUpdate = group.Key;
+            var townBankItemsLastUpdated = group.ToList();
+            var dtos = Mapper.Map<List<StackableItemDto>>(townBankItemsLastUpdated);
             LastUpdateInfoDto lastUpdateDto = null;
             if(townModel.TownBankItems.Any())
             {
-                lastUpdateDto = Mapper.Map<LastUpdateInfoDto>(townModel.TownBankItems.FirstOrDefault().IdLastUpdateInfoNavigation);
+                lastUpdateDto = Mapper.Map<LastUpdateInfoDto>(lastUpdate);
             }
             return new BankLastUpdateDto()
             {
