@@ -107,14 +107,14 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("orders")]
-        public async Task<ActionResult> SaveExpeditionOrder([FromBody] ExpeditionOrderDto expeditionOrder)
+        public ActionResult SaveExpeditionOrder([FromBody] ExpeditionOrderDto expeditionOrder)
         {
             if(!expeditionOrder.Id.HasValue)
             {
                 return BadRequest($"{nameof(expeditionOrder.Id)} cannot be empty");
             }
-            ExpeditionService.UpdateExpeditionOrder(expeditionOrder);
-            return Ok();
+            var updatedDto = ExpeditionService.UpdateExpeditionOrder(expeditionOrder);
+            return Ok(updatedDto);
         }
     }
 }

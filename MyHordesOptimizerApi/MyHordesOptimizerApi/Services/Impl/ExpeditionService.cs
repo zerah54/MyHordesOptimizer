@@ -388,13 +388,14 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.SaveChanges();
         }
 
-        public void UpdateExpeditionOrder(ExpeditionOrderDto expeditionOrderDto)
+        public ExpeditionOrderDto UpdateExpeditionOrder(ExpeditionOrderDto expeditionOrderDto)
         {
             var expeditionOrderModel = DbContext.ExpeditionOrders.Single(order => order.IdExpeditionOrder == expeditionOrderDto.Id.Value);
             var modelFromDto = Mapper.Map<ExpeditionOrder>(expeditionOrderDto);
             expeditionOrderModel.UpdateAllButKeysProperties(modelFromDto, ignoreNull: true);
             DbContext.Update(expeditionOrderModel);
             DbContext.SaveChanges();
+            return expeditionOrderModel;
         }
 
         #endregion
