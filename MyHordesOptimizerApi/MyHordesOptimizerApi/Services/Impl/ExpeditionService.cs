@@ -299,10 +299,12 @@ namespace MyHordesOptimizerApi.Services.Impl
                 foreach (var orderDto in toUpdate)
                 {
                     // Update
-                    var expeditionOrderFromDb = DbContext.ExpeditionOrders.Where(order => order.IdExpeditionOrder == orderDto.Id)
+                    var expeditionOrderFromDb = DbContext.ExpeditionOrders
+                        .Where(order => order.IdExpeditionOrder == orderDto.Id)
                         .Single();
                     var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
                     orderModel.IdExpeditionCitizen = expeditionCitizenId;
+                    orderModel.IdExpeditionCitizenNavigation = expeditionCitizen;
                     expeditionOrderFromDb.UpdateAllButKeysProperties(orderModel);
                     DbContext.SaveChanges();
                     orderModels.Add(expeditionOrderFromDb);
