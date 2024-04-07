@@ -6,10 +6,13 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request;
 using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Extensions.Models;
+using MyHordesOptimizerApi.Extensions.Models.Expeditions;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Models.Expeditions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -137,6 +140,55 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.SaveChanges();
         }
 
+        public async Task<List<ExpeditionDto>> CopyExpeditionsAsync(int townId, int fromDay, int targetDay)
+        {
+            await Lock.WaitAsync();
+            try
+            {
+                using var transaction = DbContext.Database.BeginTransaction();
+                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+                DbContext.SaveChanges();
+                var modelsFromDb = DbContext.Expeditions
+                               .Where(expedition => expedition.IdTown == townId && expedition.Day == fromDay)
+                               .Include(expedition => expedition.ExpeditionParts)
+                                   .ThenInclude(part => part.IdExpeditionOrders)
+                               .Include(expedition => expedition.ExpeditionParts)
+                                   .ThenInclude(part => part.ExpeditionCitizens)
+                                       .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
+                                           .ThenInclude(bag => bag.ExpeditionBagItems)
+                               .Include(expedition => expedition.ExpeditionParts)
+                                   .ThenInclude(part => part.ExpeditionCitizens)
+                                       .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
+                               .ToList();
+
+                var existingExpeditionToDelete = DbContext.Expeditions.Where(expedition => expedition.IdTown == townId && expedition.Day == targetDay);
+                DbContext.RemoveRange(existingExpeditionToDelete);
+                var newExpeditions = new List<Expedition>();
+                foreach (var modelFromDb in modelsFromDb)
+                {
+                    var newExpedtion = modelFromDb.Copy();
+                    newExpedtion.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                    newExpedtion.Day = targetDay;
+                    newExpedtion.State = ExpeditionConstants.ExpeditionStateStop;
+                    var updatedNewExpedition = DbContext.Add(newExpedtion).Entity;
+                    DbContext.SaveChanges();
+                    newExpeditions.Add(updatedNewExpedition);
+                }
+                DbContext.SaveChanges();
+                transaction.Commit();
+                var returnedDto = Mapper.Map<List<ExpeditionDto>>(newExpeditions);
+                return returnedDto;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                Lock.Release();
+            }
+        }
         #endregion
 
         #region ExpeditionCitizen
@@ -395,7 +447,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             expeditionOrderModel.UpdateAllButKeysProperties(modelFromDto, ignoreNull: true);
             DbContext.Update(expeditionOrderModel);
             DbContext.SaveChanges();
-            return expeditionOrderModel;
+            var returnedDto = Mapper.Map<ExpeditionOrderDto>(expeditionOrderModel);
+            return returnedDto;
         }
 
         #endregion

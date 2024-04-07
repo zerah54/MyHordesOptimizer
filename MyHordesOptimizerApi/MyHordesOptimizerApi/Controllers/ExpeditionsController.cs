@@ -49,6 +49,26 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpPost]
+        [Route("{townId}/copy")]
+        public async Task<ActionResult> CopyExpeditions([FromRoute] int townId, [FromQuery] int fromDay, [FromQuery] int targetDay)
+        {
+            if (fromDay < 1)
+            {
+                return BadRequest($"{nameof(fromDay)} should be > 0");
+            }
+            if (targetDay < 1)
+            {
+                return BadRequest($"{nameof(targetDay)} should be > 0");
+            }
+            if(fromDay == targetDay)
+            {
+                return BadRequest($"{nameof(fromDay)} should be different from {nameof(targetDay)}");
+            }
+            var newExpeditions = await ExpeditionService.CopyExpeditionsAsync(townId, fromDay, targetDay);
+            return Ok(newExpeditions);
+        }
+
+        [HttpPost]
         [Route("{expeditionId}/parts")]
         public async Task<ActionResult<ExpeditionPartDto>> PostExpeditionPart([FromRoute] int expeditionId, [FromBody] ExpeditionPartRequestDto expeditionPart)
         {
