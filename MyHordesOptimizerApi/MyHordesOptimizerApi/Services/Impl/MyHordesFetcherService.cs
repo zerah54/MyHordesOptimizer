@@ -16,6 +16,7 @@ using MyHordesOptimizerApi.Services.Interfaces;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -318,64 +319,69 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public BankLastUpdateDto GetBank()
         {
+            int lastUpdateId = -1;
             try
             {
                 var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
                 // Enregistrer en base
                 using var transaction = DbContext.Database.BeginTransaction();
-                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo()));
+                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo())).Entity;
                 DbContext.SaveChanges();
-                var newTownlastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.Entity.IdLastUpdateInfo);
+                var newTownlastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.IdLastUpdateInfo);
                 myHordeMeResponse.Map.LastUpdateInfo = newTownlastUpdate;
                 var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
                 DbContext.AddRange(town.TownBankItems);
                 DbContext.SaveChanges();
                 transaction.Commit();
+                lastUpdateId = newTownlastUpdate.IdLastUpdateInfo;
             }
             catch (Exception e)
             {
                 Logger.LogError($"Erreur lors de l'enregistrement de la bank depuis MH : {e}");
             }
-
             var townDetail = UserInfoProvider.TownDetail;
             var townId = townDetail.TownId;
-
+            if(lastUpdateId == -1)
+            {
+                lastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => tbi.IdLastUpdateInfo);
+            }
             var townModel = DbContext.Towns
-                .Include(town => town.TownBankItems)
+                .Where(town => town.IdTown == townId)
+                .Include(town => town.TownBankItems.Where(tbi => tbi.IdLastUpdateInfo == lastUpdateId))
                   .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
                       .ThenInclude(item => item.IdCategoryNavigation)
                       .AsSplitQuery()
-                .Include(town => town.TownBankItems)
+                .Include(town => town.TownBankItems.Where(tbi => tbi.IdLastUpdateInfo == lastUpdateId))
                   .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
                       .ThenInclude(item => item.PropertyNames)
                       .AsSplitQuery()
-                .Include(town => town.TownBankItems)
+                .Include(town => town.TownBankItems.Where(tbi => tbi.IdLastUpdateInfo == lastUpdateId))
                  .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
                       .ThenInclude(item => item.ActionNames)
                       .AsSplitQuery()
-                .Include(town => town.TownBankItems)
+                .Include(town => town.TownBankItems.Where(tbi => tbi.IdLastUpdateInfo == lastUpdateId))
                   .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
                       .ThenInclude(item => item.RecipeItemComponents)
                          .ThenInclude(recipe => recipe.RecipeNameNavigation)
                          .ThenInclude(recipe => recipe.RecipeItemResults)
                          .AsSplitQuery()
-                .Include(town => town.TownBankItems)
+                .Include(town => town.TownBankItems.Where(tbi => tbi.IdLastUpdateInfo == lastUpdateId))
                     .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
                         .ThenInclude(item => item.TownWishListItems.Where(wishListItem => wishListItem.IdTown == townId))
                         .AsSplitQuery()
-                .Include(town => town.TownBankItems)
-                    .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
-                        .ThenInclude(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId))
-                        .AsSplitQuery()
-                .Include(town => town.TownBankItems)
+                //.Include(town => town.TownBankItems)
+                //    .ThenInclude(town => town.IdItemNavigation)
+                //        .ThenInclude(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId))
+                //        .AsSplitQuery()
+                .Include(town => town.TownBankItems.Where(tbi => tbi.IdLastUpdateInfo == lastUpdateId))
                     .ThenInclude(townBankItem => townBankItem.IdLastUpdateInfoNavigation)
-                    .AsSplitQuery()
-                .Where(townBankItem => townBankItem.IdTown == townId)
+                    .AsSplitQuery() 
                 .First();
-
+           
             var group = townModel.TownBankItems.GroupBy(townBankItem => townBankItem.IdLastUpdateInfoNavigation)
                 .OrderByDescending(g => g.Key.DateUpdate)
                 .First();
+
             var lastUpdate = group.Key;
             var townBankItemsLastUpdated = group.ToList();
             var dtos = Mapper.Map<List<StackableItemDto>>(townBankItemsLastUpdated);
@@ -384,6 +390,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 lastUpdateDto = Mapper.Map<LastUpdateInfoDto>(lastUpdate);
             }
+            Logger.LogDebug($"Map : {sw.ElapsedMilliseconds} ms");
+            sw.Stop();
             return new BankLastUpdateDto()
             {
                 Bank = dtos,
