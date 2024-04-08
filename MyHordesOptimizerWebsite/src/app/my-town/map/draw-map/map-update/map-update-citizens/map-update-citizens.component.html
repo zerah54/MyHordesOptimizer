@@ -5,7 +5,7 @@
             <tr>
                 <th>
                     @if ((allCitizens | notInListCitizen:citizens).length > 0) {
-                        <button mat-button [matMenuTriggerFor]="addCitizenMenu" i18n>Ajouter un citoyen</button>
+                        <button mat-button type="button" [matMenuTriggerFor]="addCitizenMenu" i18n>Ajouter un citoyen</button>
                     }
                 </th>
                 <th i18n>Sac</th>

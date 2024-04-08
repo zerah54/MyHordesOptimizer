@@ -1,7 +1,7 @@
 <mat-card-header class="mho-map-header">
     <mat-card-title i18n>Carte des fouilles</mat-card-title>
     <div>
-        <button mat-icon-button (click)="sidenav.toggle()">
+        <button mat-icon-button type="button" (click)="sidenav.toggle()">
             <mat-icon>settings</mat-icon>
         </button>
     </div>
@@ -53,7 +53,7 @@
             <div>
                 <h2 i18n>Afficher les zones en distance</h2>
                 <div class="dist-zones">
-                    <button mat-button [matMenuTriggerFor]="addZone">
+                    <button mat-button type="button" [matMenuTriggerFor]="addZone">
                         <mat-icon>add</mat-icon>
                         <ng-container i18n>Ajouter une zone</ng-container>
                     </button>
@@ -73,13 +73,13 @@
                             @if (new_distance_option.unit === 'pa') {
                                 <mat-checkbox [(ngModel)]="new_distance_option.round_trip" i18n>Aller / Retour</mat-checkbox>
                             }
-                            <button mat-button (click)="addDistanceToList(); addZone.closed.next('click')" i18n>Ajouter</button>
+                            <button mat-button type="button" (click)="addDistanceToList(); addZone.closed.next('click')" i18n>Ajouter</button>
                         </div>
                     </mat-menu>
                     <mat-list>
                         @for (option of options.distances; track option) {
                             <mat-list-item>
-                                <button mat-icon-button matListItemIcon (click)="removeDistanceFromList(option)">
+                                <button mat-icon-button type="button" matListItemIcon (click)="removeDistanceFromList(option)">
                                     <mat-icon>delete</mat-icon>
                                 </button>
                                 <div matListItemTitle>{{ option.value }}&nbsp;{{ option.unit }}</div>

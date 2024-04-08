@@ -1,13 +1,13 @@
 <mat-card-header class="mho-wishlist-header">
     <mat-card-title>
         <ng-container i18n>Liste de courses</ng-container>
-        <button mat-icon-button matTooltip="Copier au format forum" i18n-matTooltip (click)="shareWishlistForum()">
+        <button mat-icon-button type="button" matTooltip="Copier au format forum" i18n-matTooltip (click)="shareWishlistForum()">
             <mat-icon>share</mat-icon>
         </button>
     </mat-card-title>
 
     <div class="actions">
-        <button mat-icon-button [matMenuTriggerFor]="shareMenu" matTooltip="Import / Export" i18n-matTooltip>
+        <button mat-icon-button type="button" [matMenuTriggerFor]="shareMenu" matTooltip="Import / Export" i18n-matTooltip>
             <mat-icon>import_export</mat-icon>
         </button>
         <mat-slide-toggle [(ngModel)]="edition_mode" (ngModelChange)="changeEditionMode()" i18n>Mode édition</mat-slide-toggle>
@@ -193,7 +193,7 @@
                                     <mho-last-update [lastUpdateInfo]="wishlist_info.update_info"
                                                      [thresholds]="[24*60, 24*2*60, 24*3*60, 24*4]"></mho-last-update>
                                     @if (edition_mode) {
-                                        <button mat-button [color]="'accent'" (click)="updateWishlist()" i18n>Enregistrer</button>
+                                        <button mat-button type="button" [color]="'accent'" (click)="updateWishlist()" i18n>Enregistrer</button>
                                     }
                                 </div>
                             </div>
@@ -204,7 +204,7 @@
             @if (edition_mode) {
                 <mat-tab (click)="$event.preventDefault(); $event.stopPropagation()" labelClass="add-tab">
                     <ng-template mat-tab-label>
-                        <button mat-icon-button (click)="$event.preventDefault(); $event.stopPropagation()" [matMenuTriggerFor]="addItem">
+                        <button mat-icon-button type="button" (click)="$event.preventDefault(); $event.stopPropagation()" [matMenuTriggerFor]="addItem">
                             <mat-icon>add</mat-icon>
                         </button>
                     </ng-template>

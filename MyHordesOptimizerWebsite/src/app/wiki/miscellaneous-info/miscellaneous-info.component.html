@@ -10,7 +10,7 @@
                         {{ misc_card.header }}
                     </mat-card-title>
                     @if (misc_card.header_action) {
-                        <button mat-icon-button (click)="misc_card.header_action.action()">
+                        <button mat-icon-button type="button" (click)="misc_card.header_action.action()">
                             <mat-icon>{{ misc_card.header_action.icon }}</mat-icon>
                         </button>
                     }

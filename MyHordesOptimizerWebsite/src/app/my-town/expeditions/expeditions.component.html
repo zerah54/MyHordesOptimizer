@@ -1,7 +1,7 @@
 <mat-card-header class="mho-expeditions-header">
     <mat-card-title>
         <ng-container i18n>Expéditions</ng-container>
-        <button mat-icon-button matTooltip="Copier au format forum" i18n-matTooltip>
+        <button mat-icon-button type="button" matTooltip="Copier au format forum" i18n-matTooltip>
             <mat-icon>share</mat-icon>
         </button>
     </mat-card-title>
@@ -27,19 +27,24 @@
                             @if (edition_mode) {
                                 <div class="actions">
                                     <div class="left-actions">
-                                        <button mat-button (click)="addNewExpedition()" i18n>Créer une expédition</button>
+                                        <button mat-button type="button" (click)="addNewExpedition()" i18n>Créer une expédition</button>
                                     </div>
                                     <div class="right-actions">
                                         @if (day_index + 1 >= this.current_day) {
-                                            <button mat-icon-button [matMenuTriggerFor]="manageExpeditions">
+                                            <button mat-icon-button type="button" [matMenuTriggerFor]="manageExpeditions">
                                                 <mat-icon>more_vert</mat-icon>
                                             </button>
                                             <mat-menu #manageExpeditions="matMenu">
-                                                <div mat-menu-item
-                                                     (click)="+dayInput.value > 1 && +dayInput.value < day ? importExpeditions(+dayInput.value) : undefined">
-                                                    <ng-container i18n>Importer le jour</ng-container>
-                                                    <mat-form-field [appearance]="'outline'">
-                                                        <input matInput #dayInput type="number" [min]="1" [max]="day - 1" [value]="day - 1">
+                                                <div mat-menu-item (click)="$event.preventDefault(); $event.stopPropagation()">
+                                                    <mat-form-field [appearance]="'outline'" class="short-bottom" style="margin-top: 0.5em">
+                                                        <mat-label i18n>Importer le jour</mat-label>
+                                                        <input matInput #dayInput type="number" [min]="1" [max]="day - 1" [value]="selected_tab_index">
+                                                        <div matSuffix>
+                                                            <button mat-icon-button type="button"
+                                                                    (click)="+dayInput.value > 1 && +dayInput.value < day ? importExpeditions(+dayInput.value) : undefined">
+                                                                <mat-icon>save</mat-icon>
+                                                            </button>
+                                                        </div>
                                                     </mat-form-field>
                                                 </div>
                                             </mat-menu>
@@ -73,7 +78,7 @@
                                                                           (ngModelChange)="changeExpeditionState(expedition, $event);">
                                                             <ng-container i18n>Expédition prête</ng-container>
                                                         </mat-slide-toggle>
-                                                        <button mat-icon-button matTooltip="Supprimer l'expédition" i18n-matTooltip
+                                                        <button mat-icon-button type="button" matTooltip="Supprimer l'expédition" i18n-matTooltip
                                                                 (click)="removeExpedition(expedition, expedition_index)">
                                                             <mat-icon>delete</mat-icon>
                                                         </button>
@@ -101,30 +106,31 @@
                                                             <thead>
                                                             <tr class="table-header">
                                                                 @if (edition_mode) {
-                                                                    <button mat-icon-button matTooltip="Supprimer la partie" i18n-matTooltip
+                                                                    <button mat-icon-button type="button" matTooltip="Supprimer la partie" i18n-matTooltip
                                                                             (click)="removeExpeditionPart(expedition_part, expedition_part_index, expedition)">
                                                                         <mat-icon>delete</mat-icon>
                                                                     </button>
                                                                 }
                                                                 <td class="job" i18n>Métier</td>
-                                                                <td class="pseudo" i18n>
+                                                                <td class="pseudo">
                                                                     <div>
-                                                                        <div>Citoyen</div>
+                                                                        <div i18n>Citoyen</div>
                                                                         @if (edition_mode) {
                                                                             <div>
-                                                                                <button mat-icon-button (click)="addNewMemberToPart(expedition_part)">
+                                                                                <button mat-icon-button type="button"
+                                                                                        (click)="addNewMemberToPart(expedition_part)">
                                                                                     <mat-icon>add</mat-icon>
                                                                                 </button>
                                                                             </div>
                                                                         }
                                                                     </div>
                                                                 </td>
-                                                                <td class="is-thirsty" i18n>
+                                                                <td class="is-thirsty">
                                                                     <div class="flex">
                                                                         <img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst1.gif'" [height]="16" [width]="16">
                                                                     </div>
                                                                 </td>
-                                                                <td class="pdc" i18n>
+                                                                <td class="pdc">
                                                                     <div class="flex">
                                                                         <img [ngSrc]="HORDES_IMG_REPO + 'professions/shield.gif'" [height]="16" [width]="16">
                                                                         {{ expedition_part | totalPdc }}/{{ expedition.min_pdc || 0 }}
@@ -142,7 +148,7 @@
                                                                     <tr class="citizen">
                                                                         @if (edition_mode) {
                                                                             <td class="action">
-                                                                                <button mat-icon-button
+                                                                                <button mat-icon-button type="button"
                                                                                         (click)="removeCitizenFromPart(citizen, expedition_part, citizen_index)">
                                                                                     <mat-icon>delete</mat-icon>
                                                                                 </button>
@@ -223,7 +229,7 @@
                                                                             @if (edition_mode) {
                                                                                 <ng-container
                                                                                     *ngTemplateOutlet="displayOrder; context: {$implicit: citizen.orders}"></ng-container>
-                                                                                <button mat-raised-button
+                                                                                <button mat-raised-button type="button"
                                                                                         (click)="openExpeditionOrders(citizen.orders, citizen)">
                                                                                     <ng-container i18n>Éditer</ng-container>
                                                                                 </button>
@@ -254,7 +260,7 @@
                                                             @if (edition_mode) {
                                                                 <ng-container
                                                                     *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_part.orders}"></ng-container>
-                                                                <button mat-raised-button
+                                                                <button mat-raised-button type="button"
                                                                         (click)="openExpeditionOrders(expedition_part.orders, expedition_part)">
                                                                     <ng-container i18n>Éditer</ng-container>
                                                                 </button>
@@ -284,11 +290,11 @@
                                             </div>
                                             @if (edition_mode) {
                                                 <div class="footer">
-                                                    <button mat-button (click)="addNewExpeditionPart(expedition)">
+                                                    <button mat-button type="button" (click)="addNewExpeditionPart(expedition)">
                                                         <ng-container i18n>Ajouter une partie à l'expédition</ng-container>
                                                     </button>
                                                     @if (expedition.parts.length > 1) {
-                                                        <button mat-button (click)="addNewMemberToExpedition(expedition)">
+                                                        <button mat-button type="button" (click)="addNewMemberToExpedition(expedition)">
                                                             <ng-container i18n>Ajouter un membre à l'expédition</ng-container>
                                                         </button>
                                                     }

@@ -22,7 +22,7 @@
             </div>
         }
         @if (site_language) {
-            <button mat-button [matMenuTriggerFor]="languageMenu">
+            <button mat-button type="button" [matMenuTriggerFor]="languageMenu">
                 <mat-icon>language</mat-icon>
                 {{ site_language.label }}
                 <mat-icon>arrow_drop_down</mat-icon>
@@ -36,7 +36,7 @@
                 }
             </mat-menu>
         }
-        <button mat-button [matMenuTriggerFor]="themeMenu">
+        <button mat-button type="button" [matMenuTriggerFor]="themeMenu">
             <mat-icon>palette</mat-icon>
             {{ selected_theme?.label }}
             <mat-icon>arrow_drop_down</mat-icon>

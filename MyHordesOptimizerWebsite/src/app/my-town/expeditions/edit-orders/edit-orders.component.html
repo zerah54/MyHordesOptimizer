@@ -3,7 +3,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <h2 i18n>Consignes</h2>
             <div class="actions">
-                <button mat-button (click)="addOrder()">
+                <button mat-button type="button" (click)="addOrder()">
                     <mat-icon>add</mat-icon>
                     <ng-container i18n>Nouvelle consigne</ng-container>
                 </button>
@@ -25,7 +25,7 @@
                                 </mat-button-toggle>
                             </mat-button-toggle-group>
                             <div class="spacer"></div>
-                            <button mat-icon-button (click)="deleteOrder(order_index)">
+                            <button mat-icon-button type="button" (click)="deleteOrder(order_index)">
                                 <mat-icon class="delete">delete</mat-icon>
                             </button>
                         </div>
@@ -45,6 +45,6 @@
     </mat-dialog-content>
 </div>
 <div mat-dialog-actions [align]="'end'">
-    <button mat-button [color]="'accent'" [mat-dialog-close]="data.orders" i18n>Annuler</button>
-    <button mat-raised-button [color]="'accent'" [mat-dialog-close]="orders" i18n>Enregistrer</button>
+    <button mat-button type="reset" [color]="'accent'" [mat-dialog-close]="data.orders" i18n>Annuler</button>
+    <button mat-raised-button type="button" [color]="'accent'" [mat-dialog-close]="orders" i18n>Enregistrer</button>
 </div>

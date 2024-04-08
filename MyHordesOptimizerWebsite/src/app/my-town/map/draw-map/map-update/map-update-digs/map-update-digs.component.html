@@ -7,7 +7,7 @@
             <thead>
             <th>
                 @if ((allCitizens | notInListCitizenDig:digs).length > 0) {
-                    <button mat-button [matMenuTriggerFor]="addCitizenMenu">
+                    <button mat-button type="button" [matMenuTriggerFor]="addCitizenMenu">
                         <ng-container i18n>Ajouter un citoyen</ng-container>
                     </button>
                 }
@@ -33,7 +33,7 @@
                             </mat-form-field>
                         </td>
                         <td class="remove">
-                            <button mat-icon-button (click)="removeCitizen(displayed_dig.digger_id)">
+                            <button mat-icon-button type="button" (click)="removeCitizen(displayed_dig.digger_id)">
                                 <mat-icon>close</mat-icon>
                             </button>
                         </td>
