@@ -390,8 +390,6 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 lastUpdateDto = Mapper.Map<LastUpdateInfoDto>(lastUpdate);
             }
-            Logger.LogDebug($"Map : {sw.ElapsedMilliseconds} ms");
-            sw.Stop();
             return new BankLastUpdateDto()
             {
                 Bank = dtos,
