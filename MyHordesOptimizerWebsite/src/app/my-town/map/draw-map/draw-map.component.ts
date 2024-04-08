@@ -29,7 +29,7 @@ export class DrawMapComponent {
     @Input() set map(map: Town) {
         if (map) {
             this.complete_map = map;
-            this.x_row = Array.from({ length: map?.map_width }, (_: unknown, i: number) => i - +map.town_x);
+            this.x_row = Array.from({length: map?.map_width}, (_: unknown, i: number) => i - +map.town_x);
 
             const rows: Cell[][] = groupBy(map?.cells || [], (cell: Cell) => cell.y);
 
@@ -60,7 +60,4 @@ export class DrawMapComponent {
     public hovered_cell: Cell | undefined;
     public drawed_map: Cell[][] = [];
 
-    public trackByCellId(_index: number, column: Cell): number {
-        return column && column.cell_id;
-    }
 }

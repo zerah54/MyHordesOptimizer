@@ -13,11 +13,10 @@
     }
     <div class="editable-container">
         <div class="list">
-            <ng-container *ngFor="let item of currentList">
-                <img [ngSrc]="HORDES_IMG_REPO + item.img"
-                     [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)"
+            @for (item of currentList; track item.id) {
+                <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)"
                      style="cursor: pointer" width="16" height="16">
-            </ng-container>
+            }
         </div>
         @if (!label && !readonly) {
             <div class="add-remove">
@@ -50,12 +49,12 @@
         </mat-form-field>
     </div>
     <div class="items">
-        <ng-container *ngFor="let item of completeList">
+        @for (item of completeList; track item) {
             @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
                 <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id)"
                      [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
             }
-        </ng-container>
+        }
     </div>
 </mat-menu>
 <mat-menu #menuRemove="matMenu" class="menu-remove">
@@ -66,12 +65,12 @@
         </mat-form-field>
     </div>
     <div class="items">
-        <ng-container *ngFor="let item of currentList">
+        @for (item of currentList; track item) {
             @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
                 <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="remove.next(item.id)"
                     [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
             }
-        </ng-container>
+        }
     </div>
     <div mat-menu-item class="empty-bag" (click)="empty.next()">
         <img [ngSrc]="HORDES_IMG_REPO + 'icons/b_close.png'" style="margin-right: 0.5em" width="16" height="16">

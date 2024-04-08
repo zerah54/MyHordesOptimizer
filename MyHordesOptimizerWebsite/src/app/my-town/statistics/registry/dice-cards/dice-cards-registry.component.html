@@ -27,15 +27,15 @@
     <div class="plays-dices-cards">
         <div class="citizen-plays">
             <h4 i18n>Ont joué</h4>
-            <div *ngFor="let citizen of entries_by_type | citizenUseDiceOrCards:completeCitizenList:displayPseudo">
-                {{ citizen }}
-            </div>
+            @for (citizen of entries_by_type | citizenUseDiceOrCards:completeCitizenList:displayPseudo; track citizen) {
+                <div>{{ citizen }}</div>
+            }
         </div>
         <div class="citizen-doesnt-play">
             <h4 i18n>N'ont pas joué</h4>
-            <div *ngFor="let citizen of entries_by_type | citizenUseDiceOrCards:completeCitizenList:displayPseudo: true">
-                {{ citizen }}
-            </div>
+            @for (citizen of entries_by_type | citizenUseDiceOrCards:completeCitizenList:displayPseudo:true; track citizen) {
+                <div>{{ citizen }}</div>
+            }
         </div>
     </div>
 </ng-template>

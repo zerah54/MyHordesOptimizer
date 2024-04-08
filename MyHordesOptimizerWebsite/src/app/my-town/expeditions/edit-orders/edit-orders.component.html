@@ -1,32 +1,50 @@
 <div class="mho-edit-order">
     <div mat-dialog-title>
-        <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <h2 i18n>Consignes</h2>
+            <div class="actions">
+                <button mat-button (click)="addOrder()">
+                    <mat-icon>add</mat-icon>
+                    <ng-container i18n>Nouvelle consigne</ng-container>
+                </button>
+            </div>
         </div>
     </div>
     <mat-dialog-content>
-        <div style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 1em; justify-content: center;">
-            <button mat-button (click)="addTextOrder()" i18n>Ajouter une consigne texte</button>
-            <button mat-button (click)="addCheckableOrder()" i18n>Ajouter une consigne cochable</button>
-        </div>
-        <div style="display: flex; flex-direction: row" *ngFor="let order of orders">
-            <div class="row-header">
-                @switch (order.type) {
-                    @case ('text') {
-                        <mat-icon>edit_note</mat-icon>
-                    }
-                    @case ('checkbox') {
-                        <mat-icon>check_box</mat-icon>
-                    }
+        <div class="rows" cdkDropList (cdkDropListDropped)="drop($event)">
+            @for (order of orders; track order; let order_index = $index) {
+                <div class="row" cdkDrag cdkDragBoundary=".rows" cdkDragLockAxis="y">
+                    <div class="row-main">
+                        <div class="row-header">
+                            <mat-button-toggle-group [(value)]="order.type" hideSingleSelectionIndicator>
+                                <mat-button-toggle value="text">
+                                    <mat-icon>edit_note</mat-icon>
+                                </mat-button-toggle>
+                                <mat-button-toggle value="checkbox">
+                                    <mat-icon>check_box</mat-icon>
+                                </mat-button-toggle>
+                            </mat-button-toggle-group>
+                            <div class="spacer"></div>
+                            <button mat-icon-button (click)="deleteOrder(order_index)">
+                                <mat-icon class="delete">delete</mat-icon>
+                            </button>
+                        </div>
+                        <div class="row-content">
+                            <mho-editor [(content)]="order.text" [showToolbarOnFocus]="true"></mho-editor>
+                        </div>
+                    </div>
+                    <div class="row-reorder" cdkDragHandle>
+                        <mat-icon>drag_indicator</mat-icon>
+                    </div>
+                </div>
+                @if (order_index < orders.length - 1) {
+                    <mat-divider></mat-divider>
                 }
-            </div>
-            <div class="row-content">
-                <mho-editor [(content)]="order.text"></mho-editor>
-            </div>
+            }
         </div>
     </mat-dialog-content>
 </div>
 <div mat-dialog-actions [align]="'end'">
-    <button mat-button [color]="'accent'" [mat-dialog-close]="data.orders" i18n>Fermer</button>
+    <button mat-button [color]="'accent'" [mat-dialog-close]="data.orders" i18n>Annuler</button>
     <button mat-raised-button [color]="'accent'" [mat-dialog-close]="orders" i18n>Enregistrer</button>
 </div>

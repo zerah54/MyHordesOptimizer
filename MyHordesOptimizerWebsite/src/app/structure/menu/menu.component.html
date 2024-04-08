@@ -1,10 +1,9 @@
 <div class="app-menu">
     <mat-list>
-        <ng-container *ngFor="let route of routes">
+        @for (route of routes; track route.path) {
             <ng-container *ngTemplateOutlet="routeTemplate; context: {$implicit: route}"></ng-container>
             <mat-divider></mat-divider>
-        </ng-container>
-
+        }
     </mat-list>
     <div class="actions">
         @if (selected_theme?.class === 'halloween') {
@@ -29,12 +28,12 @@
                 <mat-icon>arrow_drop_down</mat-icon>
             </button>
             <mat-menu #languageMenu="matMenu">
-                <ng-container *ngFor="let language of language_list">
+                @for (language of language_list; track language.code) {
                     <div mat-menu-item [disabled]="language.code === site_language.code"
                          [class.warn-color]="language.code === site_language.code" (click)="changeLanguage(language)">
                         {{ language.label }}
                     </div>
-                </ng-container>
+                }
             </mat-menu>
         }
         <button mat-button [matMenuTriggerFor]="themeMenu">
@@ -43,12 +42,12 @@
             <mat-icon>arrow_drop_down</mat-icon>
         </button>
         <mat-menu #themeMenu="matMenu">
-            <ng-container *ngFor="let theme of themes">
+            @for (theme of themes; track theme.class) {
                 <div mat-menu-item [disabled]="theme.class === selected_theme?.class"
                      [class.warn-color]="theme.class === selected_theme?.class" (click)="changeTheme(theme)">
                     {{ theme.label }}
                 </div>
-            </ng-container>
+            }
         </mat-menu>
     </div>
 </div>
@@ -56,9 +55,9 @@
 <ng-template #routeTemplate let-route>
     <ng-container *ngTemplateOutlet="routeLink; context: {$implicit: route}"></ng-container>
     @if (route.children && route.children.length > 0) {
-        <ng-container *ngFor="let sub_route of route.children">
+        @for (sub_route of route.children; track sub_route) {
             <ng-container *ngTemplateOutlet="routeTemplate; context: {$implicit: sub_route}"></ng-container>
-        </ng-container>
+        }
     }
 </ng-template>
 

@@ -11,7 +11,9 @@ import { MatInput, MatInputModule } from '@angular/material/input';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { Subject } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
+import { DebugLogPipe } from '../../pipes/debug-log.pipe';
 import { normalizeString } from '../../utilities/string.utils';
+import { BindPipe, BindValuePipe } from './bind.pipe';
 import { IconPipe } from './icon.pipe';
 import { LabelPipe } from './label.pipe';
 
@@ -28,10 +30,8 @@ import { LabelPipe } from './label.pipe';
         }
     ],
     standalone: true,
-    imports: [MatSelectModule, CommonModule, MatChipsModule, MatIconModule, NgTemplateOutlet, MatFormFieldModule, MatInputModule, MatDividerModule, MatOptionModule, NgOptimizedImage, LabelPipe, IconPipe]
+    imports: [MatSelectModule, CommonModule, MatChipsModule, MatIconModule, NgTemplateOutlet, MatFormFieldModule, MatInputModule, MatDividerModule, MatOptionModule, NgOptimizedImage, LabelPipe, IconPipe, BindPipe, BindValuePipe, DebugLogPipe]
 })
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 export class SelectComponent<T> implements ControlValueAccessor, Validator, MatFormFieldControl<T | string | T[] | string[] | undefined>, OnDestroy {
 
     private static nextId: number = 0;
@@ -45,6 +45,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     @Input() multiple: boolean = false;
     @Input() bindLabel!: string;
+    @Input() bindValue!: string;
     @Input() noLabel: boolean = false;
     @Input() bindIcon!: string;
     @Input() moreInfo?: (element: string | T) => string;
@@ -53,6 +54,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     @Input() form_control: AbstractControl = new UntypedFormControl();
     @Input() clearable: boolean = false;
     @Input() searchable: boolean = true;
+    /** Doit-on afficher sous forme de chips les différentes valeurs ? Fonctionne uniquement si "multiple" */
+    @Input() chips: boolean = true;
 
     @Input() set options(options: (T | string)[]) {
         this.displayed_options = [...options];
@@ -105,6 +108,8 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     public controlType?: string | undefined;
     public autofilled?: boolean | undefined;
 
+    public focused: boolean = false;
+
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
     protected complete_options: (T | string)[] = [];
@@ -118,8 +123,6 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     private _disabled: boolean = false;
 
     private label_pipe: LabelPipe<T> = new LabelPipe();
-
-    private focused: boolean = false;
 
     /** propagate changes into the custom form control */
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -138,7 +141,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     }
 
     // event fired when input value is changed . later propagated up to the form control using the custom value accessor interface
-    public onChange(value: T | string | undefined): void {
+    public onChange(value: T | string | undefined | T[] | string[]): void {
         //set changed value
         this.innerValue = value;
         // propagate value into form control using control value accessor interface
@@ -202,7 +205,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     }
 
     //From ControlValueAccessor interface
-    public writeValue(value: T | string | undefined): void {
+    public writeValue(value: T | string | undefined | T[] | string[]): void {
         // console.log('value', value)
         this.innerValue = value;
         this.onChange(value);
@@ -255,5 +258,6 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     ngOnDestroy(): void {
         this.stateChanges.complete();
     }
+
 }
 

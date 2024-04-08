@@ -47,9 +47,11 @@
 
                     @if (item.recipes.length > 0) {
                         <mat-divider></mat-divider>
-                        <div *ngFor="let recipe of item.recipes">
-                            <mho-recipe [recipe]="recipe"></mho-recipe>
-                        </div>
+                        @for (recipe of item.recipes; track recipe.name) {
+                            <div>
+                                <mho-recipe [recipe]="recipe"></mho-recipe>
+                            </div>
+                        }
                     }
 
                     @if (item.deco || item.guard || item.is_heaver) {
@@ -76,24 +78,24 @@
 
                     @if (item.properties && item.properties.length > 0) {
                         <mat-divider></mat-divider>
-                        <div *ngFor="let property of item.properties">
-                            @if (property) {
-                                @if (property.value.img && property.value.img !== '') {
-                                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">{{ property.value.label }}
+                        @for (property of item.properties; track property.key) {
+                            <div>
+                                @if (property?.value?.img && property?.value?.img !== '') {
+                                    <img [ngSrc]="HORDES_IMG_REPO + property?.value?.img" width="16" height="16">{{ property?.value?.label }}
                                 }
-                            }
-                        </div>
+                            </div>
+                        }
                     }
 
                     @if (item.actions && item.actions.length > 0) {
                         <mat-divider></mat-divider>
-                        <div *ngFor="let action of item.actions">
-                            @if (action) {
-                                @if (action.value.img && action.value.img !== '') {
-                                    <img [ngSrc]="HORDES_IMG_REPO + action.value.img" width="16" height="16">{{ action.value.label }}
+                        @for (action of item.actions; track action.key) {
+                            <div>
+                                @if (action?.value?.img && action?.value?.img !== '') {
+                                    <img [ngSrc]="HORDES_IMG_REPO + action?.value?.img" width="16" height="16">{{ action?.value?.label }}
                                 }
-                            }
-                        </div>
+                            </div>
+                        }
                     }
                 </div>
             }

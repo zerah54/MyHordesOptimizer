@@ -9,39 +9,45 @@
                     }
                 </th>
                 <th i18n>Sac</th>
-                <th *ngFor="let action of heroics">
-                    <img [ngSrc]="HORDES_IMG_REPO + action.value.img" [title]="action.value.label" width="16" height="16">
-                </th>
+                @for (action of heroics; track action.key) {
+                    <th><img [ngSrc]="HORDES_IMG_REPO + action.value.img" [title]="action.value.label" width="16" height="16"></th>
+                }
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let citizen of citizens">
-                <th class="name">
-                    <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{ citizen.name }}
-                </th>
-                <td class="bag">
-                    <img *ngFor="let item of citizen.bag?.items" [ngSrc]="HORDES_IMG_REPO + item.img"
-                         [class.broken]="item.is_broken" [title]="item.label[locale]" width="16" height="16">
-                </td>
-                <td *ngFor="let action of heroics">
-                    @if (citizen.heroic_actions | remainingHeroicAction:action; as value_left) {
-                        @if (action.value.max_lvl > 1) {
-                            {{ value_left }}
-                        } @else {
-                            <mat-icon>check</mat-icon>
+                @for (citizen of citizens; track citizen.id) {
+                    <tr>
+                        <th class="name">
+                            <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{ citizen.name }}
+                        </th>
+                        <td class="bag">
+                            @for (item of citizen.bag?.items; track item) {
+                                <img [ngSrc]="HORDES_IMG_REPO + item.img" [class.broken]="item.is_broken" [title]="item.label[locale]" width="16" height="16">
+                            }
+                        </td>
+                        @for (action of heroics; track action.key) {
+                            <td>
+                                @if (citizen.heroic_actions | remainingHeroicAction:action; as value_left) {
+                                    @if (action.value.max_lvl > 1) {
+                                        {{ value_left }}
+                                    } @else {
+                                        <mat-icon>check</mat-icon>
+                                    }
+                                }
+                            </td>
                         }
-                    }
-                </td>
-            </tr>
+                    </tr>
+                }
             </tbody>
         </table>
 
         <mat-menu #addCitizenMenu="matMenu">
             <mat-list class="mho-add-citizen-list" style="max-height: 300px">
-                <mat-list-item *ngFor="let citizen of (allCitizens | notInListCitizen:citizens)"
-                               (click)="addCitizen(citizen)">
-                    <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{ citizen.name }}
-                </mat-list-item>
+                @for (citizen of (allCitizens | notInListCitizen:citizens); track citizen.id) {
+                    <mat-list-item (click)="addCitizen(citizen)">
+                        <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{ citizen.name }}
+                    </mat-list-item>
+                }
             </mat-list>
         </mat-menu>
     </div>

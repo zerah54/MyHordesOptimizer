@@ -1,10 +1,11 @@
-import { NgForOf } from '@angular/common';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, HostBinding, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { EditorComponent } from '../../../shared/elements/editor/editor.component';
 
@@ -14,37 +15,49 @@ import { EditorComponent } from '../../../shared/elements/editor/editor.componen
     styleUrls: ['./edit-orders.component.scss'],
     standalone: true,
     imports: [
-        NgForOf,
         MatDialogModule,
         EditorComponent,
         MatButtonModule,
         MatCheckboxModule,
-        MatIconModule
+        MatIconModule,
+        DragDropModule,
+        MatButtonToggleModule,
+        MatDividerModule
     ]
 })
 export class EditOrdersComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    public orders!: ExpeditionOrder[];
+    public orders: ExpeditionOrder[] = [];
 
     public constructor(@Inject(MAT_DIALOG_DATA) public data: EditOrdersData) {
-        this.orders = this.data?.orders ? [...this.data.orders] : [];
+        this.orders = this.data?.orders ? [...this.data.orders.map((order: ExpeditionOrder) => new ExpeditionOrder(order.modelToDto()))] : [];
     }
 
-    public addTextOrder(): void {
-        const order: ExpeditionOrder = new ExpeditionOrder();
-        order.type = 'text';
-        this.orders.push(order);
-    }
-
-    public addCheckableOrder(): void {
+    public addOrder(): void {
         const order: ExpeditionOrder = new ExpeditionOrder();
         order.type = 'checkbox';
         this.orders.push(order);
+    }
+
+    public drop(event: CdkDragDrop<string[]>): void {
+        moveItemInArray(this.orders, event.previousIndex, event.currentIndex);
+    }
+
+    public toggleMode(order: ExpeditionOrder): void {
+        if (order.type === 'text') {
+            order.type = 'checkbox';
+        } else {
+            order.type = 'text';
+        }
+    }
+
+    public deleteOrder(index: number): void {
+        this.orders.splice(index, 1);
     }
 }
 
 export interface EditOrdersData {
     orders: ExpeditionOrder[];
-    citizen?: Citizen;
+    citizen_id?: number;
 }

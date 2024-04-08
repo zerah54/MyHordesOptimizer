@@ -77,21 +77,23 @@
                         </div>
                     </mat-menu>
                     <mat-list>
-                        <mat-list-item *ngFor="let option of options.distances">
-                            <button mat-icon-button matListItemIcon (click)="removeDistanceFromList(option)">
-                                <mat-icon>delete</mat-icon>
-                            </button>
-                            <div matListItemTitle>{{ option.value }}&nbsp;{{ option.unit }}</div>
-                            @if (option.unit === 'pa') {
-                                <div matListItemLine>
-                                    @if (option.round_trip) {
-                                        <ng-container i18n>Aller / Retour</ng-container>
-                                    } @else {
-                                        <ng-container i18n>Aller simple</ng-container>
-                                    }
-                                </div>
-                            }
-                        </mat-list-item>
+                        @for (option of options.distances; track option) {
+                            <mat-list-item>
+                                <button mat-icon-button matListItemIcon (click)="removeDistanceFromList(option)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                                <div matListItemTitle>{{ option.value }}&nbsp;{{ option.unit }}</div>
+                                @if (option.unit === 'pa') {
+                                    <div matListItemLine>
+                                        @if (option.round_trip) {
+                                            <ng-container i18n>Aller / Retour</ng-container>
+                                        } @else {
+                                            <ng-container i18n>Aller simple</ng-container>
+                                        }
+                                    </div>
+                                }
+                            </mat-list-item>
+                        }
                     </mat-list>
                 </div>
             </div>

@@ -3,6 +3,7 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, HostListener, inject, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -11,11 +12,13 @@ import { MatToolbar, MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Title } from '@angular/platform-browser';
 import { Subject, takeUntil } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { Me } from '../../_abstract_model/types/me.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
 import { getExternalAppId, getTown, getUser, setExternalAppId } from '../../shared/utilities/localstorage.util';
 
 @Component({
@@ -23,7 +26,7 @@ import { getExternalAppId, getTown, getUser, setExternalAppId } from '../../shar
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
     standalone: true,
-    imports: [MatToolbarModule, MatButtonModule, MatIconModule, NgOptimizedImage, CommonModule, MatTooltipModule, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule]
+    imports: [MatToolbarModule, MatButtonModule, MatIconModule, NgOptimizedImage, CommonModule, MatTooltipModule, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule, MatDividerModule, DebugLogPipe]
 })
 export class HeaderComponent {
     @HostBinding('style.display') display: string = 'contents';
@@ -41,6 +44,7 @@ export class HeaderComponent {
     public saved_external_app_id: string | null = getExternalAppId();
     /** Les informations de l'utilisateur */
     public me: Me = getUser();
+    public readonly is_dev: boolean = !environment.production;
 
     public is_in_town: boolean = !!getTown()?.town_id;
 

@@ -19,21 +19,23 @@
                     <th i18n>Min</th>
                     <th i18n>Max</th>
                 </tr>
-                <tr *ngFor="let percent of tdg_values">
-                    <th>{{ percent }}%</th>
-                    <td>
-                        <mat-form-field appearance="outline" class="no-bottom">
-                            <input matInput type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].min"
-                                   (paste)="pasteFromMH($event, estimations.estim['_' + percent], true)">
-                        </mat-form-field>
-                    </td>
-                    <td>
-                        <mat-form-field appearance="outline" class="no-bottom">
-                            <input matInput type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].max"
-                                   (paste)="pasteFromMH($event, estimations.estim['_' + percent], false)">
-                        </mat-form-field>
-                    </td>
-                </tr>
+                @for (percent of tdg_values; track percent) {
+                    <tr>
+                        <th>{{ percent }}%</th>
+                        <td>
+                            <mat-form-field appearance="outline" class="no-bottom">
+                                <input matInput type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].min"
+                                       (paste)="pasteFromMH($event, estimations.estim['_' + percent], true)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field appearance="outline" class="no-bottom">
+                                <input matInput type="text" [min]="0" [(ngModel)]="estimations.estim['_' + percent].max"
+                                       (paste)="pasteFromMH($event, estimations.estim['_' + percent], false)">
+                            </mat-form-field>
+                        </td>
+                    </tr>
+                }
             </table>
             <table>
                 <caption i18n>Attaque du lendemain (J{{ selected_day + 1 }})</caption>
@@ -42,21 +44,23 @@
                     <th i18n>Min</th>
                     <th i18n>Max</th>
                 </tr>
-                <tr *ngFor="let percent of planif_values">
-                    <th>{{ percent }}%</th>
-                    <td>
-                        <mat-form-field appearance="outline" class="no-bottom">
-                            <input matInput type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].min"
-                                   (paste)="pasteFromMH($event, estimations.planif['_' + percent], true)">
-                        </mat-form-field>
-                    </td>
-                    <td>
-                        <mat-form-field appearance="outline" class="no-bottom">
-                            <input matInput type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].max"
-                                   (paste)="pasteFromMH($event, estimations.planif['_' + percent], false)">
-                        </mat-form-field>
-                    </td>
-                </tr>
+                @for (percent of planif_values; track percent) {
+                    <tr>
+                        <th>{{ percent }}%</th>
+                        <td>
+                            <mat-form-field appearance="outline" class="no-bottom">
+                                <input matInput type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].min"
+                                       (paste)="pasteFromMH($event, estimations.planif['_' + percent], true)">
+                            </mat-form-field>
+                        </td>
+                        <td>
+                            <mat-form-field appearance="outline" class="no-bottom">
+                                <input matInput type="text" [min]="0" [(ngModel)]="estimations.planif['_' + percent].max"
+                                       (paste)="pasteFromMH($event, estimations.planif['_' + percent], false)">
+                            </mat-form-field>
+                        </td>
+                    </tr>
+                }
             </table>
             <!--        <div class="canvas">-->
             <!--            <canvas #todayCanvas></canvas>-->

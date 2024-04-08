@@ -12,8 +12,6 @@ import * as moment from 'moment';
 import { TableVirtualScrollDataSource, TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { HeroicActionEnum } from '../../../_abstract_model/enum/heroic-action.enum';
-import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
@@ -72,15 +70,15 @@ export class CitizensListComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly citizen_list_columns: StandardColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
-        { id: 'more_status', header: $localize`États`, class: '' },
-        { id: 'heroic_actions', header: $localize`Actions héroïques`, class: '' },
-        { id: 'home', header: $localize`Améliorations`, class: '' },
+        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
+        {id: 'more_status', header: $localize`États`, class: ''},
+        {id: 'heroic_actions', header: $localize`Actions héroïques`, class: ''},
+        {id: 'home', header: $localize`Améliorations`, class: ''},
         // { id: 'chest', header: $localize`Coffre` },
     ];
     /** La liste des colonnes pour les citoyens morts */
     public readonly dead_citizen_list_columns: StandardColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
+        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
     ];
 
     public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
@@ -309,15 +307,6 @@ export class CitizensListComponent implements OnInit {
                 });
         }
     }
-
-    public trackByColumnId(_index: number, column: StandardColumn): string {
-        return column.id;
-    }
-
-    public trackByKey(_index: number, enum_item: (HeroicActionEnum | HomeEnum)): string {
-        return enum_item.key;
-    }
-
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: Citizen, filter: string): boolean {

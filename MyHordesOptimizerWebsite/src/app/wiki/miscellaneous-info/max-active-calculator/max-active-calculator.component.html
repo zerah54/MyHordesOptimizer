@@ -15,7 +15,7 @@
     </div>
     <div class="table-container">
         <table mat-table [dataSource]="max_active_by_day.table">
-            <ng-container *ngFor="let column of max_active_by_day.columns">
+            @for (column of max_active_by_day.columns; track column.id) {
                 <ng-container [matColumnDef]="column.id" [sticky]="column.id === 'header'">
                     <th mat-header-cell *matHeaderCellDef [class.today]="my_town ? +my_town.day === +column.id : false">
                         {{ column.header }}
@@ -24,8 +24,7 @@
                         {{ row[column.id] }}
                     </td>
                 </ng-container>
-            </ng-container>
-
+            }
             <tr mat-header-row *matHeaderRowDef="max_active_by_day.columns | ids; sticky: true"></tr>
             <tr mat-row *matRowDef="let row; columns: max_active_by_day.columns | ids;"></tr>
         </table>

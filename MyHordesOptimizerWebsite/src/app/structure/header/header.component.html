@@ -39,6 +39,16 @@
                 </mat-form-field>
             </div>
         } @else {
+            @if (me && me.town_details.town_id && is_dev) {
+                <div class="me-in-town" (click)="$event.stopPropagation(); $event.preventDefault()" i18n>
+                    <div class="town-title">({{ me.town_details.town_id }})</div>
+                    <div class="status"></div>
+                    <div class="bag"></div>
+                    <div class="heroic_actions"></div>
+                    <div class="home"></div>
+                </div>
+                <mat-divider></mat-divider>
+            }
             <div mat-menu-item (click)="disconnect()" i18n>Déconnexion</div>
         }
     </mat-menu>

@@ -7,12 +7,12 @@
             </mat-form-field>
         </div>
         <div class="items">
-            <ng-container *ngFor="let item of list">
+            @for (item of list; track item) {
                 @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
                     <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="remove.next(item.id)"
                          [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
                 }
-            </ng-container>
+            }
         </div>
         <div mat-menu-item class="empty-bag" (click)="empty.next()">
             <img [ngSrc]="HORDES_IMG_REPO + 'icons/b_close.png'" style="margin-right: 0.5em" width="16" height="16">

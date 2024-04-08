@@ -2,7 +2,7 @@
     @if (lastUpdateInfo && lastUpdateInfo.update_time) {
         <small>
             @if (thresholds) {
-                <ng-container *ngFor="let diff of [moment.diff(lastUpdateInfo.update_time, 'minutes')]">
+                @for (diff of [moment.diff(lastUpdateInfo.update_time, 'minutes')]; track diff) {
                     @if (diff <= thresholds[0]) {
                         <ng-container *ngTemplateOutlet="img; context: {$implicit: 1}"></ng-container>
                     } @else if (diff <= thresholds[1]) {
@@ -14,7 +14,7 @@
                     } @else {
                         <ng-container *ngTemplateOutlet="img; context: {$implicit: 5}"></ng-container>
                     }
-                </ng-container>
+                }
             }
             @if (!hideDetails) {
                 <span i18n>Mis à jour par&nbsp;{{ lastUpdateInfo.username }}&nbsp;{{ lastUpdateInfo.update_time.fromNow() }}</span>
