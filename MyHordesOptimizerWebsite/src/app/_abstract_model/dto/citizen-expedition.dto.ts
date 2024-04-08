@@ -1,15 +1,26 @@
 ﻿import { BagDTO } from './bag.dto';
-import { CitizenDTO } from './citizen.dto';
 import { ExpeditionOrderDTO } from './expedition-order.dto';
 
 export interface CitizenExpeditionDTO {
-    id: number;
-    citizen?: CitizenDTO;
+    id?: number;
+    idUser?: number;
     bag?: BagDTO;
     orders: ExpeditionOrderDTO[];
     preinscrit: boolean;
     preinscritJob?: string;
-    preinscritHeroic?: string;
+    preinscritHeroicSkillName?: string;
     pdc: number;
-    soif?: boolean;
+    isThirsty?: boolean;
+}
+
+export interface CitizenExpeditionShortDTO {
+    id?: number;
+    idUser?: number;
+    bag?: number;
+    ordersId: number[];
+    preinscrit: boolean;
+    preinscritJob?: string;
+    preinscritHeroicSkillName?: string;
+    pdc: number;
+    isThirsty?: boolean;
 }

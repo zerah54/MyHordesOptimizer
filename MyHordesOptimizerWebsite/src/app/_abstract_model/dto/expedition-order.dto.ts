@@ -1,7 +1,9 @@
-﻿export interface ExpeditionOrderDTO {
-    id: number;
-    type: string;
+﻿import { ExpeditionOrderType } from '../types/_types';
+
+export interface ExpeditionOrderDTO {
+    id?: number;
+    type: ExpeditionOrderType;
     text: string;
-    done: boolean;
+    isDone: boolean;
     position: number;
 }

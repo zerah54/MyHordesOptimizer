@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
-@Injectable({ providedIn: 'root' })
-export class InDevModeGuard implements CanActivate {
+@Injectable({providedIn: 'root'})
+export class InDevModeGuard {
 
     /**
      * Le constructeur de la classe

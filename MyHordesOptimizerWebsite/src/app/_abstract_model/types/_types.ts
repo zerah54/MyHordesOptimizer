@@ -16,3 +16,5 @@ export interface Dictionary<T> {
 }
 
 export type TownTypeId = 'RNE' | 'RE' | 'PANDE';
+
+export type ExpeditionOrderType = 'checkbox' | 'text';

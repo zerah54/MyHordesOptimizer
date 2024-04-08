@@ -50,8 +50,10 @@ export class AppComponent implements OnInit {
 
         this.loading_service.is_loading_obs
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((is_loading: boolean) => {
-                this.is_loading = is_loading;
+            .subscribe({
+                next: (is_loading: boolean) => {
+                    this.is_loading = is_loading;
+                }
             });
 
         if (this.theme) {

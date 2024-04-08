@@ -3,7 +3,9 @@
 
     @if (theme === 'noel') {
         <ul class="lightrope">
-            <li *ngFor="let i of [].constructor(50);"></li>
+            @for (i of [].constructor(50); track i) {
+                <li></li>
+            }
         </ul>
     }
 

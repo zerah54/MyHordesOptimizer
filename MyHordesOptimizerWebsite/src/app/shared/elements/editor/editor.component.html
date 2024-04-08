@@ -1,4 +1,6 @@
-﻿<angular-editor class="mho-editor" [config]="editorConfig"
-                [(ngModel)]="sanitized_content" (ngModelChange)="updateValue($event);"
-                (focusin)="onFocusIn()" (focusout)="onFocusOut($event)" [disabled]="disabled">
-</angular-editor>
+﻿<div (blur)="onFocusOut($event)">
+    <angular-editor class="mho-editor" [config]="editorConfig"
+                    [(ngModel)]="sanitized_content" (ngModelChange)="updateValue($event);"
+                    [disabled]="disabled" (focusin)="onFocusIn()">
+    </angular-editor>
+</div>

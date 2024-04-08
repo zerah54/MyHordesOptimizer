@@ -40,7 +40,7 @@ import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
 import { GlobalService } from './global.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class ApiService extends GlobalService {
 
     /** La locale */
@@ -83,7 +83,7 @@ export class ApiService extends GlobalService {
      */
     public getBank(): Observable<BankInfo> {
         return new Observable((sub: Subscriber<BankInfo>) => {
-            super.get<BankInfoDTO>(this.API_URL + `/Fetcher/bank?userKey=${getExternalAppId()}`)
+            super.get<BankInfoDTO>(this.API_URL + '/Fetcher/bank')
                 .subscribe({
                     next: (response: HttpResponse<BankInfoDTO>) => {
                         sub.next(new BankInfo(response.body));
@@ -118,7 +118,7 @@ export class ApiService extends GlobalService {
 
         super.post(this.API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`,
             JSON.stringify({
-                map: { toolsToUpdate: tools_to_update },
+                map: {toolsToUpdate: tools_to_update},
                 townDetails: town_details
             })
         )

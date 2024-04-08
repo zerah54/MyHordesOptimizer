@@ -1,11 +1,12 @@
 ﻿import { ExpeditionOrderDTO } from '../dto/expedition-order.dto';
 import { CommonModel } from './_common.class';
+import { ExpeditionOrderType } from './_types';
 
 export class ExpeditionOrder extends CommonModel<ExpeditionOrderDTO> {
-    public id!: number;
-    public type!: string;
+    public id?: number;
+    public type!: ExpeditionOrderType;
     public text!: string;
-    public done!: boolean;
+    public is_done!: boolean;
     public position!: number;
 
     constructor(dto?: ExpeditionOrderDTO | null) {
@@ -18,7 +19,7 @@ export class ExpeditionOrder extends CommonModel<ExpeditionOrderDTO> {
             id: this.id,
             type: this.type,
             text: this.text,
-            done: this.done,
+            isDone: this.is_done,
             position: this.position
         };
     }
@@ -28,7 +29,7 @@ export class ExpeditionOrder extends CommonModel<ExpeditionOrderDTO> {
             this.id = dto.id;
             this.type = dto.type;
             this.text = dto.text;
-            this.done = dto.done;
+            this.is_done = dto.isDone;
             this.position = dto.position;
         }
     }

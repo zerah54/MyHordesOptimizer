@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class DebugLogPipe implements PipeTransform {
 
-    transform(to_log: unknown[]): void {
+    transform(...to_log: unknown[]): void {
         console.log(...to_log);
     }
 

@@ -1,6 +1,7 @@
-<div class="well" *ngFor="let rations of entries | well:completeCitizenList:displayPseudo">
-    <h4 class="rations">{{ rations.rations }} {rations.rations, plural, =0 {ration prise} =1 {ration prise} other {rations prises}}</h4>
-    <div class="citizen">{{ rations.citizen }}</div>
-    <mat-divider></mat-divider>
-</div>
-
+@for (rations of entries | well:completeCitizenList:displayPseudo; track rations) {
+    <div class="well">
+        <h4 class="rations">{{ rations.rations }} {rations.rations, plural, =0 {ration prise} =1 {ration prise} other {rations prises}}</h4>
+        <div class="citizen">{{ rations.citizen }}</div>
+        <mat-divider></mat-divider>
+    </div>
+}

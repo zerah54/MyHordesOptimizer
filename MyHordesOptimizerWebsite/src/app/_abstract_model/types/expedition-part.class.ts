@@ -1,13 +1,14 @@
-import { ExpeditionPartDTO } from '../dto/expedition-part.dto';
+import { ExpeditionPartDTO, ExpeditionPartShortDTO } from '../dto/expedition-part.dto';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { CitizenExpedition } from './citizen-expedition.class';
 import { ExpeditionOrder } from './expedition-order.class';
 
 export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
-    public id!: string;
+    public id?: number;
     public orders!: ExpeditionOrder[];
     public citizens: CitizenExpedition[] = [];
     public path!: string;
+    public position!: number;
 
 
     constructor(dto?: ExpeditionPartDTO | null) {
@@ -20,7 +21,22 @@ export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
             id: this.id,
             orders: modelToDtoArray(this.orders),
             citizens: modelToDtoArray(this.citizens),
-            path: this.path
+            path: this.path,
+            position: this.position
+        };
+    }
+
+    public modelToDtoShort(): ExpeditionPartShortDTO {
+        return {
+            id: this.id,
+            ordersId: this.orders ? this.orders
+                .filter((order: ExpeditionOrder) => order.id !== undefined && order.id !== null)
+                .map((order: ExpeditionOrder) => <number>order.id) : [],
+            citizens: this.citizens ? this.citizens
+                .filter((citizen: CitizenExpedition) => citizen.id !== undefined && citizen.id !== null)
+                .map((citizen: CitizenExpedition) => <number>citizen.id) : [],
+            path: this.path,
+            position: this.position
         };
     }
 
@@ -28,8 +44,14 @@ export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
         if (dto) {
             this.id = dto.id;
             this.orders = dtoToModelArray(ExpeditionOrder, dto.orders);
+            this.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
+                if (order_a.position < order_b.position) return -1;
+                if (order_a.position > order_b.position) return 1;
+                return 0;
+            });
             this.citizens = dtoToModelArray(CitizenExpedition, dto.citizens);
             this.path = dto.path;
+            this.position = dto.position;
         } else {
             this.citizens = [new CitizenExpedition()];
         }

@@ -16,80 +16,85 @@
         <div class="mat-elevation-z8">
             <table mat-table [dataSource]="datasource" matSort matSortActive="label" matSortDisableClear matSortDirection="asc">
 
-                <ng-container *ngFor="let column of columns" [matColumnDef]="column.id" [sticky]="column.sticky || false">
-                    @if (column.sortable) {
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                @for (column of columns; track column.id) {
+                    <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
+                        @if (column.sortable) {
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                @switch (column.id) {
+                                    @case ('label') {
+                                        <mho-header-with-string-filter [header]="column.header"
+                                                                       [(filterValue)]="ruins_filters.label" (filterValueChange)="ruins_filters_change.next()">
+                                        </mho-header-with-string-filter>
+                                    }
+                                    @case ('min_dist') {
+                                        <mho-header-with-number-filter [header]="column.header"
+                                                                       [(filterValue)]="ruins_filters.min_dist"
+                                                                       (filterValueChange)="ruins_filters_change.next()">
+                                        </mho-header-with-number-filter>
+                                    }
+                                    @case ('max_dist') {
+                                        <mho-header-with-number-filter [header]="column.header"
+                                                                       [(filterValue)]="ruins_filters.max_dist"
+                                                                       (filterValueChange)="ruins_filters_change.next()">
+                                        </mho-header-with-number-filter>
+                                    }
+                                    @case ('camping') {
+                                        {{ column.header }}
+                                    }
+                                    @case ('capacity') {
+                                        {{ column.header }}
+                                    }
+                                }
+                            </th>
+                        } @else {
+                            <th mat-header-cell *matHeaderCellDef>
+                                @switch (column.id) {
+                                    @case ('description') {
+                                        {{ column.header }}
+                                    }
+                                    @case ('drops') {
+                                        <mho-header-with-select-filter [header]="column.header"
+                                                                       [(filterValue)]="ruins_filters.objects"
+                                                                       (filterValueChange)="ruins_filters_change.next()"
+                                                                       [options]="items"
+                                                                       [bindLabel]="'item.label.' + locale">
+                                        </mho-header-with-select-filter>
+                                    }
+                                }
+                            </th>
+                        }
+                        <td mat-cell *matCellDef="let row" [ngClass]="column.id">
                             @switch (column.id) {
                                 @case ('label') {
-                                    <mho-header-with-string-filter [header]="column.header"
-                                                                   [(filterValue)]="ruins_filters.label" (filterValueChange)="ruins_filters_change.next()">
-                                    </mho-header-with-string-filter>
+                                    <img [src]="HORDES_IMG_REPO + 'ruin/' + row.img + '.gif'">
+                                    <div>{{ row[column.id][locale] }}</div>
                                 }
-                                @case ('min_dist') {
-                                    <mho-header-with-number-filter [header]="column.header"
-                                                                   [(filterValue)]="ruins_filters.min_dist" (filterValueChange)="ruins_filters_change.next()">
-                                    </mho-header-with-number-filter>
-                                }
-                                @case ('max_dist') {
-                                    <mho-header-with-number-filter [header]="column.header"
-                                                                   [(filterValue)]="ruins_filters.max_dist" (filterValueChange)="ruins_filters_change.next()">
-                                    </mho-header-with-number-filter>
-                                }
-                                @case ('camping') {
-                                    {{ column.header }}
-                                }
-                                @case ('capacity') {
-                                    {{ column.header }}
-                                }
-                            }
-                        </th>
-                    } @else {
-                        <th mat-header-cell *matHeaderCellDef>
-                            @switch (column.id) {
                                 @case ('description') {
-                                    {{ column.header }}
+                                    <span [innerHTML]="row[column.id][locale]"></span>
                                 }
                                 @case ('drops') {
-                                    <mho-header-with-select-filter [header]="column.header"
-                                                                   [(filterValue)]="ruins_filters.objects"
-                                                                   (filterValueChange)="ruins_filters_change.next()"
-                                                                   [options]="items"
-                                                                   [bindLabel]="'item.label.' + locale">
-                                    </mho-header-with-select-filter>
+                                    <div class="drops-list">
+                                        @for (drop of row[column.id]; track drop) {
+                                            <div [title]="drop.item.label[locale]">
+                                                <img [ngSrc]="HORDES_IMG_REPO + drop.item.img" width="16" height="16">
+                                                <div>{{ (drop.probability * 100) | number:'1.1-1':locale }}%</div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                @case ('camping') {
+                                    {{ row.camping }}%
+                                }
+                                @case ('capacity') {
+                                    {{ row.capacity }}
+                                }
+                                @default {
+                                    {{ row[column.id] }}km
                                 }
                             }
-                        </th>
-                    }
-                    <td mat-cell *matCellDef="let row" [ngClass]="column.id">
-                        @switch (column.id) {
-                            @case ('label') {
-                                <img [src]="HORDES_IMG_REPO + 'ruin/' + row.img + '.gif'">
-                                <div>{{ row[column.id][locale] }}</div>
-                            }
-                            @case ('description') {
-                                <span [innerHTML]="row[column.id][locale]"></span>
-                            }
-                            @case ('drops') {
-                                <div class="drops-list">
-                                    <div *ngFor="let drop of row[column.id]" [title]="drop.item.label[locale]">
-                                        <img [ngSrc]="HORDES_IMG_REPO + drop.item.img" width="16" height="16">
-                                        <div>{{ (drop.probability * 100) | number:'1.1-1':locale }}%</div>
-                                    </div>
-                                </div>
-                            }
-                            @case ('camping') {
-                                {{ row.camping }}%
-                            }
-                            @case ('capacity') {
-                                {{ row.capacity }}
-                            }
-                            @default {
-                                {{ row[column.id] }}km
-                            }
-                        }
-                    </td>
-                </ng-container>
-
+                        </td>
+                    </ng-container>
+                }
                 <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
                 <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
             </table>

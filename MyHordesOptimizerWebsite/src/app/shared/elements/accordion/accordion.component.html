@@ -1,16 +1,18 @@
 <cdk-accordion class="mho-accordion">
-    <cdk-accordion-item class="mho-accordion-item" [class.expanded]="accordionItem.expanded"
-        #accordionItem="cdkAccordionItem" role="button" tabindex="0" *ngFor="let item of items; let index = index;"
-        [attr.id]="'accordion-header-' + index" [attr.aria-expanded]="accordionItem.expanded"
-        [attr.aria-controls]="'accordion-body-' + index">
-        <div class="mho-accordion-item-header" (click)="accordionItem.toggle()">
-            {{ item.title }}
-            <mat-icon class="mho-accordion-item-toggler">{{accordionItem.expanded ? 'expand_more' : 'chevron_right'}}
-            </mat-icon>
-        </div>
-        <div class="mho-accordion-item-content" role="region" [style.display]="accordionItem.expanded ? '' : 'none'"
-            [attr.id]="'accordion-body-' + index" [attr.aria-labelledby]="'accordion-header-' + index"
-            [innerHTML]="item.content">
-        </div>
-    </cdk-accordion-item>
+    @for (item of items; track item; let index = $index) {
+        <cdk-accordion-item class="mho-accordion-item" [class.expanded]="accordionItem.expanded"
+                            #accordionItem="cdkAccordionItem" role="button" tabindex="0"
+                            [attr.id]="'accordion-header-' + index" [attr.aria-expanded]="accordionItem.expanded"
+                            [attr.aria-controls]="'accordion-body-' + index">
+            <div class="mho-accordion-item-header" (click)="accordionItem.toggle()">
+                {{ item.title }}
+                <mat-icon class="mho-accordion-item-toggler">{{ accordionItem.expanded ? 'expand_more' : 'chevron_right' }}
+                </mat-icon>
+            </div>
+            <div class="mho-accordion-item-content" role="region" [style.display]="accordionItem.expanded ? '' : 'none'"
+                 [attr.id]="'accordion-body-' + index" [attr.aria-labelledby]="'accordion-header-' + index"
+                 [innerHTML]="item.content">
+            </div>
+        </cdk-accordion-item>
+    }
 </cdk-accordion>
