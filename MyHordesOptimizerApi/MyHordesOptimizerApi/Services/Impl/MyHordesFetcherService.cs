@@ -56,6 +56,11 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public IEnumerable<ItemDto> GetItems(int? townId)
         {
+            var townBankItemLastUpdateId = -1;
+            if (townId.HasValue)
+            {
+                townBankItemLastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => tbi.IdLastUpdateInfo);
+            }          
             var items = DbContext.Items
               .Include(item => item.IdCategoryNavigation)
               .Include(item => item.PropertyNames)
@@ -64,7 +69,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                   .ThenInclude(recipe => recipe.RecipeNameNavigation)
                       .ThenInclude(recipe => recipe.RecipeItemResults)
               .Include(item => item.RecipeItemResults)
-              .Include(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId))
+              .Include(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId && bankItem.IdLastUpdateInfo == townBankItemLastUpdateId))
               .Include(item => item.TownWishListItems.Where(wishListItem => wishListItem.IdTown == townId))
               .ToList();
 
@@ -369,10 +374,6 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .ThenInclude(townBankItem => townBankItem.IdItemNavigation)
                         .ThenInclude(item => item.TownWishListItems.Where(wishListItem => wishListItem.IdTown == townId))
                         .AsSplitQuery()
-                //.Include(town => town.TownBankItems)
-                //    .ThenInclude(town => town.IdItemNavigation)
-                //        .ThenInclude(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId))
-                //        .AsSplitQuery()
                 .Include(town => town.TownBankItems.Where(tbi => tbi.IdLastUpdateInfo == lastUpdateId))
                     .ThenInclude(townBankItem => townBankItem.IdLastUpdateInfoNavigation)
                     .AsSplitQuery() 
