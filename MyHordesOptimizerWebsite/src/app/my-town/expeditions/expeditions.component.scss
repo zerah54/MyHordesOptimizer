@@ -26,7 +26,10 @@
             align-items: center;
 
             .left-actions {
-
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5em;
             }
 
             .right-actions {
@@ -194,5 +197,11 @@
                 }
             }
         }
+    }
+}
+
+.mho-expedition-bag-selector {
+    .mat-mdc-tab-body-wrapper {
+        max-height: 300px;
     }
 }

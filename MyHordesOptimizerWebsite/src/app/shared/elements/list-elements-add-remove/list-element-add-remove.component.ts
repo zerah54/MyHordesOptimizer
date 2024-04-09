@@ -4,6 +4,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
+import { ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { MenuAddComponent } from './menu-add/menu-add.component';
@@ -21,11 +22,12 @@ export class ListElementAddRemoveComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input() currentList: (Item | StatusEnum)[] = [];
-    @Input() completeList: (Item | StatusEnum)[] = [];
+    @Input() lists: ListForAddRemove[] = [];
 
     @Input() citizen!: Citizen;
     @Input() label!: string;
     @Input() readonly: boolean = false;
+    @Input() class: string = '';
 
     @Input() addLabel!: string;
     @Output() add: EventEmitter<number | string> = new EventEmitter();

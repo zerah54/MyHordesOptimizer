@@ -4,11 +4,13 @@ import * as moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import {
+    getBankWithExpirationDate,
     getExternalAppId,
     getItemsWithExpirationDate,
     getRuinsWithExpirationDate,
     getTown,
     getUserId,
+    setBankWithExpirationDate,
     setItemsWithExpirationDate,
     setRuinsWithExpirationDate,
 } from '../../shared/utilities/localstorage.util';
@@ -81,17 +83,24 @@ export class ApiService extends GlobalService {
      *
      * @returns {Observable<BankInfo>}
      */
-    public getBank(): Observable<BankInfo> {
+    public getBank(force?: boolean): Observable<BankInfo> {
         return new Observable((sub: Subscriber<BankInfo>) => {
-            super.get<BankInfoDTO>(this.API_URL + '/Fetcher/bank')
-                .subscribe({
-                    next: (response: HttpResponse<BankInfoDTO>) => {
-                        sub.next(new BankInfo(response.body));
-                    },
-                    error: (error: HttpErrorResponse) => {
-                        sub.error(error);
-                    }
-                });
+            const saved_bank: BankInfo | undefined = getBankWithExpirationDate();
+            if (saved_bank && saved_bank.items.length > 0 && !force) {
+                sub.next(saved_bank);
+            } else {
+                super.get<BankInfoDTO>(this.API_URL + '/Fetcher/bank')
+                    .subscribe({
+                        next: (response: HttpResponse<BankInfoDTO>) => {
+                            const bank: BankInfo = new BankInfo(response.body);
+                            setBankWithExpirationDate(bank);
+                            sub.next(bank);
+                        },
+                        error: (error: HttpErrorResponse) => {
+                            sub.error(error);
+                        }
+                    });
+            }
         });
     }
 

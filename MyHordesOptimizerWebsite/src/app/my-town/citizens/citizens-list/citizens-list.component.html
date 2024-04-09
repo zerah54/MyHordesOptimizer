@@ -36,10 +36,10 @@
                                         @case ('more_status') {
                                             <div>
                                                 <div class="status">
-                                                    <mho-list-element-add-remove [currentList]="row.status?.icons || []" label="États"
-                                                                                 i18n-label [completeList]="all_status"
-                                                                                 addLabel="Ajouter aux états"
-                                                                                 i18n-addLabel (add)="addStatus(row.id, $event + '')"
+                                                    <mho-list-element-add-remove [currentList]="row.status?.icons || []" [lists]="status_lists"
+                                                                                 label="États" i18n-label
+                                                                                 addLabel="Ajouter aux états" i18n-addLabel
+                                                                                 (add)="addStatus(row.id, $event + '')"
                                                                                  removeLabel="Retirer des états" i18n-removeLabel
                                                                                  (remove)="removeStatus(row.id, $event + '')"
                                                                                  emptyLabel="Vider les états"
@@ -51,8 +51,8 @@
                                                 </div>
                                                 <div class="bag">
                                                     <mho-list-element-add-remove [currentList]="row.bag?.items || []" label="Sac" i18n-label
-                                                                                 [completeList]="all_items" addLabel="Ajouter au sac"
-                                                                                 i18n-addLabel
+                                                                                 [lists]="bag_lists"
+                                                                                 addLabel="Ajouter au sac" i18n-addLabel
                                                                                  (add)="addItem(row.id, +$event)"
                                                                                  removeLabel="Retirer du sac" i18n-removeLabel
                                                                                  (remove)="removeItem(row.id, +$event)"

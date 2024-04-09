@@ -1,41 +1,50 @@
-[
-    {
+{
+    "hero_generic_return": {
         "name": "hero_generic_return",
-        "unlockable": false,
-        "used": "Ahh, es ist immer wieder schön in die Stadt zurückzukehren... Nach einer deartigen Anstrengung, kann der Wille schon mal schwach werden. Versuche es in einem nächsten Leben erneut."
+        "title": "Die Rückkehr des Helden",
+        "description": "Wenn du 11 km oder weniger von der Stadt entfernt bist, kehrst du sofort in die Stadt zurück!",
+        "daysNeeded": 0
     },
-    {
+    "hero_generic_find": {
         "name": "hero_generic_find",
-        "unlockable": false,
-        "used": "Du hast heute schon verdammt viel Schwein gehabt. So viel Glück kannst du erst in deinem nächsten Leben wieder haben..."
+        "title": "Fund",
+        "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
+        "daysNeeded": 0
     },
-    {
+    "hero_generic_punch": {
         "name": "hero_generic_punch",
-        "unlockable": false,
-        "used": "Ahh... Das hat dir gefallen, nicht wahr? Du kannst deine Fäuste erst in deinem nächsten Leben wieder schwingen lassen..."
+        "title": "Wildstyle Uppercut",
+        "description": "Damit kannst du mit einem Schlag 2 Zombies umbringen!",
+        "daysNeeded": 0
     },
-    {
+    "hero_generic_ap": {
         "name": "hero_generic_ap",
-        "unlockable": true
+        "title": "Zweite Lunge",
+        "description": "Stellt deine AP wieder her und beseitigt deine Müdigkeit.",
+        "daysNeeded": 0
     },
-    {
+    "hero_generic_immune": {
         "name": "hero_generic_immune",
-        "unlockable": true
+        "title": "Den Tod besiegen",
+        "description": "Beim nächsten Angriff wird der Durst-, Infektions- und Abhängigkeitszustand außer Kraft gesetzt.",
+        "daysNeeded": 0
     },
-    {
+    "hero_generic_find_lucky": {
         "name": "hero_generic_find_lucky",
-        "unlockable": true,
-        "used": "Du hast heute schon verdammt viel Schwein gehabt. So viel Glück kannst du erst in deinem nächsten Leben wieder haben...",
-        "replace": "hero_generic_find"
+        "title": "Schönes Fundstück",
+        "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
+        "daysNeeded": 0
     },
-    {
+    "hero_generic_rescue": {
         "name": "hero_generic_rescue",
-        "unlockable": false,
-        "used": "Du hast bereits versucht, einen deiner Mitbürger zu retten! Für deine nächste Rettungsaktion musst du bis zu deinem nächsten Leben warten!"
+        "title": "Rettung",
+        "description": "Du bringst einen anderen Spieler nach Hause (dieser darf max. 2 Felder von der Stadt entfernt sein).",
+        "daysNeeded": 0
     },
-    {
+    "hero_generic_friendship": {
         "name": "hero_generic_friendship",
-        "unlockable": false,
-        "used": "Du hast deine Großzügigkeit in diesem Leben bereits unter Beweis gestellt!"
+        "title": "Freundschaft",
+        "description": "Du spendest eine deiner noch nicht verwendeten Heldentaten an einen anderen Spieler.",
+        "daysNeeded": 0
     }
-]
+}

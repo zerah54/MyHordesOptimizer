@@ -1200,10 +1200,11 @@ $ruins_additional_info = [
 ];
 
 foreach ($ruins as &$ruin) {
-    foreach ($ruin['drops'] as &$drops)
+    foreach ($ruin['drops'] as &$drops) {
         if (!is_array($drops)) {
             $drops = [$drops];
         }
+    }
 }
 
 $new_ruins = json_encode($ruins, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

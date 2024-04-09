@@ -58,7 +58,7 @@ export class BankComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.api.getBank()
+        this.api.getBank(true)
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((bank: BankInfo) => {
                 this.bank = bank;

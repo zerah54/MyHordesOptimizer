@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
@@ -26,6 +26,8 @@ export class MenuRemoveComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatMenu) menu!: MatMenu;
+
+    @Input() class: string = '';
 
     @Output() remove: EventEmitter<number | string> = new EventEmitter();
     @Output() empty: EventEmitter<void> = new EventEmitter();

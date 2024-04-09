@@ -15,6 +15,7 @@ import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
+import { ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Cadaver } from '../../../_abstract_model/types/cadaver.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -82,6 +83,15 @@ export class CitizensListComponent implements OnInit {
     ];
 
     public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
+
+    /** La liste des listes disponibles dans le sac */
+    public readonly bag_lists: ListForAddRemove[] = [
+        {label: $localize`Tous`, list: this.all_items}
+    ];
+    /** La liste des listes disponibles dans les status */
+    public readonly status_lists: ListForAddRemove[] = [
+        {label: $localize`Tous`, list: this.all_status}
+    ];
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 

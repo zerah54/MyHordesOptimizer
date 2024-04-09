@@ -20,14 +20,12 @@
                         <div class="container">
                             <div class="header">
                                 <h2><span i18n>Préinscrits&nbsp;:&nbsp;</span><span [innerHTML]="preRegistered"></span></h2>
-                                @if (edition_mode) {
-                                    <h2><span i18n>Places&nbsp;:&nbsp;</span>{{ spots }}/{{ all_citizens.length }}</h2>
-                                }
                             </div>
                             @if (edition_mode) {
                                 <div class="actions">
                                     <div class="left-actions">
                                         <button mat-button type="button" (click)="addNewExpedition()" i18n>Créer une expédition</button>
+                                        <div><span i18n>Places&nbsp;:&nbsp;</span>{{ spots }}/{{ all_citizens.length }}</div>
                                     </div>
                                     <div class="right-actions">
                                         @if (day_index + 1 >= this.current_day) {
@@ -58,7 +56,7 @@
                                         <div [ngClass]="['expedition', expedition.state]">
                                             <div class="header">
                                                 <div class="label">
-                                                    @if (edition_mode) {
+                                                    @if (edition_mode && editable) {
                                                         <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
                                                             <mat-label i18n>Nom de l'expédition</mat-label>
                                                             <input matInput [(ngModel)]="expedition.label" (ngModelChange)="saveExpedition(expedition)">
@@ -72,7 +70,7 @@
                                                         <h2>{{ expedition.label }}</h2>
                                                     }
                                                 </div>
-                                                @if (edition_mode) {
+                                                @if (edition_mode && editable) {
                                                     <div class="actions">
                                                         <mat-slide-toggle [ngModel]="expedition.state === 'ready'"
                                                                           (ngModelChange)="changeExpeditionState(expedition, $event);">
@@ -92,7 +90,7 @@
                                                             @if (expedition.parts.length > 1) {
                                                                 <span i18n>Partie {{ expedition_part_index + 1 }}&nbsp;:&nbsp;</span>
                                                             }
-                                                            @if (edition_mode) {
+                                                            @if (edition_mode && editable) {
                                                                 <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
                                                                     <mat-label i18n>Nom du tracé</mat-label>
                                                                     <input matInput type="text" [(ngModel)]="expedition_part.path"
@@ -105,7 +103,7 @@
                                                         <table class="expedition-table">
                                                             <thead>
                                                             <tr class="table-header">
-                                                                @if (edition_mode) {
+                                                                @if (edition_mode && editable) {
                                                                     <button mat-icon-button type="button" matTooltip="Supprimer la partie" i18n-matTooltip
                                                                             (click)="removeExpeditionPart(expedition_part, expedition_part_index, expedition)">
                                                                         <mat-icon>delete</mat-icon>
@@ -115,7 +113,7 @@
                                                                 <td class="pseudo">
                                                                     <div>
                                                                         <div i18n>Citoyen</div>
-                                                                        @if (edition_mode) {
+                                                                        @if (edition_mode && editable) {
                                                                             <div>
                                                                                 <button mat-icon-button type="button"
                                                                                         (click)="addNewMemberToPart(expedition_part)">
@@ -136,7 +134,7 @@
                                                                         {{ expedition_part | totalPdc }}/{{ expedition.min_pdc || 0 }}
                                                                     </div>
                                                                 </td>
-                                                                @if (edition_mode || (expedition_part.citizens | someHeroicActionNeeded)) {
+                                                                @if ((edition_mode || (expedition_part.citizens | someHeroicActionNeeded)) && editable) {
                                                                     <td class="heroic" i18n>Action héroïque</td>
                                                                 }
                                                                 <td class="citizen-orders" i18n>Consigne perso</td>
@@ -146,7 +144,7 @@
                                                             <tbody>
                                                                 @for (citizen of expedition_part.citizens; track citizen.id; let citizen_index = $index) {
                                                                     <tr class="citizen">
-                                                                        @if (edition_mode) {
+                                                                        @if (edition_mode && editable) {
                                                                             <td class="action">
                                                                                 <button mat-icon-button type="button"
                                                                                         (click)="removeCitizenFromPart(citizen, expedition_part, citizen_index)">
@@ -155,7 +153,7 @@
                                                                             </td>
                                                                         }
                                                                         <td class="job">
-                                                                            @if (edition_mode && !citizen.citizen_id) {
+                                                                            @if (edition_mode && editable && !citizen.citizen_id) {
                                                                                 <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
                                                                                     <mho-select [options]="all_citizens_job" [searchable]="false"
                                                                                                 [emptyOption]="true"
@@ -172,7 +170,7 @@
                                                                             }
                                                                         </td>
                                                                         <td class="pseudo">
-                                                                            @if (edition_mode || (expedition.state === 'ready' && !citizen.preinscrit)) {
+                                                                            @if ((edition_mode || (expedition.state === 'ready' && !citizen.preinscrit)) && editable) {
                                                                                 <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
                                                                                     <mho-select
                                                                                         [options]="all_citizens | citizensForExpe:citizen:expedition:expeditions"
@@ -181,14 +179,14 @@
                                                                                         [bindLabel]="'name'"
                                                                                         [bindValue]="'id'"
                                                                                         [bindIcon]="'job.value.img'"
-                                                                                        (ngModelChange)="citizen && !!citizen.citizen_id ? citizen.preinscrit_job = undefined : undefined; edition_mode && !!citizen.citizen_id ? citizen.preinscrit = true : citizen.preinscrit = false; saveCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
+                                                                                        (ngModelChange)="citizen && !!citizen.citizen_id ? citizen.preinscrit_job = undefined : undefined; edition_mode && editable && !!citizen.citizen_id ? citizen.preinscrit = true : citizen.preinscrit = false; saveCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
                                                                                 </mat-form-field>
                                                                             } @else {
                                                                                 {{ citizen.citizen_id ? (citizen.citizen_id | citizenFromId:all_citizens)?.name : '' }}
                                                                             }
                                                                         </td>
                                                                         <td class="is-thirsty">
-                                                                            @if (edition_mode || expedition.state === 'ready') {
+                                                                            @if ((edition_mode || expedition.state === 'ready') && editable) {
                                                                                 <mat-checkbox [(ngModel)]="citizen.is_thirsty"
                                                                                               (ngModelChange)="saveCitizen(expedition_part, citizen)"></mat-checkbox>
                                                                             } @else if (citizen.is_thirsty !== undefined && citizen.is_thirsty !== null) {
@@ -200,7 +198,7 @@
                                                                             }
                                                                         </td>
                                                                         <td class="pdc">
-                                                                            @if (edition_mode || expedition.state === 'ready') {
+                                                                            @if ((edition_mode || expedition.state === 'ready') && editable) {
                                                                                 <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
                                                                                     <input matInput [(ngModel)]="citizen.pdc"
                                                                                            (ngModelChange)="saveCitizen(expedition_part, citizen)">
@@ -209,9 +207,9 @@
                                                                                 {{ citizen.pdc }}
                                                                             }
                                                                         </td>
-                                                                        @if (edition_mode || (expedition_part.citizens | someHeroicActionNeeded)) {
+                                                                        @if ((edition_mode || (expedition_part.citizens | someHeroicActionNeeded)) && editable) {
                                                                             <td class="heroic">
-                                                                                @if (edition_mode) {
+                                                                                @if (edition_mode && editable) {
                                                                                     <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
                                                                                         <mho-select [options]="all_heroics"
                                                                                                     [emptyOption]="true"
@@ -226,7 +224,7 @@
                                                                             </td>
                                                                         }
                                                                         <td class="citizen-orders">
-                                                                            @if (edition_mode) {
+                                                                            @if (edition_mode && editable) {
                                                                                 <ng-container
                                                                                     *ngTemplateOutlet="displayOrder; context: {$implicit: citizen.orders}"></ng-container>
                                                                                 <button mat-raised-button type="button"
@@ -239,16 +237,17 @@
                                                                             }
                                                                         </td>
                                                                         <td class="bag">
-                                                                            <mho-list-element-add-remove [currentList]="citizen.bag.items" label="Sac"
-                                                                                                         i18n-label
-                                                                                                         [completeList]="all_items"
+                                                                            <mho-list-element-add-remove [currentList]="citizen.bag.items"
+                                                                                                         label="Sac" i18n-label
+                                                                                                         [lists]="objectsList"
                                                                                                          addLabel="Ajouter au sac" i18n-addLabel
                                                                                                          (add)="addItem(citizen, +$event)"
                                                                                                          removeLabel="Retirer du sac" i18n-removeLabel
                                                                                                          (remove)="removeItem(expedition_part, citizen, +$event)"
                                                                                                          emptyLabel="Vider le sac" i18n-emptyLabel
                                                                                                          (empty)="emptyBag(expedition_part, citizen)"
-                                                                                                         [readonly]="!edition_mode">
+                                                                                                         [readonly]="!edition_mode || !editable"
+                                                                                                         [class]="'mho-expedition-bag-selector'">
                                                                             </mho-list-element-add-remove>
                                                                         </td>
                                                                     </tr>
@@ -257,7 +256,7 @@
                                                         </table>
                                                         <div class="orders">
                                                             <h3 i18n>Consignes</h3>
-                                                            @if (edition_mode) {
+                                                            @if (edition_mode && editable) {
                                                                 <ng-container
                                                                     *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_part.orders}"></ng-container>
                                                                 <button mat-raised-button type="button"
@@ -279,7 +278,8 @@
                                                                     <span [innerHTML]="order.text"></span>
                                                                 }
                                                                 @case ('checkbox') {
-                                                                    <mat-checkbox [(ngModel)]="order.done" (ngModelChange)="saveOrder(order)">
+                                                                    <mat-checkbox [(ngModel)]="order.done" (ngModelChange)="saveOrder(order)"
+                                                                                  [disabled]="!editable">
                                                                         <span [class.checked]="order.done" [innerHTML]="order.text"></span>
                                                                     </mat-checkbox>
                                                                 }
@@ -288,7 +288,7 @@
                                                     }
                                                 </ng-template>
                                             </div>
-                                            @if (edition_mode) {
+                                            @if (edition_mode && editable) {
                                                 <div class="footer">
                                                     <button mat-button type="button" (click)="addNewExpeditionPart(expedition)">
                                                         <ng-container i18n>Ajouter une partie à l'expédition</ng-container>

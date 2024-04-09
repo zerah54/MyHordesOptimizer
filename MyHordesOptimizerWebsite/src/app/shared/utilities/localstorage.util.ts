@@ -1,10 +1,12 @@
 import { Moment } from 'moment';
 import * as moment from 'moment-timezone';
-import { EXTERNAL_APP_ID_KEY, ITEMS_KEY, RUINS_KEY, TOKEN_KEY, TOWN_KEY, USER_KEY } from '../../_abstract_model/const';
+import { BANK_KEY, EXTERNAL_APP_ID_KEY, ITEMS_KEY, RUINS_KEY, TOKEN_KEY, TOWN_KEY, USER_KEY } from '../../_abstract_model/const';
+import { BankInfoDTO } from '../../_abstract_model/dto/bank-info.dto';
 import { ItemDTO } from '../../_abstract_model/dto/item.dto';
 import { RuinDTO } from '../../_abstract_model/dto/ruin.dto';
 import { TokenWithMeDTO } from '../../_abstract_model/dto/token-with-me.dto';
 import { dtoToModelArray, modelToDtoArray } from '../../_abstract_model/types/_common.class';
+import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { Me } from '../../_abstract_model/types/me.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
@@ -58,6 +60,24 @@ export function setItemsWithExpirationDate(items: Item[]): void {
         element: modelToDtoArray(items)
     };
     localStorage.setItem(ITEMS_KEY, JSON.stringify(element_with_expiration));
+}
+
+export function getBankWithExpirationDate(): BankInfo | undefined {
+    const local_storage: string | null = localStorage.getItem(BANK_KEY) || '';
+    const element_with_expiration: ElementWithExpiration<BankInfoDTO> = local_storage ? JSON.parse(local_storage) : undefined;
+    if (!element_with_expiration || moment(element_with_expiration.expire_at).isBefore(moment())) {
+        return undefined;
+    } else {
+        return new BankInfo(element_with_expiration.element);
+    }
+}
+
+export function setBankWithExpirationDate(bank: BankInfo): void {
+    const element_with_expiration: ElementWithExpiration<BankInfoDTO | null> = {
+        expire_at: moment().utc().tz('Europe/Paris').endOf('day'),
+        element: bank.modelToDto()
+    };
+    localStorage.setItem(BANK_KEY, JSON.stringify(element_with_expiration));
 }
 
 export function getRuinsWithExpirationDate(): Ruin[] {

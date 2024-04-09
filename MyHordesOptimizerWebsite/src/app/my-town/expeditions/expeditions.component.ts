@@ -13,12 +13,14 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil } from 'rxjs';
-import { EXPEDITIONS_EDITION_MODE_KEY, HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { EXPEDITIONS_EDITION_MODE_KEY, FAVORITE_EXPEDITION_ITEMS_UID, HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { HeroicActionEnum } from '../../_abstract_model/enum/heroic-action.enum';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
+import { ListForAddRemove } from '../../_abstract_model/types/_types';
 import { Bag } from '../../_abstract_model/types/bag.class';
+import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
@@ -55,6 +57,7 @@ export class ExpeditionsComponent implements OnInit {
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly current_day: number = getTown()?.day || 1;
     protected edition_mode: boolean = JSON.parse(localStorage.getItem(EXPEDITIONS_EDITION_MODE_KEY) || 'false');
+    protected editable: boolean = true;
     protected selected_tab_index: number = this.current_day - 1;
     protected all_citizens!: Citizen[];
     protected all_citizens_job!: JobEnum[];
@@ -63,6 +66,8 @@ export class ExpeditionsComponent implements OnInit {
         .filter((action: HeroicActionEnum) => action.value.count_in_daily);
     /** La liste complète des items */
     protected all_items: Item[] = [];
+    /** La liste des items en banque */
+    protected bank_items: Item[] = [];
 
     protected expeditions!: Expedition[];
 
@@ -83,6 +88,11 @@ export class ExpeditionsComponent implements OnInit {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((items: Item[]) => this.all_items = items);
 
+        this.api.getBank()
+            .pipe(takeUntil(this.destroy_sub))
+            .subscribe((bank: BankInfo) => {
+                this.bank_items = bank.items;
+            })
         this.expedition_service.getExpeditions(this.current_day)
             .subscribe({
                 next: (expeditions: Expedition[]) => {
@@ -102,6 +112,7 @@ export class ExpeditionsComponent implements OnInit {
         this.expedition_service.getExpeditions(event.index + 1).subscribe({
             next: (expeditions: Expedition[]) => {
                 this.expeditions = expeditions;
+                this.editable = event.index >= this.current_day - 1;
             }
         });
     }
@@ -252,10 +263,12 @@ export class ExpeditionsComponent implements OnInit {
      * TODO Factoriser avec le bag des citoyens
      */
     public addItem(citizen: CitizenExpedition, item_id: number): void {
-        if (citizen && citizen.bag) {
-            citizen.bag.items.push(<Item>this.all_items.find((item: Item): boolean => item.id === item_id));
-            this.saveBag(citizen.bag);
-        }
+        console.log('item', this.all_items.find((item: Item) => item.id === item_id));
+        citizen;
+        // if (citizen && citizen.bag) {
+        //     citizen.bag.items.push(<Item>this.all_items.find((item: Item): boolean => item.id === item_id));
+        //     this.saveBag(citizen.bag);
+        // }
     }
 
 
@@ -321,6 +334,18 @@ export class ExpeditionsComponent implements OnInit {
             });
         }
         return spots;
+    }
+
+    public get objectsList(): ListForAddRemove[] {
+        return [
+            {
+                label: $localize`Favoris`, list: this.all_items.filter((item: Item) => {
+                    return FAVORITE_EXPEDITION_ITEMS_UID.some((uid: string) => uid === item.uid);
+                })
+            },
+            {label: $localize`Banque`, list: this.bank_items},
+            {label: $localize`Tous`, list: this.all_items},
+        ]
     }
 
     public saveExpedition(expedition: Expedition): void {
