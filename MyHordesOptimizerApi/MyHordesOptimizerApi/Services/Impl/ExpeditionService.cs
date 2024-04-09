@@ -69,6 +69,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                             .ThenInclude(part => part.ExpeditionCitizens)
                                 .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
                                     .ThenInclude(bag => bag.ExpeditionBagItems)
+                                        .ThenInclude(bagItem => bagItem.IdItemNavigation)
                         .Include(expedition => expedition.ExpeditionParts)
                             .ThenInclude(part => part.ExpeditionCitizens)
                                 .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
@@ -157,6 +158,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                                    .ThenInclude(part => part.ExpeditionCitizens)
                                        .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
                                            .ThenInclude(bag => bag.ExpeditionBagItems)
+                                                .ThenInclude(bagItem => bagItem.IdItemNavigation)
                                .Include(expedition => expedition.ExpeditionParts)
                                    .ThenInclude(part => part.ExpeditionCitizens)
                                        .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
@@ -211,6 +213,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                     var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizen.Id.Value)
                         .Include(citizen => citizen.ExpeditionOrders)
                         .Include(citizen => citizen.IdExpeditionBagNavigation)
+                            .ThenInclude(bag => bag.ExpeditionBagItems)
+                                .ThenInclude(bagItem => bagItem.IdItemNavigation)
                         .Single();
 
                     var orderFromDb = expeditionCitizenFromDb.ExpeditionOrders;
@@ -224,9 +228,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                 else
                 {
                     // Create
-                    var newEntity = DbContext.Add(expeditionCitizenModel);
+                    if(expeditionCitizenModel.IdExpeditionBagNavigation is null)
+                    {
+                        expeditionCitizenModel.IdExpeditionBagNavigation = new ExpeditionBag();
+                    }
+                    var newEntity = DbContext.Add(expeditionCitizenModel).Entity;
                     DbContext.SaveChanges();
-                    result = Mapper.Map<ExpeditionCitizenDto>(newEntity.Entity);
+                    result = Mapper.Map<ExpeditionCitizenDto>(newEntity);
                 }
                 transaction.Commit();
                 return result;
@@ -273,6 +281,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                             .ThenInclude(citizen => citizen.ExpeditionOrders)
                         .Include(part => part.ExpeditionCitizens)
                             .ThenInclude(citizen => citizen.IdExpeditionBagNavigation)
+                                .ThenInclude(bag => bag.ExpeditionBagItems)
+                                    .ThenInclude(bagItem => bagItem.IdItemNavigation)
                         .Single();
 
                     // On récupère les collections de la db
@@ -449,6 +459,55 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.SaveChanges();
             var returnedDto = Mapper.Map<ExpeditionOrderDto>(expeditionOrderModel);
             return returnedDto;
+        }
+
+        #endregion
+
+        #region Bags
+        public ExpeditionBagDto UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto)
+        {
+            using var transaction = DbContext.Database.BeginTransaction();;
+            var expeditionBagModel = Mapper.Map<ExpeditionBag>(expeditionBagDto);
+            ExpeditionBagDto result;
+            var expeditionCitizen = DbContext.ExpeditionCitizens.Single(citizen => citizen.IdExpeditionCitizen == citizenId);
+            if (expeditionBagDto.Id.HasValue)
+            {
+                // Si l'id du sac du citizen a changer, on delete l'ancien sac
+                if(expeditionCitizen.IdExpeditionBag != expeditionBagDto.Id)
+                {
+                    DbContext.Remove(DbContext.ExpeditionBags.Single(expeditionBag => expeditionBag.IdExpeditionBag == expeditionBagDto.Id));
+                }
+                // Update 
+                var expeditionBagFromDb = DbContext.ExpeditionBags
+                    .Where(bag => bag.IdExpeditionBag == expeditionBagDto.Id)
+                    .Include(bag => bag.ExpeditionBagItems)
+                        .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                    .Single();
+                expeditionBagFromDb.UpdateAllButKeysProperties(expeditionBagModel);
+                DbContext.Update(expeditionBagFromDb);
+                expeditionCitizen.IdExpeditionBagNavigation = expeditionBagFromDb;
+                DbContext.SaveChanges();
+                result = Mapper.Map<ExpeditionBagDto>(expeditionBagFromDb);
+            }
+            else
+            {
+                // Si y'a déjà un bag, on remove
+                if (expeditionCitizen.IdExpeditionBag != null)
+                {
+                    DbContext.Remove(DbContext.ExpeditionBags.Single(expeditionBag => expeditionBag.IdExpeditionBag == expeditionCitizen.IdExpeditionBag));
+                }
+                // Create
+                var newEntity = DbContext.Add(expeditionBagModel).Entity;
+                expeditionCitizen.IdExpeditionBagNavigation = newEntity;
+                DbContext.SaveChanges();
+                var newEntityWithDependance = DbContext.ExpeditionBags.Where(bag => bag.IdExpeditionBag == newEntity.IdExpeditionBag)
+                    .Include(bag => bag.ExpeditionBagItems)
+                        .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                    .Single();
+                result = Mapper.Map<ExpeditionBagDto>(newEntityWithDependance);
+            }
+            transaction.Commit();
+            return result;
         }
 
         #endregion

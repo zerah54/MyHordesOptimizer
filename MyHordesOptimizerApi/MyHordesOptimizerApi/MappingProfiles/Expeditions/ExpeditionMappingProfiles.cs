@@ -104,25 +104,25 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                     return context.GetDbContext().ExpeditionBags.SingleOrDefault(bag => src.BagId == bag.IdExpeditionBag);
                 }));
 
-            CreateMap<ExpeditionBagDto, ExpeditionBag>()
+            CreateMap<ExpeditionBag, ExpeditionBagDto>()
+                .ForMember(dto => dto.Items, opt => opt.MapFrom(model => model.ExpeditionBagItems))
+                .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpeditionBag));
+            CreateMap<ExpeditionBagRequestDto, ExpeditionBag>()
                 .ForMember(model => model.ExpeditionBagItems, opt => opt.MapFrom(dto => dto.Items))
                 .ForMember(model => model.ExpeditionCitizens, opt => opt.Ignore())
-                .ForMember(model => model.IdExpeditionBag, opt => opt.MapFrom(dto => dto.IdBag))
-                .ReverseMap()
-                .ForMember(dto => dto.Items, opt => opt.MapFrom(model => model.ExpeditionBagItems))
-                .ForMember(dto => dto.IdBag, opt => opt.MapFrom(model => model.IdExpeditionBag));
+                .ForMember(model => model.IdExpeditionBag, opt => opt.MapFrom(dto => dto.Id));
 
 
-            CreateMap<StackableItemDto, ExpeditionBagItem>()
-                .ForMember(model => model.IdItem, opt => opt.MapFrom(dto => dto.Item.Id))
-                .ForMember(model => model.IdExpeditionBagNavigation, opt => opt.Ignore())
-                .ForMember(model => model.IsBroken, opt => opt.MapFrom(dto => dto.IsBroken))
-                .ForMember(model => model.Count, opt => opt.MapFrom(dto => dto.Count))
-                .ReverseMap()
+            CreateMap<ExpeditionBagItem, StackableItemDto>()
                 .ForMember(dto => dto.Count, opt => opt.MapFrom(model => model.Count))
                 .ForMember(dto => dto.IsBroken, opt => opt.MapFrom(model => model.IsBroken))
                 .ForMember(dto => dto.Item, opt => opt.MapFrom(model => model.IdItemNavigation))
                 .ForMember(dto => dto.WishListCount, opt => opt.Ignore());
+            CreateMap<ExpeditionBagItemRequestDto, ExpeditionBagItem>()
+                .ForMember(model => model.IdItem, opt => opt.MapFrom(dto => dto.Id))
+                .ForMember(model => model.IdExpeditionBagNavigation, opt => opt.Ignore())
+                .ForMember(model => model.IsBroken, opt => opt.MapFrom(dto => false))
+                .ForMember(model => model.Count, opt => opt.MapFrom(dto => dto.Count));
         }
     }
 }

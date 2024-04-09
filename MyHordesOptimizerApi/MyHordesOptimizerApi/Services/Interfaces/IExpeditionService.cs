@@ -22,6 +22,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         Task<List<ExpeditionOrderDto>> SavePartOrdersAsync(int expeditionPartId, List<ExpeditionOrderDto> expeditionOrder);
         void DeleteExpeditionOrder(int expeditionOrderId);
 
-        ExpeditionOrderDto UpdateExpeditionOrder(ExpeditionOrderDto expeditionOrderDto); 
+        ExpeditionOrderDto UpdateExpeditionOrder(ExpeditionOrderDto expeditionOrderDto);
+        ExpeditionBagDto UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto);
     }
 }

@@ -136,5 +136,13 @@ namespace MyHordesOptimizerApi.Controllers
             var updatedDto = ExpeditionService.UpdateExpeditionOrder(expeditionOrder);
             return Ok(updatedDto);
         }
+
+        [HttpPost]
+        [Route("citizen/{citizenId}/bags")]
+        public ActionResult SaveExpeditionBag([FromRoute] int citizenId, [FromBody] ExpeditionBagRequestDto expeditionBagDto)
+        {
+            var updatedDto = ExpeditionService.UpdateExpeditionBag(citizenId, expeditionBagDto);
+            return Ok(updatedDto);
+        }
     }
 }

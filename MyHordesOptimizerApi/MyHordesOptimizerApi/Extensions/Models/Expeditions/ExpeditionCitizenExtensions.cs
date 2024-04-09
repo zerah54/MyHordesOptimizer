@@ -13,6 +13,7 @@ namespace MyHordesOptimizerApi.Extensions.Models.Expeditions
             newCitizen.PreinscritHeroic = source.PreinscritHeroic;
             newCitizen.PreinscritJob = source.PreinscritJob;
             newCitizen.IdExpeditionBag = null;
+            newCitizen.IdExpeditionBagNavigation = source.IdExpeditionBagNavigation.Copy();
             source.ExpeditionOrders.ToList().ForEach(order => newCitizen.ExpeditionOrders.Add(order.Copy()));
             return newCitizen;
         }
