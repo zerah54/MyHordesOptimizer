@@ -18,5 +18,8 @@ namespace MyHordesOptimizerApi.Data.Heroes
 
         [JsonProperty("daysNeeded")]
         public int DaysNeeded { get; set; }
+
+        [JsonProperty("action")]
+        public string Action { get; set; }
     }
 }

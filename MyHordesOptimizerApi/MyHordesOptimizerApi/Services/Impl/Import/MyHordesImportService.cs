@@ -79,8 +79,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         public async Task ImportHeroSkill()
         {
-            var codeResult = MyHordesCodeRepository.GetHeroCapacities();
-            var capacities = Mapper.Map<List<HeroSkill>>(codeResult);
+            var codeCapacities = MyHordesCodeRepository.GetHeroCapacities();
+            var capacities = Mapper.Map<List<HeroSkill>>(codeCapacities);
 
             // Traduction
             var translations = await TranslationService.GetTranslations();
@@ -105,26 +105,14 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     .Select(ymlFileModel => ymlFileModel.Translations[capacitie.DescriptionDe])
                     .First();
             }
+
+            var codePowers = MyHordesCodeRepository.GetHeroPowers();
+            var codePowersToKeep = codePowers.Where(power => !codeCapacities.Any(capacitie => capacitie.Action == power.Name)).ToList();
+
+
             var heroSkills = DbContext.HeroSkills.ToList();
             var comparer = EqualityComparerFactory.Create<HeroSkill>(heroSkill => heroSkill.Name.GetHashCode(), (a, b) => a.Name == b.Name);
-            Patch(heroSkills, capacities, comparer);
-        }
-
-        // TODO : Utiliser la méthode d'extension
-        private void Patch<T>(List<T> fromDbEntities, List<T> updatedEntities, IEqualityComparer<T> comparer) where T : class
-        {
-            var toRemove = fromDbEntities.Except(updatedEntities, comparer);
-            DbContext.RemoveRange(toRemove);
-            var toAdd = updatedEntities.Except(fromDbEntities, comparer);
-            DbContext.AddRange(toAdd);
-            var toUpdate = fromDbEntities.Intersect(updatedEntities, comparer);
-            foreach (var update in toUpdate)
-            {
-                var updatedEntity = updatedEntities.Where(entity => comparer.Equals(entity, update)).First();
-                update.UpdateAllButKeysProperties(updatedEntity);
-                DbContext.Update(update);
-            }
-            DbContext.SaveChanges();
+            DbContext.Patch(heroSkills, capacities, comparer);
         }
 
         #endregion
@@ -164,7 +152,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
             var causeOfDeathsFromDb = DbContext.CauseOfDeaths.ToList();
             var comparer = EqualityComparerFactory.Create<CauseOfDeath>(causeOfDeath => causeOfDeath.Dtype.GetHashCode(), (a, b) => a.Dtype == b.Dtype);
-            Patch(causeOfDeathsFromDb, causesOfDeaths, comparer);
+            DbContext.Patch(causeOfDeathsFromDb, causesOfDeaths, comparer);
         }
 
         #endregion
@@ -179,7 +167,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
             var cleanUpTypesFromDb = DbContext.TownCadaverCleanUpTypes.ToList();
             var comparer = EqualityComparerFactory.Create<TownCadaverCleanUpType>(cleanUpType => cleanUpType.IdType.GetHashCode(), (a, b) => a.IdType == b.IdType);
-            Patch(cleanUpTypesFromDb, cleanUpTypes, comparer);
+            DbContext.Patch(cleanUpTypesFromDb, cleanUpTypes, comparer);
         }
 
         #endregion
@@ -232,7 +220,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
             var itemComparer = EqualityComparerFactory.Create<Item>(item => item.IdItem.GetHashCode(), (a, b) => a.IdItem == b.IdItem);
             var existingItems = DbContext.Items.ToList();
-            Patch(existingItems, mhoItems, itemComparer);
+            DbContext.Patch(existingItems, mhoItems, itemComparer);
             existingItems = DbContext.Items.ToList();
 
             // Récupération des properties
@@ -254,7 +242,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var updatedProperties = itemByProperty.Select(kvp => propertiesFromDb.FirstOrDefault(prop => prop.Name == kvp.Key, new Property() { Name = kvp.Key, IdItems = kvp.Value }))
                 .ToList();
             var propertyComparer = EqualityComparerFactory.Create<Property>(prop => prop.Name.GetHashCode(), (a, b) => a.Name == b.Name);
-            Patch(propertiesFromDb, updatedProperties, propertyComparer);
+            DbContext.Patch(propertiesFromDb, updatedProperties, propertyComparer);
 
             // Récupération des actions
             var codeItemsActions = MyHordesCodeRepository.GetItemsActions();
@@ -275,7 +263,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var updatedActions = itemByAction.Select(kvp => actionsFromDb.FirstOrDefault(action => action.Name == kvp.Key, new Action() { Name = kvp.Key, IdItems = kvp.Value }))
                 .ToList();
             var actionComparer = EqualityComparerFactory.Create<Action>(action => action.Name.GetHashCode(), (a, b) => a.Name == b.Name);
-            Patch(actionsFromDb, updatedActions, actionComparer);
+            DbContext.Patch(actionsFromDb, updatedActions, actionComparer);
 
             //Récupération des recipes
             var codeItemRecipes = MyHordesCodeRepository.GetRecipes();
@@ -300,7 +288,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             }
             var recipesFromDb = DbContext.Recipes.ToList();
             var recipeComparer = EqualityComparerFactory.Create<Recipe>(recipe => recipe.Name.GetHashCode(), (a, b) => a.Name == b.Name);
-            Patch(recipesFromDb, mhoRecipes, recipeComparer);
+            DbContext.Patch(recipesFromDb, mhoRecipes, recipeComparer);
 
             DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemComponent");
             DbContext.Database.ExecuteSqlRaw("DELETE FROM RecipeItemResult");
@@ -435,7 +423,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 .Include(ruin => ruin.RuinItemDrops)
                 .ToList();
             var ruinComparer = EqualityComparerFactory.Create<Ruin>(ruin => ruin.IdRuin.GetHashCode(), (a, b) => a.IdRuin == b.IdRuin);
-            Patch(ruinsFromDb, ruinModels, ruinComparer);
+            DbContext.Patch(ruinsFromDb, ruinModels, ruinComparer);
         }
 
         #endregion
@@ -464,7 +452,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
             var comparer = EqualityComparerFactory.Create<Category>(category => category.Name.GetHashCode(), (a, b) => a.Name == b.Name);
             var existingCategories = DbContext.Categories.ToList();
-            Patch(existingCategories, categories, comparer);
+            DbContext.Patch(existingCategories, categories, comparer);
         }
 
         #endregion
@@ -480,7 +468,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 .Include(wishListCategorie => wishListCategorie.IdItems)
                 .ToList();
             var wishListCategoryComparer = EqualityComparerFactory.Create<WishlistCategorie>(wlc => wlc.IdCategory.GetHashCode(), (a, b) => a.IdCategory == b.IdCategory);
-            Patch(wishListCategoriesFromDb, models, wishListCategoryComparer);
+            DbContext.Patch(wishListCategoriesFromDb, models, wishListCategoryComparer);
         }
 
         public void ImportDefaultWishlists()
@@ -536,7 +524,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var defaultWishlistItemComparer = EqualityComparerFactory.Create<DefaultWishlistItem>(dwi => HashCode.Combine(dwi.IdDefaultWishlist, dwi.IdItem),
                 (a, b) => a.IdDefaultWishlist == b.IdDefaultWishlist
                 && a.IdItem == b.IdItem);
-            Patch(modelsFromDb, modeles, defaultWishlistItemComparer);
+            DbContext.Patch(modelsFromDb, modeles, defaultWishlistItemComparer);
         }
 
         #endregion

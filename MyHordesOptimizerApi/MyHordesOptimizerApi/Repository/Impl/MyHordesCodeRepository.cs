@@ -73,6 +73,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return dictionnary.Values.ToList();
         }
 
+        public List<MyHordesHerosPowerCodeModel> GetHeroPowers()
+        {
+            var path = "Data/Heroes/powers.json";
+            var json = File.ReadAllText(path);
+            var list = json.FromJson<List<MyHordesHerosPowerCodeModel>>();
+            return list;
+        }
+
         public List<MyHordesCauseOfDeathModel> GetCausesOfDeath()
         {
             var path = "Data/CauseOfDeath/cause-of-death.json";
