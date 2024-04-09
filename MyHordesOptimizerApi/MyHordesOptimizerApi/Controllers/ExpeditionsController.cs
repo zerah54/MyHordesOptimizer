@@ -144,5 +144,13 @@ namespace MyHordesOptimizerApi.Controllers
             var updatedDto = ExpeditionService.UpdateExpeditionBag(citizenId, expeditionBagDto);
             return Ok(updatedDto);
         }
+
+        [HttpDelete]
+        [Route("bags/{bagId}")]
+        public ActionResult DeleteExpeditionBag([FromRoute] int bagId)
+        {
+            ExpeditionService.DeleteExpeditionBag(bagId);
+            return Ok();
+        }
     }
 }

@@ -6,7 +6,6 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request;
 using MyHordesOptimizerApi.Extensions;
-using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Extensions.Models.Expeditions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Expeditions;
@@ -228,7 +227,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 else
                 {
                     // Create
-                    if(expeditionCitizenModel.IdExpeditionBagNavigation is null)
+                    if (expeditionCitizenModel.IdExpeditionBagNavigation is null)
                     {
                         expeditionCitizenModel.IdExpeditionBagNavigation = new ExpeditionBag();
                     }
@@ -466,14 +465,14 @@ namespace MyHordesOptimizerApi.Services.Impl
         #region Bags
         public ExpeditionBagDto UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto)
         {
-            using var transaction = DbContext.Database.BeginTransaction();;
+            using var transaction = DbContext.Database.BeginTransaction(); ;
             var expeditionBagModel = Mapper.Map<ExpeditionBag>(expeditionBagDto);
             ExpeditionBagDto result;
             var expeditionCitizen = DbContext.ExpeditionCitizens.Single(citizen => citizen.IdExpeditionCitizen == citizenId);
             if (expeditionBagDto.Id.HasValue)
             {
                 // Si l'id du sac du citizen a changer, on delete l'ancien sac
-                if(expeditionCitizen.IdExpeditionBag != expeditionBagDto.Id)
+                if (expeditionCitizen.IdExpeditionBag != expeditionBagDto.Id)
                 {
                     DbContext.Remove(DbContext.ExpeditionBags.Single(expeditionBag => expeditionBag.IdExpeditionBag == expeditionBagDto.Id));
                 }
@@ -508,6 +507,13 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
             transaction.Commit();
             return result;
+        }
+
+        public void DeleteExpeditionBag(int bagId)
+        {
+            var expeditionBag = DbContext.ExpeditionBags.Single(bag => bag.IdExpeditionBag == bagId);
+            DbContext.Remove(expeditionBag);
+            DbContext.SaveChanges();
         }
 
         #endregion
