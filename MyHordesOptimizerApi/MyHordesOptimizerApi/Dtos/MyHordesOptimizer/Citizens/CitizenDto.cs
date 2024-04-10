@@ -37,6 +37,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
         public CadaverDto Cadaver { get; set; }
         public List<BathDto> Baths { get; set; }
 
+        public bool IsShunned { get; set; }
+
         public CitizenDto()
         {
             Bag = new BagDto();

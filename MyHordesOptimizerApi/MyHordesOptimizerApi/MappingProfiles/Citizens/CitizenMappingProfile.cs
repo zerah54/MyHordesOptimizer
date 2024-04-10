@@ -30,6 +30,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dto => dto.HomeMessage, opt => opt.MapFrom(model => model.HomeMessage))
                 .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdUser))
                 .ForMember(dto => dto.IsGhost, opt => opt.MapFrom(model => model.IsGhost))
+                .ForMember(dto => dto.IsShunned, opt => opt.MapFrom(model => model.IsShunned))
                 .ForMember(dto => dto.JobName, opt => opt.MapFrom(model => model.JobName))
                 .ForMember(dto => dto.JobUid, opt => opt.MapFrom(model => model.JobUid))
                 .ForMember(dto => dto.Name, opt => opt.MapFrom(model => model.IdUserNavigation.Name))
