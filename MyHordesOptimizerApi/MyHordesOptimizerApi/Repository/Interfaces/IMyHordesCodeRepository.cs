@@ -16,7 +16,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         Dictionary<string, List<string>> GetItemsActions();
         Dictionary<string, Dictionary<string, dynamic[]>> GetItemsDropRates();
         List<MyHordesHerosCapacitiesCodeModel> GetHeroCapacities();
-        List<MyHordesHerosPowerCodeModel> GetHeroPowers();
         List<MyHordesCauseOfDeathModel> GetCausesOfDeath();
         List<MyHordesCleanUpTypeModel> GetCleanUpTypes();
         Dictionary<string, MyHordesRecipeCodeModel> GetRecipes();

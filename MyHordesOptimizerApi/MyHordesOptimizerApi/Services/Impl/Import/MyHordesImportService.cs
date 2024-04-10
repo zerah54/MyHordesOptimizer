@@ -106,10 +106,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     .First();
             }
 
-            var codePowers = MyHordesCodeRepository.GetHeroPowers();
-            var codePowersToKeep = codePowers.Where(power => !codeCapacities.Any(capacitie => capacitie.Action == power.Name)).ToList();
-
-
             var heroSkills = DbContext.HeroSkills.ToList();
             var comparer = EqualityComparerFactory.Create<HeroSkill>(heroSkill => heroSkill.Name.GetHashCode(), (a, b) => a.Name == b.Name);
             DbContext.Patch(heroSkills, capacities, comparer);

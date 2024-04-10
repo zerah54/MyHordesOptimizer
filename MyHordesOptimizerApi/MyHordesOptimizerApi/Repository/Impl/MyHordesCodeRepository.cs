@@ -67,18 +67,22 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public List<MyHordesHerosCapacitiesCodeModel> GetHeroCapacities()
         {
-            var path = "Data/Heroes/capacities.json";
-            var json = File.ReadAllText(path);
-            var dictionnary = json.FromJson<Dictionary<string, MyHordesHerosCapacitiesCodeModel>>();
-            return dictionnary.Values.ToList();
-        }
+            var capacitiesPath = "Data/Heroes/capacities.json";
+            var capacitiesJson = File.ReadAllText(capacitiesPath);
+            var capacitiesDictionnary = capacitiesJson.FromJson<Dictionary<string, MyHordesHerosCapacitiesCodeModel>>();
 
-        public List<MyHordesHerosPowerCodeModel> GetHeroPowers()
-        {
-            var path = "Data/Heroes/powers.json";
-            var json = File.ReadAllText(path);
-            var list = json.FromJson<List<MyHordesHerosPowerCodeModel>>();
-            return list;
+            var powerPath = "Data/Heroes/powers.json";
+            var powerJson = File.ReadAllText(powerPath);
+            var powerDictionnary = powerJson.FromJson<Dictionary<string, MyHordesHerosCapacitiesCodeModel>>();
+            powerDictionnary = powerDictionnary.Where(powerKeyValue => capacitiesDictionnary.Values.Any(capacity => capacity.Action != powerKeyValue.Key))
+                .ToDictionary();
+            
+            foreach(var power in powerDictionnary)
+            {
+                capacitiesDictionnary.Add(power.Key, power.Value);
+            }
+
+            return capacitiesDictionnary.Values.ToList();
         }
 
         public List<MyHordesCauseOfDeathModel> GetCausesOfDeath()
