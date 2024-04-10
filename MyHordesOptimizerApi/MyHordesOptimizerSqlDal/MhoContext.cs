@@ -185,9 +185,7 @@ public partial class MhoContext : DbContext
 
             entity.Property(e => e.IsBroken).HasDefaultValueSql("b'0'");
 
-            entity.HasOne(d => d.IdExpeditionBagNavigation).WithMany(p => p.ExpeditionBagItems)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("ExpeditionBagItem_ibfk_2");
+            entity.HasOne(d => d.IdExpeditionBagNavigation).WithMany(p => p.ExpeditionBagItems).HasConstraintName("ExpeditionBagItem_ibfk_2");
 
             entity.HasOne(d => d.IdItemNavigation).WithMany(p => p.ExpeditionBagItems)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -198,7 +196,9 @@ public partial class MhoContext : DbContext
         {
             entity.HasKey(e => e.IdExpeditionCitizen).HasName("PRIMARY");
 
-            entity.HasOne(d => d.IdExpeditionBagNavigation).WithMany(p => p.ExpeditionCitizens).HasConstraintName("ExpeditionCitizen_ibfk_4");
+            entity.HasOne(d => d.IdExpeditionBagNavigation).WithMany(p => p.ExpeditionCitizens)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("ExpeditionCitizen_ibfk_4");
 
             entity.HasOne(d => d.IdExpeditionPartNavigation).WithMany(p => p.ExpeditionCitizens)
                 .OnDelete(DeleteBehavior.Cascade)
@@ -550,6 +550,7 @@ public partial class MhoContext : DbContext
             entity.Property(e => e.HasLock).HasDefaultValueSql("b'0'");
             entity.Property(e => e.HouseLevel).HasDefaultValueSql("-1");
             entity.Property(e => e.IdCadaver).HasDefaultValueSql("'0'");
+            entity.Property(e => e.IsShunned).HasDefaultValueSql("b'0'");
             entity.Property(e => e.KitchenLevel).HasDefaultValueSql("-1");
             entity.Property(e => e.LaboLevel).HasDefaultValueSql("-1");
             entity.Property(e => e.RenfortLevel).HasDefaultValueSql("-1");

@@ -127,6 +127,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.IsLegWounded, opt => opt.Ignore())
                 .ForMember(dest => dest.IsQuenched, opt => opt.Ignore())
                 .ForMember(dest => dest.IsSated, opt => opt.Ignore())
+                .ForMember(dest => dest.IsShunned, opt => opt.MapFrom(src => src.Ban))
                 .ForMember(dest => dest.IsTerrorised, opt => opt.Ignore())
                 .ForMember(dest => dest.IsThirsty, opt => opt.Ignore())
                 .ForMember(dest => dest.IsTired, opt => opt.Ignore())

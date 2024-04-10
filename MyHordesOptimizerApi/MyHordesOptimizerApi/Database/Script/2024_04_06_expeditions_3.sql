@@ -29,4 +29,8 @@ ADD CONSTRAINT ExpeditionBagItem_ibfk_2
   FOREIGN KEY (idExpeditionBag)
   REFERENCES ExpeditionBag (idExpeditionBag)
   ON DELETE CASCADE
-  ON UPDATE NO ACTION
+  ON UPDATE NO ACTION;
+
+
+ALTER TABLE TownCitizen
+ADD COLUMN isShunned BIT(1) NULL DEFAULT 0 AFTER dead;

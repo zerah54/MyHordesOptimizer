@@ -50,6 +50,9 @@ public partial class TownCitizen
     [Column("dead")]
     public bool? Dead { get; set; }
 
+    [Column("isShunned")]
+    public bool? IsShunned { get; set; }
+
     [Column("idCadaver", TypeName = "int(11)")]
     public int? IdCadaver { get; set; }
 
