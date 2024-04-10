@@ -90,7 +90,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.PreinscritHeroic, opt => opt.MapFrom(dto => dto.PreinscritHeroicSkillName))
                 .ForMember(model => model.IsPreinscrit, opt => opt.MapFrom(dto => dto.Preinscrit))
                 .ForMember(model => model.PreinscritJob, opt => opt.MapFrom(dto => dto.PreinscritJob))
-                .ForMember(model => model.IdExpeditionBag, opt => opt.Ignore())
+                .ForMember(model => model.IdExpeditionBag, opt => opt.MapFrom(dto => dto.BagId))
                 .ForMember(model => model.IdExpeditionCitizen, opt => opt.Ignore())
                 .ForMember(model => model.IdExpeditionPart, opt => opt.Ignore())
                 .ForMember(model => model.IdUser, opt => opt.MapFrom(dto => dto.IdUser))
