@@ -6,6 +6,7 @@ using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Extensions.Models;
@@ -412,25 +413,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public CitizensLastUpdateDto GetCitizens(int townId)
         {
-            var models = DbContext.TownCitizens
-                .Include(townCitizen => townCitizen.IdBagNavigation)
-                    .ThenInclude(bag => bag.BagItems)
-                        .ThenInclude(bagItem => bagItem.IdItemNavigation)
-                .Include(townCitizen => townCitizen.IdBagNavigation)
-                    .ThenInclude(bagItem => bagItem.IdLastUpdateInfoNavigation)
-                        .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
-                .Include(townCitizen => townCitizen.IdLastUpdateInfoNavigation)
-                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
-                .Include(townCitizen => townCitizen.IdLastUpdateInfoGhoulStatusNavigation)
-                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
-                .Include(townCitizen => townCitizen.IdLastUpdateInfoHeroicActionNavigation)
-                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
-                .Include(townCitizen => townCitizen.IdLastUpdateInfoHomeNavigation)
-                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
-                .Include(townCitizen => townCitizen.IdLastUpdateInfoStatusNavigation)
-                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
-                .Include(lastUpdate => lastUpdate.IdUserNavigation)
-                .Where(townCitizen => townCitizen.IdTown == townId)
+            var models = DbContext.GetMostRecentsTownCitizen(townId)
                 .ToList();
             var dtos = Mapper.Map<CitizensLastUpdateDto>(models);
             return dtos;

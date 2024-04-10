@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
+namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
 {
     public class CitizensLastUpdateDto
     {

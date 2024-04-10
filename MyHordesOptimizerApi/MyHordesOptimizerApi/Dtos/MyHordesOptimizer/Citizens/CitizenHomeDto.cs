@@ -1,7 +1,7 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using System;
 
-namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
+namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
 {
     public class CitizenHomeDto
     {

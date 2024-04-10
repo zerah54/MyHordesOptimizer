@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Linq;
 
@@ -11,47 +14,71 @@ namespace MyHordesOptimizerApi.Services.Impl
     {
         protected ILogger<TownService> Logger { get; init; }
         protected IMapper Mapper { get; init; }
+        protected IUserInfoProvider UserInfoProvider { get; init; }
         protected MhoContext DbContext { get; init; }
 
         public TownService(ILogger<TownService> logger,
-            IMapper mapper, 
+            IMapper mapper,
+            IUserInfoProvider userInfoProvider,
             MhoContext dbContext)
         {
             Logger = logger;
             Mapper = mapper;
+            UserInfoProvider = userInfoProvider;
             DbContext = dbContext;
         }
 
         public CitizenDto GetTownCitizen(int townId, int userId)
         {
-            var lastUpdateInfoId = DbContext.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId).Max(tbi => tbi.IdLastUpdateInfo);
-            var citizen = DbContext.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId)
+            var citizen = DbContext.GetMostRecentsTownCitizen(townId)
                 .Where(townCitizen => townCitizen.IdUser == userId)
-                .Where(townCitizen => townCitizen.IdLastUpdateInfo == lastUpdateInfoId
-                || townCitizen.IdLastUpdateInfoGhoulStatus == lastUpdateInfoId
-                || townCitizen.IdLastUpdateInfoHeroicAction == lastUpdateInfoId
-                || townCitizen.IdLastUpdateInfoHome == lastUpdateInfoId
-                || townCitizen.IdLastUpdateInfoStatus == lastUpdateInfoId)
-                .Include(townCitizen => townCitizen.IdBagNavigation)
-                    .ThenInclude(bag => bag.BagItems)
-                        .ThenInclude(bagItem => bagItem.IdItemNavigation)
-                .Include(townCitizen => townCitizen.IdBagNavigation)
-                    .ThenInclude(bagItem => bagItem.IdLastUpdateInfoNavigation)
-                        .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
-                .Include(townCitizen => townCitizen.IdLastUpdateInfoNavigation)
-                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
-                .Include(townCitizen => townCitizen.IdLastUpdateInfoGhoulStatusNavigation)
-                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
-                .Include(townCitizen => townCitizen.IdLastUpdateInfoHeroicActionNavigation)
-                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
-                .Include(townCitizen => townCitizen.IdLastUpdateInfoHomeNavigation)
-                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
-                .Include(townCitizen => townCitizen.IdLastUpdateInfoStatusNavigation)
-                    .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
-                .Include(lastUpdate => lastUpdate.IdUserNavigation)
                 .Single();
             var citizenDto = Mapper.Map<CitizenDto>(citizen);
             return citizenDto;
+        }
+
+        public CitizenDto AddCitizenBath(int townId, int userId, int day)
+        {
+            var bath = DbContext.TownCitizenBaths
+                .Where(townCitizenBath => townCitizenBath.IdTown == townId)
+                .Where(townCitizenBath => townCitizenBath.IdUser == userId)
+                .Where(townCitizenBath => townCitizenBath.Day == day)
+                .FirstOrDefault();
+            if (bath == null)
+            {
+                DbContext.ChangeTracker.Clear();
+                using var transaction = DbContext.Database.BeginTransaction();
+                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+                var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+                DbContext.SaveChanges();
+                DbContext.ChangeTracker.Clear();
+                bath = new TownCitizenBath()
+                {
+                    Day = day,
+                    IdUser = userId,
+                    IdTown = townId,
+                    IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo
+                };
+                DbContext.Add(bath);
+                DbContext.SaveChanges();
+                transaction.Commit();
+            }
+           return GetTownCitizen(townId, userId);
+        }
+
+        public CitizenDto DeleteCitizenBath(int townId, int userId, int day)
+        {
+            var bath = DbContext.TownCitizenBaths
+               .Where(townCitizenBath => townCitizenBath.IdTown == townId)
+               .Where(townCitizenBath => townCitizenBath.IdUser == userId)
+               .Where(townCitizenBath => townCitizenBath.Day == day)
+               .FirstOrDefault();
+            if (bath != null)
+            {
+                DbContext.Remove(bath);
+                DbContext.SaveChanges();
+            }
+            return GetTownCitizen(townId, userId);
         }
     }
 }

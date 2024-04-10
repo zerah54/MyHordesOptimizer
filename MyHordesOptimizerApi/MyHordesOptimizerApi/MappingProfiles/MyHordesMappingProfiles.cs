@@ -1,16 +1,12 @@
 ﻿using AutoMapper;
-using MyHordesOptimizerApi.Data.Ruins;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.MappingProfiles.Resolvers;
 using MyHordesOptimizerApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles
 {

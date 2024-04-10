@@ -1,4 +1,6 @@
-﻿namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
+﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+
+namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
     public class CleanUpDto
     {

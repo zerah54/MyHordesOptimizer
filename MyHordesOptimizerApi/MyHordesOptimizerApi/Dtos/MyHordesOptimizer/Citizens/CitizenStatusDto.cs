@@ -1,7 +1,6 @@
-﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
+namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
 {
     public class CitizenStatusDto
     {

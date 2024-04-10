@@ -1,6 +1,7 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Bag;
+using System.Collections.Generic;
 
-namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
+namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
 {
     public class CitizenDto
     {
@@ -34,6 +35,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public CitizenStatusDto Status { get; set; }
         public CitizenActionsHeroic ActionsHeroic { get; set; }
         public CadaverDto Cadaver { get; set; }
+        public List<BathDto> Baths { get; set; }
 
         public CitizenDto()
         {

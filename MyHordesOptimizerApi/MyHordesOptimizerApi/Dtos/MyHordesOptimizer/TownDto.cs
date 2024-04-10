@@ -1,4 +1,5 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordes;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {

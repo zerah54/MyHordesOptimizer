@@ -23,6 +23,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dto => dto.ActionsHeroic, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.Avatar, opt => opt.MapFrom(model => model.Avatar))
                 .ForMember(dto => dto.Bag, opt => opt.MapFrom(model => model.IdBagNavigation))
+                .ForMember(dto => dto.Baths, opt => opt.MapFrom(model => model.IdTownNavigation.TownCitizenBaths.Where(townBath => townBath.IdUser == model.IdUser)))
                 .ForMember(dto => dto.Cadaver, opt => opt.Ignore()) // ??
                 .ForMember(dto => dto.Dead, opt => opt.MapFrom(model => model.Dead))
                 .ForMember(dto => dto.Home, opt => opt.MapFrom(model => model))
@@ -110,6 +111,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
             CreateMap<TownCitizen, CellCitizenDto>()
                 .ForMember(cellCitizenDto => cellCitizenDto.Id, opt => opt.MapFrom(townCitizen => townCitizen.IdUser))
                 .ForMember(cellCitizenDto => cellCitizenDto.Name, opt => opt.MapFrom(townCitizen => townCitizen.IdUserNavigation.Name));
+
+            CreateMap<TownCitizenBath, BathDto>()
+                .ForMember(dto => dto.Day, opt => opt.MapFrom(model => model.Day))
+                .ForMember(dto => dto.LastUpdateInfo, opt => opt.MapFrom(model => model.IdLastUpdateInfoNavigation));
         }
 
         #region private helpers
