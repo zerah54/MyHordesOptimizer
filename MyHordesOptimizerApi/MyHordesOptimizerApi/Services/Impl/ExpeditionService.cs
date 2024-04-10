@@ -125,6 +125,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .ThenInclude(part => part.ExpeditionCitizens)
                        .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
                          .ThenInclude(bag => bag.ExpeditionBagItems)
+                             .ThenInclude(bagItem => bagItem.IdItemNavigation)
                 .Include(expedition => expedition.ExpeditionParts)
                     .ThenInclude(part => part.ExpeditionCitizens)
                         .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
