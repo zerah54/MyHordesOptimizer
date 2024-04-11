@@ -404,5 +404,33 @@ export class ApiService extends GlobalService {
                 });
         });
     }
+
+    public addBath(citizen: Citizen): Observable<void> {
+        return new Observable((sub: Subscriber<void>) => {
+            super.post<EstimationsDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/bath?day=${getTown()?.day}`)
+                .subscribe({
+                    next: () => {
+                        sub.next();
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
+
+    public removeBath(citizen: Citizen): Observable<void> {
+        return new Observable((sub: Subscriber<void>) => {
+            super.delete(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/bath?day=${getTown()?.day}`)
+                .subscribe({
+                    next: () => {
+                        sub.next();
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
 }
 

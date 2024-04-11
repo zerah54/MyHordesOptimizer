@@ -292,6 +292,8 @@ export class CitizensListComponent implements OnInit {
     /**
      * On met à jour la liste des actions héroiques
      *
+     * @param {HeroicActionsWithValue} element
+     * @param {MatCheckboxChange | MatSelectChange} event
      * @param {number} citizen_id
      */
     public updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | MatSelectChange, citizen_id: number): void {
@@ -324,8 +326,12 @@ export class CitizensListComponent implements OnInit {
         return row.baths.some((bath: Bath) => bath.day === this.current_day && bath.last_update_info);
     }
 
-    public saveBath(): void {
-
+    public saveBath(citizen: Citizen, event: MatCheckboxChange): void {
+        if (event.checked) {
+            this.api.addBath(citizen).subscribe()
+        } else {
+            this.api.removeBath(citizen).subscribe()
+        }
     }
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
@@ -353,5 +359,7 @@ export class CitizensListComponent implements OnInit {
                 console.log('dead_citizen_info', dead_citizen_info);
             });
     }
+
+    protected readonly Citizen = Citizen;
 }
 

@@ -69,7 +69,7 @@
                                                     </mho-last-update>
                                                 </div>
                                                 <div class="bath">
-                                                    <mat-checkbox [checked]="dailyBathTaken(row)" (change)="saveBath()">Bain pris</mat-checkbox>
+                                                    <mat-checkbox [checked]="dailyBathTaken(row)" (change)="saveBath(row, $event)" i18n>Bain pris</mat-checkbox>
                                                 </div>
                                             </div>
                                         }
