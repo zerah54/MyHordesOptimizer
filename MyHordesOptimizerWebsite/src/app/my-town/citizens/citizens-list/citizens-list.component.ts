@@ -16,6 +16,7 @@ import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { ListForAddRemove } from '../../../_abstract_model/types/_types';
+import { Bath } from '../../../_abstract_model/types/bath.class';
 import { Cadaver } from '../../../_abstract_model/types/cadaver.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -29,7 +30,7 @@ import { LastUpdateComponent } from '../../../shared/elements/last-update/last-u
 import { ListElementAddRemoveComponent } from '../../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
 import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
-import { getUser } from '../../../shared/utilities/localstorage.util';
+import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
 import { TypeRowPipe } from './type-row.pipe';
 
 @Component({
@@ -63,6 +64,7 @@ export class CitizensListComponent implements OnInit {
     public all_items: Item[] = [];
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly current_day: number = getTown()?.day || 1;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** Les filtres de la liste des citoyens */
@@ -316,6 +318,14 @@ export class CitizensListComponent implements OnInit {
                     }
                 });
         }
+    }
+
+    public dailyBathTaken(row: Citizen): boolean {
+        return row.baths.some((bath: Bath) => bath.day === this.current_day && bath.last_update_info);
+    }
+
+    public saveBath(): void {
+
     }
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */

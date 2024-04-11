@@ -31,7 +31,12 @@
                                     @switch (column.id) {
                                         @case ('avatar_name') {
                                             <mho-avatar [src]="row.avatar"></mho-avatar>
-                                            <div>{{ row.name }}</div>
+                                            <div>
+                                                @if (row.is_shunned) {
+                                                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/banished.gif'" width="16" height="16">
+                                                }
+                                                {{ row.name }}
+                                            </div>
                                         }
                                         @case ('more_status') {
                                             <div>
@@ -62,6 +67,9 @@
                                                     <mho-last-update [lastUpdateInfo]="row.bag?.update_info"
                                                                      [thresholds]="[30, 120, 120*2, 120*3]" [hideDetails]="true">
                                                     </mho-last-update>
+                                                </div>
+                                                <div class="bath">
+                                                    <mat-checkbox [checked]="dailyBathTaken(row)" (change)="saveBath()">Bain pris</mat-checkbox>
                                                 </div>
                                             </div>
                                         }

@@ -3,13 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { getTown } from '../../shared/utilities/localstorage.util';
-import { BagDTO } from '../dto/bag.dto';
+import { CitizenExpeditionBagDTO } from '../dto/citizen-expedition-bag.dto';
 import { CitizenExpeditionDTO } from '../dto/citizen-expedition.dto';
 import { ExpeditionOrderDTO } from '../dto/expedition-order.dto';
 import { ExpeditionPartDTO } from '../dto/expedition-part.dto';
 import { ExpeditionDTO } from '../dto/expedition.dto';
 import { dtoToModelArray, modelToDtoArray } from '../types/_common.class';
-import { Bag } from '../types/bag.class';
+import { CitizenExpeditionBag } from '../types/citizen-expedition-bag.class';
 import { CitizenExpedition } from '../types/citizen-expedition.class';
 import { ExpeditionOrder } from '../types/expedition-order.class';
 import { ExpeditionPart } from '../types/expedition-part.class';
@@ -255,14 +255,14 @@ export class ExpeditionService extends GlobalService {
     /**
      * Ajoute un sac à un citoyen
      *
-     * @param {Bag} bag
+     * @param {CitizenExpedition} citizen
      */
-    public createOrUpdateBag(bag: Bag): Observable<Bag> {
-        return new Observable((sub: Subscriber<Bag>) => {
-            super.post<BagDTO>(this.API_URL + '/expeditions/bag', JSON.stringify(bag.modelToDtoShort()))
+    public createOrUpdateBag(citizen: CitizenExpedition): Observable<CitizenExpeditionBag> {
+        return new Observable((sub: Subscriber<CitizenExpeditionBag>) => {
+            super.post<CitizenExpeditionBagDTO>(this.API_URL + `/expeditions/citizen/${citizen.id}/bags`, JSON.stringify(citizen.bag.modelToDtoShort()))
                 .subscribe({
-                    next: (response: BagDTO) => {
-                        sub.next(new Bag(response));
+                    next: (response: CitizenExpeditionBagDTO) => {
+                        sub.next(new CitizenExpeditionBag(response));
                     },
                     error: (error: HttpErrorResponse) => {
                         sub.error(error);

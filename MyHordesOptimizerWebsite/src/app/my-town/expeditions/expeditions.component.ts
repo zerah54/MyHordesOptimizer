@@ -19,8 +19,8 @@ import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
 import { ListForAddRemove } from '../../_abstract_model/types/_types';
-import { Bag } from '../../_abstract_model/types/bag.class';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
+import { CitizenExpeditionBag } from '../../_abstract_model/types/citizen-expedition-bag.class';
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
@@ -229,25 +229,28 @@ export class ExpeditionsComponent implements OnInit {
         })
             .afterClosed()
             .subscribe((new_orders: ExpeditionOrder[]) => {
-                new_orders.forEach((new_order: ExpeditionOrder, index: number) => {
-                    new_order.position = index;
-                });
-                if (prop instanceof CitizenExpedition) {
-                    this.expedition_service
-                        .createOrUpdateOrdersForCitizen(new_orders, prop)
-                        .subscribe({
-                            next: (saved_order: ExpeditionOrder[]) => {
-                                prop.orders = [...saved_order];
-                            }
-                        });
-                } else {
-                    this.expedition_service
-                        .createOrUpdateOrdersForPart(new_orders, prop)
-                        .subscribe({
-                            next: (saved_order: ExpeditionOrder[]) => {
-                                prop.orders = [...saved_order];
-                            }
-                        });
+                console.log('new_orders', new_orders)
+                if (new_orders) {
+                    new_orders.forEach((new_order: ExpeditionOrder, index: number) => {
+                        new_order.position = index;
+                    });
+                    if (prop instanceof CitizenExpedition) {
+                        this.expedition_service
+                            .createOrUpdateOrdersForCitizen(new_orders, prop)
+                            .subscribe({
+                                next: (saved_order: ExpeditionOrder[]) => {
+                                    prop.orders = [...saved_order];
+                                }
+                            });
+                    } else {
+                        this.expedition_service
+                            .createOrUpdateOrdersForPart(new_orders, prop)
+                            .subscribe({
+                                next: (saved_order: ExpeditionOrder[]) => {
+                                    prop.orders = [...saved_order];
+                                }
+                            });
+                    }
                 }
             });
 
@@ -259,16 +262,12 @@ export class ExpeditionsComponent implements OnInit {
      *
      * @param {CitizenExpedition} citizen
      * @param {number} item_id
-     *
-     * TODO Factoriser avec le bag des citoyens
      */
     public addItem(citizen: CitizenExpedition, item_id: number): void {
-        console.log('item', this.all_items.find((item: Item) => item.id === item_id));
-        citizen;
-        // if (citizen && citizen.bag) {
-        //     citizen.bag.items.push(<Item>this.all_items.find((item: Item): boolean => item.id === item_id));
-        //     this.saveBag(citizen.bag);
-        // }
+        if (citizen && citizen.bag) {
+            citizen.bag.items.push(<Item>this.all_items.find((item: Item): boolean => item.id === item_id));
+            this.saveBag(citizen);
+        }
     }
 
 
@@ -276,17 +275,16 @@ export class ExpeditionsComponent implements OnInit {
      * On retire 1 au compteur de l'item
      * Si l'item tombe à 0, on le retire de la liste
      *
-     * @param {ExpeditionPart} expedition_part
      * @param {CitizenExpedition} citizen
      * @param {number} item_id
      */
-    public removeItem(expedition_part: ExpeditionPart, citizen: CitizenExpedition, item_id: number): void {
+    public removeItem(citizen: CitizenExpedition, item_id: number): void {
         if (citizen && citizen.bag) {
             const item_in_datasource_index: number | undefined = citizen.bag.items.findIndex((item_in_bag: Item) => item_in_bag.id === item_id);
             if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
                 citizen.bag.items.splice(item_in_datasource_index, 1);
             }
-            this.saveCitizen(expedition_part, citizen);
+            this.saveBag(citizen);
         }
     }
 
@@ -410,12 +408,14 @@ export class ExpeditionsComponent implements OnInit {
         }
     }
 
-    public saveBag(bag: Bag): void {
-        this.expedition_service.createOrUpdateBag(bag).subscribe({
-            next: (new_bag: Bag) => {
-                bag = new_bag;
-            }
-        });
+    public saveBag(citizen: CitizenExpedition): void {
+        this.expedition_service
+            .createOrUpdateBag(citizen)
+            .subscribe({
+                next: (new_bag: CitizenExpeditionBag) => {
+                    citizen.bag = new_bag;
+                }
+            });
     }
 }
 

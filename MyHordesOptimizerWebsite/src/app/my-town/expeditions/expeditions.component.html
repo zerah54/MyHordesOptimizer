@@ -243,7 +243,7 @@
                                                                                                          addLabel="Ajouter au sac" i18n-addLabel
                                                                                                          (add)="addItem(citizen, +$event)"
                                                                                                          removeLabel="Retirer du sac" i18n-removeLabel
-                                                                                                         (remove)="removeItem(expedition_part, citizen, +$event)"
+                                                                                                         (remove)="removeItem(citizen, +$event)"
                                                                                                          emptyLabel="Vider le sac" i18n-emptyLabel
                                                                                                          (empty)="emptyBag(expedition_part, citizen)"
                                                                                                          [readonly]="!edition_mode || !editable"

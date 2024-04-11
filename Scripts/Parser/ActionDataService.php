@@ -1210,15 +1210,17 @@ $actions = [
     ],
 ];
 
-$complete_heroic;
+$complete_heroic = [];
 foreach ($actions['heroics'] as &$heroic) {
     $annexe_heroic = $actions['actions'][$heroic['name']];
-    $complete_heroic[$heroic['name']] = [
-        'name' => $heroic['name'],
-        'title' => $annexe_heroic['label'],
-        'description' => $annexe_heroic['tooltip'],
-        'daysNeeded' => 0
-    ];
+    if ($heroic['unlockable']) {
+        $complete_heroic[$heroic['name']] = [
+            'name' => $heroic['name'],
+            'title' => $annexe_heroic['label'],
+            'description' => $annexe_heroic['tooltip'],
+            'daysNeeded' => 0
+        ];
+    }
 }
 
 $new_actions = json_encode($actions['actions'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

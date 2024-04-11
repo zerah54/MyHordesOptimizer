@@ -1,10 +1,10 @@
-﻿import { BagDTO } from './bag.dto';
+﻿import { CitizenExpeditionBagDTO } from './citizen-expedition-bag.dto';
 import { ExpeditionOrderDTO } from './expedition-order.dto';
 
 export interface CitizenExpeditionDTO {
     id?: number;
     idUser?: number;
-    bag?: BagDTO;
+    bag?: CitizenExpeditionBagDTO;
     orders: ExpeditionOrderDTO[];
     preinscrit: boolean;
     preinscritJob?: string;
@@ -16,7 +16,7 @@ export interface CitizenExpeditionDTO {
 export interface CitizenExpeditionShortDTO {
     id?: number;
     idUser?: number;
-    bag?: number;
+    bagId?: number;
     ordersId: number[];
     preinscrit: boolean;
     preinscritJob?: string;

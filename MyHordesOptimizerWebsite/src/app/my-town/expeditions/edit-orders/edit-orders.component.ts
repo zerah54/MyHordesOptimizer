@@ -44,14 +44,6 @@ export class EditOrdersComponent {
         moveItemInArray(this.orders, event.previousIndex, event.currentIndex);
     }
 
-    public toggleMode(order: ExpeditionOrder): void {
-        if (order.type === 'text') {
-            order.type = 'checkbox';
-        } else {
-            order.type = 'text';
-        }
-    }
-
     public deleteOrder(index: number): void {
         this.orders.splice(index, 1);
     }
