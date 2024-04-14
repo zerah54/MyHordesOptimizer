@@ -161,8 +161,8 @@
                     <!-- Row shown when there is no matching data. -->
                     <tr class="mat-row" *matNoDataRow>
                         <td class="mat-cell" colspan="6">
-                            @if (filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== '') {
-                                <ng-container i18n>Aucun objet ne correspond au filtre "{{ filterInput.nativeElement.value }}"</ng-container>
+                            @if (citizen_filters && citizen_filters.length > 0) {
+                                <ng-container i18n>Aucun objet ne correspond au filtre "{{ citizen_filters }}"</ng-container>
                             } @else {
                                 <ng-container i18n>La liste est vide</ng-container>
                             }
@@ -207,8 +207,8 @@
                     <!-- Row shown when there is no matching data. -->
                     <tr class="mat-row" *matNoDataRow>
                         <td class="mat-cell" colspan="6">
-                            @if (filterInput && filterInput.nativeElement.value && filterInput.nativeElement.value !== '') {
-                                <ng-container i18n>Aucun objet ne correspond au filtre "{{ filterInput.nativeElement.value }}"</ng-container>
+                            @if (citizen_filters && citizen_filters.length > 0) {
+                                <ng-container i18n>Aucun objet ne correspond au filtre "{{ citizen_filters }}"</ng-container>
                             } @else {
                                 <ng-container i18n>La liste est vide</ng-container>
                             }

@@ -1,6 +1,6 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
@@ -50,7 +50,6 @@ export class CitizensListComponent implements OnInit {
 
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
-    @ViewChild('filterInput') filterInput!: ElementRef;
 
     /** La liste des citoyens en vie */
     public alive_citizen_info!: CitizenInfo;
@@ -88,9 +87,7 @@ export class CitizensListComponent implements OnInit {
     public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
 
     /** La liste des listes disponibles dans le sac */
-    public readonly bag_lists: ListForAddRemove[] = [
-        {label: $localize`Tous`, list: this.all_items}
-    ];
+    public bag_lists: ListForAddRemove[] = [];
     /** La liste des listes disponibles dans les status */
     public readonly status_lists: ListForAddRemove[] = [
         {label: $localize`Tous`, list: this.all_status}
@@ -120,7 +117,12 @@ export class CitizensListComponent implements OnInit {
             .getItems()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe({
-                next: (items: Item[]) => this.all_items = items
+                next: (items: Item[]) => {
+                    this.all_items = items;
+                    this.bag_lists = [
+                        {label: $localize`Tous`, list: this.all_items}
+                    ]
+                }
             });
 
         this.getCitizens();
@@ -282,7 +284,7 @@ export class CitizensListComponent implements OnInit {
      * On met à jour la liste des améliorations
      *
      * @param {HomeWithValue} element
-     * @param {MatCheckboxChange | MatSelectChange} event
+     * @param {MatCheckboxChange} event
      * @param {number} citizen_id
      */
     public updateHome(element: HomeWithValue, event: MatCheckboxChange | number, citizen_id: number): void {
@@ -316,7 +318,7 @@ export class CitizensListComponent implements OnInit {
      * On met à jour la liste des actions héroiques
      *
      * @param {HeroicActionsWithValue} element
-     * @param {MatCheckboxChange | MatSelectChange} event
+     * @param {MatCheckboxChange} event
      * @param {number} citizen_id
      */
     public updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | number, citizen_id: number): void {

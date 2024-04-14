@@ -49,9 +49,7 @@ export class CitizenMenuComponent implements OnInit {
     public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
 
     /** La liste des listes disponibles dans le sac */
-    public readonly bag_lists: ListForAddRemove[] = [
-        {label: $localize`Tous`, list: this.all_items}
-    ];
+    public bag_lists: ListForAddRemove[] = [];
     /** La liste des listes disponibles dans les status */
     public readonly status_lists: ListForAddRemove[] = [
         {label: $localize`Tous`, list: this.all_status}
@@ -78,7 +76,12 @@ export class CitizenMenuComponent implements OnInit {
             .getItems()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe({
-                next: (items: Item[]) => this.all_items = items
+                next: (items: Item[]) => {
+                    this.all_items = items;
+                    this.bag_lists = [
+                        {label: $localize`Tous`, list: this.all_items}
+                    ]
+                }
             });
 
     }

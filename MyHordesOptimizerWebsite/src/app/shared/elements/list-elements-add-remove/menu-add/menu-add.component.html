@@ -23,13 +23,15 @@
         <ng-template #menuContent let-itemList>
             @if (itemList | isItems) {
                 @for (category of itemList | itemsGroupByCategory; track category.category.id_category) {
-                    <div>{{ category.category.label[locale] }}</div>
-                    @for (item of category.items; track item) {
-                        @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
-                            <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id);" width="16" height="16"
-                                 [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+                    <div>
+                        <div>{{ category.category.label[locale] }}</div>
+                        @for (item of category.items; track item) {
+                            @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
+                                <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id);" width="16" height="16"
+                                     [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+                            }
                         }
-                    }
+                    </div>
                 }
             } @else {
                 @for (item of itemList; track item) {
