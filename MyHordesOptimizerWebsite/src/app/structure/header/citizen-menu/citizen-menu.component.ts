@@ -5,7 +5,7 @@ import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 import * as moment from 'moment/moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
@@ -239,12 +239,12 @@ export class CitizenMenuComponent implements OnInit {
      * @param {HeroicActionsWithValue} element
      * @param {MatCheckboxChange | MatSelectChange} event
      */
-    public updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | MatSelectChange): void {
+    public updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | number): void {
         const old_element_value: boolean | number = element.value;
         if (event instanceof MatCheckboxChange) {
             element.value = event.checked;
         } else {
-            element.value = event.value;
+            element.value = event;
         }
 
         if (this.citizen && this.citizen.heroic_actions) {
@@ -271,12 +271,12 @@ export class CitizenMenuComponent implements OnInit {
      * @param {HomeWithValue} element
      * @param {MatCheckboxChange | MatSelectChange} event
      */
-    public updateHome(element: HomeWithValue, event: MatCheckboxChange | MatSelectChange): void {
+    public updateHome(element: HomeWithValue, event: MatCheckboxChange | number): void {
         const old_element_value: boolean | number = element.value;
         if (event instanceof MatCheckboxChange) {
             element.value = event.checked;
         } else {
-            element.value = event.value;
+            element.value = event;
         }
 
         if (this.citizen && this.citizen.home !== undefined) {

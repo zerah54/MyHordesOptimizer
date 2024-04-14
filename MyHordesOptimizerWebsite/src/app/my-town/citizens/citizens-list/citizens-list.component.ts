@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
@@ -285,12 +285,12 @@ export class CitizensListComponent implements OnInit {
      * @param {MatCheckboxChange | MatSelectChange} event
      * @param {number} citizen_id
      */
-    public updateHome(element: HomeWithValue, event: MatCheckboxChange | MatSelectChange, citizen_id: number): void {
+    public updateHome(element: HomeWithValue, event: MatCheckboxChange | number, citizen_id: number): void {
         const old_element_value: boolean | number = element.value;
         if (event instanceof MatCheckboxChange) {
             element.value = event.checked;
         } else {
-            element.value = event.value;
+            element.value = event;
         }
 
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
@@ -319,12 +319,12 @@ export class CitizensListComponent implements OnInit {
      * @param {MatCheckboxChange | MatSelectChange} event
      * @param {number} citizen_id
      */
-    public updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | MatSelectChange, citizen_id: number): void {
+    public updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | number, citizen_id: number): void {
         const old_element_value: boolean | number = element.value;
         if (event instanceof MatCheckboxChange) {
             element.value = event.checked;
         } else {
-            element.value = event.value;
+            element.value = event;
         }
 
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
