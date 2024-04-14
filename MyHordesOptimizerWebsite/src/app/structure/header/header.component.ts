@@ -14,19 +14,21 @@ import { Title } from '@angular/platform-browser';
 import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
-import { ApiService } from '../../_abstract_model/services/api.service';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
+import { TownService } from '../../_abstract_model/services/town.service';
 import { Me } from '../../_abstract_model/types/me.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
 import { getExternalAppId, getTown, getUser, setExternalAppId } from '../../shared/utilities/localstorage.util';
+import { CitizenMenuComponent } from './citizen-menu/citizen-menu.component';
 
 @Component({
     selector: 'mho-header',
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
     standalone: true,
-    imports: [MatToolbarModule, MatButtonModule, MatIconModule, NgOptimizedImage, CommonModule, MatTooltipModule, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule, MatDividerModule, DebugLogPipe]
+    imports: [MatToolbarModule, MatButtonModule, MatIconModule, NgOptimizedImage, CommonModule, MatTooltipModule, MatMenuModule, MatFormFieldModule,
+        MatInputModule, FormsModule, MatDividerModule, DebugLogPipe, CitizenMenuComponent]
 })
 export class HeaderComponent {
     @HostBinding('style.display') display: string = 'contents';
@@ -51,8 +53,8 @@ export class HeaderComponent {
     public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
 
     private title_service: Title = inject(Title);
-    private api: ApiService = inject(ApiService);
     private authentication_api: AuthenticationService = inject(AuthenticationService);
+    private town_service: TownService = inject(TownService);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
@@ -79,7 +81,7 @@ export class HeaderComponent {
 
     /** Mise à jour des outils externes */
     public updateExternalTools(): void {
-        this.api.updateExternalTools();
+        this.town_service.updateExternalTools();
     }
 
     private updateMe(): void {

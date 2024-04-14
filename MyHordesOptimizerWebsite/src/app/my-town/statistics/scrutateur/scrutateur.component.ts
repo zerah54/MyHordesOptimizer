@@ -1,12 +1,12 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { Component, ElementRef, HostBinding, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostBinding, inject, OnInit, ViewChild } from '@angular/core';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import Chart from 'chart.js/auto';
 import { Subject, takeUntil } from 'rxjs';
 import { ZoneRegen } from '../../../_abstract_model/enum/zone-regen.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
-import { ApiService } from '../../../_abstract_model/services/api.service';
+import { TownStatisticsService } from '../../../_abstract_model/services/town-statistics.service';
 import { Regen } from '../../../_abstract_model/types/regen.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
@@ -31,10 +31,10 @@ export class ScrutateurComponent implements OnInit {
     public datasource: MatTableDataSource<Regen> = new MatTableDataSource();
     /** La liste des colonnes */
     public columns: StandardColumn[] = [
-        { id: 'day', header: $localize`Jour`, sticky: true },
-        { id: 'direction_regen', header: $localize`Direction`, class: '' },
-        { id: 'level_regen', header: $localize`Niveau`, class: '' },
-        { id: 'taux_regen', header: $localize`Taux`, class: '' }
+        {id: 'day', header: $localize`Jour`, sticky: true},
+        {id: 'direction_regen', header: $localize`Direction`, class: ''},
+        {id: 'level_regen', header: $localize`Niveau`, class: ''},
+        {id: 'taux_regen', header: $localize`Taux`, class: ''}
     ];
 
     public polar_chart!: Chart<'polarArea'>;
@@ -44,14 +44,13 @@ export class ScrutateurComponent implements OnInit {
         return zone_a.value.order_by - zone_b.value.order_by;
     });
 
+    private town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
+
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiService) {
-
-    }
-
     ngOnInit(): void {
-        this.api.getScrutList()
+        this.town_statistics_service
+            .getScrutList()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((regens: Regen[]): void => {
                 this.datasource.data = [...regens];

@@ -18,6 +18,7 @@ import { HeroicActionEnum } from '../../_abstract_model/enum/heroic-action.enum'
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
+import { TownService } from '../../_abstract_model/services/town.service';
 import { ListForAddRemove } from '../../_abstract_model/types/_types';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { CitizenExpeditionBag } from '../../_abstract_model/types/citizen-expedition-bag.class';
@@ -71,29 +72,42 @@ export class ExpeditionsComponent implements OnInit {
 
     protected expeditions!: Expedition[];
 
+    private api_service: ApiService = inject(ApiService);
+    private town_service: TownService = inject(TownService);
+
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    public constructor(private api: ApiService, private dialog: MatDialog) {
+    public constructor(private dialog: MatDialog) {
     }
 
     public ngOnInit(): void {
-        this.api.getCitizens()
+        this.town_service
+            .getCitizens()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((citizens: CitizenInfo): void => {
-                this.all_citizens = citizens.citizens;
-                this.all_citizens_job = (JobEnum.getAllValues<JobEnum>())
-                    .filter((job_enum: JobEnum) => this.all_citizens.some((citizen: Citizen): boolean => citizen.job?.key === job_enum.key));
+            .subscribe({
+                next: (citizens: CitizenInfo): void => {
+                    this.all_citizens = citizens.citizens;
+                    this.all_citizens_job = (JobEnum.getAllValues<JobEnum>())
+                        .filter((job_enum: JobEnum) => this.all_citizens.some((citizen: Citizen): boolean => citizen.job?.key === job_enum.key));
+                }
             });
-        this.api.getItems()
+        this.api_service
+            .getItems()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((items: Item[]) => this.all_items = items);
+            .subscribe({
+                next: (items: Item[]) => this.all_items = items
+            });
 
-        this.api.getBank()
+        this.town_service
+            .getBank()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((bank: BankInfo) => {
-                this.bank_items = bank.items;
+            .subscribe({
+                next: (bank: BankInfo) => {
+                    this.bank_items = bank.items;
+                }
             })
-        this.expedition_service.getExpeditions(this.current_day)
+        this.expedition_service
+            .getExpeditions(this.current_day)
             .subscribe({
                 next: (expeditions: Expedition[]) => {
                     this.expeditions = expeditions;

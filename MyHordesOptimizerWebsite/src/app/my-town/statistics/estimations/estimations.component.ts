@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostBinding, HostListener, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, HostBinding, HostListener, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -14,7 +14,7 @@ import { ChartDataset, LegendItem } from 'chart.js/dist/types';
 import { Color } from 'chartjs-plugin-datalabels/types/options';
 import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
 import { MinMax } from '../../../_abstract_model/interfaces';
-import { ApiService } from '../../../_abstract_model/services/api.service';
+import { TownStatisticsService } from '../../../_abstract_model/services/town-statistics.service';
 import { Dictionary } from '../../../_abstract_model/types/_types';
 import { Estimations } from '../../../_abstract_model/types/estimations.class';
 import { Regen } from '../../../_abstract_model/types/regen.class';
@@ -70,7 +70,9 @@ export class EstimationsComponent implements OnInit {
 
     public separators: string[] = [' à ', ' - '];
 
-    constructor(private clipboard: ClipboardService, private api: ApiService) {
+    private town_statistics_service: TownStatisticsService = inject(TownStatisticsService)
+
+    constructor(private clipboard: ClipboardService) {
     }
 
     public ngOnInit(): void {
@@ -79,29 +81,51 @@ export class EstimationsComponent implements OnInit {
 
     /** Enregistre les estimations saisies */
     public saveEstimations(): void {
-        this.api.saveEstimations(this.estimations).subscribe(() => {
-            this.getEstimations();
-        });
+        this.town_statistics_service
+            .saveEstimations(this.estimations)
+            .subscribe(() => {
+                this.getEstimations();
+            });
     }
 
     public getEstimations(): void {
-        this.api.getEstimations(this.selected_day).subscribe((estimations: Estimations) => {
-            this.estimations = estimations;
-            this.api.getApofooAttackCalculation(this.selected_day, false).subscribe((result: MinMax | null) => {
-                this.today_calculated_attack = result;
-                this.api.getApofooAttackCalculation(this.selected_day, true).subscribe((result: MinMax | null) => {
-                    this.today_calculated_attack_beta = result;
-                    this.defineTodayCanvas();
-                });
+        this.town_statistics_service
+            .getEstimations(this.selected_day)
+            .subscribe({
+                next: (estimations: Estimations) => {
+                    this.estimations = estimations;
+                    this.town_statistics_service
+                        .getApofooAttackCalculation(this.selected_day, false)
+                        .subscribe({
+                            next: (result: MinMax | null) => {
+                                this.today_calculated_attack = result;
+                                this.town_statistics_service
+                                    .getApofooAttackCalculation(this.selected_day, true)
+                                    .subscribe({
+                                        next: (result: MinMax | null) => {
+                                            this.today_calculated_attack_beta = result;
+                                            this.defineTodayCanvas();
+                                        }
+                                    });
+                            }
+                        });
+                    this.town_statistics_service
+                        .getApofooAttackCalculation(this.selected_day + 1, false)
+                        .subscribe({
+                            next: (result: MinMax | null) => {
+                                this.tomorrow_calculated_attack = result;
+                                this.town_statistics_service
+                                    .getApofooAttackCalculation(this.selected_day + 1, true)
+                                    .subscribe({
+                                        next: (result: MinMax | null) => {
+                                            this.tomorrow_calculated_attack_beta = result;
+                                            this.defineTomorrowCanvas();
+                                        }
+                                    });
+                            }
+                        });
+                }
             });
-            this.api.getApofooAttackCalculation(this.selected_day + 1, false).subscribe((result: MinMax | null) => {
-                this.tomorrow_calculated_attack = result;
-                this.api.getApofooAttackCalculation(this.selected_day + 1, true).subscribe((result: MinMax | null) => {
-                    this.tomorrow_calculated_attack_beta = result;
-                    this.defineTomorrowCanvas();
-                });
-            });
-        });
     }
 
     public setStep(step: number): void {

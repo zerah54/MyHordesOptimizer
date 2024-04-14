@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, inject, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
@@ -9,8 +9,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { ApiService } from '../../../../_abstract_model/services/api.service';
 import { DigsService } from '../../../../_abstract_model/services/digs.service';
+import { TownService } from '../../../../_abstract_model/services/town.service';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../_abstract_model/types/dig.class';
@@ -39,27 +39,37 @@ export class MapUpdateComponent implements OnInit {
 
     public readonly locale: string = moment.locale();
 
+    private digs_service: DigsService = inject(DigsService);
+    private town_service: TownService = inject(TownService);
+
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(@Inject(MAT_DIALOG_DATA) public data: MapUpdateData, private api: ApiService, private digs_services: DigsService) {
-        this.cell = new Cell({ ...this.data.cell.modelToDto() });
+    constructor(@Inject(MAT_DIALOG_DATA) public data: MapUpdateData) {
+        this.cell = new Cell({...this.data.cell.modelToDto()});
     }
 
     public ngOnInit(): void {
-        this.digs_services.getDigs()
+        this.digs_service
+            .getDigs()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((digs: Dig[]): void => {
-                this.digs = digs.filter((dig: Dig) => dig.x === this.cell.displayed_x && dig.y === this.cell.displayed_y);
+            .subscribe({
+                next: (digs: Dig[]): void => {
+                    this.digs = digs.filter((dig: Dig) => dig.x === this.cell.displayed_x && dig.y === this.cell.displayed_y);
+                }
             });
     }
 
     saveCell(): void {
-        this.api.saveCell(this.cell)
+        this.town_service
+            .saveCell(this.cell)
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((): void => {
-                this.data.cell = new Cell({ ...this.cell.modelToDto() });
+            .subscribe({
+                next: (): void => {
+                    this.data.cell = new Cell({...this.cell.modelToDto()});
+                }
             });
-        this.digs_services.updateDig(this.digs)
+        this.digs_service
+            .updateDig(this.digs)
             .pipe(takeUntil(this.destroy_sub))
             .subscribe();
     }

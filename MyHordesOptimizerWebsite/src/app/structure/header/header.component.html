@@ -12,8 +12,8 @@
                 <ng-container i18n>Mettre à jour les outils externes</ng-container>
             </button>
         } @else {
-            <button mat-icon-button type="button" [color]="'accent'" (click)="updateExternalTools()" matTooltip="Mettre à jour les outils externes"
-                    i18n-matTooltip>
+            <button mat-icon-button type="button" [color]="'accent'" (click)="updateExternalTools()"
+                    matTooltip="Mettre à jour les outils externes" i18n-matTooltip>
                 <mat-icon>send</mat-icon>
             </button>
         }
@@ -41,14 +41,7 @@
             </div>
         } @else {
             @if (me && me.town_details.town_id && is_dev) {
-                <div class="me-in-town" (click)="$event.stopPropagation(); $event.preventDefault()" i18n>
-                    <div class="town-title">({{ me.town_details.town_id }})</div>
-                    <div class="status"></div>
-                    <div class="bag"></div>
-                    <div class="heroic_actions"></div>
-                    <div class="home"></div>
-                </div>
-                <mat-divider></mat-divider>
+                <mho-header-citizen-menu></mho-header-citizen-menu>
             }
             <div mat-menu-item (click)="disconnect()" i18n>Déconnexion</div>
         }

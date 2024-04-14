@@ -1,0 +1,62 @@
+.header-menu-citizen-part {
+    .pseudo {
+        div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5em;
+        }
+    }
+}
+
+.mho-menu-citizen-details {
+
+    &.statuses, &.bag {
+
+        .mat-mdc-menu-content {
+            display: flex;
+            flex-direction: column;
+            margin: 0 0.5em;
+            gap: 0.5em;
+        }
+    }
+
+    &.heroic-actions {
+        .mat-mdc-form-field {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+
+    &.home {
+        .mat-mdc-form-field {
+            width: 100%;
+            max-width: 100%;
+
+            .mat-form-field-infix {
+                width: 125px;
+            }
+
+        }
+    }
+
+    &.heroic-actions,
+    &.home {
+
+        .mat-mdc-form-field {
+
+            .mat-mdc-form-field-infix {
+                display: flex;
+                align-items: center;
+            }
+
+            .mat-mdc-floating-label:not(.mdc-floating-label--float-above) {
+                padding-left: calc(16px + 0.5em);
+            }
+        }
+    }
+}
+
+.cdk-overlay-pane:has(.mho-menu-citizen-details) {
+    transform: translateY(0) !important;
+}

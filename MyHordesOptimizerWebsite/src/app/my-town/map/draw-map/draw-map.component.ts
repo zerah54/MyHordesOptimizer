@@ -28,9 +28,10 @@ export class DrawMapComponent {
 
     @Input() set map(map: Town) {
         if (map) {
+            console.log('map', map);
             this.complete_map = map;
             this.x_row = Array.from({length: map?.map_width}, (_: unknown, i: number) => i - +map.town_x);
-
+            console.log('x-row', this.x_row)
             const rows: Cell[][] = groupBy(map?.cells || [], (cell: Cell) => cell.y);
 
             rows.forEach((row: Cell[]) => {

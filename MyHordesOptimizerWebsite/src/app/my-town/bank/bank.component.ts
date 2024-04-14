@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, OnInit } from '@angular/core';
+import { Component, HostBinding, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,7 +10,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { BANK_CONDENSED_DISPLAY_KEY, HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { Action } from '../../_abstract_model/enum/action.enum';
 import { Property } from '../../_abstract_model/enum/property.enum';
-import { ApiService } from '../../_abstract_model/services/api.service';
+import { TownService } from '../../_abstract_model/services/town.service';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
@@ -51,29 +51,31 @@ export class BankComponent implements OnInit {
 
     public readonly locale: string = moment.locale();
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+
+    private town_service: TownService = inject(TownService);
+
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiService) {
-
-    }
-
     ngOnInit(): void {
-        this.api.getBank(true)
+        this.town_service
+            .getBank(true)
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((bank: BankInfo) => {
-                this.bank = bank;
-                if (this.bank) {
-                    this.bank.items = this.bank?.items
-                        .sort((bank_item_a: Item, bank_item_b: Item) => {
-                            if (bank_item_a.category.ordering < bank_item_b.category.ordering) {
-                                return -1;
-                            } else if (bank_item_a.category.ordering === bank_item_b.category.ordering) {
-                                return 0;
-                            } else {
-                                return 1;
-                            }
-                        });
-                    this.displayed_bank_items = [...this.bank.items];
+            .subscribe({
+                next: (bank: BankInfo) => {
+                    this.bank = bank;
+                    if (this.bank) {
+                        this.bank.items = this.bank?.items
+                            .sort((bank_item_a: Item, bank_item_b: Item) => {
+                                if (bank_item_a.category.ordering < bank_item_b.category.ordering) {
+                                    return -1;
+                                } else if (bank_item_a.category.ordering === bank_item_b.category.ordering) {
+                                    return 0;
+                                } else {
+                                    return 1;
+                                }
+                            });
+                        this.displayed_bank_items = [...this.bank.items];
+                    }
                 }
             });
     }

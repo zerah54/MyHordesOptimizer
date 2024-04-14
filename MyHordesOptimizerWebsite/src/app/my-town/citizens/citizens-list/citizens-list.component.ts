@@ -1,6 +1,6 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
@@ -15,6 +15,7 @@ import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
+import { TownService } from '../../../_abstract_model/services/town.service';
 import { ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Bath } from '../../../_abstract_model/types/bath.class';
 import { Cadaver } from '../../../_abstract_model/types/cadaver.class';
@@ -95,10 +96,10 @@ export class CitizensListComponent implements OnInit {
         {label: $localize`Tous`, list: this.all_status}
     ];
 
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    private api_service: ApiService = inject(ApiService);
+    private town_service: TownService = inject(TownService);
 
-    constructor(private api: ApiService) {
-    }
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     public ngOnInit(): void {
         this.citizen_list = new TableVirtualScrollDataSource();
@@ -115,9 +116,12 @@ export class CitizensListComponent implements OnInit {
 
         this.citizen_list.filterPredicate = (data: Citizen, filter: string): boolean => this.customFilter(data, filter);
 
-        this.api.getItems()
+        this.api_service
+            .getItems()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((items: Item[]) => this.all_items = items);
+            .subscribe({
+                next: (items: Item[]) => this.all_items = items
+            });
 
         this.getCitizens();
     }
@@ -134,12 +138,15 @@ export class CitizensListComponent implements OnInit {
         if (citizen && citizen.bag) {
             citizen.bag.items.push(<Item>this.all_items.find((item: Item) => item.id === item_id));
 
-            this.api.updateBag(citizen)
+            this.town_service
+                .updateBag(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo): void => {
-                    if (citizen.bag) {
-                        citizen.bag.update_info.username = getUser().username;
-                        citizen.bag.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo): void => {
+                        if (citizen.bag) {
+                            citizen.bag.update_info.username = getUser().username;
+                            citizen.bag.update_info.update_time = update_info.update_time;
+                        }
                     }
                 });
         }
@@ -159,12 +166,15 @@ export class CitizensListComponent implements OnInit {
             if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
                 citizen.bag.items.splice(item_in_datasource_index, 1);
             }
-            this.api.updateBag(citizen)
+            this.town_service
+                .updateBag(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo) => {
-                    if (citizen.bag) {
-                        citizen.bag.update_info.username = getUser().username;
-                        citizen.bag.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.bag) {
+                            citizen.bag.update_info.username = getUser().username;
+                            citizen.bag.update_info.update_time = update_info.update_time;
+                        }
                     }
                 });
         }
@@ -179,12 +189,15 @@ export class CitizensListComponent implements OnInit {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.bag) {
             citizen.bag.items = [];
-            this.api.updateBag(citizen)
+            this.town_service
+                .updateBag(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo) => {
-                    if (citizen.bag) {
-                        citizen.bag.update_info.username = getUser().username;
-                        citizen.bag.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.bag) {
+                            citizen.bag.update_info.username = getUser().username;
+                            citizen.bag.update_info.update_time = update_info.update_time;
+                        }
                     }
                 });
         }
@@ -201,12 +214,15 @@ export class CitizensListComponent implements OnInit {
         if (citizen && citizen.status) {
             citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status.key === status_key));
 
-            this.api.updateStatus(citizen)
+            this.town_service
+                .updateStatus(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo) => {
-                    if (citizen.status) {
-                        citizen.status.update_info.username = getUser().username;
-                        citizen.status.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.status) {
+                            citizen.status.update_info.username = getUser().username;
+                            citizen.status.update_info.update_time = update_info.update_time;
+                        }
                     }
                 });
         }
@@ -225,12 +241,15 @@ export class CitizensListComponent implements OnInit {
             if (existing_status_index !== undefined && existing_status_index !== null && existing_status_index > -1) {
                 citizen.status.icons.splice(existing_status_index, 1);
             }
-            this.api.updateStatus(citizen)
+            this.town_service
+                .updateStatus(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo) => {
-                    if (citizen.status) {
-                        citizen.status.update_info.username = getUser().username;
-                        citizen.status.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.status) {
+                            citizen.status.update_info.username = getUser().username;
+                            citizen.status.update_info.update_time = update_info.update_time;
+                        }
                     }
                 });
         }
@@ -245,12 +264,15 @@ export class CitizensListComponent implements OnInit {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.status) {
             citizen.status.icons = [];
-            this.api.updateBag(citizen)
+            this.town_service
+                .updateBag(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo) => {
-                    if (citizen.status) {
-                        citizen.status.update_info.username = getUser().username;
-                        citizen.status.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.status) {
+                            citizen.status.update_info.username = getUser().username;
+                            citizen.status.update_info.update_time = update_info.update_time;
+                        }
                     }
                 });
         }
@@ -273,7 +295,8 @@ export class CitizensListComponent implements OnInit {
 
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.home !== undefined) {
-            this.api.updateHome(citizen)
+            this.town_service
+                .updateHome(citizen)
                 .pipe(takeUntil(this.destroy_sub))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
@@ -306,7 +329,8 @@ export class CitizensListComponent implements OnInit {
 
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.heroic_actions) {
-            this.api.updateHeroicActions(citizen)
+            this.town_service
+                .updateHeroicActions(citizen)
                 .pipe(takeUntil(this.destroy_sub))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
@@ -328,9 +352,13 @@ export class CitizensListComponent implements OnInit {
 
     public saveBath(citizen: Citizen, event: MatCheckboxChange): void {
         if (event.checked) {
-            this.api.addBath(citizen).subscribe()
+            this.town_service
+                .addBath(citizen)
+                .subscribe()
         } else {
-            this.api.removeBath(citizen).subscribe()
+            this.town_service
+                .removeBath(citizen)
+                .subscribe()
         }
     }
 
@@ -344,22 +372,23 @@ export class CitizensListComponent implements OnInit {
     }
 
     public getCitizens(): void {
-        this.api.getCitizens()
+        this.town_service
+            .getCitizens()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((citizen_info: CitizenInfo) => {
-                const alive_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
-                alive_citizen_info.citizens = alive_citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_dead);
-                this.alive_citizen_info = alive_citizen_info;
-                this.citizen_list.data = [...alive_citizen_info.citizens];
+            .subscribe({
+                next: (citizen_info: CitizenInfo) => {
+                    const alive_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
+                    alive_citizen_info.citizens = alive_citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_dead);
+                    this.alive_citizen_info = alive_citizen_info;
+                    this.citizen_list.data = [...alive_citizen_info.citizens];
 
-                const dead_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
-                dead_citizen_info.citizens = dead_citizen_info.citizens.filter((citizen: Citizen) => citizen.is_dead && citizen.cadaver);
-                this.dead_citizen_info = dead_citizen_info;
-                this.dead_citizen_list.data = [...dead_citizen_info.citizens.map((citizen: Citizen) => <Cadaver>citizen.cadaver)];
-                console.log('dead_citizen_info', dead_citizen_info);
+                    const dead_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
+                    dead_citizen_info.citizens = dead_citizen_info.citizens.filter((citizen: Citizen) => citizen.is_dead && citizen.cadaver);
+                    this.dead_citizen_info = dead_citizen_info;
+                    this.dead_citizen_list.data = [...dead_citizen_info.citizens.map((citizen: Citizen) => <Cadaver>citizen.cadaver)];
+                    console.log('dead_citizen_info', dead_citizen_info);
+                }
             });
     }
-
-    protected readonly Citizen = Citizen;
 }
 
