@@ -40,7 +40,7 @@ export class CitizenExpeditionBag extends CommonModel<CitizenExpeditionBagDTO> {
                 short_items_count.push({
                     count: 1,
                     item: item.modelToDto(),
-                    isBroken: item.is_broken
+                    isBroken: !!item.is_broken
                 });
             }
         });
@@ -59,7 +59,7 @@ export class CitizenExpeditionBag extends CommonModel<CitizenExpeditionBagDTO> {
                 short_items_count.push({
                     count: 1,
                     id: item.id,
-                    isBroken: item.is_broken
+                    isBroken: !!item.is_broken
                 });
             }
         });

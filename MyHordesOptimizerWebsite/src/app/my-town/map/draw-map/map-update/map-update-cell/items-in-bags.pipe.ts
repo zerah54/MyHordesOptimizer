@@ -16,7 +16,7 @@ export class ItemsInBagsPipe implements PipeTransform {
             complete_citizen.bag?.items.forEach((item_in_bag: Item): void => {
                 const listed_item: ItemCount | undefined = items.find((item: ItemCount) => item.item.id === item_in_bag.id && item.is_broken === item_in_bag.is_broken);
                 if (!listed_item) {
-                    items.push(new ItemCount({count: 1, isBroken: item_in_bag.is_broken, item: item_in_bag.modelToDto()}));
+                    items.push(new ItemCount({count: 1, isBroken: !!item_in_bag.is_broken, item: item_in_bag.modelToDto()}));
                 } else {
                     listed_item.count++;
                 }
