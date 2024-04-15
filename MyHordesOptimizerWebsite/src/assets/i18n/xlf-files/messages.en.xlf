@@ -1624,7 +1624,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Qualité</target>
+        <target state="translated">Quality</target>
       </trans-unit>
       <trans-unit id="4912803901980915876" datatype="html" approved="yes">
         <source>Min</source>
