@@ -63,7 +63,6 @@ export class CitizenExpeditionBag extends CommonModel<CitizenExpeditionBagDTO> {
                 });
             }
         });
-        console.log('final', short_items_count)
         return short_items_count;
     }
 
