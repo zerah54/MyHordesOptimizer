@@ -50,14 +50,9 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(updateRequestDto.TownDetails)} cannot be empty");
             }
             var bbh = updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes;
-            var fata = updateRequestDto.Map.ToolsToUpdate.IsFataMorgana;
             if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(bbh))
             {
                 return BadRequest($"IsBigBrothHordes ne peut pas avoir une valeur autre que \"api\" ou \"none\"");
-            }
-            if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(fata))
-            {
-                return BadRequest($"IsFataMorgana ne peut pas avoir une valeur autre que \"api\" ou \"none\"");
             }
 
             UserInfoProvider.UserKey = userKey;

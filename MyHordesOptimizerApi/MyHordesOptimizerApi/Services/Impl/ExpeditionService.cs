@@ -59,7 +59,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 ExpeditionDto result;
                 if (expeditionDto.Id.HasValue)
                 {
-                    // Update
+                    // UpdateAsync
                     var modelFromDb = DbContext.Expeditions
                         .Where(expedition => expedition.IdExpedition == expeditionDto.Id)
                         .Include(expedition => expedition.ExpeditionParts)
@@ -209,7 +209,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 ExpeditionCitizenDto result;
                 if (expeditionCitizen.Id.HasValue)
                 {
-                    // Update
+                    // UpdateAsync
                     var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizen.Id.Value)
                         .Include(citizen => citizen.ExpeditionOrders)
                         .Include(citizen => citizen.IdExpeditionBagNavigation)
@@ -274,7 +274,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 ExpeditionPartDto result;
                 if (expeditionPart.Id.HasValue)
                 {
-                    // Update
+                    // UpdateAsync
                     var expeditionPartFromDb = DbContext.ExpeditionParts.Where(part => part.IdExpeditionPart == expeditionPart.Id.Value)
                         .Include(part => part.IdExpeditionOrders)
                         .Include(part => part.ExpeditionCitizens)
@@ -360,7 +360,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 }
                 foreach (var orderDto in toUpdate)
                 {
-                    // Update
+                    // UpdateAsync
                     var expeditionOrderFromDb = DbContext.ExpeditionOrders
                         .Where(order => order.IdExpeditionOrder == orderDto.Id)
                         .Single();
@@ -417,7 +417,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 }
                 foreach (var orderDto in toUpdate)
                 {
-                    // Update
+                    // UpdateAsync
                     var expeditionOrderFromDb = DbContext.ExpeditionOrders.Where(order => order.IdExpeditionOrder == orderDto.Id)
                         .Single();
                     var orderModel = Mapper.Map<ExpeditionOrder>(orderDto);
@@ -477,7 +477,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     DbContext.Remove(DbContext.ExpeditionBags.Single(expeditionBag => expeditionBag.IdExpeditionBag == expeditionBagDto.Id));
                 }
-                // Update 
+                // UpdateAsync 
                 var expeditionBagFromDb = DbContext.ExpeditionBags
                     .Where(bag => bag.IdExpeditionBag == expeditionBagDto.Id)
                     .Include(bag => bag.ExpeditionBagItems)

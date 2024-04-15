@@ -101,18 +101,19 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 });
                 tasks.Add(bbhTask);
             }
-            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(fata))
+            if (UpdateRequestMapToolsToUpdateDetailsDto.IsApi(fata) || UpdateRequestMapToolsToUpdateDetailsDto.IsCell(fata))
             {
-                var fataTask = Task.Run(() =>
+                var fataTask = Task.Run(async () =>
                 {
-
                     try
                     {
-                        FataMorganaRepository.Update();
+                        var updateInChaos = UpdateRequestMapToolsToUpdateDetailsDto.IsCell(fata);
+                        var cell = updateRequestDto.Map?.Cell;
+                        await FataMorganaRepository.UpdateAsync(updateInChaos, chaosX: cell?.X, chaosY: cell?.Y);
                     }
                     catch (Exception e)
                     {
-                        Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.FataMorganaStatus = e.Message;
                     }
                 });

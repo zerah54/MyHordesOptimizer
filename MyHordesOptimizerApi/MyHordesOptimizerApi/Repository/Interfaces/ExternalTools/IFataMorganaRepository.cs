@@ -1,7 +1,9 @@
-﻿namespace MyHordesOptimizerApi.Repository.Interfaces.ExternalTools
+﻿using System.Threading.Tasks;
+
+namespace MyHordesOptimizerApi.Repository.Interfaces.ExternalTools
 {
     public interface IFataMorganaRepository
     {
-        void Update();
+        Task UpdateAsync(bool updateInChaos = false, int? chaosX = null, int? chaosY = null);
     }
 }
