@@ -239,7 +239,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 transaction.Commit();
                 return result;
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 throw;
             }
@@ -379,7 +379,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var results = Mapper.Map<List<ExpeditionOrderDto>>(orderModels);
                 return results;
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 throw;
             }
@@ -433,7 +433,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var results = Mapper.Map<List<ExpeditionOrderDto>>(orderModels);
                 return results;
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 throw;
             }
@@ -487,6 +487,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 DbContext.Update(expeditionBagFromDb);
                 expeditionCitizen.IdExpeditionBagNavigation = expeditionBagFromDb;
                 DbContext.SaveChanges();
+                var updatedExpeditionBag = DbContext.GetExpeditionBag(expeditionBagDto.Id.Value);
                 result = Mapper.Map<ExpeditionBagDto>(expeditionBagFromDb);
             }
             else
@@ -500,10 +501,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var newEntity = DbContext.Add(expeditionBagModel).Entity;
                 expeditionCitizen.IdExpeditionBagNavigation = newEntity;
                 DbContext.SaveChanges();
-                var newEntityWithDependance = DbContext.ExpeditionBags.Where(bag => bag.IdExpeditionBag == newEntity.IdExpeditionBag)
-                    .Include(bag => bag.ExpeditionBagItems)
-                        .ThenInclude(bagItem => bagItem.IdItemNavigation)
-                    .Single();
+                var newEntityWithDependance = DbContext.GetExpeditionBag(newEntity.IdExpeditionBag);
                 result = Mapper.Map<ExpeditionBagDto>(newEntityWithDependance);
             }
             transaction.Commit();
