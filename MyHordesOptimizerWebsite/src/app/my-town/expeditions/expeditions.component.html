@@ -188,6 +188,7 @@
                                                                         <td class="is-thirsty">
                                                                             @if ((edition_mode || expedition.state === 'ready') && editable) {
                                                                                 <mat-checkbox [(ngModel)]="citizen.is_thirsty"
+                                                                                              [indeterminate]="(citizen.is_thirsty === undefined || citizen.is_thirsty === null) && edition_mode && editable"
                                                                                               (ngModelChange)="saveCitizen(expedition_part, citizen)"></mat-checkbox>
                                                                             } @else if (citizen.is_thirsty !== undefined && citizen.is_thirsty !== null) {
                                                                                 @if (citizen.is_thirsty) {
@@ -215,6 +216,7 @@
                                                                                                     [emptyOption]="true"
                                                                                                     [(ngModel)]="citizen.preinscrit_heroic_skill"
                                                                                                     (ngModelChange)="saveCitizen(expedition_part, citizen)"
+                                                                                                    [bindValue]="'value.action'"
                                                                                                     [bindLabel]="'value.label'"
                                                                                                     [bindIcon]="'value.img'"></mho-select>
                                                                                     </mat-form-field>

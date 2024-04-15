@@ -1,20 +1,67 @@
 {
+    "hero_generic_return": {
+        "name": "hero_generic_return",
+        "title": "Die Rückkehr des Helden",
+        "description": "Wenn du 11 km oder weniger von der Stadt entfernt bist, kehrst du sofort in die Stadt zurück!",
+        "daysNeeded": 0,
+        "unlockable": false,
+        "usable": true
+    },
+    "hero_generic_find": {
+        "name": "hero_generic_find",
+        "title": "Fund",
+        "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
+        "daysNeeded": 0,
+        "unlockable": false,
+        "usable": true
+    },
+    "hero_generic_punch": {
+        "name": "hero_generic_punch",
+        "title": "Wildstyle Uppercut",
+        "description": "Damit kannst du mit einem Schlag 2 Zombies umbringen!",
+        "daysNeeded": 0,
+        "unlockable": false,
+        "usable": true
+    },
     "hero_generic_ap": {
         "name": "hero_generic_ap",
         "title": "Zweite Lunge",
         "description": "Stellt deine AP wieder her und beseitigt deine Müdigkeit.",
-        "daysNeeded": 0
+        "daysNeeded": 0,
+        "unlockable": true,
+        "usable": true
     },
     "hero_generic_immune": {
         "name": "hero_generic_immune",
         "title": "Den Tod besiegen",
         "description": "Beim nächsten Angriff wird der Durst-, Infektions- und Abhängigkeitszustand außer Kraft gesetzt.",
-        "daysNeeded": 0
+        "daysNeeded": 0,
+        "unlockable": true,
+        "usable": true
     },
     "hero_generic_find_lucky": {
         "name": "hero_generic_find_lucky",
         "title": "Schönes Fundstück",
         "description": "Wie durch ein Wunder treibst du einen nützlichen Gegenstand auf.",
-        "daysNeeded": 0
+        "daysNeeded": 0,
+        "unlockable": true,
+        "usable": true,
+        "replace": "hero_generic_find"
+    },
+    "hero_generic_rescue": {
+        "name": "hero_generic_rescue",
+        "title": "Rettung",
+        "description": "Du bringst einen anderen Spieler nach Hause (dieser darf max. 2 Felder von der Stadt entfernt sein).",
+        "daysNeeded": 0,
+        "unlockable": false,
+        "usable": true
+    },
+    "hero_generic_friendship": {
+        "name": "hero_generic_friendship",
+        "title": "Freundschaft",
+        "description": "Du spendest eine deiner noch nicht verwendeten Heldentaten an einen anderen Spieler.",
+        "daysNeeded": 0,
+        "unlockable": false,
+        "usable": true
     }
 }

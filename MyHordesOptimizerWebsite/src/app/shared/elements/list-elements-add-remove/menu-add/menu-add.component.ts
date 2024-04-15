@@ -6,6 +6,7 @@ import { MatMenu, MatMenuModule } from '@angular/material/menu';
 import { MatTabsModule } from '@angular/material/tabs';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
+import { DebugLogPipe } from '../../../pipes/debug-log.pipe';
 import { ItemsGroupByCategory } from '../../../pipes/items-group-by-category.pipe';
 import { IsItemsPipe } from '../is-item.pipe';
 
@@ -24,7 +25,8 @@ import { IsItemsPipe } from '../is-item.pipe';
         NgOptimizedImage,
         MatTabsModule,
         IsItemsPipe,
-        ItemsGroupByCategory
+        ItemsGroupByCategory,
+        DebugLogPipe
     ],
 })
 export class MenuAddComponent {

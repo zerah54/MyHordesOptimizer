@@ -14,7 +14,7 @@
     <div class="editable-container">
         <div class="list">
             @for (item of currentList; track item.id) {
-                <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)"
+                <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="$any(item.label && item.label[$any(locale)] ? item.label[$any(locale)] : item.label)"
                      style="cursor: pointer" width="16" height="16">
             }
         </div>
