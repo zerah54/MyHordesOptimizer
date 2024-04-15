@@ -320,7 +320,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Désaltère</target>
+        <target state="translated">Quenches thirst</target>
       </trans-unit>
       <trans-unit id="8849931921318150989" datatype="html">
         <source>Compte dans le calcul du bonus de veille donné par l&apos;armurerie</source>
@@ -376,7 +376,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Provisions</target>
+        <target state="translated">Supplies</target>
       </trans-unit>
       <trans-unit id="6713813306186507025" datatype="html" approved="yes">
         <source>Pharmacie</source>
@@ -448,7 +448,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/enum/trash.enum.ts</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Appâts odorants</target>
+        <target state="translated">Smelly bait</target>
       </trans-unit>
       <trans-unit id="2537395172119379784" datatype="html">
         <source>Déchardes de bois</source>
@@ -680,7 +680,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/services/digs.service.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">La fouille a bien été supprimée</target>
+        <target state="translated">Search was cancelled successfully</target>
       </trans-unit>
       <trans-unit id="5126997801267803550" datatype="html">
         <source>La fouille a bien été mise à jour</source>
@@ -688,7 +688,7 @@
           <context context-type="sourcefile">src/app/_abstract_model/services/digs.service.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">La fouille a bien été mise à jour</target>
+        <target state="translated">Search was updated successfully</target>
       </trans-unit>
       <trans-unit id="4239682992533392472" datatype="html">
         <source>La liste de courses a bien été enregistrée</source>
@@ -724,7 +724,7 @@
           <context context-type="sourcefile">src/app/wiki/items/items.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Chercher des objets par propriétés</target>
+        <target state="translated">Sort items by properties</target>
       </trans-unit>
       <trans-unit id="2054864067473892671" datatype="html">
         <source>Chantiers</source>
@@ -740,7 +740,7 @@
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">Chantiers</target>
+        <target state="translated">Construction sites</target>
       </trans-unit>
       <trans-unit id="4273156925314176058" datatype="html">
         <source>Campings</source>
@@ -1288,7 +1288,7 @@
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Type de carte</target>
+        <target state="translated">Map type</target>
       </trans-unit>
       <trans-unit id="3425367071066107827" datatype="html" approved="yes">
         <source>Danger</source>
