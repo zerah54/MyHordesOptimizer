@@ -804,16 +804,29 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                        .Include(x => x.IdBagNavigation)
                        .ThenInclude(bag => bag.BagItems)
                        .Single(x => x.IdTown == townId && x.IdUser == userId);
-            dbContext.BagItems.RemoveRange(citizen.IdBagNavigation.BagItems);
-            citizen.IdBagNavigation.BagItems.Clear();
+            if(citizen.IdBagNavigation is not null)
+            {
+                dbContext.BagItems.RemoveRange(citizen.IdBagNavigation.BagItems);
+                citizen.IdBagNavigation.BagItems.Clear();
+            } 
+            else
+            {
+                var newBag = dbContext.Add(new Bag()).Entity;
+                dbContext.SaveChanges();
+                citizen.IdBagNavigation = newBag;
+                citizen.IdBag = newBag.IdBag;
+            }
             foreach (var item in bag)
             {
-                citizen.IdBagNavigation.BagItems.Add(new BagItem()
+                var bagItem = dbContext.Add(new BagItem()
                 {
                     Count = item.Count,
                     IdItem = item.Id,
-                    IsBroken = item.IsBroken
-                });
+                    IsBroken = item.IsBroken,
+                    IdBag = citizen.IdBag.Value
+                }).Entity;
+                dbContext.SaveChanges();
+                citizen.IdBagNavigation.BagItems.Add(bagItem);
                 citizen.IdBagNavigation.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
             }
             dbContext.SaveChanges();
