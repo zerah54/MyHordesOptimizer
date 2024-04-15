@@ -1213,13 +1213,17 @@ $actions = [
 $complete_heroic = [];
 foreach ($actions['heroics'] as &$heroic) {
     $annexe_heroic = $actions['actions'][$heroic['name']];
-    if ($heroic['unlockable']) {
-        $complete_heroic[$heroic['name']] = [
-            'name' => $heroic['name'],
-            'title' => $annexe_heroic['label'],
-            'description' => $annexe_heroic['tooltip'],
-            'daysNeeded' => 0
-        ];
+    $complete_heroic[$heroic['name']] = [
+        'name' => $heroic['name'],
+        'title' => $annexe_heroic['label'],
+        'description' => $annexe_heroic['tooltip'],
+        'daysNeeded' => 0,
+        'unlockable' => $heroic['unlockable'],
+        'nbUses' => 1
+    ];
+
+    if ($heroic['replace']) {
+        $complete_heroic[$heroic['name']]['replace'] = $heroic['replace'];
     }
 }
 

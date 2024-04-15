@@ -1,5 +1,4 @@
 ﻿import { CitizenExpeditionDTO, CitizenExpeditionShortDTO } from '../dto/citizen-expedition.dto';
-import { HeroicActionEnum } from '../enum/heroic-action.enum';
 import { JobEnum } from '../enum/job.enum';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { CitizenExpeditionBag } from './citizen-expedition-bag.class';
@@ -12,7 +11,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
     public orders!: ExpeditionOrder[];
     public preinscrit!: boolean;
     public preinscrit_job?: JobEnum;
-    public preinscrit_heroic_skill?: HeroicActionEnum;
+    public preinscrit_heroic_skill?: string;
     public pdc!: number;
     public is_thirsty?: boolean;
 
@@ -23,7 +22,6 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
     }
 
     public override modelToDto(): CitizenExpeditionDTO {
-        console.log('bag', this.bag);
         return {
             id: this.id,
             idUser: this.citizen_id ? this.citizen_id : undefined,
@@ -31,14 +29,13 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             orders: modelToDtoArray(this.orders),
             preinscrit: this.preinscrit,
             preinscritJob: this.preinscrit_job?.value.id,
-            preinscritHeroicSkillName: this.preinscrit_heroic_skill?.key,
+            preinscritHeroicSkillName: this.preinscrit_heroic_skill,
             pdc: this.pdc,
             isThirsty: this.is_thirsty
         };
     }
 
     public modelToDtoShort(): CitizenExpeditionShortDTO {
-        console.log('bag', this.bag);
         return {
             id: this.id,
             idUser: this.citizen_id ? this.citizen_id : undefined,
@@ -48,7 +45,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
                 .map((order: ExpeditionOrder) => <number>order.id) : [],
             preinscrit: this.preinscrit,
             preinscritJob: this.preinscrit_job?.value.id,
-            preinscritHeroicSkillName: this.preinscrit_heroic_skill?.key,
+            preinscritHeroicSkillName: this.preinscrit_heroic_skill,
             pdc: this.pdc,
             isThirsty: this.is_thirsty
         };
@@ -67,7 +64,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             });
             this.preinscrit = dto.preinscrit;
             this.preinscrit_job = dto.preinscritJob ? <JobEnum>JobEnum.getByKey(dto.preinscritJob) : undefined;
-            this.preinscrit_heroic_skill = dto.preinscritHeroicSkillName ? <HeroicActionEnum>HeroicActionEnum.getByKey(dto.preinscritHeroicSkillName) : undefined;
+            this.preinscrit_heroic_skill = dto.preinscritHeroicSkillName;
             this.pdc = dto.pdc;
             this.is_thirsty = dto.isThirsty;
         }

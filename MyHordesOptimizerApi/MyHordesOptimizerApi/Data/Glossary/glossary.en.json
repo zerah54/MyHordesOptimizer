@@ -1,10 +1,54 @@
 ﻿[
-  {
-    "word": "CP",
-    "definition": "Control points"
-  },
-  {
-    "word": "DO",
-    "definition": "Defense Object"
-  }
+    {
+        "word": "CP",
+        "definition": "Control points"
+    },
+    {
+        "word": "DO",
+        "definition": "Defense Object"
+    },
+    {
+        "word": "FPF",
+        "definition": "Flat Packed Furniture"
+    },
+    {
+        "word": "HR",
+        "definition": "Heroic Return"
+    },
+    {
+        "word": "HR",
+        "definition": "Heroic Rescue"
+    },
+    {
+        "word": "HReturn",
+        "definition": "Heroic Return"
+    },
+    {
+        "word": "HRescue",
+        "definition": "Heroic Rescue"
+    },
+    {
+        "word": "EC",
+        "definition": "Electronic component"
+    },
+    {
+        "word": "MOS",
+        "definition": "Ministry of Slavery"
+    },
+    {
+        "word": "BL",
+        "definition": "Banklock"
+    },
+    {
+        "word": "AS",
+        "definition": "Automatic search"
+    },
+    {
+        "word": "N&B",
+        "definition": "Nuts and Bolts"
+    },
+    {
+        "word": "EWB",
+        "definition": "Explosive Water Bomb"
+    }
 ]

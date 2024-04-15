@@ -12,6 +12,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import * as moment from 'moment/moment';
 import { Subject, takeUntil } from 'rxjs';
 import { EXPEDITIONS_EDITION_MODE_KEY, FAVORITE_EXPEDITION_ITEMS_UID, HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { HeroicActionEnum } from '../../_abstract_model/enum/heroic-action.enum';
@@ -53,6 +54,9 @@ import { TotalPdcPipe } from './total-pdc.pipe';
 export class ExpeditionsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
+    /** La langue du site */
+    public readonly locale: string = moment.locale();
+
     protected expedition_service: ExpeditionService = inject(ExpeditionService);
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
@@ -64,7 +68,7 @@ export class ExpeditionsComponent implements OnInit {
     protected all_citizens_job!: JobEnum[];
     /** La liste des actions héroïques */
     protected all_heroics: HeroicActionEnum[] = (<HeroicActionEnum[]>HeroicActionEnum.getAllValues())
-        .filter((action: HeroicActionEnum) => action.value.count_in_daily);
+        .filter((action: HeroicActionEnum) => action.value.count_in_daily && action.value.action !== '');
     /** La liste complète des items */
     protected all_items: Item[] = [];
     /** La liste des items en banque */
@@ -106,6 +110,7 @@ export class ExpeditionsComponent implements OnInit {
                     this.bank_items = bank.items;
                 }
             })
+
         this.expedition_service
             .getExpeditions(this.current_day)
             .subscribe({
@@ -243,7 +248,6 @@ export class ExpeditionsComponent implements OnInit {
         })
             .afterClosed()
             .subscribe((new_orders: ExpeditionOrder[]) => {
-                console.log('new_orders', new_orders)
                 if (new_orders) {
                     new_orders.forEach((new_order: ExpeditionOrder, index: number) => {
                         new_order.position = index;
@@ -399,6 +403,7 @@ export class ExpeditionsComponent implements OnInit {
                         part.citizens[citizen_index].preinscrit = citizen.preinscrit;
                         part.citizens[citizen_index].pdc = citizen.pdc;
                         part.citizens[citizen_index].preinscrit_job = citizen.preinscrit_job;
+                        part.citizens[citizen_index].preinscrit_heroic_skill = citizen.preinscrit_heroic_skill;
                         this.expedition_service.createOrUpdateCitizenExpedition(expedition_part, citizen).subscribe({
                             next: (new_citizen: CitizenExpedition) => {
                                 citizen = new_citizen;

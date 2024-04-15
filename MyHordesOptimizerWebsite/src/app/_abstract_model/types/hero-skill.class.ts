@@ -1,6 +1,6 @@
 import { HeroSkillDTO } from '../dto/hero-skill.dto';
-import { I18nLabels } from './_types';
 import { CommonModel } from './_common.class';
+import { I18nLabels } from './_types';
 
 export class HeroSkill extends CommonModel<HeroSkillDTO> {
     public name!: string;
@@ -31,7 +31,7 @@ export class HeroSkill extends CommonModel<HeroSkillDTO> {
         if (dto) {
             this.name = dto.name;
             this.description = dto.description;
-            this.icon = dto.icon;
+            this.icon = dto.icon ? `heroskill/${dto.icon}.gif` : '';
             this.label = dto.label;
             this.nb_uses = dto.nbUses;
             this.days_needed = dto.daysNeeded;
