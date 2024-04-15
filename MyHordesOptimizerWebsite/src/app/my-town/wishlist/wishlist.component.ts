@@ -1,7 +1,7 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { CommonModule, DOCUMENT, NgOptimizedImage } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostBinding, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -56,7 +56,6 @@ export class WishlistComponent implements OnInit {
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<WishlistItem>;
     @ViewChild(MatTabGroup) tabs!: MatTabGroup;
-    @ViewChild('filterInput') filterInput!: ElementRef;
     @ViewChild('addItemSelect') add_item_select!: SelectComponent<Item>;
 
     /** La wishlist */
@@ -190,7 +189,6 @@ export class WishlistComponent implements OnInit {
             this.wishlist_sercices.addItemToWishlist(item, this.selected_tab_key)
                 .pipe(takeUntil(this.destroy_sub))
                 .subscribe(() => {
-                    item.wishlist_count = 1;
                     this.add_item_select.value = undefined;
                     this.getWishlist();
                 });

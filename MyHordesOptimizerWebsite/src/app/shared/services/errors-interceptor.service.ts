@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, Observable, retry, throwError } from 'rxjs';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { SnackbarService } from './snackbar.service';
 
@@ -10,7 +10,7 @@ export function errorInterceptor(request: HttpRequest<unknown>, next: HttpHandle
     const authentication_service: AuthenticationService = inject(AuthenticationService);
     return next(request)
         .pipe(
-            catchError((error: HttpErrorResponse) => handleError(error, request, snackbar, authentication_service))
+            catchError((error: HttpErrorResponse) => handleError(error, snackbar, authentication_service))
         );
 }
 
@@ -18,13 +18,12 @@ export function errorInterceptor(request: HttpRequest<unknown>, next: HttpHandle
  * Gère les erreurs suite aux appels
  *
  * @param {HttpErrorResponse} error
- * @param {HttpRequest<unknown>} request
  * @param {SnackbarService} snackbar
  * @param {AuthenticationService} authentication_service
  *
  * @return {Observable<never>}
  */
-function handleError(error: HttpErrorResponse, request: HttpRequest<unknown>, snackbar: SnackbarService, authentication_service: AuthenticationService)
+function handleError(error: HttpErrorResponse, snackbar: SnackbarService, authentication_service: AuthenticationService)
     : Observable<never> {
     console.log('error', error);
 
@@ -32,9 +31,8 @@ function handleError(error: HttpErrorResponse, request: HttpRequest<unknown>, sn
         /** A client-side or network error occurred. Handle it accordingly. */
         console.error(`Erreur ${error.status} du client ou de réseau : \n`, error.error);
     } else if (error.status === 401) {
-        console.log('401');
         authentication_service.getMe(true).subscribe(() => {
-            request.clone();
+            return retry(1);
         });
     } else {
         /**
