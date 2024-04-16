@@ -26,6 +26,16 @@
                                     <div class="left-actions">
                                         <button mat-button type="button" (click)="addNewExpedition()" i18n>Créer une expédition</button>
                                         <div><span i18n>Places&nbsp;:&nbsp;</span>{{ spots }}/{{ all_citizens.length }}</div>
+                                        <div style="display: flex; align-items: center">
+                                            @if (preRegisteredJobs; as pre_registered_jobs) {
+                                                @for (job of pre_registered_jobs; track job.job.key; let i = $index) {
+                                                    {{ job.count }}&nbsp;<img [ngSrc]="HORDES_IMG_REPO + job?.job?.value?.img" width="16" height="16">
+                                                    @if (i < pre_registered_jobs.length - 1) {
+                                                        &nbsp;
+                                                    }
+                                                }
+                                            }
+                                        </div>
                                     </div>
                                     <div class="right-actions">
                                         @if (day_index + 1 >= this.current_day) {
