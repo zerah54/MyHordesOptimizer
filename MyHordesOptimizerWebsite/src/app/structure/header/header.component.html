@@ -40,7 +40,7 @@
                 </mat-form-field>
             </div>
         } @else {
-            @if (me && me.town_details.town_id && is_dev) {
+            @if (me && me.town_details.town_id) {
                 <mho-header-citizen-menu></mho-header-citizen-menu>
             }
             <div mat-menu-item (click)="disconnect()" i18n>Déconnexion</div>
