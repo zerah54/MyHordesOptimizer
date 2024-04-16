@@ -74,10 +74,6 @@ export class CitizensDispoComponent implements OnInit {
         this.getCitizens();
     }
 
-    public trackByColumnId(_index: number, column: StandardColumn): string {
-        return column.id;
-    }
-
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: DispoByCitizen, filter: string): boolean {
         const filter_object: DispoFilter = JSON.parse(filter.toLowerCase());

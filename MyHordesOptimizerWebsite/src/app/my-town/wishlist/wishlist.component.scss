@@ -57,8 +57,13 @@
                         }
                     }
 
-                    .mat-column-count {
-                        max-width: 100px;
+                    &.mat-column-count {
+                        .mat-mdc-form-field-icon-suffix {
+                            span {
+                                padding-right: 0.5em;
+                                cursor: pointer;
+                            }
+                        }
                     }
 
                     &.mat-column-should_signal {

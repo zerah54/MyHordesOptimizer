@@ -1,6 +1,19 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostBinding, Input, OnDestroy, Optional, Output, Self, ViewChild, ViewEncapsulation } from '@angular/core';
+import {
+    booleanAttribute,
+    Component,
+    ElementRef,
+    EventEmitter,
+    HostBinding,
+    Input,
+    OnDestroy,
+    Optional,
+    Output,
+    Self,
+    ViewChild,
+    ViewEncapsulation
+} from '@angular/core';
 import { AbstractControl, ControlValueAccessor, NgControl, UntypedFormControl, ValidationErrors, Validator, Validators } from '@angular/forms';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatOption, MatOptionModule } from '@angular/material/core';
@@ -43,16 +56,16 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     @ViewChild(MatSelect) select!: MatSelect;
     @ViewChild(MatInput) filter_input!: MatInput;
 
-    @Input() multiple: boolean = false;
+    @Input({transform: booleanAttribute}) multiple: boolean = false;
     @Input() bindLabel!: string;
     @Input() bindValue!: string;
-    @Input() noLabel: boolean = false;
+    @Input({transform: booleanAttribute}) noLabel: boolean = false;
     @Input() bindIcon!: string;
     @Input() moreInfo?: (element: string | T) => string;
-    @Input() emptyOption: boolean = false;
+    @Input({transform: booleanAttribute}) emptyOption: boolean = false;
     //current form control input. helpful in validating and accessing form control
     @Input() form_control: AbstractControl = new UntypedFormControl();
-    @Input() clearable: boolean = false;
+    @Input({transform: booleanAttribute}) clearable: boolean = false;
     @Input() searchable: boolean = true;
     /** Doit-on afficher sous forme de chips les différentes valeurs ? Fonctionne uniquement si "multiple" */
     @Input() chips: boolean = true;
