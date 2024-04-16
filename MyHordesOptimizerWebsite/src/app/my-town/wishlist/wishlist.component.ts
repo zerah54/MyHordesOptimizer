@@ -229,7 +229,7 @@ export class WishlistComponent implements OnInit {
                 text += `\n[collapse=${$localize`Encombrants`}]\n`;
                 heavy.forEach((item: WishlistItem): void => {
                     text += item.should_signal ? '[bad]' : '';
-                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
+                    text += `:middot:${item.item.label[this.locale]}` + (item.count >= 0 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
                     text += item.should_signal ? '[/bad]:warning:\n' : '\n';
                 });
                 text += '[/collapse]\n';
@@ -238,7 +238,7 @@ export class WishlistComponent implements OnInit {
                 text += `\n[collapse=${$localize`Non-Encombrants`}]\n`;
                 light.forEach((item: WishlistItem): void => {
                     text += item.should_signal ? '[bad]' : '';
-                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
+                    text += `:middot:${item.item.label[this.locale]}` + (item.count >= 0 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
                     text += item.should_signal ? '[/bad]:warning:\n' : '\n';
                 });
                 text += '[/collapse]\n';

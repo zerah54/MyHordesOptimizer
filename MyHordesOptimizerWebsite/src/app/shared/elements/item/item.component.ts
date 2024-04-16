@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, Input, OnInit } from '@angular/core';
+import { booleanAttribute, Component, HostBinding, Input, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import * as moment from 'moment';
@@ -25,7 +25,7 @@ export class ItemComponent implements OnInit {
     /** L'élément à afficher si c'est un objet standard */
     @Input() item!: Item;
     /** Force l'ouverture de l'élément */
-    @Input() forceOpen: boolean = false;
+    @Input({transform: booleanAttribute}) forceOpen: boolean = false;
 
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;

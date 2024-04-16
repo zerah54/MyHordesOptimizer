@@ -32,7 +32,7 @@
                                 @if (edition_mode) {
                                     <mat-form-field class="no-bottom">
                                         <mat-label i18n>Ajouter un objet</mat-label>
-                                        <mho-select #addItemSelect [emptyOption]="true"
+                                        <mho-select #addItemSelect emptyOption
                                                     placeholder="Ajouter un objet" i18n-placeholder [ngModel]="''"
                                                     (ngModelChange)="addItemToWishlist($any($event))"
                                                     [options]="items | isItemDisplayed:datasource.data"

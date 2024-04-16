@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
@@ -27,7 +27,7 @@ export class ListElementAddRemoveComponent {
 
     @Input() citizen!: Citizen;
     @Input() label!: string;
-    @Input() readonly: boolean = false;
+    @Input({transform: booleanAttribute}) readonly: boolean = false;
     @Input() class: string = '';
 
     @Input() addLabel!: string;
