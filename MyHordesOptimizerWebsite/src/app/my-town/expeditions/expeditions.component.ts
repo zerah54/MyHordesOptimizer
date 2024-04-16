@@ -322,6 +322,10 @@ export class ExpeditionsComponent implements OnInit {
         }
     }
 
+    public openReorganize(): void {
+
+    }
+
     public get formatedPreRegistered(): string {
         return this.preRegistered.map((citizen: Citizen) => {
             if (citizen.job) {
@@ -331,7 +335,7 @@ export class ExpeditionsComponent implements OnInit {
             }
         }).join(', ');
     }
-    
+
     public get spots(): number {
         let spots: number = 0;
         if (this.expeditions) {

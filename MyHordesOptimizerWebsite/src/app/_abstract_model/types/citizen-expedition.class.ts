@@ -28,7 +28,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             bag: this.bag ? this.bag.modelToDto() : undefined,
             orders: modelToDtoArray(this.orders),
             preinscrit: this.preinscrit,
-            preinscritJob: this.preinscrit_job?.value.id,
+            preinscritJob: this.preinscrit_job?.key,
             preinscritHeroicSkillName: this.preinscrit_heroic_skill,
             pdc: this.pdc,
             isThirsty: this.is_thirsty
@@ -44,7 +44,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
                 .filter((order: ExpeditionOrder) => order.id !== undefined && order.id !== null)
                 .map((order: ExpeditionOrder) => <number>order.id) : [],
             preinscrit: this.preinscrit,
-            preinscritJob: this.preinscrit_job?.value.id,
+            preinscritJob: this.preinscrit_job?.key,
             preinscritHeroicSkillName: this.preinscrit_heroic_skill,
             pdc: this.pdc,
             isThirsty: this.is_thirsty

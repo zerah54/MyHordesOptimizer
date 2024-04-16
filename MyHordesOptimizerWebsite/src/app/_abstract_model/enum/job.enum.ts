@@ -30,7 +30,7 @@ export class JobEnum extends CommonEnum {
      * Le constructeur privé empêche la création d'autres instances de cette classe.
      *
      * @param {string} key
-     * @param {StatusEnumData} value
+     * @param {JobEnumData} value
      */
     protected constructor(public override key: string, public override value: JobEnumData) {
         super(key, value);
