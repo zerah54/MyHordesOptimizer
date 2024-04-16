@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.11.0
+// @version      1.0.12.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -2201,8 +2201,10 @@ function updateFetchRequestOptions(options) {
         ...update.headers,
         'Mho-Origin': 'script',
         'Mho-Script-Version': getScriptInfo().version,
-        'Authorization': `Bearer ${token.token.accessToken?.toString()}`,
     };
+    if (token && token.token && token.token.accessToken) {
+        update.headers.Authorization = `Bearer ${token.token.accessToken?.toString()}`
+    }
     return update;
 }
 
@@ -9535,7 +9537,7 @@ function getRecipes() {
 /** Récupère la liste complète des paramètres en base */
 function getParameters() {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + '/parameters/parameters')
+        fetcherWithoutBearer(api_url + '/parameters/parameters')
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
