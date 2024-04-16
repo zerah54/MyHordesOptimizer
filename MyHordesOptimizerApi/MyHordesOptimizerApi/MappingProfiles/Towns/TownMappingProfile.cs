@@ -54,6 +54,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.TownEstimations, opt => opt.Ignore())
                 .ForMember(dest => dest.TownWishListItems, opt => opt.Ignore())
                 .ForMember(dest => dest.WaterWell, opt => opt.MapFrom(src => src.Map.City.Water))
+                .ForMember(dest => dest.Width, opt => opt.MapFrom(src => src.Map.Wid))
                 .ForMember(dest => dest.WishlistDateUpdate, opt => opt.Ignore())
                 .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.Map.City.X))
                 .ForMember(dest => dest.Y, opt => opt.MapFrom(src => src.Map.City.Y));
