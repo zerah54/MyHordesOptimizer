@@ -17,6 +17,7 @@ using MyHordesOptimizerApi.Services.Interfaces;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -92,23 +93,35 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public async Task<SimpleMeDto> GetSimpleMeAsync()
         {
+            var sw = new Stopwatch();
+            sw.Start();
+            var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
+            Logger.LogDebug($"GetSimpleMeAsync MyHordesJsonApiRepository.GetMe() après {sw.Elapsed} ms");
+            Logger.LogDebug("GetSimpleMeAsync Waiting for Lock");
             await Lock.WaitAsync();
+            Logger.LogDebug($"GetSimpleMeAsync Lock ok après {sw.Elapsed} ms");
             try
-            {
-                var myHordeMeResponse = MyHordesJsonApiRepository.GetMe();
+            {      
                 if (myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
                 {
+                    Logger.LogDebug($"GetSimpleMeAsync User en ville !");
+
                     if (!DbContext.Users.Any(u => u.IdUser == UserInfoProvider.UserId))
                     {
+                        Logger.LogDebug($"GetSimpleMeAsync Création du user en DB");
+
                         var user = Mapper.Map<User>(myHordeMeResponse);
                         DbContext.Add(user);
                         DbContext.SaveChanges();
                         DbContext.ChangeTracker.Clear();
+                        Logger.LogDebug($"GetSimpleMeAsync Création du user en DB après {sw.Elapsed} ms");
                     }
                     using var transaction = DbContext.Database.BeginTransaction();
                     var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo()));
                     DbContext.SaveChanges();
+                    Logger.LogDebug($"GetSimpleMeAsync Génération du lastupdate {sw.Elapsed} ms");
                     var lastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.Entity.IdLastUpdateInfo);
+                    Logger.LogDebug($"GetSimpleMeAsync Récupération du lastupdate {sw.Elapsed} ms");
                     myHordeMeResponse.Map.LastUpdateInfo = lastUpdate;
                     var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
                     var citizens = town.TownCitizens;
@@ -118,8 +131,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                     var existingTown = DbContext.Towns
                         .Include(town => town.TownCitizens)
                         .FirstOrDefault(t => t.IdTown == town.IdTown);
+                    Logger.LogDebug($"GetSimpleMeAsync Récupération de la town {sw.Elapsed} ms");
                     if (existingTown == null)
                     {
+                        Logger.LogDebug($"GetSimpleMeAsync La Town n'existe pas !");
                         // On Crée la ville
                         DbContext.Add(town);
                         // On crée les citoyen
@@ -135,9 +150,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                             lastUpdate);
                         DbContext.AddRange(cells);
                         DbContext.SaveChanges();
+                        Logger.LogDebug($"GetSimpleMeAsync Création de la Town après {sw.Elapsed} ms");
                     }
                     else
                     {
+                        Logger.LogDebug($"GetSimpleMeAsync La Town existe {town.IdTown} !");
                         // On met à jour la ville
                         existingTown.UpdateNoNullProperties(town);
                         DbContext.Update(existingTown);
@@ -282,10 +299,12 @@ namespace MyHordesOptimizerApi.Services.Impl
                             DbContext.UpdateRange(cells);
                         }
                         DbContext.SaveChanges();
+                        Logger.LogDebug($"GetSimpleMeAsync Update de toute la Town après {sw.Elapsed} ms");
                     }
 
                     // TODO : Il manque les cadavers ?
                     transaction.Commit();
+                    Logger.LogDebug($"GetSimpleMeAsync Transaction commit {sw.Elapsed} ms");
                     //MyHordesOptimizerRepository.PatchCadaver(town.Id, town.Cadavers);
                 }
                 var simpleMe = Mapper.Map<SimpleMeDto>(myHordeMeResponse);
@@ -299,6 +318,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             finally
             {
                 Lock.Release();
+                Logger.LogDebug($"GetSimpleMeAsync Lock released {sw.Elapsed} ms");
             }
         }
 
