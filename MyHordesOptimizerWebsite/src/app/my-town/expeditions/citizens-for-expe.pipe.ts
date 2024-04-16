@@ -16,8 +16,6 @@ export class CitizensForExpePipe implements PipeTransform {
 
         return all_citizens.filter((citizen: Citizen): boolean => {
             if (citizen.is_dead) return false;
-            console.log('citizen.job', citizen.job);
-            console.log('preinscrit_job', expedition_citizen.preinscrit_job);
             if (citizen.job?.key !== expedition_citizen.preinscrit_job?.key) return false;
             // const is_already_placed: boolean = all_expeditions
             //     .filter((expedition: Expedition) => {
