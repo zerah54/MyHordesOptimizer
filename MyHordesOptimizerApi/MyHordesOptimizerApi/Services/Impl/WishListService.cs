@@ -143,6 +143,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 ZoneXpa = zoneXPa,
                 IdItem = itemId,
+                Count = -1
             });
             town.IdUserWishListUpdater = userId;
             town.WishlistDateUpdate = DateTime.UtcNow;
