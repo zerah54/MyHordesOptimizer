@@ -60,8 +60,7 @@ export default [
     {
         path: 'expeditions',
         component: ExpeditionsComponent,
-        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Expéditions`,
-        canActivate: [(): boolean => inject(InDevModeGuard).canActivate()]
+        title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Expéditions`
     },
     {
         path: 'map',
