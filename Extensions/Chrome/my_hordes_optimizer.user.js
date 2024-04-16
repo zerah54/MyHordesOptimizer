@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.6.0
+// @version      1.0.7.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,10 +32,11 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Affichage et enregistrement des estimations de la tour de guet dans l'extension Firefox \n\n`
-    + `[Nouveauté] Ajout de liens vers les profils externes dans la popup d'un utilisateur \n\n`
-    + `[Amélioration] Plus besoin d'appuyer sur Entrée pour démarrer une traduction, elle se lancera automatiquement à chaque recherche de plus de 2 lettres \n`
-    + `[Amélioration] Indicateur visuel sur le bouton de copie du registre quand la copie est effectuée \n`;
+    + `[Correctif] Lors de l'enregistrement des fouilles, les fouilles de celui qui enregistre n'étaient jamais prises en compte\n`
+    + `[Correctif] Correction d'un bug d'affichage des liens vers les profils externes des utilisateurs\n`
+    + `[Correctif] Quelques corrections sur l'Anti-Abus (c'est pas fini, et j'ai l'impression de pas en voir le bout 🥲) \n`
+    + `[Correctif] Correction d'un bug d'intégration avec Fata Morgana \n\n`
+    + `[Supression] Retrait de la fonctionnalité de notification lors d'un nouveau message, puisqu'elle existe maintenant nativement dans MyHordes\n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -44,7 +45,7 @@ const website = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https
 
 const gest_hordes_url = 'https://gest-hordes2.eragaming.fr';
 const big_broth_hordes_url = 'https://bbh.fred26.fr';
-const fata_morgana_url = 'https://bbh.fred26.fr';
+const fata_morgana_url = 'https://fatamorgana.md26.eu';
 
 const gm_bbh_updated_key = 'MHO_bbh_updated';
 const gm_gh_updated_key = 'MHO_gh_updated';
@@ -94,7 +95,6 @@ const repo_img_hordes_url = repo_img_url + 'hordes_img/';
 
 const mh_optimizer_icon = 'https://myhordes-optimizer.web.app/assets/img/logo/logo_mho_64x64_outlined.png';
 
-const mho_title = 'MH Optimizer';
 const mh_optimizer_window_id = 'optimizer-window';
 const mh_optimizer_map_window_id = 'optimizer-map-window';
 const btn_id = 'optimizer-btn';
@@ -1596,21 +1596,6 @@ let params_categories = [
                     de: `Ermöglicht den Erhalt einer Benachrichtigung wann eine Grabungsaktion endet wenn die Seite in der Zwischenzeit nicht geschlossen wurde`,
                     es: `Permite recibir una notificación al terminar una búsqueda si la página no ha sido cerrada entre tanto`
                 },
-            },
-            {
-                id: `notify_on_new_msg`,
-                label: {
-                    en: `Notify me if I receive a new message`,
-                    fr: `Me notifier si je reçois un nouveau message`,
-                    de: `Benachrichtigen Sie mich, wenn ich eine neue Nachricht erhalte`,
-                    es: `Notificarme si recibo un mensaje nuevo`
-                },
-                help: {
-                    en: `Allows to receive a notification in case of reception of a new notification changing the count of notifications of the game`,
-                    fr: `Permet de recevoir une notification en cas de réception d'une nouvelle notification faisant changer le compteur de notifications du jeu`,
-                    de: `Ermöglicht den Erhalt einer Benachrichtigung im Falle des Empfangs einer neuen Benachrichtigung, die die Anzahl der Benachrichtigungen des Spiels ändert`,
-                    es: `Permite recibir una notificación en caso de recibir una nueva notificación cambiando el conteo de notificaciones del juego`
-                },
             }
         ]
     }
@@ -1936,7 +1921,7 @@ function getErrorFromApi(error) {
     if (error.name !== 'AbortError' && error.name !== 'TypeError') {
         let error_text = '';
         error_text += `
-            <div>${getI18N(api_texts.error).replace('$error$', (error.status ?? '') + ' - ' + (error.message ?? error.name ?? error.statusText))}</div>
+            <div>${getI18N(api_texts.error).replace('$error$', (error.status ?? '') + (error.status !== 500 && error.status !== 502 && error.status !== 504 ? ' - ' + (error.message ?? error.name ?? error.statusText) : ''))}</div>
             <br />`
         if (!isScriptVersionLastVersion()) {
             error_text += `<div><small>${getI18N(api_texts.error_version).replace('$your_version$', getScriptInfo().version).replace('$recent_version$', parameters?.find((param) => param.name === 'ScriptVersion')?.value)}</small></div>`;
@@ -2179,7 +2164,6 @@ function initOptionsWithoutLoginNeeded() {
         displayNbDeadZombies();
     }, 250)
     displayTranslateTool();
-    notifyOnNewMessage();
     displayCampingPredict();
     displayAntiAbuseCounter();
     automaticallyOpenBag();
@@ -2229,6 +2213,7 @@ function createSelectWithSearch() {
 
     let input = document.createElement('input');
     input.type = 'text';
+    input.autocomplete = 'off';
 
     let close = document.createElement('div');
     close.innerHTML = '&#128473';
@@ -2281,7 +2266,7 @@ function createOptimizerBtn() {
 
         let title_hidden = document.createElement('span');
         title_hidden.classList.add('label_text');
-        title_hidden.innerHTML = mho_title;
+        title_hidden.innerText = getScriptInfo().name;
 
         let title = document.createElement('h1');
 
@@ -2373,7 +2358,7 @@ function createOptimizerButtonContent() {
         wiki_btn.classList.add('button');
         wiki_btn.style.marginTop = 0;
         wiki_btn.style.textAlign = 'center';
-        wiki_btn.innerHTML = 'Wiki';
+        wiki_btn.innerText = 'Wiki';
         wiki_btn.id = wiki_btn_id;
 
         wiki_btn.addEventListener('click', () => {
@@ -2386,7 +2371,7 @@ function createOptimizerButtonContent() {
         tools_btn.classList.add('button');
         tools_btn.style.marginTop = 0;
         tools_btn.style.textAlign = 'center';
-        tools_btn.innerHTML = getI18N(texts.tools_btn_label);
+        tools_btn.innerText = getI18N(texts.tools_btn_label);
         tools_btn.addEventListener('click', () => {
             displayWindow('tools');
         });
@@ -3694,7 +3679,7 @@ function displayRuins() {
                         case 'label':
                         case 'description':
                             cell.setAttribute('style', 'text-align: left');
-                            cell.innerHTML = getI18N(ruin[header_cell.id]);
+                            cell.innerText = getI18N(ruin[header_cell.id]);
                             break;
                         case 'drops':
                             cell.setAttribute('style', 'text-align: left');
@@ -3729,15 +3714,15 @@ function displayRuins() {
                         case 'minDist':
                         case 'maxDist':
                             cell.setAttribute('style', 'text-align: center');
-                            cell.innerHTML = ruin[header_cell.id] + 'km';
+                            cell.innerText = ruin[header_cell.id] + 'km';
                             break;
                         case 'camping':
                             cell.setAttribute('style', 'text-align: center');
-                            cell.innerHTML = ruin[header_cell.id] + '%';
+                            cell.innerText = ruin[header_cell.id] + '%';
                             break;
                         case 'capacity':
                             cell.setAttribute('style', 'text-align: center');
-                            cell.innerHTML = ruin[header_cell.id];
+                            cell.innerText = ruin[header_cell.id];
                             break;
                         default:
                             break;
@@ -3849,13 +3834,13 @@ function getRecipeElement(recipe) {
 function createHelpButton(text_to_display) {
 
     let help_button = document.createElement('a');
-    help_button.innerHTML = getI18N(texts.external_app_id_help_label);
+    help_button.innerText = getI18N(texts.external_app_id_help_label);
     help_button.classList.add('help-button');
 
     let help_tooltip = document.createElement('div')
     help_tooltip.classList.add('tooltip', 'help', 'hidden', 'mho');
     help_tooltip.setAttribute('style', `text-transform: initial; display: block; position: absolute; width: 250px;`);
-    help_tooltip.innerHTML = text_to_display;
+    help_tooltip.innerText = text_to_display;
     help_button.appendChild(help_tooltip);
 
     help_button.addEventListener('mouseenter', function () {
@@ -3934,7 +3919,7 @@ function createUpdateExternalToolsButton() {
                 warn_missing_logs = document.createElement('div');
                 warn_missing_logs.id = mho_warn_missing_logs_id;
                 warn_missing_logs.classList.add('note', 'note-important');
-                warn_missing_logs.innerHTML = getI18N(texts.warn_missing_logs_title);
+                warn_missing_logs.innerText = getI18N(texts.warn_missing_logs_title);
                 let warn_help = createHelpButton(getI18N(texts.warn_missing_logs_help));
                 warn_missing_logs.appendChild(warn_help);
 
@@ -3962,7 +3947,7 @@ function createLargeUpdateExternalToolsButton(update_external_tools_btn) {
     updater_title.appendChild(updater_title_mho_img);
 
     let updater_title_text = document.createElement('text');
-    updater_title_text.innerHTML = getScriptInfo().name;
+    updater_title_text.innerText = getScriptInfo().name;
     updater_title.appendChild(updater_title_text);
 
     updater_bloc.appendChild(updater_title);
@@ -4055,7 +4040,7 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
     update_external_tools_btn.addEventListener('click', () => {
         /** Au clic sur le bouton, on appelle la fonction de mise à jour */
         update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/middot.gif" height="16">`;
-        status.innerHTML = getI18N(texts.update_external_tools_pending_btn_label);
+        status.innerText = getI18N(texts.update_external_tools_pending_btn_label);
 
         updateExternalTools()
             .then((response) => {
@@ -4088,7 +4073,7 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
             .catch((error) => {
                 console.error(`Erreur lors de la mise à jour de l'un des outils`, error);
                 update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}professions/death.gif" height="16">`;
-                status.innerHTML = getI18N(texts.update_external_tools_fail_btn_label);
+                status.innerText = getI18N(texts.update_external_tools_fail_btn_label);
             });
     });
 
@@ -4971,41 +4956,41 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'hero_find':
             if (!(hovered_item.properties && hovered_item.properties.some((property) => property === 'hero_find_lucky')) && !(hovered_item.actions && hovered_item.actions.some((property) => property === 'hero_find_lucky'))) {
                 item_action.classList.add(`item-tag-hero`);
-                item_action.innerHTML = `Trouvaille`;
+                item_action.innerText = `Trouvaille`;
             } else {
                 item_action.classList.remove('item-tag');
             }
             break;
         case 'hero_find_lucky':
             item_action.classList.add(`item-tag-hero`);
-            item_action.innerHTML = `Trouvaille améliorée`;
+            item_action.innerText = `Trouvaille améliorée`;
             break;
         case 'ressource':
-            item_action.innerHTML = `Ressource`;
+            item_action.innerText = `Ressource`;
             break;
         case 'flash_photo_1':
             item_action.classList.add(`mho-item-tag-large`);
             var fail_1 = Math.round(60 / 90 * 100);
-            item_action.innerHTML = `${100 - fail_1}% de chances de pouvoir fuir pendant 30 secondes`;
+            item_action.innerText = `${100 - fail_1}% de chances de pouvoir fuir pendant 30 secondes`;
             break;
         case 'flash_photo_2':
             item_action.classList.add(`mho-item-tag-large`);
             var fail_2 = Math.round(30 / 90 * 100);
-            item_action.innerHTML = `${100 - fail_2}% de chances de pouvoir fuir pendant 60 secondes`;
+            item_action.innerText = `${100 - fail_2}% de chances de pouvoir fuir pendant 60 secondes`;
             break;
         case 'flash_photo_3':
             item_action.classList.add(`mho-item-tag-large`);
             var fail_3 = 1;
-            item_action.innerHTML = `Succès : ${100 - fail_3}% de chances de pouvoir fuir pendant 120 secondes`;
+            item_action.innerText = `Succès : ${100 - fail_3}% de chances de pouvoir fuir pendant 120 secondes`;
             break;
         case 'can_cook':
-            item_action.innerHTML = `Peut être cuisiné`;
+            item_action.innerText = `Peut être cuisiné`;
             break;
         case 'pet':
-            item_action.innerHTML = `Animal`;
+            item_action.innerText = `Animal`;
             break;
         case 'can_poison':
-            item_action.innerHTML = `Peut être empoisonné`;
+            item_action.innerText = `Peut être empoisonné`;
             break;
         case 'load_maglite':
         case 'load_lamp':
@@ -5021,14 +5006,14 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'load_emt':
         case 'load_rmk2':
             item_action.classList.add(`item-tag-load`);
-            item_action.innerHTML = `Peut être rechargé`;
+            item_action.innerText = `Peut être rechargé`;
             break;
         case 'smokebomb':
             item_action.classList.add(`item-tag-smokebomb`);
-            item_action.innerHTML = `Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)`
+            item_action.innerText = `Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)`
             break;
         case 'improve':
-            item_action.innerHTML = `Permet d'aménager un campement`
+            item_action.innerText = `Permet d'aménager un campement`
             break;
         case 'defence':
             // déjà affichés par le jeu
@@ -5057,7 +5042,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
                 }
                 if (devastated) chances = Math.max(0.1, chances - 0.2);
                 var success = chances * 100;
-                item_action.innerHTML = `${success}% de chances de réussir son manuel`;
+                item_action.innerText = `${success}% de chances de réussir son manuel`;
             } else {
                 item_action.classList.remove('item-tag');
             }
@@ -5828,7 +5813,7 @@ function preventFromLeaving() {
                     mho_leaving_info = document.createElement('div');
                     mho_leaving_info.id = 'mho-leaving-info';
                     mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                    mho_leaving_info.innerHTML = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.prevent_not_in_ae);
+                    mho_leaving_info.innerText = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.prevent_not_in_ae);
                     ae_button.parentNode.insertBefore(mho_leaving_info, ae_button.nextSibling);
                 }
             }
@@ -5841,7 +5826,7 @@ function preventFromLeaving() {
                     mho_leaving_info = document.createElement('div');
                     mho_leaving_info.id = 'mho-leaving-info';
                     mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                    mho_leaving_info.innerHTML = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.escort_not_released);
+                    mho_leaving_info.innerText = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.escort_not_released);
                     is_escorting.parentNode.insertBefore(mho_leaving_info, is_escorting.nextSibling);
                 }
             }
@@ -5925,16 +5910,6 @@ function notifyOnSearchEnd() {
             notifyOnSearchEnd();
         }
     }, 250);
-}
-
-function notifyOnNewMessage() {
-    if (mho_parameters.notify_on_new_msg) {
-        let counter = document.querySelector('#postbox-new-msg-counter');
-        if (counter && counter.innerText !== count_pending_notifications && counter.innerText !== '0') {
-            count_pending_notifications = counter.innerText;
-            createNotification(getI18N(texts.new_message).replace('%VAR%', count_pending_notifications));
-        }
-    }
 }
 
 /** Affiche le nombre de zombies morts aujourd'hui */
@@ -6037,7 +6012,7 @@ function displayTranslateTool() {
             let option = document.createElement('option');
             option.value = lang_option.value;
             option.setAttribute('style', 'font-size: 16px');
-            option.innerHTML = lang_option.img;
+            option.innerText = lang_option.img;
             option.selected = lang_option.value === lang;
             select.appendChild(option);
         })
@@ -6072,10 +6047,10 @@ function displayTranslateTool() {
                             show_exact_match = !show_exact_match;
                             if (show_exact_match) {
                                 display_all_img.src = `${repo_img_hordes_url}/icons/small_more.gif`;
-                                display_all_text.innerHTML = getI18N(texts.display_all_search_result);
+                                display_all_text.innerText = getI18N(texts.display_all_search_result);
                             } else {
                                 display_all_img.src = `${repo_img_hordes_url}/icons/small_less.gif`;
-                                display_all_text.innerHTML = getI18N(texts.display_exact_search_result);
+                                display_all_text.innerText = getI18N(texts.display_exact_search_result);
                             }
                             let not_exact = Array.from(block_to_display.getElementsByClassName('not-exact') || []);
                             not_exact.forEach((not_exact_item) => {
@@ -6164,7 +6139,7 @@ function displayCellDetailsOnPage() {
                 cell_informations_header.appendChild(cell_informations_header_left);
 
                 let cell_informations_header_right = document.createElement('div');
-                cell_informations_header_right.innerHTML = `🗘`;
+                cell_informations_header_right.innerText = `🗘`;
                 cell_informations_header_right.style.fontSize = '16px';
                 cell_informations_header_right.style.cursor = 'pointer';
                 cell_informations_header.appendChild(cell_informations_header_right);
@@ -6210,8 +6185,6 @@ function displayCellDetailsOnPage() {
                 }
 
                 let map_box = document.querySelector('.map-box');
-                console.log('map_box', map_box);
-
                 map_box.parentElement.parentElement.appendChild(cell_informations);
 
                 let cell_note = createSubBlock('cell-note', getI18N(texts.note));
@@ -6367,7 +6340,7 @@ function displayEstimationsOnWatchtower() {
 
                 let estim_block_title_text = document.createElement('text');
                 estim_block_title_text.style.flex = '1';
-                estim_block_title_text.innerHTML = getScriptInfo().name;
+                estim_block_title_text.innerText = getScriptInfo().name;
                 estim_block_title.appendChild(estim_block_title_text);
 
                 let estim_block_title_save_button = document.createElement('button');
@@ -6674,7 +6647,7 @@ function displayAntiAbuseCounter() {
                     let time_left = new Date((15 * 60000) - since);
                     if (time_left < 0) {
                         counter_values.splice(index, 1);
-                        setStorageItem(mho_anti_abuse_key, counter_values);
+                        setStorageItem(mho_anti_abuse_key, [...counter_values]);
                     }
                     return time_left < 0;
                 };
@@ -6717,12 +6690,11 @@ function displayAntiAbuseCounter() {
             });
 
             if (pageIsBank()) {
-                let old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
                 let bank = document.querySelector('#bank-inventory');
                 let bank_items = bank ? Array.from(bank.querySelectorAll('li.item') || []) : [];
                 bank_items.forEach((bank_item) => {
                     bank_item.addEventListener('click', (event) => {
-                        old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+                        let old_bag = Array.from(document.querySelectorAll("#gma ul.rucksack li.item"));
 
                         document.addEventListener('mh-navigation-complete', () => {
                             controller.abort();
@@ -6733,23 +6705,35 @@ function displayAntiAbuseCounter() {
                                     if (!counter_values) {
                                         counter_values = [];
                                     }
-                                    let counter_value = {
-                                        item: {
-                                            item: getItemFromImg(bank_item.querySelector('img').src),
-                                            broken: bank_item.classList.contains('broken')
-                                        },
-                                        take_at: Date.now() + 5000
-                                    };
-                                    counter_values.push(counter_value);
+                                    let old_bag_items = Array.from(old_bag).map((item_in_old_bag) => getItemFromImg(item_in_old_bag.querySelector('img').src))
+                                    let new_bag_items = Array.from(new_bag).map((item_in_new_bag) => getItemFromImg(item_in_new_bag.querySelector('img').src));
+                                    new_bag_items.forEach((new_bag_item, index) => {
+                                        let old_bag_item_index = old_bag_items.findIndex((old_bag_item) => old_bag_item.id === new_bag_item.id)
+                                        if (old_bag_item_index > -1) {
+                                            old_bag_items.splice(old_bag_item_index, 1);
+                                        } else {
+                                            let counter_value = {
+                                                item: {
+                                                    item: new_bag_item,
+                                                    broken: new_bag[index].classList.contains('broken')
+                                                },
+                                                take_at: Date.now() + 2500
+                                            };
+                                            counter_values.push(counter_value);
+
+                                            let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
+                                            if (new_mho_anti_abuse_counter) {
+                                                let new_content = new_mho_anti_abuse_counter.querySelector('.content');
+                                                define_row(counter_value, counter_values.length - 1, new_content);
+                                            }
+                                        }
+                                    });
+
                                     setStorageItem(mho_anti_abuse_key, counter_values);
-                                    let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
-                                    if (new_mho_anti_abuse_counter) {
-                                        let new_content = new_mho_anti_abuse_counter.querySelector('.content');
-                                        define_row(counter_value, counter_values.length - 1, new_content);
-                                    }
                                 })
+                            } else {
+                                new_bag = undefined;
                             }
-                            old_bag = document.querySelectorAll("#gma ul.rucksack li.item");
                         }, {once: true});
                     }, {signal: controller.signal})
                 });
@@ -6838,7 +6822,7 @@ function displayCampingPredict() {
                 updater_title.appendChild(updater_title_mho_img);
 
                 let updater_title_text = document.createElement('text');
-                updater_title_text.innerHTML = getScriptInfo().name;
+                updater_title_text.innerText = getScriptInfo().name;
                 updater_title_text.style.fontSize = '1.5em';
                 updater_title.appendChild(updater_title_text);
 
@@ -7308,7 +7292,9 @@ function addExternalLinksToProfiles() {
     if (mho_parameters.display_external_links) {
         let user_tooltip = document.querySelector('#user-tooltip');
         if (user_tooltip) {
-            let user_id = user_tooltip.querySelector('[x-friend-id]').getAttribute('x-friend-id');
+            let user_id = user_tooltip.querySelector('[x-ajax-href]')?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
+            if (!user_id) return;
+
             let dash_separators = user_tooltip.querySelectorAll('hr.dashed');
             let last_separator = Array.from(dash_separators).pop();
             let link_color = window.getComputedStyle(user_tooltip.querySelector('.link')).getPropertyValue('color');
@@ -7333,6 +7319,8 @@ function addExternalLinksToProfiles() {
             bbh_link.href = `${big_broth_hordes_url}/?pg=user&uid=5-${user_id}`;
             new_part.appendChild(bbh_link);
 
+            bbh_link.addEventListener('click', () => user_tooltip.remove())
+
             let bbh_img = document.createElement('img');
             bbh_img.src = `${repo_img_url}external-tools/bbh.gif`;
             bbh_link.appendChild(bbh_img);
@@ -7341,13 +7329,15 @@ function addExternalLinksToProfiles() {
             bbh_link.appendChild(bbh_br);
 
             let bbh_title = document.createElement('text');
-            bbh_title.innerHTML = `BigBroth'\nHordes`;
+            bbh_title.innerText = `BigBroth'\nHordes`;
             bbh_link.appendChild(bbh_title);
 
             let gh_link = document.createElement('a');
             gh_link.classList.add('link-block');
             gh_link.href = `${gest_hordes_url}/ame/${user_id}`;
             new_part.appendChild(gh_link);
+
+            gh_link.addEventListener('click', () => user_tooltip.remove())
 
             let gh_img = document.createElement('img');
             gh_img.src = `${repo_img_url}external-tools/gh.gif`;
@@ -9318,7 +9308,7 @@ function updateExternalTools() {
                 .filter((citizen) => { // On ne garde que les citoyens actuellement en train de fouiller
                     let is_digging = false;
                     if (citizen.id === mh_user.id) { // Il s'agit de l'utilisateur qui a cliqué sur le bouton
-                        is_digging = document.querySelector('#mgd-digging-note [x-countdown]') ? true : false
+                        is_digging = document.querySelector('#mgd-digging-note [x-countdown-to]') ? true : false
                     } else { // Les autres
                         is_digging = citizen.row.parentElement.parentElement.parentElement.querySelector('li.status img[src*=small_gather]') ? true : false;
                     }
