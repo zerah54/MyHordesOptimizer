@@ -45,6 +45,18 @@
         --mdc-secondary-navigation-tab-container-height: 40px !important;
     }
 
+    .mat-mdc-form-field.compact-field {
+        .mdc-text-field--outlined {
+            .mat-mdc-form-field-infix {
+                --mat-form-field-container-vertical-padding: 8px !important;
+                min-height: unset;
+            }
+
+            .mat-mdc-floating-label:not(.mdc-floating-label--float-above) {
+                top: 20px !important;
+            }
+        }
+    }
 
     .mat-mdc-dialog-container {
         --mdc-dialog-container-color: #{variables.$card-background-color} !important;

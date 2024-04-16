@@ -1,23 +1,25 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using MyHordesOptimizerApi.Models;
-using MyHordesOptimizerApi.Repository.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Converters
 {
-    public class DeutchNameToCategoryIdConverter : IValueConverter<string, int>
+    public class DeutchNameToCategoryIdConverter : IValueConverter<string, int?>
     {
-        protected IMyHordesOptimizerRepository MyHordesOptimizerRepository { get; set; }
-        private List<CategoryModel> _categories;
+        protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
+        private List<Category> _categories;
 
-        public DeutchNameToCategoryIdConverter(IMyHordesOptimizerRepository myHordesOptimizerRepository)
+        public DeutchNameToCategoryIdConverter(IServiceScopeFactory serviceScopeFactory)
         {
-            MyHordesOptimizerRepository = myHordesOptimizerRepository;
-            _categories = MyHordesOptimizerRepository.GetCategories().ToList();
+            ServiceScopeFactory = serviceScopeFactory;
+            using var scope = ServiceScopeFactory.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            _categories = dbContext.Categories.ToList();
         }
 
-        public int Convert(string sourceMember, ResolutionContext context)
+        public int? Convert(string sourceMember, ResolutionContext context)
         {
             var category = _categories.First(cat => cat.LabelDe == sourceMember);
             return category.IdCategory;

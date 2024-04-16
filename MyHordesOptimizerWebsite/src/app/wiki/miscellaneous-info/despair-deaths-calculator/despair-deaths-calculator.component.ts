@@ -43,7 +43,6 @@ export class DespairDeathsCalculatorComponent {
     ];
 
     public rebuildElements(): void {
-        console.log('test', this.days);
         const saved_days: KilledZombiesForDay[] = [...this.days];
         const new_days: KilledZombiesForDay[] = [this.day_0];
 
@@ -51,7 +50,6 @@ export class DespairDeathsCalculatorComponent {
         while (i === 0 || new_days[i].nb_night_dead_zombies && i < 100) {
             const current_day: KilledZombiesForDay = new_days[i];
             i++;
-            console.log('current_day', current_day);
             const night_killed_zombies: number = Math.floor(Math.max(0, (+(current_day.nb_killed_zombies || 0) + +(current_day.nb_night_dead_zombies || 0) - 1) / 2));
             const new_day: KilledZombiesForDay = {
                 day: $localize`Jour J + ${i}`,

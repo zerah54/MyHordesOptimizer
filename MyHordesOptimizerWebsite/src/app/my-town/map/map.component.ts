@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, HostListener, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -18,6 +18,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { TownService } from '../../_abstract_model/services/town.service';
 import { Dictionary } from '../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
@@ -63,6 +64,9 @@ export class MapComponent implements OnInit {
         distances: []
     };
 
+    private api_service: ApiService = inject(ApiService);
+    private town_service: TownService = inject(TownService);
+
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     @HostListener('window:resize', ['$event'])
@@ -71,30 +75,42 @@ export class MapComponent implements OnInit {
     }
 
 
-    constructor(private breakpoint_observer: BreakpointObserver, private api: ApiService) {
+    constructor(private breakpoint_observer: BreakpointObserver) {
 
     }
 
     ngOnInit(): void {
-        this.api.getMap()
+        this.town_service
+            .getMap()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((map: Town) => {
-                this.map = map;
+            .subscribe({
+                next: (map: Town) => {
+                    this.map = map;
+                }
             });
-        this.api.getRuins()
+        this.api_service
+            .getRuins()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((ruins: Ruin[]) => {
-                this.all_ruins = ruins;
+            .subscribe({
+                next: (ruins: Ruin[]) => {
+                    this.all_ruins = ruins;
+                }
             });
-        this.api.getItems()
+        this.api_service
+            .getItems()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((items: Item[]) => {
-                this.all_items = items;
+            .subscribe({
+                next: (items: Item[]) => {
+                    this.all_items = items;
+                }
             });
-        this.api.getCitizens()
+        this.town_service
+            .getCitizens()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((citizens: CitizenInfo): void => {
-                this.all_citizens = citizens.citizens;
+            .subscribe({
+                next: (citizens: CitizenInfo): void => {
+                    this.all_citizens = citizens.citizens;
+                }
             });
 
         this.options = JSON.parse(localStorage.getItem('MAP_OPTIONS') || JSON.stringify(this.default_options));
@@ -121,7 +137,7 @@ export class MapComponent implements OnInit {
         if (already_exists && current_distances.length > 0) return;
 
         /** Sinon, on ajoute à la liste */
-        current_distances.push({ ...this.new_distance_option });
+        current_distances.push({...this.new_distance_option});
 
         this.changeOptions('distances', [...current_distances]);
     }
@@ -149,7 +165,7 @@ export class MapComponent implements OnInit {
     public changeOptions<T>(key: string, value: T): void {
         (<{ [key: string]: unknown }><unknown>this.options)[key] = value;
         setTimeout(() => {
-            this.options = { ...this.options };
+            this.options = {...this.options};
             localStorage.setItem('MAP_OPTIONS', JSON.stringify(this.options));
         });
     }

@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Authentication;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Controllers
 {
@@ -26,15 +27,15 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Token")]
-        public ActionResult<AuthenticationResponseDto> GetToken(string userKey)
+        public async Task<ActionResult<AuthenticationResponseDto>> GetToken(string userKey)
         {
             if (string.IsNullOrWhiteSpace(userKey))
             {
                 return BadRequest($"{nameof(userKey)} cannot be empty");
             }
-            UserKeyProvider.UserKey = userKey;
-            var simpleMe = _myHordesFetcherService.GetSimpleMe();
-            var token = _authenticationService.CreateToken(simpleMe);
+            UserInfoProvider.UserKey = userKey;
+            var simpleMe = await _myHordesFetcherService.GetSimpleMeAsync();
+            var token = _authenticationService.CreateToken(simpleMe, userKey);
             return new AuthenticationResponseDto()
             {
                 SimpleMe = simpleMe,

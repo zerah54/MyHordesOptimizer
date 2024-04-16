@@ -7,7 +7,8 @@ namespace MyHordesOptimizerApi.Providers.Interfaces
         string UserKey { get; set; }
         int UserId { get; set; }
         string UserName { get; set; }
+        SimpleMeTownDetailDto TownDetail { get; set; }
 
-        LastUpdateInfo GenerateLastUpdateInfo();
+        LastUpdateInfoDto GenerateLastUpdateInfo();
     }
 }

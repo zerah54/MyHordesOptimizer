@@ -1210,6 +1210,23 @@ $actions = [
     ],
 ];
 
+$complete_heroic = [];
+foreach ($actions['heroics'] as &$heroic) {
+    $annexe_heroic = $actions['actions'][$heroic['name']];
+    $complete_heroic[$heroic['name']] = [
+        'name' => $heroic['name'],
+        'title' => $annexe_heroic['label'],
+        'description' => $annexe_heroic['tooltip'],
+        'daysNeeded' => 0,
+        'unlockable' => $heroic['unlockable'],
+        'nbUses' => 1
+    ];
+
+    if ($heroic['replace']) {
+        $complete_heroic[$heroic['name']]['replace'] = $heroic['replace'];
+    }
+}
+
 $new_actions = json_encode($actions['actions'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 $filename_actions_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/actions.json';
 file_put_contents($filename_actions_target, $new_actions);
@@ -1226,7 +1243,7 @@ $new_meta_results = json_encode($actions['meta_results'], JSON_UNESCAPED_UNICODE
 $filename_meta_results_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Items/meta-results.json';
 file_put_contents($filename_meta_results_target, $new_meta_results);
 
-$new_heroics = json_encode($actions['heroics'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+$new_heroics = json_encode($complete_heroic, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 $filename_powers_target = '../../MyHordesOptimizerApi/MyHordesOptimizerApi/Data/Heroes/powers.json';
 file_put_contents($filename_powers_target, $new_heroics);
 

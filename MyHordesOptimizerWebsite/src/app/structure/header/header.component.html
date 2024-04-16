@@ -7,17 +7,18 @@
     <span class="spacer"></span>
     @if (saved_external_app_id && is_in_town) {
         @if (is_gt_xs) {
-            <button mat-button [color]="'accent'" (click)="updateExternalTools()">
+            <button mat-button type="button" [color]="'accent'" (click)="updateExternalTools()">
                 <mat-icon>send</mat-icon>
                 <ng-container i18n>Mettre à jour les outils externes</ng-container>
             </button>
         } @else {
-            <button mat-icon-button [color]="'accent'" (click)="updateExternalTools()" matTooltip="Mettre à jour les outils externes" i18n-matTooltip>
+            <button mat-icon-button type="button" [color]="'accent'" (click)="updateExternalTools()"
+                    matTooltip="Mettre à jour les outils externes" i18n-matTooltip>
                 <mat-icon>send</mat-icon>
             </button>
         }
     }
-    <button mat-button class="profil-button" [matMenuTriggerFor]="userMenu">
+    <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
         @if (saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === '') {
             <ng-container i18n>Se connecter</ng-container>
         } @else if (me && me.username && me.username !== '') {
@@ -33,12 +34,15 @@
                 <mat-form-field class="external-app-id-input no-bottom">
                     <mat-label i18n>Identifiant d'app externe</mat-label>
                     <input matInput type="text" placeholder="Identifiant externe pour les app" i18n-placeholder [(ngModel)]="external_app_id_field_value">
-                    <button matSuffix mat-icon-button (click)="saveExternalAppId();" [disabled]="!external_app_id_field_value">
+                    <button matSuffix mat-icon-button type="button" (click)="saveExternalAppId();" [disabled]="!external_app_id_field_value">
                         <mat-icon>check</mat-icon>
                     </button>
                 </mat-form-field>
             </div>
         } @else {
+            @if (me && me.town_details.town_id && is_dev) {
+                <mho-header-citizen-menu></mho-header-citizen-menu>
+            }
             <div mat-menu-item (click)="disconnect()" i18n>Déconnexion</div>
         }
     </mat-menu>

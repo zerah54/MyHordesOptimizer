@@ -13,12 +13,16 @@
             </mat-form-field>
         </div>
         <ul>
-            <div class="category" *ngFor="let category of (displayed_items | itemsGroupByCategory)">
-                <h2>{{ category.category.label[locale] }}</h2>
-                <div class="items">
-                    <mho-item *ngFor="let item of category.items" [item]="item"></mho-item>
+            @for (category of (displayed_items | itemsGroupByCategory); track category.category.id_category) {
+                <div class="category">
+                    <h2>{{ category.category.label[locale] }}</h2>
+                    <div class="items">
+                        @for (item of category.items; track item.id) {
+                            <mho-item [item]="item"></mho-item>
+                        }
+                    </div>
                 </div>
-            </div>
+            }
         </ul>
     }
 </mat-card-content>

@@ -50,18 +50,13 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(updateRequestDto.TownDetails)} cannot be empty");
             }
             var bbh = updateRequestDto.Map.ToolsToUpdate.IsBigBrothHordes;
-            var fata = updateRequestDto.Map.ToolsToUpdate.IsFataMorgana;
             if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(bbh))
             {
                 return BadRequest($"IsBigBrothHordes ne peut pas avoir une valeur autre que \"api\" ou \"none\"");
             }
-            if (UpdateRequestMapToolsToUpdateDetailsDto.IsCell(fata))
-            {
-                return BadRequest($"IsFataMorgana ne peut pas avoir une valeur autre que \"api\" ou \"none\"");
-            }
 
-            UserKeyProvider.UserKey = userKey;
-            UserKeyProvider.UserId = userId;
+            UserInfoProvider.UserKey = userKey;
+            UserInfoProvider.UserId = userId;
             var response = await ExternalToolsService.UpdateExternalsTools(updateRequestDto);
             return Ok(response);
         }
@@ -86,45 +81,45 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Bag")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenBag([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleBagDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenBag([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleBagDto request)
         {
-            UserKeyProvider.UserId = userId;
+            UserInfoProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenBag(townId, request.UserId, request.Objects);
             return Ok(lastUpdateInfo);
         }
 
         [HttpPost]
         [Route("Status")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleStatusDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleStatusDto request)
         {
-            UserKeyProvider.UserId = userId;
+            UserInfoProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenStatus(townId, request.UserId, request.Status);
             return Ok(lastUpdateInfo);
         }
 
         [HttpPost]
         [Route("HeroicActions")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenHeroicActions([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleHeroicActionsDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenHeroicActions([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleHeroicActionsDto request)
         {
-            UserKeyProvider.UserId = userId;
+            UserInfoProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenHeroicActions(townId, request.UserId, request.HeroicActions);
             return Ok(lastUpdateInfo);
         }
 
         [HttpPost]
         [Route("Home")]
-        public ActionResult<LastUpdateInfo> UpdateCitizenHome([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleHomeDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenHome([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateSingleHomeDto request)
         {
-            UserKeyProvider.UserId = userId;
+            UserInfoProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateCitizenHome(townId, request.UserId, request.Home);
             return Ok(lastUpdateInfo);
         }
 
         [HttpPost]
         [Route("Ghoul")]
-        public ActionResult<LastUpdateInfo> UpdateGhoulStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateGhoulStatusDto request)
+        public ActionResult<LastUpdateInfoDto> UpdateGhoulStatus([FromQuery] int townId, [FromQuery] int userId, [FromBody] UpdateGhoulStatusDto request)
         {
-            UserKeyProvider.UserId = userId;
+            UserInfoProvider.UserId = userId;
             var lastUpdateInfo = ExternalToolsService.UpdateGhoulStatus(townId, userId, request);
             return Ok(lastUpdateInfo);
         }

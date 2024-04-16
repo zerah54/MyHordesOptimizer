@@ -1,7 +1,7 @@
-import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { CommonModule, DOCUMENT, NgOptimizedImage } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostBinding, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostBinding, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -33,7 +33,7 @@ import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { ConfirmDialogComponent } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
 import { LastUpdateComponent } from '../../shared/elements/last-update/last-update.component';
 import { HeaderWithStringFilterComponent } from '../../shared/elements/lists/header-with-string-filter/header-with-string-filter.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
@@ -48,7 +48,7 @@ import { IsItemDisplayedPipe } from './is-item-displayed.pipe';
     styleUrls: ['./wishlist.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, MatMenuModule, MatSlideToggleModule, FormsModule, CommonModule, MatTabsModule, MatFormFieldModule, SelectComponent, CdkVirtualScrollViewport, TableVirtualScrollModule, MatTableModule, CdkDropList, HeaderWithStringFilterComponent, CdkDragHandle, NgOptimizedImage, MatSelectModule, MatOptionModule, MatInputModule, MatCheckboxModule, CdkDrag, LastUpdateComponent, CustomKeyValuePipe, ColumnIdPipe, IsItemDisplayedPipe]
+    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, MatMenuModule, MatSlideToggleModule, FormsModule, CommonModule, MatTabsModule, MatFormFieldModule, SelectComponent, CdkVirtualScrollViewport, TableVirtualScrollModule, MatTableModule, HeaderWithStringFilterComponent, NgOptimizedImage, MatSelectModule, MatOptionModule, MatInputModule, MatCheckboxModule, DragDropModule, LastUpdateComponent, CustomKeyValuePipe, ColumnIdPipe, IsItemDisplayedPipe]
 })
 export class WishlistComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -56,7 +56,6 @@ export class WishlistComponent implements OnInit {
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<WishlistItem>;
     @ViewChild(MatTabGroup) tabs!: MatTabGroup;
-    @ViewChild('filterInput') filterInput!: ElementRef;
     @ViewChild('addItemSelect') add_item_select!: SelectComponent<Item>;
 
     /** La wishlist */
@@ -69,17 +68,17 @@ export class WishlistComponent implements OnInit {
     public readonly locale: string = moment.locale();
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        { id: 'sort', header: '', displayed: (): boolean => this.edition_mode },
-        { id: 'name', header: $localize`Objet`, sticky: true },
-        { id: 'heaver', header: '' },
-        { id: 'priority', header: $localize`Priorité` },
-        { id: 'depot', header: $localize`Dépôt` },
-        { id: 'bank_count', header: $localize`Banque` },
-        { id: 'bag_count', header: $localize`Sacs` },
-        { id: 'count', header: $localize`Stock souhaité` },
-        { id: 'needed', header: $localize`Quantité manquante` },
-        { id: 'should_signal', header: $localize`Signaler` },
-        { id: 'delete', header: '', displayed: (): boolean => this.edition_mode },
+        {id: 'sort', header: '', displayed: (): boolean => this.edition_mode},
+        {id: 'name', header: $localize`Objet`, sticky: true},
+        {id: 'heaver', header: ''},
+        {id: 'priority', header: $localize`Priorité`},
+        {id: 'depot', header: $localize`Dépôt`},
+        {id: 'bank_count', header: $localize`Banque`},
+        {id: 'bag_count', header: $localize`Sacs`},
+        {id: 'count', header: $localize`Stock souhaité`},
+        {id: 'needed', header: $localize`Quantité manquante`},
+        {id: 'should_signal', header: $localize`Signaler`},
+        {id: 'delete', header: '', displayed: (): boolean => this.edition_mode},
     ];
 
     public readonly basic_list_label: string = $localize`Toute la carte`;
@@ -190,15 +189,10 @@ export class WishlistComponent implements OnInit {
             this.wishlist_sercices.addItemToWishlist(item, this.selected_tab_key)
                 .pipe(takeUntil(this.destroy_sub))
                 .subscribe(() => {
-                    item.wishlist_count = 1;
                     this.add_item_select.value = undefined;
                     this.getWishlist();
                 });
         }
-    }
-
-    public trackByColumnId(_index: number, column: StandardColumn): string {
-        return column.id;
     }
 
     public addZone(distance: number): void {
@@ -235,7 +229,7 @@ export class WishlistComponent implements OnInit {
                 text += `\n[collapse=${$localize`Encombrants`}]\n`;
                 heavy.forEach((item: WishlistItem): void => {
                     text += item.should_signal ? '[bad]' : '';
-                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
+                    text += `:middot:${item.item.label[this.locale]}` + (item.count >= 0 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
                     text += item.should_signal ? '[/bad]:warning:\n' : '\n';
                 });
                 text += '[/collapse]\n';
@@ -244,7 +238,7 @@ export class WishlistComponent implements OnInit {
                 text += `\n[collapse=${$localize`Non-Encombrants`}]\n`;
                 light.forEach((item: WishlistItem): void => {
                     text += item.should_signal ? '[bad]' : '';
-                    text += `:middot:${item.item.label[this.locale]}` + (item.count !== null && item.count !== undefined && item.count < 100 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
+                    text += `:middot:${item.item.label[this.locale]}` + (item.count >= 0 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
                     text += item.should_signal ? '[/bad]:warning:\n' : '\n';
                 });
                 text += '[/collapse]\n';
@@ -288,13 +282,13 @@ export class WishlistComponent implements OnInit {
                 final_item[this.excel_headers['depot'].label] = item.depot.value.count;
                 return final_item;
             });
-            const data: WorkSheet = utils.json_to_sheet(simplify_item, { cellStyles: true });
+            const data: WorkSheet = utils.json_to_sheet(simplify_item, {cellStyles: true});
             workbook.SheetNames.push(zone_items_key);
             workbook.Sheets[zone_items_key] = data;
         }
 
-        const u8: Uint8Array = write(workbook, { type: 'buffer', bookType: 'xlsx' });
-        const blob: Blob = new Blob([u8], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const u8: Uint8Array = write(workbook, {type: 'buffer', bookType: 'xlsx'});
+        const blob: Blob = new Blob([u8], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 
         const url: string = URL.createObjectURL(blob);
         const hidden_link: HTMLAnchorElement = this.document.createElement('a');
@@ -309,7 +303,7 @@ export class WishlistComponent implements OnInit {
 
     public importExcel(event: Event): void {
         this.dialog
-            .open(ConfirmDialogComponent, {
+            .open<ConfirmDialogComponent, ConfirmDialogData>(ConfirmDialogComponent, {
                 data: {
                     title: $localize`Confirmer`,
                     text: $localize`Voulez-vous écraser la liste actuelle ? Elle sera perdue.`

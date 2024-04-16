@@ -12,7 +12,7 @@ import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { AutoDestroy } from '../../decorators/autodestroy.decorator';
 import { getTown } from '../../utilities/localstorage.util';
-import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
     selector: 'mho-dig',
@@ -24,11 +24,11 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 export class DigComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @Input({ required: true }) citizen!: Citizen;
-    @Input({ required: true }) day!: number;
-    @Input({ required: true }) digsMode!: 'creation' | 'update' | 'registry';
+    @Input({required: true}) citizen!: Citizen;
+    @Input({required: true}) day!: number;
+    @Input({required: true}) digsMode!: 'creation' | 'update' | 'registry';
 
-    @Input({ required: true }) set dig(dig: Dig | undefined) {
+    @Input({required: true}) set dig(dig: Dig | undefined) {
         setTimeout(() => {
             if (this.digsMode === 'registry') {
                 this.updated_dig = dig;
@@ -61,7 +61,7 @@ export class DigComponent {
 
     protected deleteDig(dig_to_delete: Dig): void {
         this.dialog
-            .open(ConfirmDialogComponent, {
+            .open<ConfirmDialogComponent, ConfirmDialogData>(ConfirmDialogComponent, {
                 data: {
                     title: $localize`Confirmer`,
                     text: $localize`Êtes-vous sûr de vouloir supprimer cette fouille ?`

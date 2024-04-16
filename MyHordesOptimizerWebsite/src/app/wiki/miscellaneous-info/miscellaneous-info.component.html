@@ -3,14 +3,14 @@
 </mat-card-header>
 <mat-card-content class="mho-miscellaneous-info">
     <div class="container">
-        <ng-container *ngFor="let misc_card of misc">
+        @for (misc_card of misc; track misc_card) {
             <mat-card class="card">
                 <mat-card-header class="card-header">
                     <mat-card-title>
                         {{ misc_card.header }}
                     </mat-card-title>
                     @if (misc_card.header_action) {
-                        <button mat-icon-button (click)="misc_card.header_action.action()">
+                        <button mat-icon-button type="button" (click)="misc_card.header_action.action()">
                             <mat-icon>{{ misc_card.header_action.icon }}</mat-icon>
                         </button>
                     }
@@ -18,15 +18,14 @@
                 <mat-card-content class="content">
                     <table mat-table [dataSource]="misc_card.table">
 
-                        <ng-container *ngFor="let column of misc_card.columns">
+                        @for (column of misc_card.columns; track column.id) {
                             <mat-text-column [headerText]="column.header" [name]="column.id"></mat-text-column>
-                        </ng-container>
-
+                        }
                         <tr mat-header-row *matHeaderRowDef="misc_card.columns | ids; sticky: true"></tr>
                         <tr mat-row *matRowDef="let row; columns: misc_card.columns | ids;" [class.today]="row | isTodayMiscRow:misc_card:my_town"></tr>
                     </table>
                 </mat-card-content>
             </mat-card>
-        </ng-container>
+        }
     </div>
 </mat-card-content>

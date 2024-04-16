@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input } from '@angular/core';
+import { booleanAttribute, Component, HostBinding, Input } from '@angular/core';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
 
 @Component({
@@ -10,8 +10,8 @@ import { Cell } from '../../../../_abstract_model/types/cell.class';
 export class MapBorderComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @Input() horizontal: boolean = false;
-    @Input() vertical: boolean = false;
+    @Input({transform: booleanAttribute}) horizontal: boolean = false;
+    @Input({transform: booleanAttribute}) vertical: boolean = false;
 
     @Input() set index(index: null | number) {
         this.cell_index = index;

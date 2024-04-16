@@ -1,11 +1,13 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
+import { ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../_abstract_model/types/item.class';
+import { DebugLogPipe } from '../../pipes/debug-log.pipe';
 import { MenuAddComponent } from './menu-add/menu-add.component';
 import { MenuRemoveComponent } from './menu-remove/menu-remove.component';
 
@@ -15,17 +17,18 @@ import { MenuRemoveComponent } from './menu-remove/menu-remove.component';
     styleUrls: ['./list-element-add-remove.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [CommonModule, NgTemplateOutlet, NgOptimizedImage, MatMenuModule, MenuAddComponent, MenuRemoveComponent]
+    imports: [CommonModule, NgTemplateOutlet, NgOptimizedImage, MatMenuModule, MenuAddComponent, MenuRemoveComponent, DebugLogPipe]
 })
 export class ListElementAddRemoveComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input() currentList: (Item | StatusEnum)[] = [];
-    @Input() completeList: (Item | StatusEnum)[] = [];
+    @Input() lists: ListForAddRemove[] = [];
 
     @Input() citizen!: Citizen;
     @Input() label!: string;
-    @Input() readonly: boolean = false;
+    @Input({transform: booleanAttribute}) readonly: boolean = false;
+    @Input() class: string = '';
 
     @Input() addLabel!: string;
     @Output() add: EventEmitter<number | string> = new EventEmitter();

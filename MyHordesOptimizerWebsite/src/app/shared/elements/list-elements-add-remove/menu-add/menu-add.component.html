@@ -1,18 +1,46 @@
-<mat-menu #menuAdd="matMenu" class="mho-menu-add">
-    <ng-template matMenuContent let-menuLabel="menuLabel" let-list="list">
+<mat-menu #menuAdd="matMenu" class="mho-menu-add {{class}}">
+    <ng-template matMenuContent let-menuLabel="menuLabel" let-lists="lists">
         <div class="search" (click)="$event.stopPropagation()">
-            <mat-form-field>
+            <mat-form-field class="no-bottom" style="width: 100%">
                 <mat-label>{{ menuLabel }}</mat-label>
                 <input matInput #searchItem>
             </mat-form-field>
         </div>
         <div class="items">
-            <ng-container *ngFor="let item of list">
-                @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
-                    <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id);" width="16" height="16"
-                         [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
-                }
-            </ng-container>
+            @if (lists.length === 1) {
+                <ng-container *ngTemplateOutlet="menuContent; context: {$implicit: lists[0].list}"></ng-container>
+            } @else {
+                <mat-tab-group (click)="$event.stopPropagation();">
+                    @for (list of lists; track list.label) {
+                        <mat-tab [label]="list.label">
+                            <ng-container *ngTemplateOutlet="menuContent; context: {$implicit: list.list}"></ng-container>
+                        </mat-tab>
+                    }
+                </mat-tab-group>
+            }
         </div>
+
+        <ng-template #menuContent let-itemList>
+            @if (itemList | isItems) {
+                @for (category of itemList | itemsGroupByCategory; track category.category.id_category) {
+                    <div>
+                        <div>{{ category.category.label[locale] }}</div>
+                        @for (item of category.items; track item) {
+                            @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
+                                <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="add.next(item.id);" width="16" height="16"
+                                     [title]="$any(item.label[$any(locale)] ? (item.label[$any(locale)] || '') : item.label)">
+                            }
+                        }
+                    </div>
+                }
+            } @else {
+                @for (item of itemList; track item) {
+                    @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
+                        <img [ngSrc]="HORDES_IMG_REPO + item.img" [class.broken]="item.is_broken" (click)="add.next(item.id);" width="16" height="16"
+                             [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+                    }
+                }
+            }
+        </ng-template>
     </ng-template>
 </mat-menu>

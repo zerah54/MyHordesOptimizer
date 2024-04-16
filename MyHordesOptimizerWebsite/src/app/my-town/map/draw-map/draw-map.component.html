@@ -4,17 +4,21 @@
         <ng-container *ngTemplateOutlet="firstLastRow; context: {$implicit: true}"></ng-container>
         </thead>
         <tbody>
-        <tr *ngFor="let row of drawed_map; let row_index = index">
-            <mho-map-border [vertical]="true" [horizontal]="false" [myCell]="my_cell" [hoveredCell]="hovered_cell"
-                            [index]="+complete_map.town_y - row_index"></mho-map-border>
-            <mho-map-cell *ngFor="let cell of row; trackBy: trackByCellId; let cell_index = index" [cell]="cell"
-                          (cellChange)="drawed_map[row_index][cell_index] = $event" [allItems]="allItems" [allRuins]="allRuins"
-                          [allCitizens]="allCitizens" [options]="options" [drawedMap]="drawed_map"
-                          (currentHoveredCellChange)="hovered_cell = $event">
-            </mho-map-cell>
-            <mho-map-border [vertical]="true" [horizontal]="false" [myCell]="my_cell" [hoveredCell]="hovered_cell"
-                            [index]="+complete_map.town_y - row_index"></mho-map-border>
-        </tr>
+            @for (row of drawed_map; track row; let row_index = $index) {
+                <tr>
+                    <mho-map-border vertical [myCell]="my_cell" [hoveredCell]="hovered_cell"
+                                    [index]="+complete_map.town_y - row_index"></mho-map-border>
+                    @for (cell of row; track cell.cell_id; let cell_index = $index) {
+                        <mho-map-cell [cell]="cell"
+                                      (cellChange)="drawed_map[row_index][cell_index] = $event" [allItems]="allItems" [allRuins]="allRuins"
+                                      [allCitizens]="allCitizens" [options]="options" [drawedMap]="drawed_map"
+                                      (currentHoveredCellChange)="hovered_cell = $event">
+                        </mho-map-cell>
+                    }
+                    <mho-map-border vertical [myCell]="my_cell" [hoveredCell]="hovered_cell"
+                                    [index]="+complete_map.town_y - row_index"></mho-map-border>
+                </tr>
+            }
         </tbody>
         <tfoot>
         <ng-container *ngTemplateOutlet="firstLastRow; context: {$implicit: false}"></ng-container>
@@ -22,10 +26,12 @@
 
         <ng-template #firstLastRow let-first>
             <tr [class.first]="first" [class.last]="!first">
-                <mho-map-border [vertical]="true" [horizontal]="true" [myCell]="my_cell" [hoveredCell]="hovered_cell"></mho-map-border>
-                <mho-map-border [vertical]="false" [horizontal]="true" *ngFor="let x of x_row" [index]="x" [myCell]="my_cell"
-                                [hoveredCell]="hovered_cell"></mho-map-border>
-                <mho-map-border [vertical]="true" [horizontal]="true" [myCell]="my_cell" [hoveredCell]="hovered_cell"></mho-map-border>
+                <mho-map-border vertical horizontal [myCell]="my_cell" [hoveredCell]="hovered_cell"></mho-map-border>
+                @for (x of x_row; track x) {
+                    <mho-map-border horizontal [index]="x" [myCell]="my_cell"
+                                    [hoveredCell]="hovered_cell"></mho-map-border>
+                }
+                <mho-map-border vertical horizontal [myCell]="my_cell" [hoveredCell]="hovered_cell"></mho-map-border>
             </tr>
         </ng-template>
     </table>

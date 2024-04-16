@@ -3,7 +3,7 @@ using System.Net;
 
 namespace MyHordesOptimizerApi.Exceptions
 {
-    public class WebApiException : Exception
+    public class WebApiException : MhoTechnicalException
     {
         public HttpStatusCode StatusCode { get; }
         public string Response { get; }

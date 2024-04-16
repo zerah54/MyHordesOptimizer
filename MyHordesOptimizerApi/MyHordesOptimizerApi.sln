@@ -5,7 +5,11 @@ VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHordesOptimizerApi", "MyHordesOptimizerApi\MyHordesOptimizerApi.csproj", "{DAB054FA-8774-45E4-B490-928C914A4B26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serilog.Sinks.Discord", "Serilog.Sinks.Discord\Serilog.Sinks.Discord.csproj", "{FCE714DA-E7C1-4F3C-8333-22BA8B5347FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Sinks.Discord", "Serilog.Sinks.Discord\Serilog.Sinks.Discord.csproj", "{FCE714DA-E7C1-4F3C-8333-22BA8B5347FC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHordesOptimizerSqlDal", "MyHordesOptimizerSqlDal\MyHordesOptimizerSqlDal.csproj", "{2823221A-2037-4B54-A0C9-4A1A209D6BA4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHordesOptimizerApiIntegrationTests", "MyHordesOptimizerApiIntegrationTests\MyHordesOptimizerApiIntegrationTests.csproj", "{15E1BE2E-93A2-443F-9E70-C51AC1A7E052}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{FCE714DA-E7C1-4F3C-8333-22BA8B5347FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCE714DA-E7C1-4F3C-8333-22BA8B5347FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCE714DA-E7C1-4F3C-8333-22BA8B5347FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2823221A-2037-4B54-A0C9-4A1A209D6BA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2823221A-2037-4B54-A0C9-4A1A209D6BA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2823221A-2037-4B54-A0C9-4A1A209D6BA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2823221A-2037-4B54-A0C9-4A1A209D6BA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15E1BE2E-93A2-443F-9E70-C51AC1A7E052}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15E1BE2E-93A2-443F-9E70-C51AC1A7E052}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15E1BE2E-93A2-443F-9E70-C51AC1A7E052}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15E1BE2E-93A2-443F-9E70-C51AC1A7E052}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

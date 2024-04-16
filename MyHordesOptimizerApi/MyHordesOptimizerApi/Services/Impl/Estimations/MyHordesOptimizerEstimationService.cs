@@ -1,61 +1,80 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Estimations;
-using MyHordesOptimizerApi.Models.Estimations;
+using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
-using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Estimations;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MyHordesOptimizerApi.Services.Impl.Estimations
 {
     public class MyHordesOptimizerEstimationService : IMyHordesOptimizerEstimationService
     {
-        protected IMyHordesOptimizerRepository MyHordesOptimizerRepository { get; private set; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
         protected IUserInfoProvider UserInfoProvider { get; private set; }
         protected ILogger<MyHordesOptimizerEstimationService> Logger { get; private set; }
         protected IMapper Mapper { get; private set; }
+        protected MhoContext DbContext { get; set; }
 
-        public MyHordesOptimizerEstimationService(IMyHordesOptimizerRepository myHordesOptimizerRepository, IUserInfoProvider userInfoProvider, ILogger<MyHordesOptimizerEstimationService> logger, IMapper mapper)
+        public MyHordesOptimizerEstimationService(IServiceScopeFactory serviceScopeFactory,
+            IUserInfoProvider userInfoProvider,
+            ILogger<MyHordesOptimizerEstimationService> logger,
+            IMapper mapper,
+            MhoContext dbContext)
         {
-            MyHordesOptimizerRepository = myHordesOptimizerRepository;
+            ServiceScopeFactory = serviceScopeFactory;
             UserInfoProvider = userInfoProvider;
             Logger = logger;
             Mapper = mapper;
+            DbContext = dbContext;
         }
 
         public void UpdateEstimations(int townId, EstimationRequestDto request)
         {
-            var lastUpdateInfo = UserInfoProvider.GenerateLastUpdateInfo();
-            var idLastUpdateInfo = MyHordesOptimizerRepository.CreateLastUpdateInfo(lastUpdateInfo);
+            using var transaction = DbContext.Database.BeginTransaction();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(DbContext)));
+            DbContext.SaveChanges();
 
-            var estimation = Mapper.Map<TownEstimationModel>(request.Estim);
-            estimation.Day = request.Day.Value;
-            estimation.IdTown = townId;
-            estimation.IdLastUpdateInfo = idLastUpdateInfo;
-            var planif = Mapper.Map<TownEstimationModel>(request.Planif);
-            planif.Day = request.Day.Value;
-            planif.IdTown = townId;
-            planif.IdLastUpdateInfo = idLastUpdateInfo;
-            planif.IsPlanif = true;
-
-            MyHordesOptimizerRepository.UpdateEstimation(townId, estimation);
-            MyHordesOptimizerRepository.UpdateEstimation(townId, planif);
+            var newEstimations = Mapper.Map<List<TownEstimation>>(request, opt =>
+            {
+                opt.SetLastUpdateInfoId(newLastUpdate.Entity.IdLastUpdateInfo);
+                opt.SetTownId(townId);
+            });
+            var estimations = DbContext.TownEstimations.Where(x => x.Day == request.Day && x.IdTown == townId)
+                .ToList();
+            if (estimations.Any())
+            {
+                var planif = estimations.First(e => e.IsPlanif);
+                planif.UpdateNoNullProperties(newEstimations.First(ne => ne.IsPlanif));
+                DbContext.Update(planif);
+                var estim = estimations.First(e => !e.IsPlanif);
+                estim.UpdateNoNullProperties(newEstimations.First(ne => !ne.IsPlanif));
+                DbContext.Update(estim);
+            }
+            else
+            {
+                DbContext.AddRange(newEstimations);
+            }            
+            DbContext.SaveChanges();
+            transaction.Commit();
         }
 
         public EstimationRequestDto GetEstimations(int townId, int day)
         {
-            var estimations = MyHordesOptimizerRepository.GetEstimations(townId, day);
-            if(estimations.Any())
+            var models = DbContext.TownEstimations.Where(x => x.Day == day && x.IdTown == townId)
+                .ToList();
+            if(models.Any())
             {
-                var dto = Mapper.Map<EstimationRequestDto>(estimations);
+                var dto = Mapper.Map<EstimationRequestDto>(models);
                 return dto;
             }
-
-            return new EstimationRequestDto()
+            else
             {
-                Day = day
-            };
+                return new EstimationRequestDto();
+            }                       
         }
     }
 }

@@ -9,6 +9,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Home
         public int UserId { get; set; }
 
         [JsonProperty("home")]
-        public CitizenHomeValue Home { get; set; }
+        public CitizenHomeValueDto Home { get; set; }
     }
 }

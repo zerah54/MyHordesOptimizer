@@ -1,3 +1,207 @@
+@use 'variables';
+
+.mho-expeditions-header {
+    justify-content: space-between;
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+
 .mho-expeditions {
 
+    .container {
+        padding-top: 0.5em;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+
+        .actions {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+
+            .left-actions {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5em;
+            }
+
+            .right-actions {
+
+            }
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+
+            .expedition {
+                background-color: rgba(0, 0, 0, 0.15);
+                border-radius: 0.5em;
+                padding: 1em;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5em;
+
+                &.ready {
+                    border-left: 5px solid green;
+                }
+
+                &.stop {
+                    border-left: 5px solid red;
+                }
+
+                .header {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    flex-wrap: wrap;
+                    gap: 0.5em;
+
+                    .label {
+                        display: flex;
+                        align-items: center;
+                        flex-direction: row;
+                        flex-wrap: wrap;
+                        gap: 0.5em;
+                    }
+
+                    .actions {
+                    }
+                }
+
+                .expedition-part {
+                    border: 1px solid variables.$primary;
+                    border-radius: 0.25em;
+                    overflow: auto;
+                    padding: 0 0.5em;
+
+                    .expedition-part-header {
+                        padding: 0.5em 0.5em 0.25em;
+                    }
+
+                    table.expedition-table {
+
+                        width: 100%;
+                        border-spacing: 0;
+                        border-collapse: collapse;
+
+
+                        .mat-mdc-icon-button {
+                            --mdc-icon-button-state-layer-size: 36px;
+                            padding: 6px;
+
+                            .mat-mdc-button-touch-target {
+                                width: 100%;
+                                height: 100%;
+                            }
+                        }
+
+                        tr {
+                            border-bottom: 1px solid var(--primary);
+
+                            &.citizen, &.table-header {
+
+                                td > div.flex {
+                                    display: flex;
+                                    flex-direction: row;
+                                    align-items: center;
+                                    gap: 0.5em;
+                                }
+
+                                .action {
+                                    width: 36px;
+                                }
+
+                                .job {
+                                    width: 60px;
+
+                                    .mat-mdc-form-field {
+                                        width: 60px;
+                                    }
+                                }
+
+                                .pseudo {
+                                    width: 100px;
+                                }
+
+                                .is-thirsty {
+                                    width: 50px;
+                                    text-align: center;
+
+                                    > div {
+                                        align-items: center;
+                                        justify-content: center;
+                                    }
+
+                                    .mat-mdc-form-field {
+                                        width: 60px;
+                                    }
+                                }
+
+                                .pdc {
+                                    width: 50px;
+
+                                    .mat-mdc-form-field {
+                                        width: 60px;
+                                    }
+                                }
+
+                                .citizen-orders {
+                                    padding: 0 0.5em;
+
+                                    .checked {
+                                        text-decoration: line-through !important;
+                                    }
+                                }
+
+                                .bag {
+
+                                }
+                            }
+
+                            &.citizen {
+                                .job {
+                                    text-align: center;
+                                }
+                            }
+
+                            &.table-header {
+                                .pseudo {
+                                    > div {
+                                        display: flex;
+                                        flex-direction: row;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    .orders {
+                        padding: 0.25em 0.5em 0.5em;
+
+                        .checked {
+                            text-decoration: line-through !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.mho-expedition-bag-selector {
+    .mat-mdc-tab-body-wrapper {
+        max-height: 300px;
+    }
 }

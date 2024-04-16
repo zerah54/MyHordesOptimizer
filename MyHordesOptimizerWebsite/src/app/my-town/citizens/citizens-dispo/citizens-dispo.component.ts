@@ -1,12 +1,12 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
-import { ApiService } from '../../../_abstract_model/services/api.service';
+import { TownService } from '../../../_abstract_model/services/town.service';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
@@ -46,8 +46,8 @@ export class CitizensDispoComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center' },
-        { id: 'today_dispo', header: $localize`Disponibilités du jour`, class: '' },
+        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center'},
+        {id: 'today_dispo', header: $localize`Disponibilités du jour`, class: ''},
     ];
     public readonly current_day: number = getTown()?.day || 1;
     public filters: DispoFilter = {
@@ -55,12 +55,9 @@ export class CitizensDispoComponent implements OnInit {
         citizen: []
     };
 
+    private town_service: TownService = inject(TownService)
+
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
-
-    constructor(private api: ApiService) {
-
-    }
-
 
     public ngOnInit(): void {
         this.datasource = new MatTableDataSource();
@@ -77,10 +74,6 @@ export class CitizensDispoComponent implements OnInit {
         this.getCitizens();
     }
 
-    public trackByColumnId(_index: number, column: StandardColumn): string {
-        return column.id;
-    }
-
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: DispoByCitizen, filter: string): boolean {
         const filter_object: DispoFilter = JSON.parse(filter.toLowerCase());
@@ -90,7 +83,8 @@ export class CitizensDispoComponent implements OnInit {
     }
 
     private getCitizens(): void {
-        this.api.getCitizens()
+        this.town_service
+            .getCitizens()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((citizen_info: CitizenInfo) => {
                 citizen_info.citizens = citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_dead);

@@ -17,7 +17,7 @@ import {
     ViewEncapsulation
 } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
-import { MatFormFieldControl } from '@angular/material/form-field';
+import { MatFormField, MatFormFieldControl } from '@angular/material/form-field';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AngularEditorConfig, AngularEditorModule } from '@kolkov/angular-editor';
 import { Subject } from 'rxjs';
@@ -35,9 +35,11 @@ import { Subject } from 'rxjs';
     changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [AngularEditorModule, FormsModule]
+    imports: [AngularEditorModule, FormsModule, MatFormField]
 })
 export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestroy, MatFormFieldControl<string> {
+    @HostBinding('style.display') display: string = 'contents';
+
     @HostBinding('class.floating')
     get shouldLabelFloat(): boolean {
         return true;

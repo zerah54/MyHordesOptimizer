@@ -22,7 +22,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("Cell")]
-        public ActionResult<LastUpdateInfo> UpdateCell([FromQuery] int? townId, [FromQuery] int? userId, [FromBody] MyHordesOptimizerCellUpdateDto updateRequest)
+        public ActionResult<LastUpdateInfoDto> UpdateCell([FromQuery] int? townId, [FromQuery] int? userId, [FromBody] MyHordesOptimizerCellUpdateDto updateRequest)
         {
             if (!userId.HasValue)
             {
@@ -32,7 +32,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(townId)} cannot be empty");
             }
-            UserKeyProvider.UserId = userId.Value;
+            UserInfoProvider.UserId = userId.Value;
             var lastUpdateInfo = _mapService.UpdateCell(townId.Value, updateRequest);
             return lastUpdateInfo;
         }

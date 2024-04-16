@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -14,6 +14,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { TownService } from '../../_abstract_model/services/town.service';
 import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
@@ -54,13 +55,13 @@ export class RuinsComponent implements OnInit {
     public datasource: MatTableDataSource<Ruin> = new MatTableDataSource();
     /** La liste des colonnes */
     public readonly columns: RuinColumns[] = [
-        { id: 'label', header: $localize`Nom du bâtiment`, sortable: true, sticky: true },
-        { id: 'description', header: $localize`Description`, sortable: false },
-        { id: 'min_dist', header: $localize`Distance minimum`, sortable: true },
-        { id: 'max_dist', header: $localize`Distance maximum`, sortable: true },
-        { id: 'camping', header: $localize`Bonus en camping`, sortable: true },
-        { id: 'capacity', header: $localize`Capacité`, sortable: true },
-        { id: 'drops', header: $localize`Objets`, sortable: false }
+        {id: 'label', header: $localize`Nom du bâtiment`, sortable: true, sticky: true},
+        {id: 'description', header: $localize`Description`, sortable: false},
+        {id: 'min_dist', header: $localize`Distance minimum`, sortable: true},
+        {id: 'max_dist', header: $localize`Distance maximum`, sortable: true},
+        {id: 'camping', header: $localize`Bonus en camping`, sortable: true},
+        {id: 'capacity', header: $localize`Capacité`, sortable: true},
+        {id: 'drops', header: $localize`Objets`, sortable: false}
     ];
 
     public ruins_filters: RuinFilters = {
@@ -73,13 +74,14 @@ export class RuinsComponent implements OnInit {
 
     public ruins_filters_change: EventEmitter<void> = new EventEmitter();
 
+    private town_service: TownService = inject(TownService);
+    private api_service: ApiService = inject(ApiService);
+
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    constructor(private api: ApiService) {
-    }
-
     public ngOnInit(): void {
-        this.api.getRuins()
+        this.api_service
+            .getRuins()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe({
                 next: (ruins: Ruin[]) => {
@@ -117,7 +119,7 @@ export class RuinsComponent implements OnInit {
             });
 
         if (this.town) {
-            this.api.getTownRuins()
+            this.town_service.getTownRuins()
                 .pipe(takeUntil(this.destroy_sub))
                 .subscribe({
                     next: (town_ruins: Ruin[]) => {

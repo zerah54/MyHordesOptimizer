@@ -9,7 +9,7 @@
         }
         <small>&nbsp;[{{ cell.displayed_x }} ; {{ cell.displayed_y }}]</small>
     </h1>
-    <button mat-icon-button [mat-dialog-close]="data.cell">
+    <button mat-icon-button type="button" [mat-dialog-close]="data.cell">
         <mat-icon>close</mat-icon>
     </button>
 </div>
@@ -52,6 +52,6 @@
 </div>
 
 <div mat-dialog-actions [align]="'end'">
-    <button mat-button [color]="'accent'" [mat-dialog-close]="data.cell">Fermer</button>
-    <button mat-raised-button [color]="'accent'" (click)="saveCell()">Enregistrer</button>
+    <button mat-button type="reset" [color]="'accent'" [mat-dialog-close]="data.cell">Fermer</button>
+    <button mat-raised-button type="button" [color]="'accent'" (click)="saveCell()">Enregistrer</button>
 </div>

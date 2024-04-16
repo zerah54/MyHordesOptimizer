@@ -1,10 +1,10 @@
+import { ItemDTO } from '../dto/item.dto';
 import { Action } from '../enum/action.enum';
 import { Property } from '../enum/property.enum';
-import { Category } from './category.class';
-import { Recipe } from './recipe.class';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { I18nLabels } from './_types';
-import { ItemDTO } from '../dto/item.dto';
+import { Category } from './category.class';
+import { Recipe } from './recipe.class';
 
 export class Item extends CommonModel<ItemDTO> {
     public uid!: string;
@@ -23,7 +23,7 @@ export class Item extends CommonModel<ItemDTO> {
     public wishlist_count!: number;
     public drop_rate_not_praf!: number;
     public drop_rate_praf!: number;
-    public is_broken!: boolean;
+    public is_broken?: boolean;
 
     constructor(dto?: ItemDTO) {
         super();

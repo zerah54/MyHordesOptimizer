@@ -11,17 +11,17 @@
 
     @if (visible) {
         <mat-form-field (click)="$event.stopPropagation();" class="short-bottom">
-            <button mat-icon-button matPrefix [disabled]="filterValue === min" (click)="filterValueChange.next(min)">
+            <button mat-icon-button type="button" matPrefix [disabled]="filterValue === min" (click)="filterValueChange.next(min)">
                 <mat-icon>first_page</mat-icon>
             </button>
-            <button mat-icon-button matPrefix [disabled]="filterValue === min" (click)="filterValueChange.next(+filterValue - 1)">
+            <button mat-icon-button type="button" matPrefix [disabled]="filterValue === min" (click)="filterValueChange.next(+filterValue - 1)">
                 <mat-icon>arrow_back_ios</mat-icon>
             </button>
             <input matInput type="number" [ngModel]="filterValue" (ngModelChange)="filterValueChange.next($event)" [min]="min" [max]="max">
-            <button mat-icon-button matSuffix [disabled]="filterValue === max" (click)="filterValueChange.next(+filterValue + 1)">
+            <button mat-icon-button type="button" matSuffix [disabled]="filterValue === max" (click)="filterValueChange.next(+filterValue + 1)">
                 <mat-icon>arrow_forward_ios</mat-icon>
             </button>
-            <button mat-icon-button matSuffix [disabled]="filterValue === max" (click)="filterValueChange.next(max)">
+            <button mat-icon-button type="button" matSuffix [disabled]="filterValue === max" (click)="filterValueChange.next(max)">
                 <mat-icon>last_page</mat-icon>
             </button>
         </mat-form-field>

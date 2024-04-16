@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -11,6 +11,7 @@ import { environment } from '../../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { Entry } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
+import { TownService } from '../../../_abstract_model/services/town.service';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { BankDiffRegistryComponent } from './bank-diff/bank-diff-registry.component';
@@ -44,16 +45,16 @@ export class RegistryComponent implements OnInit {
     /** La locale */
     public readonly locale: string = moment.locale();
 
-
-    constructor(private api: ApiService) {
-
-    }
+    private api_service: ApiService = inject(ApiService);
+    private town_service: TownService = inject(TownService);
 
     public ngOnInit(): void {
-        this.api.getCitizens().subscribe((citizen: CitizenInfo): void => {
+        this.town_service
+            .getCitizens().subscribe((citizen: CitizenInfo): void => {
             this.complete_citizen_list = citizen;
         });
-        this.api.getItems().subscribe((items: Item[]): void => {
+        this.api_service
+            .getItems().subscribe((items: Item[]): void => {
             this.complete_items_list = items;
         });
     }

@@ -53,7 +53,7 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(userId)} cannot be empty");
             }
 
-            UserKeyProvider.UserId = userId.Value;
+            UserInfoProvider.UserId = userId.Value;
 
             EstimationService.UpdateEstimations(townId.Value, request);
             return Ok();
@@ -74,7 +74,7 @@ namespace MyHordesOptimizerApi.Controllers
             }
 
             var estimations = EstimationService.GetEstimations(townId.Value, day.Value);
-            return Ok(estimations.ToJson());
+            return Ok(estimations);
         }
 
         [HttpGet]

@@ -5,6 +5,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces
 {
     public interface IAuthenticationService
     {
-        TokenDto CreateToken(SimpleMeDto me);
+        TokenDto CreateToken(SimpleMeDto me, string userKey);
     }
 }

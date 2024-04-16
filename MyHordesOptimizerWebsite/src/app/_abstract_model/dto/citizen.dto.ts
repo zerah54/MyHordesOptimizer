@@ -1,4 +1,5 @@
 import { BagDTO } from './bag.dto';
+import { BathDTO } from './bath.dto';
 import { CadaverDTO } from './cadaver.dto';
 import { HeroicActionsDTO } from './heroic-actions.dto';
 import { HomeDTO } from './home.dto';
@@ -10,6 +11,7 @@ export interface CitizenDTO {
     id: number;
     cadaver?: CadaverDTO;
     isGhost?: boolean;
+    isShunned?: boolean;
     dead?: boolean;
     jobName?: string;
     jobUid?: string;
@@ -22,4 +24,5 @@ export interface CitizenDTO {
     home?: HomeDTO;
     status?: StatusDTO;
     actionsHeroic?: HeroicActionsDTO;
+    baths: BathDTO[],
 }

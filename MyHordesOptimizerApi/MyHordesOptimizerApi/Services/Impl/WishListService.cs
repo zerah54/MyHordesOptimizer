@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
-using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace MyHordesOptimizerApi.Services.Impl
@@ -19,94 +20,171 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         protected IUserInfoProvider UserInfoProvider { get; set; }
         protected IMyHordesApiRepository MyHordesJsonApiRepository { get; set; }
-        protected IMyHordesOptimizerRepository MyHordesOptimizerRepository { get; set; }
+        protected IServiceScopeFactory ServiceScopeFactory { get; private set; }
         protected IMapper Mapper { get; set; }
+        protected MhoContext DbContext { get; init; }
 
         public WishListService(ILogger<MyHordesFetcherService> logger,
             IUserInfoProvider userInfoProvider,
             IMyHordesApiRepository myHordesJsonApiRepository,
-            IMyHordesOptimizerRepository firebaseRepository,
-            IMapper mapper)
+            IServiceScopeFactory serviceScopeFactory,
+            IMapper mapper,
+            MhoContext context)
         {
             Logger = logger;
             UserInfoProvider = userInfoProvider;
             MyHordesJsonApiRepository = myHordesJsonApiRepository;
-            MyHordesOptimizerRepository = firebaseRepository;
+            ServiceScopeFactory = serviceScopeFactory;
             Mapper = mapper;
+            DbContext = context;
         }
 
-        public WishListLastUpdate GetWishList(int townId)
+        public WishListLastUpdateDto GetWishList(int townId)
         {
-            var sw = new Stopwatch();
-            sw.Start();
-            var wishList = MyHordesOptimizerRepository.GetWishList(townId);
-            Logger.LogInformation($"[GetWishList] GetWishList : {sw.ElapsedMilliseconds}");
-            var recipes = MyHordesOptimizerRepository.GetRecipes().ToList();
-            Logger.LogInformation($"[GetWishList] GetRecipes : {sw.ElapsedMilliseconds}");
-            var bank = MyHordesOptimizerRepository.GetBank(townId);
-            Logger.LogInformation($"[GetWishList] GetBank : {sw.ElapsedMilliseconds}");
-            var allBagsItem = MyHordesOptimizerRepository.GetAllBagItems(townId);
-            var wishListItems = wishList.WishList.Values.SelectMany(x => x).ToList();
-            foreach (var wishlistItem in wishListItems)
+            var wishListItems = DbContext.TownWishListItems
+                .Where(wishList => wishList.IdTown == townId)
+                .Include(wishlist => wishlist.IdItemNavigation)
+                    .ThenInclude(item => item.IdCategoryNavigation)
+                    .AsSplitQuery()
+                .Include(wishlist => wishlist.IdItemNavigation)
+                    .ThenInclude(item => item.PropertyNames)
+                    .AsSplitQuery()
+                .Include(wishlist => wishlist.IdItemNavigation)
+                    .ThenInclude(item => item.ActionNames)
+                    .AsSplitQuery()
+                .Include(wishlist => wishlist.IdItemNavigation)
+                    .ThenInclude(item => item.RecipeItemComponents)
+                        .ThenInclude(recipe => recipe.RecipeNameNavigation)
+                            .ThenInclude(recipe => recipe.RecipeItemResults)
+                            .AsSplitQuery()
+                .Include(wishlist => wishlist.IdItemNavigation)
+                    .ThenInclude(item => item.RecipeItemResults)
+                    .AsSplitQuery()
+                .Include(wishlist => wishlist.IdItemNavigation)
+                    .ThenInclude(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId))
+                    .AsSplitQuery()
+                .Include(wishlist => wishlist.IdTownNavigation)
+                    .ThenInclude(town => town.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId))
+                        .ThenInclude(townCitizen => townCitizen.IdBagNavigation)
+                            .ThenInclude(citizenBag => citizenBag.BagItems)
+                                .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                                .AsSplitQuery()
+                .Include(wishlist => wishlist.IdTownNavigation)
+                    .ThenInclude(town => town.IdUserWishListUpdaterNavigation)
+                        .AsSplitQuery()
+                .ToList();
+            if (wishListItems.Any())
             {
-                var bankItem = bank.Bank.FirstOrDefault(x => x.Item.Id == wishlistItem.Item.Id);
-                if (bankItem != null)
+                var itemsDto = Mapper.Map<List<WishListItemDto>>(wishListItems);
+                var dto = new WishListLastUpdateDto()
                 {
-                    wishlistItem.BankCount = bankItem.Count;
-                }
-                else
-                {
-                    wishlistItem.BankCount = 0;
-                }
-                var bagItem = allBagsItem.SingleOrDefault(x => x.IdItem == wishlistItem.Item.Id);
-                if(bagItem != null)
-                {
-                    wishlistItem.BagCount = bagItem.Count;
-                }
-                wishlistItem.IsWorkshop = recipes.Any(x => x.Type.StartsWith("Recipe::WorkshopType")
-                                                             && (x.Components.Any(component => component.Id == wishlistItem.Item.Id) || x.Result.Any(result => result.Item.Id == wishlistItem.Item.Id)));
+                    LastUpdateInfo = new LastUpdateInfoDto()
+                    {
+                        UserId = wishListItems.First().IdTownNavigation.IdUserWishListUpdaterNavigation.IdUser,
+                        UserName = wishListItems.First().IdTownNavigation.IdUserWishListUpdaterNavigation.Name,
+                        UpdateTime = wishListItems.First().IdTownNavigation.WishlistDateUpdate.Value
+                    },
+                    WishList = itemsDto.GroupBy(item => item.ZoneXPa, item => item).ToDictionary(group => group.Key, group => group.ToList())
+                };
+                return dto;
             }
-            Logger.LogInformation($"[GetWishList] Récupération bankcount : {sw.ElapsedMilliseconds}");
-            wishListItems.ForEach(wishlist => wishlist.Item.Recipes = recipes.GetRecipeForItem(wishlist.Item.Id));
-            Logger.LogInformation($"[GetWishList] Association des recipes : {sw.ElapsedMilliseconds}");
-            return wishList;
+            else
+            {
+                return new WishListLastUpdateDto();
+            }
         }
 
-        public WishListLastUpdate PutWishList(int townId, int userId, List<WishListPutResquestDto> wishListPutRequest)
+        public WishListLastUpdateDto PutWishList(int townId, int userId, List<WishListPutResquestDto> wishListPutRequest)
         {
-            var items = Mapper.Map<List<TownWishlistItemModel>>(wishListPutRequest);
-            MyHordesOptimizerRepository.PutWishList(townId, userId, items);
-            var wishList = MyHordesOptimizerRepository.GetWishList(townId);
-            return wishList;
+            var items = Mapper.Map<List<TownWishListItem>>(wishListPutRequest);
+            using var transaction = DbContext.Database.BeginTransaction();
+            DbContext.TownWishListItems.RemoveRange(DbContext.TownWishListItems.Where(townWishListItem => townWishListItem.IdTown == townId));
+            var town = DbContext.Towns
+                .Where(town => town.IdTown == townId)
+                .Include(town => town.TownWishListItems)
+                .Single();
+            town.TownWishListItems = items;
+            town.IdUserWishListUpdater = userId;
+            town.WishlistDateUpdate = DateTime.UtcNow;
+            DbContext.Update(town);
+            DbContext.SaveChanges();
+            transaction.Commit();
+            return GetWishList(townId);
         }
 
-        public WishListLastUpdate CreateFromTemplate(int townId, int userId, int templateId)
+        public WishListLastUpdateDto CreateFromTemplate(int townId, int userId, int templateId)
         {
-            var itemTemplates = MyHordesOptimizerRepository.GetWishListTemplate(templateId);
-            var items = Mapper.Map<List<TownWishlistItemModel>>(itemTemplates);
-            MyHordesOptimizerRepository.PutWishList(townId, userId, items);
-            var wishList = MyHordesOptimizerRepository.GetWishList(townId);
-            return wishList;
+            using var transaction = DbContext.Database.BeginTransaction();
+            DbContext.TownWishListItems.RemoveRange(DbContext.TownWishListItems.Where(townWishListItem => townWishListItem.IdTown == townId));
+            var templateWishList = DbContext.DefaultWishlistItems.Where(defaultWishListitem => defaultWishListitem.IdDefaultWishlist == templateId)
+                .ToList();
+            var items = Mapper.Map<List<TownWishListItem>>(templateWishList);
+            var town = DbContext.Towns
+               .Where(town => town.IdTown == townId)
+               .Include(town => town.TownWishListItems)
+               .Single();
+            town.TownWishListItems = items;
+            town.IdUserWishListUpdater = userId;
+            town.WishlistDateUpdate = DateTime.UtcNow;
+            DbContext.Update(town);
+            DbContext.SaveChanges();
+            transaction.Commit();
+            return GetWishList(townId);
         }
 
         public void AddItemToWishList(int townId, int userId, int itemId, int zoneXPa)
         {
-            MyHordesOptimizerRepository.AddItemToWishlist(townId, itemId, userId, zoneXPa);
+            using var transaction = DbContext.Database.BeginTransaction();
+            var town = DbContext.Towns
+             .Where(town => town.IdTown == townId)
+             .Include(town => town.TownWishListItems)
+             .Single();
+            town.TownWishListItems.Add(new TownWishListItem()
+            {
+                ZoneXpa = zoneXPa,
+                IdItem = itemId,
+                Count = -1
+            });
+            town.IdUserWishListUpdater = userId;
+            town.WishlistDateUpdate = DateTime.UtcNow;
+            DbContext.Update(town);
+            DbContext.SaveChanges();
+            transaction.Commit();
         }
 
         public List<WishlistCategorieDto> GetWishListCategories()
         {
-            var models = MyHordesOptimizerRepository.GetWishListCategories();
-            var groupping = models.GroupBy(x => x.IdCategory);
-            var dtos = Mapper.Map<List<WishlistCategorieDto>>(groupping);
+            var models = DbContext.WishlistCategories
+                .Include(wshlstCategorie => wshlstCategorie.IdItems)
+                .ToList();
+            var dtos = Mapper.Map<List<WishlistCategorieDto>>(models);
             return dtos;
         }
 
         public List<WishlistTemplateDto> GetWishListTemplates()
         {
-            var models = MyHordesOptimizerRepository.GetWishListTemplates();
-            var groupping = models.GroupBy(x => x.IdDefaultWishlist);
-            var dtos = Mapper.Map<List<WishlistTemplateDto>>(groupping);
+            var models = DbContext.DefaultWishlistItems.ToList();
+            var templates = models.GroupBy(model => new
+            {
+                model.IdDefaultWishlist,
+                model.IdUserAuthor,
+                Labels = new Dictionary<string, string>() { { "fr", model.LabelFr }, { "en", model.LabelEn }, { "es", model.LabelEs }, { "de", model.LabelDe } },
+                model.Name
+            });
+            var dtos = new List<WishlistTemplateDto>();
+            foreach (var group in templates)
+            {
+                var templateId = group.Key.IdDefaultWishlist;
+                var items = Mapper.Map<List<WishListItemDto>>(group.ToList());
+                dtos.Add(new WishlistTemplateDto()
+                {
+                    IdTemplate = templateId,
+                    IdUserAuthor = group.Key.IdUserAuthor,
+                    Labels = group.Key.Labels,
+                    Name = group.Key.Name,
+                    Items = items
+                });
+            }
             return dtos;
         }
     }

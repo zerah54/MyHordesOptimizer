@@ -3,13 +3,13 @@
 </mat-card-header>
 <mat-card-content class="mho-citizens">
     <nav mat-tab-nav-bar [mat-stretch-tabs]="false" mat-align-tabs="start" [tabPanel]="panel">
-        <ng-container *ngFor="let link of links">
+        @for (link of links; track link.path) {
             @if (link.displayed) {
                 <a mat-tab-link [routerLink]="[link.path]" [active]="router.url === link.path">
                     {{ link.label }}
                 </a>
             }
-        </ng-container>
+        }
     </nav>
 
     <mat-tab-nav-panel #panel>

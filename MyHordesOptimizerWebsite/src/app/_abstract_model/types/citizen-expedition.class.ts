@@ -1,49 +1,72 @@
-﻿import { CitizenExpeditionDTO } from '../dto/citizen-expedition.dto';
-import { HeroicActionEnum } from '../enum/heroic-action.enum';
+﻿import { CitizenExpeditionDTO, CitizenExpeditionShortDTO } from '../dto/citizen-expedition.dto';
 import { JobEnum } from '../enum/job.enum';
-import { CommonModel } from './_common.class';
-import { Bag } from './bag.class';
-import { Citizen } from './citizen.class';
+import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
+import { CitizenExpeditionBag } from './citizen-expedition-bag.class';
+import { ExpeditionOrder } from './expedition-order.class';
 
 export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
-    public citizen!: Citizen;
-    public bag: Bag = new Bag();
-    public consigne!: string;
+    public id?: number;
+    public citizen_id?: number;
+    public bag: CitizenExpeditionBag = new CitizenExpeditionBag();
+    public orders!: ExpeditionOrder[];
     public preinscrit!: boolean;
     public preinscrit_job?: JobEnum;
-    public preinscrit_heroic?: HeroicActionEnum;
+    public preinscrit_heroic_skill?: string;
     public pdc!: number;
-    public soif!: boolean;
+    public is_thirsty?: boolean;
 
 
-    constructor(dto?: CitizenExpeditionDTO) {
+    constructor(dto?: CitizenExpeditionDTO | null) {
         super();
         this.dtoToModel(dto);
     }
 
     public override modelToDto(): CitizenExpeditionDTO {
         return {
-            citizen: this.citizen ? this.citizen.modelToDto() : undefined,
+            id: this.id,
+            idUser: this.citizen_id ? this.citizen_id : undefined,
             bag: this.bag ? this.bag.modelToDto() : undefined,
-            consigne: this.consigne,
+            orders: modelToDtoArray(this.orders),
             preinscrit: this.preinscrit,
-            preinscritJob: this.preinscrit_job?.value.id,
-            preinscritHeroic: this.preinscrit_heroic?.key,
+            preinscritJob: this.preinscrit_job?.key,
+            preinscritHeroicSkillName: this.preinscrit_heroic_skill,
             pdc: this.pdc,
-            soif: this.soif
+            isThirsty: this.is_thirsty
         };
     }
 
-    protected override dtoToModel(dto?: CitizenExpeditionDTO): void {
+    public modelToDtoShort(): CitizenExpeditionShortDTO {
+        return {
+            id: this.id,
+            idUser: this.citizen_id ? this.citizen_id : undefined,
+            bagId: this.bag?.bag_id,
+            ordersId: this.orders ? this.orders
+                .filter((order: ExpeditionOrder) => order.id !== undefined && order.id !== null)
+                .map((order: ExpeditionOrder) => <number>order.id) : [],
+            preinscrit: this.preinscrit,
+            preinscritJob: this.preinscrit_job?.key,
+            preinscritHeroicSkillName: this.preinscrit_heroic_skill,
+            pdc: this.pdc,
+            isThirsty: this.is_thirsty
+        };
+    }
+
+    protected override dtoToModel(dto?: CitizenExpeditionDTO | null): void {
         if (dto) {
-            this.citizen = new Citizen(dto.citizen);
-            this.bag = new Bag(dto.bag);
-            this.consigne = dto.consigne;
+            this.id = dto.id;
+            this.citizen_id = dto.idUser;
+            this.bag = new CitizenExpeditionBag(dto.bag);
+            this.orders = dtoToModelArray(ExpeditionOrder, dto.orders);
+            this.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
+                if (order_a.position < order_b.position) return -1;
+                if (order_a.position > order_b.position) return 1;
+                return 0;
+            });
             this.preinscrit = dto.preinscrit;
             this.preinscrit_job = dto.preinscritJob ? <JobEnum>JobEnum.getByKey(dto.preinscritJob) : undefined;
-            this.preinscrit_heroic = dto.preinscritHeroic ? <HeroicActionEnum>HeroicActionEnum.getByKey(dto.preinscritHeroic) : undefined;
+            this.preinscrit_heroic_skill = dto.preinscritHeroicSkillName;
             this.pdc = dto.pdc;
-            this.soif = dto.soif;
+            this.is_thirsty = dto.isThirsty;
         }
     }
 

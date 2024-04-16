@@ -15,13 +15,15 @@ namespace MyHordesOptimizerApi.Providers.Impl
         private string _userName;
         public string UserName { get => _userName; set => _userName = value; }
 
-        public LastUpdateInfo GenerateLastUpdateInfo()
+        public SimpleMeTownDetailDto TownDetail { get; set; }
+
+        public LastUpdateInfoDto GenerateLastUpdateInfo()
         {
-            return new LastUpdateInfo()
+            return new LastUpdateInfoDto()
             {
                 UserId = UserId,
-                UserName = UserName,
-                UpdateTime = DateTime.UtcNow
+                UpdateTime = DateTime.UtcNow,
+                UserName = UserName
             };
         }
     }

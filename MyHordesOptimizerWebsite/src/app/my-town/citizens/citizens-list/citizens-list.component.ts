@@ -1,22 +1,23 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostBinding, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { TableVirtualScrollDataSource, TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { HeroicActionEnum } from '../../../_abstract_model/enum/heroic-action.enum';
-import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
+import { TownService } from '../../../_abstract_model/services/town.service';
+import { ListForAddRemove } from '../../../_abstract_model/types/_types';
+import { Bath } from '../../../_abstract_model/types/bath.class';
 import { Cadaver } from '../../../_abstract_model/types/cadaver.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -30,7 +31,7 @@ import { LastUpdateComponent } from '../../../shared/elements/last-update/last-u
 import { ListElementAddRemoveComponent } from '../../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
 import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
-import { getUser } from '../../../shared/utilities/localstorage.util';
+import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
 import { TypeRowPipe } from './type-row.pipe';
 
 @Component({
@@ -49,7 +50,6 @@ export class CitizensListComponent implements OnInit {
 
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
-    @ViewChild('filterInput') filterInput!: ElementRef;
 
     /** La liste des citoyens en vie */
     public alive_citizen_info!: CitizenInfo;
@@ -64,6 +64,7 @@ export class CitizensListComponent implements OnInit {
     public all_items: Item[] = [];
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    public readonly current_day: number = getTown()?.day || 1;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** Les filtres de la liste des citoyens */
@@ -72,23 +73,30 @@ export class CitizensListComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly citizen_list_columns: StandardColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
-        { id: 'more_status', header: $localize`États`, class: '' },
-        { id: 'heroic_actions', header: $localize`Actions héroïques`, class: '' },
-        { id: 'home', header: $localize`Améliorations`, class: '' },
+        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
+        {id: 'more_status', header: $localize`États`, class: ''},
+        {id: 'heroic_actions', header: $localize`Actions héroïques`, class: ''},
+        {id: 'home', header: $localize`Améliorations`, class: ''},
         // { id: 'chest', header: $localize`Coffre` },
     ];
     /** La liste des colonnes pour les citoyens morts */
     public readonly dead_citizen_list_columns: StandardColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
+        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
     ];
 
     public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
 
-    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
+    /** La liste des listes disponibles dans le sac */
+    public bag_lists: ListForAddRemove[] = [];
+    /** La liste des listes disponibles dans les status */
+    public readonly status_lists: ListForAddRemove[] = [
+        {label: $localize`Tous`, list: this.all_status}
+    ];
 
-    constructor(private api: ApiService) {
-    }
+    private api_service: ApiService = inject(ApiService);
+    private town_service: TownService = inject(TownService);
+
+    @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     public ngOnInit(): void {
         this.citizen_list = new TableVirtualScrollDataSource();
@@ -105,9 +113,17 @@ export class CitizensListComponent implements OnInit {
 
         this.citizen_list.filterPredicate = (data: Citizen, filter: string): boolean => this.customFilter(data, filter);
 
-        this.api.getItems()
+        this.api_service
+            .getItems()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((items: Item[]) => this.all_items = items);
+            .subscribe({
+                next: (items: Item[]) => {
+                    this.all_items = items;
+                    this.bag_lists = [
+                        {label: $localize`Tous`, list: this.all_items}
+                    ]
+                }
+            });
 
         this.getCitizens();
     }
@@ -124,12 +140,15 @@ export class CitizensListComponent implements OnInit {
         if (citizen && citizen.bag) {
             citizen.bag.items.push(<Item>this.all_items.find((item: Item) => item.id === item_id));
 
-            this.api.updateBag(citizen)
+            this.town_service
+                .updateBag(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo): void => {
-                    if (citizen.bag) {
-                        citizen.bag.update_info.username = getUser().username;
-                        citizen.bag.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo): void => {
+                        if (citizen.bag) {
+                            citizen.bag.update_info.username = getUser().username;
+                            citizen.bag.update_info.update_time = update_info.update_time;
+                        }
                     }
                 });
         }
@@ -149,12 +168,15 @@ export class CitizensListComponent implements OnInit {
             if (item_in_datasource_index !== undefined && item_in_datasource_index !== null && item_in_datasource_index > -1) {
                 citizen.bag.items.splice(item_in_datasource_index, 1);
             }
-            this.api.updateBag(citizen)
+            this.town_service
+                .updateBag(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo) => {
-                    if (citizen.bag) {
-                        citizen.bag.update_info.username = getUser().username;
-                        citizen.bag.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.bag) {
+                            citizen.bag.update_info.username = getUser().username;
+                            citizen.bag.update_info.update_time = update_info.update_time;
+                        }
                     }
                 });
         }
@@ -169,12 +191,15 @@ export class CitizensListComponent implements OnInit {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.bag) {
             citizen.bag.items = [];
-            this.api.updateBag(citizen)
+            this.town_service
+                .updateBag(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo) => {
-                    if (citizen.bag) {
-                        citizen.bag.update_info.username = getUser().username;
-                        citizen.bag.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.bag) {
+                            citizen.bag.update_info.username = getUser().username;
+                            citizen.bag.update_info.update_time = update_info.update_time;
+                        }
                     }
                 });
         }
@@ -191,12 +216,15 @@ export class CitizensListComponent implements OnInit {
         if (citizen && citizen.status) {
             citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status.key === status_key));
 
-            this.api.updateStatus(citizen)
+            this.town_service
+                .updateStatus(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo) => {
-                    if (citizen.status) {
-                        citizen.status.update_info.username = getUser().username;
-                        citizen.status.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.status) {
+                            citizen.status.update_info.username = getUser().username;
+                            citizen.status.update_info.update_time = update_info.update_time;
+                        }
                     }
                 });
         }
@@ -215,12 +243,15 @@ export class CitizensListComponent implements OnInit {
             if (existing_status_index !== undefined && existing_status_index !== null && existing_status_index > -1) {
                 citizen.status.icons.splice(existing_status_index, 1);
             }
-            this.api.updateStatus(citizen)
+            this.town_service
+                .updateStatus(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo) => {
-                    if (citizen.status) {
-                        citizen.status.update_info.username = getUser().username;
-                        citizen.status.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.status) {
+                            citizen.status.update_info.username = getUser().username;
+                            citizen.status.update_info.update_time = update_info.update_time;
+                        }
                     }
                 });
         }
@@ -235,12 +266,15 @@ export class CitizensListComponent implements OnInit {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.status) {
             citizen.status.icons = [];
-            this.api.updateBag(citizen)
+            this.town_service
+                .updateBag(citizen)
                 .pipe(takeUntil(this.destroy_sub))
-                .subscribe((update_info: UpdateInfo) => {
-                    if (citizen.status) {
-                        citizen.status.update_info.username = getUser().username;
-                        citizen.status.update_info.update_time = update_info.update_time;
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.status) {
+                            citizen.status.update_info.username = getUser().username;
+                            citizen.status.update_info.update_time = update_info.update_time;
+                        }
                     }
                 });
         }
@@ -250,20 +284,21 @@ export class CitizensListComponent implements OnInit {
      * On met à jour la liste des améliorations
      *
      * @param {HomeWithValue} element
-     * @param {MatCheckboxChange | MatSelectChange} event
+     * @param {MatCheckboxChange} event
      * @param {number} citizen_id
      */
-    public updateHome(element: HomeWithValue, event: MatCheckboxChange | MatSelectChange, citizen_id: number): void {
+    public updateHome(element: HomeWithValue, event: MatCheckboxChange | number, citizen_id: number): void {
         const old_element_value: boolean | number = element.value;
         if (event instanceof MatCheckboxChange) {
             element.value = event.checked;
         } else {
-            element.value = event.value;
+            element.value = event;
         }
 
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.home !== undefined) {
-            this.api.updateHome(citizen)
+            this.town_service
+                .updateHome(citizen)
                 .pipe(takeUntil(this.destroy_sub))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
@@ -282,19 +317,22 @@ export class CitizensListComponent implements OnInit {
     /**
      * On met à jour la liste des actions héroiques
      *
+     * @param {HeroicActionsWithValue} element
+     * @param {MatCheckboxChange} event
      * @param {number} citizen_id
      */
-    public updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | MatSelectChange, citizen_id: number): void {
+    public updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | number, citizen_id: number): void {
         const old_element_value: boolean | number = element.value;
         if (event instanceof MatCheckboxChange) {
             element.value = event.checked;
         } else {
-            element.value = event.value;
+            element.value = event;
         }
 
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.heroic_actions) {
-            this.api.updateHeroicActions(citizen)
+            this.town_service
+                .updateHeroicActions(citizen)
                 .pipe(takeUntil(this.destroy_sub))
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
@@ -310,14 +348,21 @@ export class CitizensListComponent implements OnInit {
         }
     }
 
-    public trackByColumnId(_index: number, column: StandardColumn): string {
-        return column.id;
+    public dailyBathTaken(row: Citizen): boolean {
+        return row.baths.some((bath: Bath) => bath.day === this.current_day && bath.last_update_info);
     }
 
-    public trackByKey(_index: number, enum_item: (HeroicActionEnum | HomeEnum)): string {
-        return enum_item.key;
+    public saveBath(citizen: Citizen, event: MatCheckboxChange): void {
+        if (event.checked) {
+            this.town_service
+                .addBath(citizen)
+                .subscribe()
+        } else {
+            this.town_service
+                .removeBath(citizen)
+                .subscribe()
+        }
     }
-
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */
     private customFilter(data: Citizen, filter: string): boolean {
@@ -329,19 +374,22 @@ export class CitizensListComponent implements OnInit {
     }
 
     public getCitizens(): void {
-        this.api.getCitizens()
+        this.town_service
+            .getCitizens()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((citizen_info: CitizenInfo) => {
-                const alive_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
-                alive_citizen_info.citizens = alive_citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_dead);
-                this.alive_citizen_info = alive_citizen_info;
-                this.citizen_list.data = [...alive_citizen_info.citizens];
+            .subscribe({
+                next: (citizen_info: CitizenInfo) => {
+                    const alive_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
+                    alive_citizen_info.citizens = alive_citizen_info.citizens.filter((citizen: Citizen) => !citizen.is_dead);
+                    this.alive_citizen_info = alive_citizen_info;
+                    this.citizen_list.data = [...alive_citizen_info.citizens];
 
-                const dead_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
-                dead_citizen_info.citizens = dead_citizen_info.citizens.filter((citizen: Citizen) => citizen.is_dead && citizen.cadaver);
-                this.dead_citizen_info = dead_citizen_info;
-                this.dead_citizen_list.data = [...dead_citizen_info.citizens.map((citizen: Citizen) => <Cadaver>citizen.cadaver)];
-                console.log('dead_citizen_info', dead_citizen_info);
+                    const dead_citizen_info: CitizenInfo = Object.assign({}, citizen_info);
+                    dead_citizen_info.citizens = dead_citizen_info.citizens.filter((citizen: Citizen) => citizen.is_dead && citizen.cadaver);
+                    this.dead_citizen_info = dead_citizen_info;
+                    this.dead_citizen_list.data = [...dead_citizen_info.citizens.map((citizen: Citizen) => <Cadaver>citizen.cadaver)];
+                    console.log('dead_citizen_info', dead_citizen_info);
+                }
             });
     }
 }

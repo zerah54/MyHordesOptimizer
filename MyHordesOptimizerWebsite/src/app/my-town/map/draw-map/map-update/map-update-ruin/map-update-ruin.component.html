@@ -47,18 +47,20 @@
         @if (ruin.drops && ruin.drops.length > 0) {
             <mat-divider></mat-divider>
             <div class="drops">
-                <div *ngFor="let drop of ruin.drops">
-                    <img [ngSrc]="HORDES_IMG_REPO + drop.item.img" width="16" height="16">
-                    {{ drop.item.label[locale] }}
-                    <small>&nbsp;({{ drop.probability * 100 | number:'1.0-2':locale }}%)</small>
-                </div>
+                @for (drop of ruin.drops; track drop.item.id) {
+                    <div>
+                        <img [ngSrc]="HORDES_IMG_REPO + drop.item.img" width="16" height="16">
+                        {{ drop.item.label[locale] }}
+                        <small>&nbsp;({{ drop.probability * 100 | number:'1.0-2':locale }}%)</small>
+                    </div>
+                }
             </div>
         }
         @if (ruin.id === -1) {
             <mat-divider></mat-divider>
             <h4 i18n>Liste des bâtiments possibles</h4>
             <mat-list>
-                <ng-container *ngFor="let ruin of (allRuins | filterRuinsByKm:cell.nb_km)">
+                @for (ruin of (allRuins | filterRuinsByKm:cell.nb_km); track ruin.id) {
                     @if (ruin.id > -1) {
                         <mat-list-item>
                             <span matListItemTitle>{{ ruin.label[locale] }}</span>
@@ -68,7 +70,7 @@
                             </span>
                         </mat-list-item>
                     }
-                </ng-container>
+                }
             </mat-list>
         }
     </div>

@@ -15,32 +15,39 @@
         </div>
         @if (!condensed_display) {
             <ul>
-                <div class="category" *ngFor="let category of (displayed_bank_items | itemsGroupByCategory)">
-                    <h2>{{ category.category.label[locale] }}</h2>
-                    <div class="items">
-                        <mho-item *ngFor="let bank_item of category.items" [item]="bank_item"></mho-item>
+                @for (category of (displayed_bank_items | itemsGroupByCategory); track category.category.id_category) {
+                    <div class="category">
+                        <h2>{{ category.category.label[locale] }}</h2>
+                        <div class="items">
+                            @for (bank_item of category.items; track bank_item.id) {
+                                <mho-item [item]="bank_item"></mho-item>
+                            }
+                        </div>
                     </div>
-                </div>
+                }
             </ul>
         } @else {
             <div class="condensed">
                 <div class="bank">
-                    <div class="category" *ngFor="let category of (displayed_bank_items | itemsGroupByCategory:'id')">
-                        <h2>{{ category.category.label[locale] }}</h2>
-                        <ul class="items">
-                            <li *ngFor="let bank_item of category.items" class="item" (click)="detailed_item = bank_item"
-                                [class.broken]="bank_item.is_broken"
-                                [matTooltip]="bank_item.label[locale]">
-                                <img class="item-icon" [ngSrc]="HORDES_IMG_REPO + bank_item.img" width="16" height="16">
-                                @if (bank_item.bank_count > 1) {
-                                    <span class="item-count">{{ bank_item.bank_count }}</span>
+                    @for (category of (displayed_bank_items | itemsGroupByCategory:'id'); track category.category.id_category) {
+                        <div class="category">
+                            <h2>{{ category.category.label[locale] }}</h2>
+                            <ul class="items">
+                                @for (bank_item of category.items; track bank_item.id) {
+                                    <li class="item" (click)="detailed_item = bank_item"
+                                        [class.broken]="bank_item.is_broken" [matTooltip]="bank_item.label[locale]">
+                                        <img class="item-icon" [ngSrc]="HORDES_IMG_REPO + bank_item.img" width="16" height="16">
+                                        @if (bank_item.bank_count > 1) {
+                                            <span class="item-count">{{ bank_item.bank_count }}</span>
+                                        }
+                                    </li>
                                 }
-                            </li>
-                        </ul>
-                    </div>
+                            </ul>
+                        </div>
+                    }
                 </div>
                 <div class="detail">
-                    <mho-item [item]="detailed_item" [forceOpen]="true"></mho-item>
+                    <mho-item [item]="detailed_item" forceOpen></mho-item>
                 </div>
             </div>
         }

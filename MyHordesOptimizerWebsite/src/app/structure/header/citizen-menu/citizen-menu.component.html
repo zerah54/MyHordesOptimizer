@@ -1,0 +1,118 @@
+@if (citizen) {
+    <div class="header-menu-citizen-part">
+        <div mat-menu-item class="pseudo" disabled>
+            <div>
+                <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">
+                {{ citizen.name }}
+                @if (citizen.is_shunned) {
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/banished.gif'" width="16" height="16">
+                }
+            </div>
+        </div>
+        <div mat-menu-item #statusItem [matMenuTriggerFor]="status" [role]="'menuitem'" i18n>États</div>
+        <div mat-menu-item [matMenuTriggerFor]="bag" [role]="'menuitem'" i18n>Sac</div>
+        <div mat-menu-item [matMenuTriggerFor]="heroicActions" [role]="'menuitem'" i18n>Actions héroïques</div>
+        <div mat-menu-item class="home" [matMenuTriggerFor]="home" [role]="'menuitem'" i18n>Améliorations</div>
+    </div>
+    <mat-menu #status (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
+              class="mho-menu-citizen-details statuses">
+        <div class="status" (click)="$event.stopPropagation();">
+            <mho-list-element-add-remove [currentList]="citizen.status?.icons || []" [lists]="status_lists"
+                                         label="États" i18n-label
+                                         addLabel="Ajouter aux états" i18n-addLabel
+                                         (add)="addStatus($event + '')"
+                                         removeLabel="Retirer des états" i18n-removeLabel
+                                         (remove)="removeStatus($event + '')"
+                                         emptyLabel="Vider les états"
+                                         i18n-emptyLabel (empty)="emptyStatus()">
+            </mho-list-element-add-remove>
+        </div>
+        <div class="bath" (click)="$event.stopPropagation();">
+            <mat-checkbox [checked]="dailyBathTaken()" (change)="saveBath($event)" i18n>Bain pris</mat-checkbox>
+        </div>
+    </mat-menu>
+    <mat-menu #bag (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
+              class="mho-menu-citizen-details bag">
+        <div (click)="$event.stopPropagation()">
+            <mho-list-element-add-remove [currentList]="citizen.bag?.items || []" label="Sac" i18n-label
+                                         [lists]="bag_lists"
+                                         addLabel="Ajouter au sac" i18n-addLabel
+                                         (add)="addItem(+$event)"
+                                         removeLabel="Retirer du sac" i18n-removeLabel
+                                         (remove)="removeItem(+$event)"
+                                         emptyLabel="Vider le sac" i18n-emptyLabel
+                                         (empty)="emptyBag()">
+            </mho-list-element-add-remove>
+        </div>
+    </mat-menu>
+    <mat-menu #heroicActions (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
+              class="mho-menu-citizen-details heroic-actions">
+        @for (action of (citizen.heroic_actions?.content || []); track action.element.key) {
+            <div mat-menu-item [role]="action.element.value.max_lvl > 1 ? 'menuitem': 'menuitemcheckbox'" (click)="$event.stopPropagation();">
+                @if (action.element.value.max_lvl > 1) {
+                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                        <mat-label>{{ action.element.value.label }}</mat-label>
+                        <mat-select [(ngModel)]="action.value" (ngModelChange)="updateActions(action, $event)">
+                            @for (option of action.element.value.options; track option) {
+                                <mat-option [value]="option">{{ option }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                } @else if (action.element.value.max_lvl === 1) {
+                    <mat-checkbox [checked]="action.value === true"
+                                  [indeterminate]="action.value === null || action.value === undefined"
+                                  (change)="updateActions(action, $event)">
+                        {{ action.element.value.label }}
+                    </mat-checkbox>
+                }
+            </div>
+        }
+    </mat-menu>
+    <mat-menu #home (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
+              class="mho-menu-citizen-details home">
+        @for (home of (citizen.home?.content || []); track home.element.key) {
+            <div mat-menu-item [role]="home.element.value.max_lvl > 1 ? 'menuitem': 'menuitemcheckbox'" (click)="$event.stopPropagation();">
+                @if (home.element.value.max_lvl > 1) {
+                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                        <mat-label>{{ home.element.value.label }}</mat-label>
+                        @if (home.element.value.img && home.element.value.img !== '') {
+                            <img style="vertical-align: super; margin-right: 0.5em;"
+                                 [ngSrc]="HORDES_IMG_REPO + home.element.value.img"
+                                 width="16" height="16">
+                        }
+                        @if (home.element.value.house_options) {
+                            <img style="vertical-align: super; margin-right: 0.5em;"
+                                 [ngSrc]="HORDES_IMG_REPO + 'home/home_lv' + home.value + '.gif'"
+                                 width="16" height="16">
+                        }
+                        <mat-select [ngModel]="home.value" (ngModelChange)="updateHome(home, $event)">
+                            @for (option of $any(home.element.value.house_options || home.element.value.options); track option; let i = $index; ) {
+                                <mat-option [value]="i">
+                                    @if (!$any(option)[locale]) {
+                                        {{ i }}
+                                    } @else {
+                                        <img [ngSrc]="HORDES_IMG_REPO + 'home/home_lv' + i + '.gif'"
+                                             style="margin-right: 0.5em;"
+                                             width="16" height="16">{{ $any(option)[locale] }}
+                                    }
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                } @else {
+                    <mat-checkbox [checked]="home.value === true"
+                                  [indeterminate]="home.value === null || home.value === undefined"
+                                  (change)="updateHome(home, $event)">
+                        @if (home.element.value.img) {
+                            <img style="vertical-align: middle; margin-right: 0.5em;"
+                                 [ngSrc]="HORDES_IMG_REPO + home.element.value.img"
+                                 width="16" height="16">
+                        }
+                        {{ home.element.value.label }}
+                    </mat-checkbox>
+                }
+            </div>
+        }
+    </mat-menu>
+    <mat-divider></mat-divider>
+}

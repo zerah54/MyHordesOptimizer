@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Interactions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.DiscordBot.Enums;
 using MyHordesOptimizerApi.DiscordBot.Utility;
@@ -16,12 +18,12 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
     public class RecipesModule : InteractionModuleBase<SocketInteractionContext>
     {
         private readonly ILogger<RecipesModule> _logger;
-        private readonly IEnumerable<ItemRecipe> _recipes;
+        private readonly IEnumerable<ItemRecipeDto> _recipes;
 
-        public RecipesModule(ILogger<RecipesModule> logger, IMyHordesOptimizerRepository recipesService)
+        public RecipesModule(ILogger<RecipesModule> logger, IServiceScopeFactory serviceScopeFactory)
         {
             _logger = logger;
-            _recipes = recipesService.GetRecipes();
+            //_recipes = recipesService.GetRecipes();
         }
 
         [SlashCommand(name: "recipe", description: "Find the recipe for an item and the recipes that lead to it")]
@@ -75,7 +77,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             }
         }
 
-        private List<ItemRecipe> GetRecipesFromResultItemName(string searchValue, Locales locale)
+        private List<ItemRecipeDto> GetRecipesFromResultItemName(string searchValue, Locales locale)
         {
             var filteredRecipes = _recipes
                 .Where(recipe => GetItemResultFromRecipe(searchValue, locale, recipe) != null)
@@ -84,7 +86,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             return filteredRecipes;
         }
 
-        private ItemResult GetItemResultFromRecipe(string searchValue, Locales locale, ItemRecipe recipe)
+        private ItemResultDto GetItemResultFromRecipe(string searchValue, Locales locale, ItemRecipeDto recipe)
         {
             return recipe.Result
                 .Find(result =>
@@ -96,7 +98,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 });
         }
 
-        private void CreateFieldFromRecipe(ItemRecipe recipe, Locales locale, EmbedBuilder embedBuilder)
+        private void CreateFieldFromRecipe(ItemRecipeDto recipe, Locales locale, EmbedBuilder embedBuilder)
         {
             var componentsLabels = recipe.Components
                 .Select(component => component.Label[locale.ToString().ToLower()]);
@@ -131,7 +133,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             embedBuilder.WithFields(resultField);
         }
 
-        private void CreateFieldsForChildren(ItemRecipe recipe, Locales locale, EmbedBuilder embedBuilder)
+        private void CreateFieldsForChildren(ItemRecipeDto recipe, Locales locale, EmbedBuilder embedBuilder)
         {
             recipe.Components.ForEach(component =>
             {

@@ -5,6 +5,6 @@
     {{ data.text }}
 </div>
 <div mat-dialog-actions>
-    <button mat-button [mat-dialog-close]="false" i18n>Annuler</button>
-    <button mat-button [mat-dialog-close]="true" cdkFocusInitial i18n>Valider</button>
+    <button mat-button type="reset" [mat-dialog-close]="false" i18n>Annuler</button>
+    <button mat-button type="button" [mat-dialog-close]="true" cdkFocusInitial i18n>Valider</button>
 </div>

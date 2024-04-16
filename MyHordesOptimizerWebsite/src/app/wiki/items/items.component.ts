@@ -54,13 +54,9 @@ export class ItemsComponent implements OnInit {
                 this.items = items;
                 if (this.items) {
                     this.items = this.items.sort((item_a: Item, item_b: Item) => {
-                        if (item_a.category.ordering < item_b.category.ordering) {
-                            return -1;
-                        } else if (item_a.category.ordering === item_b.category.ordering) {
-                            return 0;
-                        } else {
-                            return 1;
-                        }
+                        if (item_a.category.ordering < item_b.category.ordering) return -1;
+                        if (item_a.category.ordering > item_b.category.ordering) return 1;
+                        return 0;
                     });
                     this.displayed_items = [...this.items];
                 }

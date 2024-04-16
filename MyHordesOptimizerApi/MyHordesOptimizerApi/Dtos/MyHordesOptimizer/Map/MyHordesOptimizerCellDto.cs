@@ -1,5 +1,4 @@
-﻿using MyHordesOptimizerApi.Models.Map;
-using System;
+﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Bags;
 using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
@@ -31,14 +30,14 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         public string ZoneRegen { get; set; }
         public string Note { get; set; }
 
-        public LastUpdateInfo? LastUpdateInfo { get; set; }
+        public LastUpdateInfoDto? LastUpdateInfo { get; set; }
 
-        public List<CellItemDto> Items { get; set; }
+        public List<UpdateObjectDto> Items { get; set; }
         public List<CellCitizenDto> Citizens { get; set; }
 
         public MyHordesOptimizerCellDto()
         {
-            Items = new List<CellItemDto>();
+            Items = new List<UpdateObjectDto>();
             Citizens = new List<CellCitizenDto>();
         }
 

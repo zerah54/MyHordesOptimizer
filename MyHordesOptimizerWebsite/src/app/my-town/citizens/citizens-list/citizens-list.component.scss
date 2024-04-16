@@ -108,14 +108,10 @@
                             .mat-mdc-form-field-infix {
                                 display: flex;
                                 align-items: center;
-                                padding-top: 8px;
-                                padding-bottom: 8px;
-                                min-height: unset;
                             }
 
                             .mat-mdc-floating-label:not(.mdc-floating-label--float-above) {
                                 padding-left: calc(16px + 0.5em);
-                                top: 20px;
                             }
                         }
                     }

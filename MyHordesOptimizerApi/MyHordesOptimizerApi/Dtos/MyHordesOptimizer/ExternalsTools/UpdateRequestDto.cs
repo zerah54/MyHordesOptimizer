@@ -11,18 +11,18 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
     public class UpdateRequestDto
     {
         [JsonProperty("map")]
-        public UpdateRequestMapDto Map { get; set; }
+        public UpdateRequestMapDto? Map { get; set; }
         [JsonProperty("bags")]
-        public UpdateBagsRequestDto Bags { get; set; }
+        public UpdateBagsRequestDto? Bags { get; set; }
         [JsonProperty("townDetails")]
         public UpdateTownDetailsDto TownDetails { get; set; }
         [JsonProperty("heroicActions")]
-        public UpdateHeroicActionsDto HeroicActions { get; set; }
+        public UpdateHeroicActionsDto? HeroicActions { get; set; }
         [JsonProperty("amelios")]
-        public UpdateHomeDto Amelios { get; set; }
+        public UpdateHomeDto? Amelios { get; set; }
         [JsonProperty("status")]
-        public UpdateStatusDto Status { get; set; }
+        public UpdateStatusDto? Status { get; set; }
         [JsonProperty("successedDig")]
-        public UpdateSuccesDigDto SuccessedDig { get; set; }
+        public UpdateSuccesDigDto? SuccessedDig { get; set; }
     }
 }

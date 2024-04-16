@@ -2,7 +2,7 @@
     <div class="mho-citizens-digs">
         <table mat-table [dataSource]="datasource" matSort>
 
-            <ng-container *ngFor="let column of columns; trackBy: trackByColumnId" [matColumnDef]="column.id" [sticky]="column.sticky || false">
+            @for (column of columns; track column.id) {
                 <th mat-header-cell *matHeaderCellDef [ngClass]="[column.id, column.class || '']">
                     @switch (column.id) {
                         @case ('avatar_name') {
@@ -36,15 +36,16 @@
                                 <mho-dig [dig]="undefined" [citizen]="row.citizen" [day]="current_day"
                                          [digsMode]="'creation'"
                                          (deletedDig)="deletedDig($event)" (updatedDig)="updatedDig($event)"></mho-dig>
-                                <mho-dig *ngFor="let dig of row.digs" [dig]="dig" [citizen]="row.citizen"
-                                         [day]="current_day" [digsMode]="'update'"
-                                         (deletedDig)="deletedDig($event)" (updatedDig)="updatedDig($event)"></mho-dig>
+                                @for (dig of row.digs; track dig) {
+                                    <mho-dig [dig]="dig" [citizen]="row.citizen"
+                                             [day]="current_day" [digsMode]="'update'"
+                                             (deletedDig)="deletedDig($event)" (updatedDig)="updatedDig($event)"></mho-dig>
+                                }
                             </div>
                         }
                     }
                 </td>
-            </ng-container>
-
+            }
             <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
             <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
             <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->

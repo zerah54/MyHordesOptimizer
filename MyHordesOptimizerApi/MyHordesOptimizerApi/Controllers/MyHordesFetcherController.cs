@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -28,7 +29,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Items")]
-        public ActionResult<IEnumerable<Item>> GetItems(int? townId)
+        public ActionResult<IEnumerable<ItemDto>> GetItems(int? townId)
         {
             var items = _myHordesFetcherService.GetItems(townId).ToList();
             return items;
@@ -36,7 +37,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("HeroSkills")]
-        public ActionResult<IEnumerable<HeroSkill>> GetHeroSkills()
+        public ActionResult<IEnumerable<HeroSkillDto>> GetHeroSkills()
         {
             var heroSkills = _myHordesFetcherService.GetHeroSkills().ToList();
             return heroSkills;
@@ -44,7 +45,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("CausesOfDeath")]
-        public ActionResult<IEnumerable<CauseOfDeath>> GetCausesOfDeath()
+        public ActionResult<IEnumerable<CauseOfDeathDto>> GetCausesOfDeath()
         {
             var causesOfDeath = _myHordesFetcherService.GetCausesOfDeath().ToList();
             return causesOfDeath;
@@ -52,7 +53,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("CleanUpTypes")]
-        public ActionResult<IEnumerable<CleanUpType>> GetCleanUpTypes()
+        public ActionResult<IEnumerable<CleanUpTypeDto>> GetCleanUpTypes()
         {
             var cleanUpTypes = _myHordesFetcherService.GetCleanUpTypes().ToList();
             return cleanUpTypes;
@@ -60,7 +61,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Recipes")]
-        public ActionResult<IEnumerable<ItemRecipe>> GetRecipes()
+        public ActionResult<IEnumerable<ItemRecipeDto>> GetRecipes()
         {
             var recipes = _myHordesFetcherService.GetRecipes().ToList();
             return recipes;
@@ -68,14 +69,9 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Bank")]
-        public ActionResult<BankLastUpdate> GetBank(string userKey)
+        [Authorize]
+        public ActionResult<BankLastUpdateDto> GetBank()
         {
-            if (string.IsNullOrWhiteSpace(userKey))
-            {
-                return BadRequest($"{nameof(userKey)} cannot be empty");
-            }
-
-            UserKeyProvider.UserKey = userKey;
             var bank = _myHordesFetcherService.GetBank();
             return bank;
         }
@@ -83,7 +79,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpGet]
         [Route("Citizens")]
-        public ActionResult<CitizensLastUpdate> GetCitizens(int? townId, int? userId)
+        public ActionResult<CitizensLastUpdateDto> GetCitizens(int? townId, int? userId)
         {
             if (!townId.HasValue)
             {
@@ -95,14 +91,14 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(userId)} cannot be empty");
             }
 
-            UserKeyProvider.UserId = userId.Value;
+            UserInfoProvider.UserId = userId.Value;
             var citizens = _myHordesFetcherService.GetCitizens(townId.Value);
             return citizens;
         }
 
         [HttpGet]
         [Route("Ruins")]
-        public ActionResult<IEnumerable<MyHordesOptimizerRuin>> GetRuins(int? townId)
+        public ActionResult<IEnumerable<MyHordesOptimizerRuinDto>> GetRuins(int? townId)
         {
             var ruins = _myHordesFetcherService.GetRuins(townId).ToList();
             return ruins;
@@ -155,14 +151,14 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(townId)} cannot be empty when no cellId is provided");
             }
 
-            UserKeyProvider.UserId = userId.Value;
-            var dto = _myHordesFetcherService.CreateOrUpdateMapDigs(townId, userId.Value, requests);
+            UserInfoProvider.UserId = userId.Value;
+            var dto = _myHordesFetcherService.CreateOrUpdateMapDigs(townId.Value, userId.Value, requests);
             return Ok(dto);
         }
 
         [HttpDelete]
         [Route("MapDigs")]
-        public ActionResult<LastUpdateInfo> CreaterOrUpdateMapDig([FromQuery] int? idCell, [FromQuery] int? diggerId,
+        public ActionResult<LastUpdateInfoDto> CreaterOrUpdateMapDig([FromQuery] int? idCell, [FromQuery] int? diggerId,
             [FromQuery] int? day)
         {
             if (!idCell.HasValue)

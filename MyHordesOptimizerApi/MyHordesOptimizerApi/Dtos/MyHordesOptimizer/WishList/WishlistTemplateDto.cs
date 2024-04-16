@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList
 {
@@ -8,12 +9,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList
         public int? IdUserAuthor { get; set; }
         public string Name { get; set; }
         public Dictionary<string, string> Labels { get; set; }
-        public List<WishListItem> Items { get; set; }
+        public List<WishListItemDto> Items { get; set; }
 
         public WishlistTemplateDto()
         {
             Labels = new Dictionary<string, string>();
-            Items = new List<WishListItem>();
+            Items = new List<WishListItemDto>();
         }
     }
 }

@@ -1,4 +1,6 @@
 import { ModuleWithProviders, Type } from '@angular/core';
+import { StatusEnum } from '../enum/status.enum';
+import { Item } from './item.class';
 
 export type Modules = Type<unknown>[] | ModuleWithProviders<unknown>[];
 
@@ -16,3 +18,10 @@ export interface Dictionary<T> {
 }
 
 export type TownTypeId = 'RNE' | 'RE' | 'PANDE';
+
+export type ExpeditionOrderType = 'checkbox' | 'text';
+
+export interface ListForAddRemove {
+    label: string;
+    list: (Item | StatusEnum)[];
+}

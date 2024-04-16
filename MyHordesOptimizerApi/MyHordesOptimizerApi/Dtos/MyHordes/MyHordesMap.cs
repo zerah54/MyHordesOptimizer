@@ -1,4 +1,4 @@
-﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+﻿using MyHordesOptimizerApi.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
