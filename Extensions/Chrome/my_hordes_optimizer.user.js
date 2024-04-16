@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.7.0
+// @version      1.0.8.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,11 +32,9 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Lors de l'enregistrement des fouilles, les fouilles de celui qui enregistre n'étaient jamais prises en compte\n`
-    + `[Correctif] Correction d'un bug d'affichage des liens vers les profils externes des utilisateurs\n`
-    + `[Correctif] Quelques corrections sur l'Anti-Abus (c'est pas fini, et j'ai l'impression de pas en voir le bout 🥲) \n`
-    + `[Correctif] Correction d'un bug d'intégration avec Fata Morgana \n\n`
-    + `[Supression] Retrait de la fonctionnalité de notification lors d'un nouveau message, puisqu'elle existe maintenant nativement dans MyHordes\n\n`;
+    + `[Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée\n`;
++`[Correction] Traductions manquantes\n`;
++`[Correction] Notification de fin de fouille\n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -586,6 +584,18 @@ const texts = {
         fr: `Tout cocher`,
         de: `Alle überprüfen`,
         es: `Comprobar todo`
+    },
+    can_be_dumped: {
+        en: `Can be dumped`,
+        fr: `Peut être jeté`,
+        de: `Kann weggeworfen werden`,
+        es: `Se puede tirar`,
+    },
+    can_be_recovered: {
+        en: `Can be recovered`,
+        fr: `Peut être récupéré`,
+        de: `Kann wiederhergestellt werden`,
+        es: `Se puede recuperar`,
     },
     calculated_attack: {
         en: `Calculated`,
@@ -1227,6 +1237,15 @@ let params_categories = [
                     es: `Actualizar Fata Morgana`
                 },
                 children: [
+                    {
+                        id: `update_fata_devastated`,
+                        label: {
+                            en: `Zone update even after the town has been devastated`,
+                            fr: `Mise à jour en ville dévastée`,
+                            de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
+                            es: `Actualización en pueblo devastado`
+                        },
+                    },
                     {
                         id: `refresh_fm_after_update`,
                         label: {
@@ -2156,7 +2175,6 @@ function initOptionsWithLoginNeeded() {
 function initOptionsWithoutLoginNeeded() {
     preventFromLeaving();
     alertIfInactiveAndNoEscort();
-    displayWishlistInApp();
     clickOnVotedToRedirect();
     displaySearchFields();
     displayMinApOnBuildings();
@@ -2181,7 +2199,8 @@ function updateFetchRequestOptions(options) {
     update.headers = {
         ...update.headers,
         'Mho-Origin': 'script',
-        'Mho-Script-Version': getScriptInfo().version
+        'Mho-Script-Version': getScriptInfo().version,
+        'Authorization': `Bearer ${token.token.access_token?.toString()}`,
     };
     return update;
 }
@@ -4323,7 +4342,7 @@ function displaySearchFieldOnDump() {
                 can_be_dumped.appendChild(can_be_dumped_input);
 
                 let can_be_dumped_label = document.createElement('label');
-                can_be_dumped_label.innerText = 'Peut être jeté';
+                can_be_dumped_label.innerText = getI18N(texts.can_be_dumped);
                 can_be_dumped_label.htmlFor = 'can_be_dumped';
                 can_be_dumped.appendChild(can_be_dumped_label);
 
@@ -4337,7 +4356,7 @@ function displaySearchFieldOnDump() {
                 can_be_recovered.appendChild(can_be_recovered_input);
 
                 let can_be_recovered_label = document.createElement('label');
-                can_be_recovered_label.innerText = 'Peut être récupéré';
+                can_be_recovered_label.innerText = getI18N(texts.can_be_recovered);
                 can_be_recovered_label.htmlFor = 'can_be_recovered';
                 can_be_recovered.appendChild(can_be_recovered_label);
 
@@ -4620,12 +4639,12 @@ function displayWishlistInApp() {
 
                     let bank_need = document.createElement('span');
                     bank_need.classList.add('padded', 'cell', 'rw-2');
-                    bank_need.innerHTML = `<span class="small">${item.count}</span>`;
+                    bank_need.innerHTML = `<span class="small">${item.count >= 0 ? item.count : '∞'}</span>`;
                     list_item.appendChild(bank_need);
 
                     let needed = document.createElement('span');
                     needed.classList.add('padded', 'cell', 'rw-2');
-                    needed.innerHTML = `<span class="small">${item.count - item.bankCount - item.bagCount}</span>`;
+                    needed.innerHTML = `<span class="small">${item.count >= 0 ? (item.count - item.bankCount - item.bagCount) : '∞'}</span>`;
                     list_item.appendChild(needed);
                 });
 
@@ -5880,7 +5899,7 @@ function alertIfInactiveAndNoEscort() {
 function notifyOnSearchEnd() {
     let interval = setInterval(() => {
         if (mho_parameters.notify_on_search_end && pageIsDesert()) {
-            let count = document.querySelector('span[x-countdown]');
+            let count = document.querySelector('span[x-countdown-to]');
             if (count) {
                 clearInterval(interval);
                 let countdown_array = count.innerText.split(':');
@@ -6614,6 +6633,7 @@ function displayAntiAbuseCounter() {
         /** Fin */
 
         getStorageItem(mho_anti_abuse_key).then((counter_values) => {
+            console.log('counter_values on loading (avant que la prise soit prise en compte)', counter_values);
             let add_counter_btn = document.createElement('button');
             add_counter_btn.innerText = '+';
             second_part.appendChild(add_counter_btn);
@@ -6637,16 +6657,23 @@ function displayAntiAbuseCounter() {
                 let new_mho_anti_abuse_counter = document.querySelector(`#${mho_anti_abuse_counter_id}`);
                 if (new_mho_anti_abuse_counter) {
                     let new_content = new_mho_anti_abuse_counter.querySelector('.content');
-                    define_row(counter_value, counter_values.length - 1, new_content);
+                    define_row(counter_value, counter_values.length - 1, new_content, true);
                 }
             })
 
-            let define_row = (counter_value, index, new_content) => {
+            let define_row = (counter_value, index, new_content, fictive) => {
                 let is_time_invalid = (_counter_value, _index) => {
                     let since = (Date.now() - parseInt(_counter_value.take_at))
-                    let time_left = new Date((15 * 60000) - since);
+                    let time_left = new Date(((fictive ? 1 : 15) * 60000) - since);
                     if (time_left < 0) {
+                        console.log('_counter_value', _counter_value);
+                        console.log('_index', _index);
+                        console.log('time_left', time_left);
+                        console.log('counter_values', [...counter_values]);
+                        console.log('index', index);
+                        console.log('counter_value_before', [...counter_values]);
                         counter_values.splice(index, 1);
+                        console.log('counter_value_after', [...counter_values]);
                         setStorageItem(mho_anti_abuse_key, [...counter_values]);
                     }
                     return time_left < 0;
@@ -6666,10 +6693,11 @@ function displayAntiAbuseCounter() {
                     item_counter.style.width = '50px';
                     let interval = setInterval(() => {
                         let since = (Date.now() - parseInt(counter_value.take_at))
-                        let time_left = new Date((15 * 60000) - since);
+                        let time_left = new Date(((fictive ? 1 : 15) * 60000) - since);
                         if (is_time_invalid(counter_value, index)) {
                             clearInterval(interval);
                             if (value_in_list) {
+                                console.log('remove_value_in_list', value_in_list);
                                 value_in_list.remove();
                             }
                         } else {
@@ -6700,6 +6728,7 @@ function displayAntiAbuseCounter() {
                             controller.abort();
                             if (!pageIsBank()) return;
                             let new_bag = document.querySelectorAll("#gma ul.rucksack li.item");
+
                             if (old_bag.length < new_bag.length) {
                                 getStorageItem(mho_anti_abuse_key).then((counter_values) => {
                                     if (!counter_values) {
@@ -7294,7 +7323,6 @@ function addExternalLinksToProfiles() {
         if (user_tooltip) {
             let user_id = user_tooltip.querySelector('[x-ajax-href]')?.getAttribute('x-ajax-href')?.replace(/\D/g, '');
             if (!user_id) return;
-
             let dash_separators = user_tooltip.querySelectorAll('hr.dashed');
             let last_separator = Array.from(dash_separators).pop();
             let link_color = window.getComputedStyle(user_tooltip.querySelector('.link')).getPropertyValue('color');
@@ -9032,7 +9060,7 @@ function updateExternalTools() {
         data.map = {}
         data.map.toolsToUpdate = {
             isBigBrothHordes: mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : 'none',
-            isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
+            isFataMorgana: mho_parameters && mho_parameters.update_fata ? (pageIsDesert() && (mho_parameters.update_fata_devastated && mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none',
             isGestHordes: mho_parameters && mho_parameters.update_gh ? (pageIsDesert() && ((mho_parameters.update_gh_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_gh_devastated && mh_user.townDetails.isDevaste)) ? 'cell' : 'api') : 'none',
             isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? (pageIsDesert() && ((mho_parameters.update_mho_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_mho_devastated && mh_user.townDetails.isDevaste)) ? 'cell' : 'api') : 'none'
         };
@@ -9052,7 +9080,8 @@ function updateExternalTools() {
         }
 
         // Mise à jour en ville dévastée
-        if (((mho_parameters.update_gh && mho_parameters.update_gh_devastated) || (mho_parameters.update_mho && mho_parameters.update_mho_devastated)) && pageIsDesert() && mh_user.townDetails.isDevaste) {
+        if (((mho_parameters.update_gh && mho_parameters.update_gh_devastated) || (mho_parameters.update_mho && mho_parameters.update_mho_devastated) || (mho_parameters.update_fata && mho_parameters.update_fata_devastated))
+            && pageIsDesert() && mh_user.townDetails.isDevaste) {
             let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
                 let item = convertImgToItem(desert_item.querySelector('img'));
                 return {id: item.id, isBroken: desert_item.classList.contains('broken')};
