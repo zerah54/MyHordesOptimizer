@@ -33,7 +33,7 @@ import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { ConfirmDialogComponent } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
 import { LastUpdateComponent } from '../../shared/elements/last-update/last-update.component';
 import { HeaderWithStringFilterComponent } from '../../shared/elements/lists/header-with-string-filter/header-with-string-filter.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
@@ -303,7 +303,7 @@ export class WishlistComponent implements OnInit {
 
     public importExcel(event: Event): void {
         this.dialog
-            .open(ConfirmDialogComponent, {
+            .open<ConfirmDialogComponent, ConfirmDialogData>(ConfirmDialogComponent, {
                 data: {
                     title: $localize`Confirmer`,
                     text: $localize`Voulez-vous écraser la liste actuelle ? Elle sera perdue.`

@@ -21,6 +21,7 @@ import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
 import { TownService } from '../../_abstract_model/services/town.service';
+import { dtoToModelArray, modelToDtoArray } from '../../_abstract_model/types/_common.class';
 import { ListForAddRemove } from '../../_abstract_model/types/_types';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { CitizenExpeditionBag } from '../../_abstract_model/types/citizen-expedition-bag.class';
@@ -32,7 +33,7 @@ import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.clas
 import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { ConfirmDialogComponent } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
 import { ListElementAddRemoveComponent } from '../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
 import { CitizenFromIdPipe } from '../../shared/pipes/citizens-from-id.pipe';
@@ -42,6 +43,7 @@ import { getCitizenFromId } from '../../shared/utilities/citizen.util';
 import { getTown } from '../../shared/utilities/localstorage.util';
 import { CitizensForExpePipe, SomeHeroicActionNeededPipe } from './citizens-for-expe.pipe';
 import { EditOrdersComponent, EditOrdersData } from './edit-orders/edit-orders.component';
+import { EditPositionsComponent, EditPositionsData } from './edit-positions/edit-positions.component';
 import { TotalPdcPipe } from './total-pdc.pipe';
 
 @Component({
@@ -204,7 +206,7 @@ export class ExpeditionsComponent implements OnInit {
 
     public removeExpedition(expedition: Expedition, expedition_index: number): void {
         this.dialog
-            .open(ConfirmDialogComponent, {
+            .open<ConfirmDialogComponent, ConfirmDialogData>(ConfirmDialogComponent, {
                 data: {
                     title: $localize`Confirmer`,
                     text: $localize`Voulez-vous effacer cette expédition ? Elle sera définitivement perdue.`
@@ -223,7 +225,7 @@ export class ExpeditionsComponent implements OnInit {
 
     public removeExpeditionPart(expedition_part: ExpeditionPart, expedition_part_index: number, expedition: Expedition): void {
         this.dialog
-            .open(ConfirmDialogComponent, {
+            .open<ConfirmDialogComponent, ConfirmDialogData>(ConfirmDialogComponent, {
                 data: {
                     title: $localize`Confirmer`,
                     text: $localize`Voulez-vous effacer cette partie d'expédition ? Elle sera définitivement perdue.`
@@ -241,14 +243,14 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     public openExpeditionOrders(orders: ExpeditionOrder[], prop: CitizenExpedition | ExpeditionPart): void {
-        const data: EditOrdersData = {
-            orders: orders,
-            citizen_id: prop instanceof CitizenExpedition ? prop.citizen_id : undefined
-        };
-        this.dialog.open(EditOrdersComponent, {
-            data: data,
-            width: '80%'
-        })
+        this.dialog
+            .open<EditOrdersComponent, EditOrdersData>(EditOrdersComponent, {
+                data: {
+                    orders: orders,
+                    citizen_id: prop instanceof CitizenExpedition ? prop.citizen_id : undefined
+                },
+                width: '80%'
+            })
             .afterClosed()
             .subscribe((new_orders: ExpeditionOrder[]) => {
                 if (new_orders) {
@@ -323,7 +325,39 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     public openReorganize(): void {
+        this.dialog
+            .open<EditPositionsComponent, EditPositionsData>(EditPositionsComponent, {
+                data: {expeditions: this.expeditions},
+                width: '500px'
+            })
+            .afterClosed()
+            .subscribe((new_expeditions: Expedition[]) => {
+                new_expeditions.forEach((new_expedition: Expedition, expedition_index: number) => {
+                    new_expedition.position = expedition_index;
 
+                    new_expedition.parts.forEach((new_expedition_part: ExpeditionPart, part_index: number) => {
+                        new_expedition_part.position = part_index;
+                    })
+                    new_expedition.parts.sort((new_expedition_part_a: ExpeditionPart, new_expedition_part_b: ExpeditionPart) => {
+                        if (new_expedition_part_a.position < new_expedition_part_b.position) return -1;
+                        if (new_expedition_part_a.position > new_expedition_part_b.position) return 1;
+                        return 0;
+                    })
+                });
+
+                new_expeditions.sort((new_expedition_a: Expedition, new_expedition_b: Expedition) => {
+                    if (new_expedition_a.position < new_expedition_b.position) return -1;
+                    if (new_expedition_a.position > new_expedition_b.position) return 1;
+                    return 0;
+                });
+
+                this.expeditions = [...dtoToModelArray(Expedition, modelToDtoArray(new_expeditions))];
+
+                this.expeditions.forEach((expedition: Expedition) => {
+                    this.saveExpedition(expedition);
+                })
+
+            });
     }
 
     public get formatedPreRegistered(): string {
@@ -384,8 +418,8 @@ export class ExpeditionsComponent implements OnInit {
         order.is_done = !order.is_done;
         this.expedition_service.updateOrder(order)
             .subscribe({
-                next: (/*new_order: ExpeditionOrder*/) => {
-                    // order = new_order;
+                next: (new_order: ExpeditionOrder) => {
+                    order = new_order;
                 }
             });
     }

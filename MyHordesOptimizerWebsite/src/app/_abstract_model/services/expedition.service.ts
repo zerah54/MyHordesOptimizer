@@ -35,7 +35,13 @@ export class ExpeditionService extends GlobalService {
             super.get<ExpeditionDTO[]>(this.API_URL + `/expeditions/${getTown()?.town_id}/${day}`)
                 .subscribe({
                     next: (response: HttpResponse<ExpeditionDTO[]>) => {
-                        sub.next(dtoToModelArray(Expedition, response.body));
+                        let expeditions: Expedition[] = dtoToModelArray(Expedition, response.body)
+                        expeditions.sort((expedition_a: Expedition, expedition_b: Expedition) => {
+                            if (expedition_a.position < expedition_b.position) return -1;
+                            if (expedition_a.position > expedition_b.position) return 1;
+                            return 0;
+                        });
+                        sub.next(expeditions);
                     },
                     error: (error: HttpErrorResponse) => {
                         sub.error(error);
@@ -49,7 +55,6 @@ export class ExpeditionService extends GlobalService {
      *
      * @param {number} day
      * @param {Expedition} expedition
-     * @param {Citizen[]} citizen_list
      */
     public createOrUpdateExpedition(day: number, expedition: Expedition): Observable<Expedition> {
         return new Observable((sub: Subscriber<Expedition>) => {

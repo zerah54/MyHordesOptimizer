@@ -1,0 +1,47 @@
+<div class="mho-edit-positions">
+    <div mat-dialog-title>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <h2 i18n>Réorganiser</h2>
+            <div class="actions">
+            </div>
+        </div>
+    </div>
+    <mat-dialog-content>
+        <div class="expedition-rows" cdkDropList (cdkDropListDropped)="drop($event)">
+            @for (expedition of expeditions; track expedition.id; let expedition_index = $index) {
+                <div class="expedition-row" cdkDrag cdkDragBoundary=".expedition-rows" cdkDragLockAxis="y">
+                    <div class="expedition-row-main">
+                        <div class="expedition-row-reorder" cdkDragHandle>
+                            <mat-icon>drag_indicator</mat-icon>
+                        </div>
+                        <div class="expedition-row-title">
+                            {{ expedition.label }}
+                        </div>
+                    </div>
+
+                    @if (expedition.parts.length > 1) {
+                        <div class="part-rows" cdkDropList (cdkDropListDropped)="dropPart($event, expedition)">
+                            @for (part of expedition.parts; track part.id) {
+                                <div class="part-row" cdkDrag cdkDragBoundary=".part-rows" cdkDragLockAxis="y">
+                                    <div class="part-row-reorder" cdkDragHandle>
+                                        <mat-icon>drag_indicator</mat-icon>
+                                    </div>
+                                    <div class="part-row-main">
+                                        {{ part.path }}
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                @if (expedition_index < expeditions.length - 1) {
+                    <mat-divider></mat-divider>
+                }
+            }
+        </div>
+    </mat-dialog-content>
+</div>
+<div mat-dialog-actions [align]="'end'">
+    <button mat-button type="reset" [color]="'accent'" mat-dialog-close i18n>Annuler</button>
+    <button mat-raised-button type="button" [color]="'accent'" [mat-dialog-close]="expeditions" i18n>Enregistrer</button>
+</div>

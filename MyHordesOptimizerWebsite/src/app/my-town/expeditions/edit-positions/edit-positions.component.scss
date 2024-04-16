@@ -1,4 +1,4 @@
-.mho-edit-order {
+.mho-edit-positions {
     .mat-mdc-dialog-title {
         display: flex;
 
@@ -15,7 +15,7 @@
         justify-content: center;
     }
 
-    .rows {
+    .expedition-rows {
         display: flex;
         flex-direction: column;
         gap: 0.5em;
@@ -23,41 +23,39 @@
 }
 
 
-.row {
+.expedition-row {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
 
-    .row-main {
+    .expedition-row-main {
         display: flex;
         flex-direction: row;
-        flex-wrap: wrap;
-        gap: 0.5em;
-        flex: 1;
+        align-items: center;
+        gap: 1em;
 
-        .row-header {
-            margin-top: 5px;
+        .expedition-row-reorder {
             display: flex;
             flex-direction: column;
-
-            align-items: center;
-
-            .spacer {
-                flex: 1;
-            }
+            justify-content: center;
+            cursor: grab;
         }
 
-        .row-content {
+        .expedition-row-title {
             flex: 1;
         }
     }
 
-    .row-reorder {
-        margin-top: 5px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        cursor: grab;
+    .part-rows {
+        padding-left: 2em;
+
     }
+}
+
+.part-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1em;
 }
 
 .cdk-drag-preview {
@@ -76,10 +74,10 @@
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.row:last-child {
+.expedition-row:last-child, part-row:last-child {
     border: none;
 }
 
-.rows.cdk-drop-list-dragging .row:not(.cdk-drag-placeholder) {
+.expedition-rows.cdk-drop-list-dragging .expedition-row:not(.cdk-drag-placeholder), .part-rows.cdk-drop-list-dragging .part-row:not(.cdk-drag-placeholder) {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
