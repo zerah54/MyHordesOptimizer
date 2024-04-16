@@ -14,6 +14,7 @@ import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import * as moment from 'moment/moment';
 import { Subject, takeUntil } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { EXPEDITIONS_EDITION_MODE_KEY, FAVORITE_EXPEDITION_ITEMS_UID, HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { HeroicActionEnum } from '../../_abstract_model/enum/heroic-action.enum';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
@@ -36,6 +37,7 @@ import { ListElementAddRemoveComponent } from '../../shared/elements/list-elemen
 import { SelectComponent } from '../../shared/elements/select/select.component';
 import { CitizenFromIdPipe } from '../../shared/pipes/citizens-from-id.pipe';
 import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
+import { ClipboardService } from '../../shared/services/clipboard.service';
 import { getCitizenFromId } from '../../shared/utilities/citizen.util';
 import { getTown } from '../../shared/utilities/localstorage.util';
 import { CitizensForExpePipe, SomeHeroicActionNeededPipe } from './citizens-for-expe.pipe';
@@ -81,7 +83,7 @@ export class ExpeditionsComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    public constructor(private dialog: MatDialog) {
+    public constructor(private clipboard: ClipboardService, private dialog: MatDialog) {
     }
 
     public ngOnInit(): void {
@@ -319,19 +321,8 @@ export class ExpeditionsComponent implements OnInit {
         }
     }
 
-    public get preRegistered(): string {
-        const pre_registered: Citizen[] = [];
-        this.expeditions?.forEach((expedition: Expedition) => {
-            expedition.parts.forEach((part: ExpeditionPart) => {
-                part.citizens.forEach((citizen: CitizenExpedition) => {
-                    if (citizen.preinscrit && getCitizenFromId(this.all_citizens, citizen.citizen_id)
-                        && !pre_registered.some((pre_registered_citizen: Citizen) => pre_registered_citizen.id === citizen.citizen_id)) {
-                        pre_registered.push(<Citizen>getCitizenFromId(this.all_citizens, citizen.citizen_id));
-                    }
-                });
-            });
-        });
-        return pre_registered.map((citizen: Citizen) => {
+    public get formatedPreRegistered(): string {
+        return this.preRegistered.map((citizen: Citizen) => {
             if (citizen.job) {
                 return `<img src="${HORDES_IMG_REPO}/${citizen.job?.value.img}">&nbsp;${citizen.name}`;
             } else {
@@ -435,6 +426,63 @@ export class ExpeditionsComponent implements OnInit {
                     citizen.bag = new_bag;
                 }
             });
+    }
+
+    public shareExpeditionForum(): void {
+        let text: string = `[big][b][i]${$localize`Expéditions (J${this.selected_tab_index + 1})`}[/i][/b][/big]\n`;
+
+        let pre_registered: Citizen[] = this.preRegistered;
+        text += `\n[rp=${$localize`Préinscrits`}]\n`;
+        if (pre_registered.length > 0) {
+            pre_registered.forEach((citizen: Citizen, expedition_index: number, array: Citizen[]) => {
+                text += `:${citizen.job?.value.id}: ${citizen.name}${expedition_index < array.length - 1 ? ', ' : ''}`
+            })
+        }
+        text += `\n[/rp]\n`
+
+        this.expeditions.forEach((expedition: Expedition, expedition_index: number) => {
+            text += `\n[collapse=${expedition.label || expedition_index + 1}]\n`;
+            expedition.parts.forEach((part: ExpeditionPart, part_index: number) => {
+                if (expedition.parts.length > 1) {
+                    text += part.path || ''
+                }
+
+                part.citizens.forEach((citizen_expedition: CitizenExpedition) => {
+                    text += `\n:middot: `
+                    if (citizen_expedition.preinscrit) {
+                        let citizen: Citizen | undefined = this.all_citizens.find((_citizen: Citizen) => _citizen.id === citizen_expedition.citizen_id);
+                        text += citizen?.name || '';
+                    } else if (citizen_expedition.preinscrit_job) {
+                        text += `:${citizen_expedition.preinscrit_job.value.forum_icon}:`
+                    }
+                })
+
+                if (expedition.parts.length > 1 && part_index < expedition.parts.length - 1) {
+                    text += '\n{hr}'
+                }
+            });
+            text += '[/collapse]\n';
+
+        });
+
+        text += `[aparte]${$localize`Ce message a été généré à partir du site MyHordes Optimizer. Vous pouvez retrouver les expéditions en suivant [link=${environment.website_url}my-town/expeditions]ce lien[/link]`}[/aparte]`;
+
+        this.clipboard.copy(text, $localize`Les expéditions ont bien été copiées au format forum`);
+    }
+
+    private get preRegistered(): Citizen[] {
+        const pre_registered: Citizen[] = [];
+        this.expeditions?.forEach((expedition: Expedition) => {
+            expedition.parts.forEach((part: ExpeditionPart) => {
+                part.citizens.forEach((citizen: CitizenExpedition) => {
+                    if (citizen.preinscrit && getCitizenFromId(this.all_citizens, citizen.citizen_id)
+                        && !pre_registered.some((pre_registered_citizen: Citizen) => pre_registered_citizen.id === citizen.citizen_id)) {
+                        pre_registered.push(<Citizen>getCitizenFromId(this.all_citizens, citizen.citizen_id));
+                    }
+                });
+            });
+        });
+        return pre_registered;
     }
 }
 

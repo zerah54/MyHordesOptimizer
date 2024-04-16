@@ -1,7 +1,7 @@
 <mat-card-header class="mho-expeditions-header">
     <mat-card-title>
         <ng-container i18n>Expéditions</ng-container>
-        <button mat-icon-button type="button" matTooltip="Copier au format forum" i18n-matTooltip>
+        <button mat-icon-button type="button" (click)="shareExpeditionForum()" matTooltip="Copier au format forum" i18n-matTooltip>
             <mat-icon>share</mat-icon>
         </button>
     </mat-card-title>
@@ -19,7 +19,7 @@
                     <ng-template matTabContent>
                         <div class="container">
                             <div class="header">
-                                <h2><span i18n>Préinscrits&nbsp;:&nbsp;</span><span [innerHTML]="preRegistered"></span></h2>
+                                <h2><span i18n>Préinscrits&nbsp;:&nbsp;</span><span [innerHTML]="formatedPreRegistered"></span></h2>
                             </div>
                             @if (edition_mode) {
                                 <div class="actions">

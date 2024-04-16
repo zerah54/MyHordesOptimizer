@@ -43,10 +43,12 @@ function handleError(error: HttpErrorResponse, snackbar: SnackbarService, authen
     }
     /** Return an observable with a user-facing error message. */
     return throwError(() => {
-        if (error.error && error.error !== '' && error.status !== 500 && error.status !== 502 && error.status !== 504 && typeof error.error === 'string') {
-            snackbar.errorSnackbar(`Erreur ${error.status} : ${error.error}`);
-        } else {
-            snackbar.errorSnackbar(`Une erreur s'est produite lors de l'appel (Erreur ${error.status})`);
+        if (error.status !== 401) {
+            if (error.error && error.error !== '' && error.status !== 500 && error.status !== 502 && error.status !== 504 && typeof error.error === 'string') {
+                snackbar.errorSnackbar(`Erreur ${error.status} : ${error.error}`);
+            } else {
+                snackbar.errorSnackbar(`Une erreur s'est produite lors de l'appel (Erreur ${error.status})`);
+            }
         }
     });
 }
