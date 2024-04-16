@@ -228,12 +228,17 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 var citizenModels = dbContext.TownCitizens.Where(citizen => citizen.IdTown == updateRequestDto.TownDetails.TownId
                                                                                  && updateCellDto.CitizenId.Contains(citizen.IdUser))
                                                                          .ToList();
-                                citizenModels.ForEach(citizen =>
+                                dbContext.RemoveRange(citizenModels);
+                                var newCitizenModels = citizenModels.Select(citizen =>
                                 {
-                                    citizen.PositionX = realX;
-                                    citizen.PositionY = realY;
-                                    citizen.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
-                                });
+                                    var newCitizen = citizen.ToJson().FromJson<TownCitizen>();
+                                    newCitizen.PositionX = realX;
+                                    newCitizen.PositionY = realY;
+                                    newCitizen.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                                    var entity = dbContext.Add(newCitizen).Entity;
+                                    return entity;
+                                }).ToList();
+                                dbContext.SaveChanges();
                             }
                         }
                         var mapCellEqualityComaprer = new MapCellEqualityComaprer();
@@ -492,10 +497,11 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                                             .Single();
                 foreach (var dig in successedDig.Values)
                 {
-                    var cellDigModel = dbContext.MapCellDigs.Where(cell => cell.IdCellNavigation.IdTown == updateRequestDto.TownDetails.TownId
-                                                                   && cell.IdCellNavigation.X == realX
-                                                                   && cell.IdCellNavigation.Y == realY
-                                                                   && cell.IdUser == dig.CitizenId)
+                    var cellDigModel = dbContext.MapCellDigs.Where(cellDig => cellDig.IdCellNavigation.IdTown == updateRequestDto.TownDetails.TownId
+                                                                   && cellDig.Day == successedDig.Cell.Day
+                                                                   && cellDig.IdCellNavigation.X == realX
+                                                                   && cellDig.IdCellNavigation.Y == realY
+                                                                   && cellDig.IdUser == dig.CitizenId)
                                                              .FirstOrDefault();
                     if (cellDigModel == null)
                     {
