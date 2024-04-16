@@ -118,4 +118,4 @@ ADD CONSTRAINT ExpeditionBagItem_ibfk_2
   FOREIGN KEY (idExpeditionBag)
   REFERENCES ExpeditionBag (idExpeditionBag)
   ON DELETE NO ACTION
-  ON UPDATE NO ACTION
+  ON UPDATE NO ACTION;
