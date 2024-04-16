@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.8.0
+// @version      1.0.9.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,9 +32,11 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée\n`;
-+`[Correction] Traductions manquantes\n`;
-+`[Correction] Notification de fin de fouille\n\n`;
+    + `[Correctif] Lors de l'enregistrement des fouilles, les fouilles de celui qui enregistre n'étaient jamais prises en compte\n`
+    + `[Correctif] Correction d'un bug d'affichage des liens vers les profils externes des utilisateurs\n`
+    + `[Correctif] Quelques corrections sur l'Anti-Abus (c'est pas fini, et j'ai l'impression de pas en voir le bout 🥲) \n`
+    + `[Correctif] Correction d'un bug d'intégration avec Fata Morgana \n\n`
+    + `[Supression] Retrait de la fonctionnalité de notification lors d'un nouveau message, puisqu'elle existe maintenant nativement dans MyHordes\n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -2200,7 +2202,7 @@ function updateFetchRequestOptions(options) {
         ...update.headers,
         'Mho-Origin': 'script',
         'Mho-Script-Version': getScriptInfo().version,
-        'Authorization': `Bearer ${token.token.access_token?.toString()}`,
+        'Authorization': `Bearer ${token.token.accessToken?.toString()}`,
     };
     return update;
 }
