@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.8.0
+// @version      1.0.10.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,9 +32,9 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée\n`;
-+`[Correction] Traductions manquantes\n`;
-+`[Correction] Notification de fin de fouille\n\n`;
+    + `[Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée\n\n`
+    + `[Correction] Traductions manquantes\n`
+    + `[Correction] Notification de fin de fouille\n\n`;
 
 const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
 
@@ -2200,7 +2200,7 @@ function updateFetchRequestOptions(options) {
         ...update.headers,
         'Mho-Origin': 'script',
         'Mho-Script-Version': getScriptInfo().version,
-        'Authorization': `Bearer ${token.token.access_token?.toString()}`,
+        'Authorization': `Bearer ${token.token.accessToken?.toString()}`,
     };
     return update;
 }
@@ -8742,7 +8742,7 @@ function getFMRuin() {
 
 function getItems() {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + '/Fetcher/items' + (mh_user && mh_user.townDetails ? ('?townId=' + mh_user.townDetails.townId) : ''))
+        fetcher(api_url + '/Fetcher/items' + (mh_user && mh_user.townDetails && mh_user.townDetails.townId > 0 ? ('?townId=' + mh_user.townDetails.townId) : ''))
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
