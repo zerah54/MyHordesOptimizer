@@ -195,10 +195,6 @@ export class WishlistComponent implements OnInit {
         }
     }
 
-    public trackByColumnId(_index: number, column: StandardColumn): string {
-        return column.id;
-    }
-
     public addZone(distance: number): void {
         if (!this.wishlist_info.wishlist_items.has(distance.toString())) {
             this.wishlist_info.wishlist_items.set(distance.toString(), []);

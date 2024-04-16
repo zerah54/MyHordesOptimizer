@@ -142,10 +142,6 @@ export class ScrutateurComponent implements OnInit {
             });
     }
 
-    public trackByColumnId(_index: number, column: StandardColumn): string {
-        return column.id;
-    }
-
     public groupByDiago(item: Regen): string {
         return (<ZoneRegen>item.direction_regen).value.diag + '';
     }
