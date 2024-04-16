@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.10.0
+// @version      1.0.12.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -2088,6 +2088,7 @@ function calculateDespairDeaths(nb_killed_zombies) {
 }
 
 function fixMhCompiledImg(img) {
+    if (!img) return;
     return img.replace(/\/(\w+)\.(\w+)\.(\w+)/, '/$1.$3')
 }
 
@@ -2200,13 +2201,29 @@ function updateFetchRequestOptions(options) {
         ...update.headers,
         'Mho-Origin': 'script',
         'Mho-Script-Version': getScriptInfo().version,
-        'Authorization': `Bearer ${token.token.accessToken?.toString()}`,
+    };
+    if (token && token.token && token.token.accessToken) {
+        update.headers.Authorization = `Bearer ${token.token.accessToken?.toString()}`
+    }
+    return update;
+}
+
+function updateFetchRequestOptionsWithoutBearer(options) {
+    const update = {...options};
+    update.headers = {
+        ...update.headers,
+        'Mho-Origin': 'script',
+        'Mho-Script-Version': getScriptInfo().version,
     };
     return update;
 }
 
 function fetcher(url, options) {
     return fetch(url, updateFetchRequestOptions(options));
+}
+
+function fetcherWithoutBearer(url, options) {
+    return fetch(url, updateFetchRequestOptionsWithoutBearer(options));
 }
 
 /**
@@ -3824,7 +3841,7 @@ function getRecipeElement(recipe) {
 
         let result_img = document.createElement('img');
         result_img.setAttribute('style', 'margin-right: 0.5em');
-        result_img.src = repo_img_hordes_url + fixMhCompiledImg(result.item.img);
+        result_img.src = repo_img_hordes_url + fixMhCompiledImg(result.item?.img);
         result_container.appendChild(result_img);
 
         let result_label = document.createElement('span');
@@ -5324,6 +5341,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'hero_tamer_2':
         case 'hero_tamer_2b':
         case 'alarm_clock':
+        case 'inedible':
             item_action.classList.remove('item-tag');
             break;
         case 'deco':
@@ -8825,7 +8843,7 @@ function getToken(force, stop) {
     return new Promise((resolve, reject) => {
         if (external_app_id) {
             if (!isValidToken() || force) {
-                fetcher(api_url + '/Authentication/Token?userKey=' + external_app_id)
+                fetcherWithoutBearer(api_url + '/Authentication/Token?userKey=' + external_app_id)
                     .then((response) => {
                         if (response.status === 200) {
                             return response.json();
@@ -8916,7 +8934,7 @@ function getCitizens() {
 /** Récupère les informations de la banque */
 function getBank() {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + '/Fetcher/bank?userKey=' + external_app_id)
+        fetcher(api_url + '/Fetcher/bank')
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -9519,7 +9537,7 @@ function getRecipes() {
 /** Récupère la liste complète des paramètres en base */
 function getParameters() {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + '/parameters/parameters')
+        fetcherWithoutBearer(api_url + '/parameters/parameters')
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
