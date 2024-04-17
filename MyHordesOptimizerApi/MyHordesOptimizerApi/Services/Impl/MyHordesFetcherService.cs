@@ -101,7 +101,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             await Lock.WaitAsync();
             Logger.LogDebug($"GetSimpleMeAsync Lock ok après {sw.Elapsed} ms");
             try
-            {      
+            {
                 if (myHordeMeResponse.Map != null) // Si l'utilisateur est en ville
                 {
                     Logger.LogDebug($"GetSimpleMeAsync User en ville !");
@@ -171,6 +171,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                                     c.ImportHomeDetail(citizen);
                                     c.ImportHeroicActionDetail(citizen);
                                     c.ImportStatusDetail(citizen);
+                                    c.IdBag = citizen.IdBag;
                                 }
                             }
                         }
