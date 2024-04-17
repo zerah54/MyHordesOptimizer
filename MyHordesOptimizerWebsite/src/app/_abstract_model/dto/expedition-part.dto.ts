@@ -12,7 +12,7 @@ export interface ExpeditionPartDTO {
 export interface ExpeditionPartShortDTO {
     id?: number;
     ordersId: number[];
-    citizens: number[];
+    citizensId: number[];
     position: number;
     path: string;
 }

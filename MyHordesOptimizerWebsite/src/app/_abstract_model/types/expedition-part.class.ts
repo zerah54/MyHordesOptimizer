@@ -32,7 +32,7 @@ export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
             ordersId: this.orders ? this.orders
                 .filter((order: ExpeditionOrder) => order.id !== undefined && order.id !== null)
                 .map((order: ExpeditionOrder) => <number>order.id) : [],
-            citizens: this.citizens ? this.citizens
+            citizensId: this.citizens ? this.citizens
                 .filter((citizen: CitizenExpedition) => citizen.id !== undefined && citizen.id !== null)
                 .map((citizen: CitizenExpedition) => <number>citizen.id) : [],
             path: this.path,
