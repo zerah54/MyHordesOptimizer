@@ -30,7 +30,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public CitizenDto GetTownCitizen(int townId, int userId)
         {
-            var citizen = DbContext.GetMostRecentsTownCitizen(townId)
+            var citizen = DbContext.GetTownCitizen(townId)
                 .Where(townCitizen => townCitizen.IdUser == userId)
                 .Single();
             var citizenDto = Mapper.Map<CitizenDto>(citizen);

@@ -25,15 +25,9 @@ namespace MyHordesOptimizerApi
             base.OnConfiguring(optionsBuilder);
         }
 
-        public IQueryable<TownCitizen> GetMostRecentsTownCitizen(int townId)
+        public IQueryable<TownCitizen> GetTownCitizen(int townId)
         {
-            var lastUpdateInfoId = this.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId).Max(tbi => tbi.IdLastUpdateInfo);
             return this.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId)
-                .Where(townCitizen => townCitizen.IdLastUpdateInfo == lastUpdateInfoId
-                || townCitizen.IdLastUpdateInfoGhoulStatus == lastUpdateInfoId
-                || townCitizen.IdLastUpdateInfoHeroicAction == lastUpdateInfoId
-                || townCitizen.IdLastUpdateInfoHome == lastUpdateInfoId
-                || townCitizen.IdLastUpdateInfoStatus == lastUpdateInfoId)
                 .Include(townCitizen => townCitizen.IdBagNavigation)
                     .ThenInclude(bag => bag.BagItems)
                         .ThenInclude(bagItem => bagItem.IdItemNavigation)

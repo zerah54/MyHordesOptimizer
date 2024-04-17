@@ -437,7 +437,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public CitizensLastUpdateDto GetCitizens(int townId)
         {
-            var models = DbContext.GetMostRecentsTownCitizen(townId)
+            var models = DbContext.GetTownCitizen(townId)
                 .ToList();
             var dtos = Mapper.Map<CitizensLastUpdateDto>(models);
             return dtos;
