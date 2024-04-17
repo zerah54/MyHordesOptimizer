@@ -14,6 +14,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.GestHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicAction;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Status;
+using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;
@@ -93,9 +94,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     {
                         BigBrothHordesRepository.Update();
                     }
+                    catch (WebApiException e)
+                    {
+                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
+                        response.MapResponseDto.BigBrothHordesStatus = $"{e.Message} : {e.Response}";
+                    }
                     catch (Exception e)
                     {
-                        Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.BigBrothHordesStatus = e.Message;
                     }
                 });
@@ -110,6 +116,11 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         var updateInChaos = UpdateRequestMapToolsToUpdateDetailsDto.IsCell(fata);
                         var cell = updateRequestDto.Map?.Cell;
                         await FataMorganaRepository.UpdateAsync(updateInChaos, chaosX: cell?.X, chaosY: cell?.Y);
+                    }
+                    catch (WebApiException e)
+                    {
+                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
+                        response.MapResponseDto.FataMorganaStatus = $"{e.Message} : {e.Response}";
                     }
                     catch (Exception e)
                     {
@@ -284,9 +295,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     {
                         GestHordesRepository.Update();
                     }
+                    catch (WebApiException e)
+                    {
+                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
+                        response.MapResponseDto.GestHordesApiStatus = $"{e.Message} : {e.Response}";
+                    }
                     catch (Exception e)
                     {
-                        Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.GestHordesApiStatus = e.Message;
                     }
                 }
@@ -313,9 +329,14 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             }
                         }
                     }
+                    catch (WebApiException e)
+                    {
+                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
+                        response.MapResponseDto.GestHordesCellsStatus = $"{e.Message} : {e.Response}";
+                    }
                     catch (Exception e)
                     {
-                        Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.GestHordesCellsStatus = e.Message;
                     }
                 }
