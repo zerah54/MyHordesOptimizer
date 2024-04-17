@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.12.0
+// @version      1.0.13.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -34,9 +34,10 @@
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
     + `[Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée\n\n`
     + `[Correction] Traductions manquantes\n`
-    + `[Correction] Notification de fin de fouille\n\n`;
+    + `[Correction] Notification de fin de fouille\n`
+    + `[Correction] Divers bugs depuis la version 1.0.8.0\n`;
 
-const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
+const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
 const is_mh_beta = document.URL.indexOf('staging') >= 0;
 const website = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
@@ -9116,7 +9117,7 @@ function updateExternalTools() {
             if (data.map.cell) {
                 data.map.cell.zombies = content.zombies;
                 data.map.cell.zoneEmpty = content.zoneEmpty;
-                data.map.cell.objects = content.objects;
+                data.map.cell.objects = content.objects || [];
                 data.map.cell.citizenId = content.citizenId;
             } else {
                 data.map.cell = content;
@@ -9223,7 +9224,7 @@ function updateExternalTools() {
             if (heroics && heroics.length > 0) {
                 for (let heroic of heroics) {
                     let action = {
-                        locale: lang,
+                        locale: lang || 'fr',
                         label: heroic.querySelector('.label')?.innerText,
                         value: heroic.classList.contains('already') ? 0 : 1
                     }
@@ -9241,7 +9242,7 @@ function updateExternalTools() {
             let apag = document.querySelector('.pointer.rucksack [src*=item_photo]');
             if (apag) {
                 let action = {
-                    locale: lang,
+                    locale: lang || 'fr',
                     label: apag.alt,
                     value: +apag.src.replace(/.*item_photo_(\d).*/, '$1') || 0
                 }
@@ -9252,14 +9253,14 @@ function updateExternalTools() {
                 let pef = document.querySelector('ul.special_actions [src*=armag]');
                 if (pef) {
                     let action = {
-                        locale: lang,
+                        locale: lang || 'fr',
                         label: 'PEF',
                         value: 1
                     }
                     data.heroicActions.actions.push(action);
                 } else if (!no_interaction) {
                     let action = {
-                        locale: lang,
+                        locale: lang || 'fr',
                         label: 'PEF',
                         value: 0
                     }

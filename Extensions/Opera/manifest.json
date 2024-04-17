@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "MyHordes Optimizer",
     "short_name": "MHO",
-    "version": "1.0.12.0",
+    "version": "1.0.13.0",
     "description": "Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels",
     "author": "Zerah",
     "homepage_url": "https://myhordes-optimizer.web.app/tutorials/script/installation",
