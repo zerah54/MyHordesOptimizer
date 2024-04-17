@@ -21,7 +21,7 @@
                             <div class="header">
                                 <h2><span i18n>Préinscrits&nbsp;:&nbsp;</span><span [innerHTML]="formatedPreRegistered"></span></h2>
                             </div>
-                            @if (edition_mode) {
+                            @if (edition_mode && editable) {
                                 <div class="actions">
                                     <div class="left-actions">
                                         <button mat-button type="button" (click)="addNewExpedition()" i18n>Créer une expédition</button>
@@ -122,17 +122,7 @@
                                                                 }
                                                                 <td class="job" i18n>Métier</td>
                                                                 <td class="pseudo">
-                                                                    <div>
-                                                                        <div i18n>Citoyen</div>
-                                                                        @if (edition_mode && editable) {
-                                                                            <div>
-                                                                                <button mat-icon-button type="button"
-                                                                                        (click)="addNewMemberToPart(expedition_part)">
-                                                                                    <mat-icon>add</mat-icon>
-                                                                                </button>
-                                                                            </div>
-                                                                        }
-                                                                    </div>
+                                                                    <div i18n>Citoyen</div>
                                                                 </td>
                                                                 <td class="is-thirsty">
                                                                     <div class="flex">
@@ -148,7 +138,7 @@
                                                                 @if ((edition_mode || (expedition_part.citizens | someHeroicActionNeeded)) && editable) {
                                                                     <td class="heroic" i18n>Action héroïque</td>
                                                                 }
-                                                                <td class="citizen-orders" i18n>Consigne perso</td>
+                                                                <td class="citizen-orders" i18n>Consignes perso</td>
                                                                 <td class="bag" i18n>Sac</td>
                                                             </tr>
                                                             </thead>
@@ -157,7 +147,8 @@
                                                                     <tr class="citizen">
                                                                         @if (edition_mode && editable) {
                                                                             <td class="action">
-                                                                                <button mat-icon-button type="button"
+                                                                                <button mat-icon-button type="button" matTooltip="Supprimer la place"
+                                                                                        i18n-matTooltip
                                                                                         (click)="removeCitizenFromPart(citizen, expedition_part, citizen_index)">
                                                                                     <mat-icon>delete</mat-icon>
                                                                                 </button>
@@ -240,9 +231,9 @@
                                                                             @if (edition_mode && editable) {
                                                                                 <ng-container
                                                                                     *ngTemplateOutlet="displayOrder; context: {$implicit: citizen.orders}"></ng-container>
-                                                                                <button mat-raised-button type="button"
+                                                                                <button mat-icon-button type="button"
                                                                                         (click)="openExpeditionOrders(citizen.orders, citizen)">
-                                                                                    <ng-container i18n>Éditer</ng-container>
+                                                                                    <mat-icon>edit</mat-icon>
                                                                                 </button>
                                                                             } @else {
                                                                                 <ng-container
@@ -266,16 +257,30 @@
                                                                     </tr>
                                                                 }
                                                             </tbody>
+                                                            @if (edition_mode && editable) {
+                                                                <tfoot>
+                                                                <tr>
+                                                                    <td [attr.colspan]="'100%'">
+                                                                        <button mat-button (click)="addNewMemberToPart(expedition_part)">
+                                                                            <mat-icon>add</mat-icon>
+                                                                            <ng-container i18n>Ajouter une place</ng-container>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                                </tfoot>
+                                                            }
                                                         </table>
                                                         <div class="orders">
-                                                            <h3 i18n>Consignes</h3>
+                                                            <h3 style="    display: flex;align-items: center;">
+                                                                <ng-container i18n>Consignes de l'expédition</ng-container>
+                                                                <button mat-icon-button type="button"
+                                                                        (click)="openExpeditionOrders(expedition_part.orders, expedition_part)">
+                                                                    <mat-icon>edit</mat-icon>
+                                                                </button>
+                                                            </h3>
                                                             @if (edition_mode && editable) {
                                                                 <ng-container
                                                                     *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_part.orders}"></ng-container>
-                                                                <button mat-raised-button type="button"
-                                                                        (click)="openExpeditionOrders(expedition_part.orders, expedition_part)">
-                                                                    <ng-container i18n>Éditer</ng-container>
-                                                                </button>
                                                             } @else {
                                                                 <ng-container
                                                                     *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_part.orders}"></ng-container>
@@ -284,20 +289,24 @@
                                                     </div>
                                                 }
                                                 <ng-template #displayOrder let-orders>
-                                                    @for (order of orders; track order.id) {
-                                                        <div>
-                                                            @switch (order.type) {
-                                                                @case ('text') {
-                                                                    <span [innerHTML]="order.text"></span>
+                                                    @if (orders.length > 0) {
+                                                        @for (order of orders; track order.id) {
+                                                            <div>
+                                                                @switch (order.type) {
+                                                                    @case ('text') {
+                                                                        <span [innerHTML]="order.text"></span>
+                                                                    }
+                                                                    @case ('checkbox') {
+                                                                        <mat-checkbox [(ngModel)]="order.done" (ngModelChange)="saveOrder(order)"
+                                                                                      [disabled]="!editable">
+                                                                            <span [class.checked]="order.done" [innerHTML]="order.text"></span>
+                                                                        </mat-checkbox>
+                                                                    }
                                                                 }
-                                                                @case ('checkbox') {
-                                                                    <mat-checkbox [(ngModel)]="order.done" (ngModelChange)="saveOrder(order)"
-                                                                                  [disabled]="!editable">
-                                                                        <span [class.checked]="order.done" [innerHTML]="order.text"></span>
-                                                                    </mat-checkbox>
-                                                                }
-                                                            }
-                                                        </div>
+                                                            </div>
+                                                        }
+                                                    } @else {
+                                                        <div class="no-order">Pas de consigne.</div>
                                                     }
                                                 </ng-template>
                                             </div>

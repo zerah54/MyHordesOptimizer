@@ -158,6 +158,10 @@
                                 .citizen-orders {
                                     padding: 0 0.5em;
 
+                                    .no-order {
+                                        display: none;
+                                    }
+
                                     .checked {
                                         text-decoration: line-through !important;
                                     }
@@ -190,6 +194,12 @@
                     .orders {
                         padding: 0.25em 0.5em 0.5em;
 
+                        .no-order {
+                            color: rgba(0, 0, 0, 0.75);
+                            font-weight: bold;
+                            font-style: italic;
+                        }
+
                         .checked {
                             text-decoration: line-through !important;
                         }
@@ -201,6 +211,13 @@
 }
 
 .mho-expedition-bag-selector {
+    width: 325px;
+    max-width: 325px;
+
+    .mat-mdc-tab-group {
+        width: 100%;
+    }
+
     .mat-mdc-tab-body-wrapper {
         max-height: 300px;
     }
