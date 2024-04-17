@@ -14,7 +14,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
     public preinscrit_heroic_skill?: string;
     public pdc!: number;
     public is_thirsty?: boolean;
-
+    public starts_7_ap: boolean = false;
 
     constructor(dto?: CitizenExpeditionDTO | null) {
         super();
@@ -31,7 +31,8 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             preinscritJob: this.preinscrit_job?.key,
             preinscritHeroicSkillName: this.preinscrit_heroic_skill,
             pdc: this.pdc,
-            isThirsty: this.is_thirsty
+            isThirsty: this.is_thirsty,
+            nombrePaDepart: this.starts_7_ap ? 7 : 6
         };
     }
 
@@ -47,7 +48,8 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             preinscritJob: this.preinscrit_job?.key,
             preinscritHeroicSkillName: this.preinscrit_heroic_skill,
             pdc: this.pdc,
-            isThirsty: this.is_thirsty
+            isThirsty: this.is_thirsty,
+            nombrePaDepart: this.starts_7_ap ? 7 : 6
         };
     }
 
@@ -67,6 +69,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             this.preinscrit_heroic_skill = dto.preinscritHeroicSkillName;
             this.pdc = dto.pdc;
             this.is_thirsty = dto.isThirsty;
+            this.starts_7_ap = dto.nombrePaDepart === 7;
         }
     }
 

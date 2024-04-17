@@ -129,6 +129,13 @@
                                                                         <img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst1.gif'" [height]="16" [width]="16">
                                                                     </div>
                                                                 </td>
+                                                                <td class="starts-7-ap">
+                                                                    <div class="flex">
+                                                                        7 <img
+                                                                        [ngSrc]="HORDES_IMG_REPO + 'icons/ap_small' + (locale === 'de' ? '' : '_' + locale) + '.gif'"
+                                                                        width="16" height="16">
+                                                                    </div>
+                                                                </td>
                                                                 <td class="pdc">
                                                                     <div class="flex">
                                                                         <img [ngSrc]="HORDES_IMG_REPO + 'professions/shield.gif'" [height]="16" [width]="16">
@@ -165,7 +172,7 @@
                                                                                                 [(ngModel)]="citizen.preinscrit_job"
                                                                                                 (ngModelChange)="saveCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
                                                                                 </mat-form-field>
-                                                                            } @else {
+                                                                            } @else if (citizen.preinscrit_job?.value?.img || (citizen.citizen_id | citizenFromId:all_citizens)?.job?.value?.img) {
                                                                                 <img
                                                                                     [ngSrc]="HORDES_IMG_REPO + (citizen.preinscrit_job?.value?.img ?? (citizen.citizen_id ? (citizen.citizen_id | citizenFromId:all_citizens)?.job?.value?.img : ''))"
                                                                                     width="16" height="16">
@@ -198,6 +205,14 @@
                                                                                 } @else {
                                                                                     <ng-container i18n>Non</ng-container>
                                                                                 }
+                                                                            }
+                                                                        </td>
+                                                                        <td class="starts-7-ap">
+                                                                            @if ((edition_mode || expedition.state === 'ready') && editable) {
+                                                                                <mat-checkbox [(ngModel)]="citizen.starts_7_ap"
+                                                                                              (ngModelChange)="saveCitizen(expedition_part, citizen)"></mat-checkbox>
+                                                                            } @else if (citizen.starts_7_ap) {
+                                                                                <ng-container i18n>Oui</ng-container>
                                                                             }
                                                                         </td>
                                                                         <td class="pdc">

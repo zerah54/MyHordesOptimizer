@@ -8,7 +8,8 @@ import { getCitizenFromId } from '../utilities/citizen.util';
     standalone: true,
 })
 export class CitizenFromIdPipe implements PipeTransform {
-    transform(citizen_id: number, all_citizens: Citizen[]): Citizen | undefined {
+    transform(citizen_id: number | undefined, all_citizens: Citizen[]): Citizen | undefined {
+        if (!citizen_id) return undefined;
         return getCitizenFromId(all_citizens, citizen_id);
     }
 }

@@ -30,12 +30,10 @@ if (environment.production) {
 
 const lang: string = localStorage.getItem('mho-locale') ?? 'fr';
 
-bootstrapApplication(AppComponent, appConfig)
-    .catch((err: unknown) => console.error(err));
-
 initLanguage(lang)
     .then(() => import('./app/app.component'))
-    .then(() => bootstrapApplication(AppComponent, appConfig));
+    .then(() => bootstrapApplication(AppComponent, appConfig))
+    .catch((err: unknown) => console.error(err));
 
 async function initLanguage(locale: string): Promise<void> {
     if (locale === 'fr') {

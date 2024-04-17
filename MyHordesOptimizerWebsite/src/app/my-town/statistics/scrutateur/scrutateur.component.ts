@@ -4,7 +4,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import Chart from 'chart.js/auto';
 import { Subject, takeUntil } from 'rxjs';
-import { ZoneRegen } from '../../../_abstract_model/enum/zone-regen.enum';
+import { Direction } from '../../../_abstract_model/enum/direction.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { TownStatisticsService } from '../../../_abstract_model/services/town-statistics.service';
 import { Regen } from '../../../_abstract_model/types/regen.class';
@@ -40,7 +40,7 @@ export class ScrutateurComponent implements OnInit {
     public polar_chart!: Chart<'polarArea'>;
     public pie_chart!: Chart<'pie'>;
 
-    private all_zones_regen: ZoneRegen[] = (<ZoneRegen[]>ZoneRegen.getAllValues()).sort((zone_a: ZoneRegen, zone_b: ZoneRegen) => {
+    private all_zones_regen: Direction[] = (<Direction[]>Direction.getAllValues()).sort((zone_a: Direction, zone_b: Direction) => {
         return zone_a.value.order_by - zone_b.value.order_by;
     });
 
@@ -58,7 +58,7 @@ export class ScrutateurComponent implements OnInit {
                 let regens_for_polar: Regen[] = [...regens];
                 regens_for_polar = regens_for_polar.filter((regen: Regen) => regen && regen.direction_regen);
                 regens_for_polar.sort((regen_a: Regen, regen_b: Regen) => {
-                    return (<ZoneRegen>regen_a.direction_regen).value.order_by - (<ZoneRegen>regen_b.direction_regen).value.order_by;
+                    return (<Direction>regen_a.direction_regen).value.order_by - (<Direction>regen_b.direction_regen).value.order_by;
                 });
                 let polar_data: number[] = new Array(8).fill(0);
                 polar_data = polar_data.map((_data: number, index: number) => {
@@ -68,7 +68,7 @@ export class ScrutateurComponent implements OnInit {
                 this.polar_chart = new Chart<'polarArea'>(polar_ctx, {
                     type: 'polarArea',
                     data: {
-                        labels: this.all_zones_regen.map((zone: ZoneRegen) => zone.getLabel()),
+                        labels: this.all_zones_regen.map((zone: Direction) => zone.getLabel()),
                         datasets: [{
                             data: polar_data
                         }]
@@ -101,7 +101,7 @@ export class ScrutateurComponent implements OnInit {
                 let regens_for_pie: Regen[] = [...regens];
                 regens_for_pie = regens_for_pie.filter((regen: Regen) => regen && regen.direction_regen);
                 regens_for_pie.sort((regen_a: Regen): number => {
-                    return (<ZoneRegen>regen_a.direction_regen).value.diag ? 1 : -1;
+                    return (<Direction>regen_a.direction_regen).value.diag ? 1 : -1;
                 });
                 const group_by_diag: Regen[][] = groupBy(regens_for_pie, this.groupByDiago);
                 const pie_data: number[] = [];
@@ -143,6 +143,6 @@ export class ScrutateurComponent implements OnInit {
     }
 
     public groupByDiago(item: Regen): string {
-        return (<ZoneRegen>item.direction_regen).value.diag + '';
+        return (<Direction>item.direction_regen).value.diag + '';
     }
 }
