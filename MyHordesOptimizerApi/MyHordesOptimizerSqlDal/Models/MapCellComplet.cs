@@ -76,8 +76,6 @@ public partial class MapCellComplet
     public int? LastUpdateInfoUserId { get; set; }
 
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
     public string? LastUpdateInfoUserName { get; set; }
 
     [Column(TypeName = "int(11)")]
@@ -108,8 +106,6 @@ public partial class MapCellComplet
     public int Day { get; set; }
 
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
     public string? CitizenName { get; set; }
 
     [Column(TypeName = "int(11)")]

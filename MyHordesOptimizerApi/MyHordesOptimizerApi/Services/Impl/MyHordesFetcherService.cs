@@ -209,7 +209,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                             }
                             var cells = DbContext.MapCells.Where(c => c.IdTown == town.IdTown)
                                 .ToList();
-                            RegenDirectionEnum regen = RegenDirectionEnum.All;
+                            DirectionEnum regen = DirectionEnum.All;
 
                             var dynamicNews = myHordeMeResponse.Map.City.News;
                             MyHordesNews news = null;
@@ -224,7 +224,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                             if (news != null && news.RegenDir != null)
                             {
                                 var regenDirLabel = news.RegenDir.De;
-                                regen = regenDirLabel.GetEnumFromDescription<RegenDirectionEnum>();
+                                regen = regenDirLabel.GetEnumFromDescription<DirectionEnum>();
                             }
                             float averageNbOfItemAdded = ((float)MyHordesScrutateurConfiguration.MinItemAdd + ((float)MyHordesScrutateurConfiguration.MaxItemAdd - (float)MyHordesScrutateurConfiguration.MinItemAdd) / (float)2);
                             var xVille = myHordeMeResponse.Map.City.X;
@@ -243,17 +243,17 @@ namespace MyHordesOptimizerApi.Services.Impl
                                     {
                                         cell.NbPa = GetCellDistanceInActionPoint(xFromTown, yFromTown);
                                     }
-                                    RegenDirectionEnum cellZone;
+                                    DirectionEnum cellZone;
                                     if (cell.ZoneRegen.HasValue)
                                     {
-                                        cellZone = (RegenDirectionEnum)cell.ZoneRegen.Value;
+                                        cellZone = (DirectionEnum)cell.ZoneRegen.Value;
                                     }
                                     else
                                     {
                                         cellZone = GetCellZone(xFromTown, yFromTown);
                                         cell.ZoneRegen = (int)cellZone;
                                     }
-                                    if (cellZone == regen || regen == RegenDirectionEnum.All)
+                                    if (cellZone == regen || regen == DirectionEnum.All)
                                     {
                                         var max = cell.MaxPotentialRemainingDig ?? 0;
                                         var average = cell.AveragePotentialRemainingDig ?? 0;
@@ -264,7 +264,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                                             {
                                                 itemToAdd = Convert.ToInt32(Math.Ceiling(((float)itemToAdd - 1.0) / 2.0));
                                             }
-                                            if (regen == RegenDirectionEnum.All)
+                                            if (regen == DirectionEnum.All)
                                             {
                                                 itemToAdd = 0;
                                             }
@@ -278,7 +278,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                                             {
                                                 averageItemAdd = ((float)regenChance / (float)100) * (float)Math.Ceiling((averageNbOfItemAdded - 1.0) / 2.0);
                                             }
-                                            if (regen == RegenDirectionEnum.All)
+                                            if (regen == DirectionEnum.All)
                                             {
                                                 averageItemAdd = averageItemAdd / (float)8;
                                             }
@@ -632,44 +632,44 @@ namespace MyHordesOptimizerApi.Services.Impl
 
             return cells;
         }
-        private RegenDirectionEnum GetCellZone(int x, int y)
+        private DirectionEnum GetCellZone(int x, int y)
         {
             if (Math.Abs(Math.Abs(x) - Math.Abs(y)) < Math.Min(Math.Abs(x), Math.Abs(y)))
             {
                 if (x < 0 && y < 0)
                 {
-                    return RegenDirectionEnum.SouthWest;
+                    return DirectionEnum.SouthWest;
                 }
                 if (x < 0 && y > 0)
                 {
-                    return RegenDirectionEnum.NorthWest;
+                    return DirectionEnum.NorthWest;
                 }
                 if (x > 0 && y < 0)
                 {
-                    return RegenDirectionEnum.SouthEst;
+                    return DirectionEnum.SouthEst;
                 }
                 if (x > 0 && y > 0)
                 {
-                    return RegenDirectionEnum.NorthEst;
+                    return DirectionEnum.NorthEst;
                 }
             }
             else
             {
                 if (x < 0 && Math.Abs(x) > Math.Abs(y))
                 {
-                    return RegenDirectionEnum.West;
+                    return DirectionEnum.West;
                 }
                 if (x > 0 && Math.Abs(x) > Math.Abs(y))
                 {
-                    return RegenDirectionEnum.Est;
+                    return DirectionEnum.Est;
                 }
                 if (y < 0 && Math.Abs(x) < Math.Abs(y))
                 {
-                    return RegenDirectionEnum.South;
+                    return DirectionEnum.South;
                 }
                 if (y > 0 && Math.Abs(x) < Math.Abs(y))
                 {
-                    return RegenDirectionEnum.North;
+                    return DirectionEnum.North;
                 }
             }
             throw new Exception();

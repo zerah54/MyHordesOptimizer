@@ -40,6 +40,9 @@ public partial class ExpeditionCitizen
     [Column("pdc", TypeName = "int(11)")]
     public int? Pdc { get; set; }
 
+    [Column("nombrePaDepart", TypeName = "int(11)")]
+    public int NombrePaDepart { get; set; }
+
     [Column("isThirsty")]
     public bool? IsThirsty { get; set; }
 

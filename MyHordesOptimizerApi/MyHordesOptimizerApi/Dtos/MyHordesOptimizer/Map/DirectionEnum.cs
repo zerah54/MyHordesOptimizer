@@ -2,7 +2,7 @@
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
 {
-    public enum RegenDirectionEnum
+    public enum DirectionEnum
     {
         [Description("Norden")]
         North,

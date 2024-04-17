@@ -2,8 +2,10 @@
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
+using System;
 using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
@@ -35,7 +37,11 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
 
             CreateMap<ExpeditionPart, ExpeditionPartDto>()
                 .ForMember(dto => dto.Citizens, opt => opt.MapFrom(model => model.ExpeditionCitizens))
-                .ForMember(dto => dto.Direction, opt => opt.MapFrom(model => model.Direction))
+                .ForMember(dto => dto.Direction, opt => 
+                { 
+                    opt.MapFrom(model => ((DirectionEnum)model.Direction.Value).GetDescription());
+                    opt.PreCondition(model => model.Direction.HasValue); 
+                })
                 .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpeditionPart))
                 .ForMember(dto => dto.Label, opt => opt.MapFrom(model => model.Label))
                 .ForMember(dto => dto.Orders, opt => opt.MapFrom(model => model.IdExpeditionOrders))
@@ -46,7 +52,11 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.Label, opt => opt.MapFrom(dto => dto.Label))
                 .ForMember(model => model.IdExpeditionPart, opt => opt.Ignore())
                 .ForMember(model => model.IdExpedition, opt => opt.Ignore())
-                .ForMember(model => model.Direction, opt => opt.MapFrom(dto => dto.Direction))
+                .ForMember(model => model.Direction, opt =>
+                {
+                    opt.PreCondition(dto => !string.IsNullOrEmpty(dto.Direction));
+                    opt.MapFrom(dto => (int)dto.Direction.GetEnumFromDescription<DirectionEnum>());
+                })
                 .ForMember(model => model.IdExpeditionOrders, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
                     return context.GetDbContext().ExpeditionOrders.Where(order => src.OrdersId.Contains(order.IdExpeditionOrder)).ToList();
@@ -83,7 +93,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(dto => dto.Pdc, opt => opt.MapFrom(model => model.Pdc))
                 .ForMember(dto => dto.Preinscrit, opt => opt.MapFrom(model => model.IsPreinscrit))
                 .ForMember(dto => dto.PreinscritHeroicSkillName, opt => opt.MapFrom(model => model.PreinscritHeroic))
-                .ForMember(dto => dto.PreinscritJob, opt => opt.MapFrom(model => model.PreinscritJob));
+                .ForMember(dto => dto.PreinscritJob, opt => opt.MapFrom(model => model.PreinscritJob))
+                .ForMember(dto => dto.NombrePaDepart, opt => opt.MapFrom(model => model.NombrePaDepart));
             CreateMap<ExpeditionCitizenRequestDto, ExpeditionCitizen>()
                 .ForMember(model => model.IdExpeditionCitizen, opt => opt.MapFrom(dto => dto.Id))
                 .ForMember(model => model.Pdc, opt => opt.MapFrom(dto => dto.Pdc))
@@ -95,6 +106,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.IdExpeditionPart, opt => opt.Ignore())
                 .ForMember(model => model.IdUser, opt => opt.MapFrom(dto => dto.IdUser))
                 .ForMember(model => model.IsThirsty, opt => opt.MapFrom(dto => dto.IsThirsty))
+                .ForMember(model => model.NombrePaDepart, opt => opt.MapFrom(dto => dto.NombrePaDepart))
                 .ForMember(model => model.ExpeditionOrders, opt => opt.MapFrom((src, dest, srcMember, context) =>
                 {
                     return context.GetDbContext().ExpeditionOrders.Where(order => src.OrdersId.Contains(order.IdExpeditionOrder)).ToList();
@@ -123,6 +135,15 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.IdExpeditionBagNavigation, opt => opt.Ignore())
                 .ForMember(model => model.IsBroken, opt => opt.MapFrom(dto => false))
                 .ForMember(model => model.Count, opt => opt.MapFrom(dto => dto.Count));
+        }
+
+        private int? hehe(ExpeditionPartRequestDto dto)
+        {
+            if (dto.Direction is not null)
+            {
+                return (int)dto.Direction.GetEnumFromDescription<DirectionEnum>();
+            }
+            return null;
         }
     }
 }

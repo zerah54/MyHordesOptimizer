@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.EquivalencyExpression;
 using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Extensions;
@@ -29,13 +28,12 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(model => model.TownCitizenIdLastUpdateInfoStatusNavigations, opt => opt.Ignore())
                 .ForMember(model => model.TownEstimations, opt => opt.Ignore());
 
-            CreateMap<LastUpdateInfo, LastUpdateInfoDto>()  
-                .ForMember(dto => dto.UserId, opt => opt.MapFrom(model => model.IdUser))    
+            CreateMap<LastUpdateInfo, LastUpdateInfoDto>()
+                .ForMember(dto => dto.UserId, opt => opt.MapFrom(model => model.IdUser))
                 .ForMember(dto => dto.UserName, opt => opt.MapFrom(model => model.IdUserNavigation.Name))
                 .ForMember(dto => dto.UpdateTime, opt => opt.MapFrom(model => model.DateUpdate));
 
             CreateMap<LastUpdateInfoDto, User>()
-                .EqualityComparison((dto, model) => dto.UserId == model.IdUser)
                 .ForMember(user => user.ExpeditionCitizens, opt => opt.Ignore())
                 .ForMember(user => user.IdUser, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(user => user.LastUpdateInfos, opt => opt.Ignore())

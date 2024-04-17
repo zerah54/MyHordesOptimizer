@@ -32,11 +32,8 @@ public partial class ExpeditionPart
     [MySqlCollation("utf8_general_ci")]
     public string? Label { get; set; }
 
-    [Column("direction")]
-    [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
-    public string? Direction { get; set; }
+    [Column(TypeName = "int(11)")]
+    public int? Direction { get; set; }
 
     [InverseProperty("IdExpeditionPartNavigation")]
     public virtual ICollection<ExpeditionCitizen> ExpeditionCitizens { get; set; } = new List<ExpeditionCitizen>();

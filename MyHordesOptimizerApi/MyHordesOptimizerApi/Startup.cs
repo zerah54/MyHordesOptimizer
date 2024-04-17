@@ -1,9 +1,6 @@
-using AutoMapper;
-using AutoMapper.EquivalencyExpression;
 using Cockpit.Api.Extensions;
 using Common.Core.Repository.Impl;
 using Common.Core.Repository.Interfaces;
-using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Builder;
@@ -13,7 +10,6 @@ using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using MyHordesOptimizerApi.Configuration.Impl;
 using MyHordesOptimizerApi.Configuration.Impl.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
@@ -37,11 +33,9 @@ using MyHordesOptimizerApi.Services.Interfaces.Estimations;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
-using System;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text.Json.Serialization;
 
 namespace MyHordesOptimizerApi
@@ -84,11 +78,10 @@ namespace MyHordesOptimizerApi
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
-            services.AddAutoMapper((serviceProvider, automapper) =>
+            services.AddAutoMapper(opt =>
             {
-                automapper.AddCollectionMappers();
-                automapper.UseEntityFrameworkCoreModel<MhoContext>(serviceProvider);
-            }, Assembly.GetAssembly(this.GetType()));
+                opt.AllowNullDestinationValues = true;
+            },Assembly.GetAssembly(this.GetType()));
 
             // Providers
             services.AddScoped<IUserInfoProvider, UserInfoProvider>();

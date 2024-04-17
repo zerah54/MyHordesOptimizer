@@ -12,6 +12,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions
         public string? PreinscritJob { get; set; }
         public string? PreinscritHeroicSkillName { get; set; }
         public int Pdc { get; set; }
+        public int NombrePaDepart { get; set; }
         public bool? IsThirsty { get; set; }
     }
 }

@@ -55,7 +55,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                 .ForMember(dto => dto.TotalSucces, opt => opt.Ignore())
                 .ForMember(dto => dto.X, opt => opt.MapFrom(model => model.X))
                 .ForMember(dto => dto.Y, opt => opt.MapFrom(model => model.Y))
-                .ForMember(dto => dto.ZoneRegen, opt => { opt.MapFrom(src => ((RegenDirectionEnum)src.ZoneRegen.Value).GetDescription()); opt.PreCondition(src => src.ZoneRegen.HasValue); });
+                .ForMember(dto => dto.ZoneRegen, opt => { opt.MapFrom(src => ((DirectionEnum)src.ZoneRegen.Value).GetDescription()); opt.PreCondition(src => src.ZoneRegen.HasValue); });
 
             CreateMap<Town, List<MyHordesOptimizerMapDigDto>>()
                     .ConvertUsing<TownToMapDigDto>();
@@ -72,7 +72,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
 
             CreateMap<MapCellDigUpdate, MyHordesOptimizerMapUpdateDto>()
                 .ForMember(dest => dest.Day, opt => opt.MapFrom(src => src.Day))
-                .ForMember(dest => dest.DirectionRegen, opt => opt.MapFrom(src => ((RegenDirectionEnum)src.DirectionRegen).GetDescription()))
+                .ForMember(dest => dest.DirectionRegen, opt => opt.MapFrom(src => ((DirectionEnum)src.DirectionRegen).GetDescription()))
                 .ForMember(dest => dest.IdTown, opt => opt.MapFrom(src => src.IdTown))
                 .ForMember(dest => dest.LevelRegen, opt => opt.MapFrom(src => src.LevelRegen))
                 .ForMember(dest => dest.TauxRegen, opt => opt.MapFrom(src => src.TauxRegen));

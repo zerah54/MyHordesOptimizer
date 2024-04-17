@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.EquivalencyExpression;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.MappingProfiles.Resolvers.MyHordes;
@@ -14,7 +13,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
         public TownMappingProfile()
         {
             CreateMap<MyHordesMeResponseDto, Town>()
-                .EqualityComparison((dto, model) => dto.Map.Id == model.IdTown)
                 .ForMember(dest => dest.Day, opt => opt.MapFrom(src => src.Map.Days))
                 .ForMember(dest => dest.Expeditions, opt => opt.Ignore())
                 .ForMember(dest => dest.Height, opt => opt.MapFrom(src => src.Map.Hei))
@@ -70,7 +68,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.IsBroken, opt => opt.MapFrom(src => src.Broken));
 
             CreateMap<MyHordesCitizen, TownCitizen>()
-                .EqualityComparison((dto, model) => dto.Id == model.IdUser)
                 .ForMember(dest => dest.Apagcharges, opt => opt.Ignore())
                 .ForMember(dest => dest.Avatar, opt => opt.MapFrom(src => src.Avatar))
                 .ForMember(dest => dest.ChestLevel, opt => opt.Ignore())
@@ -142,7 +139,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.RestLevel, opt => opt.Ignore());
 
             CreateMap<MyHordesCitizen, User>()
-                .EqualityComparison((dto, model) => dto.Id == model.IdUser)
                 .ForMember(dest => dest.ExpeditionCitizens, opt => opt.Ignore())
                 .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.LastUpdateInfos, opt => opt.Ignore())

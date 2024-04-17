@@ -198,6 +198,8 @@ public partial class MhoContext : DbContext
         {
             entity.HasKey(e => e.IdExpeditionCitizen).HasName("PRIMARY");
 
+            entity.Property(e => e.NombrePaDepart).HasDefaultValueSql("'6'");
+
             entity.HasOne(d => d.IdExpeditionBagNavigation).WithMany(p => p.ExpeditionCitizens)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("ExpeditionCitizen_ibfk_4");
