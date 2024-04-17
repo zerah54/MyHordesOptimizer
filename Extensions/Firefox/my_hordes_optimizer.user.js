@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.13.0
+// @version      1.0.14.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -2094,7 +2094,7 @@ function fixMhCompiledImg(img) {
 }
 
 function isValidToken() {
-    if (!token) return false;
+    if (!token || !token.token || !token.token.accessToken) return false;
     let expiration_date = new Date(token.token.validTo).getTime();
     let current_date = new Date().getTime();
     return !shouldRefreshMe() && current_date < expiration_date;
@@ -2203,8 +2203,14 @@ function updateFetchRequestOptions(options) {
         'Mho-Origin': 'script',
         'Mho-Script-Version': getScriptInfo().version,
     };
-    if (token && token.token && token.token.accessToken) {
-        update.headers.Authorization = `Bearer ${token.token.accessToken?.toString()}`
+    if (isValidToken()) {
+        update.headers.Authorization = `Bearer ${token.token.accessToken?.toString()}`;
+    } else {
+        getToken().then(() => {
+            if (isValidToken()) {
+                update.headers.Authorization = `Bearer ${token.token.accessToken?.toString()}`;
+            }
+        })
     }
     return update;
 }
@@ -8901,7 +8907,11 @@ function getToken(force, stop) {
                 }
             }
         } else {
-            resolve();
+            getApiKey().then(() => {
+                getToken(false, true).then(() => {
+                    resolve();
+                });
+            });
         }
     });
 }
@@ -9224,7 +9234,7 @@ function updateExternalTools() {
             if (heroics && heroics.length > 0) {
                 for (let heroic of heroics) {
                     let action = {
-                        locale: lang || 'fr',
+                        locale: lang,
                         label: heroic.querySelector('.label')?.innerText,
                         value: heroic.classList.contains('already') ? 0 : 1
                     }
@@ -9232,7 +9242,7 @@ function updateExternalTools() {
                 }
             } else if (!no_interaction) {
                 let action = {
-                    locale: null,
+                    locale: lang,
                     label: 'Empty',
                     value: pageIsDesert() ? 0 /* 'desert' */ : 1 /* 'town' */
                 }
@@ -9242,7 +9252,7 @@ function updateExternalTools() {
             let apag = document.querySelector('.pointer.rucksack [src*=item_photo]');
             if (apag) {
                 let action = {
-                    locale: lang || 'fr',
+                    locale: lang,
                     label: apag.alt,
                     value: +apag.src.replace(/.*item_photo_(\d).*/, '$1') || 0
                 }
@@ -9253,14 +9263,14 @@ function updateExternalTools() {
                 let pef = document.querySelector('ul.special_actions [src*=armag]');
                 if (pef) {
                     let action = {
-                        locale: lang || 'fr',
+                        locale: lang,
                         label: 'PEF',
                         value: 1
                     }
                     data.heroicActions.actions.push(action);
                 } else if (!no_interaction) {
                     let action = {
-                        locale: lang || 'fr',
+                        locale: lang,
                         label: 'PEF',
                         value: 0
                     }
