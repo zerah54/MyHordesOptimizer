@@ -9,6 +9,8 @@ namespace MyHordesOptimizerApi.Services.Interfaces
     {
         void DeleteExpedition(int expeditionId);
         List<ExpeditionDto> GetExpeditionsByDay(int townId, int day);
+        List<ExpeditionDto> GetUserExpeditionsByDay(int townId, int userId, int day);
+
         Task<ExpeditionDto> SaveExpeditionAsync(ExpeditionRequestDto expedition, int idTown, int day);
         Task<List<ExpeditionDto>> CopyExpeditionsAsync(int townId, int fromDay, int targetDay);
 

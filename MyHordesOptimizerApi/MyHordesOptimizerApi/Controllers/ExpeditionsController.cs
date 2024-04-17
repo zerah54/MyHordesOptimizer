@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request;
-using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
@@ -40,6 +39,14 @@ namespace MyHordesOptimizerApi.Controllers
             return Ok(expedition);
         }
 
+        [HttpGet]
+        [Route("me/{day}")]
+        public async Task<ActionResult<List<ExpeditionDto>>> GetMyExpeditions([FromRoute] int townId, [FromRoute] int day)
+        {
+            var expedition = ExpeditionService.GetUserExpeditionsByDay(UserInfoProvider.TownDetail.TownId, UserInfoProvider.UserId, day);
+            return Ok(expedition);
+        }
+
         [HttpDelete]
         [Route("{expeditionId}")]
         public ActionResult DeleteExpedition([FromRoute] int expeditionId)
@@ -60,7 +67,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 return BadRequest($"{nameof(targetDay)} should be > 0");
             }
-            if(fromDay == targetDay)
+            if (fromDay == targetDay)
             {
                 return BadRequest($"{nameof(fromDay)} should be different from {nameof(targetDay)}");
             }
@@ -129,7 +136,7 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("orders")]
         public ActionResult SaveExpeditionOrder([FromBody] ExpeditionOrderDto expeditionOrder)
         {
-            if(!expeditionOrder.Id.HasValue)
+            if (!expeditionOrder.Id.HasValue)
             {
                 return BadRequest($"{nameof(expeditionOrder.Id)} cannot be empty");
             }

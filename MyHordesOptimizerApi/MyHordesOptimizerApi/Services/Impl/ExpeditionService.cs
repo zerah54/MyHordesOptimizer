@@ -10,6 +10,7 @@ using MyHordesOptimizerApi.Extensions.Models.Expeditions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Models.Expeditions;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Repository.Expeditions;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -117,19 +118,20 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public List<ExpeditionDto> GetExpeditionsByDay(int townId, int day)
         {
-            var models = DbContext.Expeditions
-                .Where(expedition => expedition.IdTown == townId && expedition.Day == day)
-                .Include(expedition => expedition.ExpeditionParts)
-                    .ThenInclude(part => part.IdExpeditionOrders)
-                .Include(expedition => expedition.ExpeditionParts)
-                    .ThenInclude(part => part.ExpeditionCitizens)
-                       .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
-                         .ThenInclude(bag => bag.ExpeditionBagItems)
-                             .ThenInclude(bagItem => bagItem.IdItemNavigation)
-                .Include(expedition => expedition.ExpeditionParts)
-                    .ThenInclude(part => part.ExpeditionCitizens)
-                        .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders)
+            var models = DbContext.Expeditions.Where(expedition => expedition.IdTown == townId && expedition.Day == day)
+                .IncludeAll()
                 .ToList();
+            var dtos = Mapper.Map<List<ExpeditionDto>>(models);
+            return dtos;
+        }
+
+        public List<ExpeditionDto> GetUserExpeditionsByDay(int townId, int userId, int day)
+        {
+            var models = DbContext.Expeditions.Where(expedition => expedition.IdTown == townId && expedition.Day == day)
+                .Where(expedition => expedition.ExpeditionParts.Any(part => part.ExpeditionCitizens.Any(citizen => citizen.IdUser == userId)))
+                .IncludeAll()
+                .ToList();
+
             var dtos = Mapper.Map<List<ExpeditionDto>>(models);
             return dtos;
         }

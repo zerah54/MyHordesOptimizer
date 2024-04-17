@@ -12,5 +12,20 @@ namespace MyHordesOptimizerApi
                              .ThenInclude(bagItem => bagItem.IdItemNavigation)
                          .Single();
         }
+
+        public IQueryable<Expedition> GetTownExpeditionsByDay(int townId, int day)
+        {
+            return Expeditions.Where(expedition => expedition.IdTown == townId && expedition.Day == day)
+                 .Include(expedition => expedition.ExpeditionParts)
+                     .ThenInclude(part => part.IdExpeditionOrders)
+                 .Include(expedition => expedition.ExpeditionParts)
+                     .ThenInclude(part => part.ExpeditionCitizens)
+                        .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
+                          .ThenInclude(bag => bag.ExpeditionBagItems)
+                              .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                 .Include(expedition => expedition.ExpeditionParts)
+                     .ThenInclude(part => part.ExpeditionCitizens)
+                         .ThenInclude(expeditionCitizen => expeditionCitizen.ExpeditionOrders);
+        }
     }
 }
