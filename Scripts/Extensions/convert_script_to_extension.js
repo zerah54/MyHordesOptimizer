@@ -146,7 +146,8 @@ async function generateManifestV3(header_data) {
         browser_specific_settings: {
             gecko: {
                 id: "{14876417-17c6-417d-80bb-b18c5b40c366}"
-            }
+            },
+            gecko_android: {}
         }
     };
 }
@@ -176,7 +177,8 @@ async function generateManifestV2(header_data) {
         browser_specific_settings: {
             gecko: {
                 id: "{14876417-17c6-417d-80bb-b18c5b40c366}"
-            }
+            },
+            gecko_android: {}
         }
     };
 }

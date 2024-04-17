@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.12.0
+// @version      1.0.14.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -34,9 +34,10 @@
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
     + `[Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée\n\n`
     + `[Correction] Traductions manquantes\n`
-    + `[Correction] Notification de fin de fouille\n\n`;
+    + `[Correction] Notification de fin de fouille\n`
+    + `[Correction] Divers bugs depuis la version 1.0.8.0\n`;
 
-const lang = (document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2);
+const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
 const is_mh_beta = document.URL.indexOf('staging') >= 0;
 const website = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
@@ -2093,7 +2094,7 @@ function fixMhCompiledImg(img) {
 }
 
 function isValidToken() {
-    if (!token) return false;
+    if (!token || !token.token || !token.token.accessToken) return false;
     let expiration_date = new Date(token.token.validTo).getTime();
     let current_date = new Date().getTime();
     return !shouldRefreshMe() && current_date < expiration_date;
@@ -2202,8 +2203,14 @@ function updateFetchRequestOptions(options) {
         'Mho-Origin': 'script',
         'Mho-Script-Version': getScriptInfo().version,
     };
-    if (token && token.token && token.token.accessToken) {
-        update.headers.Authorization = `Bearer ${token.token.accessToken?.toString()}`
+    if (isValidToken()) {
+        update.headers.Authorization = `Bearer ${token.token.accessToken?.toString()}`;
+    } else {
+        getToken().then(() => {
+            if (isValidToken()) {
+                update.headers.Authorization = `Bearer ${token.token.accessToken?.toString()}`;
+            }
+        })
     }
     return update;
 }
@@ -8900,7 +8907,11 @@ function getToken(force, stop) {
                 }
             }
         } else {
-            resolve();
+            getApiKey().then(() => {
+                getToken(false, true).then(() => {
+                    resolve();
+                });
+            });
         }
     });
 }
@@ -9116,7 +9127,7 @@ function updateExternalTools() {
             if (data.map.cell) {
                 data.map.cell.zombies = content.zombies;
                 data.map.cell.zoneEmpty = content.zoneEmpty;
-                data.map.cell.objects = content.objects;
+                data.map.cell.objects = content.objects || [];
                 data.map.cell.citizenId = content.citizenId;
             } else {
                 data.map.cell = content;
@@ -9231,7 +9242,7 @@ function updateExternalTools() {
                 }
             } else if (!no_interaction) {
                 let action = {
-                    locale: null,
+                    locale: lang,
                     label: 'Empty',
                     value: pageIsDesert() ? 0 /* 'desert' */ : 1 /* 'town' */
                 }
