@@ -523,7 +523,7 @@ export class ExpeditionsComponent implements OnInit {
                         if (pre_registered_job) {
                             pre_registered_job.count += 1;
                         } else {
-                            pre_registered_jobs.push({count: 1, job: citizen.preinscrit_job})
+                            pre_registered_jobs.push({count: 1, job: citizen?.preinscrit_job})
                         }
                     } else if (citizen.preinscrit) {
                         let pre_registered_citizen: Citizen = <Citizen>getCitizenFromId(this.all_citizens, citizen.citizen_id);
@@ -536,7 +536,7 @@ export class ExpeditionsComponent implements OnInit {
                         if (pre_registered_job) {
                             pre_registered_job.count += 1;
                         } else {
-                            pre_registered_jobs.push({count: 1, job: <JobEnum>pre_registered_citizen.job})
+                            pre_registered_jobs.push({count: 1, job: <JobEnum>pre_registered_citizen?.job})
                         }
                     }
                 });
