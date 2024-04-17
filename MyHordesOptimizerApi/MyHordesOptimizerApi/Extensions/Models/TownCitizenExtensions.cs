@@ -15,6 +15,7 @@ namespace MyHordesOptimizerApi.Extensions.Models
             src.LaboLevel = homeDetail.LaboLevel;
             src.RestLevel = homeDetail.RestLevel;
             src.HasLock = homeDetail.HasLock;
+            src.IdLastUpdateInfoHome = homeDetail.IdLastUpdateInfoHome;
         }
 
         public static void ImportHeroicActionDetail(this TownCitizen src, TownCitizen heroicDetailDetail)
@@ -29,6 +30,7 @@ namespace MyHordesOptimizerApi.Extensions.Models
             src.HasHeroicReturn = heroicDetailDetail.HasHeroicReturn;
             src.HasBreakThrough = heroicDetailDetail.HasBreakThrough;
             src.HasBrotherInArms = heroicDetailDetail.HasBrotherInArms;
+            src.IdLastUpdateInfoHeroicAction = heroicDetailDetail.IdLastUpdateInfoHeroicAction;
         }
 
         public static void ImportStatusDetail(this TownCitizen src, TownCitizen statusDetail)
@@ -55,6 +57,7 @@ namespace MyHordesOptimizerApi.Extensions.Models
             src.IsLegWounded = statusDetail.IsLegWounded;
             src.IsEyeWounded = statusDetail.IsEyeWounded;
             src.IsFootWounded = statusDetail.IsFootWounded;
+            src.IdLastUpdateInfoStatus = statusDetail.IdLastUpdateInfoStatus;
         }
     }
 }
