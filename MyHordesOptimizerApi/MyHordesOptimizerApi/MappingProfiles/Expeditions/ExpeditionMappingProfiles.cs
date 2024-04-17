@@ -105,6 +105,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 .ForMember(model => model.IdExpeditionCitizen, opt => opt.Ignore())
                 .ForMember(model => model.IdExpeditionPart, opt => opt.Ignore())
                 .ForMember(model => model.IdUser, opt => opt.MapFrom(dto => dto.IdUser))
+                .ForMember(model => model.IdUserNavigation, opt => opt.MapFrom((src, dest, srcMember, context) =>
+                {
+                    return context.GetDbContext().Users.Where(user => src.IdUser == user.IdUser).SingleOrDefault();
+                }))
                 .ForMember(model => model.IsThirsty, opt => opt.MapFrom(dto => dto.IsThirsty))
                 .ForMember(model => model.NombrePaDepart, opt => opt.MapFrom(dto => dto.NombrePaDepart))
                 .ForMember(model => model.ExpeditionOrders, opt => opt.MapFrom((src, dest, srcMember, context) =>

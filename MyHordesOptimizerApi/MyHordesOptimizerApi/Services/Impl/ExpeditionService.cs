@@ -214,9 +214,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                     // UpdateAsync
                     var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizen.Id.Value)
                         .Include(citizen => citizen.ExpeditionOrders)
+                        .AsSplitQuery()
                         .Include(citizen => citizen.IdExpeditionBagNavigation)
                             .ThenInclude(bag => bag.ExpeditionBagItems)
                                 .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                        .AsSplitQuery()
+                        .Include(citizen => citizen.IdUserNavigation)
+                        .AsSplitQuery()
                         .Single();
 
                     var orderFromDb = expeditionCitizenFromDb.ExpeditionOrders;
