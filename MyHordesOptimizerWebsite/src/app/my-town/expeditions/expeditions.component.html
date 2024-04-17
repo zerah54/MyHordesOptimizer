@@ -181,7 +181,7 @@
                                                                                         [bindLabel]="'name'"
                                                                                         [bindValue]="'id'"
                                                                                         [bindIcon]="'job.value.img'"
-                                                                                        (ngModelChange)="citizen && !!citizen.citizen_id ? citizen.preinscrit_job = undefined : undefined; edition_mode && editable && !!citizen.citizen_id ? citizen.preinscrit = true : citizen.preinscrit = false; saveCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
+                                                                                        (ngModelChange)="edition_mode && editable && !!citizen.citizen_id ? citizen.preinscrit = true : citizen.preinscrit = false; saveCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
                                                                                 </mat-form-field>
                                                                             } @else {
                                                                                 {{ citizen.citizen_id ? (citizen.citizen_id | citizenFromId:all_citizens)?.name : '' }}

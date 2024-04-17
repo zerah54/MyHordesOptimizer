@@ -512,12 +512,13 @@ export class ExpeditionsComponent implements OnInit {
     public get preRegisteredJobs(): { count: number, job: JobEnum }[] {
         const pre_registered_jobs: { count: number, job: JobEnum }[] = [];
         this.expeditions?.forEach((expedition: Expedition) => {
-            expedition.parts.forEach((part: ExpeditionPart) => {
+            if (expedition.parts) {
+                let part: ExpeditionPart = expedition.parts[0];
                 part.citizens.forEach((citizen: CitizenExpedition) => {
                     let pre_registered_job: { count: number, job: JobEnum } | undefined;
                     if (citizen.preinscrit_job) {
                         pre_registered_job = pre_registered_jobs
-                            .find((_pre_registered_job: { count: number, job: JobEnum }) => _pre_registered_job.job.key === citizen.preinscrit_job?.key)
+                            .find((_pre_registered_job: { count: number, job: JobEnum }) => _pre_registered_job?.job?.key === citizen?.preinscrit_job?.key)
 
                         if (pre_registered_job) {
                             pre_registered_job.count += 1;
@@ -527,7 +528,10 @@ export class ExpeditionsComponent implements OnInit {
                     } else if (citizen.preinscrit) {
                         let pre_registered_citizen: Citizen = <Citizen>getCitizenFromId(this.all_citizens, citizen.citizen_id);
                         pre_registered_job = pre_registered_jobs
-                            .find((_pre_registered_job: { count: number, job: JobEnum }) => _pre_registered_job.job?.key === pre_registered_citizen.job?.key)
+                            .find((_pre_registered_job: {
+                                count: number,
+                                job: JobEnum
+                            }) => _pre_registered_job?.job?.key === pre_registered_citizen?.job?.key)
 
                         if (pre_registered_job) {
                             pre_registered_job.count += 1;
@@ -536,7 +540,7 @@ export class ExpeditionsComponent implements OnInit {
                         }
                     }
                 });
-            });
+            }
         });
         return pre_registered_jobs;
     }
