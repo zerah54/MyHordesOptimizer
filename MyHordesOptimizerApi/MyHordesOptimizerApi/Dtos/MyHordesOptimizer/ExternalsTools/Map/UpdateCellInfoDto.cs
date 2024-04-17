@@ -19,7 +19,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.Map
 
 
         [JsonProperty("objects")]
-        public List<UpdateObjectDto> Objects { get; set; }
+        public List<UpdateObjectDto>? Objects { get; set; }
         [JsonProperty("citizenId")]
         public List<int> CitizenId { get; set; }
     }
