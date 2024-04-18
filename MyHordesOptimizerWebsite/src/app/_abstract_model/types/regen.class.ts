@@ -1,10 +1,10 @@
 import { RegenDTO } from '../dto/regen.dto';
-import { ZoneRegen } from '../enum/zone-regen.enum';
+import { Direction } from '../enum/direction.enum';
 import { CommonModel } from './_common.class';
 
 export class Regen extends CommonModel<RegenDTO> {
     public day!: number;
-    public direction_regen?: ZoneRegen;
+    public direction_regen?: Direction;
     public id_town!: number;
     public level_regen!: number;
     public taux_regen!: number;
@@ -27,7 +27,7 @@ export class Regen extends CommonModel<RegenDTO> {
     protected dtoToModel(dto?: RegenDTO | null): void {
         if (dto) {
             this.day = dto.day;
-            this.direction_regen = ZoneRegen.getByKey(dto.directionRegen);
+            this.direction_regen = Direction.getByKey(dto.directionRegen);
             this.id_town = dto.idTown;
             this.level_regen = dto.levelRegen;
             this.taux_regen = dto.tauxRegen;

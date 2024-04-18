@@ -133,17 +133,14 @@
                                     width: 100px;
                                 }
 
-                                .is-thirsty {
-                                    width: 50px;
+                                .is-thirsty, .starts-7-ap {
+                                    width: 40px;
                                     text-align: center;
+                                    gap: 0;
 
                                     > div {
                                         align-items: center;
                                         justify-content: center;
-                                    }
-
-                                    .mat-mdc-form-field {
-                                        width: 60px;
                                     }
                                 }
 

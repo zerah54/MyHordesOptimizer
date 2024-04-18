@@ -7,6 +7,7 @@ export interface ExpeditionPartDTO {
     citizens: CitizenExpeditionDTO[];
     position: number;
     path: string;
+    direction?: string;
 }
 
 export interface ExpeditionPartShortDTO {
@@ -15,4 +16,5 @@ export interface ExpeditionPartShortDTO {
     citizensId: number[];
     position: number;
     path: string;
+    direction?: string;
 }
