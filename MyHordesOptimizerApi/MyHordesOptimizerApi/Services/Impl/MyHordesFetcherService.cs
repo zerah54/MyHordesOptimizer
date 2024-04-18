@@ -450,6 +450,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 var models = DbContext.MapCells
                      .Where(cell => cell.IdTown == townId)
+                     .Where(cell => cell.IdRuin.HasValue)
                      .Include(mapCell => mapCell.IdRuinNavigation)
                       .ThenInclude(ruin => ruin.RuinItemDrops)
                        .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
@@ -463,7 +464,9 @@ namespace MyHordesOptimizerApi.Services.Impl
                        .ThenInclude(itemRuinDrop => itemRuinDrop.IdItemNavigation)
                           .ThenInclude(item => item.IdCategoryNavigation)
                      .Select(cell => cell.IdRuinNavigation)
-                     .ToList();
+                     .ToList()
+                     .DistinctBy(ruin => ruin.IdRuin);
+;
                 var dtos = Mapper.Map<List<MyHordesOptimizerRuinDto>>(models);
                 return dtos;
             }
