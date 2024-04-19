@@ -10,11 +10,12 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
     public bag: CitizenExpeditionBag = new CitizenExpeditionBag();
     public orders!: ExpeditionOrder[];
     public preinscrit!: boolean;
+    public is_preinscrit_soif?: boolean;
     public preinscrit_job?: JobEnum;
     public preinscrit_heroic_skill?: string;
     public pdc!: number;
     public is_thirsty?: boolean;
-    public starts_7_ap: boolean = false;
+    public starts_7_ap?: boolean;
 
     constructor(dto?: CitizenExpeditionDTO | null) {
         super();
@@ -28,6 +29,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             bag: this.bag ? this.bag.modelToDto() : undefined,
             orders: modelToDtoArray(this.orders),
             preinscrit: this.preinscrit,
+            isPreinscritSoif: this.is_preinscrit_soif,
             preinscritJob: this.preinscrit_job?.key,
             preinscritHeroicSkillName: this.preinscrit_heroic_skill,
             pdc: this.pdc,
@@ -45,6 +47,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
                 .filter((order: ExpeditionOrder) => order.id !== undefined && order.id !== null)
                 .map((order: ExpeditionOrder) => <number>order.id) : [],
             preinscrit: this.preinscrit,
+            isPreinscritSoif: this.is_preinscrit_soif,
             preinscritJob: this.preinscrit_job?.key,
             preinscritHeroicSkillName: this.preinscrit_heroic_skill,
             pdc: this.pdc,
@@ -65,6 +68,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
                 return 0;
             });
             this.preinscrit = dto.preinscrit;
+            this.is_preinscrit_soif = dto.isPreinscritSoif;
             this.preinscrit_job = dto.preinscritJob ? <JobEnum>JobEnum.getByKey(dto.preinscritJob) : undefined;
             this.preinscrit_heroic_skill = dto.preinscritHeroicSkillName;
             this.pdc = dto.pdc;

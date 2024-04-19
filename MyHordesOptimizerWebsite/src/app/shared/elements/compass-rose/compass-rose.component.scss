@@ -5,14 +5,14 @@
 
     .compass {
         width: 200px;
-        height: 200px;
+        aspect-ratio: 1;
         position: relative;
         margin: 0 auto;
     }
 
     .compass-main {
-        width: 94%;
-        height: 94%;
+        width: 100%;
+        height: 100%;
     }
 
     .compass-rose {

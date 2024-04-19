@@ -67,6 +67,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             DbContext.ChangeTracker.Clear();
             ImportCleanUpTypes();
             DbContext.ChangeTracker.Clear();
+            await ImportBuildingAsync();
+            DbContext.ChangeTracker.Clear();
             ImportRuins();
             DbContext.ChangeTracker.Clear();
             ImportWishlistCategorie();
@@ -361,6 +363,22 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             {
                 map[key] = new List<T>(src.Where(predicate));
             }
+        }
+
+        #endregion
+
+        #region Building
+
+        public async Task ImportBuildingAsync()
+        {
+            var buildingsDto = await MyHordesApiRepository.GetBuildingAsync();
+            var buildingModels = Mapper.Map<List<Building>>(buildingsDto);
+            buildingModels = buildingModels.OrderBy(x => x.IdBuildingParent).ToList();
+
+            var buildingFromDb = DbContext.Buildings
+                .Include(ruin => ruin.BuildingRessources)
+                .ToList();
+            DbContext.Patch(buildingFromDb, buildingModels);
         }
 
         #endregion

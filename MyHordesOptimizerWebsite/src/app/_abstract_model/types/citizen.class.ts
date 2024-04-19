@@ -56,7 +56,6 @@ export class Citizen extends CommonModel<CitizenDTO> {
             status: this.status?.modelToDto(),
             home: this.home?.modelToDto(),
             actionsHeroic: this.heroic_actions?.modelToDto(),
-            cadaver: this.cadaver?.modelToDto(),
             baths: this.baths ? modelToDtoArray(this.baths) : []
         };
     }
@@ -120,7 +119,6 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.status = new Status(dto.status);
             this.home = new Home(dto.home);
             this.heroic_actions = new HeroicActions(dto.actionsHeroic);
-            this.cadaver = dto.cadaver && dto.cadaver.id > 0 ? new Cadaver(dto.cadaver) : undefined;
             this.baths = dtoToModelArray(Bath, dto.baths);
         }
     }

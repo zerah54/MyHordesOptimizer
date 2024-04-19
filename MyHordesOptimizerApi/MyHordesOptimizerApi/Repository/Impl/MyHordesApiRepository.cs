@@ -1,14 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
 using MyHordesOptimizerApi.Dtos.MyHordes;
+using MyHordesOptimizerApi.Dtos.MyHordes.Building;
 using MyHordesOptimizerApi.Dtos.MyHordes.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Abstract;
 using MyHordesOptimizerApi.Repository.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
@@ -47,6 +48,13 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var url = GenerateUrl(EndpointRuins);
             url = AddParameterToQuery(url, _parameterFields, "id,name,desc,explorable,img");
             return base.Get<Dictionary<string, MyHordesApiRuinDto>>(url);
+        }
+
+        public Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync()
+        {
+            var url = GenerateUrl(EndpointBuilding);
+            url = AddParameterToQuery(url, _parameterFields, "id,img,name,desc,pa,maxLife,breakable,def,hasUpgrade,rarity,temporary,parent,resources");
+            return Task.FromResult(base.Get<Dictionary<string, MyHordesApiBuildingDto>>(url));
         }
     }
 }

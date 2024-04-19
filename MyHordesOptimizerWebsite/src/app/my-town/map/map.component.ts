@@ -26,7 +26,7 @@ import { Item } from '../../_abstract_model/types/item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { Town } from '../../_abstract_model/types/town.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { CompassRoseComponent } from './compass-rose/compass-rose.component';
+import { CompassRoseComponent } from '../../shared/elements/compass-rose/compass-rose.component';
 import { DrawMapComponent } from './draw-map/draw-map.component';
 
 @Component({
@@ -35,7 +35,7 @@ import { DrawMapComponent } from './draw-map/draw-map.component';
     styleUrls: ['./map.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatCardModule, MatButtonModule, MatIconModule, MatSidenavModule, DrawMapComponent, CommonModule, MatChipsModule, CompassRoseComponent, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule, MatSelectModule, MatOptionModule, MatCheckboxModule, MatListModule]
+    imports: [MatCardModule, MatButtonModule, MatIconModule, MatSidenavModule, DrawMapComponent, CommonModule, MatChipsModule, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule, MatSelectModule, MatOptionModule, MatCheckboxModule, MatListModule, CompassRoseComponent]
 })
 export class MapComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

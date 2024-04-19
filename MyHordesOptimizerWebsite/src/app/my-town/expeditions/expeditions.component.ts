@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -32,15 +33,18 @@ import { ExpeditionOrder } from '../../_abstract_model/types/expedition-order.cl
 import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.class';
 import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { Item } from '../../_abstract_model/types/item.class';
+import { Me } from '../../_abstract_model/types/me.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
+import { CompassRoseComponent } from '../../shared/elements/compass-rose/compass-rose.component';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../shared/elements/confirm-dialog/confirm-dialog.component';
+import { IconApComponent } from '../../shared/elements/icon-ap/icon-ap.component';
 import { ListElementAddRemoveComponent } from '../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
 import { CitizenFromIdPipe } from '../../shared/pipes/citizens-from-id.pipe';
 import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
 import { getCitizenFromId } from '../../shared/utilities/citizen.util';
-import { getTown } from '../../shared/utilities/localstorage.util';
+import { getTown, getUser } from '../../shared/utilities/localstorage.util';
 import { CitizensForExpePipe, SomeHeroicActionNeededPipe } from './citizens-for-expe.pipe';
 import { EditOrdersComponent, EditOrdersData } from './edit-orders/edit-orders.component';
 import { EditPositionsComponent, EditPositionsData } from './edit-positions/edit-positions.component';
@@ -54,7 +58,7 @@ import { TotalPdcPipe } from './total-pdc.pipe';
     standalone: true,
     imports: [MatCardModule, MatIconModule, MatSlideToggleModule, MatTabsModule, MatMenuModule, FormsModule, CommonModule, MatButtonModule, MatTooltipModule,
         NgClass, MatFormFieldModule, NgOptimizedImage, SelectComponent, MatCheckboxModule, MatInputModule, TotalPdcPipe, CitizensForExpePipe,
-        ListElementAddRemoveComponent, SomeHeroicActionNeededPipe, CitizenFromIdPipe, DebugLogPipe]
+        ListElementAddRemoveComponent, SomeHeroicActionNeededPipe, CitizenFromIdPipe, DebugLogPipe, MatExpansionModule, IconApComponent, CompassRoseComponent]
 })
 export class ExpeditionsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -78,8 +82,9 @@ export class ExpeditionsComponent implements OnInit {
     protected all_items: Item[] = [];
     /** La liste des items en banque */
     protected bank_items: Item[] = [];
-
     protected expeditions!: Expedition[];
+
+    protected readonly me: Me = getUser()
 
     private api_service: ApiService = inject(ApiService);
     private town_service: TownService = inject(TownService);
@@ -314,13 +319,12 @@ export class ExpeditionsComponent implements OnInit {
     /**
      * On vide complètement le sac
      *
-     * @param {ExpeditionPart} expedition_part
      * @param {CitizenExpedition} citizen
      */
-    public emptyBag(expedition_part: ExpeditionPart, citizen: CitizenExpedition): void {
+    public emptyBag(citizen: CitizenExpedition): void {
         if (citizen && citizen.bag) {
             citizen.bag.items = [];
-            this.saveCitizen(expedition_part, citizen);
+            this.expedition_service.createOrUpdateBag(citizen).subscribe();
         }
     }
 
@@ -424,6 +428,34 @@ export class ExpeditionsComponent implements OnInit {
             });
     }
 
+    public changeThirstyMode(citizen: CitizenExpedition) {
+        if (this.edition_mode) {
+            if (citizen.is_thirsty === null || citizen.is_thirsty === undefined) {
+                citizen.is_thirsty = false;
+            } else if (citizen.is_thirsty) {
+                citizen.is_thirsty = undefined;
+            } else {
+                citizen.is_thirsty = true;
+            }
+        } else {
+            citizen.is_thirsty = !citizen.is_thirsty;
+        }
+    }
+
+    public change7ApMode(citizen: CitizenExpedition) {
+        if (this.edition_mode) {
+            if (citizen.starts_7_ap === null || citizen.starts_7_ap === undefined) {
+                citizen.starts_7_ap = false;
+            } else if (citizen.starts_7_ap) {
+                citizen.starts_7_ap = undefined;
+            } else {
+                citizen.starts_7_ap = true;
+            }
+        } else {
+            citizen.starts_7_ap = !citizen.starts_7_ap;
+        }
+    }
+
     public saveCitizen(expedition_part: ExpeditionPart, citizen: CitizenExpedition, expedition_part_index?: number, expedition?: Expedition, citizen_index?: number): void {
         if (expedition && expedition_part_index !== undefined && expedition_part_index !== null && citizen_index !== undefined && citizen_index !== null) {
             if (expedition_part_index === 0 && expedition?.parts.length > 1) {
@@ -507,6 +539,22 @@ export class ExpeditionsComponent implements OnInit {
         text += `[aparte]${$localize`Ce message a été généré à partir du site MyHordes Optimizer. Vous pouvez retrouver les expéditions en suivant [link=${environment.website_url}my-town/expeditions]ce lien[/link]`}[/aparte]`;
 
         this.clipboard.copy(text, $localize`Les expéditions ont bien été copiées au format forum`);
+    }
+
+    /** true si l'expédition doit être étendue par défaut */
+    public isDefaultExpanded(expedition: Expedition): boolean {
+        if (this.edition_mode) return true;
+        const my_expedition: boolean = expedition.parts
+            .some((part: ExpeditionPart) => part.citizens.some((citizen: CitizenExpedition) => citizen.citizen_id === this.me.id))
+        if (my_expedition) return true;
+        const am_i_somewhere: boolean = this.expeditions
+            .some((some_expedition: Expedition) => some_expedition.parts
+                .some((part: ExpeditionPart) => part.citizens
+                    .some((citizen: CitizenExpedition) => citizen.citizen_id === this.me.id)
+                )
+            );
+        if (!am_i_somewhere && expedition.state === 'ready') return true
+        return false;
     }
 
     public get preRegisteredJobs(): { count: number, job: JobEnum }[] {

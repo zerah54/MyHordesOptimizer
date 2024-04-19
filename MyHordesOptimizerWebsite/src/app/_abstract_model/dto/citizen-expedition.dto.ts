@@ -7,6 +7,7 @@ export interface CitizenExpeditionDTO {
     bag?: CitizenExpeditionBagDTO;
     orders: ExpeditionOrderDTO[];
     preinscrit: boolean;
+    isPreinscritSoif?: boolean;
     preinscritJob?: string;
     preinscritHeroicSkillName?: string;
     pdc: number;
@@ -20,6 +21,7 @@ export interface CitizenExpeditionShortDTO {
     bagId?: number;
     ordersId: number[];
     preinscrit: boolean;
+    isPreinscritSoif?: boolean;
     preinscritJob?: string;
     preinscritHeroicSkillName?: string;
     pdc: number;

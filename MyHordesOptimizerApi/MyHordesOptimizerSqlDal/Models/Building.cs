@@ -84,7 +84,7 @@ public partial class Building
     public bool Temporary { get; set; }
 
     [Column("idBuildingParent", TypeName = "int(11)")]
-    public int IdBuildingParent { get; set; }
+    public int? IdBuildingParent { get; set; }
 
     [Column("watchBonus", TypeName = "int(11)")]
     public int WatchBonus { get; set; }
@@ -94,7 +94,7 @@ public partial class Building
 
     [ForeignKey("IdBuildingParent")]
     [InverseProperty("InverseIdBuildingParentNavigation")]
-    public virtual Building IdBuildingParentNavigation { get; set; } = null!;
+    public virtual Building? IdBuildingParentNavigation { get; set; }
 
     [InverseProperty("IdBuildingParentNavigation")]
     public virtual ICollection<Building> InverseIdBuildingParentNavigation { get; set; } = new List<Building>();

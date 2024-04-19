@@ -109,5 +109,19 @@ namespace MyHordesOptimizerApi.Controllers
             MyHordesImportService.ImportDefaultWishlists();
             return Ok();
         }
+
+
+        [HttpPost]
+        [Route("Buildings")]
+        public async Task<ActionResult> ImportBuildingAsync([FromQuery] string userKey)
+        {
+            if (string.IsNullOrEmpty(userKey))
+            {
+                return BadRequest($"{nameof(userKey)} is required");
+            }
+            UserInfoProvider.UserKey = userKey;
+            await MyHordesImportService.ImportBuildingAsync();
+            return Ok();
+        }
     }
 }

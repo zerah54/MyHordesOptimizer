@@ -1,6 +1,7 @@
 import { ExpeditionPartDTO, ExpeditionPartShortDTO } from '../dto/expedition-part.dto';
 import { Direction } from '../enum/direction.enum';
 import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
+import { Dictionary } from './_types';
 import { CitizenExpedition } from './citizen-expedition.class';
 import { ExpeditionOrder } from './expedition-order.class';
 
@@ -10,7 +11,7 @@ export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
     public citizens: CitizenExpedition[] = [];
     public path!: string;
     public position!: number;
-    public direction?: Direction;
+    public direction: Dictionary<boolean> = {};
 
 
     constructor(dto?: ExpeditionPartDTO | null) {
@@ -25,7 +26,7 @@ export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
             citizens: modelToDtoArray(this.citizens),
             path: this.path,
             position: this.position,
-            direction: this.direction?.key
+            direction: Direction.getSelectedDirections(this.direction)[0] || undefined
         };
     }
 
@@ -40,7 +41,7 @@ export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
                 .map((citizen: CitizenExpedition) => <number>citizen.id) : [],
             path: this.path,
             position: this.position,
-            direction: this.direction?.key
+            direction: Direction.getSelectedDirections(this.direction)[0] || undefined
         };
     }
 
@@ -56,7 +57,9 @@ export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
             this.citizens = dtoToModelArray(CitizenExpedition, dto.citizens);
             this.path = dto.path;
             this.position = dto.position;
-            this.direction = dto.direction ? <Direction>Direction.getByKey(dto.direction) : undefined;
+            if (dto.direction) {
+                this.direction[dto.direction] = true;
+            }
         } else {
             this.citizens = [new CitizenExpedition()];
         }

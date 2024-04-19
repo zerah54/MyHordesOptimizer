@@ -147,9 +147,7 @@ public partial class MhoContext : DbContext
 
             entity.Property(e => e.IdBuilding).ValueGeneratedNever();
 
-            entity.HasOne(d => d.IdBuildingParentNavigation).WithMany(p => p.InverseIdBuildingParentNavigation)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Building_ibfk_1");
+            entity.HasOne(d => d.IdBuildingParentNavigation).WithMany(p => p.InverseIdBuildingParentNavigation).HasConstraintName("Building_ibfk_1");
         });
 
         modelBuilder.Entity<BuildingRessource>(entity =>
