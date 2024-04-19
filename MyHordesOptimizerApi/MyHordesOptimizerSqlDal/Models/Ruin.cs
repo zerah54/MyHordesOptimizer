@@ -89,5 +89,8 @@ public partial class Ruin
     public virtual ICollection<MapCell> MapCells { get; set; } = new List<MapCell>();
 
     [InverseProperty("IdRuinNavigation")]
+    public virtual ICollection<RuinBlueprint> RuinBlueprints { get; set; } = new List<RuinBlueprint>();
+
+    [InverseProperty("IdRuinNavigation")]
     public virtual ICollection<RuinItemDrop> RuinItemDrops { get; set; } = new List<RuinItemDrop>();
 }

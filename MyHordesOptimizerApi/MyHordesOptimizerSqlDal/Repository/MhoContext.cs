@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Models;
 
@@ -22,6 +23,7 @@ namespace MyHordesOptimizerApi
             optionsBuilder.EnableSensitiveDataLogging(true);
             optionsBuilder.EnableDetailedErrors(true);
             optionsBuilder.UseLoggerFactory(LoggerFactory);
+            optionsBuilder.ConfigureWarnings(builder => builder.Ignore(RelationalEventId.MultipleCollectionIncludeWarning));
             base.OnConfiguring(optionsBuilder);
         }
 

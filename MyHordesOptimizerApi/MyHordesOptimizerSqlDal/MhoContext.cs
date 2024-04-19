@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Models;
+using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 using Action = MyHordesOptimizerApi.Models.Action;
 
 namespace MyHordesOptimizerApi;
@@ -20,6 +23,10 @@ public partial class MhoContext : DbContext
     public virtual DbSet<Bag> Bags { get; set; }
 
     public virtual DbSet<BagItem> BagItems { get; set; }
+
+    public virtual DbSet<Building> Buildings { get; set; }
+
+    public virtual DbSet<BuildingRessource> BuildingRessources { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
 
@@ -70,6 +77,8 @@ public partial class MhoContext : DbContext
     public virtual DbSet<RecipeItemResult> RecipeItemResults { get; set; }
 
     public virtual DbSet<Ruin> Ruins { get; set; }
+
+    public virtual DbSet<RuinBlueprint> RuinBlueprints { get; set; }
 
     public virtual DbSet<RuinComplete> RuinCompletes { get; set; }
 
@@ -130,6 +139,32 @@ public partial class MhoContext : DbContext
             entity.HasOne(d => d.IdItemNavigation).WithMany(p => p.BagItems)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("BagItem_ibfk_1");
+        });
+
+        modelBuilder.Entity<Building>(entity =>
+        {
+            entity.HasKey(e => e.IdBuilding).HasName("PRIMARY");
+
+            entity.Property(e => e.IdBuilding).ValueGeneratedNever();
+
+            entity.HasOne(d => d.IdBuildingParentNavigation).WithMany(p => p.InverseIdBuildingParentNavigation)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Building_ibfk_1");
+        });
+
+        modelBuilder.Entity<BuildingRessource>(entity =>
+        {
+            entity.HasKey(e => new { e.IdBuilding, e.IdItem })
+                .HasName("PRIMARY")
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+            entity.HasOne(d => d.IdBuildingNavigation).WithMany(p => p.BuildingRessources)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("BuildingRessources_ibfk_1");
+
+            entity.HasOne(d => d.IdItemNavigation).WithMany(p => p.BuildingRessources)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("BuildingRessources_ibfk_2");
         });
 
         modelBuilder.Entity<Category>(entity =>
@@ -462,6 +497,17 @@ public partial class MhoContext : DbContext
 
             entity.Property(e => e.IdRuin).ValueGeneratedNever();
             entity.Property(e => e.Capacity).HasDefaultValueSql("'100'");
+        });
+
+        modelBuilder.Entity<RuinBlueprint>(entity =>
+        {
+            entity.HasKey(e => new { e.IdRuin, e.IdBuilding })
+                .HasName("PRIMARY")
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+            entity.HasOne(d => d.IdRuinNavigation).WithMany(p => p.RuinBlueprints)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("RuinBlueprint_ibfk_1");
         });
 
         modelBuilder.Entity<RuinComplete>(entity =>

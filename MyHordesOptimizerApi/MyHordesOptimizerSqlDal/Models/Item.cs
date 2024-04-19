@@ -96,6 +96,9 @@ public partial class Item
     public virtual ICollection<BagItem> BagItems { get; set; } = new List<BagItem>();
 
     [InverseProperty("IdItemNavigation")]
+    public virtual ICollection<BuildingRessource> BuildingRessources { get; set; } = new List<BuildingRessource>();
+
+    [InverseProperty("IdItemNavigation")]
     public virtual ICollection<DefaultWishlistItem> DefaultWishlistItems { get; set; } = new List<DefaultWishlistItem>();
 
     [InverseProperty("IdItemNavigation")]
