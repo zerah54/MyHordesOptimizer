@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Models;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 using Action = MyHordesOptimizerApi.Models.Action;
 
 namespace MyHordesOptimizerApi;
@@ -200,8 +197,6 @@ public partial class MhoContext : DbContext
         modelBuilder.Entity<ExpeditionCitizen>(entity =>
         {
             entity.HasKey(e => e.IdExpeditionCitizen).HasName("PRIMARY");
-
-            entity.Property(e => e.NombrePaDepart).HasDefaultValueSql("'6'");
 
             entity.HasOne(d => d.IdExpeditionBagNavigation).WithMany(p => p.ExpeditionCitizens)
                 .OnDelete(DeleteBehavior.Cascade)

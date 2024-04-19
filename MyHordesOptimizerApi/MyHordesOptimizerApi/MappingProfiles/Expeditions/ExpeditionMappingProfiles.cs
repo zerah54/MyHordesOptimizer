@@ -87,6 +87,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
             CreateMap<ExpeditionCitizen, ExpeditionCitizenDto>()
                 .ForMember(dto => dto.Id, opt => opt.MapFrom(model => model.IdExpeditionCitizen))
                 .ForMember(dto => dto.IdUser, opt => opt.MapFrom(model => model.IdUser))
+                .ForMember(dto => dto.IsPreinscritSoif, opt => opt.MapFrom(model => model.IsPreinscritSoif))
                 .ForMember(dto => dto.IsThirsty, opt => opt.MapFrom(model => model.IsThirsty))
                 .ForMember(dto => dto.Bag, opt => opt.MapFrom(model => model.IdExpeditionBagNavigation))
                 .ForMember(dto => dto.Orders, opt => opt.MapFrom(model => model.ExpeditionOrders))
@@ -109,6 +110,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Expeditions
                 {
                     return context.GetDbContext().Users.Where(user => src.IdUser == user.IdUser).SingleOrDefault();
                 }))
+                .ForMember(model => model.IsPreinscritSoif, opt => opt.MapFrom(dto => dto.IsPreinscritSoif))
                 .ForMember(model => model.IsThirsty, opt => opt.MapFrom(dto => dto.IsThirsty))
                 .ForMember(model => model.NombrePaDepart, opt => opt.MapFrom(dto => dto.NombrePaDepart))
                 .ForMember(model => model.ExpeditionOrders, opt => opt.MapFrom((src, dest, srcMember, context) =>
