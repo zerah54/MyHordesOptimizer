@@ -113,9 +113,16 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 {
                     try
                     {
-                        var updateInChaos = UpdateRequestMapToolsToUpdateDetailsDto.IsCell(fata);
-                        var cell = updateRequestDto.Map?.Cell;
-                        await FataMorganaRepository.UpdateAsync(updateInChaos, chaosX: cell?.X, chaosY: cell?.Y);
+                        var isCell = UpdateRequestMapToolsToUpdateDetailsDto.IsCell(fata);
+                        if(isCell)
+                        {
+                            var cell = updateRequestDto.Map?.Cell;
+                            await FataMorganaRepository.UpdateAsync(chaosX: cell.X, chaosY: cell.Y, deadZombie: cell.Zombies);
+                        }
+                        else
+                        {
+                            await FataMorganaRepository.UpdateAsync();
+                        }
                     }
                     catch (WebApiException e)
                     {

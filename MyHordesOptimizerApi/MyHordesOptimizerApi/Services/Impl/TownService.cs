@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
@@ -32,7 +34,22 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var citizen = DbContext.GetTownCitizen(townId)
                 .Where(townCitizen => townCitizen.IdUser == userId)
-                .Single();
+                .SingleOrDefault();
+            if (citizen == null)
+            {
+                var cadaver = DbContext.TownCadavers.Where(cadaver => cadaver.IdTown == townId)
+                    .Where(cadaver => cadaver.IdUser == userId)
+                    .Include(cadaver => cadaver.IdUserNavigation)
+                    .FirstOrDefault();
+                if(cadaver is null)
+                {
+                    throw new MhoTechnicalException($"Aucun citizen ou cadavre trouvé pour la ville {townId} et l'utilisateur {userId}");
+                }
+                else
+                {
+                    throw new MhoFunctionalException($"Le citoyen {cadaver.IdUserNavigation.Name} est décédé !", FunctionErrorCode.DeadCitizen);
+                }
+            }
             var citizenDto = Mapper.Map<CitizenDto>(citizen);
             return citizenDto;
         }
@@ -63,7 +80,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 DbContext.SaveChanges();
                 transaction.Commit();
             }
-           return GetTownCitizen(townId, userId);
+            return GetTownCitizen(townId, userId);
         }
 
         public CitizenDto DeleteCitizenBath(int townId, int userId, int day)

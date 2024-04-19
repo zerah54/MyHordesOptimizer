@@ -4,6 +4,7 @@ namespace MyHordesOptimizerApi.Repository.Interfaces.ExternalTools
 {
     public interface IFataMorganaRepository
     {
-        Task UpdateAsync(bool updateInChaos = false, int? chaosX = null, int? chaosY = null);
+        Task UpdateAsync(int chaosX, int chaosY, int deadZombie);
+        Task UpdateAsync();
     }
 }
