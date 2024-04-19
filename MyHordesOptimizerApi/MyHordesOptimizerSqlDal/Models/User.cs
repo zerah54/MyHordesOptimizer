@@ -14,6 +14,8 @@ public partial class User
 
     [Column("name")]
     [StringLength(255)]
+    [MySqlCharSet("utf8")]
+    [MySqlCollation("utf8_general_ci")]
     public string Name { get; set; } = null!;
 
     [StringLength(255)]
@@ -28,7 +30,7 @@ public partial class User
     [InverseProperty("IdUserNavigation")]
     public virtual ICollection<MapCellDig> MapCellDigs { get; set; } = new List<MapCellDig>();
 
-    [InverseProperty("IdCitizenNavigation")]
+    [InverseProperty("IdUserNavigation")]
     public virtual ICollection<TownCadaver> TownCadavers { get; set; } = new List<TownCadaver>();
 
     [InverseProperty("IdUserNavigation")]

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Models;
 
@@ -18,6 +19,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Cadavers
                 .ForMember(dest => dest.IdCleanUp, opt => opt.MapFrom(src => src.IdCleanUp))
                 .ForMember(dest => dest.CitizenCleanUp, opt => opt.Ignore())
                 .ForMember(dest => dest.Type, opt => opt.Ignore());
+
         }
     }
 }

@@ -70,8 +70,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
 
             //TownCadaver
             CreateMap<CadaverDto, TownCadaver>()
-                .ForMember(dest => dest.IdCadaver, opt => opt.Ignore())
-                .ForMember(dest => dest.IdCitizen, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.IdUser, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.CadaverName, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Avatar, opt => opt.MapFrom(src => src.Avatar))
                 .ForMember(dest => dest.CauseOfDeath, opt => opt.Ignore())

@@ -6,19 +6,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyHordesOptimizerApi.Models;
 
+[PrimaryKey("IdTown", "IdUser")]
 [Table("TownCadaver")]
+[Index("IdUser", Name = "TownCadaver_ibfk_1")]
 [Index("CauseOfDeath", Name = "causeOfDeath")]
 [Index("CleanUp", Name = "cleanUp")]
-[Index("IdCitizen", Name = "idCitizen")]
 [Index("IdLastUpdateInfo", Name = "idLastUpdateInfo")]
 public partial class TownCadaver
 {
     [Key]
-    [Column("idCadaver", TypeName = "int(11)")]
-    public int IdCadaver { get; set; }
+    [Column("idTown", TypeName = "int(11)")]
+    public int IdTown { get; set; }
 
-    [Column("idCitizen", TypeName = "int(11)")]
-    public int? IdCitizen { get; set; }
+    [Key]
+    [Column("idUser", TypeName = "int(11)")]
+    public int IdUser { get; set; }
 
     [Column("idLastUpdateInfo", TypeName = "int(11)")]
     public int? IdLastUpdateInfo { get; set; }
@@ -61,11 +63,15 @@ public partial class TownCadaver
     [InverseProperty("TownCadavers")]
     public virtual TownCadaverCleanUp? CleanUpNavigation { get; set; }
 
-    [ForeignKey("IdCitizen")]
-    [InverseProperty("TownCadavers")]
-    public virtual User? IdCitizenNavigation { get; set; }
-
     [ForeignKey("IdLastUpdateInfo")]
     [InverseProperty("TownCadavers")]
     public virtual LastUpdateInfo? IdLastUpdateInfoNavigation { get; set; }
+
+    [ForeignKey("IdTown")]
+    [InverseProperty("TownCadavers")]
+    public virtual Town IdTownNavigation { get; set; } = null!;
+
+    [ForeignKey("IdUser")]
+    [InverseProperty("TownCadavers")]
+    public virtual User IdUserNavigation { get; set; } = null!;
 }

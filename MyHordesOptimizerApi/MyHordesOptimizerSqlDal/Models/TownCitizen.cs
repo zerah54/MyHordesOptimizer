@@ -53,9 +53,6 @@ public partial class TownCitizen
     [Column("isShunned")]
     public bool? IsShunned { get; set; }
 
-    [Column("idCadaver", TypeName = "int(11)")]
-    public int? IdCadaver { get; set; }
-
     [Key]
     [Column("idLastUpdateInfo", TypeName = "int(11)")]
     public int IdLastUpdateInfo { get; set; }

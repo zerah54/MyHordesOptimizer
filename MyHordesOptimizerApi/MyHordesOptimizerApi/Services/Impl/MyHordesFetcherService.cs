@@ -128,8 +128,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                     town.TownCitizens = null;
                     var bankItems = town.TownBankItems;
                     town.TownBankItems = null;
+                    var cadavers = town.TownCadavers;
+                    town.TownCadavers = null;
                     var existingTown = DbContext.Towns
                         .Include(town => town.TownCitizens)
+                        .Include(town => town.TownCadavers)
                         .FirstOrDefault(t => t.IdTown == town.IdTown);
                     Logger.LogDebug($"GetSimpleMeAsync Récupération de la town {sw.Elapsed} ms");
                     if (existingTown == null)
@@ -141,6 +144,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                         DbContext.AddRange(citizens);
                         // On crée la banque
                         DbContext.AddRange(bankItems);
+                        // On crée les cadavers
+                        DbContext.AddRange(cadavers);
                         // On crée les cells
                         var cells = CreateCellsForTown(xVille: myHordeMeResponse.Map.City.X,
                             yVille: myHordeMeResponse.Map.City.Y,
@@ -176,6 +181,9 @@ namespace MyHordesOptimizerApi.Services.Impl
                             }
                         }
                         DbContext.AddRange(citizens);
+                        // On maj les cadavers
+                        DbContext.RemoveRange(existingTown.TownCadavers);
+                        DbContext.AddRange(cadavers);
                         // On maj les cellsdigs
                         if (DbContext.MapCellDigUpdates.FirstOrDefault(x => x.IdTown == town.IdTown) == null) // Si on a déjà fait la maj de la regen, il faut pas la refaire
                         {
@@ -302,11 +310,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                         DbContext.SaveChanges();
                         Logger.LogDebug($"GetSimpleMeAsync Update de toute la Town après {sw.Elapsed} ms");
                     }
-
-                    // TODO : Il manque les cadavers ?
                     transaction.Commit();
                     Logger.LogDebug($"GetSimpleMeAsync Transaction commit {sw.Elapsed} ms");
-                    //MyHordesOptimizerRepository.PatchCadaver(town.Id, town.Cadavers);
                 }
                 var simpleMe = Mapper.Map<SimpleMeDto>(myHordeMeResponse);
 
@@ -466,7 +471,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                      .Select(cell => cell.IdRuinNavigation)
                      .ToList()
                      .DistinctBy(ruin => ruin.IdRuin);
-;
+                ;
                 var dtos = Mapper.Map<List<MyHordesOptimizerRuinDto>>(models);
                 return dtos;
             }

@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Me;
+using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.MappingProfiles.Resolvers.MyHordes;
 using MyHordesOptimizerApi.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MyHordesOptimizerApi.MappingProfiles.Towns
 {
@@ -42,6 +44,19 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                     foreach (var myHordeCitizen in src.Map.Citizens)
                     {
                         var model = context.Mapper.Map<TownCitizen>(myHordeCitizen);
+                        model.IdLastUpdateInfo = src.Map.LastUpdateInfo.IdLastUpdateInfo;
+                        model.IdLastUpdateInfoNavigation = src.Map.LastUpdateInfo;
+                        model.IdTown = src.MapId;
+                        results.Add(model);
+                    }
+                    return results;
+                }))
+                .ForMember(dest => dest.TownCadavers, opt => opt.MapFrom((src, dest, srcMember, context) =>
+                {
+                    var results = new List<TownCadaver>();
+                    foreach (var myHordeCadaver in src.Map.Cadavers)
+                    {
+                        var model = context.Mapper.Map<TownCadaver>(myHordeCadaver);
                         model.IdLastUpdateInfo = src.Map.LastUpdateInfo.IdLastUpdateInfo;
                         model.IdLastUpdateInfoNavigation = src.Map.LastUpdateInfo;
                         model.IdTown = src.MapId;
@@ -89,7 +104,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.HouseLevel, opt => opt.Ignore())
                 .ForMember(dest => dest.IdBag, opt => opt.Ignore())
                 .ForMember(dest => dest.IdBagNavigation, opt => opt.Ignore())
-                .ForMember(dest => dest.IdCadaver, opt => opt.Ignore())
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
                 .ForMember(dest => dest.IdLastUpdateInfoGhoulStatus, opt => opt.Ignore())
                 .ForMember(dest => dest.IdLastUpdateInfoGhoulStatusNavigation, opt => opt.Ignore())
@@ -149,6 +163,37 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.UserKey, opt => opt.Ignore())
                 .ForMember(dest => dest.WishlistCategories, opt => opt.Ignore());
 
+            CreateMap<MyHordesCadaver, TownCadaver>()
+                .ForMember(model => model.Avatar, opt => opt.MapFrom(dto => dto.Avatar))
+                .ForMember(model => model.CadaverName, opt => opt.MapFrom(dto => dto.Name))
+                .ForMember(model => model.CauseOfDeath, opt => opt.MapFrom(dto => dto.Dtype))
+                .ForMember(model => model.CauseOfDeathNavigation, opt => opt.Ignore())
+                .ForMember(model => model.CleanUp, opt => opt.Ignore())
+                .ForMember(model => model.CleanUpNavigation, opt => opt.Ignore())
+                .ForMember(model => model.DeathMessage, opt => opt.MapFrom(dto => dto.Msg))
+                .ForMember(model => model.IdLastUpdateInfo, opt => opt.Ignore())
+                .ForMember(model => model.IdLastUpdateInfoNavigation, opt => opt.Ignore())
+                .ForMember(model => model.IdTown, opt => opt.Ignore())
+                .ForMember(model => model.IdTownNavigation, opt => opt.Ignore())
+                .ForMember(model => model.IdUser, opt => opt.MapFrom(dto => dto.Id))
+                .ForMember(model => model.IdUserNavigation, opt => opt.MapFrom((src, dest, srcMember, context) =>
+                {
+                    var dbContext = context.GetDbContext();
+                    var dbUser = dbContext.Users.FirstOrDefault(x => x.IdUser == src.Id);
+                    if (dbUser == null)
+                    {
+                        var user = new User()
+                        {
+                            IdUser = src.Id,
+                            Name = src.Name,
+                        };
+                        dbContext.Add(user);
+                    }
+                    return dbUser;
+                }))
+                .ForMember(model => model.Score, opt => opt.MapFrom(dto => dto.Score))
+                .ForMember(model => model.SurvivalDay, opt => opt.MapFrom(dto => dto.Survival))
+                .ForMember(model => model.TownMessage, opt => opt.MapFrom(dto => dto.Comment));
         }
     }
 }

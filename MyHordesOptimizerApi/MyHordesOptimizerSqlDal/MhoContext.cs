@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Models;
+using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 using Action = MyHordesOptimizerApi.Models.Action;
 
 namespace MyHordesOptimizerApi;
@@ -518,15 +521,23 @@ public partial class MhoContext : DbContext
 
         modelBuilder.Entity<TownCadaver>(entity =>
         {
-            entity.HasKey(e => e.IdCadaver).HasName("PRIMARY");
+            entity.HasKey(e => new { e.IdTown, e.IdUser })
+                .HasName("PRIMARY")
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
 
             entity.HasOne(d => d.CauseOfDeathNavigation).WithMany(p => p.TownCadavers).HasConstraintName("TownCadaver_ibfk_3");
 
             entity.HasOne(d => d.CleanUpNavigation).WithMany(p => p.TownCadavers).HasConstraintName("TownCadaver_ibfk_4");
 
-            entity.HasOne(d => d.IdCitizenNavigation).WithMany(p => p.TownCadavers).HasConstraintName("TownCadaver_ibfk_1");
-
             entity.HasOne(d => d.IdLastUpdateInfoNavigation).WithMany(p => p.TownCadavers).HasConstraintName("TownCadaver_ibfk_2");
+
+            entity.HasOne(d => d.IdTownNavigation).WithMany(p => p.TownCadavers)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("town_cadaver_fk_town");
+
+            entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.TownCadavers)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("TownCadaver_ibfk_1");
         });
 
         modelBuilder.Entity<TownCadaverCleanUp>(entity =>
@@ -553,7 +564,6 @@ public partial class MhoContext : DbContext
             entity.Property(e => e.GhoulVoracity).HasDefaultValueSql("-1");
             entity.Property(e => e.HasLock).HasDefaultValueSql("b'0'");
             entity.Property(e => e.HouseLevel).HasDefaultValueSql("-1");
-            entity.Property(e => e.IdCadaver).HasDefaultValueSql("'0'");
             entity.Property(e => e.IsShunned).HasDefaultValueSql("b'0'");
             entity.Property(e => e.KitchenLevel).HasDefaultValueSql("-1");
             entity.Property(e => e.LaboLevel).HasDefaultValueSql("-1");
