@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.14.0
+// @version      1.0.15.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,10 +32,9 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Amélioration] Une nouvelle option est disponible pour mettre à jour Fata Morgana en ville dévastée\n\n`
-    + `[Correction] Traductions manquantes\n`
-    + `[Correction] Notification de fin de fouille\n`
-    + `[Correction] Divers bugs depuis la version 1.0.8.0\n`;
+    + `[Amélioration] Les mises à jour disponibles sont désormais signalées par un indicateur visuel et un nouveau lien fait son apparition dans le menu en cas de mise à jour disponible\n`
+    + `[Amélioration] Les changelogs ne sont plus affichés au chargement de l'application mais signalés par un indicateur visuel sur le menu\n\n`
+    + `[Nouveauté] Une nouvelle option fait son apparition pour Fata Morgana : l'envoi du nombre de zombies tués\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -140,6 +139,8 @@ let current_cell;
 
 let is_refresh_wishlist;
 let count_pending_notifications;
+/** true quand le changelog est nouveau et qu'il faut afficher une pastille sur le menu */
+let has_new_changelog = false;
 /** True quand une erreur vient d'être affichée. Repasse à false au bout d'une seconde, pour éviter le spam d'erreurs */
 let is_error = false;
 
@@ -1239,6 +1240,15 @@ let params_categories = [
                 },
                 children: [
                     {
+                        id: `update_fata_killed_zombies`,
+                        label: {
+                            en: `Record the number of zombies killed`,
+                            fr: `Enregistrer le nombre de zombies tués`,
+                            de: `Notieren Sie die Anzahl der getöteten Zombies`,
+                            es: `Registrar el número de zombis asesinados`
+                        },
+                    },
+                    {
                         id: `update_fata_devastated`,
                         label: {
                             en: `Zone update even after the town has been devastated`,
@@ -1545,7 +1555,16 @@ let params_categories = [
                     de: `Zeigt Links zu externen Profilen an`,
                     es: `Muestra enlaces a perfiles externos`
                 },
-            }
+            },
+            // {
+            //     id: `store_notifications`,
+            //     label: {
+            //         en: `Stores notifications until cleared`,
+            //         fr: `Stocke les notifications jusqu'à effacement`,
+            //         de: `Speichert Benachrichtigungen, bis sie gelöscht werden`,
+            //         es: `Almacena notificaciones hasta que se borran`
+            //     },
+            // }
             // {
             //     id: `block_users`,
             //     label: {
@@ -1632,9 +1651,30 @@ let informations = [
         },
         src: undefined,
         action: () => {
-            alert(changelog);
+            getStorageItem(mho_version_key).then((version) => {
+                if (isNewVersion(version)) {
+                    version[getScriptInfo().version] = confirm(changelog);
+                    toggleNewChangelog(!!version[getScriptInfo().version]);
+                    setStorageItem(mho_version_key, version);
+                } else {
+                    alert(changelog);
+                }
+            });
         },
         img: `emotes/rptext.gif`
+    },
+    {
+        id: `update`,
+        label: {
+            en: `Update available`,
+            fr: `Mise à jour disponible`,
+            de: `Update verfügbar`,
+            es: `Actualización disponible`
+        },
+        src: isScript() ? getScriptInfo().updateURL : undefined,
+        action: undefined,
+        img: `icons/small_news.gif`,
+        display: () => isScript() && !isScriptVersionLastVersion()
     },
     {
         id: `discord-url-id`,
@@ -1769,7 +1809,7 @@ function getWebsiteLanguage() {
 }
 
 /** @return {boolean}     true if button exists */
-function buttonOptimizerExists() {
+function buttonOptimizerElement() {
     return document.getElementById(btn_id);
 }
 
@@ -1952,27 +1992,101 @@ function getErrorFromApi(error) {
     }
 }
 
-function isScriptVersionLastVersion(display_error) {
+function isScriptVersionLastVersion() {
+    if (!isScript()) return true;
+
+    const current_script_version = getScriptInfo().version;
+    const base_script_version = parameters?.find((param) => param.name === 'ScriptVersion')?.value;
+
+    const comparison_regex = /(\d+)/g;
+    const splitted_current = current_script_version.match(comparison_regex);
+    const splitted_base = base_script_version.match(comparison_regex);
+
+    return splitted_base.every((part, index) => {
+        const is_ok = !splitted_current[index] || splitted_current[index] >= part;
+        if (!is_ok) {
+            toggleNewVersion(true);
+        }
+        return is_ok;
+    });
+}
+
+function isNewVersion(version) {
+    if (!version || typeof version !== "object") {
+        version = {};
+        setStorageItem(mho_version_key, version);
+    }
+    return !version || !version[getScriptInfo().version];
+}
+
+function toggleNewChangelog(new_changelog) {
+    has_new_changelog = new_changelog;
+    let optimizer_btn = buttonOptimizerElement();
+    if (optimizer_btn) {
+        if (new_changelog && !optimizer_btn.classList.contains('mho-new-changelog')) {
+            optimizer_btn.classList.add('mho-new-changelog');
+        } else if (optimizer_btn.classList.contains('mho-new-changelog')) {
+            optimizer_btn.classList.remove('mho-new-changelog');
+        }
+
+        let changelog_item = optimizer_btn.querySelector('#version');
+        if (changelog_item) {
+            if (new_changelog && !changelog_item.classList.contains('mho-new-changelog')) {
+                changelog_item.classList.add('mho-new-changelog');
+            } else if (!new_changelog && changelog_item.classList.contains('mho-new-changelog')) {
+                changelog_item.classList.remove('mho-new-changelog');
+            }
+        }
+    }
+}
+
+function toggleNewVersion(new_version) {
+    let optimizer_btn = buttonOptimizerElement();
+    if (optimizer_btn) {
+        if (new_version && !optimizer_btn.classList.contains('mho-new-version')) {
+            optimizer_btn.classList.add('mho-new-version');
+        } else if (!new_version && optimizer_btn.classList.contains('mho-new-version')) {
+            optimizer_btn.classList.remove('mho-new-version');
+        }
+
+        let update_item = optimizer_btn.querySelector('#update');
+        if (update_item) {
+            if (new_version && !update_item.classList.contains('mho-new-version')) {
+                update_item.classList.add('mho-new-version');
+            } else if (!new_version && update_item.classList.contains('mho-new-version')) {
+                update_item.classList.remove('mho-new-version');
+            }
+
+            if (new_version && update_item.parentElement.classList.contains('mho-hidden')) {
+                update_item.parentElement.classList.remove('mho-hidden');
+            } else if (!new_version && !update_item.parentElement.classList.contains('mho-hidden')) {
+                update_item.parentElement.classList.add('mho-hidden');
+            }
+        }
+    }
+}
+
+function getOrigin() {
     try {
         GM_info.script;
-
-        const current_script_version = getScriptInfo().version;
-        const base_script_version = parameters?.find((param) => param.name === 'ScriptVersion')?.value;
-
-        const comparison_regex = /(\d+)/g;
-        const splitted_current = current_script_version.match(comparison_regex);
-        const splitted_base = base_script_version.match(comparison_regex);
-
-        return splitted_base.every((part, index) => {
-            const is_ok = !splitted_current[index] || splitted_current[index] >= part;
-            if (display_error && !is_ok) {
-                addError(`<div>${getI18N(api_texts.error_version_startup).replace('$your_version$', current_script_version).replace('$recent_version$', base_script_version)}</div><small>${getI18N(api_texts.update_script)}</small>`);
-            }
-            return is_ok;
-        });
+        return 'script';
     } catch (error) {
-        return true;
+        try {
+            browser.runtime;
+            return 'firerox';
+        } catch (error) {
+            try {
+                chrome.runtime;
+                return 'chrome';
+            } catch (error) {
+                console.error(error);
+            }
+        }
     }
+}
+
+function isScript() {
+    return getOrigin() === 'script';
 }
 
 function getScriptInfo() {
@@ -2156,7 +2270,7 @@ function getItemFromImg(img_src) {
 
 function initOptionsWithLoginNeeded() {
     /** Gère le bouton de mise à jour des outils externes) */
-    if (!buttonOptimizerExists()) {
+    if (!buttonOptimizerElement()) {
         setTimeout(() => {
             createOptimizerBtn();
         }, 100)
@@ -2292,7 +2406,7 @@ function createSelectWithSearch() {
 
 /** Create Optimize button */
 function createOptimizerBtn() {
-    let optimizer_btn = document.getElementById(btn_id);
+    let optimizer_btn = buttonOptimizerElement();
     if (!optimizer_btn) {
         let content_zone = document.getElementById(mh_content_id);
         let header_zone = document.getElementById(mh_header_id);
@@ -2381,7 +2495,7 @@ function createOptimizerBtn() {
 
 /** Crée le contenu du bouton de l'optimizer (bouton de wiki, bouton de configuration, etc) */
 function createOptimizerButtonContent() {
-    let optimizer_btn = document.getElementById(btn_id);
+    let optimizer_btn = buttonOptimizerElement();
     let content = document.getElementById(content_btn_id);
     content.innerHTML = '';
     optimizer_btn.appendChild(content);
@@ -2460,9 +2574,14 @@ function createOptimizerButtonContent() {
             information_container.appendChild(information_link);
 
             informations_list.appendChild(information_container);
+            if (information.display && !information.display()) {
+                information_container.classList.add('mho-hidden');
+            }
         });
 
         content.appendChild(informations_container);
+        toggleNewChangelog(has_new_changelog);
+        isScriptVersionLastVersion();
 
     } else {
         let no_external_app_id = document.createElement('div');
@@ -2576,7 +2695,7 @@ function createParams(content) {
                     children_container.style.outline = '1px solid #000';
 
                     param_container.addEventListener('mouseenter', () => {
-                        children_container.style.left = document.querySelector(`#${btn_id}`).getBoundingClientRect().width - 7 + 'px';
+                        children_container.style.left = buttonOptimizerElement().getBoundingClientRect().width - 7 + 'px';
                         children_container.style.top = param_container.getBoundingClientRect().top - 10 + 'px';
                     });
                 } else {
@@ -5680,169 +5799,9 @@ function displayMap() {
                     getFMMap().then((map) => transformMapping(map));
                 }
             }
-            // if (mho_map.map === 'ruin') {
-            //     createOptimizePathButton();
-            // }
         }
     });
 }
-
-
-function createOptimizePathButton() {
-    let opti_button_parent = document.getElementById('optimizer-map-window-content');
-    let opti_button = document.createElement('button');
-    opti_button.setAttribute('style', 'max-width: initial');
-    opti_button.innerHTML = `<span style="margin: auto; vertical-align: middle;">[i18n] Chemin optimisé</span>`;
-    opti_button.id = mho_opti_map_id;
-    opti_button.addEventListener('click', () => {
-        opti_button.disabled = true;
-        getOptimalPath(mapToOptimize()).then((optimal_path) => displayOptimalPath(optimal_path));
-    });
-    opti_button_parent.appendChild(opti_button);
-}
-
-function mapToOptimize() {
-    let map = document.querySelector('#optimizer-map-window-content');
-    let rows = Array.from(map.querySelectorAll('tr') || []).filter((row) => Array.from(row.querySelectorAll('td') || []).some((col) => {
-        return !col.classList.contains('around-map') // Ligne d'index
-    }));
-    let final_rows = [];
-    let doors_positions = [];
-    let entrance = {};
-
-    rows.forEach((row, row_index) => {
-        let cols = Array.from(row.querySelectorAll('td') || []);
-        let final_cols = cols
-            .filter((col) => !col.classList.contains('around-map')) // Colonne d'index
-            .map((col, col_index) => {
-                if (col.classList.contains('empty')) {
-                    // Pas de passage
-                    return 0;
-                } else {
-                    // Porte
-                    if (col.classList.contains('door')) {
-                        doors_positions.push({colIndex: col_index, rowIndex: row_index});
-                    }
-                    // Entrée
-                    if (col.classList.contains('exit')) {
-                        entrance = {colIndex: col_index, rowIndex: row_index};
-                    }
-                    return 1;
-                }
-            });
-        final_rows.push(final_cols);
-    });
-    return {
-        map: final_rows,
-        doors: doors_positions,
-        entrance: entrance
-    }
-}
-
-function displayOptimalPath(html, response) {
-    console.log('display opti');
-    let rows = Array.from(html.querySelectorAll('tr') || [])
-        .filter((row) => Array.from(row.querySelectorAll('td') || []).some((col) => {
-            return !col.classList.contains('bordCarteRuine') // Ligne d'index
-        }))
-        .map((row) => {
-            return Array.from(row.querySelectorAll('td') || []).filter((col) => !col.classList.contains('bordCarteRuine')) // Colonne d'index
-        });
-
-    rows.forEach((row, row_index) => {
-        let response_pos_in_row = response.filter((response_pos) => response_pos.row === row_index);
-        if (response_pos_in_row && response_pos_in_row.length > 0) {
-            console.log('response_pos_in_row', response_pos_in_row);
-            row.forEach((col, col_index) => {
-                let response_at_pos = response_pos_in_row.filter((response_pos) => response_pos.column === col_index);
-                if (response_at_pos && response_at_pos.length > 0) {
-                    let mho_path_div = document.createElement('div');
-                    mho_path_div.classList.add('mho_opti_path');
-                    mho_path_div.setAttribute('style', 'position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; justify-content: space-around;');
-                    col.appendChild(mho_path_div);
-                }
-            });
-        }
-    });
-
-    response.forEach((path, index) => {
-        let path_cell = rows[path.row][path.column];
-
-        let path_div = document.createElement('span');
-        path_div.setAttribute('posPath', index);
-
-        let next_path = response[index + 1];
-        if (next_path) {
-
-            let next_path_cell = rows[next_path.row][next_path.column];
-
-            let next_path_div = document.createElement('span');
-            next_path_div.setAttribute('posPath', index);
-
-            path_div.setAttribute('position', 'start');
-            next_path_div.setAttribute('position', 'end');
-
-            if (next_path.column === path.column) { // Déplacement vertical
-                path_div.setAttribute('orientation', 'vertical');
-                next_path_div.setAttribute('orientation', 'vertical');
-                if (next_path.row > path.row) { // on se déplace vers le bas
-                    path_div.setAttribute('alignment', 'bottom');
-                    next_path_div.setAttribute('alignment', 'top');
-                } else { // on se déplace vers le haut
-                    path_div.setAttribute('alignment', 'top');
-                    next_path_div.setAttribute('alignment', 'bottom');
-                }
-
-                path_div.style.height = 'calc(50% - 4px)';
-                path_div.style.width = '4px';
-                path_div.style.display = 'inline-block';
-                path_div.style.backgroundColor = 'red';
-                next_path_div.style.height = 'calc(50% - 4px)';
-                next_path_div.style.width = '4px';
-                next_path_div.style.display = 'inline-block';
-                next_path_div.style.backgroundColor = 'red';
-            } else { // Déplacement horizontal
-                path_div.setAttribute('orientation', 'horizontal');
-                next_path_div.setAttribute('orientation', 'horizontal');
-
-                if (next_path.column > path.column) { // on se déplace vers la gauche
-                    path_div.setAttribute('alignment', 'right');
-                    next_path_div.setAttribute('alignment', 'left');
-                } else { // on se déplace vers la droite
-                    path_div.setAttribute('alignment', 'left');
-                    next_path_div.setAttribute('alignment', 'right');
-                }
-
-                path_div.style.width = 'calc(50% - 4px)';
-                path_div.style.height = '4px';
-                path_div.style.display = 'inline-block';
-                path_div.style.backgroundColor = 'red';
-                next_path_div.style.width = 'calc(50% - 4px)';
-                next_path_div.style.height = '4px';
-                next_path_div.style.display = 'inline-block';
-                next_path_div.style.backgroundColor = 'red';
-            }
-
-            path_div.style.marginLeft = path_div.getAttribute('alignment') === 'right' ? '50%' : 'initial';
-            path_div.style.marginRight = path_div.getAttribute('alignment') === 'left' ? '50%' : 'initial';
-            path_div.style.marginTop = path_div.getAttribute('alignment') === 'bottom' ? '50%' : 'initial';
-            path_div.style.marginBottom = path_div.getAttribute('alignment') === 'top' ? '50%' : 'initial';
-
-            next_path_div.style.marginLeft = next_path_div.getAttribute('alignment') === 'right' ? '50%' : 'initial';
-            next_path_div.style.marginRight = next_path_div.getAttribute('alignment') === 'left' ? '50%' : 'initial';
-            next_path_div.style.marginTop = next_path_div.getAttribute('alignment') === 'bottom' ? '50%' : 'initial';
-            next_path_div.style.marginBottom = next_path_div.getAttribute('alignment') === 'top' ? '50%' : 'initial';
-
-            path_cell.querySelector('.mho_opti_path')?.appendChild(path_div);
-            next_path_cell.querySelector('.mho_opti_path')?.appendChild(next_path_div);
-        }
-        console.log('cell', path_cell);
-    });
-
-    console.log('rows', rows);
-    console.log('response', response);
-}
-
 
 /** Si l'option associée est activée, demande confirmation avant de quitter si les options d'escorte ne sont pas bonnes */
 function preventFromLeaving() {
@@ -7854,7 +7813,7 @@ function createStyles() {
         + 'color: #f0d79e;'
         + '}';
 
-    const li_style = '#categories > ul > li, ul.parameters > li, #tab-content ul > li {'
+    const li_style = '#categories > ul > li, ul.parameters > li, #tab-content ul > li, #informations ul > li {'
         + 'list-style: none;'
         + '}';
 
@@ -8121,6 +8080,44 @@ function createStyles() {
         + `height: unset !important;`
         + `}`;
 
+    let main_new_changelog = `div.mho-new-changelog::before {`
+        + `position: absolute;`
+        + `top: -3px;`
+        + `left: -3px;`
+        + `}`;
+
+    let item_new_changelog = `a.mho-new-changelog::before {`
+        + `position: relative;`
+        + `top: 0;`
+        + `left: 0;`
+        + `}`;
+
+    let new_changelog = `.mho-new-changelog::before {`
+        + `content: '';`
+        + `width: 6px;`
+        + `aspect-ratio: 1;`
+        + `background: #4B107B;`
+        + `border-radius: 50%;`
+        + `box-shadow: 0px 0px 6px 3px #BF61CF;`
+        + `display: inline-block;`
+        + `}`;
+
+    let main_new_version = `div.mho-new-version::before {`
+        + `position: absolute;`
+        + `top: -3px;`
+        + `left: -3px;`
+        + `}`;
+
+    let new_version = `.mho-new-version::before {`
+        + `content: '';`
+        + `width: 8px;`
+        + `aspect-ratio: 1;`
+        + `background: #BF61CF;`
+        + `border-radius: 50%;`
+        + `box-shadow: 0px 0px 8px 4px #4B107B;`
+        + `display: inline-block;`
+        + `}`;
+
 
     let css = params_style + btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
         + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
@@ -8133,7 +8130,7 @@ function createStyles() {
         + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
         + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
         + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
-        + citizen_list_more_info_header_content + hidden + item_tag;
+        + citizen_list_more_info_header_content + hidden + item_tag + main_new_changelog + item_new_changelog + new_changelog + main_new_version + new_version;
 
     let style = document.createElement('style');
 
@@ -9089,7 +9086,7 @@ function updateExternalTools() {
         data.map = {}
         data.map.toolsToUpdate = {
             isBigBrothHordes: mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : 'none',
-            isFataMorgana: mho_parameters && mho_parameters.update_fata ? (pageIsDesert() && (mho_parameters.update_fata_devastated && mh_user.townDetails.isDevaste) ? 'cell' : 'api') : 'none',
+            isFataMorgana: mho_parameters && mho_parameters.update_fata ? (pageIsDesert() && ((mho_parameters.update_fata_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_fata_devastated && mh_user.townDetails.isDevaste)) ? 'cell' : 'api') : 'none',
             isGestHordes: mho_parameters && mho_parameters.update_gh ? (pageIsDesert() && ((mho_parameters.update_gh_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_gh_devastated && mh_user.townDetails.isDevaste)) ? 'cell' : 'api') : 'none',
             isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? (pageIsDesert() && ((mho_parameters.update_mho_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_mho_devastated && mh_user.townDetails.isDevaste)) ? 'cell' : 'api') : 'none'
         };
@@ -9135,7 +9132,10 @@ function updateExternalTools() {
         }
 
         // Mise à jour du nombre de zombies tués
-        if (((mho_parameters.update_gh && mho_parameters.update_gh_killed_zombies) || (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies)) && pageIsDesert() && nb_dead_zombies > 0) {
+        if (((mho_parameters.update_gh && mho_parameters.update_gh_killed_zombies)
+                || (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies)
+                || (mho_parameters.update_fata && mho_parameters.update_fata_killed_zombies))
+            && pageIsDesert() && nb_dead_zombies > 0) {
             let content = {
                 x: +position[0],
                 y: +position[1],
@@ -9558,7 +9558,7 @@ function getParameters() {
             })
             .then((response) => {
                 parameters = response;
-                isScriptVersionLastVersion(true);
+                isScriptVersionLastVersion();
                 resolve();
             })
             .catch((error) => {
@@ -9886,17 +9886,9 @@ function getApiKey() {
         }, 1000);
     } else {
 
-        /** Affiche le changelog de la version au premier chargement après la mise à jour */
+        /** Vérifie si la version est nouvelle ou non */
         getStorageItem(mho_version_key).then((version) => {
-            if (!version || !version[getScriptInfo().version]) {
-                if (!version || typeof version !== "object") {
-                    version = {};
-                }
-
-                version[getScriptInfo().version] = confirm(changelog);
-                setStorageItem(mho_version_key, version);
-            }
-
+            toggleNewChangelog(isNewVersion(version))
 
             createStyles();
             createMhoHeaderSpace();
