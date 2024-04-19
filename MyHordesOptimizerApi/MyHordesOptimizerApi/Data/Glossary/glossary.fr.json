@@ -1,363 +1,371 @@
 ﻿[
-  {
-    "word": "AA",
-    "definition": "Anti-Abus"
-  },
-  {
-    "word": "AAA",
-    "definition": "Abri Anti-Atomique"
-  },
-  {
-    "word": "AE",
-    "definition": "Attente d'Escorte"
-  },
-  {
-    "word": "AEEP",
-    "definition": "Appareil Electronique En Panne"
-  },
-  {
-    "word": "AH",
-    "definition": "Action Heroïque"
-  },
-  {
-    "word": "AQUA",
-    "definition": "Aquasplash"
-  },
-  {
-    "word": "APAG",
-    "definition": "Appareil Photo d'Avant Guerre"
-  },
-  {
-    "word": "AS",
-    "definition": "Aquasplash"
-  },
-  {
-    "word": "AT",
-    "definition": "Aqua-Tourelles"
-  },
-  {
-    "word": "B6",
-    "definition": "Bouffe 6pa"
-  },
-  {
-    "word": "B7",
-    "definition": "Bouffe 7pa"
-  },
-  {
-    "word": "BAO",
-    "definition": "Bombe A Eau"
-  },
-  {
-    "word": "BAOEX",
-    "definition": "Bombe A Eau Explosive"
-  },
-  {
-    "word": "BDE",
-    "definition": "Bureau des Esclavagiste"
-  },
-  {
-    "word": "BDS",
-    "definition": "Boule de Sable"
-  },
-  {
-    "word": "BEM",
-    "definition": "Boîte en Métal"
-  },
-  {
-    "word": "CA",
-    "definition": "Coffre d'Architecte"
-  },
-  {
-    "word": "CAS",
-    "definition": "Coffre d'Architecte Scellé"
-  },
-  {
-    "word": "CAV",
-    "definition": "Cage à Viande"
-  },
-  {
-    "word": "CDV",
-    "definition": "Cadavre de Voyageur (CdV)"
-  },
-  {
-    "word": "CE",
-    "definition": "Composant Electronique"
-  },
-  {
-    "word": "CM",
-    "definition": "Camping Massif"
-  },
-  {
-    "word": "CP",
-    "definition": "Campeur Pro"
-  },
-  {
-    "word": "CS",
-    "definition": "Coin Sieste"
-  },
-  {
-    "word": "DC",
-    "definition": "Dernière Chance"
-  },
-  {
-    "word": "DH",
-    "definition": "Décharge Humidifiée"
-  },
-  {
-    "word": "DLM",
-    "definition": "Debout-Les-Morts"
-  },
-  {
-    "word": "DO",
-    "definition": "Décharge Organisée"
-  },
-  {
-    "word": "ETL",
-    "definition": "Exploration Tres Lointaine"
-  },
-  {
-    "word": "FA",
-    "definition": "Fouille Automatique"
-  },
-  {
-    "word": "FAO",
-    "definition": "Fouille Automatique Ouvriere"
-  },
-  {
-    "word": "FAOA",
-    "definition": "Fouille Automatique Ouvriere Améliorée"
-  },
-  {
-    "word": "FDA",
-    "definition": "Feux d'Artifices"
-  },
-  {
-    "word": "FM",
-    "definition": "Forum Monde"
-  },
-  {
-    "word": "Furax",
-    "definition": "Petit Chaton Partiellement Digéré"
-  },
-  {
-    "word": "FV",
-    "definition": "Fausse Ville"
-  },
-  {
-    "word": "FV",
-    "definition": "Forum Ville"
-  },
-  {
-    "word": "GBS",
-    "definition": "Grand Bâton Sec"
-  },
-  {
-    "word": "GCEM",
-    "definition": "Gros Coffre en Metal"
-  },
-  {
-    "word": "GD",
-    "definition": "Grand Déménagement"
-  },
-  {
-    "word": "GDB",
-    "definition": "Gueule de Bois"
-  },
-  {
-    "word": "GF",
-    "definition": "Grand Fossé"
-  },
-  {
-    "word": "GOM",
-    "definition": "Guide de l'Outre-Monde"
-  },
-  {
-    "word": "HF",
-    "definition": "Habitations Fortifiées"
-  },
-  {
-    "word": "LP",
-    "definition": "Lance Pile"
-  },
-  {
-    "word": "LZ",
-    "definition": "Livre Zen"
-  },
-  {
-    "word": "MAL",
-    "definition": "Machine à Laver"
-  },
-  {
-    "word": "ME",
-    "definition": "Muraille Evolutive"
-  },
-  {
-    "word": "MEK",
-    "definition": "Meuble en Kit"
-  },
-  {
-    "word": "MP",
-    "definition": "Message Privée"
-  },
-  {
-    "word": "MSE",
-    "definition": "Médicament Sans Etiquette"
-  },
-  {
-    "word": "MU",
-    "definition": "Mort Ultime"
-  },
-  {
-    "word": "MUP",
-    "definition": "Mort Ultime du Pandémonium"
-  },
-  {
-    "word": "OB",
-    "definition": "Ouvre-Boite"
-  },
-  {
-    "word": "OC",
-    "definition": "Os Charnu"
-  },
-  {
-    "word": "OD",
-    "definition": "Objet de Defense"
-  },
-  {
-    "word": "ODC",
-    "definition": "Objet De Camping"
-  },
-  {
-    "word": "OM",
-    "definition": "Outre-Monde"
-  },
-  {
-    "word": "PAMPEX",
-    "definition": "Pamplemousse Explosif"
-  },
-  {
-    "word": "PANDE",
-    "definition": "Pandémonium"
-  },
-  {
-    "word": "PAO",
-    "definition": "Pistolet A Eau"
-  },
-  {
-    "word": "PAT",
-    "definition": "Post Attaque"
-  },
-  {
-    "word": "PDC",
-    "definition": "Point De Contrôle"
-  },
-  {
-    "word": "PEF",
-    "definition": "Passage En Force"
-  },
-  {
-    "word": "PI",
-    "definition": "Projet Insensé"
-  },
-  {
-    "word": "PMV",
-    "definition": "Petit Manche Vibrant"
-  },
-  {
-    "word": "PP",
-    "definition": "Produit Pharmaceutique"
-  },
-  {
-    "word": "PRAF",
-    "definition": "Plus Rien A Fouiller"
-  },
-  {
-    "word": "PVE",
-    "definition": "Poignée de Vis et d'Ecrous"
-  },
-  {
-    "word": "QC",
-    "definition": "Quartiers Circulaires"
-  },
-  {
-    "word": "RC",
-    "definition": "Rocking Chair"
-  },
-  {
-    "word": "RDH",
-    "definition": "Retour du Heros"
-  },
-  {
-    "word": "RE",
-    "definition": "Région Eloignée"
-  },
-  {
-    "word": "RNE",
-    "definition": "Région non-Eloignée"
-  },
-  {
-    "word": "RP",
-    "definition": "RolePlay"
-  },
-  {
-    "word": "SD",
-    "definition": "Supports Défensifs",
-    "category": "Chantier"
-  },
-  {
-    "word": "SE",
-    "definition": "Sport-Elec'"
-  },
-  {
-    "word": "SLP",
-    "definition": "Super Lance Pile (Devastator ou Mark II)"
-  },
-  {
-    "word": "SS",
-    "definition": "Second Souffle"
-  },
-  {
-    "word": "TA",
-    "definition": "Trouvaille Améliorée"
-  },
-  {
-    "word": "TDC",
-    "definition": "Tube de Cuivre"
-  },
-  {
-    "word": "TDG",
-    "definition": "Tour De Guet"
-  },
-  {
-    "word": "TDGA",
-    "definition": "Tour Des Gardiens"
-  },
-  {
-    "word": "TN",
-    "definition": "Tableau Noir"
-  },
-  {
-    "word": "UC",
-    "definition": "Unité Centrale "
-  },
-  {
-    "word": "US",
-    "definition": "Uppercut Sauvage"
-  },
-  {
-    "word": "VH",
-    "definition": "Viande Humaine"
-  },
-  {
-    "word": "VLM",
-    "definition": "Vaincre La Mort"
-  },
-  {
-    "word": "VP",
-    "definition": "Veilleur Pro"
-  },
-  {
-    "word": "ZZ",
-    "definition": "Zombies"
-  }
+    {
+        "word": "AA",
+        "definition": "Anti-Abus"
+    },
+    {
+        "word": "AAA",
+        "definition": "Abri Anti-Atomique"
+    },
+    {
+        "word": "AE",
+        "definition": "Attente d'Escorte"
+    },
+    {
+        "word": "AEEP",
+        "definition": "Appareil Electronique En Panne"
+    },
+    {
+        "word": "AH",
+        "definition": "Action Heroïque"
+    },
+    {
+        "word": "AQUA",
+        "definition": "Aquasplash"
+    },
+    {
+        "word": "APAG",
+        "definition": "Appareil Photo d'Avant Guerre"
+    },
+    {
+        "word": "AS",
+        "definition": "Aquasplash"
+    },
+    {
+        "word": "AT",
+        "definition": "Aqua-Tourelles"
+    },
+    {
+        "word": "B6",
+        "definition": "Bouffe 6pa"
+    },
+    {
+        "word": "B7",
+        "definition": "Bouffe 7pa"
+    },
+    {
+        "word": "BAO",
+        "definition": "Bombe A Eau"
+    },
+    {
+        "word": "BAOEX",
+        "definition": "Bombe A Eau Explosive"
+    },
+    {
+        "word": "BDE",
+        "definition": "Bureau des Esclavagiste"
+    },
+    {
+        "word": "BDS",
+        "definition": "Boule de Sable"
+    },
+    {
+        "word": "BEM",
+        "definition": "Boîte en Métal"
+    },
+    {
+        "word": "CA",
+        "definition": "Coffre d'Architecte"
+    },
+    {
+        "word": "CAS",
+        "definition": "Coffre d'Architecte Scellé"
+    },
+    {
+        "word": "CAV",
+        "definition": "Cage à Viande"
+    },
+    {
+        "word": "CDV",
+        "definition": "Cadavre de Voyageur (CdV)"
+    },
+    {
+        "word": "CE",
+        "definition": "Composant Electronique"
+    },
+    {
+        "word": "CM",
+        "definition": "Camping Massif"
+    },
+    {
+        "word": "CP",
+        "definition": "Campeur Pro"
+    },
+    {
+        "word": "CP",
+        "definition": "Contreplaqué"
+    },
+    {
+        "word": "CS",
+        "definition": "Coin Sieste"
+    },
+    {
+        "word": "DC",
+        "definition": "Dernière Chance"
+    },
+    {
+        "word": "DH",
+        "definition": "Décharge Humidifiée"
+    },
+    {
+        "word": "DLM",
+        "definition": "Debout-Les-Morts"
+    },
+    {
+        "word": "DO",
+        "definition": "Décharge Organisée"
+    },
+    {
+        "word": "ETL",
+        "definition": "Exploration Tres Lointaine"
+    },
+    {
+        "word": "FA",
+        "definition": "Fouille Automatique"
+    },
+    {
+        "word": "FAO",
+        "definition": "Fouille Automatique Ouvriere"
+    },
+    {
+        "word": "FAOA",
+        "definition": "Fouille Automatique Ouvriere Améliorée"
+    },
+    {
+        "word": "FDA",
+        "definition": "Feux d'Artifices"
+    },
+    {
+        "word": "FM",
+        "definition": "Forum Monde"
+    },
+    {
+        "word": "Furax",
+        "definition": "Petit Chaton Partiellement Digéré"
+    },
+    {
+        "word": "FV",
+        "definition": "Fausse Ville"
+    },
+    {
+        "word": "FV",
+        "definition": "Forum Ville"
+    },
+    {
+        "word": "GBS",
+        "definition": "Grand Bâton Sec"
+    },
+    {
+        "word": "CHAMINO",
+        "definition": "Champs de mines à eau"
+    },
+    {
+        "word": "GCEM",
+        "definition": "Gros Coffre en Metal"
+    },
+    {
+        "word": "GD",
+        "definition": "Grand Déménagement"
+    },
+    {
+        "word": "GDB",
+        "definition": "Gueule de Bois"
+    },
+    {
+        "word": "GF",
+        "definition": "Grand Fossé"
+    },
+    {
+        "word": "GOM",
+        "definition": "Guide de l'Outre-Monde"
+    },
+    {
+        "word": "HF",
+        "definition": "Habitations Fortifiées"
+    },
+    {
+        "word": "LP",
+        "definition": "Lance Pile"
+    },
+    {
+        "word": "LZ",
+        "definition": "Livre Zen"
+    },
+    {
+        "word": "MAL",
+        "definition": "Machine à Laver"
+    },
+    {
+        "word": "ME",
+        "definition": "Muraille Evolutive"
+    },
+    {
+        "word": "MEK",
+        "definition": "Meuble en Kit"
+    },
+    {
+        "word": "MP",
+        "definition": "Message Privée"
+    },
+    {
+        "word": "MSE",
+        "definition": "Médicament Sans Etiquette"
+    },
+    {
+        "word": "MU",
+        "definition": "Mort Ultime"
+    },
+    {
+        "word": "MUP",
+        "definition": "Mort Ultime du Pandémonium"
+    },
+    {
+        "word": "OB",
+        "definition": "Ouvre-Boite"
+    },
+    {
+        "word": "OC",
+        "definition": "Os Charnu"
+    },
+    {
+        "word": "OD",
+        "definition": "Objet de Defense"
+    },
+    {
+        "word": "ODC",
+        "definition": "Objet De Camping"
+    },
+    {
+        "word": "OM",
+        "definition": "Outre-Monde"
+    },
+    {
+        "word": "PAMPEX",
+        "definition": "Pamplemousse Explosif"
+    },
+    {
+        "word": "PANDE",
+        "definition": "Pandémonium"
+    },
+    {
+        "word": "PAO",
+        "definition": "Pistolet A Eau"
+    },
+    {
+        "word": "PAT",
+        "definition": "Post Attaque"
+    },
+    {
+        "word": "PDC",
+        "definition": "Point De Contrôle"
+    },
+    {
+        "word": "PEF",
+        "definition": "Passage En Force"
+    },
+    {
+        "word": "PI",
+        "definition": "Projet Insensé"
+    },
+    {
+        "word": "PMV",
+        "definition": "Petit Manche Vibrant"
+    },
+    {
+        "word": "PP",
+        "definition": "Produit Pharmaceutique"
+    },
+    {
+        "word": "PRAF",
+        "definition": "Plus Rien A Fouiller"
+    },
+    {
+        "word": "PVE",
+        "definition": "Poignée de Vis et d'Ecrous"
+    },
+    {
+        "word": "QC",
+        "definition": "Quartiers Circulaires"
+    },
+    {
+        "word": "RC",
+        "definition": "Rocking Chair"
+    },
+    {
+        "word": "RDH",
+        "definition": "Retour du Heros"
+    },
+    {
+        "word": "RE",
+        "definition": "Région Eloignée"
+    },
+    {
+        "word": "RNE",
+        "definition": "Région non-Eloignée"
+    },
+    {
+        "word": "RP",
+        "definition": "RolePlay"
+    },
+    {
+        "word": "SD",
+        "definition": "Supports Défensifs",
+        "category": "Chantier"
+    },
+    {
+        "word": "SE",
+        "definition": "Sport-Elec'"
+    },
+    {
+        "word": "SLP",
+        "definition": "Super Lance Pile (Devastator ou Mark II)"
+    },
+    {
+        "word": "SS",
+        "definition": "Second Souffle"
+    },
+    {
+        "word": "TA",
+        "definition": "Trouvaille Améliorée"
+    },
+    {
+        "word": "TDC",
+        "definition": "Tube de Cuivre"
+    },
+    {
+        "word": "TDG",
+        "definition": "Tour De Guet"
+    },
+    {
+        "word": "TDGA",
+        "definition": "Tour Des Gardiens"
+    },
+    {
+        "word": "TN",
+        "definition": "Tableau Noir"
+    },
+    {
+        "word": "UC",
+        "definition": "Unité Centrale "
+    },
+    {
+        "word": "US",
+        "definition": "Uppercut Sauvage"
+    },
+    {
+        "word": "VH",
+        "definition": "Viande Humaine"
+    },
+    {
+        "word": "VLM",
+        "definition": "Vaincre La Mort"
+    },
+    {
+        "word": "VP",
+        "definition": "Veilleur Pro"
+    },
+    {
+        "word": "ZZ",
+        "definition": "Zombies"
+    }
 ]
