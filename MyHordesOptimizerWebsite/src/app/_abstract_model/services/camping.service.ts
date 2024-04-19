@@ -9,7 +9,7 @@ import { CampingParameters } from '../types/camping-parameters.class';
 import { GlobalService } from './global.service';
 
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class CampingService extends GlobalService {
 
     constructor(_http: HttpClient) {
@@ -18,7 +18,7 @@ export class CampingService extends GlobalService {
 
     public calculateCamping(camping_parameters: CampingParameters): Observable<CampingOdds> {
         return new Observable((sub: Subscriber<CampingOdds>) => {
-            super.post<CampingOddsDTO>(this.API_URL + '/Camping/Calculate', JSON.stringify(camping_parameters.modelToDto()), true)
+            super.post<CampingOddsDTO>(this.API_URL + '/Camping/Calculate', JSON.stringify(camping_parameters.modelToDto()))
                 .subscribe({
                     next: (response: CampingOddsDTO) => {
                         sub.next(new CampingOdds(response));

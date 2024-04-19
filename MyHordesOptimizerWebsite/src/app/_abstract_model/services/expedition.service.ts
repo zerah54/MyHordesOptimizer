@@ -58,7 +58,7 @@ export class ExpeditionService extends GlobalService {
      */
     public createOrUpdateExpedition(day: number, expedition: Expedition): Observable<Expedition> {
         return new Observable((sub: Subscriber<Expedition>) => {
-            super.post<ExpeditionDTO>(this.API_URL + `/expeditions/${getTown()?.town_id}/${day}`, JSON.stringify(expedition.modelToDtoShort()), true)
+            super.post<ExpeditionDTO>(this.API_URL + `/expeditions/${getTown()?.town_id}/${day}`, JSON.stringify(expedition.modelToDtoShort()))
                 .subscribe({
                     next: (response: ExpeditionDTO) => {
                         sub.next(new Expedition(response));
@@ -114,7 +114,7 @@ export class ExpeditionService extends GlobalService {
      */
     public createOrUpdateExpeditionPart(expedition: Expedition, expedition_part: ExpeditionPart): Observable<ExpeditionPart> {
         return new Observable((sub: Subscriber<ExpeditionPart>) => {
-            super.post<ExpeditionPartDTO>(this.API_URL + `/expeditions/${expedition.id}/parts`, JSON.stringify(expedition_part.modelToDtoShort()), true)
+            super.post<ExpeditionPartDTO>(this.API_URL + `/expeditions/${expedition.id}/parts`, JSON.stringify(expedition_part.modelToDtoShort()))
                 .subscribe({
                     next: (response: ExpeditionPartDTO) => {
                         sub.next(new ExpeditionPart(response));
@@ -155,7 +155,7 @@ export class ExpeditionService extends GlobalService {
      */
     public createOrUpdateCitizenExpedition(expedition_part: ExpeditionPart, citizen_expedition: CitizenExpedition): Observable<CitizenExpedition> {
         return new Observable((sub: Subscriber<CitizenExpedition>) => {
-            super.post<CitizenExpeditionDTO>(this.API_URL + `/expeditions/parts/${expedition_part.id}/citizen`, JSON.stringify(citizen_expedition.modelToDtoShort()), true)
+            super.post<CitizenExpeditionDTO>(this.API_URL + `/expeditions/parts/${expedition_part.id}/citizen`, JSON.stringify(citizen_expedition.modelToDtoShort()))
                 .subscribe({
                     next: (response: CitizenExpeditionDTO) => {
                         sub.next(new CitizenExpedition(response));
@@ -196,7 +196,7 @@ export class ExpeditionService extends GlobalService {
      */
     public createOrUpdateOrdersForPart(orders: ExpeditionOrder[], expedition_part: ExpeditionPart): Observable<ExpeditionOrder[]> {
         return new Observable((sub: Subscriber<ExpeditionOrder[]>) => {
-            super.post<ExpeditionOrderDTO[]>(this.API_URL + `/expeditions/parts/${expedition_part.id}/orders`, JSON.stringify(modelToDtoArray(orders)), true)
+            super.post<ExpeditionOrderDTO[]>(this.API_URL + `/expeditions/parts/${expedition_part.id}/orders`, JSON.stringify(modelToDtoArray(orders)))
                 .subscribe({
                     next: (response: ExpeditionOrderDTO[]) => {
                         response.sort((order_a: ExpeditionOrderDTO, order_b: ExpeditionOrderDTO) => {
@@ -221,7 +221,7 @@ export class ExpeditionService extends GlobalService {
      */
     public createOrUpdateOrdersForCitizen(orders: ExpeditionOrder[], citizen: CitizenExpedition): Observable<ExpeditionOrder[]> {
         return new Observable((sub: Subscriber<ExpeditionOrder[]>) => {
-            super.post<ExpeditionOrderDTO[]>(this.API_URL + `/expeditions/citizen/${citizen.id}/orders`, JSON.stringify(modelToDtoArray(orders)), true)
+            super.post<ExpeditionOrderDTO[]>(this.API_URL + `/expeditions/citizen/${citizen.id}/orders`, JSON.stringify(modelToDtoArray(orders)))
                 .subscribe({
                     next: (response: ExpeditionOrderDTO[]) => {
                         response.sort((order_a: ExpeditionOrderDTO, order_b: ExpeditionOrderDTO) => {
@@ -264,7 +264,7 @@ export class ExpeditionService extends GlobalService {
      */
     public createOrUpdateBag(citizen: CitizenExpedition): Observable<CitizenExpeditionBag> {
         return new Observable((sub: Subscriber<CitizenExpeditionBag>) => {
-            super.post<CitizenExpeditionBagDTO>(this.API_URL + `/expeditions/citizen/${citizen.id}/bags`, JSON.stringify(citizen.bag.modelToDtoShort()), true)
+            super.post<CitizenExpeditionBagDTO>(this.API_URL + `/expeditions/citizen/${citizen.id}/bags`, JSON.stringify(citizen.bag.modelToDtoShort()))
                 .subscribe({
                     next: (response: CitizenExpeditionBagDTO) => {
                         sub.next(new CitizenExpeditionBag(response));

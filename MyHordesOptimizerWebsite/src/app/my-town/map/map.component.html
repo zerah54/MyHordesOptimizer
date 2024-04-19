@@ -47,7 +47,7 @@
                 <h2 i18n>Afficher les zones du scrutateur</h2>
                 <div class="scrut-zones">
                     <mho-compass-rose [selectedScrutZone]="options.displayed_scrut_zone"
-                                      (selectedScrutZoneChange)="changeOptions('displayed_scrut_zone', $event)"></mho-compass-rose>
+                                      (selectedScrutZoneChange)="changeOptions('displayed_scrut_zone', $event)" multiple withDiags></mho-compass-rose>
                 </div>
             </div>
             <div>

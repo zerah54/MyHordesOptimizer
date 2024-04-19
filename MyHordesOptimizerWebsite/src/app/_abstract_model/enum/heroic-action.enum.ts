@@ -87,7 +87,7 @@ export class HeroicActionEnum extends CommonEnum {
      * Le constructeur privé empêche la création d'autres instances de cette classe.
      *
      * @param {string} key
-     * @param {StatusEnumData} value
+     * @param {HeroicActionEnumData} value
      */
     protected constructor(public override key: string, public override value: HeroicActionEnumData) {
         super(key, value);

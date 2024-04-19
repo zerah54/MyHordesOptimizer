@@ -90,7 +90,7 @@
                                                             <mat-checkbox [checked]="action.value === true"
                                                                           [indeterminate]="action.value === null || action.value === undefined"
                                                                           (change)="updateActions(action, $event, row.id)">
-                                                                {{ action.element.value.label }}
+                                                                {{ action.element.getLabel() }}
                                                             </mat-checkbox>
                                                         }
                                                     </div>

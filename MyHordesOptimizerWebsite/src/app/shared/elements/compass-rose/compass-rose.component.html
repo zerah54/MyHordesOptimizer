@@ -1,0 +1,36 @@
+<div class="mho-compass-rose">
+    <div class="compass">
+        <div class="compass-main">
+            @if (withLegend) {
+                <span class="north-label" i18n>N</span>
+                <span class="east-label" i18n>E</span>
+                <span class="west-label" i18n>O</span>
+                <span class="south-label" i18n>S</span>
+            }
+            <div class="compass-rose">
+                <div class="cardial-points">
+                    <div class="north-pointer pointer main" [class.selected]="selectedScrutZone | isDirectionSelected:'Norden'"
+                         (click)="addToSelection('Norden')"></div>
+                    <div class="south-pointer pointer main" [class.selected]="selectedScrutZone | isDirectionSelected:'Süden'"
+                         (click)="addToSelection('Süden')"></div>
+                    <div class="east-pointer pointer main" [class.selected]="selectedScrutZone | isDirectionSelected:'Osten'"
+                         (click)="addToSelection('Osten')"></div>
+                    <div class="west-pointer pointer main" [class.selected]="selectedScrutZone | isDirectionSelected:'Westen'"
+                         (click)="addToSelection('Westen')"></div>
+                </div>
+                <div class="ordinal-points">
+                    <div class="northeast-pointer pointer sub" [class.selected]="selectedScrutZone | isDirectionSelected:'Nordosten'"
+                         (click)="withDiags ? addToSelection('Nordosten') : undefined"></div>
+                    <div class="northwest-pointer pointer sub" [class.selected]="selectedScrutZone | isDirectionSelected:'Nordwesten'"
+                         (click)="withDiags ? addToSelection('Nordwesten') : undefined"></div>
+                    <div class="southeast-pointer pointer sub" [class.selected]="selectedScrutZone | isDirectionSelected:'Südosten'"
+                         (click)="withDiags ? addToSelection('Südosten') : undefined"></div>
+                    <div class="southwest-pointer pointer sub" [class.selected]="selectedScrutZone | isDirectionSelected:'Südwesten'"
+                         (click)="withDiags ? addToSelection('Südwesten') : undefined"></div>
+                </div>
+            </div>
+
+            <div class="bt-center" [class.all-selected]="selectedScrutZone | areAllDirectionsSelected" (click)="addAllToSelection()"></div>
+        </div>
+    </div>
+</div>

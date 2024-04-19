@@ -14,10 +14,16 @@
 .mho-expeditions {
 
     .container {
-        padding-top: 0.5em;
         display: flex;
         flex-direction: column;
         gap: 0.5em;
+        height: 100%;
+
+        > .header {
+            h2 {
+                margin-bottom: 0;
+            }
+        }
 
         .actions {
             display: flex;
@@ -39,29 +45,31 @@
 
         .content {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5em;
+            overflow: auto;
 
             .expedition {
                 background-color: rgba(0, 0, 0, 0.15);
-                border-radius: 0.5em;
-                padding: 1em;
-                display: flex;
-                flex-direction: column;
-                gap: 0.5em;
+
+                &:not(.mat-expansion-panel-spacing) {
+                    margin-bottom: 0.5em;
+                }
+
+                .mat-expansion-panel-header {
+                    height: unset !important;
+                    min-height: var(--mat-expansion-header-expanded-state-height);
+                }
+
+                border-left-style: solid;
 
                 &.ready {
-                    border-left: 5px solid green;
+                    border-left-color: green;
                 }
 
                 &.stop {
-                    border-left: 5px solid red;
+                    border-left-color: red;
                 }
 
-                .header {
-                    display: flex;
-                    flex-direction: row;
+                .header > .mat-content {
                     justify-content: space-between;
                     flex-wrap: wrap;
                     gap: 0.5em;
@@ -86,6 +94,16 @@
 
                     .expedition-part-header {
                         padding: 0.5em 0.5em 0.25em;
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        gap: 0.5em;
+
+                        > .expedition-compass {
+                            width: 40px;
+                            height: 40px;
+                            transform: scale(0.4) translateY(-80px);;
+                        }
                     }
 
                     table.expedition-table {
@@ -136,11 +154,16 @@
                                 .is-thirsty, .starts-7-ap {
                                     width: 40px;
                                     text-align: center;
-                                    gap: 0;
 
                                     > div {
                                         align-items: center;
                                         justify-content: center;
+                                    }
+                                }
+
+                                .starts-7-ap {
+                                    .flex {
+                                        gap: 0;
                                     }
                                 }
 

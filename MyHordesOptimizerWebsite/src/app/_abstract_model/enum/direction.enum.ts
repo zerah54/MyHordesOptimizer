@@ -1,3 +1,4 @@
+import { Dictionary } from '../types/_types';
 import { CommonEnum, CommonEnumData } from './_common.enum';
 
 const NORTH_KEY: string = 'Norden';
@@ -42,6 +43,10 @@ export class Direction extends CommonEnum {
 
     public getLabel(): string {
         return this.value.label;
+    }
+
+    public static getSelectedDirections(directions: Dictionary<boolean>): string[] {
+        return Object.keys(directions);
     }
 
 }

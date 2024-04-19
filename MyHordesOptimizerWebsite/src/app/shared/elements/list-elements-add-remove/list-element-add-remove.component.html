@@ -3,6 +3,12 @@
         <div class="label">
             {{ label }}
 
+            @if (currentList | isItems) {
+                <div class="count-ap-in-bag">
+                    {{ currentList | countAvailableAp:lists }}&nbsp;<mho-icon-ap></mho-icon-ap>
+                </div>
+            }
+
             @if (!readonly) {
                 <div class="add-remove">
                     <ng-container *ngTemplateOutlet="buttonRemove"></ng-container>

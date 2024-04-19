@@ -7,6 +7,7 @@ import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
+import { IconApComponent } from '../../../../shared/elements/icon-ap/icon-ap.component';
 import { LastUpdateComponent } from '../../../../shared/elements/last-update/last-update.component';
 import { CitizensFromShortPipe } from '../../../../shared/pipes/citizens-from-short.pipe';
 import { ItemDetailsPipe } from '../../../../shared/pipes/item-details.pipe';
@@ -19,7 +20,7 @@ import { RuinInCell } from './ruin-in-cell.pipe';
     templateUrl: './map-cell-details.component.html',
     styleUrls: ['./map-cell-details.component.scss'],
     standalone: true,
-    imports: [CommonModule, NgOptimizedImage, MatDividerModule, LastUpdateComponent, CitizensFromShortPipe, ItemDetailsPipe, CellDetailsLeftPipe, CellDetailsBottomPipe, CellDetailsRightPipe, CellDetailsTopPipe, RuinInCell]
+    imports: [CommonModule, NgOptimizedImage, MatDividerModule, LastUpdateComponent, CitizensFromShortPipe, ItemDetailsPipe, CellDetailsLeftPipe, CellDetailsBottomPipe, CellDetailsRightPipe, CellDetailsTopPipe, RuinInCell, IconApComponent]
 })
 export class MapCellDetailsComponent {
     @HostBinding('style.display') display: string = 'contents';
