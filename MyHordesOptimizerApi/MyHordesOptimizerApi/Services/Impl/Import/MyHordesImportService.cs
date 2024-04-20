@@ -486,6 +486,31 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 .ToList();
             var ruinComparer = EqualityComparerFactory.Create<Ruin>(ruin => ruin.IdRuin.GetHashCode(), (a, b) => a.IdRuin == b.IdRuin);
             DbContext.Patch(ruinsFromDb, ruinModels, ruinComparer);
+
+            // Plan des chantier de ruin
+            var blueprints = new List<RuinBlueprint>();
+            foreach (var ruinModel in ruinModels)
+            {
+                if (ruinsFromCode.TryGetValue(ruinModel.Img, out var ruinFromCode))
+                {
+                    if(ruinFromCode.Constructions is not null)
+                    {
+                        foreach (var buildingId in ruinFromCode.Constructions)
+                        {
+                            blueprints.Add(new RuinBlueprint()
+                            {
+                                IdBuilding = buildingId,
+                                IdRuin = ruinModel.IdRuin
+                            });
+                        }
+                    }            
+                }
+            }
+            var ruinBlueprintsFromDb = DbContext.RuinBlueprints
+              .ToList();
+            var comparer = EqualityComparerFactory.Create<RuinBlueprint>(blueprint => HashCode.Combine(blueprint.IdBuilding, blueprint.IdRuin),
+               (a, b) => a.IdBuilding == b.IdBuilding && a.IdRuin == b.IdRuin);
+            DbContext.Patch(ruinBlueprintsFromDb, blueprints, comparer);
         }
 
         #endregion
