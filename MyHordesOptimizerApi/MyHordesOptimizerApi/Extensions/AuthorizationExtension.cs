@@ -5,14 +5,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using MyHordesOptimizerApi.Providers.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cockpit.Api.Extensions
+namespace MyHordesOptimizerApi.Extensions
 {
     public static class AuthorizationExtension
     {

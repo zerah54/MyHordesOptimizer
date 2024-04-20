@@ -16,7 +16,7 @@ namespace MyHordesOptimizerApi.Controllers
     [Authorize]
     public class ExpeditionsController : AbstractMyHordesOptimizerControllerBase
     {
-        protected IExpeditionService ExpeditionService { get; private set; }
+        protected IExpeditionService ExpeditionService { get; init; }
 
         public ExpeditionsController(ILogger<AbstractMyHordesOptimizerControllerBase> logger, IUserInfoProvider userInfoProvider, IExpeditionService expeditionService) : base(logger, userInfoProvider)
         {
