@@ -40,3 +40,25 @@ CREATE TABLE RuinBlueprint(
 
 ALTER TABLE Building
 MODIFY COLUMN idBuildingParent INT NULL;
+
+----------------
+CREATE TABLE Jobs(
+	jobUID NVARCHAR(30),
+	baseWatchSurvival INT NOT NULL,
+	PRIMARY KEY (jobUID)
+);
+
+ALTER TABLE Building
+DROP COLUMN watchBonus;
+
+ALTER TABLE Building
+ADD COLUMN watchSurvivalBonusUpgradeLevelRequired INT NOT NULL DEFAULT(0);
+
+CREATE TABLE BuildingWatchSurvivalBonusJobs(
+	idBuilding INT NOT NULL,
+	jobUID NVARCHAR(30) NOT NULL,
+	watchSurvivalBonus INT NOT NULL,
+	PRIMARY KEY(idBuilding, jobUID),
+	FOREIGN KEY(idBuilding) REFERENCES Building(idBuilding),
+	FOREIGN KEY(jobUID) REFERENCES Jobs(jobUID)
+);

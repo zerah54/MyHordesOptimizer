@@ -57,6 +57,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         public async Task ImportAllAsync()
         {
+            await ImportJobsAsync();
+            DbContext.ChangeTracker.Clear();
             await ImportHeroSkill();
             DbContext.ChangeTracker.Clear();
             await ImportCategoriesAsync();
@@ -76,6 +78,22 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             ImportDefaultWishlists();
             DbContext.ChangeTracker.Clear();
         }
+
+        #region Jobs
+
+        public Task ImportJobsAsync()
+        {
+            var jobs = MyHordesCodeRepository.GetJobs();
+            var jobsModel = Mapper.Map<List<Job>>(jobs);
+
+            var jobsFromDb = DbContext.Jobs
+               .ToList();
+            DbContext.Patch(jobsFromDb, jobsModel);
+
+            return Task.CompletedTask;
+        }
+
+        #endregion
 
         #region HeroSkill
 
@@ -372,13 +390,43 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
         public async Task ImportBuildingAsync()
         {
             var buildingsDto = await MyHordesApiRepository.GetBuildingAsync();
+            var buildingCodes = MyHordesCodeRepository.GetBuildings();
+
             var buildingModels = Mapper.Map<List<Building>>(buildingsDto);
             buildingModels = buildingModels.OrderBy(x => x.IdBuildingParent).ToList();
 
+            foreach (var buildingCode in buildingCodes)
+            {
+                var buildingModel = buildingModels.First(building => building.Uid == buildingCode.Key);
+                buildingModel.WatchSurvivalBonusUpgradeLevelRequired = buildingCode.Value.WatchSurvivalBonusUpgradeLevelRequired;
+            }
             var buildingFromDb = DbContext.Buildings
-                .Include(ruin => ruin.BuildingRessources)
-                .ToList();
+            .Include(building => building.BuildingRessources)
+            .ToList();
             DbContext.Patch(buildingFromDb, buildingModels);
+
+
+            var buildingWatchSurvivalJobs = new List<BuildingWatchSurvivalBonusJob>();
+            foreach (var buildingCode in buildingCodes)
+            {
+                var buildingModel = buildingModels.First(building => building.Uid == buildingCode.Key);
+                foreach (var job in buildingCode.Value.WatchSurvivalBonusJob)
+                {
+                    var buildingWatchSurvivalJob = new BuildingWatchSurvivalBonusJob()
+                    {
+                        IdBuilding = buildingModel.IdBuilding,
+                        JobUid = job,
+                        WatchSurvivalBonus = buildingCode.Value.WatchSurvivalBonus
+                    };
+                    buildingWatchSurvivalJobs.Add(buildingWatchSurvivalJob);
+                }
+            }
+
+            var buildingSurvivalJobsFromDb = DbContext.BuildingWatchSurvivalBonusJobs
+                .ToList();
+            var comparer = EqualityComparerFactory.Create<BuildingWatchSurvivalBonusJob>(buildingSurvivalJob => HashCode.Combine(buildingSurvivalJob.JobUid, buildingSurvivalJob.IdBuilding),
+                (a, b) => a.JobUid == b.JobUid && a.IdBuilding == b.IdBuilding);
+            DbContext.Patch(buildingSurvivalJobsFromDb, buildingWatchSurvivalJobs, comparer);
         }
 
         #endregion

@@ -1,0 +1,15 @@
+﻿{
+  "small_watchmen_#02": {
+    "watchSurvivalBonus": 4,
+    "watchSurvivalBonusJob": [ "shield", "book", "dig", "tech", "vest", "tamer" ]
+  },
+  "small_pet_#00": {
+    "watchSurvivalBonus": 3,
+    "watchSurvivalBonusJob": [ "tamer" ]
+  },
+  "small_round_path_#00": {
+    "watchSurvivalBonus": 1,
+    "watchSurvivalBonusJob": [ "shield", "book", "dig", "tech", "vest", "tamer" ],
+    "watchSurvivalBonusUpgradeLevelRequired": 3
+  }
+}

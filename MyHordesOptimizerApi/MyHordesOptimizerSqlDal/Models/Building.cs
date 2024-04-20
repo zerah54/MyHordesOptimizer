@@ -86,11 +86,14 @@ public partial class Building
     [Column("idBuildingParent", TypeName = "int(11)")]
     public int? IdBuildingParent { get; set; }
 
-    [Column("watchBonus", TypeName = "int(11)")]
-    public int WatchBonus { get; set; }
+    [Column("watchSurvivalBonusUpgradeLevelRequired", TypeName = "int(11)")]
+    public int WatchSurvivalBonusUpgradeLevelRequired { get; set; }
 
     [InverseProperty("IdBuildingNavigation")]
     public virtual ICollection<BuildingRessource> BuildingRessources { get; set; } = new List<BuildingRessource>();
+
+    [InverseProperty("IdBuildingNavigation")]
+    public virtual ICollection<BuildingWatchSurvivalBonusJob> BuildingWatchSurvivalBonusJobs { get; set; } = new List<BuildingWatchSurvivalBonusJob>();
 
     [ForeignKey("IdBuildingParent")]
     [InverseProperty("InverseIdBuildingParentNavigation")]

@@ -4,6 +4,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
 {
     public interface IMyHordesImportService
     {
+        Task ImportJobsAsync();
         Task ImportHeroSkill();
         Task ImportCauseOfDeath();
         void ImportCleanUpTypes();

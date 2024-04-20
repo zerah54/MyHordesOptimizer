@@ -1,0 +1,26 @@
+{
+  "shield": {
+    "baseWatchSurvival": 98
+  },
+  "tamer": {
+    "baseWatchSurvival": 93
+  },
+  "book": {
+    "baseWatchSurvival": 90
+  },
+  "dig": {
+    "baseWatchSurvival": 90
+  },
+  "tech": {
+    "baseWatchSurvival": 90
+  },
+  "vest": {
+    "baseWatchSurvival": 90
+  },
+  "looser": {
+    "baseWatchSurvival": 0
+  },
+  "basic": {
+    "baseWatchSurvival": 90
+  }
+}

@@ -37,7 +37,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Buildings
                 .ForMember(model => model.Rarity, opt => opt.MapFrom(dto => dto.Value.Rarity))
                 .ForMember(model => model.Temporary, opt => opt.MapFrom(dto => dto.Value.Temporary))
                 .ForMember(model => model.Uid, opt => opt.MapFrom(dto => dto.Key))
-                .ForMember(model => model.WatchBonus, opt => opt.Ignore());
+                .ForMember(model => model.WatchSurvivalBonusUpgradeLevelRequired, opt => opt.Ignore())
+                .ForMember(model => model.BuildingWatchSurvivalBonusJobs, opt => opt.Ignore());
 
             CreateMap<MyHordesApiBuildingRessource, BuildingRessource>()
                 .ForMember(model => model.Count, opt => opt.MapFrom(dto => dto.Amount))

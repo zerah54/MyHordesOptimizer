@@ -123,5 +123,13 @@ namespace MyHordesOptimizerApi.Controllers
             await MyHordesImportService.ImportBuildingAsync();
             return Ok();
         }
+
+        [HttpPost]
+        [Route("Jobs")]
+        public async Task<ActionResult> ImportJobsAsync()
+        {
+            await MyHordesImportService.ImportJobsAsync();
+            return Ok();
+        }
     }
 }

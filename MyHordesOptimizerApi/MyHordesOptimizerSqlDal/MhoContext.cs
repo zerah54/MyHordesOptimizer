@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Models;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 using Action = MyHordesOptimizerApi.Models.Action;
 
 namespace MyHordesOptimizerApi;
@@ -28,6 +25,8 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<BuildingRessource> BuildingRessources { get; set; }
 
+    public virtual DbSet<BuildingWatchSurvivalBonusJob> BuildingWatchSurvivalBonusJobs { get; set; }
+
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<CauseOfDeath> CauseOfDeaths { get; set; }
@@ -51,6 +50,8 @@ public partial class MhoContext : DbContext
     public virtual DbSet<Item> Items { get; set; }
 
     public virtual DbSet<ItemComplet> ItemComplets { get; set; }
+
+    public virtual DbSet<Job> Jobs { get; set; }
 
     public virtual DbSet<LastUpdateInfo> LastUpdateInfos { get; set; }
 
@@ -163,6 +164,21 @@ public partial class MhoContext : DbContext
             entity.HasOne(d => d.IdItemNavigation).WithMany(p => p.BuildingRessources)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("BuildingRessources_ibfk_2");
+        });
+
+        modelBuilder.Entity<BuildingWatchSurvivalBonusJob>(entity =>
+        {
+            entity.HasKey(e => new { e.IdBuilding, e.JobUid })
+                .HasName("PRIMARY")
+                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
+
+            entity.HasOne(d => d.IdBuildingNavigation).WithMany(p => p.BuildingWatchSurvivalBonusJobs)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("BuildingWatchSurvivalBonusJobs_ibfk_1");
+
+            entity.HasOne(d => d.JobU).WithMany(p => p.BuildingWatchSurvivalBonusJobs)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("BuildingWatchSurvivalBonusJobs_ibfk_2");
         });
 
         modelBuilder.Entity<Category>(entity =>
@@ -357,6 +373,11 @@ public partial class MhoContext : DbContext
         modelBuilder.Entity<ItemComplet>(entity =>
         {
             entity.ToView("ItemComplet");
+        });
+
+        modelBuilder.Entity<Job>(entity =>
+        {
+            entity.HasKey(e => e.JobUid).HasName("PRIMARY");
         });
 
         modelBuilder.Entity<LastUpdateInfo>(entity =>

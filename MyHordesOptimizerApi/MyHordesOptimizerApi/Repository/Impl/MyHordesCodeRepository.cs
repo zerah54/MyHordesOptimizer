@@ -10,6 +10,8 @@ using System.IO;
 using MyHordesOptimizerApi.Data.Camping;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using MyHordesOptimizerApi.Data.Building;
+using MyHordesOptimizerApi.Data.Jobs;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
@@ -140,5 +142,23 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var list = json.FromJson<List<MyHordesCampingResultModel>>();
             return list;
         }
+
+        public Dictionary<string, BuildingCodeModel> GetBuildings()
+        {
+            var path = "Data/Building/building.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, BuildingCodeModel>>();
+            return dico;
+        }
+
+        public Dictionary<string, JobCodeModel> GetJobs()
+        {
+            var path = "Data/Jobs/jobs.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, JobCodeModel>>();
+            return dico;
+        }
+
+        
     }
 }
