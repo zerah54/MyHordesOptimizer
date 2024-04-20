@@ -41,7 +41,6 @@ CREATE TABLE RuinBlueprint(
 ALTER TABLE Building
 MODIFY COLUMN idBuildingParent INT NULL;
 
-----------------
 CREATE TABLE Jobs(
 	jobUID NVARCHAR(30),
 	baseWatchSurvival INT NOT NULL,
