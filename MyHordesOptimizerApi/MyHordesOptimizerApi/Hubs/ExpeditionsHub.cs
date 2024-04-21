@@ -49,7 +49,8 @@ namespace MyHordesOptimizerApi.Hubs
                 usersId.Add(userId);
             }
             _connectedUsersByTown.TryAdd(townId, usersId);
-            await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserJoined.GetDescription(), _connectedUsersByTown[townId].ToJson());
+            var connectedUserOnTownAsJson = _connectedUsersByTown[townId].ToJson();
+            await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserJoined.GetDescription(), connectedUserOnTownAsJson);
             await base.OnConnectedAsync();
         }
 
@@ -61,7 +62,8 @@ namespace MyHordesOptimizerApi.Hubs
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, townId.ToString());
                 var usersId = _connectedUsersByTown[townId];
                 usersId.Remove(userId);
-                await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserLeft.GetDescription(), _connectedUsersByTown[townId].ToJson());
+                string connectedUserOnTownAsJson = _connectedUsersByTown[townId].ToJson();
+                await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserLeft.GetDescription(), connectedUserOnTownAsJson);
             }
             await base.OnDisconnectedAsync(exception);
         }
