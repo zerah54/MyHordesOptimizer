@@ -24,6 +24,7 @@ namespace MyHordesOptimizerApi.Hubs
         protected ILogger<AbstractMyHordesOptimizerControllerBase> Logger { get; init; }
 
         private static ConcurrentDictionary<string, int> _townIdBySocketToken = new();
+        private static ConcurrentDictionary<int,List<int>> _connectedUsersByTown = new();
 
         public ExpeditionsHub(IExpeditionService expeditionService, IUserInfoProvider userInfoProvider, ILogger<AbstractMyHordesOptimizerControllerBase> logger)
         {
@@ -38,7 +39,17 @@ namespace MyHordesOptimizerApi.Hubs
             var userId = UserInfoProvider.UserId;
             _townIdBySocketToken.TryAdd(Context.ConnectionId, townId);
             await Groups.AddToGroupAsync(Context.ConnectionId, townId.ToString());
-            await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserJoined.GetDescription(), userId.ToString());
+            _connectedUsersByTown.TryGetValue(townId, out var usersId);
+            if(usersId is null)
+            {
+                usersId = new List<int>();
+            }
+            if(!usersId.Contains(userId))
+            {
+                usersId.Add(userId);
+            }
+            _connectedUsersByTown.TryAdd(townId, usersId);
+            await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserJoined.GetDescription(), _connectedUsersByTown[townId].ToJson());
             await base.OnConnectedAsync();
         }
 
@@ -48,7 +59,9 @@ namespace MyHordesOptimizerApi.Hubs
             {
                 var userId = UserInfoProvider.UserId;
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, townId.ToString());
-                await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserLeft.GetDescription(), userId.ToString());
+                var usersId = _connectedUsersByTown[townId];
+                usersId.Remove(userId);
+                await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserLeft.GetDescription(), _connectedUsersByTown[townId].ToJson());
             }
             await base.OnDisconnectedAsync(exception);
         }
