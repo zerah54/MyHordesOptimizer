@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
+using MyHordesOptimizerApi.Models.Expeditions;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Collections.Generic;
@@ -35,6 +36,14 @@ namespace MyHordesOptimizerApi.Controllers
         {
             var expedition = ExpeditionService.GetUserExpeditionsByDay(UserInfoProvider.TownDetail.TownId, UserInfoProvider.UserId, day);
             return Ok(expedition);
+        }
+
+        [HttpGet]
+        [Route("{townId}/{day}/validate")]
+        public ActionResult<ExpeditionInhorenceModel> ValidateExpeditions([FromRoute] int townId, [FromRoute] int day)
+        {
+            var incoherence = ExpeditionService.ValidateExpeditions(townId, day);
+            return Ok(incoherence);
         }
     }
 }

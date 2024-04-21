@@ -193,6 +193,210 @@ namespace MyHordesOptimizerApi.Services.Impl
                 Lock.Release();
             }
         }
+
+        public ExpeditionInhorenceModel ValidateExpeditions(int townId, int day)
+        {
+            var expeditions = DbContext.GetTownExpeditionsByDay(townId, day)
+                .Include(expedition => expedition.ExpeditionParts)
+                    .ThenInclude(part => part.ExpeditionCitizens)
+                        .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
+                            .ThenInclude(bag => bag.ExpeditionBagItems)
+                                .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                                    .ThenInclude(item => item.ActionNames)
+                                    .AsSplitQuery()
+                .Include(expedition => expedition.ExpeditionParts)
+                    .ThenInclude(part => part.ExpeditionCitizens)
+                        .ThenInclude(expeditionCitizen => expeditionCitizen.IdExpeditionBagNavigation)
+                            .ThenInclude(bag => bag.ExpeditionBagItems)
+                                .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                                    .ThenInclude(item => item.PropertyNames)
+                                    .AsSplitQuery()
+                .ToList();
+            var townExpeditionIncoherences = new List<TownExpeditionIncoherenceModel>();
+            var partIncoherences = new List<ExpeditionPartIncoherenceModel>();
+            var citizenIncoherences = new List<ExpeditionCitizenIncoherenceModel>();
+            var expeditionIdForCitizenId = new Dictionary<int, List<int>>();
+            foreach (var expedition in expeditions)
+            {
+                foreach (var part in expedition.ExpeditionParts)
+                {
+                    // Si la somme des PDC de la part est < au nombre de PDC min
+                    if (part.ExpeditionCitizens.ToList().Sum(expeditionCitizen => expeditionCitizen.Pdc) < expedition.MinPdc)
+                    {
+                        partIncoherences.Add(new ExpeditionPartIncoherenceModel(part.IdExpeditionPart, ExpeditionPartIncoherenceType.NotEnoughPdc));
+                    }
+                    var hasSportElec = false;
+                    var nbBandage = 0;
+                    var citizenPa = -1;
+                    foreach (var citizen in part.ExpeditionCitizens)
+                    {
+                        if (citizen.IdUser is not null)
+                        {
+                            if (!expeditionIdForCitizenId.TryGetValue(citizen.IdUser.Value, out var registerExpedition))
+                            {
+                                registerExpedition = new List<int>();
+                            }
+                            if (!registerExpedition.Contains(expedition.IdExpedition))
+                            {
+                                registerExpedition.Add(expedition.IdExpedition);
+                            }
+                            expeditionIdForCitizenId[citizen.IdUser.Value] = registerExpedition;
+                            if (registerExpedition.Count > 1) // si l'utilisateur est déjà inscrit sur une autre expé
+                            {
+                                citizenIncoherences.Add(new ExpeditionCitizenIncoherenceModel(citizen.IdExpeditionCitizen, ExpeditionCitizenIncoherenceType.CitizenAlreadyRegister));
+                            }
+                            var townCitizen = DbContext.TownCitizens.Single(townCitizen => townCitizen.IdUser == citizen.IdUser && townCitizen.IdTown == townId);
+                            // Vérification des pouvoirs héroic
+                            switch (citizen.PreinscritHeroic)
+                            {
+                                case "hero_generic_ap":
+                                    if (townCitizen.HasSecondWind != true)
+                                    {
+                                        citizenIncoherences.Add(new ExpeditionCitizenIncoherenceModel(citizen.IdExpeditionCitizen, ExpeditionCitizenIncoherenceType.CitizenHasNoSecondWind));
+                                    }
+                                    break;
+                                case "hero_generic_punch":
+                                    if (townCitizen.HasUppercut != true)
+                                    {
+                                        citizenIncoherences.Add(new ExpeditionCitizenIncoherenceModel(citizen.IdExpeditionCitizen, ExpeditionCitizenIncoherenceType.CitizenHasNoUppercut));
+                                    }
+                                    break;
+                                case "hero_generic_rescue":
+                                    if (townCitizen.HasRescue != true)
+                                    {
+                                        citizenIncoherences.Add(new ExpeditionCitizenIncoherenceModel(citizen.IdExpeditionCitizen, ExpeditionCitizenIncoherenceType.CitizenHasNoRescue));
+                                    }
+                                    break;
+                                case "hero_generic_return":
+                                    if (townCitizen.HasHeroicReturn != true)
+                                    {
+                                        citizenIncoherences.Add(new ExpeditionCitizenIncoherenceModel(citizen.IdExpeditionCitizen, ExpeditionCitizenIncoherenceType.CitizenHasNoHeroicReturn));
+                                    }
+                                    break;
+                            }
+                        }
+                        if (citizen.IdExpeditionBagNavigation is not null)
+                        {
+                            var nbAlcool = 0;
+                            var nbDrug = 0;
+                            var nbWater = 0;
+                            var nbFood = 0;
+                            var totalPaCitizen = 6;
+                            foreach (var item in citizen.IdExpeditionBagNavigation.ExpeditionBagItems)
+                            {
+                                if (item.IdItemNavigation.ActionNames.Any(action => action.Name == "eat_6ap"))
+                                {
+                                    nbFood++;
+                                    if (nbFood == 1)
+                                    {
+                                        totalPaCitizen += 6;
+                                    }
+                                }
+                                if (item.IdItemNavigation.ActionNames.Any(action => action.Name == "eat_7ap"))
+                                {
+                                    nbFood++;
+                                    if (nbFood == 1)
+                                    {
+                                        totalPaCitizen += 7;
+                                    }
+
+                                }
+                                if (item.IdItemNavigation.PropertyNames.Any(property => property.Name == "is_water"))
+                                {
+                                    nbWater++;
+                                    if (nbWater == 1)
+                                    {
+                                        totalPaCitizen += 6;
+                                    }
+                                }
+                                if (item.IdItemNavigation.ActionNames.Any(action => action.Name == "emt" || action.Name == "load_emt")) // Sport elec
+                                {
+                                    hasSportElec = true;
+                                }
+                                if (item.IdItemNavigation.ActionNames.Any(action => action.Name == "drug_6ap_1"))
+                                {
+                                    nbDrug++;
+                                    if (nbDrug == 1)
+                                    {
+                                        totalPaCitizen += 6;
+                                    }
+                                }
+                                if (item.IdItemNavigation.ActionNames.Any(action => action.Name == "drug_8ap_1"))
+                                {
+                                    nbDrug++;
+                                    if (nbDrug == 1)
+                                    {
+                                        totalPaCitizen += 8;
+                                    }
+                                }
+                                if (item.IdItemNavigation.ActionNames.Any(action => action.Name == "coffee"))
+                                {
+                                    totalPaCitizen += 4;
+                                }
+                                if (item.IdItemNavigation.ActionNames.Any(action => action.Name == "alcohol"))
+                                {
+                                    nbAlcool++;
+                                    if (nbAlcool == 1)
+                                    {
+                                        totalPaCitizen += 6;
+                                    }
+                                }
+                                if (item.IdItemNavigation.ActionNames.Any(action => action.Name == "bandage"))
+                                {
+                                    nbBandage++;
+                                }
+                                if (item.IdItemNavigation.ActionNames.Any(action => action.Name == "alcohol_dx"))
+                                {
+                                    totalPaCitizen += 6;
+                                }
+                            }
+                            if (hasSportElec)
+                            {
+                                totalPaCitizen += 5;
+                            }
+                            if (citizen.NombrePaDepart == 7 && totalPaCitizen >= 21) // Départ 7 pa + boosté twino
+                            {
+                                citizenIncoherences.Add(new ExpeditionCitizenIncoherenceModel(citizen.IdExpeditionCitizen, ExpeditionCitizenIncoherenceType.CitizenWillComeBackDehidrated));
+                            }
+                            if (citizen.IsThirsty == true && totalPaCitizen > 21) // soif plus boosté twino
+                            {
+                                citizenIncoherences.Add(new ExpeditionCitizenIncoherenceModel(citizen.IdExpeditionCitizen, ExpeditionCitizenIncoherenceType.CitizenWillComeBackDehidrated));
+                            }
+                            if (citizen.IsThirsty == false && totalPaCitizen > 32) // Pas soif + expé de plus de 32pa
+                            {
+                                citizenIncoherences.Add(new ExpeditionCitizenIncoherenceModel(citizen.IdExpeditionCitizen, ExpeditionCitizenIncoherenceType.CitizenWillComeBackDehidrated));
+                            }
+                            if (nbAlcool > 1) // Trop d'alcool
+                            {
+                                citizenIncoherences.Add(new ExpeditionCitizenIncoherenceModel(citizen.IdExpeditionCitizen, ExpeditionCitizenIncoherenceType.HasMoreThanOneAlcool));
+                            }
+                            if (citizenPa == -1)
+                            {
+                                citizenPa = totalPaCitizen;
+                            }
+                            if (citizenPa != totalPaCitizen)
+                            {
+                                citizenIncoherences.Add(new ExpeditionCitizenIncoherenceModel(citizen.IdExpeditionCitizen, ExpeditionCitizenIncoherenceType.CitizenHasNotSamePaHasOtherCitizen));
+                            }
+                        }
+                    }
+                    if (hasSportElec && nbBandage < part.ExpeditionCitizens.Count)
+                    {
+                        partIncoherences.Add(new ExpeditionPartIncoherenceModel(part.IdExpeditionPart, ExpeditionPartIncoherenceType.NotEnoughBandage));
+                    }
+                }
+            }
+            var nbAliveCitizen = DbContext.TownCitizens.Count(townCitizen => townCitizen.IdTown == townId);
+            if (expeditions.Sum(expe => expe.ExpeditionParts.Max(part => part.ExpeditionCitizens.Count)) > nbAliveCitizen)
+            {
+                townExpeditionIncoherences.Add(new TownExpeditionIncoherenceModel(townId, day, TownExpeditionIncoherenceType.TooMuchExpedition));
+            }
+            if (expeditions.Sum(expe => expe.ExpeditionParts.Max(part => part.ExpeditionCitizens.Count)) < nbAliveCitizen)
+            {
+                townExpeditionIncoherences.Add(new TownExpeditionIncoherenceModel(townId, day, TownExpeditionIncoherenceType.NotEnoughExpedition));
+            }
+            return new ExpeditionInhorenceModel(townExpeditionIncoherences, citizenIncoherences, partIncoherences);
+        }
         #endregion
 
         #region ExpeditionCitizen

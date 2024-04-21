@@ -1,5 +1,6 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions.Request;
+using MyHordesOptimizerApi.Models.Expeditions;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         void DeleteExpedition(int expeditionId);
         List<ExpeditionDto> GetExpeditionsByDay(int townId, int day);
         List<ExpeditionDto> GetUserExpeditionsByDay(int townId, int userId, int day);
+        ExpeditionInhorenceModel ValidateExpeditions(int townId, int day);
 
         Task<ExpeditionDto> SaveExpeditionAsync(ExpeditionRequestDto expedition, int idTown, int day);
         Task<List<ExpeditionDto>> CopyExpeditionsAsync(int townId, int fromDay, int targetDay);
