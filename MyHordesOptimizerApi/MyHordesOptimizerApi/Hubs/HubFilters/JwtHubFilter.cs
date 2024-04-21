@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Extensions;
@@ -19,15 +18,34 @@ namespace MyHordesOptimizerApi.Hubs.HubFilters
         {
             UserInfoProvider = userInfoProvider;
         }
+
+        public Task OnConnectedAsync(HubLifetimeContext context, Func<HubLifetimeContext, Task> next)
+        {
+            SetUserInfoProvider(context?.Context);
+            return next(context);
+        }
+
+        public Task OnDisconnectedAsync(HubLifetimeContext context, Exception? exception, Func<HubLifetimeContext, Exception?, Task> next)
+        {
+            SetUserInfoProvider(context?.Context);
+            return next(context, exception);
+        }
+
         public ValueTask<object?> InvokeMethodAsync(HubInvocationContext invocationContext, Func<HubInvocationContext, ValueTask<object?>> next)
         {
-            int.TryParse(invocationContext?.Context?.User?.FindFirstValue(ClaimTypes.Upn), out var upn);
-            var userKey = invocationContext?.Context?.User?.FindFirstValue(MhoClaimsType.UserKey);
+            SetUserInfoProvider(invocationContext?.Context);
+            return next(invocationContext);
+        }
+
+
+        private void SetUserInfoProvider(HubCallerContext? context)
+        {
+            int.TryParse(context?.User?.FindFirstValue(ClaimTypes.Upn), out var upn);
+            var userKey = context?.User?.FindFirstValue(MhoClaimsType.UserKey);
             UserInfoProvider.UserId = upn;
             UserInfoProvider.UserKey = userKey;
-            UserInfoProvider.UserName = invocationContext?.Context?.User?.FindFirstValue(ClaimTypes.Name);
-            UserInfoProvider.TownDetail = invocationContext?.Context?.User?.FindFirstValue(MhoClaimsType.Town)?.FromJson<SimpleMeTownDetailDto>();
-            return next(invocationContext);
+            UserInfoProvider.UserName = context?.User?.FindFirstValue(ClaimTypes.Name);
+            UserInfoProvider.TownDetail = context?.User?.FindFirstValue(MhoClaimsType.Town)?.FromJson<SimpleMeTownDetailDto>();
         }
     }
 }
