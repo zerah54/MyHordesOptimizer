@@ -417,21 +417,17 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     // UpdateAsync
                     var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizen.Id.Value)
-                        .Include(citizen => citizen.ExpeditionOrders)
-                        .AsSplitQuery()
-                        .Include(citizen => citizen.IdExpeditionBagNavigation)
-                            .ThenInclude(bag => bag.ExpeditionBagItems)
-                                .ThenInclude(bagItem => bagItem.IdItemNavigation)
-                        .AsSplitQuery()
-                        .Include(citizen => citizen.IdUserNavigation)
-                        .AsSplitQuery()
+                        .IncludeAll()
                         .Single();
 
                     var orderFromDb = expeditionCitizenFromDb.ExpeditionOrders;
                     var orderFromDto = expeditionCitizenModel.ExpeditionOrders;
                     DbContext.Patch(orderFromDb, orderFromDto);
 
+                    var part = expeditionCitizenFromDb.IdExpeditionPartNavigation;
                     expeditionCitizenFromDb.UpdateAllButKeysProperties(expeditionCitizenModel);
+                    expeditionCitizenFromDb.IdExpeditionPartNavigation = part;
+                    expeditionCitizenFromDb.IdExpeditionPart = part.IdExpeditionPart;
                     DbContext.SaveChanges();
                     result = Mapper.Map<ExpeditionCitizenDto>(expeditionCitizenFromDb);
                 }
@@ -444,7 +440,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                     }
                     var newEntity = DbContext.Add(expeditionCitizenModel).Entity;
                     DbContext.SaveChanges();
-                    result = Mapper.Map<ExpeditionCitizenDto>(newEntity);
+                    var expeditionCitizenFromDb = DbContext.ExpeditionCitizens.Where(citizen => citizen.IdExpeditionCitizen == newEntity.IdExpeditionCitizen)
+                      .IncludeAll()
+                      .Single();
+                    result = Mapper.Map<ExpeditionCitizenDto>(expeditionCitizenFromDb);
                 }
                 transaction.Commit();
                 return result;
@@ -554,6 +553,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var expeditionCitizen = DbContext.ExpeditionCitizens
                     .Where(citizen => citizen.IdExpeditionCitizen == expeditionCitizenId)
                     .Include(citizen => citizen.ExpeditionOrders)
+                    .Include(citizen => citizen.IdExpeditionPartNavigation)
                     .Single();
                 var toAdd = expeditionOrder.Where(orderDto => orderDto.Id is null);
                 var toUpdate = expeditionOrder.Where(orderDto => orderDto.Id is not null);
@@ -662,7 +662,13 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public ExpeditionOrderDto UpdateExpeditionOrder(ExpeditionOrderDto expeditionOrderDto)
         {
-            var expeditionOrderModel = DbContext.ExpeditionOrders.Single(order => order.IdExpeditionOrder == expeditionOrderDto.Id.Value);
+            var expeditionOrderModel = DbContext.ExpeditionOrders
+                .Include(order => order.IdExpeditionCitizenNavigation)
+                    .ThenInclude(citizen => citizen.IdExpeditionPartNavigation)
+                        .ThenInclude(part => part.IdExpeditionNavigation)
+                .Include(order => order.IdExpeditionParts)
+                    .ThenInclude(part => part.IdExpeditionNavigation)
+                .Single(order => order.IdExpeditionOrder == expeditionOrderDto.Id.Value);
             var modelFromDto = Mapper.Map<ExpeditionOrder>(expeditionOrderDto);
             expeditionOrderModel.UpdateAllButKeysProperties(modelFromDto, ignoreNull: true);
             DbContext.Update(expeditionOrderModel);
@@ -688,11 +694,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     DbContext.Remove(DbContext.ExpeditionBags.Single(expeditionBag => expeditionBag.IdExpeditionBag == expeditionBagDto.Id));
                 }
                 // UpdateAsync 
-                var expeditionBagFromDb = DbContext.ExpeditionBags
-                    .Where(bag => bag.IdExpeditionBag == expeditionBagDto.Id)
-                    .Include(bag => bag.ExpeditionBagItems)
-                        .ThenInclude(bagItem => bagItem.IdItemNavigation)
-                    .Single();
+                var expeditionBagFromDb = DbContext.GetExpeditionBag(expeditionBagDto.Id.Value);
                 expeditionBagFromDb.UpdateAllButKeysProperties(expeditionBagModel);
                 DbContext.Update(expeditionBagFromDb);
                 expeditionCitizen.IdExpeditionBagNavigation = expeditionBagFromDb;

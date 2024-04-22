@@ -11,5 +11,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions
         public string? Path { get; set; }
         public string? Label { get; set; }
         public string? Direction { get; set; }
+        public int ExpeditionId { get; set; }
     }
 }

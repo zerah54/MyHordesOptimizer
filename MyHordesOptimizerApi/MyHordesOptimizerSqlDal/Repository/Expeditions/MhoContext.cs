@@ -10,6 +10,9 @@ namespace MyHordesOptimizerApi
             return ExpeditionBags.Where(bag => bag.IdExpeditionBag == idExpeditionBag)
                          .Include(bag => bag.ExpeditionBagItems)
                              .ThenInclude(bagItem => bagItem.IdItemNavigation)
+                         .Include(bag => bag.ExpeditionCitizens)
+                             .ThenInclude(citizen => citizen.IdExpeditionPartNavigation)
+                                .ThenInclude(part => part.IdExpeditionNavigation)                             
                          .Single();
         }
 

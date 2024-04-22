@@ -15,5 +15,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Expeditions
         public int? NombrePaDepart { get; set; }
         public bool? IsPreinscritSoif { get; set; }
         public bool? IsThirsty { get; set; }
+        public int ExpeditionPartId { get; set; }
+        public int ExpeditionId { get; set; }
     }
 }
