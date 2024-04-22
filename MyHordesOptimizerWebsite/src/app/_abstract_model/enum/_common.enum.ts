@@ -17,7 +17,7 @@ export abstract class CommonEnum {
             return property_descriptor.value.valueOf();
         } else {
             if (!environment.production) {
-                console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);
+                // console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);
             }
             return undefined;
         }

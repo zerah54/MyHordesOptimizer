@@ -23,10 +23,7 @@ export function errorInterceptor(request: HttpRequest<unknown>, next: HttpHandle
  *
  * @return {Observable<never>}
  */
-function handleError(error: HttpErrorResponse, snackbar: SnackbarService, authentication_service: AuthenticationService)
-    : Observable<never> {
-    console.log('error', error);
-
+function handleError(error: HttpErrorResponse, snackbar: SnackbarService, authentication_service: AuthenticationService): Observable<never> {
     if (error.status === 0) {
         /** A client-side or network error occurred. Handle it accordingly. */
         console.error(`Erreur ${error.status} du client ou de réseau : \n`, error.error);

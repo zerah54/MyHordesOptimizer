@@ -1,7 +1,15 @@
 @use 'variables';
 
 .mho-avatar {
+    display: contents;
+
     > * {
         width: 100px;
+    }
+
+    &.rounded {
+        > * {
+            transform: scale(0.35) translateX(-110%) translateY(-95%);
+        }
     }
 }

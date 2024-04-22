@@ -8,9 +8,9 @@ import { MinMax } from '../interfaces';
 import { dtoToModelArray } from '../types/_common.class';
 import { Estimations } from '../types/estimations.class';
 import { Regen } from '../types/regen.class';
-import { GlobalService } from './global.service';
+import { GlobalService } from './_global.service';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class TownStatisticsService extends GlobalService {
 
     constructor(_http: HttpClient) {

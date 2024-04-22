@@ -2,7 +2,7 @@ import { FirebaseOptions } from '@firebase/app';
 
 export const environment: Environment = {
     production: true,
-    api_url: 'https://myhordesoptimizerapi.azurewebsites.net',
+    api_url: 'https://api.myhordesoptimizer.fr/dev',
     website_url: 'https://myhordes-optimizer-dev.web.app/',
     firebase_config: {
         apiKey: 'AIzaSyB3H--KamQP_FZfFgFgrGXHpaa9msDqp50',

@@ -5,6 +5,12 @@
     border-radius: 0.25em;
     padding: 0.5em;
 
+    .count-ap-in-bag {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+
     .label {
         border-bottom: 1px dotted;
         margin-bottom: 0.5em;

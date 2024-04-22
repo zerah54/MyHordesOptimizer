@@ -11,7 +11,7 @@ import {
 import { TokenWithMeDTO } from '../dto/token-with-me.dto';
 import { Me } from '../types/me.class';
 import { TokenWithMe } from '../types/token-with-me.class';
-import { GlobalService } from './global.service';
+import { GlobalService } from './_global.service';
 
 
 @Injectable({ providedIn: 'root' })
@@ -28,19 +28,9 @@ export class AuthenticationService extends GlobalService {
                 if (saved_me && !force) {
                     sub.next(saved_me);
                 } else {
-                    super.get<TokenWithMeDTO>(this.API_URL + `/Authentication/Token?userKey=${getExternalAppId()}`)
-                        .subscribe({
-                            next: (response: HttpResponse<TokenWithMeDTO>) => {
-                                const token_with_me: TokenWithMe = new TokenWithMe(response.body);
-                                setUser(token_with_me.simple_me);
-                                setTown(token_with_me.simple_me.town_details);
-                                setTokenWithMeWithExpirationDate(token_with_me);
-                                sub.next(token_with_me.simple_me);
-                            },
-                            error: (error: HttpErrorResponse) => {
-                                sub.error(error);
-                            }
-                        });
+                    this.getToken().subscribe((token: TokenWithMe) => {
+                        sub.next(token.simple_me);
+                    });
                 }
 
             } else {
@@ -48,6 +38,24 @@ export class AuthenticationService extends GlobalService {
                 setTown(null);
                 sub.next(null);
             }
+        });
+    }
+
+    public getToken(): Observable<TokenWithMe> {
+        return new Observable((sub: Subscriber<TokenWithMe>) => {
+            super.get<TokenWithMeDTO>(this.API_URL + `/Authentication/Token?userKey=${getExternalAppId()}`)
+                .subscribe({
+                    next: (response: HttpResponse<TokenWithMeDTO>) => {
+                        const token_with_me: TokenWithMe = new TokenWithMe(response.body);
+                        setUser(token_with_me.simple_me);
+                        setTown(token_with_me.simple_me.town_details);
+                        setTokenWithMeWithExpirationDate(token_with_me);
+                        sub.next(token_with_me);
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
         });
     }
 }

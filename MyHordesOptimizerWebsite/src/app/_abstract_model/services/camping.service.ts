@@ -6,10 +6,10 @@ import { CampingOddsDTO } from '../dto/camping-odds.dto';
 import { CampingBonus } from '../types/camping-bonus.class';
 import { CampingOdds } from '../types/camping-odds.class';
 import { CampingParameters } from '../types/camping-parameters.class';
-import { GlobalService } from './global.service';
+import { GlobalService } from './_global.service';
 
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class CampingService extends GlobalService {
 
     constructor(_http: HttpClient) {

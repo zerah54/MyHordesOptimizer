@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding, Input } from '@angular/core';
+import { booleanAttribute, Component, HostBinding, Input } from '@angular/core';
 
 @Component({
     selector: 'mho-avatar',
@@ -12,5 +12,7 @@ export class AvatarComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input() src: string | undefined;
+    @Input({ transform: booleanAttribute }) rounded: boolean = false;
+    @Input() width: string | undefined;
 
 }

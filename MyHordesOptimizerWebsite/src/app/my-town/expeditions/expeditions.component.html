@@ -4,6 +4,7 @@
         <button mat-icon-button type="button" (click)="shareExpeditionForum()" matTooltip="Copier au format forum" i18n-matTooltip>
             <mat-icon>share</mat-icon>
         </button>
+        <mho-active-citizens [citizenList]="active_citizens_list()" [completeCitizenList]="all_citizens"></mho-active-citizens>
     </mat-card-title>
     <div class="actions">
         <mat-slide-toggle [(ngModel)]="edition_mode" (ngModelChange)="changeEditionMode()">
@@ -43,7 +44,8 @@
                                                 <mat-icon>more_vert</mat-icon>
                                             </button>
                                             <mat-menu #manageExpeditions="matMenu">
-                                                <div mat-menu-item (click)="$event.preventDefault(); $event.stopPropagation()">
+                                                <div mat-menu-item (click)="$event.preventDefault(); $event.stopPropagation()"
+                                                     (keydown)="$event.stopPropagation()">
                                                     <mat-form-field [appearance]="'outline'" class="short-bottom" style="margin-top: 0.5em">
                                                         <mat-label i18n>Importer le jour</mat-label>
                                                         <input matInput #dayInput type="number" [min]="1" [max]="day - 1" [value]="selected_tab_index">
@@ -61,304 +63,299 @@
                                     </div>
                                 </div>
                             }
-                            @if (expeditions) {
-                                <mat-accordion class="content" [multi]="true">
-                                    @for (expedition of expeditions; track expedition.id; let expedition_index = $index) {
-                                        <mat-expansion-panel [ngClass]="['expedition', expedition.state]"
-                                                             [expanded]="isDefaultExpanded(expedition)">
-                                            <mat-expansion-panel-header class="header">
-                                                <div class="label">
-                                                    @if (edition_mode && editable) {
-                                                        <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
-                                                            <mat-label i18n>Nom de l'expédition</mat-label>
-                                                            <input matInput [(ngModel)]="expedition.label" (ngModelChange)="saveExpedition(expedition)">
-                                                        </mat-form-field>
-                                                        <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
-                                                            <mat-label i18n>Points de contrôles requis</mat-label>
-                                                            <input matInput type="number" [(ngModel)]="expedition.min_pdc"
-                                                                   (ngModelChange)="saveExpedition(expedition)">
-                                                        </mat-form-field>
-                                                    } @else {
-                                                        <h2>{{ expedition.label }}</h2>
-                                                    }
-                                                </div>
+                            <mat-accordion class="content" [multi]="true">
+                                @for (expedition of expeditions(); track expedition.id) {
+                                    <mat-expansion-panel [ngClass]="['expedition', expedition.state]"
+                                                         [expanded]="isDefaultExpanded(expedition)">
+                                        <mat-expansion-panel-header class="header">
+                                            <div class="label">
                                                 @if (edition_mode && editable) {
-                                                    <div class="actions" (click)="$event.stopPropagation()">
-                                                        <mat-slide-toggle [ngModel]="expedition.state === 'ready'"
-                                                                          (ngModelChange)="changeExpeditionState(expedition, $event);">
-                                                            <ng-container i18n>Expédition prête</ng-container>
-                                                        </mat-slide-toggle>
-                                                        <button mat-icon-button type="button" matTooltip="Supprimer l'expédition" i18n-matTooltip
-                                                                (click)="removeExpedition(expedition, expedition_index)">
-                                                            <mat-icon>delete</mat-icon>
-                                                        </button>
-                                                    </div>
+                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field" (click)="$event.stopPropagation()">
+                                                        <mat-label i18n>Nom de l'expédition</mat-label>
+                                                        <input matInput [(ngModel)]="expedition.label" (ngModelChange)="saveExpedition(expedition)">
+                                                    </mat-form-field>
+                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field" (click)="$event.stopPropagation()">
+                                                        <mat-label i18n>Points de contrôles requis</mat-label>
+                                                        <input matInput type="number" [(ngModel)]="expedition.min_pdc"
+                                                               (ngModelChange)="saveExpedition(expedition)">
+                                                    </mat-form-field>
+                                                } @else {
+                                                    <h2>{{ expedition.label }}</h2>
                                                 }
-                                            </mat-expansion-panel-header>
-                                            <div class="content">
-                                                @for (expedition_part of expedition.parts; track expedition_part.id; let expedition_part_index = $index) {
-                                                    <div class="expedition-part">
-                                                        <div class="expedition-part-header">
-                                                            @if (expedition.parts.length > 1) {
-                                                                <span i18n>Partie {{ expedition_part_index + 1 }}&nbsp;:&nbsp;</span>
-                                                            }
-                                                            @if (edition_mode && editable) {
-                                                                <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
-                                                                    <mat-label i18n>Nom du tracé</mat-label>
-                                                                    <input matInput type="text" [(ngModel)]="expedition_part.path"
-                                                                           (ngModelChange)="saveExpeditionPart(expedition, expedition_part)">
-                                                                </mat-form-field>
-                                                            } @else {
-                                                                <span [innerHTML]="expedition_part.path"></span>
-                                                            }
-                                                            <div class="expedition-compass">
-                                                                <mho-compass-rose [(selectedScrutZone)]="expedition_part.direction"
-                                                                                  (selectedScrutZoneChange)="saveExpeditionPart(expedition, expedition_part)"
-                                                                                  [readonly]="!edition_mode || !editable"></mho-compass-rose>
-                                                            </div>
-                                                        </div>
-                                                        <table class="expedition-table">
-                                                            <thead>
-                                                            <tr class="table-header">
-                                                                @if (edition_mode && editable) {
-                                                                    <button mat-icon-button type="button" matTooltip="Supprimer la partie" i18n-matTooltip
-                                                                            (click)="removeExpeditionPart(expedition_part, expedition_part_index, expedition)">
-                                                                        <mat-icon>delete</mat-icon>
-                                                                    </button>
-                                                                }
-                                                                <td class="job" i18n>Métier</td>
-                                                                <td class="pseudo">
-                                                                    <div i18n>Citoyen</div>
-                                                                </td>
-                                                                <td class="is-thirsty">
-                                                                    <div class="flex">
-                                                                        <img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst1.gif'" [height]="16" [width]="16">
-                                                                    </div>
-                                                                </td>
-                                                                <td class="starts-7-ap">
-                                                                    <div class="flex">
-                                                                        7
-                                                                        <mho-icon-ap></mho-icon-ap>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="pdc">
-                                                                    <div class="flex">
-                                                                        <img [ngSrc]="HORDES_IMG_REPO + 'professions/shield.gif'" [height]="16" [width]="16">
-                                                                        {{ expedition_part | totalPdc }}/{{ expedition.min_pdc || 0 }}
-                                                                    </div>
-                                                                </td>
-                                                                @if ((edition_mode || (expedition_part.citizens | someHeroicActionNeeded)) && editable) {
-                                                                    <td class="heroic" i18n>Action héroïque</td>
-                                                                }
-                                                                <td class="citizen-orders" i18n>Consignes perso</td>
-                                                                <td class="bag" i18n>Sac</td>
-                                                            </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @for (citizen of expedition_part.citizens; track citizen.id; let citizen_index = $index) {
-                                                                    <tr class="citizen">
-                                                                        @if (edition_mode && editable) {
-                                                                            <td class="action">
-                                                                                <button mat-icon-button type="button" matTooltip="Supprimer la place"
-                                                                                        i18n-matTooltip
-                                                                                        (click)="removeCitizenFromPart(citizen, expedition_part, citizen_index)">
-                                                                                    <mat-icon>delete</mat-icon>
-                                                                                </button>
-                                                                            </td>
-                                                                        }
-                                                                        <td class="job">
-                                                                            @if (edition_mode && editable && !citizen.citizen_id) {
-                                                                                <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
-                                                                                    <mho-select [options]="all_citizens_job" [searchable]="false"
-                                                                                                emptyOption
-                                                                                                [bindLabel]="'value.label'"
-                                                                                                noLabel
-                                                                                                [bindIcon]="'value.img'"
-                                                                                                [(ngModel)]="citizen.preinscrit_job"
-                                                                                                (ngModelChange)="saveCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
-                                                                                </mat-form-field>
-                                                                            } @else if (citizen.preinscrit_job?.value?.img || (citizen.citizen_id | citizenFromId:all_citizens)?.job?.value?.img) {
-                                                                                <img
-                                                                                    [ngSrc]="HORDES_IMG_REPO + (citizen.preinscrit_job?.value?.img ?? (citizen.citizen_id ? (citizen.citizen_id | citizenFromId:all_citizens)?.job?.value?.img : ''))"
-                                                                                    width="16" height="16">
-                                                                            }
-                                                                        </td>
-                                                                        <td class="pseudo">
-                                                                            @if ((edition_mode || (expedition.state === 'ready' && !citizen.preinscrit)) && editable) {
-                                                                                <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
-                                                                                    <mho-select
-                                                                                        [options]="all_citizens | citizensForExpe:citizen:expedition:expeditions"
-                                                                                        emptyOption
-                                                                                        [(ngModel)]="citizen.citizen_id"
-                                                                                        [bindLabel]="'name'"
-                                                                                        [bindValue]="'id'"
-                                                                                        [bindIcon]="'job.value.img'"
-                                                                                        (ngModelChange)="edition_mode && editable && !!citizen.citizen_id ? citizen.preinscrit = true : citizen.preinscrit = false; saveCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
-                                                                                </mat-form-field>
-                                                                            } @else {
-                                                                                {{ citizen.citizen_id ? (citizen.citizen_id | citizenFromId:all_citizens)?.name : '' }}
-                                                                            }
-                                                                        </td>
-                                                                        <td class="is-thirsty">
-                                                                            @if (edition_mode && editable) {
-                                                                                <mat-checkbox
-                                                                                    [ngModel]="citizen.is_preinscrit_soif"
-                                                                                    [indeterminate]="citizen.is_preinscrit_soif === undefined || citizen.is_preinscrit_soif === null"
-                                                                                    (ngModelChange)="this.changeThirstyMode(citizen); saveCitizen(expedition_part, citizen)"></mat-checkbox>
-                                                                            } @else if (expedition.state === 'ready' && editable) {
-                                                                                <mat-checkbox
-                                                                                    [ngModel]="citizen.is_thirsty"
-                                                                                    (ngModelChange)="this.changeThirstyMode(citizen); saveCitizen(expedition_part, citizen)"></mat-checkbox>
-                                                                            } @else if (citizen.is_preinscrit_soif !== undefined && citizen.is_preinscrit_soif !== null) {
-                                                                                @if (citizen.is_preinscrit_soif) {
-                                                                                    <ng-container i18n>Oui</ng-container>
-                                                                                } @else {
-                                                                                    <ng-container i18n>Non</ng-container>
-                                                                                }
-                                                                            }
-                                                                        </td>
-                                                                        <td class="starts-7-ap">
-                                                                            @if (edition_mode && editable) {
-                                                                                <mat-checkbox [ngModel]="citizen.starts_7_ap"
-                                                                                              [indeterminate]="(citizen.starts_7_ap === undefined || citizen.starts_7_ap === null) && edition_mode && editable"
-                                                                                              (ngModelChange)="this.change7ApMode(citizen); saveCitizen(expedition_part, citizen)"></mat-checkbox>
-                                                                            } @else if (citizen.starts_7_ap !== undefined && citizen.starts_7_ap !== null) {
-                                                                                @if (citizen.starts_7_ap) {
-                                                                                    <ng-container i18n>Oui</ng-container>
-                                                                                } @else {
-                                                                                    <ng-container i18n>Non</ng-container>
-                                                                                }
-                                                                            }
-                                                                        </td>
-                                                                        <td class="pdc">
-                                                                            @if ((edition_mode || expedition.state === 'ready') && editable) {
-                                                                                <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
-                                                                                    <input matInput [(ngModel)]="citizen.pdc"
-                                                                                           (ngModelChange)="saveCitizen(expedition_part, citizen)">
-                                                                                </mat-form-field>
-                                                                            } @else {
-                                                                                {{ citizen.pdc }}
-                                                                            }
-                                                                        </td>
-                                                                        @if ((edition_mode || (expedition_part.citizens | someHeroicActionNeeded)) && editable) {
-                                                                            <td class="heroic">
-                                                                                @if (edition_mode && editable) {
-                                                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
-                                                                                        <mho-select [options]="all_heroics"
-                                                                                                    emptyOption
-                                                                                                    [(ngModel)]="citizen.preinscrit_heroic_skill"
-                                                                                                    (ngModelChange)="saveCitizen(expedition_part, citizen)"
-                                                                                                    [bindValue]="'value.action'"
-                                                                                                    [bindLabel]="'value.label'"
-                                                                                                    [bindIcon]="'value.img'"></mho-select>
-                                                                                    </mat-form-field>
-                                                                                } @else {
-                                                                                    {{ citizen.preinscrit_heroic_skill ? citizen.preinscrit_heroic_skill : '' }}
-                                                                                }
-                                                                            </td>
-                                                                        }
-                                                                        <td class="citizen-orders">
-                                                                            @if (edition_mode && editable) {
-                                                                                <ng-container
-                                                                                    *ngTemplateOutlet="displayOrder; context: {$implicit: citizen.orders}"></ng-container>
-                                                                                <button mat-icon-button type="button"
-                                                                                        (click)="openExpeditionOrders(citizen.orders, citizen)">
-                                                                                    <mat-icon>edit</mat-icon>
-                                                                                </button>
-                                                                            } @else {
-                                                                                <ng-container
-                                                                                    *ngTemplateOutlet="displayOrder; context: {$implicit: citizen.orders}"></ng-container>
-                                                                            }
-                                                                        </td>
-                                                                        <td class="bag">
-                                                                            <mho-list-element-add-remove [currentList]="citizen.bag.items"
-                                                                                                         label="Sac" i18n-label
-                                                                                                         [lists]="objectsList"
-                                                                                                         addLabel="Ajouter au sac" i18n-addLabel
-                                                                                                         (add)="addItem(citizen, +$event)"
-                                                                                                         removeLabel="Retirer du sac" i18n-removeLabel
-                                                                                                         (remove)="removeItem(citizen, +$event)"
-                                                                                                         emptyLabel="Vider le sac" i18n-emptyLabel
-                                                                                                         (empty)="emptyBag(citizen)"
-                                                                                                         [readonly]="!edition_mode || !editable"
-                                                                                                         [class]="'mho-expedition-bag-selector'">
-                                                                            </mho-list-element-add-remove>
-                                                                        </td>
-                                                                    </tr>
-                                                                }
-                                                            </tbody>
-                                                            @if (edition_mode && editable) {
-                                                                <tfoot>
-                                                                <tr>
-                                                                    <td [attr.colspan]="'100%'">
-                                                                        <button mat-button (click)="addNewMemberToPart(expedition_part)">
-                                                                            <mat-icon>add</mat-icon>
-                                                                            <ng-container i18n>Ajouter une place</ng-container>
-                                                                        </button>
-                                                                    </td>
-                                                                </tr>
-                                                                </tfoot>
-                                                            }
-                                                        </table>
-                                                        <div class="orders">
-                                                            <h3 style="display: flex;align-items: center;">
-                                                                <ng-container i18n>Consignes de l'expédition</ng-container>
-                                                                @if (edition_mode && editable) {
-                                                                    <button mat-icon-button type="button"
-                                                                            (click)="openExpeditionOrders(expedition_part.orders, expedition_part)">
-                                                                        <mat-icon>edit</mat-icon>
-                                                                    </button>
-                                                                }
-                                                            </h3>
-                                                            @if (edition_mode && editable) {
-                                                                <ng-container
-                                                                    *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_part.orders}"></ng-container>
-                                                            } @else {
-                                                                <ng-container
-                                                                    *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_part.orders}"></ng-container>
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                }
-                                                <ng-template #displayOrder let-orders>
-                                                    @if (orders.length > 0) {
-                                                        @for (order of orders; track order.id) {
-                                                            <div>
-                                                                @switch (order.type) {
-                                                                    @case ('text') {
-                                                                        <span [innerHTML]="order.text"></span>
-                                                                    }
-                                                                    @case ('checkbox') {
-                                                                        <mat-checkbox [(ngModel)]="order.done" (ngModelChange)="saveOrder(order)"
-                                                                                      [disabled]="!editable">
-                                                                            <span [class.checked]="order.done" [innerHTML]="order.text"></span>
-                                                                        </mat-checkbox>
-                                                                    }
-                                                                }
-                                                            </div>
-                                                        }
-                                                    } @else {
-                                                        <div class="no-order">Pas de consigne.</div>
-                                                    }
-                                                </ng-template>
                                             </div>
                                             @if (edition_mode && editable) {
-                                                <div class="footer">
-                                                    <button mat-button type="button" (click)="addNewExpeditionPart(expedition)">
-                                                        <ng-container i18n>Ajouter une partie à l'expédition</ng-container>
+                                                <div class="actions" (click)="$event.stopPropagation()">
+                                                    <mat-slide-toggle [ngModel]="expedition.state === 'ready'"
+                                                                      (ngModelChange)="changeExpeditionState(expedition, $event);">
+                                                        <ng-container i18n>Expédition prête</ng-container>
+                                                    </mat-slide-toggle>
+                                                    <button mat-icon-button type="button" matTooltip="Supprimer l'expédition" i18n-matTooltip
+                                                            (click)="removeExpedition(expedition)">
+                                                        <mat-icon>delete</mat-icon>
                                                     </button>
-                                                    @if (expedition.parts.length > 1) {
-                                                        <button mat-button type="button" (click)="addNewMemberToExpedition(expedition)">
-                                                            <ng-container i18n>Ajouter un membre à l'expédition</ng-container>
-                                                        </button>
-                                                    }
                                                 </div>
                                             }
-                                        </mat-expansion-panel>
-                                    }
-                                </mat-accordion>
-
-                            }
+                                        </mat-expansion-panel-header>
+                                        <div class="content">
+                                            @for (expedition_part of expedition.parts; track expedition_part.id; let expedition_part_index = $index) {
+                                                <div class="expedition-part">
+                                                    <div class="expedition-part-header">
+                                                        @if (expedition.parts.length > 1) {
+                                                            <span i18n>Partie {{ expedition_part_index + 1 }}&nbsp;:&nbsp;</span>
+                                                        }
+                                                        @if (edition_mode && editable) {
+                                                            <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                                <mat-label i18n>Nom du tracé</mat-label>
+                                                                <input matInput type="text" [(ngModel)]="expedition_part.path"
+                                                                       (ngModelChange)="saveExpeditionPart(expedition, expedition_part)">
+                                                            </mat-form-field>
+                                                        } @else {
+                                                            <span [innerHTML]="expedition_part.path"></span>
+                                                        }
+                                                        <div class="expedition-compass">
+                                                            <mho-compass-rose [(selectedScrutZone)]="expedition_part.direction"
+                                                                              (selectedScrutZoneChange)="saveExpeditionPart(expedition, expedition_part)"
+                                                                              [readonly]="!edition_mode || !editable"></mho-compass-rose>
+                                                        </div>
+                                                    </div>
+                                                    <table class="expedition-table">
+                                                        <thead>
+                                                        <tr class="table-header">
+                                                            @if (edition_mode && editable) {
+                                                                <button mat-icon-button type="button" matTooltip="Supprimer la partie" i18n-matTooltip
+                                                                        (click)="removeExpeditionPart(expedition_part)">
+                                                                    <mat-icon>delete</mat-icon>
+                                                                </button>
+                                                            }
+                                                            <td class="job" i18n>Métier</td>
+                                                            <td class="pseudo">
+                                                                <div i18n>Citoyen</div>
+                                                            </td>
+                                                            <td class="is-thirsty">
+                                                                <div class="flex">
+                                                                    <img [ngSrc]="HORDES_IMG_REPO + 'status/status_thirst1.gif'" [height]="16" [width]="16">
+                                                                </div>
+                                                            </td>
+                                                            <td class="starts-7-ap">
+                                                                <div class="flex">
+                                                                    7
+                                                                    <mho-icon-ap></mho-icon-ap>
+                                                                </div>
+                                                            </td>
+                                                            <td class="pdc">
+                                                                <div class="flex">
+                                                                    <img [ngSrc]="HORDES_IMG_REPO + 'professions/shield.gif'" [height]="16" [width]="16">
+                                                                    {{ expedition_part | totalPdc }}/{{ expedition.min_pdc || 0 }}
+                                                                </div>
+                                                            </td>
+                                                            @if ((edition_mode || (expedition_part.citizens | someHeroicActionNeeded)) && editable) {
+                                                                <td class="heroic" i18n>Action héroïque</td>
+                                                            }
+                                                            <td class="citizen-orders" i18n>Consignes perso</td>
+                                                            <td class="bag" i18n>Sac</td>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @for (citizen of expedition_part.citizens; track citizen.id; let citizen_index = $index) {
+                                                                <tr class="citizen">
+                                                                    @if (edition_mode && editable) {
+                                                                        <td class="action">
+                                                                            <button mat-icon-button type="button" matTooltip="Supprimer la place"
+                                                                                    i18n-matTooltip
+                                                                                    (click)="removeCitizenFromPart(citizen)">
+                                                                                <mat-icon>delete</mat-icon>
+                                                                            </button>
+                                                                        </td>
+                                                                    }
+                                                                    <td class="job">
+                                                                        @if (edition_mode && editable && !citizen.citizen_id) {
+                                                                            <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                                                <mho-select [options]="all_citizens_job" [searchable]="false"
+                                                                                            emptyOption
+                                                                                            [bindLabel]="'value.label'"
+                                                                                            noLabel
+                                                                                            [bindIcon]="'value.img'"
+                                                                                            [(ngModel)]="citizen.preinscrit_job"
+                                                                                            (ngModelChange)="saveCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
+                                                                            </mat-form-field>
+                                                                        } @else if (citizen.preinscrit_job?.value?.img || (citizen.citizen_id | citizenFromId:all_citizens)?.job?.value?.img) {
+                                                                            <img
+                                                                                [ngSrc]="HORDES_IMG_REPO + (citizen.preinscrit_job?.value?.img ?? (citizen.citizen_id ? (citizen.citizen_id | citizenFromId:all_citizens)?.job?.value?.img : ''))"
+                                                                                width="16" height="16">
+                                                                        }
+                                                                    </td>
+                                                                    <td class="pseudo">
+                                                                        @if ((edition_mode || (expedition.state === 'ready' && !citizen.preinscrit)) && editable) {
+                                                                            <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                                                <mho-select
+                                                                                    [options]="all_citizens | citizensForExpe:citizen:expedition:expeditions()"
+                                                                                    emptyOption
+                                                                                    [(ngModel)]="citizen.citizen_id"
+                                                                                    [bindLabel]="'name'"
+                                                                                    [bindValue]="'id'"
+                                                                                    [bindIcon]="'job.value.img'"
+                                                                                    (ngModelChange)="edition_mode && editable && !!citizen.citizen_id ? citizen.preinscrit = true : citizen.preinscrit = false; saveCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
+                                                                            </mat-form-field>
+                                                                        } @else {
+                                                                            {{ citizen.citizen_id ? (citizen.citizen_id | citizenFromId:all_citizens)?.name : '' }}
+                                                                        }
+                                                                    </td>
+                                                                    <td class="is-thirsty">
+                                                                        @if (edition_mode && editable) {
+                                                                            <mat-checkbox
+                                                                                [ngModel]="citizen.is_preinscrit_soif"
+                                                                                [indeterminate]="citizen.is_preinscrit_soif === undefined || citizen.is_preinscrit_soif === null"
+                                                                                (change)="this.changeThirstyMode(citizen); saveCitizen(expedition_part, citizen)"></mat-checkbox>
+                                                                        } @else if (expedition.state === 'ready' && editable) {
+                                                                            <mat-checkbox
+                                                                                [ngModel]="citizen.is_thirsty"
+                                                                                (change)="this.changeThirstyMode(citizen); saveCitizen(expedition_part, citizen)"></mat-checkbox>
+                                                                        } @else if (citizen.is_preinscrit_soif !== undefined && citizen.is_preinscrit_soif !== null) {
+                                                                            @if (citizen.is_preinscrit_soif) {
+                                                                                <ng-container i18n>Oui</ng-container>
+                                                                            } @else {
+                                                                                <ng-container i18n>Non</ng-container>
+                                                                            }
+                                                                        }
+                                                                    </td>
+                                                                    <td class="starts-7-ap">
+                                                                        @if (edition_mode && editable) {
+                                                                            <mat-checkbox [ngModel]="citizen.starts_7_ap"
+                                                                                          [indeterminate]="(citizen.starts_7_ap === undefined || citizen.starts_7_ap === null) && edition_mode && editable"
+                                                                                          (change)="this.change7ApMode(citizen); saveCitizen(expedition_part, citizen)"></mat-checkbox>
+                                                                        } @else if (citizen.starts_7_ap !== undefined && citizen.starts_7_ap !== null) {
+                                                                            @if (citizen.starts_7_ap) {
+                                                                                <ng-container i18n>Oui</ng-container>
+                                                                            } @else {
+                                                                                <ng-container i18n>Non</ng-container>
+                                                                            }
+                                                                        }
+                                                                    </td>
+                                                                    <td class="pdc">
+                                                                        @if ((edition_mode || expedition.state === 'ready') && editable) {
+                                                                            <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                                                <input matInput [(ngModel)]="citizen.pdc"
+                                                                                       (ngModelChange)="saveCitizen(expedition_part, citizen)">
+                                                                            </mat-form-field>
+                                                                        } @else {
+                                                                            {{ citizen.pdc }}
+                                                                        }
+                                                                    </td>
+                                                                    @if ((edition_mode || (expedition_part.citizens | someHeroicActionNeeded)) && editable) {
+                                                                        <td class="heroic">
+                                                                            @if (edition_mode && editable) {
+                                                                                <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                                                                                    <mho-select [options]="all_heroics"
+                                                                                                emptyOption
+                                                                                                [(ngModel)]="citizen.preinscrit_heroic_skill"
+                                                                                                (ngModelChange)="saveCitizen(expedition_part, citizen)"
+                                                                                                [bindLabel]="'value.label'"
+                                                                                                [bindIcon]="'value.img'"></mho-select>
+                                                                                </mat-form-field>
+                                                                            } @else {
+                                                                                {{ citizen.preinscrit_heroic_skill ? citizen.preinscrit_heroic_skill : '' }}
+                                                                            }
+                                                                        </td>
+                                                                    }
+                                                                    <td class="citizen-orders">
+                                                                        @if (edition_mode && editable) {
+                                                                            <ng-container
+                                                                                *ngTemplateOutlet="displayOrder; context: {$implicit: citizen.orders}"></ng-container>
+                                                                            <button mat-icon-button type="button"
+                                                                                    (click)="openExpeditionOrders(citizen.orders, citizen)">
+                                                                                <mat-icon>edit</mat-icon>
+                                                                            </button>
+                                                                        } @else {
+                                                                            <ng-container
+                                                                                *ngTemplateOutlet="displayOrder; context: {$implicit: citizen.orders}"></ng-container>
+                                                                        }
+                                                                    </td>
+                                                                    <td class="bag">
+                                                                        <mho-list-element-add-remove [currentList]="citizen.bag.items"
+                                                                                                     label="Sac" i18n-label
+                                                                                                     [lists]="objectsList"
+                                                                                                     addLabel="Ajouter au sac" i18n-addLabel
+                                                                                                     (add)="addItem(citizen, +$event)"
+                                                                                                     removeLabel="Retirer du sac" i18n-removeLabel
+                                                                                                     (remove)="removeItem(citizen, +$event)"
+                                                                                                     emptyLabel="Vider le sac" i18n-emptyLabel
+                                                                                                     (empty)="emptyBag(citizen)"
+                                                                                                     [readonly]="!edition_mode || !editable"
+                                                                                                     [class]="'mho-expedition-bag-selector'">
+                                                                        </mho-list-element-add-remove>
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                        @if (edition_mode && editable) {
+                                                            <tfoot>
+                                                            <tr>
+                                                                <td [attr.colspan]="'100%'">
+                                                                    <button mat-button (click)="addNewMemberToPart(expedition_part)">
+                                                                        <mat-icon>add</mat-icon>
+                                                                        <ng-container i18n>Ajouter une place</ng-container>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                            </tfoot>
+                                                        }
+                                                    </table>
+                                                    <div class="orders">
+                                                        <h3 style="display: flex;align-items: center;">
+                                                            <ng-container i18n>Consignes de l'expédition</ng-container>
+                                                            @if (edition_mode && editable) {
+                                                                <button mat-icon-button type="button"
+                                                                        (click)="openExpeditionOrders(expedition_part.orders, expedition_part)">
+                                                                    <mat-icon>edit</mat-icon>
+                                                                </button>
+                                                            }
+                                                        </h3>
+                                                        @if (edition_mode && editable) {
+                                                            <ng-container
+                                                                *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_part.orders}"></ng-container>
+                                                        } @else {
+                                                            <ng-container
+                                                                *ngTemplateOutlet="displayOrder; context: {$implicit: expedition_part.orders}"></ng-container>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                            <ng-template #displayOrder let-orders>
+                                                @if (orders.length > 0) {
+                                                    @for (order of orders; track order.id) {
+                                                        <div>
+                                                            @switch (order.type) {
+                                                                @case ('text') {
+                                                                    <span [innerHTML]="order.text"></span>
+                                                                }
+                                                                @case ('checkbox') {
+                                                                    <mat-checkbox [ngModel]="order.done" (change)="saveOrder(order)" [disabled]="!editable">
+                                                                        <span [class.checked]="order.done" [innerHTML]="order.text"></span>
+                                                                    </mat-checkbox>
+                                                                }
+                                                            }
+                                                        </div>
+                                                    }
+                                                } @else {
+                                                    <div class="no-order">Pas de consigne.</div>
+                                                }
+                                            </ng-template>
+                                        </div>
+                                        @if (edition_mode && editable) {
+                                            <div class="footer">
+                                                <button mat-button type="button" (click)="addNewExpeditionPart(expedition)">
+                                                    <ng-container i18n>Ajouter une partie à l'expédition</ng-container>
+                                                </button>
+                                                @if (expedition.parts.length > 1) {
+                                                    <button mat-button type="button" (click)="addNewMemberToExpedition(expedition)">
+                                                        <ng-container i18n>Ajouter un membre à l'expédition</ng-container>
+                                                    </button>
+                                                }
+                                            </div>
+                                        }
+                                    </mat-expansion-panel>
+                                }
+                            </mat-accordion>
                         </div>
                     </ng-template>
                 </mat-tab>

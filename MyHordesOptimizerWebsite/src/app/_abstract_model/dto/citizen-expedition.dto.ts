@@ -12,7 +12,7 @@ export interface CitizenExpeditionDTO {
     preinscritHeroicSkillName?: string;
     pdc: number;
     isThirsty?: boolean;
-    nombrePaDepart: number;
+    nombrePaDepart?: number;
 }
 
 export interface CitizenExpeditionShortDTO {
@@ -26,5 +26,5 @@ export interface CitizenExpeditionShortDTO {
     preinscritHeroicSkillName?: string;
     pdc: number;
     isThirsty?: boolean;
-    nombrePaDepart: number;
+    nombrePaDepart?: number;
 }

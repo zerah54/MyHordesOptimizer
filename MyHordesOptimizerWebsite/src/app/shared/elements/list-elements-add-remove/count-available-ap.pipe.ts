@@ -14,9 +14,9 @@ import { Item } from '../../../_abstract_model/types/item.class';
 export class CountAvailableApPipe implements PipeTransform {
     transform(list: (Item | StatusEnum)[], all_lists: ListForAddRemove[]): number {
         if (!list) return 0;
-        let typed_list: Item[] = <Item[]>list;
+        const typed_list: Item[] = <Item[]>list;
         // TODO ajouter citizen status blessé
-        let max_ap: number = 6;
+        const max_ap: number = 6;
         let ap: number = 0;
 
         let all_items: Item[] = [];
@@ -24,25 +24,25 @@ export class CountAvailableApPipe implements PipeTransform {
             if (list_for_add_remove.list.length > all_items.length) {
                 all_items = <Item[]>[...list_for_add_remove.list];
             }
-        })
+        });
 
         let water_counted: boolean = false;
         let ap_from_eat: number = 0;
         let alcohol_counted: boolean = false;
 
-        let list_with_complete_items: Item[] = typed_list
+        const list_with_complete_items: Item[] = typed_list
             .map((list_item: Item) => <Item>(all_items.find((complete_item: Item) => complete_item.id === list_item.id)));
 
         list_with_complete_items.forEach((item: Item) => {
-            let is_water: boolean = item.properties.some((property: Property) => property.key === Property.IS_WATER.key)
+            const is_water: boolean = item.properties.some((property: Property) => property.key === Property.IS_WATER.key);
             if (is_water && !water_counted) {
                 ap += max_ap;
                 water_counted = true;
             }
 
-            let is_food: boolean = item.properties.some((property: Property) => property.key === Property.FOOD.key)
-            let max_plus_one_ap_food: boolean = item.actions.some((action: Action) => action.key === Action.EAT_7AP.key)
-            let max_ap_food: boolean = item.actions.some((action: Action) => action.key === Action.EAT_6AP.key)
+            const is_food: boolean = item.properties.some((property: Property) => property.key === Property.FOOD.key);
+            const max_plus_one_ap_food: boolean = item.actions.some((action: Action) => action.key === Action.EAT_7AP.key);
+            const max_ap_food: boolean = item.actions.some((action: Action) => action.key === Action.EAT_6AP.key);
             if (is_food && ap_from_eat < max_ap + 1 && (max_plus_one_ap_food || max_ap_food)) {
                 if (ap_from_eat >= 0) {
                     ap -= ap_from_eat;
@@ -52,29 +52,29 @@ export class CountAvailableApPipe implements PipeTransform {
             }
 
             // TODO ajouter citizen status !== gdb
-            let is_alcohol: boolean = item.actions.some((action: Action) => action.key === Action.ALCOHOL.key);
+            const is_alcohol: boolean = item.actions.some((action: Action) => action.key === Action.ALCOHOL.key);
             if (is_alcohol && !alcohol_counted) {
                 ap += max_ap;
                 alcohol_counted = true;
             }
 
-            let is_6ap: boolean = item.actions.some((action: Action) => {
+            const is_6ap: boolean = item.actions.some((action: Action) => {
                 return action.key === Action.ALCOHOL_DX.key
-                    || action.key === Action.DRUG_6AP_1.key
+                    || action.key === Action.DRUG_6AP_1.key;
             });
             if (is_6ap) {
                 ap += max_ap;
             }
 
-            let is_4ap: boolean = item.actions.some((action: Action) => {
-                return action.key === Action.COFFEE.key
+            const is_4ap: boolean = item.actions.some((action: Action) => {
+                return action.key === Action.COFFEE.key;
             });
             if (is_4ap) {
                 ap += 4;
             }
 
-            let is_8ap: boolean = item.actions.some((action: Action) => {
-                return action.key === Action.DRUG_8AP_1.key
+            const is_8ap: boolean = item.actions.some((action: Action) => {
+                return action.key === Action.DRUG_8AP_1.key;
             });
             if (is_8ap) {
                 ap += max_ap;

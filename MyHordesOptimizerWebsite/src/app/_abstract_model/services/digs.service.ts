@@ -6,7 +6,7 @@ import { getTown, getUserId } from '../../shared/utilities/localstorage.util';
 import { DigDTO } from '../dto/dig.dto';
 import { dtoToModelArray, modelToDtoArray } from '../types/_common.class';
 import { Dig } from '../types/dig.class';
-import { GlobalService } from './global.service';
+import { GlobalService } from './_global.service';
 
 
 @Injectable({ providedIn: 'root' })

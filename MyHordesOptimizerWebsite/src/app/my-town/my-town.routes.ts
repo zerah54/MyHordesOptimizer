@@ -7,6 +7,7 @@ import { CampingsComponent } from './campings/campings.component';
 import { CitizensDigsComponent } from './citizens/citizens-digs/citizens-digs.component';
 import { CitizensDispoComponent } from './citizens/citizens-dispo/citizens-dispo.component';
 import { CitizensListComponent } from './citizens/citizens-list/citizens-list.component';
+import { CitizensWatchComponent } from './citizens/citizens-watch/citizens-watch.component';
 import { CitizensComponent } from './citizens/citizens.component';
 import { ExpeditionsComponent } from './expeditions/expeditions.component';
 import { MapComponent } from './map/map.component';
@@ -18,9 +19,9 @@ import { StatisticsComponent } from './statistics/statistics.component';
 import { WishlistComponent } from './wishlist/wishlist.component';
 
 export default [
-    {path: '', redirectTo: 'citizens/list', pathMatch: 'full'},
-    {path: 'citizens', redirectTo: 'citizens/list', pathMatch: 'full'},
-    {path: 'stats', redirectTo: 'stats/estimations', pathMatch: 'full'},
+    { path: '', redirectTo: 'citizens/list', pathMatch: 'full' },
+    { path: 'citizens', redirectTo: 'citizens/list', pathMatch: 'full' },
+    { path: 'stats', redirectTo: 'stats/estimations', pathMatch: 'full' },
     {
         path: 'bank',
         component: BankComponent,
@@ -47,10 +48,17 @@ export default [
                 path: 'list',
                 component: CitizensListComponent,
                 canActivate: [],
-            }, {
+            },
+            {
                 path: 'digs',
                 component: CitizensDigsComponent,
-            }, {
+            },
+            {
+                path: 'watch',
+                component: CitizensWatchComponent,
+                canActivate: [(): boolean => inject(InDevModeGuard).canActivate()],
+            },
+            {
                 path: 'dispo',
                 component: CitizensDispoComponent,
                 canActivate: [(): boolean => inject(InDevModeGuard).canActivate()],

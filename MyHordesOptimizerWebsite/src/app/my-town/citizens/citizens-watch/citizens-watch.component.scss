@@ -1,0 +1,57 @@
+.mho-citizens-watch {
+    height: 100%;
+
+    table {
+        width: 100%;
+
+        tr {
+
+            > td {
+                padding: 0 0.5em;
+
+                &.center {
+                    text-align: center;
+                }
+
+                &.avatar_name {
+                    > div {
+                        text-align: center;
+                        margin: auto;
+                    }
+                }
+
+                .digs {
+                    display: flex;
+                    gap: 0.5em;
+                    flex-wrap: wrap;
+                }
+            }
+
+            th,
+            td {
+                &:not(.avatar_name) {
+                    padding: 0.5em;
+                }
+
+            }
+        }
+
+        .table-filters {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .previous-next {
+            .mho-header-with-filter {
+                display: flex;
+                gap: 0.5em;
+                white-space: nowrap;
+
+                > div {
+                    flex-wrap: nowrap;
+                }
+            }
+        }
+
+    }
+}

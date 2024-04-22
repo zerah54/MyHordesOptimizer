@@ -22,18 +22,18 @@ const SPECIAl_GUITAR_KEY: string = 'special_guitar';
 const LOAD_PILEGUN_KEY: string = 'load_pilegun';
 
 
-const EAT_6AP_DATA: ActionData = {label: $localize`Restaure l'ensemble des points d'actions`, category: 'food', img: ''};
-const EAT_7AP_DATA: ActionData = {label: $localize`Restaure l'ensemble des points d'actions plus un point`, category: 'food', img: ''};
+const EAT_6AP_DATA: ActionData = { label: $localize`Restaure l'ensemble des points d'actions`, category: 'food', img: '' };
+const EAT_7AP_DATA: ActionData = { label: $localize`Restaure l'ensemble des points d'actions plus un point`, category: 'food', img: '' };
 
-const DRUG_6AP_1_DATA: ActionData = {label: $localize`Restaure l'ensemble des points d'actions`, category: 'food', img: ''};
+const DRUG_6AP_1_DATA: ActionData = { label: $localize`Restaure l'ensemble des points d'actions`, category: 'food', img: '' };
 // const DRUG_6AP_2_DATA: ActionData = {label: $localize`Restaure l'ensemble des points d'actions`, category: 'food', img: ''};
 
-const DRUG_8AP_1_DATA: ActionData = {label: $localize`Restaure l'ensemble des points d'actions plus deux points`, category: 'food', img: ''};
+const DRUG_8AP_1_DATA: ActionData = { label: $localize`Restaure l'ensemble des points d'actions plus deux points`, category: 'food', img: '' };
 // const DRUG_8AP_2_DATA: ActionData = {label: $localize`Restaure l'ensemble des points d'actions`, category: 'food', img: ''};
 
-const COFFEE_DATA: ActionData = {label: $localize`Restaure 4 points d'actions`, category: '', img: ''};
+const COFFEE_DATA: ActionData = { label: $localize`Restaure 4 points d'actions`, category: '', img: '' };
 
-const ALCOHOL_DATA: ActionData = {label: $localize`Restaure l'ensemble des points d'actions`, category: 'alcohol', img: ''};
+const ALCOHOL_DATA: ActionData = { label: $localize`Restaure l'ensemble des points d'actions`, category: 'alcohol', img: '' };
 const ALCOHOL_DX_DATA: ActionData = {
     label: $localize`Restaure l'ensemble des points d'actions sans donner l'effet gueule de bois`,
     category: 'alcohol',
@@ -46,7 +46,7 @@ const SPECIAl_GUITAR_DATA: ActionData = {
     img: ''
 };
 
-const LOAD_PILEGUN_DATA: ActionData = {label: $localize`Peut être rechargé avec une pile`, category: 'reload', img: ''};
+const LOAD_PILEGUN_DATA: ActionData = { label: $localize`Peut être rechargé avec une pile`, category: 'reload', img: '' };
 
 /** Type de champs de propriétés existants */
 export class Action extends CommonEnum {
@@ -94,7 +94,7 @@ export class Action extends CommonEnum {
         const element: T | undefined = elements.find((_element: T) => _element.key === key);
         if (!element) {
             if (!environment.production) {
-                console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);
+                // console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);
             }
             return;
         } else {

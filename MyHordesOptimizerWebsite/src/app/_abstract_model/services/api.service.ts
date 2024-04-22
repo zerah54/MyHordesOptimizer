@@ -18,9 +18,9 @@ import { HeroSkill } from '../types/hero-skill.class';
 import { Item } from '../types/item.class';
 import { Recipe } from '../types/recipe.class';
 import { Ruin } from '../types/ruin.class';
-import { GlobalService } from './global.service';
+import { GlobalService } from './_global.service';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class ApiService extends GlobalService {
 
     /** La locale */

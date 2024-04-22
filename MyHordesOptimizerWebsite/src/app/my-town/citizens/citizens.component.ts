@@ -27,6 +27,11 @@ export class CitizensComponent {
             displayed: true
         },
         {
+            label: $localize`Veille`,
+            path: '/my-town/citizens/watch',
+            displayed: !environment.production
+        },
+        {
             label: $localize`Disponibilités`,
             path: '/my-town/citizens/dispo',
             displayed: !environment.production

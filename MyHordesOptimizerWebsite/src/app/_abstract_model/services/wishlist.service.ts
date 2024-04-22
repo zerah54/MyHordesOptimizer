@@ -7,7 +7,7 @@ import { getTown, getUserId } from '../../shared/utilities/localstorage.util';
 import { WishlistInfoDTO } from '../dto/wishlist-info.dto';
 import { Item } from '../types/item.class';
 import { WishlistInfo } from '../types/wishlist-info.class';
-import { GlobalService } from './global.service';
+import { GlobalService } from './_global.service';
 
 @Injectable({ providedIn: 'root' })
 export class WishlistService extends GlobalService {

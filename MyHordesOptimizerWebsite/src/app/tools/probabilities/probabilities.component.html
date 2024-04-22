@@ -70,7 +70,7 @@
                             </tbody>
                             <tfoot>
                             <tr>
-                                <th colspan="2">
+                                <th [attr.colspan]="'100%'">
                                     <ng-container i18n>Moyenne</ng-container>
                                     &nbsp;:&nbsp;{{ simulation.result_average | number:'1.0-2':locale }}
                                 </th>
