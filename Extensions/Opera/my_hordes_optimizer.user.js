@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.15.0
+// @version      1.0.16.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,9 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Amélioration] Les mises à jour disponibles sont désormais signalées par un indicateur visuel et un nouveau lien fait son apparition dans le menu en cas de mise à jour disponible\n`
-    + `[Amélioration] Les changelogs ne sont plus affichés au chargement de l'application mais signalés par un indicateur visuel sur le menu\n\n`
-    + `[Nouveauté] Une nouvelle option fait son apparition pour Fata Morgana : l'envoi du nombre de zombies tués\n`;
+    + `[Corretif] Déploiement d'un hotfix suite à l'introduction d'un bug. La récupération automatique de votre identifiant externe pour les apps n'est pour l'instant plus disponible.\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -9749,55 +9747,55 @@ function getOptimalPath(map, html, button) {
 function getApiKey() {
     return new Promise((resolve, reject) => {
         if (!external_app_id || external_app_id === '') {
-
-            fetcher(location.origin + `/jx/soul/settings`, {
-                method: 'POST',
-                body: JSON.stringify({}),
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-Request-Intent': 'WebNavigation',
-                    'X-Render-Target': 'content'
+            //
+            //     fetcher(location.origin + `/jx/soul/settings`, {
+            //         method: 'POST',
+            //         body: JSON.stringify({}),
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //             'X-Requested-With': 'XMLHttpRequest',
+            //             'X-Request-Intent': 'WebNavigation',
+            //             'X-Render-Target': 'content'
+            //         }
+            //     })
+            //         .then((response) => {
+            //             if (response.status === 200) {
+            //                 return response.text();
+            //             } else {
+            //                 return convertResponsePromiseToError(response);
+            //             }
+            //         })
+            //         .then((response) => {
+            let manual = () => {
+                let manual_app_id_key = prompt(getI18N(texts.manually_add_app_id_key));
+                if (manual_app_id_key) {
+                    external_app_id = manual_app_id_key;
+                    setStorageItem(gm_mh_external_app_id_key, external_app_id);
+                    resolve(external_app_id);
+                } else {
+                    reject(response);
                 }
-            })
-                .then((response) => {
-                    if (response.status === 200) {
-                        return response.text();
-                    } else {
-                        return convertResponsePromiseToError(response);
-                    }
-                })
-                .then((response) => {
-                    let manual = () => {
-                        let manual_app_id_key = prompt(getI18N(texts.manually_add_app_id_key));
-                        if (manual_app_id_key) {
-                            external_app_id = manual_app_id_key;
-                            setStorageItem(gm_mh_external_app_id_key, external_app_id);
-                            resolve(external_app_id);
-                        } else {
-                            reject(response);
-                        }
-                    }
-                    let temp_body = document.createElement('body');
-
-                    if (response) {
-                        temp_body.innerHTML = response;
-                        let id = temp_body.querySelector('#app_ext');
-                        if (id && id !== '' && id !== 'not set') {
-                            external_app_id = id.value && id.value !== '' && id.value !== 'not set' ? id.value : undefined;
-                            setStorageItem(gm_mh_external_app_id_key, external_app_id);
-                            resolve(external_app_id);
-                        } else {
-                            manual();
-                        }
-                    } else {
-                        manual();
-                    }
-                })
-                .catch((error) => {
-                    reject(error);
-                    addError(error);
-                });
+            }
+            //             let temp_body = document.createElement('body');
+            //
+            //             if (response) {
+            //                 temp_body.innerHTML = response;
+            //                 let id = temp_body.querySelector('#app_ext');
+            //                 if (id && id !== '' && id !== 'not set') {
+            //                     external_app_id = id.value && id.value !== '' && id.value !== 'not set' ? id.value : undefined;
+            //                     setStorageItem(gm_mh_external_app_id_key, external_app_id);
+            //                     resolve(external_app_id);
+            //                 } else {
+            manual();
+            //                 }
+            //             } else {
+            //                 manual();
+            //             }
+            //         })
+            //         .catch((error) => {
+            //             reject(error);
+            //             addError(error);
+            //         });
         } else {
             resolve(external_app_id);
         }
