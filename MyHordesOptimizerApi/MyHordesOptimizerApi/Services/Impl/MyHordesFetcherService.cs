@@ -62,14 +62,21 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var townBankItemLastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => tbi.IdLastUpdateInfo);
                 var items = DbContext.Items
                     .Include(item => item.IdCategoryNavigation)
+                    .AsSplitQuery()
                     .Include(item => item.PropertyNames)
+                    .AsSplitQuery()
                     .Include(item => item.ActionNames)
+                    .AsSplitQuery()
                     .Include(item => item.RecipeItemComponents)
                         .ThenInclude(recipe => recipe.RecipeNameNavigation)
                         .ThenInclude(recipe => recipe.RecipeItemResults)
+                        .AsSplitQuery()
                     .Include(item => item.RecipeItemResults)
+                    .AsSplitQuery()
                     .Include(item => item.TownBankItems.Where(bankItem => bankItem.IdTown == townId && bankItem.IdLastUpdateInfo == townBankItemLastUpdateId))
+                    .AsSplitQuery()
                     .Include(item => item.TownWishListItems.Where(wishListItem => wishListItem.IdTown == townId))
+                    .AsSplitQuery()
                     .ToList();
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
                 return itemsDto;
@@ -78,12 +85,17 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 var items = DbContext.Items
                    .Include(item => item.IdCategoryNavigation)
+                   .AsSplitQuery()
                    .Include(item => item.PropertyNames)
+                   .AsSplitQuery()
                    .Include(item => item.ActionNames)
+                   .AsSplitQuery()
                    .Include(item => item.RecipeItemComponents)
                        .ThenInclude(recipe => recipe.RecipeNameNavigation)
                        .ThenInclude(recipe => recipe.RecipeItemResults)
+                       .AsSplitQuery()
                    .Include(item => item.RecipeItemResults)
+                   .AsSplitQuery()
                    .ToList();
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
                 return itemsDto;
