@@ -35,6 +35,7 @@ using MyHordesOptimizerApi.Services.Interfaces.Estimations;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
+using Serilog;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
@@ -43,7 +44,9 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors();
-
+builder.Host.UseSerilog((context, services, configuration) =>
+                configuration.ReadFrom.Configuration(builder.Configuration)
+                             .Enrich.With(services.GetService<MyHordesOptimizerEnricher>()));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient(nameof(GestHordesRepository)).ConfigurePrimaryHttpMessageHandler(() =>
