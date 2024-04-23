@@ -43,21 +43,23 @@ namespace MyHordesOptimizerApi.Extensions
                 OnAuthenticationFailed = (context) =>
                 {
                     context.NoResult();
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    context.Response.ContentType = "application/json";
-
-                    var response = new JsonResult(
-                        new { errorType = "Authentication error", errorMessage = context.Exception.Message });
-
-
-                    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                    if (!context.Response.HasStarted)
                     {
-                        context.Response.Headers.Add("Token-Expired", "true");
-                        response = new JsonResult(
-                            new { errorType = "Authentication error", errorMessage = "The access token provided has expired." });
-                    }
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/json";
 
-                    context.Response.WriteAsync(JsonConvert.SerializeObject(response.Value));
+                        var response = new JsonResult(
+                            new { errorType = "Authentication error", errorMessage = context.Exception.Message });
+
+
+                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                        {
+                            context.Response.Headers.Add("Token-Expired", "true");
+                            response = new JsonResult(
+                                new { errorType = "Authentication error", errorMessage = "The access token provided has expired." });
+                        }
+                        context.Response.WriteAsync(JsonConvert.SerializeObject(response.Value));
+                    }
                     return Task.CompletedTask;
                 },
 
