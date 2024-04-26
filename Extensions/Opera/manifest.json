@@ -21,6 +21,7 @@
                 "*://myhordes.eu/*",
                 "*://myhord.es/*",
                 "*://myhordes.localhost/*",
+                "*://staging.myhordes.de/*",
                 "https://bbh.fred26.fr/*",
                 "https://gest-hordes2.eragaming.fr/*",
                 "https://fatamorgana.md26.eu/*"
@@ -36,7 +37,6 @@
         "notifications"
     ],
     "host_permissions": [
-        "https://myhordesoptimizerapi.azurewebsites.net/",
         "https://api.myhordesoptimizer.fr/"
     ],
     "browser_specific_settings": {

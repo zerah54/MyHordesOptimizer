@@ -8,6 +8,8 @@ import { ExpeditionOrder } from './expedition-order.class';
 export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
     public id?: number;
     public citizen_id?: number;
+    public expedition_part_id?: number;
+    public expedition_id?: number;
     public bag: CitizenExpeditionBag = new CitizenExpeditionBag();
     public orders!: ExpeditionOrder[];
     public preinscrit!: boolean;
@@ -40,6 +42,7 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
     }
 
     public modelToDtoShort(): CitizenExpeditionShortDTO {
+        console.log('bag', this.bag);
         return {
             id: this.id,
             idUser: this.citizen_id ? this.citizen_id : undefined,
@@ -75,6 +78,8 @@ export class CitizenExpedition extends CommonModel<CitizenExpeditionDTO> {
             this.pdc = dto.pdc;
             this.is_thirsty = dto.isThirsty;
             this.starts_7_ap = dto.nombrePaDepart === 7 ? true : (dto.nombrePaDepart === 6 ? false : undefined);
+            this.expedition_part_id = dto.expeditionPartId;
+            this.expedition_id = dto.expeditionId;
         }
     }
 

@@ -92,6 +92,7 @@ export class HeaderComponent {
                 this.external_app_id_field_value = null;
                 this.saved_external_app_id = getExternalAppId();
                 this.is_in_town = !!getTown()?.town_id;
+                location.reload();
             });
     }
 }

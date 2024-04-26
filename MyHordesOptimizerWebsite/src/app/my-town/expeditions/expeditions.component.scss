@@ -170,6 +170,10 @@
                                 .pdc {
                                     width: 50px;
 
+                                    > div {
+                                        gap: 0;
+                                    }
+
                                     .mat-mdc-form-field {
                                         width: 60px;
                                     }

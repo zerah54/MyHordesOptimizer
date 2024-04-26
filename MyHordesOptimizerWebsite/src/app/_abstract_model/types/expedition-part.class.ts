@@ -7,6 +7,7 @@ import { ExpeditionOrder } from './expedition-order.class';
 
 export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
     public id?: number;
+    public expedition_id?: number;
     public orders!: ExpeditionOrder[];
     public citizens: CitizenExpedition[] = [];
     public path!: string;
@@ -60,6 +61,7 @@ export class ExpeditionPart extends CommonModel<ExpeditionPartDTO> {
             if (dto.direction) {
                 this.direction[dto.direction] = true;
             }
+            this.expedition_id = dto.expeditionId;
         } else {
             this.citizens = [new CitizenExpedition()];
         }

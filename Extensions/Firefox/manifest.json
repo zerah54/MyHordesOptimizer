@@ -23,6 +23,7 @@
                 "*://myhordes.eu/*",
                 "*://myhord.es/*",
                 "*://myhordes.localhost/*",
+                "*://staging.myhordes.de/*",
                 "https://bbh.fred26.fr/*",
                 "https://gest-hordes2.eragaming.fr/*",
                 "https://fatamorgana.md26.eu/*"
@@ -36,7 +37,6 @@
         "storage",
         "clipboardWrite",
         "notifications",
-        "https://myhordesoptimizerapi.azurewebsites.net/",
         "https://api.myhordesoptimizer.fr/",
         "webRequest"
     ],

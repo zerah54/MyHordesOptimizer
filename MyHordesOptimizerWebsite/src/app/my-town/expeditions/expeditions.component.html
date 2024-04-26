@@ -72,12 +72,11 @@
                                                 @if (edition_mode && editable) {
                                                     <mat-form-field [appearance]="'outline'" class="no-bottom compact-field" (click)="$event.stopPropagation()">
                                                         <mat-label i18n>Nom de l'expédition</mat-label>
-                                                        <input matInput [(ngModel)]="expedition.label" (ngModelChange)="saveExpedition(expedition)">
+                                                        <input matInput [(ngModel)]="expedition.label" (change)="saveExpedition(expedition)">
                                                     </mat-form-field>
                                                     <mat-form-field [appearance]="'outline'" class="no-bottom compact-field" (click)="$event.stopPropagation()">
                                                         <mat-label i18n>Points de contrôles requis</mat-label>
-                                                        <input matInput type="number" [(ngModel)]="expedition.min_pdc"
-                                                               (ngModelChange)="saveExpedition(expedition)">
+                                                        <input matInput type="number" [(ngModel)]="expedition.min_pdc" (change)="saveExpedition(expedition)">
                                                     </mat-form-field>
                                                 } @else {
                                                     <h2>{{ expedition.label }}</h2>
@@ -107,7 +106,7 @@
                                                             <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
                                                                 <mat-label i18n>Nom du tracé</mat-label>
                                                                 <input matInput type="text" [(ngModel)]="expedition_part.path"
-                                                                       (ngModelChange)="saveExpeditionPart(expedition, expedition_part)">
+                                                                       (change)="saveExpeditionPart(expedition, expedition_part)">
                                                             </mat-form-field>
                                                         } @else {
                                                             <span [innerHTML]="expedition_part.path"></span>
@@ -176,7 +175,7 @@
                                                                                             noLabel
                                                                                             [bindIcon]="'value.img'"
                                                                                             [(ngModel)]="citizen.preinscrit_job"
-                                                                                            (ngModelChange)="saveCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
+                                                                                            (change)="saveCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
                                                                             </mat-form-field>
                                                                         } @else if (citizen.preinscrit_job?.value?.img || (citizen.citizen_id | citizenFromId:all_citizens)?.job?.value?.img) {
                                                                             <img
@@ -203,13 +202,13 @@
                                                                     <td class="is-thirsty">
                                                                         @if (edition_mode && editable) {
                                                                             <mat-checkbox
-                                                                                [ngModel]="citizen.is_preinscrit_soif"
+                                                                                [checked]="citizen.is_preinscrit_soif"
                                                                                 [indeterminate]="citizen.is_preinscrit_soif === undefined || citizen.is_preinscrit_soif === null"
-                                                                                (change)="this.changeThirstyMode(citizen); saveCitizen(expedition_part, citizen)"></mat-checkbox>
+                                                                                (click)="this.changeThirstyMode(citizen); saveCitizen(expedition_part, citizen)"></mat-checkbox>
                                                                         } @else if (expedition.state === 'ready' && editable) {
                                                                             <mat-checkbox
-                                                                                [ngModel]="citizen.is_thirsty"
-                                                                                (change)="this.changeThirstyMode(citizen); saveCitizen(expedition_part, citizen)"></mat-checkbox>
+                                                                                [checked]="citizen.is_thirsty"
+                                                                                (click)="this.changeThirstyMode(citizen); saveCitizen(expedition_part, citizen)"></mat-checkbox>
                                                                         } @else if (citizen.is_preinscrit_soif !== undefined && citizen.is_preinscrit_soif !== null) {
                                                                             @if (citizen.is_preinscrit_soif) {
                                                                                 <ng-container i18n>Oui</ng-container>
@@ -220,9 +219,9 @@
                                                                     </td>
                                                                     <td class="starts-7-ap">
                                                                         @if (edition_mode && editable) {
-                                                                            <mat-checkbox [ngModel]="citizen.starts_7_ap"
+                                                                            <mat-checkbox [checked]="citizen.starts_7_ap"
                                                                                           [indeterminate]="(citizen.starts_7_ap === undefined || citizen.starts_7_ap === null) && edition_mode && editable"
-                                                                                          (change)="this.change7ApMode(citizen); saveCitizen(expedition_part, citizen)"></mat-checkbox>
+                                                                                          (click)="this.change7ApMode(citizen); saveCitizen(expedition_part, citizen)"></mat-checkbox>
                                                                         } @else if (citizen.starts_7_ap !== undefined && citizen.starts_7_ap !== null) {
                                                                             @if (citizen.starts_7_ap) {
                                                                                 <ng-container i18n>Oui</ng-container>
@@ -235,7 +234,7 @@
                                                                         @if ((edition_mode || expedition.state === 'ready') && editable) {
                                                                             <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
                                                                                 <input matInput [(ngModel)]="citizen.pdc"
-                                                                                       (ngModelChange)="saveCitizen(expedition_part, citizen)">
+                                                                                       (change)="saveCitizen(expedition_part, citizen)">
                                                                             </mat-form-field>
                                                                         } @else {
                                                                             {{ citizen.pdc }}
@@ -248,7 +247,7 @@
                                                                                     <mho-select [options]="all_heroics"
                                                                                                 emptyOption
                                                                                                 [(ngModel)]="citizen.preinscrit_heroic_skill"
-                                                                                                (ngModelChange)="saveCitizen(expedition_part, citizen)"
+                                                                                                (change)="saveCitizen(expedition_part, citizen)"
                                                                                                 [bindLabel]="'value.label'"
                                                                                                 [bindIcon]="'value.img'"></mho-select>
                                                                                 </mat-form-field>
@@ -329,8 +328,9 @@
                                                                     <span [innerHTML]="order.text"></span>
                                                                 }
                                                                 @case ('checkbox') {
-                                                                    <mat-checkbox [ngModel]="order.done" (change)="saveOrder(order)" [disabled]="!editable">
-                                                                        <span [class.checked]="order.done" [innerHTML]="order.text"></span>
+                                                                    <mat-checkbox [checked]="order.is_done" (change)="saveOrder(order, $event)"
+                                                                                  [disabled]="!editable">
+                                                                        <span [class.checked]="order.is_done" [innerHTML]="order.text"></span>
                                                                     </mat-checkbox>
                                                                 }
                                                             }

@@ -28,13 +28,19 @@ export abstract class RealtimeGlobalService {
     };
     protected snackbar: SnackbarService = inject(SnackbarService);
 
-    protected async startConnexion(part: string): Promise<void> {
+    protected async defineConnexion(part: string): Promise<void> {
 
         this.hubConnection = new signalR.HubConnectionBuilder()
             .withAutomaticReconnect()
+            .withStatefulReconnect()
             .withUrl(this.HUB_URL + part, this.options)
             .build();
 
+        this.hubConnection.onclose(() => this.startConnexion());
+        await this.startConnexion();
+    }
+
+    protected async startConnexion(): Promise<void> {
         await this.hubConnection
             .start()
             .then(() => console.log('Connected to SignalR hub'))

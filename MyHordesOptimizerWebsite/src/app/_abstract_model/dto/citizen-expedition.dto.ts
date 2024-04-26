@@ -4,6 +4,8 @@ import { ExpeditionOrderDTO } from './expedition-order.dto';
 export interface CitizenExpeditionDTO {
     id?: number;
     idUser?: number;
+    expeditionPartId?: number;
+    expeditionId?: number;
     bag?: CitizenExpeditionBagDTO;
     orders: ExpeditionOrderDTO[];
     preinscrit: boolean;
@@ -18,6 +20,8 @@ export interface CitizenExpeditionDTO {
 export interface CitizenExpeditionShortDTO {
     id?: number;
     idUser?: number;
+    expeditionPartId?: number;
+    expeditionId?: number;
     bagId?: number;
     ordersId: number[];
     preinscrit: boolean;

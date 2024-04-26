@@ -2,6 +2,9 @@
 
 export interface ExpeditionOrderDTO {
     id?: number;
+    expeditionCitizenId?: number;
+    expeditionPartsId?: number[];
+    expeditionsId?: number[];
     type: ExpeditionOrderType;
     text: string;
     isDone: boolean;

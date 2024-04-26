@@ -19,132 +19,132 @@ import { RealtimeGlobalService } from './_realtime-global.service';
 })
 export class RealtimeExpeditionsService extends RealtimeGlobalService {
 
-    private expeditionUpdatedSubject: Subject<Expedition> = new Subject<Expedition>();
-    public expeditionUpdated$: Observable<Expedition> = this.expeditionUpdatedSubject.asObservable();
+    private expedition_updated_subject: Subject<Expedition> = new Subject<Expedition>();
+    public expedition_updated$: Observable<Expedition> = this.expedition_updated_subject.asObservable();
 
-    private expeditionsUpdatedSubject: Subject<Expedition[]> = new Subject<Expedition[]>();
-    public expeditionsUpdated$: Observable<Expedition[]> = this.expeditionsUpdatedSubject.asObservable();
+    private expeditions_updated_subject: Subject<Expedition[]> = new Subject<Expedition[]>();
+    public expeditions_updated$: Observable<Expedition[]> = this.expeditions_updated_subject.asObservable();
 
-    private expeditionDeletedSubject: Subject<number> = new Subject<number>();
-    public expeditionDeleted$: Observable<number> = this.expeditionDeletedSubject.asObservable();
+    private expedition_deleted_subject: Subject<number> = new Subject<number>();
+    public expedition_deleted$: Observable<number> = this.expedition_deleted_subject.asObservable();
 
-    private expeditionPartUpdatedSubject: Subject<ExpeditionPart> = new Subject<ExpeditionPart>();
-    public expeditionPartUpdated$: Observable<ExpeditionPart> = this.expeditionPartUpdatedSubject.asObservable();
+    private expedition_part_updated_subject: Subject<ExpeditionPart> = new Subject<ExpeditionPart>();
+    public expedition_part_updated$: Observable<ExpeditionPart> = this.expedition_part_updated_subject.asObservable();
 
-    private expeditionPartDeletedSubject: Subject<number> = new Subject<number>();
-    public expeditionPartDeleted$: Observable<number> = this.expeditionPartDeletedSubject.asObservable();
+    private expedition_part_deleted_subject: Subject<number> = new Subject<number>();
+    public expedition_part_deleted$: Observable<number> = this.expedition_part_deleted_subject.asObservable();
 
-    private expeditionCitizenUpdatedSubject: Subject<CitizenExpedition> = new Subject<CitizenExpedition>();
-    public expeditionCitizenUpdated$: Observable<CitizenExpedition> = this.expeditionCitizenUpdatedSubject.asObservable();
+    private expedition_citizen_updated_subject: Subject<CitizenExpedition> = new Subject<CitizenExpedition>();
+    public expedition_citizen_updated$: Observable<CitizenExpedition> = this.expedition_citizen_updated_subject.asObservable();
 
-    private expeditionCitizenDeletedSubject: Subject<number> = new Subject<number>();
-    public expeditionCitizenDeleted$: Observable<number> = this.expeditionCitizenDeletedSubject.asObservable();
+    private expedition_citizen_deleted_subject: Subject<number> = new Subject<number>();
+    public expedition_citizen_deleted$: Observable<number> = this.expedition_citizen_deleted_subject.asObservable();
 
-    private expeditionPartOrdersUpdatedSubject: Subject<ExpeditionOrder[]> = new Subject<ExpeditionOrder[]>();
-    public expeditionPartOrdersUpdated$: Observable<ExpeditionOrder[]> = this.expeditionPartOrdersUpdatedSubject.asObservable();
+    private expedition_part_orders_updated_subject: Subject<ExpeditionOrder[]> = new Subject<ExpeditionOrder[]>();
+    public expedition_part_orders_updated$: Observable<ExpeditionOrder[]> = this.expedition_part_orders_updated_subject.asObservable();
 
-    private expeditionCitizenOrdersUpdatedSubject: Subject<ExpeditionOrder[]> = new Subject<ExpeditionOrder[]>();
-    public expeditionCitizenOrdersUpdated$: Observable<ExpeditionOrder[]> = this.expeditionCitizenOrdersUpdatedSubject.asObservable();
+    private expedition_citizen_orders_updated_subject: Subject<ExpeditionOrder[]> = new Subject<ExpeditionOrder[]>();
+    public expedition_citizen_orders_updated$: Observable<ExpeditionOrder[]> = this.expedition_citizen_orders_updated_subject.asObservable();
 
-    private expeditionOrderDeletedSubject: Subject<number> = new Subject<number>();
-    public expeditionOrderDeleted$: Observable<number> = this.expeditionOrderDeletedSubject.asObservable();
+    private expedition_order_deleted_subject: Subject<number> = new Subject<number>();
+    public expedition_order_deleted$: Observable<number> = this.expedition_order_deleted_subject.asObservable();
 
-    private expeditionOrdersUpdatedSubject: Subject<Expedition> = new Subject<Expedition>();
-    public expeditionOrdersUpdated$: Observable<Expedition> = this.expeditionOrdersUpdatedSubject.asObservable();
+    private expedition_orders_updated_subject: Subject<Expedition> = new Subject<Expedition>();
+    public expedition_orders_updated$: Observable<Expedition> = this.expedition_orders_updated_subject.asObservable();
 
-    private expeditionOrderUpdatedSubject: Subject<ExpeditionOrder> = new Subject<ExpeditionOrder>();
-    public expeditionOrderUpdated$: Observable<ExpeditionOrder> = this.expeditionOrderUpdatedSubject.asObservable();
+    private expedition_order_updated_subject: Subject<ExpeditionOrder> = new Subject<ExpeditionOrder>();
+    public expedition_order_updated$: Observable<ExpeditionOrder> = this.expedition_order_updated_subject.asObservable();
 
-    private expeditionBagUpdatedSubject: Subject<CitizenExpeditionBag> = new Subject<CitizenExpeditionBag>();
-    public expeditionBagUpdated$: Observable<CitizenExpeditionBag> = this.expeditionBagUpdatedSubject.asObservable();
+    private expedition_bag_updated_subject: Subject<CitizenExpeditionBag> = new Subject<CitizenExpeditionBag>();
+    public expedition_bag_updated$: Observable<CitizenExpeditionBag> = this.expedition_bag_updated_subject.asObservable();
 
-    private expeditionBagDeletedSubject: Subject<number> = new Subject<number>();
-    public expeditionBagDeleted$: Observable<number> = this.expeditionBagDeletedSubject.asObservable();
+    private expedition_bag_deleted_subject: Subject<number> = new Subject<number>();
+    public expedition_bag_deleted$: Observable<number> = this.expedition_bag_deleted_subject.asObservable();
 
-    private userJoinedSubject: Subject<number[]> = new Subject<number[]>();
-    public userJoined$: Observable<number[]> = this.userJoinedSubject.asObservable();
+    private user_joined_subject: Subject<number[]> = new Subject<number[]>();
+    public user_joined$: Observable<number[]> = this.user_joined_subject.asObservable();
 
-    private userLeftSubject: Subject<number[]> = new Subject<number[]>();
-    public userLeft$: Observable<number[]> = this.userLeftSubject.asObservable();
+    private user_left_subject: Subject<number[]> = new Subject<number[]>();
+    public user_left$: Observable<number[]> = this.user_left_subject.asObservable();
 
     constructor() {
         super();
 
-        this.startConnexion('expeditions').then(() => {
+        this.defineConnexion('expeditions').then(() => {
 
             this.hubConnection.on('ExpeditionUpdated', (expedition: ExpeditionDTO) => {
                 console.log('receive', 'ExpeditionUpdated', expedition);
-                this.expeditionUpdatedSubject.next(new Expedition(expedition));
+                this.expedition_updated_subject.next(new Expedition(expedition));
             });
 
             this.hubConnection.on('ExpeditionsUpdated', (expeditions: ExpeditionDTO[]) => {
                 console.log('receive', 'ExpeditionsUpdated', expeditions);
-                this.expeditionsUpdatedSubject.next(dtoToModelArray(Expedition, expeditions));
+                this.expeditions_updated_subject.next(dtoToModelArray(Expedition, expeditions));
             });
 
             this.hubConnection.on('ExpeditionDeleted', (expedition_id: number) => {
                 console.log('receive', 'ExpeditionDeleted', expedition_id);
-                this.expeditionDeletedSubject.next(expedition_id);
+                this.expedition_deleted_subject.next(expedition_id);
             });
 
             this.hubConnection.on('ExpeditionPartUpdated', (expedition_part: ExpeditionPartDTO) => {
                 console.log('receive', 'ExpeditionPartUpdated', expedition_part);
-                this.expeditionPartUpdatedSubject.next(new ExpeditionPart(expedition_part));
+                this.expedition_part_updated_subject.next(new ExpeditionPart(expedition_part));
             });
 
             this.hubConnection.on('ExpeditionPartDeleted', (expedition_part_id: number) => {
                 console.log('receive', 'ExpeditionPartDeleted', expedition_part_id);
-                this.expeditionPartDeletedSubject.next(expedition_part_id);
+                this.expedition_part_deleted_subject.next(expedition_part_id);
             });
 
             this.hubConnection.on('ExpeditionCitizenUpdated', (expedition_citizen: CitizenExpeditionDTO) => {
                 console.log('receive', 'ExpeditionCitizenUpdated', expedition_citizen);
-                this.expeditionCitizenUpdatedSubject.next(new CitizenExpedition(expedition_citizen));
+                this.expedition_citizen_updated_subject.next(new CitizenExpedition(expedition_citizen));
             });
 
             this.hubConnection.on('ExpeditionCitizenDeleted', (expedition_citizen_id: number) => {
                 console.log('receive', 'ExpeditionCitizenDeleted', expedition_citizen_id);
-                this.expeditionCitizenDeletedSubject.next(expedition_citizen_id);
+                this.expedition_citizen_deleted_subject.next(expedition_citizen_id);
             });
 
             this.hubConnection.on('ExpeditionPartOrdersUpdated', (expedition_orders: ExpeditionOrderDTO[]) => {
                 console.log('receive', 'ExpeditionPartOrdersUpdated', expedition_orders);
-                this.expeditionPartOrdersUpdatedSubject.next(dtoToModelArray(ExpeditionOrder, expedition_orders));
+                this.expedition_part_orders_updated_subject.next(dtoToModelArray(ExpeditionOrder, expedition_orders));
             });
 
             this.hubConnection.on('ExpeditionCitizenOrdersUpdated', (expedition_orders: ExpeditionOrderDTO[]) => {
                 console.log('receive', 'ExpeditionCitizenOrdersUpdated', expedition_orders);
-                this.expeditionCitizenOrdersUpdatedSubject.next(dtoToModelArray(ExpeditionOrder, expedition_orders));
+                this.expedition_citizen_orders_updated_subject.next(dtoToModelArray(ExpeditionOrder, expedition_orders));
             });
 
             this.hubConnection.on('ExpeditionOrderDeleted', (expedition_order_id: number) => {
                 console.log('receive', 'ExpeditionOrderDeleted', expedition_order_id);
-                this.expeditionOrderDeletedSubject.next(expedition_order_id);
+                this.expedition_order_deleted_subject.next(expedition_order_id);
             });
 
             this.hubConnection.on('ExpeditionOrderUpdated', (expedition_order: ExpeditionOrderDTO) => {
                 console.log('receive', 'ExpeditionOrderUpdated', expedition_order);
-                this.expeditionOrderUpdatedSubject.next(new ExpeditionOrder(expedition_order));
+                this.expedition_order_updated_subject.next(new ExpeditionOrder(expedition_order));
             });
 
             this.hubConnection.on('ExpeditionBagUpdated', (expedition_citizen_bag: CitizenExpeditionBagDTO) => {
                 console.log('receive', 'ExpeditionBagUpdated', expedition_citizen_bag);
-                this.expeditionBagUpdatedSubject.next(new CitizenExpeditionBag(expedition_citizen_bag));
+                this.expedition_bag_updated_subject.next(new CitizenExpeditionBag(expedition_citizen_bag));
             });
 
             this.hubConnection.on('ExpeditionBagDeleted', (expedition_citizen_bag_id: number) => {
                 console.log('receive', 'ExpeditionBagDeleted', expedition_citizen_bag_id);
-                this.expeditionBagDeletedSubject.next(expedition_citizen_bag_id);
+                this.expedition_bag_deleted_subject.next(expedition_citizen_bag_id);
             });
 
             this.hubConnection.on('UserJoined', (user_ids: string) => {
                 console.log('receive', 'UserJoined', user_ids);
-                this.userJoinedSubject.next(JSON.parse(user_ids));
+                this.user_joined_subject.next(JSON.parse(user_ids));
             });
 
             this.hubConnection.on('UserLeft', (user_ids: string) => {
                 console.log('receive', 'UserLeft', user_ids);
-                this.userLeftSubject.next(JSON.parse(user_ids));
+                this.user_left_subject.next(JSON.parse(user_ids));
             });
         });
     }

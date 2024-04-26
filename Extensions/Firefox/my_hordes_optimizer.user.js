@@ -12,7 +12,6 @@
 // @homepageURL  https://myhordes-optimizer.web.app/tutorials/script/installation
 // @supportURL   https://discord.gg/ZQH7ZPWcCm
 //
-// @connect      https://myhordesoptimizerapi.azurewebsites.net/
 // @connect      https://api.myhordesoptimizer.fr/
 // @connect      *
 //
@@ -20,6 +19,7 @@
 // @match        *://myhordes.eu/*
 // @match        *://myhord.es/*
 // @match        *://myhordes.localhost/*
+// @match        *://staging.myhordes.de/*
 //
 // @match        https://bbh.fred26.fr/*
 // @match        https://gest-hordes2.eragaming.fr/*
@@ -36,7 +36,8 @@ const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScri
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
-const is_mh_beta = document.URL.indexOf('staging') >= 0;
+// const is_mh_beta = document.URL.indexOf('staging') >= 0;
+const is_mh_beta = false;
 const website = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
 
 const gest_hordes_url = 'https://gest-hordes2.eragaming.fr';
@@ -8844,6 +8845,20 @@ function getRuins() {
 function getToken(force, stop) {
     return new Promise((resolve, reject) => {
         if (external_app_id) {
+            let tokenReceived = async () => {
+                console.log('MHO - I am...', mh_user);
+
+                let get_items_promise = getItems()
+                let get_ruins_promise = getRuins();
+                if (mh_user !== '' && mh_user.townDetails.townId) {
+                    let get_wishlist_promise = getWishlist()
+                    let get_map_promise = getMap();
+                    await Promise.all([get_items_promise, get_ruins_promise, get_wishlist_promise, get_map_promise]);
+                } else {
+                    await Promise.all([get_items_promise, get_ruins_promise]);
+                }
+            }
+
             if (!isValidToken() || force) {
                 fetcherWithoutBearer(api_url + '/Authentication/Token?userKey=' + external_app_id)
                     .then((response) => {
@@ -8861,17 +8876,8 @@ function getToken(force, stop) {
                         }
                         setStorageItem(mh_user_key, mh_user);
                         setStorageItem(mho_token_key, token);
-                        console.log('MHO - I am...', mh_user);
-                        getItems().then(() => {
-                            getRuins().then(() => {
-                                resolve();
-                            });
-                        });
 
-                        if (mh_user !== '' && mh_user.townDetails.townId) {
-                            getWishlist().then();
-                            getMap().then();
-                        }
+                        tokenReceived().then(() => resolve());
                     })
                     .catch((error) => {
                         if (error.status === 400 && !stop) {
@@ -8889,24 +8895,10 @@ function getToken(force, stop) {
                     });
             } else {
                 mh_user = token.simpleMe;
-                console.log('MHO - I am...', mh_user);
-                getItems().then(() => {
-                    getRuins().then(() => {
-                        resolve();
-                    });
-                });
-
-                if (mh_user !== '' && mh_user.townDetails.townId) {
-                    getWishlist().then();
-                    getMap().then();
-                }
+                tokenReceived().then(() => resolve());
             }
         } else {
-            getApiKey().then(() => {
-                getToken(false, true).then(() => {
-                    resolve();
-                });
-            });
+            resolve();
         }
     });
 }
@@ -9714,88 +9706,63 @@ function calculateCamping(camping_parameters) {
     });
 }
 
-/** Récupère le chemin optimal à partir d'une carte */
-function getOptimalPath(map, html, button) {
-    return new Promise((resolve, reject) => {
-        map.doors = map.doors.slice(2);
-        console.log('map before send', map);
-
-        fetcher(api_url + `/ruine/pathopti`, {
-            method: 'POST',
-            body: JSON.stringify(map),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then((response) => {
-                if (response.status === 200) {
-                    return response.json();
-                } else {
-                    return convertResponsePromiseToError(response);
-                }
-            })
-            .then((response) => {
-                resolve(response);
-            })
-            .catch((error) => {
-                addError(error);
-                reject(error);
-            });
-    });
-}
-
 function getApiKey() {
+    console.log('getAPIKey1');
     return new Promise((resolve, reject) => {
+        console.log('getAPIKey2');
         if (!external_app_id || external_app_id === '') {
-            //
-            //     fetcher(location.origin + `/jx/soul/settings`, {
-            //         method: 'POST',
-            //         body: JSON.stringify({}),
-            //         headers: {
-            //             'Content-Type': 'application/json',
-            //             'X-Requested-With': 'XMLHttpRequest',
-            //             'X-Request-Intent': 'WebNavigation',
-            //             'X-Render-Target': 'content'
-            //         }
-            //     })
-            //         .then((response) => {
-            //             if (response.status === 200) {
-            //                 return response.text();
-            //             } else {
-            //                 return convertResponsePromiseToError(response);
-            //             }
-            //         })
-            //         .then((response) => {
-            let manual = () => {
-                let manual_app_id_key = prompt(getI18N(texts.manually_add_app_id_key));
-                if (manual_app_id_key) {
-                    external_app_id = manual_app_id_key;
-                    setStorageItem(gm_mh_external_app_id_key, external_app_id);
-                    resolve(external_app_id);
-                } else {
-                    reject(response);
+
+            fetcherWithoutBearer(location.origin + `/jx/soul/settings`, {
+                method: 'POST',
+                body: JSON.stringify({}),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-Request-Intent': 'WebNavigation',
+                    'X-Render-Target': 'content'
                 }
-            }
-            //             let temp_body = document.createElement('body');
-            //
-            //             if (response) {
-            //                 temp_body.innerHTML = response;
-            //                 let id = temp_body.querySelector('#app_ext');
-            //                 if (id && id !== '' && id !== 'not set') {
-            //                     external_app_id = id.value && id.value !== '' && id.value !== 'not set' ? id.value : undefined;
-            //                     setStorageItem(gm_mh_external_app_id_key, external_app_id);
-            //                     resolve(external_app_id);
-            //                 } else {
-            manual();
-            //                 }
-            //             } else {
-            //                 manual();
-            //             }
-            //         })
-            //         .catch((error) => {
-            //             reject(error);
-            //             addError(error);
-            //         });
+            })
+                .then((response) => {
+                    if (response.status === 200) {
+                        return response.text();
+                    } else {
+                        return convertResponsePromiseToError(response);
+                    }
+                })
+                .then((response) => {
+                    let manual = () => {
+                        let manual_app_id_key = prompt(getI18N(texts.manually_add_app_id_key));
+                        if (manual_app_id_key) {
+                            external_app_id = manual_app_id_key;
+                            setStorageItem(gm_mh_external_app_id_key, external_app_id);
+                            resolve(external_app_id);
+                        } else {
+                            reject(response);
+                        }
+                    }
+                    let temp_body = document.createElement('body');
+
+                    if (response) {
+                        temp_body.innerHTML = response;
+                        let id = temp_body.querySelector('#app_ext');
+                        if (id && id !== '' && id !== 'not set' && id.value && id.value !== '' && id.value !== 'not set') {
+                            external_app_id = id.value;
+                            setStorageItem(gm_mh_external_app_id_key, external_app_id);
+                            getStorageItem(gm_mh_external_app_id_key).then((new_external_app_id) => {
+                                console.log('external_app_id after', new_external_app_id)
+                            })
+                            resolve(external_app_id);
+                        } else {
+                            manual();
+                        }
+                    } else {
+                        manual();
+                    }
+                })
+                .catch((error) => {
+                    reject(error);
+                    addError(error);
+                });
         } else {
             resolve(external_app_id);
         }

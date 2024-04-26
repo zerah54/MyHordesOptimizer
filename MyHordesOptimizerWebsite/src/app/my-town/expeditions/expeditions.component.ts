@@ -1,9 +1,9 @@
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, HostBinding, inject, OnInit, signal, ViewEncapsulation, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, inject, OnInit, signal, ViewEncapsulation, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -96,7 +96,7 @@ export class ExpeditionsComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    public constructor(private clipboard: ClipboardService, private dialog: MatDialog) {
+    public constructor(private clipboard: ClipboardService, private dialog: MatDialog, private cdr: ChangeDetectorRef) {
     }
 
     public async ngOnInit(): Promise<void> {
@@ -108,13 +108,17 @@ export class ExpeditionsComponent implements OnInit {
                     this.all_citizens = citizens.citizens;
                     this.all_citizens_job = (JobEnum.getAllValues<JobEnum>())
                         .filter((job_enum: JobEnum) => this.all_citizens.some((citizen: Citizen): boolean => citizen.job?.key === job_enum.key));
+                    this.cdr.detectChanges();
                 }
             });
         this.api_service
             .getItems()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe({
-                next: (items: Item[]) => this.all_items = items
+                next: (items: Item[]) => {
+                    this.all_items = items;
+                    this.cdr.detectChanges();
+                }
             });
 
         this.town_service
@@ -123,13 +127,15 @@ export class ExpeditionsComponent implements OnInit {
             .subscribe({
                 next: (bank: BankInfo) => {
                     this.bank_items = bank.items;
+                    this.cdr.detectChanges();
                 }
             });
 
         const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_tab_index + 1));
         this.expeditions.set([...existing_expeditions]);
+        this.cdr.detectChanges();
 
-        this.realtime_expeditions_service.expeditionUpdated$
+        this.realtime_expeditions_service.expedition_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition: Expedition) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
@@ -146,17 +152,19 @@ export class ExpeditionsComponent implements OnInit {
                         if (expedition_a.position > expedition_b.position) return 1;
                         return 0;
                     });
-
-
                     return current_expeditions;
                 });
+                this.cdr.detectChanges();
             });
 
-        this.realtime_expeditions_service.expeditionsUpdated$
+        this.realtime_expeditions_service.expeditions_updated$
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((expeditions: Expedition[]) => this.expeditions.set([...expeditions]));
+            .subscribe((expeditions: Expedition[]) => {
+                this.expeditions.set([...expeditions]);
+                this.cdr.detectChanges();
+            });
 
-        this.realtime_expeditions_service.expeditionDeleted$
+        this.realtime_expeditions_service.expedition_deleted$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_id: number) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
@@ -168,39 +176,44 @@ export class ExpeditionsComponent implements OnInit {
 
                     return current_expeditions;
                 });
+                this.cdr.detectChanges();
             });
 
-        this.realtime_expeditions_service.expeditionPartUpdated$
+        this.realtime_expeditions_service.expedition_part_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_part: ExpeditionPart) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
-                    current_expeditions.forEach((current_expedition: Expedition) => {
-                        const part_to_update: number = current_expedition.parts
-                            .findIndex((_part_to_update: ExpeditionPart) => _part_to_update.id === expedition_part.id);
-                        if (part_to_update < 0) {
-                            current_expedition.parts.push(expedition_part);
-                            if (current_expedition.parts.length > 1) {
-                                current_expedition.parts[0].citizens.forEach((existing_citizen: CitizenExpedition) => {
-                                    this.addNewMemberToPart(expedition_part, existing_citizen);
-                                });
-                            } else {
-                                this.addNewMemberToPart(expedition_part);
-                            }
-                        } else {
-                            current_expedition.parts[part_to_update] = expedition_part;
-                        }
+                    const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
+                        return _current_expedition.id === expedition_part.expedition_id;
+                    });
+                    if (!current_expedition) return current_expeditions;
 
-                        current_expedition.parts.sort((expedition_part_a: ExpeditionPart, expedition_part_b: ExpeditionPart) => {
-                            if (expedition_part_a.position < expedition_part_b.position) return -1;
-                            if (expedition_part_a.position > expedition_part_b.position) return 1;
-                            return 0;
-                        });
+                    const part_to_update: number = current_expedition.parts
+                        .findIndex((_part_to_update: ExpeditionPart) => _part_to_update.id === expedition_part.id);
+                    if (part_to_update < 0) {
+                        current_expedition.parts.push(expedition_part);
+                        if (current_expedition.parts.length > 1) {
+                            current_expedition.parts[0].citizens.forEach((existing_citizen: CitizenExpedition) => {
+                                this.addNewMemberToPart(expedition_part, existing_citizen);
+                            });
+                        } else {
+                            this.addNewMemberToPart(expedition_part);
+                        }
+                    } else {
+                        current_expedition.parts[part_to_update] = expedition_part;
+                    }
+
+                    current_expedition.parts.sort((expedition_part_a: ExpeditionPart, expedition_part_b: ExpeditionPart) => {
+                        if (expedition_part_a.position < expedition_part_b.position) return -1;
+                        if (expedition_part_a.position > expedition_part_b.position) return 1;
+                        return 0;
                     });
                     return current_expeditions;
                 });
+                this.cdr.detectChanges();
             });
 
-        this.realtime_expeditions_service.expeditionPartDeleted$
+        this.realtime_expeditions_service.expedition_part_deleted$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_part_id: number) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
@@ -213,30 +226,37 @@ export class ExpeditionsComponent implements OnInit {
                     });
                     return current_expeditions;
                 });
+                this.cdr.detectChanges();
             });
 
-        this.realtime_expeditions_service.expeditionCitizenUpdated$
+        this.realtime_expeditions_service.expedition_citizen_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_citizen: CitizenExpedition) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
-                    current_expeditions.forEach((current_expedition: Expedition) => {
-                        current_expedition.parts
-                            .forEach((current_expedition_part: ExpeditionPart) => {
-                                const citizen_to_update: number = current_expedition_part.citizens
-                                    .findIndex((_citizen_to_update: CitizenExpedition) => _citizen_to_update.id === expedition_citizen.id);
-
-                                if (citizen_to_update < 0) {
-                                    current_expedition_part.citizens.push(expedition_citizen);
-                                } else {
-                                    current_expedition_part.citizens[citizen_to_update] = expedition_citizen;
-                                }
-                            });
+                    const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
+                        return _current_expedition.id === expedition_citizen.expedition_id;
                     });
+                    if (!current_expedition) return current_expeditions;
+
+                    const current_expedition_part: ExpeditionPart | undefined = current_expedition.parts.find((_current_expedition_part: ExpeditionPart) => {
+                        return _current_expedition_part.id === expedition_citizen.expedition_part_id;
+                    });
+                    if (!current_expedition_part) return current_expeditions;
+
+                    const citizen_to_update: number = current_expedition_part.citizens
+                        .findIndex((_citizen_to_update: CitizenExpedition) => _citizen_to_update.id === expedition_citizen.id);
+
+                    if (citizen_to_update < 0) {
+                        current_expedition_part.citizens.push(expedition_citizen);
+                    } else {
+                        current_expedition_part.citizens[citizen_to_update] = expedition_citizen;
+                    }
                     return current_expeditions;
                 });
+                this.cdr.detectChanges();
             });
 
-        this.realtime_expeditions_service.expeditionCitizenDeleted$
+        this.realtime_expeditions_service.expedition_citizen_deleted$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_citizen_id: number) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
@@ -251,63 +271,79 @@ export class ExpeditionsComponent implements OnInit {
                     });
                     return current_expeditions;
                 });
+                this.cdr.detectChanges();
             });
 
-        this.realtime_expeditions_service.expeditionPartOrdersUpdated$
+        this.realtime_expeditions_service.expedition_part_orders_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_orders: ExpeditionOrder[]) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
-                    expedition_orders.forEach((expedition_order: ExpeditionOrder) => {
-                        current_expeditions.forEach((current_expedition: Expedition) => {
-                            current_expedition.parts.forEach((current_expedition_part: ExpeditionPart) => {
-                                const order_to_update: number = current_expedition_part.orders
-                                    .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
-                                if (order_to_update > -1) {
-                                    current_expedition_part.orders[order_to_update] = expedition_order;
-                                } else {
-                                    current_expedition_part.orders.push(expedition_order);
-                                }
-                                current_expedition_part.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
-                                    if (order_a.position < order_b.position) return -1;
-                                    if (order_a.position > order_b.position) return 1;
-                                    return 0;
-                                });
-                            });
+                    for (const expedition_order of expedition_orders) {
+                        const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
+                            return _current_expedition.id === expedition_order.expeditions_id;
                         });
-                    });
+                        if (!current_expedition) break;
+
+                        const current_expedition_part: ExpeditionPart | undefined = current_expedition.parts.find((_current_expedition_part: ExpeditionPart) => {
+                            return _current_expedition_part.id === expedition_order.expedition_parts_id;
+                        });
+                        if (!current_expedition_part) break;
+
+                        const order_to_update: number = current_expedition_part.orders
+                            .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
+                        if (order_to_update > -1) {
+                            current_expedition_part.orders[order_to_update] = expedition_order;
+                        } else {
+                            current_expedition_part.orders.push(expedition_order);
+                        }
+                        current_expedition_part.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
+                            if (order_a.position < order_b.position) return -1;
+                            if (order_a.position > order_b.position) return 1;
+                            return 0;
+                        });
+                    }
                     return current_expeditions;
                 });
+                this.cdr.detectChanges();
             });
 
-        this.realtime_expeditions_service.expeditionCitizenOrdersUpdated$
+        this.realtime_expeditions_service.expedition_citizen_orders_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_orders: ExpeditionOrder[]) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
-                    expedition_orders.forEach((expedition_order: ExpeditionOrder) => {
-                        current_expeditions.forEach((current_expedition: Expedition) => {
-                            current_expedition.parts.forEach((current_expedition_part: ExpeditionPart) => {
-                                current_expedition_part.citizens.forEach((current_expedition_citizen: CitizenExpedition) => {
-                                    const order_to_update: number = current_expedition_citizen.orders
-                                        .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
-                                    if (order_to_update > -1) {
-                                        console.log('before', current_expedition_citizen.orders[order_to_update]);
-                                        current_expedition_citizen.orders[order_to_update] = expedition_order;
-                                        console.log('after', current_expedition_citizen.orders[order_to_update]);
-                                    } else {
-                                        current_expedition_citizen.orders.push(expedition_order);
-                                    }
-                                    current_expedition_citizen.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
-                                        if (order_a.position < order_b.position) return -1;
-                                        if (order_a.position > order_b.position) return 1;
-                                        return 0;
-                                    });
-                                });
-                            });
+                    for (const expedition_order of expedition_orders) {
+                        const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
+                            return _current_expedition.id === expedition_order.expeditions_id;
                         });
-                    });
-                    console.log('final', current_expeditions);
+                        if (!current_expedition) break;
+
+                        const current_expedition_part: ExpeditionPart | undefined = current_expedition.parts.find((_current_expedition_part: ExpeditionPart) => {
+                            return _current_expedition_part.id === expedition_order.expedition_parts_id;
+                        });
+                        if (!current_expedition_part) break;
+
+                        const current_expedition_citizen: CitizenExpedition | undefined = current_expedition_part.citizens
+                            .find((_current_expedition_citizen: CitizenExpedition) => {
+                                return _current_expedition_citizen.id === expedition_order.expedition_citizen_id;
+                            });
+                        if (!current_expedition_citizen) break;
+
+                        const order_to_update: number = current_expedition_citizen.orders
+                            .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
+                        if (order_to_update > -1) {
+                            current_expedition_citizen.orders[order_to_update] = expedition_order;
+                        } else {
+                            current_expedition_citizen.orders.push(expedition_order);
+                        }
+                        current_expedition_citizen.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
+                            if (order_a.position < order_b.position) return -1;
+                            if (order_a.position > order_b.position) return 1;
+                            return 0;
+                        });
+                    }
                     return current_expeditions;
                 });
+                this.cdr.detectChanges();
             });
 
         // // TODO
@@ -322,68 +358,84 @@ export class ExpeditionsComponent implements OnInit {
         //     .subscribe(() => {
         //     });
 
-        this.realtime_expeditions_service.expeditionOrderUpdated$
+        this.realtime_expeditions_service.expedition_order_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_order: ExpeditionOrder) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
-                    current_expeditions.forEach((current_expedition: Expedition) => {
-                        current_expedition.parts.forEach((current_expedition_part: ExpeditionPart) => {
-                            current_expedition_part.citizens.forEach((current_expedition_citizen: CitizenExpedition) => {
-                                const order_to_update: number = current_expedition_citizen.orders
-                                    .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
-                                if (order_to_update > -1) {
-                                    console.log('before 1', current_expedition_citizen.orders[order_to_update]);
-                                    current_expedition_citizen.orders[order_to_update] = expedition_order;
-                                    console.log('after 1', current_expedition_citizen.orders[order_to_update]);
-                                } else {
-                                    current_expedition_citizen.orders.push(expedition_order);
-                                }
-                                current_expedition_citizen.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
-                                    if (order_a.position < order_b.position) return -1;
-                                    if (order_a.position > order_b.position) return 1;
-                                    return 0;
-                                });
-                            });
-                            const order_to_update: number = current_expedition_part.orders
-                                .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
-                            if (order_to_update > -1) {
-                                console.log('before 2', current_expedition_part.orders[order_to_update]);
-                                current_expedition_part.orders[order_to_update] = expedition_order;
-                                console.log('after 2', current_expedition_part.orders[order_to_update]);
-                            } else {
-                                current_expedition_part.orders.push(expedition_order);
-                            }
-
-                            current_expedition_part.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
-                                if (order_a.position < order_b.position) return -1;
-                                if (order_a.position > order_b.position) return 1;
-                                return 0;
-                            });
-                        });
+                    const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
+                        return _current_expedition.id === expedition_order.expeditions_id;
                     });
-                    console.log('final', current_expeditions);
+                    if (!current_expedition) return current_expeditions;
+
+                    const current_expedition_part: ExpeditionPart | undefined = current_expedition.parts.find((_current_expedition_part: ExpeditionPart) => {
+                        return _current_expedition_part.id === expedition_order.expedition_parts_id;
+                    });
+                    if (!current_expedition_part) return current_expeditions;
+
+                    const current_expedition_citizen: CitizenExpedition | undefined = current_expedition_part.citizens
+                        .find((_current_expedition_citizen: CitizenExpedition) => {
+                            return _current_expedition_citizen.id === expedition_order.expedition_citizen_id;
+                        });
+                    if (!current_expedition_citizen) {
+                        const order_to_update: number = current_expedition_part.orders
+                            .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
+                        if (order_to_update > -1) {
+                            current_expedition_part.orders[order_to_update] = expedition_order;
+                        } else {
+                            current_expedition_part.orders.push(expedition_order);
+                        }
+                        current_expedition_part.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
+                            if (order_a.position < order_b.position) return -1;
+                            if (order_a.position > order_b.position) return 1;
+                            return 0;
+                        });
+                    } else {
+                        const order_to_update: number = current_expedition_citizen.orders
+                            .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
+                        if (order_to_update > -1) {
+                            current_expedition_citizen.orders[order_to_update] = expedition_order;
+                        } else {
+                            current_expedition_citizen.orders.push(expedition_order);
+                        }
+                        current_expedition_citizen.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
+                            if (order_a.position < order_b.position) return -1;
+                            if (order_a.position > order_b.position) return 1;
+                            return 0;
+                        });
+                    }
                     return current_expeditions;
                 });
+                this.cdr.detectChanges();
             });
 
-        this.realtime_expeditions_service.expeditionBagUpdated$
+        this.realtime_expeditions_service.expedition_bag_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_bag: CitizenExpeditionBag) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
-                    current_expeditions.forEach((current_expedition: Expedition) => {
-                        current_expedition.parts.forEach((current_expedition_part: ExpeditionPart) => {
-                            current_expedition_part.citizens.forEach((current_expedition_citizen: CitizenExpedition) => {
-                                if (expedition_bag.bag_id === current_expedition_citizen.bag.bag_id) {
-                                    current_expedition_citizen.bag = expedition_bag;
-                                }
-                            });
-                        });
+                    const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
+                        return _current_expedition.id === expedition_bag.expeditions_id;
                     });
+                    if (!current_expedition) return current_expeditions;
+
+                    const current_expedition_part: ExpeditionPart | undefined = current_expedition.parts.find((_current_expedition_part: ExpeditionPart) => {
+                        return _current_expedition_part.id === expedition_bag.expeditions_part_id;
+                    });
+                    if (!current_expedition_part) return current_expeditions;
+
+                    const current_expedition_citizen: CitizenExpedition | undefined = current_expedition_part.citizens
+                        .find((_current_expedition_citizen: CitizenExpedition) => {
+                            return _current_expedition_citizen.id === expedition_bag.expeditions_citizen_id;
+                        });
+                    if (!current_expedition_citizen) return current_expeditions;
+
+                    current_expedition_citizen.bag = expedition_bag;
+
                     return current_expeditions;
                 });
+                this.cdr.detectChanges();
             });
 
-        this.realtime_expeditions_service.expeditionBagDeleted$
+        this.realtime_expeditions_service.expedition_bag_deleted$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((bag_id: number) => {
                 this.expeditions.update((current_expeditions: Expedition[]) => {
@@ -399,15 +451,22 @@ export class ExpeditionsComponent implements OnInit {
                     });
                     return current_expeditions;
                 });
+                this.cdr.detectChanges();
             });
 
-        this.realtime_expeditions_service.userJoined$
+        this.realtime_expeditions_service.user_joined$
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((user_ids: number[]) => this.active_citizens_list.set([...user_ids]));
+            .subscribe((user_ids: number[]) => {
+                this.active_citizens_list.set([...user_ids]);
+                this.cdr.detectChanges();
+            });
 
-        this.realtime_expeditions_service.userLeft$
+        this.realtime_expeditions_service.user_left$
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((user_ids: number[]) => this.active_citizens_list.set([...user_ids]));
+            .subscribe((user_ids: number[]) => {
+                this.active_citizens_list.set([...user_ids]);
+                this.cdr.detectChanges();
+            });
     }
 
     /**
@@ -632,8 +691,8 @@ export class ExpeditionsComponent implements OnInit {
         await this.realtime_expeditions_service.updateExpeditionPart(expedition, expedition_part);
     }
 
-    public async saveOrder(order: ExpeditionOrder): Promise<void> {
-        order.is_done = !order.is_done;
+    public async saveOrder(order: ExpeditionOrder, change: MatCheckboxChange): Promise<void> {
+        order.is_done = change.checked;
         await this.realtime_expeditions_service.updateExpeditionOrder(order);
     }
 

@@ -7,7 +7,9 @@ import { Item } from './item.class';
 export class CitizenExpeditionBag extends CommonModel<CitizenExpeditionBagDTO> {
     public bag_id!: number;
     public items: Item[] = [];
-
+    public expeditions_id?: number;
+    public expeditions_citizen_id?: number;
+    public expeditions_part_id?: number;
 
     constructor(dto?: CitizenExpeditionBagDTO) {
         super();
@@ -78,6 +80,9 @@ export class CitizenExpeditionBag extends CommonModel<CitizenExpeditionBagDTO> {
                     this.items.push(item);
                 }
             });
+            this.expeditions_id = dto.expeditionsId && dto.expeditionsId.length > 0 ? dto.expeditionsId[0] : undefined;
+            this.expeditions_citizen_id = dto.expeditionsCitizenId && dto.expeditionsCitizenId.length > 0 ? dto.expeditionsCitizenId[0] : undefined;
+            this.expeditions_part_id = dto.expeditionsPartId && dto.expeditionsPartId.length > 0 ? dto.expeditionsPartId[0] : undefined;
         }
     }
 

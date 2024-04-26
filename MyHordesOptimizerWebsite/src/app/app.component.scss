@@ -55,6 +55,10 @@ $snow-3: url('/assets/img/noel/s3.png');
                 .mat-mdc-card-header {
                     height: 40px;
                     align-items: center;
+
+                    .mat-mdc-card-header-text {
+                        flex: 1;
+                    }
                 }
 
                 .mat-mdc-card-content {
