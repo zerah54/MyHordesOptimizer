@@ -12,6 +12,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Hubs
@@ -24,7 +25,7 @@ namespace MyHordesOptimizerApi.Hubs
         protected ILogger<AbstractMyHordesOptimizerControllerBase> Logger { get; init; }
 
         private static ConcurrentDictionary<string, int> _townIdBySocketToken = new();
-        private static ConcurrentDictionary<int, List<int>> _connectedUsersByTown = new();
+        private static ConcurrentDictionary<int, ConcurrentDictionary<string, int>> _connectedUsersByTownByConnexionId = new();
 
         public ExpeditionsHub(IExpeditionService expeditionService, IUserInfoProvider userInfoProvider, ILogger<AbstractMyHordesOptimizerControllerBase> logger)
         {
@@ -41,20 +42,19 @@ namespace MyHordesOptimizerApi.Hubs
             Logger.LogDebug("[{@connectionId}] User {@userId} from town {@townId} joined hub", connectionId, userId, townId);
             _townIdBySocketToken.TryAdd(connectionId, townId);
             await Groups.AddToGroupAsync(connectionId, townId.ToString());
-            _connectedUsersByTown.TryGetValue(townId, out var usersId);
-            if (usersId is null)
+            _connectedUsersByTownByConnexionId.TryGetValue(townId, out var usersIdByConnexionId);
+            List<int> usersId = new();
+            if (usersIdByConnexionId is null)
             {
-                usersId = new List<int>();
+                usersIdByConnexionId = new ConcurrentDictionary<string, int>();
             }
-            if (!usersId.Contains(userId))
-            {
-                usersId.Add(userId);
-                Logger.LogDebug("[{@connectionId}] User {@userId} added to list of connected users", connectionId, userId);
-            }
-            _connectedUsersByTown.TryAdd(townId, usersId);
-            var connectedUserOnTownAsJson = _connectedUsersByTown[townId].ToJson();
+            usersId.Add(userId);
+            usersIdByConnexionId.TryAdd(connectionId, userId);
+            Logger.LogDebug("[{@connectionId}] User {@userId} added to list of connected users", connectionId, userId);
+            var connectedUserOnTownAsJson = usersIdByConnexionId.Values.ToList().Distinct().ToJson();
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserJoined.GetDescription(), connectedUserOnTownAsJson);
             Logger.LogDebug("[{@connectionId}] Sent to Group({@townId}) UserJoined : {@connectedUserOnTownAsJson}", connectionId, townId, connectedUserOnTownAsJson);
+            _connectedUsersByTownByConnexionId[townId] = usersIdByConnexionId;
             await base.OnConnectedAsync();
         }
 
@@ -66,11 +66,15 @@ namespace MyHordesOptimizerApi.Hubs
                 var userId = UserInfoProvider.UserId;
                 Logger.LogDebug("[{@connectionId}] {@userId} Disconnected", connectionId, userId);
                 await Groups.RemoveFromGroupAsync(connectionId, townId.ToString());
-                var usersId = _connectedUsersByTown[townId];
-                usersId.Remove(userId);
-                string connectedUserOnTownAsJson = _connectedUsersByTown[townId].ToJson();
-                await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserLeft.GetDescription(), connectedUserOnTownAsJson);
-                Logger.LogDebug("[{@connectionId}] Sent to Group({@townId}) UserLeft : {@connectedUserOnTownAsJson}", connectionId, townId, connectedUserOnTownAsJson);
+                var usersId = _connectedUsersByTownByConnexionId[townId];
+                usersId.Remove(connectionId, out var removedValue);
+                var connectedUserOnTown = _connectedUsersByTownByConnexionId[townId].Values.ToList().Distinct();
+                if (!connectedUserOnTown.Contains(userId))
+                {
+                    var connectedUserOnTownAsJson = connectedUserOnTown.ToJson();
+                    await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.UserLeft.GetDescription(), connectedUserOnTownAsJson);
+                    Logger.LogDebug("[{@connectionId}] Sent to Group({@townId}) UserLeft : {@connectedUserOnTownAsJson}", connectionId, townId, connectedUserOnTownAsJson);
+                }
             }
             await base.OnDisconnectedAsync(exception);
         }
