@@ -61,5 +61,14 @@ namespace MyHordesOptimizerApi.Controllers
             return Ok(updatedCitizen);
 
         }
+
+        [HttpPost]
+        [Route("{townId}/user/{userId}/chamanicDetail")]
+        public ActionResult<CitizenDto> UpdateCitizenChamanicDetail([FromRoute] int townId, [FromRoute] int userId, [FromBody] CitizenChamanicDetailDto chamanicDetailDto)
+        {
+            var updatedCitizen = TownService.UpdateCitizenChamanicDetail(townId, userId, chamanicDetailDto);
+            return Ok(updatedCitizen);
+
+        }
     }
 }

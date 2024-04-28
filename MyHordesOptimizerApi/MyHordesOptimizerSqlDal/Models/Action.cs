@@ -11,8 +11,8 @@ public partial class Action
 {
     [Key]
     [Column("name")]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string Name { get; set; } = null!;
 
     [ForeignKey("ActionName")]

@@ -11,8 +11,8 @@ public partial class Job
     [Key]
     [Column("jobUID")]
     [StringLength(30)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string JobUid { get; set; } = null!;
 
     [Column("baseWatchSurvival", TypeName = "int(11)")]

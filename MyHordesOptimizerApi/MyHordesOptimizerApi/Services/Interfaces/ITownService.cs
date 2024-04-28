@@ -7,5 +7,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         CitizenDto AddCitizenBath(int townId, int userId, int day);
         CitizenDto DeleteCitizenBath(int townId, int userId, int day);
         CitizenDto GetTownCitizen(int townId, int userId);
+
+        CitizenDto UpdateCitizenChamanicDetail(int townId, int userId, CitizenChamanicDetailDto chamanicDetailDto);
     }
 }

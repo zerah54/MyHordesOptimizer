@@ -19,8 +19,8 @@ public partial class Item
 
     [Column("uid")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? Uid { get; set; }
 
     [Column("deco", TypeName = "int(11)")]
@@ -28,50 +28,50 @@ public partial class Item
 
     [Column("label_fr")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? LabelFr { get; set; }
 
     [Column("label_en")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? LabelEn { get; set; }
 
     [Column("label_es")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? LabelEs { get; set; }
 
     [Column("label_de")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? LabelDe { get; set; }
 
     [Column("description_fr")]
     [StringLength(1000)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? DescriptionFr { get; set; }
 
     [Column("description_en")]
     [StringLength(1000)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? DescriptionEn { get; set; }
 
     [Column("description_es")]
     [StringLength(1000)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? DescriptionEs { get; set; }
 
     [Column("description_de")]
     [StringLength(1000)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? DescriptionDe { get; set; }
 
     [Column("guard", TypeName = "int(11)")]
@@ -79,8 +79,8 @@ public partial class Item
 
     [Column("img")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? Img { get; set; }
 
     [Column("isHeaver")]

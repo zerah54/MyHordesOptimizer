@@ -24,32 +24,32 @@ public partial class DefaultWishlistItem
 
     [Column("name")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string Name { get; set; } = null!;
 
     [Column("label_fr")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? LabelFr { get; set; }
 
     [Column("label_en")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? LabelEn { get; set; }
 
     [Column("label_es")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? LabelEs { get; set; }
 
     [Column("label_de")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? LabelDe { get; set; }
 
     [Column("count", TypeName = "int(11)")]

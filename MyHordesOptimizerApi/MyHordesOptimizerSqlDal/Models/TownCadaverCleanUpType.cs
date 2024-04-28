@@ -17,13 +17,13 @@ public partial class TownCadaverCleanUpType
 
     [Column("typeName")]
     [StringLength(100)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? TypeName { get; set; }
 
     [Column("myHordesApiName")]
     [StringLength(100)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? MyHordesApiName { get; set; }
 }

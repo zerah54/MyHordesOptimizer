@@ -25,6 +25,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
                 .ForMember(dto => dto.Bag, opt => opt.MapFrom(model => model.IdBagNavigation))
                 .ForMember(dto => dto.Baths, opt => opt.MapFrom(model => model.IdTownNavigation.TownCitizenBaths.Where(townBath => townBath.IdUser == model.IdUser)))
                 .ForMember(dto => dto.Cadaver, opt => opt.Ignore()) // ??
+                .ForMember(dto => dto.ChamanicDetail, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.Dead, opt => opt.MapFrom(model => model.Dead))
                 .ForMember(dto => dto.Home, opt => opt.MapFrom(model => model))
                 .ForMember(dto => dto.HomeMessage, opt => opt.MapFrom(model => model.HomeMessage))
@@ -52,6 +53,10 @@ namespace MyHordesOptimizerApi.MappingProfiles.Citizens
             CreateMap<TownCitizen, CitizenActionsHeroic>()
                 .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src))
                 .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => src.IdLastUpdateInfoHeroicActionNavigation));
+            CreateMap<TownCitizen, CitizenChamanicDetailDto>()
+              .ForMember(dest => dest.IsImmuneToSoul, opt => opt.MapFrom(src => src.IsImmuneToSoul))
+              .ForMember(dest => dest.LastUpdateInfo, opt => opt.MapFrom(src => src.IdLastUpdateChamanicNavigation))
+              .ForMember(dest => dest.NbPotionChaman, opt => opt.MapFrom(src => src.NbPotionChamanique));
 
             CreateMap<Bag, BagDto>()
                 .ForMember(dto => dto.Items, opt => opt.MapFrom(model => model.BagItems))

@@ -97,5 +97,30 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
             return GetTownCitizen(townId, userId);
         }
+
+        public CitizenDto UpdateCitizenChamanicDetail(int townId, int userId, CitizenChamanicDetailDto chamanicDetailDto)
+        {
+            var citizen = DbContext.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId)
+                 .Where(townCitizen => townCitizen.IdUser == userId)
+                 .Include(townCitizen => townCitizen.IdLastUpdateChamanicNavigation)
+                 .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                 .Single();
+            DbContext.ChangeTracker.Clear();
+
+            using var transaction = DbContext.Database.BeginTransaction();
+            LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+            var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
+            DbContext.SaveChanges();
+            DbContext.ChangeTracker.Clear();
+
+            citizen.IsImmuneToSoul = chamanicDetailDto.IsImmuneToSoul;
+            citizen.NbPotionChamanique = chamanicDetailDto.NbPotionChaman;
+            citizen.IdLastUpdateChamanic = newLastUpdate.IdLastUpdateInfo;
+            DbContext.Update(citizen);
+            DbContext.SaveChanges();
+            transaction.Commit();
+
+            return GetTownCitizen(townId, userId);
+        }
     }
 }

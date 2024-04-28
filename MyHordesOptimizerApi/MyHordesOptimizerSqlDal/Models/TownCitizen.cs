@@ -8,6 +8,7 @@ namespace MyHordesOptimizerApi.Models;
 
 [PrimaryKey("IdTown", "IdUser", "IdLastUpdateInfo")]
 [Table("TownCitizen")]
+[Index("IdLastUpdateChamanic", Name = "TownCitizen_fk_last_update_chamanic")]
 [Index("IdBag", Name = "idBag")]
 [Index("IdLastUpdateInfo", Name = "idLastUpdateInfo")]
 [Index("IdLastUpdateInfoGhoulStatus", Name = "idLastUpdateInfoGhoulStatus")]
@@ -34,8 +35,8 @@ public partial class TownCitizen
 
     [Column("jobUID")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? JobUid { get; set; }
 
     [Column("positionX", TypeName = "int(11)")]
@@ -208,9 +209,23 @@ public partial class TownCitizen
     [Column("idLastUpdateInfoStatus", TypeName = "int(11)")]
     public int? IdLastUpdateInfoStatus { get; set; }
 
+    [Required]
+    [Column("isImmuneToSoul")]
+    public bool? IsImmuneToSoul { get; set; }
+
+    [Column("nbPotionChamanique", TypeName = "int(11)")]
+    public int NbPotionChamanique { get; set; }
+
+    [Column("idLastUpdateChamanic", TypeName = "int(11)")]
+    public int? IdLastUpdateChamanic { get; set; }
+
     [ForeignKey("IdBag")]
     [InverseProperty("TownCitizens")]
     public virtual Bag? IdBagNavigation { get; set; }
+
+    [ForeignKey("IdLastUpdateChamanic")]
+    [InverseProperty("TownCitizenIdLastUpdateChamanicNavigations")]
+    public virtual LastUpdateInfo? IdLastUpdateChamanicNavigation { get; set; }
 
     [ForeignKey("IdLastUpdateInfoGhoulStatus")]
     [InverseProperty("TownCitizenIdLastUpdateInfoGhoulStatusNavigations")]

@@ -17,8 +17,8 @@ public partial class ItemComplet
 
     [Column("itemUid")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? ItemUid { get; set; }
 
     [Column("itemDeco", TypeName = "int(11)")]
@@ -26,50 +26,50 @@ public partial class ItemComplet
 
     [Column("itemLabel_fr")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? ItemLabelFr { get; set; }
 
     [Column("itemLabel_en")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? ItemLabelEn { get; set; }
 
     [Column("itemLabel_es")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? ItemLabelEs { get; set; }
 
     [Column("itemLabel_de")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? ItemLabelDe { get; set; }
 
     [Column("itemDescription_fr")]
     [StringLength(1000)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? ItemDescriptionFr { get; set; }
 
     [Column("itemDescription_en")]
     [StringLength(1000)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? ItemDescriptionEn { get; set; }
 
     [Column("itemDescription_es")]
     [StringLength(1000)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? ItemDescriptionEs { get; set; }
 
     [Column("itemDescription_de")]
     [StringLength(1000)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? ItemDescriptionDe { get; set; }
 
     [Column("itemGuard", TypeName = "int(11)")]
@@ -77,8 +77,8 @@ public partial class ItemComplet
 
     [Column("itemImg")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? ItemImg { get; set; }
 
     [Column("itemIsHeaver")]
@@ -92,8 +92,8 @@ public partial class ItemComplet
 
     [Column("catName")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? CatName { get; set; }
 
     [Column("catOrdering", TypeName = "int(11)")]
@@ -101,38 +101,38 @@ public partial class ItemComplet
 
     [Column("catLabel_fr")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? CatLabelFr { get; set; }
 
     [Column("catLabel_en")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? CatLabelEn { get; set; }
 
     [Column("catLabel_es")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? CatLabelEs { get; set; }
 
     [Column("catLabel_de")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? CatLabelDe { get; set; }
 
     [Column("actionName")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? ActionName { get; set; }
 
     [Column("propertyName")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? PropertyName { get; set; }
 
     [Column("dropRate_praf")]

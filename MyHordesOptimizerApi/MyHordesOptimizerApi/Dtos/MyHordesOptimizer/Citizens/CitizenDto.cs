@@ -34,6 +34,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens
         public CitizenHomeDto Home { get; set; }
         public CitizenStatusDto Status { get; set; }
         public CitizenActionsHeroic ActionsHeroic { get; set; }
+        public CitizenChamanicDetailDto ChamanicDetail { get; set; }
         public CadaverDto Cadaver { get; set; }
         public List<BathDto> Baths { get; set; }
 

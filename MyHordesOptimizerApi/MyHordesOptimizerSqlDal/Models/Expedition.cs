@@ -29,14 +29,14 @@ public partial class Expedition
 
     [Column("state")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? State { get; set; }
 
     [Column("label")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? Label { get; set; }
 
     [Column("minPdc", TypeName = "int(11)")]

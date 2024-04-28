@@ -338,8 +338,8 @@ public partial class MhoContext : DbContext
                             .HasColumnName("idItem");
                         j.IndexerProperty<string>("ActionName")
                             .HasColumnName("actionName")
-                            .UseCollation("utf8_general_ci")
-                            .HasCharSet("utf8");
+                            .UseCollation("utf8mb3_general_ci")
+                            .HasCharSet("utf8mb3");
                     });
 
             entity.HasMany(d => d.PropertyNames).WithMany(p => p.IdItems)
@@ -365,8 +365,8 @@ public partial class MhoContext : DbContext
                             .HasColumnName("idItem");
                         j.IndexerProperty<string>("PropertyName")
                             .HasColumnName("propertyName")
-                            .UseCollation("utf8_general_ci")
-                            .HasCharSet("utf8");
+                            .UseCollation("utf8mb3_general_ci")
+                            .HasCharSet("utf8mb3");
                     });
         });
 
@@ -624,6 +624,7 @@ public partial class MhoContext : DbContext
             entity.Property(e => e.GhoulVoracity).HasDefaultValueSql("-1");
             entity.Property(e => e.HasLock).HasDefaultValueSql("b'0'");
             entity.Property(e => e.HouseLevel).HasDefaultValueSql("-1");
+            entity.Property(e => e.IsImmuneToSoul).HasDefaultValueSql("b'0'");
             entity.Property(e => e.IsShunned).HasDefaultValueSql("b'0'");
             entity.Property(e => e.KitchenLevel).HasDefaultValueSql("-1");
             entity.Property(e => e.LaboLevel).HasDefaultValueSql("-1");
@@ -631,6 +632,8 @@ public partial class MhoContext : DbContext
             entity.Property(e => e.RestLevel).HasDefaultValueSql("-1");
 
             entity.HasOne(d => d.IdBagNavigation).WithMany(p => p.TownCitizens).HasConstraintName("TownCitizen_ibfk_4");
+
+            entity.HasOne(d => d.IdLastUpdateChamanicNavigation).WithMany(p => p.TownCitizenIdLastUpdateChamanicNavigations).HasConstraintName("TownCitizen_fk_last_update_chamanic");
 
             entity.HasOne(d => d.IdLastUpdateInfoNavigation).WithMany(p => p.TownCitizenIdLastUpdateInfoNavigations)
                 .OnDelete(DeleteBehavior.ClientSetNull)

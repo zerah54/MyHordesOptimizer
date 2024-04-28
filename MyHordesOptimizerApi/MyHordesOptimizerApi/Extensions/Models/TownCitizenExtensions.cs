@@ -59,5 +59,12 @@ namespace MyHordesOptimizerApi.Extensions.Models
             src.IsFootWounded = statusDetail.IsFootWounded;
             src.IdLastUpdateInfoStatus = statusDetail.IdLastUpdateInfoStatus;
         }
+
+        public static void ImportChamanicDetail(this TownCitizen src, TownCitizen chamanicDetail)
+        {
+            src.IsImmuneToSoul = chamanicDetail.IsImmuneToSoul;
+            src.NbPotionChamanique = chamanicDetail.NbPotionChamanique;
+            src.IdLastUpdateChamanic = chamanicDetail.IdLastUpdateChamanic;
+        }
     }
 }

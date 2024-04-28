@@ -15,8 +15,8 @@ public partial class CauseOfDeath
 
     [Column("ref")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? Ref { get; set; }
 
     [Column("description_fr", TypeName = "text")]
@@ -33,8 +33,8 @@ public partial class CauseOfDeath
 
     [Column("icon")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? Icon { get; set; }
 
     [Column("label_fr", TypeName = "text")]

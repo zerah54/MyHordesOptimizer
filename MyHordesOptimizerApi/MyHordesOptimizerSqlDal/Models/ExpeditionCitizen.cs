@@ -28,13 +28,13 @@ public partial class ExpeditionCitizen
 
     [Column("preinscritJob")]
     [StringLength(255)]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? PreinscritJob { get; set; }
 
     [Column("preinscritHeroic")]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string? PreinscritHeroic { get; set; }
 
     [Column("pdc", TypeName = "int(11)")]

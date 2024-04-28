@@ -13,8 +13,8 @@ public partial class RecipeItemResult
 {
     [Key]
     [Column("recipeName")]
-    [MySqlCharSet("utf8")]
-    [MySqlCollation("utf8_general_ci")]
+    [MySqlCharSet("utf8mb3")]
+    [MySqlCollation("utf8mb3_general_ci")]
     public string RecipeName { get; set; } = null!;
 
     [Key]

@@ -57,8 +57,10 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public IEnumerable<ItemDto> GetItems(int? townId)
         {
+            var sw = new Stopwatch();
             if (townId.HasValue)
             {
+                sw.Start();
                 var townBankItemLastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => tbi.IdLastUpdateInfo);
                 var items = DbContext.Items
                     .Include(item => item.IdCategoryNavigation)
@@ -78,11 +80,16 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .Include(item => item.TownWishListItems.Where(wishListItem => wishListItem.IdTown == townId))
                     .AsSplitQuery()
                     .ToList();
+                Logger.LogDebug("GetItem({@townId}) FetchInDb in {@ElapsedMilliseconds} ms", townId, sw.ElapsedMilliseconds);
+                sw.Restart();
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
+                Logger.LogDebug("GetItem({@townId}) MApper in {@ElapsedMilliseconds} ms", townId, sw.ElapsedMilliseconds);
+                sw.Stop();
                 return itemsDto;
             }
             else
             {
+                sw.Start();
                 var items = DbContext.Items
                    .Include(item => item.IdCategoryNavigation)
                    .AsSplitQuery()
@@ -97,7 +104,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                    .Include(item => item.RecipeItemResults)
                    .AsSplitQuery()
                    .ToList();
+                Logger.LogDebug("GetItem() FetchInDb in {@ElapsedMilliseconds} ms", sw.ElapsedMilliseconds);
+                sw.Restart();
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
+                Logger.LogDebug("GetItem() MApper in {@ElapsedMilliseconds} ms", sw.ElapsedMilliseconds);
+                sw.Stop();
                 return itemsDto;
             }
 
@@ -188,6 +199,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                                     c.ImportHomeDetail(citizen);
                                     c.ImportHeroicActionDetail(citizen);
                                     c.ImportStatusDetail(citizen);
+                                    c.ImportChamanicDetail(citizen);
                                     c.IdBag = citizen.IdBag;
                                 }
                             }
