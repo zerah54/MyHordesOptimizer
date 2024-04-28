@@ -43,6 +43,7 @@ import { ListElementAddRemoveComponent } from '../../shared/elements/list-elemen
 import { SelectComponent } from '../../shared/elements/select/select.component';
 import { CitizenFromIdPipe } from '../../shared/pipes/citizens-from-id.pipe';
 import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
+import { JobFromIdPipe } from '../../shared/pipes/job-from-id.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
 import { getCitizenFromId } from '../../shared/utilities/citizen.util';
 import { getTown, getUser } from '../../shared/utilities/localstorage.util';
@@ -61,7 +62,7 @@ import { TotalPdcPipe } from './total-pdc.pipe';
     imports: [MatCardModule, MatIconModule, MatSlideToggleModule, MatTabsModule, MatMenuModule, FormsModule, CommonModule, MatButtonModule, MatTooltipModule,
         NgClass, MatFormFieldModule, NgOptimizedImage, SelectComponent, MatCheckboxModule, MatInputModule, TotalPdcPipe, CitizensForExpePipe,
         ListElementAddRemoveComponent, SomeHeroicActionNeededPipe, CitizenFromIdPipe, DebugLogPipe, MatExpansionModule, IconApComponent, CompassRoseComponent,
-        CitizensForExpePipe, SomeHeroicActionNeededPipe, TotalPdcPipe, ActiveCitizensComponent]
+        CitizensForExpePipe, SomeHeroicActionNeededPipe, TotalPdcPipe, ActiveCitizensComponent, JobFromIdPipe]
 })
 export class ExpeditionsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -725,16 +726,16 @@ export class ExpeditionsComponent implements OnInit {
     public async saveCitizen(expedition_part: ExpeditionPart, citizen: CitizenExpedition, expedition_part_index?: number, expedition?: Expedition, citizen_index?: number): Promise<void> {
         if (expedition && expedition_part_index !== undefined && expedition_part_index !== null && citizen_index !== undefined && citizen_index !== null) {
             if (expedition_part_index === 0 && expedition?.parts.length > 1) {
-                expedition.parts.forEach(async (part: ExpeditionPart, index: number) => {
-                    if (index > 0 && part.citizens[citizen_index]) {
-                        part.citizens[citizen_index].citizen_id = citizen.citizen_id;
-                        part.citizens[citizen_index].preinscrit = citizen.preinscrit;
-                        part.citizens[citizen_index].pdc = citizen.pdc;
-                        part.citizens[citizen_index].preinscrit_job = citizen.preinscrit_job;
-                        part.citizens[citizen_index].preinscrit_heroic_skill = citizen.preinscrit_heroic_skill;
-                        await this.realtime_expeditions_service.updateExpeditionCitizen(expedition_part, citizen);
+                await this.realtime_expeditions_service.updateExpeditionCitizen(expedition_part, citizen);
+
+                let i: number = 0;
+                for (const part of expedition.parts) {
+                    const citizen_in_array: CitizenExpedition = part.citizens[citizen_index];
+                    if (i > 0 && citizen_in_array && !citizen_in_array.citizen_id && citizen_in_array.citizen_id !== citizen.citizen_id) {
+                        await this.realtime_expeditions_service.updateExpeditionCitizen(part, citizen);
                     }
-                });
+                    i++;
+                }
             } else {
                 await this.realtime_expeditions_service.updateExpeditionCitizen(expedition_part, citizen);
             }
@@ -772,7 +773,7 @@ export class ExpeditionsComponent implements OnInit {
                         const citizen: Citizen | undefined = this.all_citizens.find((_citizen: Citizen) => _citizen.id === citizen_expedition.citizen_id);
                         text += citizen?.name || '';
                     } else if (citizen_expedition.preinscrit_job) {
-                        text += `:${citizen_expedition.preinscrit_job.value.forum_icon}:`;
+                        text += `:${(<JobEnum>JobEnum.getByKey(citizen_expedition.preinscrit_job))?.value.img}:`;
                     }
                 });
 
@@ -805,16 +806,16 @@ export class ExpeditionsComponent implements OnInit {
         return false;
     }
 
-    public get preRegisteredJobs(): { count: number, job: JobEnum }[] {
-        const pre_registered_jobs: { count: number, job: JobEnum }[] = [];
+    public get preRegisteredJobs(): { count: number, job: string }[] {
+        const pre_registered_jobs: { count: number, job: string }[] = [];
         this.expeditions()?.forEach((expedition: Expedition) => {
             if (expedition.parts && expedition.parts.length > 0) {
                 const part: ExpeditionPart = expedition.parts[0];
                 part.citizens.forEach((citizen: CitizenExpedition) => {
-                    let pre_registered_job: { count: number, job: JobEnum } | undefined;
+                    let pre_registered_job: { count: number, job: string } | undefined;
                     if (citizen.preinscrit_job) {
                         pre_registered_job = pre_registered_jobs
-                            .find((_pre_registered_job: { count: number, job: JobEnum }) => _pre_registered_job?.job?.key === citizen?.preinscrit_job?.key);
+                            .find((_pre_registered_job: { count: number, job: string }) => _pre_registered_job?.job === citizen?.preinscrit_job);
 
                         if (pre_registered_job) {
                             pre_registered_job.count += 1;
@@ -826,13 +827,13 @@ export class ExpeditionsComponent implements OnInit {
                         pre_registered_job = pre_registered_jobs
                             .find((_pre_registered_job: {
                                 count: number,
-                                job: JobEnum
-                            }) => _pre_registered_job?.job?.key === pre_registered_citizen?.job?.key);
+                                job: string
+                            }) => _pre_registered_job?.job === pre_registered_citizen?.job?.key);
 
                         if (pre_registered_job) {
                             pre_registered_job.count += 1;
                         } else {
-                            pre_registered_jobs.push({ count: 1, job: <JobEnum>pre_registered_citizen?.job });
+                            pre_registered_jobs.push({ count: 1, job: <string>pre_registered_citizen?.job?.key });
                         }
                     }
                 });

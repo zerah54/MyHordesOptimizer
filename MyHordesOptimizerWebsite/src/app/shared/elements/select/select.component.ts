@@ -67,6 +67,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     @Input() form_control: AbstractControl = new UntypedFormControl();
     @Input({transform: booleanAttribute}) clearable: boolean = false;
     @Input() searchable: boolean = true;
+    @Input() class: string = '';
     /** Doit-on afficher sous forme de chips les différentes valeurs ? Fonctionne uniquement si "multiple" */
     @Input() chips: boolean = true;
 

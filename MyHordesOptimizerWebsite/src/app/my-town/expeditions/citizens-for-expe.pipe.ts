@@ -1,8 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
-import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.class';
-import { Expedition } from '../../_abstract_model/types/expedition.class';
 
 
 @Pipe({
@@ -11,12 +9,12 @@ import { Expedition } from '../../_abstract_model/types/expedition.class';
     standalone: true
 })
 export class CitizensForExpePipe implements PipeTransform {
-    transform(all_citizens: Citizen[], expedition_citizen: CitizenExpedition, current_expedition: Expedition, all_expeditions: Expedition[]): Citizen[] {
+    transform(all_citizens: Citizen[], expedition_citizen: CitizenExpedition/*, current_expedition: Expedition, all_expeditions: Expedition[]*/): Citizen[] {
         if (!expedition_citizen.preinscrit_job) return all_citizens;
 
         return all_citizens.filter((citizen: Citizen): boolean => {
             if (citizen.is_dead) return false;
-            if (citizen.job?.key !== expedition_citizen.preinscrit_job?.key) return false;
+            if (expedition_citizen.preinscrit_job && citizen.job?.key !== expedition_citizen.preinscrit_job) return false;
             // const is_already_placed: boolean = all_expeditions
             //     .filter((expedition: Expedition) => {
             //         return expedition.id !== current_expedition.id;
@@ -27,17 +25,17 @@ export class CitizensForExpePipe implements PipeTransform {
             //     });
             // if (is_already_placed) return false;
 
-            all_expeditions
-                .filter((expedition: Expedition) => {
-                    return expedition.id !== current_expedition.id;
-                })
-                .forEach((expedition: Expedition) => {
-                    expedition.parts.forEach((part: ExpeditionPart) => {
-                        part.citizens.forEach((citizen: CitizenExpedition) => {
-                            console.log('citizen', citizen);
-                        });
-                    });
-                });
+            // all_expeditions
+            //     .filter((expedition: Expedition) => {
+            //         return expedition.id !== current_expedition.id;
+            //     })
+            //     .forEach((expedition: Expedition) => {
+            //         expedition.parts.forEach((part: ExpeditionPart) => {
+            //             part.citizens.forEach((citizen: CitizenExpedition) => {
+            //                 console.log('citizen', citizen);
+            //             });
+            //         });
+            //     });
             return true;
         });
     }

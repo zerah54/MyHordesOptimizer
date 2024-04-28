@@ -12,7 +12,9 @@
                         <td mat-cell *matCellDef="let row">
                             @switch (column.id) {
                                 @case ('icon') {
-                                    <img [ngSrc]="HORDES_IMG_REPO + 'heroskill/' + row[column.id] + '.gif'" width="16" height="16">
+                                    @if (row[column.id] && row[column.id] !== '') {
+                                        <img [ngSrc]="HORDES_IMG_REPO + row[column.id]" width="16" height="16">
+                                    }
                                 }
                                 @case ('label') {
                                     {{ row[column.id][locale] }}
