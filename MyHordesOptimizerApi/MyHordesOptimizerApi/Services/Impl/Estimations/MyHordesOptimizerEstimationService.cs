@@ -73,7 +73,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             }
             else
             {
-                return new EstimationRequestDto();
+                return new EstimationRequestDto()
+                {
+                    Day = day
+                };
             }                       
         }
     }
