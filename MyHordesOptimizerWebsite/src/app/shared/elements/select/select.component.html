@@ -1,6 +1,6 @@
 <mat-select class="mho-select" [multiple]="multiple" [value]="value" (valueChange)="writeValue($event);"
             [attr.aria-labelledby]="parent_form_field.getLabelId()"
-            (closed)="closed.next()" [placeholder]="placeholder">
+            (closed)="closed.next()" [placeholder]="placeholder" [panelClass]="class">
     @if (multiple) {
         <mat-select-trigger>
             @if (chips) {
@@ -67,7 +67,7 @@
         @if (emptyOption) {
             <mat-option class="mho-option" [value]="undefined">--</mat-option>
         }
-        @for (option of displayed_options; track option) {
+        @for (option of displayed_options; track index; let index = $index) {
             <mat-option class="mho-option" [value]="option | bindValue:bindValue" [title]="option | label:bindLabel">
             <span style="display: flex; align-items: center; gap: 0.5em;">
                 <ng-container *ngTemplateOutlet="icons; context: {$implicit: option}"></ng-container>
