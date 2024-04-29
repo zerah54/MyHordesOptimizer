@@ -8,20 +8,26 @@ import { Subject, takeUntil } from 'rxjs';
 import { Action } from '../../_abstract_model/enum/action.enum';
 import { Property } from '../../_abstract_model/enum/property.enum';
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
 import { ItemComponent } from '../../shared/elements/item/item.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
-import { ItemsGroupByCategory } from '../../shared/pipes/items-group-by-category.pipe';
+import { ItemsGroupByCategoryPipe } from '../../shared/pipes/items-group-by-category.pipe';
 import { normalizeString } from '../../shared/utilities/string.utils';
+
+const angular_common: Imports = [CommonModule, FormsModule];
+const components: Imports = [FilterFieldComponent, ItemComponent, SelectComponent];
+const pipes: Imports = [ItemsGroupByCategoryPipe];
+const material_modules: Imports = [MatCardModule, MatFormFieldModule];
 
 @Component({
     selector: 'mho-items',
     templateUrl: './items.component.html',
     styleUrls: ['./items.component.scss'],
     standalone: true,
-    imports: [MatCardModule, CommonModule, FilterFieldComponent, MatFormFieldModule, SelectComponent, FormsModule, ItemComponent, ItemsGroupByCategory]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ItemsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

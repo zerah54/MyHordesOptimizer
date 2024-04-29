@@ -8,16 +8,22 @@ import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { Imports } from '../../_abstract_model/types/_types';
 import { HeroSkill } from '../../_abstract_model/types/hero-skill.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
+
+const angular_common: Imports = [CommonModule, NgOptimizedImage];
+const components: Imports = [];
+const pipes: Imports = [ColumnIdPipe];
+const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule];
 
 @Component({
     selector: 'mho-hero-skills',
     templateUrl: './hero-skills.component.html',
     styleUrls: ['./hero-skills.component.scss'],
     standalone: true,
-    imports: [MatCardModule, CommonModule, MatTableModule, MatSortModule, NgOptimizedImage, ColumnIdPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeroSkillsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

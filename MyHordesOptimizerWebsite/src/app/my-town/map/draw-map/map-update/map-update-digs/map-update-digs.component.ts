@@ -9,6 +9,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
+import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../../_abstract_model/types/dig.class';
@@ -19,12 +20,17 @@ import { getTown } from '../../../../../shared/utilities/localstorage.util';
 import { DigsPerDayPipe } from './digs-per-day.pipe';
 import { NotInListCitizenDigPipe } from './not-in-list-citizen.pipe';
 
+const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
+const components: Imports = [HeaderWithNumberPreviousNextFilterComponent];
+const pipes: Imports = [DigsPerDayPipe, NotInListCitizenDigPipe];
+const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule];
+
 @Component({
     selector: 'mho-map-update-digs',
     templateUrl: './map-update-digs.component.html',
     styleUrls: ['./map-update-digs.component.scss'],
     standalone: true,
-    imports: [CommonModule, HeaderWithNumberPreviousNextFilterComponent, MatButtonModule, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule, MatIconModule, MatListModule, NgOptimizedImage, NotInListCitizenDigPipe, DigsPerDayPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateDigsComponent {
     @HostBinding('style.display') display: string = 'contents';

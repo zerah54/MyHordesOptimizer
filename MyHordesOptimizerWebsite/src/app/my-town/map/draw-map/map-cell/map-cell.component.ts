@@ -6,6 +6,7 @@ import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
+import { Imports } from '../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
@@ -21,6 +22,14 @@ import { MyCellPipe } from './pipes/my-cell.pipe';
 import { ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop } from './pipes/scrut-borders.pipe';
 import { TrashLevelPipe } from './pipes/trash-level.pipe';
 import { TrashValuePipe } from './pipes/trash-value.pipe';
+
+const angular_common: Imports = [CommonModule, NgClass, NgOptimizedImage];
+const components: Imports = [
+    DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop,
+    MapCellDetailsComponent,
+    ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop];
+const pipes: Imports = [DecimalPipe, DigLevelPipe, IsRuinPipe, MyCellPipe, TrashLevelPipe, TrashValuePipe];
+const material_modules: Imports = [];
 
 @Component({
     selector: 'mho-map-cell',
@@ -40,7 +49,7 @@ import { TrashValuePipe } from './pipes/trash-value.pipe';
         ])
     ],
     standalone: true,
-    imports: [NgClass, CommonModule, NgOptimizedImage, MapCellDetailsComponent, DecimalPipe, IsRuinPipe, DigLevelPipe, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop, ScrutBorderBottom, MyCellPipe, DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop, TrashValuePipe, TrashLevelPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapCellComponent {
     @HostBinding('style.display') display: string = 'contents';

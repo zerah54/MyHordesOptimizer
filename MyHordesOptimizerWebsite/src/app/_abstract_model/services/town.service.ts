@@ -8,8 +8,6 @@ import { BankInfoDTO } from '../dto/bank-info.dto';
 import { CellDTO } from '../dto/cell.dto';
 import { CitizenInfoDTO } from '../dto/citizen-info.dto';
 import { CitizenDTO } from '../dto/citizen.dto';
-import { EstimationsDTO } from '../dto/estimations.dto';
-import { RegenDTO } from '../dto/regen.dto';
 import { RuinDTO } from '../dto/ruin.dto';
 import { TownDTO } from '../dto/town.dto';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
@@ -19,7 +17,6 @@ import { BankInfo } from '../types/bank-info.class';
 import { Cell } from '../types/cell.class';
 import { CitizenInfo } from '../types/citizen-info.class';
 import { Citizen } from '../types/citizen.class';
-import { Regen } from '../types/regen.class';
 import { Ruin } from '../types/ruin.class';
 import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
@@ -228,20 +225,6 @@ export class TownService extends GlobalService {
         });
     }
 
-    public getScrutList(): Observable<Regen[]> {
-        return new Observable((sub: Subscriber<Regen[]>) => {
-            super.get<RegenDTO[]>(this.API_URL + `/Fetcher/MapUpdates?townid=${getTown()?.town_id}`)
-                .subscribe({
-                    next: (response: HttpResponse<RegenDTO[]>) => {
-                        sub.next(dtoToModelArray(Regen, response.body));
-                    },
-                    error: (error: HttpErrorResponse) => {
-                        sub.error(error);
-                    }
-                });
-        });
-    }
-
     public saveCell(cell: Cell): Observable<Cell> {
         return new Observable((sub: Subscriber<Cell>) => {
             super.post<CellDTO>(this.API_URL + `/Map/cell?townid=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(cell.toSaveCellDTO()))
@@ -257,12 +240,12 @@ export class TownService extends GlobalService {
         });
     }
 
-    public addBath(citizen: Citizen): Observable<void> {
-        return new Observable((sub: Subscriber<void>) => {
-            super.post<EstimationsDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/bath?day=${getTown()?.day}`)
+    public addBath(citizen: Citizen): Observable<UpdateInfo> {
+        return new Observable((sub: Subscriber<UpdateInfo>) => {
+            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/bath?day=${getTown()?.day}`)
                 .subscribe({
-                    next: () => {
-                        sub.next();
+                    next: (update_info: UpdateInfoDTO) => {
+                        sub.next(new UpdateInfo(update_info));
                     },
                     error: (error: HttpErrorResponse) => {
                         sub.error(error);
@@ -277,6 +260,20 @@ export class TownService extends GlobalService {
                 .subscribe({
                     next: () => {
                         sub.next();
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
+
+    public saveChamanicDetails(citizen: Citizen): Observable<UpdateInfo> {
+        return new Observable((sub: Subscriber<UpdateInfo>) => {
+            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/chamanicDetail`, JSON.stringify(citizen.chamanic_detail.modelToDto()))
+                .subscribe({
+                    next: (response: UpdateInfoDTO) => {
+                        sub.next(new UpdateInfo(response));
                     },
                     error: (error: HttpErrorResponse) => {
                         sub.error(error);

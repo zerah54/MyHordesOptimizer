@@ -8,6 +8,7 @@ import { Dictionary } from './_types';
 import { Bag } from './bag.class';
 import { Bath } from './bath.class';
 import { Cadaver } from './cadaver.class';
+import { ChamanicDetail } from './chamanic-detail.class';
 import { HeroicActions, HeroicActionsWithValue } from './heroic-actions.class';
 import { Home, HomeWithValue } from './home.class';
 import { Status } from './status.class';
@@ -31,6 +32,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
     public heroic_actions?: HeroicActions;
     public cadaver?: Cadaver;
     public baths: Bath[] = [];
+    public chamanic_detail!: ChamanicDetail;
 
     constructor(dto?: CitizenDTO) {
         super();
@@ -56,7 +58,8 @@ export class Citizen extends CommonModel<CitizenDTO> {
             status: this.status?.modelToDto(),
             home: this.home?.modelToDto(),
             actionsHeroic: this.heroic_actions?.modelToDto(),
-            baths: this.baths ? modelToDtoArray(this.baths) : []
+            baths: this.baths ? modelToDtoArray(this.baths) : [],
+            chamanicDetail: this.chamanic_detail.modelToDto()
         };
     }
 
@@ -84,7 +87,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
         return {
             userId: this.id,
             heroicActions: this.heroic_actions?.content.reduce((accumulator: Dictionary<number | boolean>, content: HeroicActionsWithValue) => {
-                return {...accumulator, [content.element.key]: content.value};
+                return { ...accumulator, [content.element.key]: content.value };
             }, {}) || {}
         };
     }
@@ -93,7 +96,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
         return {
             userId: this.id,
             home: this.home?.content.reduce((accumulator: Dictionary<number | boolean>, content: HomeWithValue) => {
-                return {...accumulator, [content.element.key]: content.value};
+                return { ...accumulator, [content.element.key]: content.value };
             }, {}) || {}
         };
     }
@@ -120,6 +123,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.home = new Home(dto.home);
             this.heroic_actions = new HeroicActions(dto.actionsHeroic);
             this.baths = dtoToModelArray(Bath, dto.baths);
+            this.chamanic_detail = new ChamanicDetail(dto.chamanicDetail);
         }
     }
 }

@@ -5,13 +5,19 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { Imports } from '../../../../_abstract_model/types/_types';
+
+const angular_common: Imports = [CommonModule, FormsModule];
+const components: Imports = [];
+const pipes: Imports = [];
+const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule];
 
 @Component({
     selector: 'mho-header-with-number-previous-next-filter',
     templateUrl: './header-with-number-previous-next-filter.component.html',
     styleUrls: ['./header-with-number-previous-next-filter.component.scss'],
     standalone: true,
-    imports: [CommonModule, MatIconModule, MatFormFieldModule, MatButtonModule, MatInputModule, FormsModule]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

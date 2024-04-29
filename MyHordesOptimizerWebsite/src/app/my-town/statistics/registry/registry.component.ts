@@ -12,6 +12,7 @@ import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { Entry } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
+import { Imports } from '../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { BankDiffRegistryComponent } from './bank-diff/bank-diff-registry.component';
@@ -20,13 +21,18 @@ import { DigsRegistryComponent } from './digs/digs-registry.component';
 import { DoorsRegistryComponent } from './doors/doors-registry.component';
 import { WellRegistryComponent } from './well/well-registry.component';
 
+const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
+const components: Imports = [BankDiffRegistryComponent, DiceCardsRegistryComponent, DigsRegistryComponent, DoorsRegistryComponent, WellRegistryComponent];
+const pipes: Imports = [];
+const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatInputModule, MatTooltipModule];
+
 @Component({
     selector: 'mho-registry',
     templateUrl: './registry.component.html',
     styleUrls: ['./registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatFormFieldModule, MatInputModule, FormsModule, CommonModule, MatButtonModule, MatTooltipModule, NgOptimizedImage, DiceCardsRegistryComponent, DigsRegistryComponent, BankDiffRegistryComponent, WellRegistryComponent, DoorsRegistryComponent, MatButtonToggleModule]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class RegistryComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

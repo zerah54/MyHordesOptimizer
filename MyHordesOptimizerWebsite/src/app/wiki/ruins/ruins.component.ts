@@ -15,6 +15,7 @@ import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { TownService } from '../../_abstract_model/services/town.service';
+import { Imports } from '../../_abstract_model/types/_types';
 import { RuinItem } from '../../_abstract_model/types/ruin-item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
@@ -26,12 +27,17 @@ import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { getTown } from '../../shared/utilities/localstorage.util';
 import { normalizeString } from '../../shared/utilities/string.utils';
 
+const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
+const components: Imports = [HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent];
+const pipes: Imports = [DecimalPipe, ColumnIdPipe];
+const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule, MatMenuModule, MatSlideToggleModule, MatSortModule, MatTableModule, MatTooltipModule];
+
 @Component({
     selector: 'mho-ruins',
     templateUrl: './ruins.component.html',
     styleUrls: ['./ruins.component.scss'],
     standalone: true,
-    imports: [MatCardModule, CommonModule, MatTableModule, MatSortModule, HeaderWithStringFilterComponent, HeaderWithNumberFilterComponent, HeaderWithSelectFilterComponent, NgClass, NgOptimizedImage, DecimalPipe, ColumnIdPipe, FormsModule, MatSlideToggleModule, MatButtonModule, MatIconModule, MatTooltipModule, MatMenuModule]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class RuinsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -55,13 +61,13 @@ export class RuinsComponent implements OnInit {
     public datasource: MatTableDataSource<Ruin> = new MatTableDataSource();
     /** La liste des colonnes */
     public readonly columns: RuinColumns[] = [
-        {id: 'label', header: $localize`Nom du bâtiment`, sortable: true, sticky: true},
-        {id: 'description', header: $localize`Description`, sortable: false},
-        {id: 'min_dist', header: $localize`Distance minimum`, sortable: true},
-        {id: 'max_dist', header: $localize`Distance maximum`, sortable: true},
-        {id: 'camping', header: $localize`Bonus en camping`, sortable: true},
-        {id: 'capacity', header: $localize`Capacité`, sortable: true},
-        {id: 'drops', header: $localize`Objets`, sortable: false}
+        { id: 'label', header: $localize`Nom du bâtiment`, sortable: true, sticky: true },
+        { id: 'description', header: $localize`Description`, sortable: false },
+        { id: 'min_dist', header: $localize`Distance minimum`, sortable: true },
+        { id: 'max_dist', header: $localize`Distance maximum`, sortable: true },
+        { id: 'camping', header: $localize`Bonus en camping`, sortable: true },
+        { id: 'capacity', header: $localize`Capacité`, sortable: true },
+        { id: 'drops', header: $localize`Objets`, sortable: false }
     ];
 
     public ruins_filters: RuinFilters = {

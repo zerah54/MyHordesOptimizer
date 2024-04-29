@@ -11,9 +11,15 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import * as moment from 'moment';
 import { environment } from '../../../environments/environment';
 import { Theme } from '../../_abstract_model/interfaces';
+import { Imports } from '../../_abstract_model/types/_types';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { ChartsThemingService } from '../../shared/services/charts-theming.service';
 import { getTown } from '../../shared/utilities/localstorage.util';
+
+const angular_common: Imports = [CommonModule, NgClass, NgTemplateOutlet, RouterLink, RouterLinkActive];
+const components: Imports = [];
+const pipes: Imports = [];
+const material_modules: Imports = [MatButtonModule, MatDividerModule, MatIconModule, MatListModule, MatMenuModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-menu',
@@ -21,7 +27,7 @@ import { getTown } from '../../shared/utilities/localstorage.util';
     styleUrls: ['./menu.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatListModule, CommonModule, NgTemplateOutlet, MatDividerModule, MatButtonModule, MatMenuModule, MatIconModule, RouterLinkActive, RouterLink, NgClass, MatTooltipModule]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MenuComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

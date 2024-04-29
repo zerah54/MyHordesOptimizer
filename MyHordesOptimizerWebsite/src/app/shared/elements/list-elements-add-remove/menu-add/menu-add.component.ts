@@ -6,9 +6,15 @@ import { MatMenu, MatMenuModule } from '@angular/material/menu';
 import { MatTabsModule } from '@angular/material/tabs';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
+import { Imports } from '../../../../_abstract_model/types/_types';
 import { DebugLogPipe } from '../../../pipes/debug-log.pipe';
-import { ItemsGroupByCategory } from '../../../pipes/items-group-by-category.pipe';
+import { ItemsGroupByCategoryPipe } from '../../../pipes/items-group-by-category.pipe';
 import { IsItemsPipe } from '../is-item.pipe';
+
+const angular_common: Imports = [CommonModule, NgOptimizedImage];
+const components: Imports = [];
+const pipes: Imports = [DebugLogPipe, IsItemsPipe, ItemsGroupByCategoryPipe];
+const material_modules: Imports = [MatFormFieldModule, MatInputModule, MatMenuModule, MatTabsModule];
 
 @Component({
     selector: 'mho-menu-add',
@@ -17,22 +23,12 @@ import { IsItemsPipe } from '../is-item.pipe';
     encapsulation: ViewEncapsulation.None,
     exportAs: 'menuAdd',
     standalone: true,
-    imports: [
-        MatMenuModule,
-        MatFormFieldModule,
-        MatInputModule,
-        CommonModule,
-        NgOptimizedImage,
-        MatTabsModule,
-        IsItemsPipe,
-        ItemsGroupByCategory,
-        DebugLogPipe
-    ],
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class MenuAddComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @ViewChild(MatMenu, {static: true}) menu!: MatMenu;
+    @ViewChild(MatMenu, { static: true }) menu!: MatMenu;
 
     @Input() class: string = '';
 

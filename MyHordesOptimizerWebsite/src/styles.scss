@@ -27,6 +27,10 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+.comma::after {
+    content: ', ';
+}
+
 .mat-mdc-snack-bar-container {
     &.snackbar-success {
         --mdc-snackbar-container-color: darkseagreen !important;

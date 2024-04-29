@@ -8,6 +8,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item.class';
 import { Recipe } from '../../_abstract_model/types/recipe.class';
@@ -16,12 +17,17 @@ import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-
 import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { normalizeString } from '../../shared/utilities/string.utils';
 
+const angular_common: Imports = [CommonModule, NgOptimizedImage];
+const components: Imports = [FilterFieldComponent];
+const pipes: Imports = [DecimalPipe, ColumnIdPipe];
+const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule];
+
 @Component({
     selector: 'mho-recipes',
     templateUrl: './recipes.component.html',
     styleUrls: ['./recipes.component.scss'],
     standalone: true,
-    imports: [MatCardModule, CommonModule, FilterFieldComponent, MatTableModule, MatSortModule, NgOptimizedImage, DecimalPipe, ColumnIdPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class RecipesComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

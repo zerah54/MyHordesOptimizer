@@ -7,16 +7,22 @@ import { MatMenuModule } from '@angular/material/menu';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { HeroicActionEnum } from '../../../../../_abstract_model/enum/heroic-action.enum';
+import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 import { HasStillHeroicPipe } from './has-still-heroic.pipe';
 import { NotInListCitizenPipe } from './not-in-list-citizen.pipe';
+
+const angular_common: Imports = [CommonModule, NgOptimizedImage];
+const components: Imports = [];
+const pipes: Imports = [HasStillHeroicPipe, NotInListCitizenPipe];
+const material_modules: Imports = [MatButtonModule, MatIconModule, MatListModule, MatMenuModule];
 
 @Component({
     selector: 'mho-map-update-citizens',
     templateUrl: './map-update-citizens.component.html',
     styleUrls: ['./map-update-citizens.component.scss'],
     standalone: true,
-    imports: [CommonModule, MatButtonModule, MatMenuModule, NgOptimizedImage, MatIconModule, MatListModule, HasStillHeroicPipe, NotInListCitizenPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateCitizensComponent {
     @HostBinding('style.display') display: string = 'contents';

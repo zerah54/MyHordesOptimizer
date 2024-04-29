@@ -1,5 +1,6 @@
 import { CommonModule, NgClass } from '@angular/common';
 import { Component, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
@@ -7,8 +8,10 @@ import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { TownService } from '../../../_abstract_model/services/town.service';
+import { Imports } from '../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { DigComponent } from '../../../shared/elements/dig/dig.component';
 import {
@@ -16,8 +19,13 @@ import {
 } from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
 import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
-import { getTown } from '../../../shared/utilities/localstorage.util';
+import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
+import { BathForDayPipe } from '../bath-for-day.pipe';
 
+const angular_common: Imports = [CommonModule, NgClass];
+const components: Imports = [DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent];
+const pipes: Imports = [BathForDayPipe, ColumnIdPipe];
+const material_modules: Imports = [MatCheckboxModule, MatSortModule, MatTableModule];
 
 @Component({
     selector: 'mho-citizens-watch',
@@ -25,7 +33,7 @@ import { getTown } from '../../../shared/utilities/localstorage.util';
     styleUrls: ['./citizens-watch.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatTableModule, MatSortModule, CommonModule, NgClass, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent, DigComponent, ColumnIdPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensWatchComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -49,7 +57,7 @@ export class CitizensWatchComponent implements OnInit {
         ...Array.from({ length: getTown()?.day || 1 }, (_: unknown, i: number): StandardColumn => {
             return {
                 id: (i + 1).toString(10),
-                header: (i + 1).toString(10),
+                header: $localize`Jour` + ' ' + (i + 1).toString(10),
                 class: '',
                 sticky: false
             };
@@ -79,6 +87,25 @@ export class CitizensWatchComponent implements OnInit {
         this.datasource.filterPredicate = (data: Citizen, filter: string): boolean => this.customFilter(data, filter);
 
         this.getCitizens();
+    }
+
+    public saveBath(citizen: Citizen, event: MatCheckboxChange): void {
+        if (event.checked) {
+            this.town_service
+                .addBath(citizen)
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.chamanic_detail) {
+                            citizen.chamanic_detail.update_info.username = getUser().username;
+                            citizen.chamanic_detail.update_info.update_time = update_info.update_time;
+                        }
+                    }
+                });
+        } else {
+            this.town_service
+                .removeBath(citizen)
+                .subscribe();
+        }
     }
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */

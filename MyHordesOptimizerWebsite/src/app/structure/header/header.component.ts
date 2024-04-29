@@ -16,19 +16,24 @@ import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { TownService } from '../../_abstract_model/services/town.service';
+import { Imports } from '../../_abstract_model/types/_types';
 import { Me } from '../../_abstract_model/types/me.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
 import { getExternalAppId, getTown, getUser, setExternalAppId } from '../../shared/utilities/localstorage.util';
 import { CitizenMenuComponent } from './citizen-menu/citizen-menu.component';
 
+const angular_common: Imports = [CommonModule, NgOptimizedImage, FormsModule];
+const components: Imports = [CitizenMenuComponent];
+const pipes: Imports = [DebugLogPipe];
+const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatToolbarModule, MatTooltipModule];
+
 @Component({
     selector: 'mho-header',
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.scss'],
     standalone: true,
-    imports: [MatToolbarModule, MatButtonModule, MatIconModule, NgOptimizedImage, CommonModule, MatTooltipModule, MatMenuModule, MatFormFieldModule,
-        MatInputModule, FormsModule, MatDividerModule, DebugLogPipe, CitizenMenuComponent]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderComponent {
     @HostBinding('style.display') display: string = 'contents';

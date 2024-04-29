@@ -8,6 +8,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import * as moment from 'moment';
+import { Imports } from '../../_abstract_model/types/_types';
+
+const angular_common: Imports = [CommonModule, FormsModule];
+const components: Imports = [];
+const pipes: Imports = [DecimalPipe];
+const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-probabilities',
@@ -15,7 +21,7 @@ import * as moment from 'moment';
     styleUrls: ['./probabilities.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, MatFormFieldModule, MatInputModule, FormsModule, CommonModule, DecimalPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ProbabilitiesComponent implements AfterViewInit {
     @HostBinding('style.display') display: string = 'contents';

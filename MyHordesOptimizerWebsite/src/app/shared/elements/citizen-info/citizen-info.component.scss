@@ -1,0 +1,8 @@
+@use 'variables';
+
+.mho-citizen-info {
+    display: inline-flex;
+    flex-direction: row;
+    gap: 0.25em;
+    align-items: flex-start;
+}

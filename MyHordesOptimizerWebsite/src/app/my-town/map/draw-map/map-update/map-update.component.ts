@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, HostBinding, inject, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -11,6 +11,7 @@ import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { DigsService } from '../../../../_abstract_model/services/digs.service';
 import { TownService } from '../../../../_abstract_model/services/town.service';
+import { Imports } from '../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../_abstract_model/types/dig.class';
@@ -22,13 +23,18 @@ import { MapUpdateCitizensComponent } from './map-update-citizens/map-update-cit
 import { MapUpdateDigsComponent } from './map-update-digs/map-update-digs.component';
 import { MapUpdateRuinComponent } from './map-update-ruin/map-update-ruin.component';
 
+const angular_common: Imports = [CommonModule, FormsModule];
+const components: Imports = [MapUpdateCellComponent, MapUpdateCitizensComponent, MapUpdateDigsComponent, MapUpdateRuinComponent];
+const pipes: Imports = [CitizensFromShortPipe];
+const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTabsModule];
+
 @Component({
     selector: 'mho-map-update',
     templateUrl: './map-update.component.html',
     styleUrls: ['./map-update.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatDialogTitle, CommonModule, MatButtonModule, MatDialogClose, MatIconModule, MatDialogContent, MatTabsModule, MapUpdateCellComponent, MapUpdateRuinComponent, MapUpdateCitizensComponent, MatFormFieldModule, MatInputModule, FormsModule, MapUpdateDigsComponent, MatDialogActions, CitizensFromShortPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -45,7 +51,7 @@ export class MapUpdateComponent implements OnInit {
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     constructor(@Inject(MAT_DIALOG_DATA) public data: MapUpdateData) {
-        this.cell = new Cell({...this.data.cell.modelToDto()});
+        this.cell = new Cell({ ...this.data.cell.modelToDto() });
     }
 
     public ngOnInit(): void {
@@ -65,7 +71,7 @@ export class MapUpdateComponent implements OnInit {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe({
                 next: (): void => {
-                    this.data.cell = new Cell({...this.cell.modelToDto()});
+                    this.data.cell = new Cell({ ...this.cell.modelToDto() });
                 }
             });
         this.digs_service

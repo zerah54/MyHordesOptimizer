@@ -5,6 +5,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
+import { Imports } from '../../../../_abstract_model/types/_types';
+
+const angular_common: Imports = [CommonModule, NgOptimizedImage];
+const components: Imports = [];
+const pipes: Imports = [];
+const material_modules: Imports = [MatFormFieldModule, MatInputModule, MatMenuModule];
 
 @Component({
     selector: 'mho-menu-remove',
@@ -13,14 +19,7 @@ import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
     encapsulation: ViewEncapsulation.None,
     exportAs: 'menuRemove',
     standalone: true,
-    imports: [
-        MatMenuModule,
-        MatFormFieldModule,
-        MatInputModule,
-        CommonModule,
-        CommonModule,
-        NgOptimizedImage,
-    ],
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class MenuRemoveComponent {
     @HostBinding('style.display') display: string = 'contents';

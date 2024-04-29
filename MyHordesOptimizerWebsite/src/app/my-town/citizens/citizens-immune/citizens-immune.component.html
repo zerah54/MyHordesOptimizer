@@ -1,0 +1,34 @@
+@if (citizen_info) {
+    <div class="mho-citizens-immune">
+        <div class="filters">
+            <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
+                <mho-select [options]="all_citizens_job" [searchable]="false"
+                            multiple
+                            [class]="'job-select'"
+                            [bindLabel]="'value.label'"
+                            [bindIcon]="'value.img'"
+                            [(ngModel)]="filters.jobs"
+                            (ngModelChange)="changeFilters()"></mho-select>
+            </mat-form-field>
+
+        </div>
+        @if (filtered_citizen | citizenGroupByImmuneState; as grouped_citizen) {
+            @for (state of grouped_citizen; track i_group; let i_group = $index) {
+                <div>
+                    <h3>{{ state.label }}</h3>
+                    <div>
+                        @for (citizen of state.citizen; track citizen.id; let i_citizen = $index) {
+                            <mho-citizen-info [citizen]="citizen"></mho-citizen-info>
+                            @if (i_citizen < state.citizen.length - 1) {
+                                <span>,&nbsp;</span>
+                            }
+                        }
+                    </div>
+                </div>
+                @if (i_group < grouped_citizen.length - 1) {
+                    <mat-divider></mat-divider>
+                }
+            }
+        }
+    </div>
+}

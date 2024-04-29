@@ -1,5 +1,5 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
@@ -7,6 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { TownService } from '../../../_abstract_model/services/town.service';
+import { Imports } from '../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
@@ -18,6 +19,11 @@ import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
 import { getTown } from '../../../shared/utilities/localstorage.util';
 
+const angular_common: Imports = [CommonModule, NgClass];
+const components: Imports = [HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent];
+const pipes: Imports = [ColumnIdPipe];
+const material_modules: Imports = [MatSortModule, MatTableModule];
+
 
 @Component({
     selector: 'mho-citizens-dispo',
@@ -25,14 +31,13 @@ import { getTown } from '../../../shared/utilities/localstorage.util';
     styleUrls: ['./citizens-dispo.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatTableModule, MatSortModule, CommonModule, NgClass, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent, ColumnIdPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensDispoComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
-    @ViewChild('filterInput') filterInput!: ElementRef;
 
     /** La liste des citoyens */
     public citizen_info!: CitizenInfo;
@@ -46,8 +51,8 @@ export class CitizensDispoComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center'},
-        {id: 'today_dispo', header: $localize`Disponibilités du jour`, class: ''},
+        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center' },
+        { id: 'today_dispo', header: $localize`Disponibilités du jour`, class: '' },
     ];
     public readonly current_day: number = getTown()?.day || 1;
     public filters: DispoFilter = {
@@ -55,7 +60,7 @@ export class CitizensDispoComponent implements OnInit {
         citizen: []
     };
 
-    private town_service: TownService = inject(TownService)
+    private town_service: TownService = inject(TownService);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 

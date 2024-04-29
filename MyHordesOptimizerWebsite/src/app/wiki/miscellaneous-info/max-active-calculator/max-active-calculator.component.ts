@@ -2,35 +2,29 @@ import { CommonModule, formatNumber } from '@angular/common';
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { Misc } from '../../../_abstract_model/interfaces';
+import { Imports } from '../../../_abstract_model/types/_types';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
 import { getTown } from '../../../shared/utilities/localstorage.util';
+
+const angular_common: Imports = [CommonModule, FormsModule];
+const components: Imports = [];
+const pipes: Imports = [ColumnIdPipe];
+const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTableModule];
 
 @Component({
     selector: 'mho-max-active-calculator',
     templateUrl: './max-active-calculator.component.html',
     styleUrls: ['./max-active-calculator.component.scss'],
     standalone: true,
-    imports: [
-        MatDialogTitle,
-        MatButtonModule,
-        MatDialogClose,
-        MatIconModule,
-        MatDialogContent,
-        CommonModule,
-        MatFormFieldModule,
-        MatInputModule,
-        FormsModule,
-        ColumnIdPipe,
-        MatTableModule,
-    ],
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class MaxActiveCalculatorComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

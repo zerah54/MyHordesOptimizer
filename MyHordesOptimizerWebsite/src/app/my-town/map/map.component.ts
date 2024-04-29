@@ -19,7 +19,7 @@ import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { TownService } from '../../_abstract_model/services/town.service';
-import { Dictionary } from '../../_abstract_model/types/_types';
+import { Dictionary, Imports } from '../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { Item } from '../../_abstract_model/types/item.class';
@@ -29,13 +29,18 @@ import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { CompassRoseComponent } from '../../shared/elements/compass-rose/compass-rose.component';
 import { DrawMapComponent } from './draw-map/draw-map.component';
 
+const angular_common: Imports = [CommonModule, FormsModule];
+const components: Imports = [CompassRoseComponent, DrawMapComponent];
+const pipes: Imports = [];
+const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatChipsModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSidenavModule];
+
 @Component({
     selector: 'mho-map',
     templateUrl: './map.component.html',
     styleUrls: ['./map.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatCardModule, MatButtonModule, MatIconModule, MatSidenavModule, DrawMapComponent, CommonModule, MatChipsModule, MatMenuModule, MatFormFieldModule, MatInputModule, FormsModule, MatSelectModule, MatOptionModule, MatCheckboxModule, MatListModule, CompassRoseComponent]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -137,7 +142,7 @@ export class MapComponent implements OnInit {
         if (already_exists && current_distances.length > 0) return;
 
         /** Sinon, on ajoute à la liste */
-        current_distances.push({...this.new_distance_option});
+        current_distances.push({ ...this.new_distance_option });
 
         this.changeOptions('distances', [...current_distances]);
     }
@@ -165,7 +170,7 @@ export class MapComponent implements OnInit {
     public changeOptions<T>(key: string, value: T): void {
         (<{ [key: string]: unknown }><unknown>this.options)[key] = value;
         setTimeout(() => {
-            this.options = {...this.options};
+            this.options = { ...this.options };
             localStorage.setItem('MAP_OPTIONS', JSON.stringify(this.options));
         });
     }

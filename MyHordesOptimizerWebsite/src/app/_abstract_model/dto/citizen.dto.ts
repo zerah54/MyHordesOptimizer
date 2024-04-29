@@ -1,5 +1,6 @@
 import { BagDTO } from './bag.dto';
 import { BathDTO } from './bath.dto';
+import { ChamanicDetailDTO } from './chamanic-detail.dto';
 import { HeroicActionsDTO } from './heroic-actions.dto';
 import { HomeDTO } from './home.dto';
 import { StatusDTO } from './status.dto';
@@ -22,5 +23,6 @@ export interface CitizenDTO {
     home?: HomeDTO;
     status?: StatusDTO;
     actionsHeroic?: HeroicActionsDTO;
-    baths: BathDTO[],
+    baths: BathDTO[];
+    chamanicDetail: ChamanicDetailDTO;
 }
