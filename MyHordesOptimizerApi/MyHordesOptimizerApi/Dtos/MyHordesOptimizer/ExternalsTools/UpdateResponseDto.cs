@@ -13,6 +13,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
         public HeroicActionsResponseDto HeroicActionsResponseDto { get; set; }
         public HomeResponseDto HomeResponseDto { get; set; }
         public StatusResponseDto StatusResponseDto { get; set; }
+        public DigsUpdateResponseDto DigResponseDto { get; internal set; }
 
         public UpdateResponseDto(UpdateRequestDto updateRequestDto)
         {
@@ -21,6 +22,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
             HeroicActionsResponseDto = new HeroicActionsResponseDto(updateRequestDto);
             HomeResponseDto = new HomeResponseDto(updateRequestDto);
             StatusResponseDto = new StatusResponseDto(updateRequestDto);
+            DigResponseDto = new DigsUpdateResponseDto(updateRequestDto);
         }
     }
 }

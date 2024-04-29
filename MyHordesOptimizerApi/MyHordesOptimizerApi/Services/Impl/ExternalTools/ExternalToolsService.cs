@@ -96,12 +96,12 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (WebApiException e)
                     {
-                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"Exception pendant la maj globale BBH : {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.BigBrothHordesStatus = $"{e.Message} : {e.Response}";
                     }
                     catch (Exception e)
                     {
-                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"Exception pendant la maj globale BBH : {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.BigBrothHordesStatus = e.Message;
                     }
                 });
@@ -126,12 +126,12 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (WebApiException e)
                     {
-                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"Exception pendant la maj globale Fata : {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.FataMorganaStatus = $"{e.Message} : {e.Response}";
                     }
                     catch (Exception e)
                     {
-                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"Exception pendant la maj globale Fata : {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.FataMorganaStatus = e.Message;
                     }
                 });
@@ -288,7 +288,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
-                        Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"Exception pendant la maj map MHO {e.ToString()} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.MhoApiStatus = e.Message;
                     }
                 });
@@ -304,12 +304,12 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (WebApiException e)
                     {
-                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"Exception pendant la maj api GH :  {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.GestHordesApiStatus = $"{e.Message} : {e.Response}";
                     }
                     catch (Exception e)
                     {
-                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"Exception pendant la maj api GH :  {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.GestHordesApiStatus = e.Message;
                     }
                 }
@@ -338,12 +338,12 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (WebApiException e)
                     {
-                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"Exception pendant la maj cell GH : {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.GestHordesCellsStatus = $"{e.Message} : {e.Response}";
                     }
                     catch (Exception e)
                     {
-                        Logger.LogWarning($"{e} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"Exception pendant la maj cell GH : {e} => {updateRequestDto.ToJson()}");
                         response.MapResponseDto.GestHordesCellsStatus = e.Message;
                     }
                 }
@@ -363,7 +363,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     }
                     catch (Exception e)
                     {
-                        Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
+                        Logger.LogWarning($"Exception pendant la MAJ des sacs de MHO : {e.ToString()} => {updateRequestDto.ToJson()}");
                         response.BagsResponseDto.MhoStatus = e.Message;
                     }
                 });
@@ -464,7 +464,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         }
                         catch (Exception e)
                         {
-                            Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
+                            Logger.LogWarning($"Exception pendant la MAJ du détail d'un citizen MHO : {e.ToString()} => {updateRequestDto.ToJson()}");
                             response.HeroicActionsResponseDto.MhoStatus = e.Message;
                             response.StatusResponseDto.MhoStatus = e.Message;
                             response.HomeResponseDto.MhoStatus = e.Message;
@@ -483,7 +483,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         }
                         catch (Exception e)
                         {
-                            Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
+                            Logger.LogWarning($"Exception pendant la MAJ du détail d'un citizen GH : {e.ToString()} => {updateRequestDto.ToJson()}");
                             response.HeroicActionsResponseDto.GestHordesStatus = e.Message;
                             response.StatusResponseDto.GestHordesStatus = e.Message;
                             response.HomeResponseDto.GestHordesStatus = e.Message;
@@ -494,7 +494,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             }
             catch (Exception e)
             {
-                Logger.LogWarning($"{e.ToString()} => {updateRequestDto.ToJson()}");
+                Logger.LogWarning($"Exception inconue : {e.ToString()} => {updateRequestDto.ToJson()}");
                 response.HeroicActionsResponseDto.MhoStatus = e.Message;
                 response.HeroicActionsResponseDto.GestHordesStatus = e.Message;
                 response.StatusResponseDto.MhoStatus = e.Message;
@@ -509,53 +509,61 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             var successedDig = updateRequestDto.SuccessedDig;
             if (successedDig != null)
             {
-                using var scope = ServiceScopeFactory.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
-                using var transaction = dbContext.Database.BeginTransaction();
-
-                var cellDigsToUpdate = new List<MapCellDig>();
-                var realX = updateRequestDto.TownDetails.TownX + successedDig.Cell.X;
-                var realY = updateRequestDto.TownDetails.TownY - successedDig.Cell.Y;
-                int townId = updateRequestDto.TownDetails.TownId;
-
-                var cellId = dbContext.MapCells.Where(cell => cell.IdTown == updateRequestDto.TownDetails.TownId
-                                                                 && cell.X == realX
-                                                                 && cell.Y == realY)
-                                                            .Select(cell => cell.IdCell)
-                                                            .Single();
-                foreach (var dig in successedDig.Values)
+                try
                 {
-                    var cellDigModel = dbContext.MapCellDigs.Where(cellDig => cellDig.IdCellNavigation.IdTown == updateRequestDto.TownDetails.TownId
-                                                                   && cellDig.Day == successedDig.Cell.Day
-                                                                   && cellDig.IdCellNavigation.X == realX
-                                                                   && cellDig.IdCellNavigation.Y == realY
-                                                                   && cellDig.IdUser == dig.CitizenId)
-                                                             .FirstOrDefault();
-                    if (cellDigModel == null)
+                    using var scope = ServiceScopeFactory.CreateScope();
+                    var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
+                    using var transaction = dbContext.Database.BeginTransaction();
+
+                    var cellDigsToUpdate = new List<MapCellDig>();
+                    var realX = updateRequestDto.TownDetails.TownX + successedDig.Cell.X;
+                    var realY = updateRequestDto.TownDetails.TownY - successedDig.Cell.Y;
+                    int townId = updateRequestDto.TownDetails.TownId;
+
+                    var cellId = dbContext.MapCells.Where(cell => cell.IdTown == updateRequestDto.TownDetails.TownId
+                                                                     && cell.X == realX
+                                                                     && cell.Y == realY)
+                                                                .Select(cell => cell.IdCell)
+                                                                .Single();
+                    foreach (var dig in successedDig.Values)
                     {
-                        cellDigModel = new MapCellDig()
+                        var cellDigModel = dbContext.MapCellDigs.Where(cellDig => cellDig.IdCellNavigation.IdTown == updateRequestDto.TownDetails.TownId
+                                                                       && cellDig.Day == successedDig.Cell.Day
+                                                                       && cellDig.IdCellNavigation.X == realX
+                                                                       && cellDig.IdCellNavigation.Y == realY
+                                                                       && cellDig.IdUser == dig.CitizenId)
+                                                                 .FirstOrDefault();
+                        if (cellDigModel == null)
                         {
-                            Day = successedDig.Cell.Day,
-                            IdCell = cellId,
-                            IdUser = dig.CitizenId,
-                            NbSucces = dig.SuccessDigs,
-                            NbTotalDig = dig.TotalDigs,
-                            IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo
-                        };
-                        dbContext.Add(cellDigModel);
+                            cellDigModel = new MapCellDig()
+                            {
+                                Day = successedDig.Cell.Day,
+                                IdCell = cellId,
+                                IdUser = dig.CitizenId,
+                                NbSucces = dig.SuccessDigs,
+                                NbTotalDig = dig.TotalDigs,
+                                IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo
+                            };
+                            dbContext.Add(cellDigModel);
+                        }
+                        else
+                        {
+                            cellDigModel.Day = successedDig.Cell.Day;
+                            cellDigModel.IdUser = dig.CitizenId;
+                            cellDigModel.NbSucces = dig.SuccessDigs;
+                            cellDigModel.NbTotalDig = dig.TotalDigs;
+                            cellDigModel.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+                            dbContext.Update(cellDigModel);
+                        }
                     }
-                    else
-                    {
-                        cellDigModel.Day = successedDig.Cell.Day;
-                        cellDigModel.IdUser = dig.CitizenId;
-                        cellDigModel.NbSucces = dig.SuccessDigs;
-                        cellDigModel.NbTotalDig = dig.TotalDigs;
-                        cellDigModel.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
-                        dbContext.Update(cellDigModel);
-                    }
+                    dbContext.SaveChanges();
+                    transaction.Commit();
                 }
-                dbContext.SaveChanges();
-                transaction.Commit();
+                catch (Exception e)
+                {
+                    Logger.LogWarning($"Exception pendant la MAJ des digs de MHO : {e.ToString()} => {updateRequestDto.ToJson()}");
+                    response.DigResponseDto.MhoStatus = e.Message;
+                }
             }
 
             #endregion
