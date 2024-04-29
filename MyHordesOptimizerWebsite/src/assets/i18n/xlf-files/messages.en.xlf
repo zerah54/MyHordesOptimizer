@@ -1316,7 +1316,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">Points de contrôles requis</target>
+        <target state="translated">Required control points</target>
       </trans-unit>
       <trans-unit id="5444790026778117235" datatype="html">
         <source>Expédition prête</source>
@@ -1404,7 +1404,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">227</context>
         </context-group>
-        <target state="needs-translation">Oui</target>
+        <target state="translated">Yes</target>
       </trans-unit>
       <trans-unit id="4709450557795328287" datatype="html">
         <source>Non</source>
@@ -1416,7 +1416,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">229</context>
         </context-group>
-        <target state="needs-translation">Non</target>
+        <target state="translated">No</target>
       </trans-unit>
       <trans-unit id="6799332973355663459" datatype="html">
         <source>Ajouter une place</source>
@@ -1880,7 +1880,7 @@
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">69</context>
         </context-group>
-        <target state="needs-translation">PA</target>
+        <target state="translated">AP</target>
       </trans-unit>
       <trans-unit id="7649141370266521403" datatype="html">
         <source>Aller / Retour</source>
@@ -2284,7 +2284,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Prises dans le puits</target>
+        <target state="translated">Taken from the well</target>
       </trans-unit>
       <trans-unit id="6979945454590589971" datatype="html">
         <source>Entrées / Sorties</source>
@@ -2436,7 +2436,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="needs-translation">Importer depuis un fichier Excel</target>
+        <target state="translated">Import from Excel file</target>
       </trans-unit>
       <trans-unit id="1229846018197621216" datatype="html">
         <source>Objet encombrant</source>
@@ -2472,7 +2472,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.html</context>
           <context context-type="linenumber">231</context>
         </context-group>
-        <target state="needs-translation">Zone de ramassage</target>
+        <target state="translated">Collection zone</target>
       </trans-unit>
       <trans-unit id="291877573183684359" datatype="html" approved="yes">
         <source>Objet</source>
