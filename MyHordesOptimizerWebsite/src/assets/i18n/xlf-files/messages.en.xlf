@@ -2984,7 +2984,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-tools/tuto-script-tools.component.ts</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="needs-translation">Camping</target>
+        <target state="translated">Camping</target>
       </trans-unit>
       <trans-unit id="8628521144156217897" datatype="html" approved="yes">
         <source>Chances de survie</source>
@@ -3108,7 +3108,7 @@
           <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Pouvoirs</target>
+        <target state="translated">Powers</target>
       </trans-unit>
       <trans-unit id="8819719048481824214" datatype="html" approved="yes">
         <source>Bâtiments</source>
@@ -3184,7 +3184,7 @@
           <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Tutoriels</target>
+        <target state="translated">Tutorials</target>
       </trans-unit>
       <trans-unit id="6304154521414539936" datatype="html" approved="yes">
         <source>Script / Extension</source>
@@ -3316,7 +3316,7 @@
           <context context-type="sourcefile">src/app/tutorials/tutorials.routes.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Bot Discord</target>
+        <target state="translated">Discord Bot</target>
       </trans-unit>
       <trans-unit id="5737526992758767493" datatype="html" approved="yes">
         <source>Noël</source>
@@ -3340,7 +3340,7 @@
           <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Un grand merci à Renack, sans qui ni le script ni le site n'existeraient puisqu'il a fait tout le backend !</target>
+        <target state="translated">A big thank you to Renack, without whom neither the script nor the site would exist since he did all the backend !</target>
       </trans-unit>
       <trans-unit id="3079822284604019418" datatype="html">
         <source>Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.</source>
@@ -3348,7 +3348,7 @@
           <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Merci aussi à Bigonoud, qui a accepté de mettre les mains dans le code pour nous aider au développement.</target>
+        <target state="translated">Thank you also to Bigonoud, who agreed to put his hands in the code to help us develop.</target>
       </trans-unit>
       <trans-unit id="7508106374158857656" datatype="html">
         <source>Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l&apos;ergonomie du site.</source>
@@ -3356,7 +3356,7 @@
           <context context-type="sourcefile">src/app/thanks/thanks.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Merci à CrazyUnicorn, qui nous fait profiter de ses talents pour l'ergonomie du site.</target>
+        <target state="translated">Thank you to CrazyUnicorn, who used his talents for the site ergonomic.</target>
       </trans-unit>
       <trans-unit id="9186323945331905549" datatype="html">
         <source>Merci également aux traducteurs qui rendent l&apos;internationalisation possible.</source>
