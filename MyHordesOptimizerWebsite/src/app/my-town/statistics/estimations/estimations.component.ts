@@ -15,7 +15,7 @@ import { Color } from 'chartjs-plugin-datalabels/types/options';
 import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
 import { MinMax } from '../../../_abstract_model/interfaces';
 import { TownStatisticsService } from '../../../_abstract_model/services/town-statistics.service';
-import { Dictionary } from '../../../_abstract_model/types/_types';
+import { Dictionary, Imports } from '../../../_abstract_model/types/_types';
 import { Estimations } from '../../../_abstract_model/types/estimations.class';
 import { Regen } from '../../../_abstract_model/types/regen.class';
 import {
@@ -25,13 +25,18 @@ import { ClipboardService } from '../../../shared/services/clipboard.service';
 import { getMaxAttack, getMinAttack } from '../../../shared/utilities/estimations.util';
 import { getTown } from '../../../shared/utilities/localstorage.util';
 
+const angular_common: Imports = [CommonModule, FormsModule];
+const components: Imports = [HeaderWithNumberPreviousNextFilterComponent];
+const pipes: Imports = [];
+const material_modules: Imports = [MatButtonModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule];
+
 @Component({
     selector: 'mho-estimations',
     templateUrl: './estimations.component.html',
     styleUrls: ['./estimations.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [HeaderWithNumberPreviousNextFilterComponent, MatButtonModule, MatTooltipModule, MatIconModule, CommonModule, MatFormFieldModule, MatInputModule, FormsModule, MatExpansionModule]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class EstimationsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -70,7 +75,7 @@ export class EstimationsComponent implements OnInit {
 
     public separators: string[] = [' à ', ' - '];
 
-    private town_statistics_service: TownStatisticsService = inject(TownStatisticsService)
+    private town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
 
     constructor(private clipboard: ClipboardService) {
     }

@@ -16,8 +16,7 @@
 
                 &.avatar_name {
                     > img {
-                        width: 100px;
-                        height: 100px;
+                        max-width: 100px;
                     }
 
                     > div {
@@ -36,12 +35,21 @@
                             display: flex;
                             flex-direction: row;
                             align-items: center;
+                            justify-content: space-between;
 
                             .list-element-add-remove {
                                 flex: 1;
 
                                 .list {
                                     white-space: nowrap;
+                                }
+                            }
+
+                            &.chamanic {
+                                .fields {
+                                    img {
+                                        margin-right: 0.5em;
+                                    }
                                 }
                             }
                         }

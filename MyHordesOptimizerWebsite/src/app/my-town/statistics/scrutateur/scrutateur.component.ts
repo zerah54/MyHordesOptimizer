@@ -7,6 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { Direction } from '../../../_abstract_model/enum/direction.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { TownStatisticsService } from '../../../_abstract_model/services/town-statistics.service';
+import { Imports } from '../../../_abstract_model/types/_types';
 import { Regen } from '../../../_abstract_model/types/regen.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
@@ -14,12 +15,17 @@ import { groupBy } from '../../../shared/utilities/array.util';
 
 // import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 
+const angular_common: Imports = [CommonModule, NgClass];
+const components: Imports = [];
+const pipes: Imports = [ColumnIdPipe];
+const material_modules: Imports = [MatSortModule, MatTableModule];
+
 @Component({
     selector: 'mho-scrutateur',
     templateUrl: './scrutateur.component.html',
     styleUrls: ['./scrutateur.component.scss'],
     standalone: true,
-    imports: [MatTableModule, MatSortModule, CommonModule, NgClass, ColumnIdPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ScrutateurComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -31,10 +37,10 @@ export class ScrutateurComponent implements OnInit {
     public datasource: MatTableDataSource<Regen> = new MatTableDataSource();
     /** La liste des colonnes */
     public columns: StandardColumn[] = [
-        {id: 'day', header: $localize`Jour`, sticky: true},
-        {id: 'direction_regen', header: $localize`Direction`, class: ''},
-        {id: 'level_regen', header: $localize`Niveau`, class: ''},
-        {id: 'taux_regen', header: $localize`Taux`, class: ''}
+        { id: 'day', header: $localize`Jour`, sticky: true },
+        { id: 'direction_regen', header: $localize`Direction`, class: '' },
+        { id: 'level_regen', header: $localize`Niveau`, class: '' },
+        { id: 'taux_regen', header: $localize`Taux`, class: '' }
     ];
 
     public polar_chart!: Chart<'polarArea'>;

@@ -23,7 +23,7 @@ import { RealtimeExpeditionsService } from '../../_abstract_model/realtime-servi
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
 import { TownService } from '../../_abstract_model/services/town.service';
-import { ListForAddRemove } from '../../_abstract_model/types/_types';
+import { Imports, ListForAddRemove } from '../../_abstract_model/types/_types';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { CitizenExpeditionBag } from '../../_abstract_model/types/citizen-expedition-bag.class';
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
@@ -52,6 +52,11 @@ import { EditOrdersComponent, EditOrdersData } from './edit-orders/edit-orders.c
 import { EditPositionsComponent, EditPositionsData } from './edit-positions/edit-positions.component';
 import { TotalPdcPipe } from './total-pdc.pipe';
 
+const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
+const components: Imports = [ActiveCitizensComponent, IconApComponent, ListElementAddRemoveComponent, SelectComponent];
+const pipes: Imports = [CitizensForExpePipe, CitizenFromIdPipe, CompassRoseComponent, DebugLogPipe, JobFromIdPipe, SomeHeroicActionNeededPipe, TotalPdcPipe];
+const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSlideToggleModule, MatTabsModule, MatTooltipModule];
+
 @Component({
     selector: 'mho-expeditions',
     templateUrl: './expeditions.component.html',
@@ -59,10 +64,7 @@ import { TotalPdcPipe } from './total-pdc.pipe';
     encapsulation: ViewEncapsulation.None,
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [MatCardModule, MatIconModule, MatSlideToggleModule, MatTabsModule, MatMenuModule, FormsModule, CommonModule, MatButtonModule, MatTooltipModule,
-        NgClass, MatFormFieldModule, NgOptimizedImage, SelectComponent, MatCheckboxModule, MatInputModule, TotalPdcPipe, CitizensForExpePipe,
-        ListElementAddRemoveComponent, SomeHeroicActionNeededPipe, CitizenFromIdPipe, DebugLogPipe, MatExpansionModule, IconApComponent, CompassRoseComponent,
-        CitizensForExpePipe, SomeHeroicActionNeededPipe, TotalPdcPipe, ActiveCitizensComponent, JobFromIdPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ExpeditionsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

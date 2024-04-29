@@ -24,11 +24,17 @@ import { MatInput, MatInputModule } from '@angular/material/input';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { Subject } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
+import { Imports } from '../../../_abstract_model/types/_types';
 import { DebugLogPipe } from '../../pipes/debug-log.pipe';
 import { normalizeString } from '../../utilities/string.utils';
 import { BindPipe, BindValuePipe } from './bind.pipe';
 import { IconPipe } from './icon.pipe';
 import { LabelPipe } from './label.pipe';
+
+const angular_common: Imports = [CommonModule, NgOptimizedImage, NgTemplateOutlet];
+const components: Imports = [];
+const pipes: Imports = [BindPipe, BindValuePipe, DebugLogPipe, IconPipe, LabelPipe];
+const material_modules: Imports = [MatChipsModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatOptionModule, MatSelectModule];
 
 @Component({
     selector: 'mho-select',
@@ -43,7 +49,7 @@ import { LabelPipe } from './label.pipe';
         }
     ],
     standalone: true,
-    imports: [MatSelectModule, CommonModule, MatChipsModule, MatIconModule, NgTemplateOutlet, MatFormFieldModule, MatInputModule, MatDividerModule, MatOptionModule, NgOptimizedImage, LabelPipe, IconPipe, BindPipe, BindValuePipe, DebugLogPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class SelectComponent<T> implements ControlValueAccessor, Validator, MatFormFieldControl<T | string | T[] | string[] | undefined>, OnDestroy {
 
@@ -56,16 +62,16 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     @ViewChild(MatSelect) select!: MatSelect;
     @ViewChild(MatInput) filter_input!: MatInput;
 
-    @Input({transform: booleanAttribute}) multiple: boolean = false;
+    @Input({ transform: booleanAttribute }) multiple: boolean = false;
     @Input() bindLabel!: string;
     @Input() bindValue!: string;
-    @Input({transform: booleanAttribute}) noLabel: boolean = false;
+    @Input({ transform: booleanAttribute }) noLabel: boolean = false;
     @Input() bindIcon!: string;
     @Input() moreInfo?: (element: string | T) => string;
-    @Input({transform: booleanAttribute}) emptyOption: boolean = false;
+    @Input({ transform: booleanAttribute }) emptyOption: boolean = false;
     //current form control input. helpful in validating and accessing form control
     @Input() form_control: AbstractControl = new UntypedFormControl();
-    @Input({transform: booleanAttribute}) clearable: boolean = false;
+    @Input({ transform: booleanAttribute }) clearable: boolean = false;
     @Input() searchable: boolean = true;
     @Input() class: string = '';
     /** Doit-on afficher sous forme de chips les différentes valeurs ? Fonctionne uniquement si "multiple" */
@@ -211,11 +217,14 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     }
 
     public filter(event: Event): void {
+        console.log('filter', event);
         const value: string = normalizeString((<HTMLInputElement>event.target)?.value);
+        console.log('value', value);
         this.displayed_options = [...this.complete_options.filter((option: T | string) => {
             const label: string = normalizeString(this.label_pipe.transform(option, this.bindLabel));
             return label.indexOf(value) > -1;
         })];
+        console.log('displayed_options', this.displayed_options);
     }
 
     //From ControlValueAccessor interface

@@ -10,7 +10,7 @@ import { normalizeString } from '../utilities/string.utils';
     name: 'itemsGroupByCategory',
     standalone: true,
 })
-export class ItemsGroupByCategory implements PipeTransform {
+export class ItemsGroupByCategoryPipe implements PipeTransform {
 
     private locale: string = moment.locale();
 

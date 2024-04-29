@@ -1,5 +1,5 @@
 @if (citizen_info) {
-    <div class="mho-citizens-digs">
+    <div class="mho-citizens-watch">
         <table mat-table [dataSource]="datasource" matSort>
 
             @for (column of columns; track column.id) {
@@ -28,7 +28,12 @@
                                 <div>{{ row.name }}</div>
                             }
                             @default {
-
+                                @if (row.baths) {
+                                    <mat-checkbox [checked]="row.baths | bathForDay:+column.id" (change)="saveBath(row, $event)"
+                                                  [disabled]="+column.id !== current_day">
+                                        <ng-container i18n>Bain pris</ng-container>
+                                    </mat-checkbox>
+                                }
                             }
                         }
                     </td>

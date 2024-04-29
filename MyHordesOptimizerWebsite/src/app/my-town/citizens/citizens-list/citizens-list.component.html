@@ -32,10 +32,7 @@
                                         @case ('avatar_name') {
                                             <mho-avatar [src]="row.avatar"></mho-avatar>
                                             <div>
-                                                {{ row.name }}
-                                                @if (row.is_shunned) {
-                                                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/banished.gif'" width="16" height="16">
-                                                }
+                                                <mho-citizen-info [citizen]="row"></mho-citizen-info>
                                             </div>
                                         }
                                         @case ('more_status') {
@@ -69,7 +66,33 @@
                                                     </mho-last-update>
                                                 </div>
                                                 <div class="bath">
-                                                    <mat-checkbox [checked]="dailyBathTaken(row)" (change)="saveBath(row, $event)" i18n>Bain pris</mat-checkbox>
+                                                    <mat-checkbox [checked]="row.baths | bathForDay:current_day" (change)="saveBath(row, $event)">
+                                                        <ng-container i18n>Bain pris</ng-container>
+                                                    </mat-checkbox>
+                                                    <mho-last-update [lastUpdateInfo]="(row.baths | bathForDay:current_day)?.update_info"
+                                                                     [thresholds]="[30, 120, 120*2, 120*3]" [hideDetails]="true">
+                                                    </mho-last-update>
+                                                </div>
+                                                <div class="chamanic">
+                                                    <div class="fields">
+                                                        <mat-form-field [appearance]="'outline'" class="short-bottom compact-field">
+                                                            <mat-label>
+                                                                <img [ngSrc]="HORDES_IMG_REPO + 'item/item_potion.gif'" width="16" height="16">
+                                                                <ng-container i18n>Potions bues</ng-container>
+                                                            </mat-label>
+                                                            <input matInput type="number" [(ngModel)]="row.chamanic_detail.nb_potion_shaman"
+                                                                   (ngModelChange)="saveChamanicDetails(row)">
+                                                        </mat-form-field>
+
+                                                        <mat-checkbox [(ngModel)]="row.chamanic_detail.is_immune_to_soul"
+                                                                      (ngModelChange)="saveChamanicDetails(row)">
+                                                            <img [ngSrc]="HORDES_IMG_REPO + 'item/item_potion.gif'" width="16" height="16">
+                                                            <ng-container i18n>Immunisé</ng-container>
+                                                        </mat-checkbox>
+                                                    </div>
+                                                    <mho-last-update [lastUpdateInfo]="row.chamanic_detail.update_info"
+                                                                     [thresholds]="[30, 120, 120*2, 120*3]" [hideDetails]="true">
+                                                    </mho-last-update>
                                                 </div>
                                             </div>
                                         }

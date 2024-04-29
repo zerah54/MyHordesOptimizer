@@ -151,66 +151,66 @@ export class RealtimeExpeditionsService extends RealtimeGlobalService {
 
     public async updateExpedition(day: number, expedition: Expedition): Promise<void> {
         console.log('send', 'PostExpedition', getTown()?.town_id, day, expedition.modelToDtoShort());
-        await this.hubConnection.invoke('PostExpedition', getTown()?.town_id, day, JSON.stringify(expedition.modelToDtoShort()));
+        await this.invokeHub('PostExpedition', getTown()?.town_id, day, JSON.stringify(expedition.modelToDtoShort()));
     }
 
     public async deleteExpedition(expedition: Expedition): Promise<void> {
         console.log('send', 'DeleteExpedition', expedition.id);
-        await this.hubConnection.invoke('DeleteExpedition', expedition.id);
+        await this.invokeHub('DeleteExpedition', expedition.id);
     }
 
     public async copyExpeditions(from_day: number, to_day: number): Promise<void> {
         console.log('send', 'CopyExpeditions', getTown()?.town_id, from_day, to_day);
-        await this.hubConnection.invoke('CopyExpeditions', getTown()?.town_id, from_day, to_day);
+        await this.invokeHub('CopyExpeditions', getTown()?.town_id, from_day, to_day);
     }
 
     public async updateExpeditionPart(expedition: Expedition, part: ExpeditionPart): Promise<void> {
         console.log('send', 'PostExpeditionPart', expedition.id, part.modelToDtoShort());
-        await this.hubConnection.invoke('PostExpeditionPart', expedition.id, JSON.stringify(part.modelToDtoShort()));
+        await this.invokeHub('PostExpeditionPart', expedition.id, JSON.stringify(part.modelToDtoShort()));
     }
 
     public async deleteExpeditionPart(part: ExpeditionPart): Promise<void> {
         console.log('send', 'DeleteExpeditionPart', part.id);
-        await this.hubConnection.invoke('DeleteExpeditionPart', part.id);
+        await this.invokeHub('DeleteExpeditionPart', part.id);
     }
 
     public async updateExpeditionCitizen(part: ExpeditionPart, citizen: CitizenExpedition): Promise<void> {
         console.log('send', 'PostExpeditionCitizen', part.id, citizen.modelToDtoShort());
-        await this.hubConnection.invoke('PostExpeditionCitizen', part.id, JSON.stringify(citizen.modelToDtoShort()));
+        await this.invokeHub('PostExpeditionCitizen', part.id, JSON.stringify(citizen.modelToDtoShort()));
     }
 
     public async deleteExpeditionCitizen(citizen: CitizenExpedition): Promise<void> {
         console.log('send', 'DeleteExpeditionCitizen', citizen.id);
-        await this.hubConnection.invoke('DeleteExpeditionCitizen', citizen.id);
+        await this.invokeHub('DeleteExpeditionCitizen', citizen.id);
     }
 
     public async updateExpeditionPartOrders(part: ExpeditionPart, orders: ExpeditionOrder[]): Promise<void> {
         console.log('send', 'PostPartOrders', part.id, modelToDtoArray(orders));
-        await this.hubConnection.invoke('PostPartOrders', part.id, JSON.stringify(modelToDtoArray(orders)));
+        await this.invokeHub('PostPartOrders', part.id, JSON.stringify(modelToDtoArray(orders)));
     }
 
     public async updateExpeditionCitizenOrders(citizen: CitizenExpedition, orders: ExpeditionOrder[]): Promise<void> {
         console.log('send', 'PostCitizenOrders', citizen.id, modelToDtoArray(orders));
-        await this.hubConnection.invoke('PostCitizenOrders', citizen.id, JSON.stringify(modelToDtoArray(orders)));
+        await this.invokeHub('PostCitizenOrders', citizen.id, JSON.stringify(modelToDtoArray(orders)));
     }
 
     public async deleteExpeditionOrder(order: ExpeditionOrder): Promise<void> {
         console.log('send', 'DeleteExpeditionOrder', order.id);
-        await this.hubConnection.invoke('DeleteExpeditionOrder', order.id);
+        await this.invokeHub('DeleteExpeditionOrder', order.id);
     }
 
     public async updateExpeditionOrder(order: ExpeditionOrder): Promise<void> {
         console.log('send', 'SaveExpeditionOrder', order.modelToDto());
-        await this.hubConnection.invoke('SaveExpeditionOrder', JSON.stringify(order.modelToDto()));
+        await this.invokeHub('SaveExpeditionOrder', JSON.stringify(order.modelToDto()));
     }
 
     public async updateExpeditionBag(citizen: CitizenExpedition): Promise<void> {
         console.log('send', 'SaveExpeditionBag', citizen.id, citizen.bag.modelToDtoShort());
-        await this.hubConnection.invoke('SaveExpeditionBag', citizen.id, JSON.stringify(citizen.bag.modelToDtoShort()));
+        await this.invokeHub('SaveExpeditionBag', citizen.id, JSON.stringify(citizen.bag.modelToDtoShort()));
     }
 
     public async deleteExpeditionBag(bag: CitizenExpeditionBag): Promise<void> {
         console.log('send', 'SaveExpeditionBag', bag.bag_id);
-        await this.hubConnection.invoke('SaveExpeditionBag', bag.bag_id);
+        await this.invokeHub('SaveExpeditionBag', bag.bag_id);
     }
 }

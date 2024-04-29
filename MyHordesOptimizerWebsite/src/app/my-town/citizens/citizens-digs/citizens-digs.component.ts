@@ -8,6 +8,7 @@ import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { DigsService } from '../../../_abstract_model/services/digs.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
+import { Imports } from '../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
@@ -20,6 +21,11 @@ import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
 import { getTown } from '../../../shared/utilities/localstorage.util';
 
+const angular_common: Imports = [CommonModule, NgClass];
+const components: Imports = [DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent];
+const pipes: Imports = [ColumnIdPipe];
+const material_modules: Imports = [MatSortModule, MatTableModule];
+
 
 @Component({
     selector: 'mho-citizens-digs',
@@ -27,7 +33,7 @@ import { getTown } from '../../../shared/utilities/localstorage.util';
     styleUrls: ['./citizens-digs.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatTableModule, MatSortModule, CommonModule, NgClass, HeaderWithSelectFilterComponent, HeaderWithNumberPreviousNextFilterComponent, DigComponent, ColumnIdPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizensDigsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

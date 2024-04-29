@@ -17,10 +17,16 @@ import {
     ViewEncapsulation
 } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NgControl } from '@angular/forms';
-import { MatFormField, MatFormFieldControl } from '@angular/material/form-field';
+import { MatFormFieldControl, MatFormFieldModule } from '@angular/material/form-field';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AngularEditorConfig, AngularEditorModule } from '@kolkov/angular-editor';
 import { Subject } from 'rxjs';
+import { Imports } from '../../../_abstract_model/types/_types';
+
+const angular_common: Imports = [FormsModule];
+const components: Imports = [];
+const pipes: Imports = [];
+const material_modules: Imports = [MatFormFieldModule];
 
 @Component({
     selector: 'mho-editor',
@@ -35,7 +41,7 @@ import { Subject } from 'rxjs';
     changeDetection: ChangeDetectionStrategy.OnPush,
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [AngularEditorModule, FormsModule, MatFormField]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes, AngularEditorModule]
 })
 export class EditorComponent implements ControlValueAccessor, OnChanges, OnDestroy, MatFormFieldControl<string> {
     @HostBinding('style.display') display: string = 'contents';

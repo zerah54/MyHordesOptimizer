@@ -10,6 +10,7 @@ import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { ApiService } from '../../../../../_abstract_model/services/api.service';
+import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 import { ItemCountShort } from '../../../../../_abstract_model/types/item-count-short.class';
@@ -20,13 +21,18 @@ import { ArrayItemDetailsPipe } from '../../../../../shared/pipes/array-item-det
 import { ItemDetailsPipe } from '../../../../../shared/pipes/item-details.pipe';
 import { ItemsInBagsPipe } from './items-in-bags.pipe';
 
+const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, ReactiveFormsModule];
+const components: Imports = [LastUpdateComponent];
+const pipes: Imports = [ArrayItemDetailsPipe, ItemDetailsPipe, ItemsInBagsPipe];
+const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatInputModule, MatMenuModule];
+
 @Component({
     selector: 'mho-map-update-cell',
     templateUrl: './map-update-cell.component.html',
     styleUrls: ['./map-update-cell.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule, NgOptimizedImage, MatInputModule, MatCheckboxModule, MatDividerModule, CommonModule, MatMenuModule, LastUpdateComponent, ArrayItemDetailsPipe, ItemDetailsPipe, ItemsInBagsPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MapUpdateCellComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

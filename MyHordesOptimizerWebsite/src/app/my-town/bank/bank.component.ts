@@ -11,21 +11,27 @@ import { BANK_CONDENSED_DISPLAY_KEY, HORDES_IMG_REPO } from '../../_abstract_mod
 import { Action } from '../../_abstract_model/enum/action.enum';
 import { Property } from '../../_abstract_model/enum/property.enum';
 import { TownService } from '../../_abstract_model/services/town.service';
+import { Imports } from '../../_abstract_model/types/_types';
 import { BankInfo } from '../../_abstract_model/types/bank-info.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-field.component';
 import { ItemComponent } from '../../shared/elements/item/item.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
-import { ItemsGroupByCategory } from '../../shared/pipes/items-group-by-category.pipe';
+import { ItemsGroupByCategoryPipe } from '../../shared/pipes/items-group-by-category.pipe';
 import { normalizeString } from '../../shared/utilities/string.utils';
+
+const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
+const components: Imports = [FilterFieldComponent, ItemComponent, SelectComponent];
+const pipes: Imports = [ItemsGroupByCategoryPipe];
+const material_modules: Imports = [MatCardModule, MatFormFieldModule, MatSlideToggleModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-bank',
     templateUrl: './bank.component.html',
     styleUrls: ['./bank.component.scss'],
     standalone: true,
-    imports: [MatCardModule, MatSlideToggleModule, FormsModule, FilterFieldComponent, MatFormFieldModule, SelectComponent, CommonModule, ItemComponent, MatTooltipModule, NgOptimizedImage, ItemsGroupByCategory]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class BankComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';

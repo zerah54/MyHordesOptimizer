@@ -4,7 +4,7 @@ import { UpdateInfo } from './update-info.class';
 
 export class Bath extends CommonModel<BathDTO> {
     public day!: number;
-    public last_update_info!: UpdateInfo;
+    public update_info!: UpdateInfo;
 
     constructor(dto?: BathDTO | null) {
         super();
@@ -14,14 +14,14 @@ export class Bath extends CommonModel<BathDTO> {
     public modelToDto(): BathDTO {
         return {
             day: this.day,
-            lastUpdateInfo: this.last_update_info?.modelToDto()
+            lastUpdateInfo: this.update_info?.modelToDto()
         };
     }
 
     protected dtoToModel(dto?: BathDTO | null): void {
         if (dto) {
             this.day = dto.day;
-            this.last_update_info = new UpdateInfo(dto.lastUpdateInfo);
+            this.update_info = new UpdateInfo(dto.lastUpdateInfo);
         }
     }
 }

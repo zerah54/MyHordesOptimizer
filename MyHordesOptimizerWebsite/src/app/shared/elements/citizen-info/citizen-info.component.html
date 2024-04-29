@@ -1,0 +1,9 @@
+<div class="mho-citizen-info">
+    @if (citizen) {
+        <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">
+        {{ citizen.name }}
+        @if (citizen.is_shunned) {
+            <img [ngSrc]="HORDES_IMG_REPO + 'icons/banished.gif'" width="16" height="16">
+        }
+    }
+</div>

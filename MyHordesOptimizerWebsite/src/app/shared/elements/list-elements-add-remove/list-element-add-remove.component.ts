@@ -4,7 +4,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
-import { ListForAddRemove } from '../../../_abstract_model/types/_types';
+import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { DebugLogPipe } from '../../pipes/debug-log.pipe';
@@ -14,13 +14,18 @@ import { IsItemsPipe } from './is-item.pipe';
 import { MenuAddComponent } from './menu-add/menu-add.component';
 import { MenuRemoveComponent } from './menu-remove/menu-remove.component';
 
+const angular_common: Imports = [CommonModule, NgOptimizedImage, NgTemplateOutlet];
+const components: Imports = [IconApComponent, MenuAddComponent, MenuRemoveComponent];
+const pipes: Imports = [CountAvailableApPipe, DebugLogPipe, IsItemsPipe];
+const material_modules: Imports = [MatMenuModule];
+
 @Component({
     selector: 'mho-list-element-add-remove',
     templateUrl: './list-element-add-remove.component.html',
     styleUrls: ['./list-element-add-remove.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [CommonModule, NgTemplateOutlet, NgOptimizedImage, MatMenuModule, MenuAddComponent, MenuRemoveComponent, DebugLogPipe, IsItemsPipe, CountAvailableApPipe, IconApComponent]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ListElementAddRemoveComponent {
     @HostBinding('style.display') display: string = 'contents';
@@ -30,7 +35,7 @@ export class ListElementAddRemoveComponent {
 
     @Input() citizen!: Citizen;
     @Input() label!: string;
-    @Input({transform: booleanAttribute}) readonly: boolean = false;
+    @Input({ transform: booleanAttribute }) readonly: boolean = false;
     @Input() class: string = '';
 
     @Input() addLabel!: string;

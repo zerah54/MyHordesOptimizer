@@ -8,27 +8,33 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { DigsService } from '../../../_abstract_model/services/digs.service';
+import { Imports } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { AutoDestroy } from '../../decorators/autodestroy.decorator';
 import { getTown } from '../../utilities/localstorage.util';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../confirm-dialog/confirm-dialog.component';
 
+const angular_common: Imports = [CommonModule, NgOptimizedImage, FormsModule];
+const components: Imports = [];
+const pipes: Imports = [];
+const material_modules: Imports = [MatButtonModule, MatDividerModule, MatTooltipModule];
+
 @Component({
     selector: 'mho-dig',
     templateUrl: './dig.component.html',
     styleUrls: ['./dig.component.scss'],
     standalone: true,
-    imports: [CommonModule, MatDividerModule, NgOptimizedImage, FormsModule, MatButtonModule, MatTooltipModule]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DigComponent {
     @HostBinding('style.display') display: string = 'contents';
 
-    @Input({required: true}) citizen!: Citizen;
-    @Input({required: true}) day!: number;
-    @Input({required: true}) digsMode!: 'creation' | 'update' | 'registry';
+    @Input({ required: true }) citizen!: Citizen;
+    @Input({ required: true }) day!: number;
+    @Input({ required: true }) digsMode!: 'creation' | 'update' | 'registry';
 
-    @Input({required: true}) set dig(dig: Dig | undefined) {
+    @Input({ required: true }) set dig(dig: Dig | undefined) {
         setTimeout(() => {
             if (this.digsMode === 'registry') {
                 this.updated_dig = dig;

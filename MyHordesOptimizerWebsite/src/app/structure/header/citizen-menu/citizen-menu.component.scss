@@ -21,6 +21,14 @@
         }
     }
 
+    &.statuses {
+        .chamanic {
+            img {
+                margin-right: 0.5em;
+            }
+        }
+    }
+
     &.heroic-actions {
         .mat-mdc-form-field {
             width: 100%;

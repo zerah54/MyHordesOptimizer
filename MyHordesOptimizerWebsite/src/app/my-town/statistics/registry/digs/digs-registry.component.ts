@@ -7,6 +7,7 @@ import { Moment } from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { JobEnum } from '../../../../_abstract_model/enum/job.enum';
 import { Entry } from '../../../../_abstract_model/interfaces';
+import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../_abstract_model/types/dig.class';
@@ -15,13 +16,18 @@ import { SelectComponent } from '../../../../shared/elements/select/select.compo
 import { getTown } from '../../../../shared/utilities/localstorage.util';
 import { CitizenForDigPipe, CitizenNotInDigListPipe } from './citizen-for-dig.pipe';
 
+const angular_common: Imports = [CommonModule, FormsModule];
+const components: Imports = [DigComponent, SelectComponent];
+const pipes: Imports = [CitizenForDigPipe, CitizenNotInDigListPipe];
+const material_modules: Imports = [MatFormFieldModule];
+
 @Component({
     selector: 'mho-registry-digs',
     templateUrl: './digs-registry.component.html',
     styleUrls: ['./digs-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatFormFieldModule, SelectComponent, FormsModule, CommonModule, DigComponent, CitizenForDigPipe, CitizenNotInDigListPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DigsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';

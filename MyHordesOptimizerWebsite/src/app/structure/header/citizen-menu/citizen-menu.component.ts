@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import * as moment from 'moment/moment';
@@ -12,7 +13,7 @@ import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
-import { ListForAddRemove } from '../../../_abstract_model/types/_types';
+import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Bath } from '../../../_abstract_model/types/bath.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
@@ -21,10 +22,16 @@ import { Item } from '../../../_abstract_model/types/item.class';
 import { Me } from '../../../_abstract_model/types/me.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
+import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
 import { LastUpdateComponent } from '../../../shared/elements/last-update/last-update.component';
 import { ListElementAddRemoveComponent } from '../../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
 import { CitizenFromIdPipe } from '../../../shared/pipes/citizens-from-id.pipe';
 import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
+
+const angular_common: Imports = [NgOptimizedImage, FormsModule];
+const components: Imports = [CitizenInfoComponent, LastUpdateComponent, ListElementAddRemoveComponent];
+const pipes: Imports = [CitizenFromIdPipe];
+const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatSelectModule];
 
 @Component({
     selector: 'mho-header-citizen-menu',
@@ -32,8 +39,7 @@ import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
     styleUrls: ['./citizen-menu.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatDividerModule, MatMenuModule, NgOptimizedImage, CitizenFromIdPipe, LastUpdateComponent, ListElementAddRemoveComponent, MatCheckboxModule,
-        MatFormFieldModule, MatSelectModule, FormsModule]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class CitizenMenuComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -52,7 +58,7 @@ export class CitizenMenuComponent implements OnInit {
     public bag_lists: ListForAddRemove[] = [];
     /** La liste des listes disponibles dans les status */
     public readonly status_lists: ListForAddRemove[] = [
-        {label: $localize`Tous`, list: this.all_status}
+        { label: $localize`Tous`, list: this.all_status }
     ];
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
@@ -67,7 +73,6 @@ export class CitizenMenuComponent implements OnInit {
             .getCitizen(this.me.id)
             .subscribe({
                 next: (citizen: Citizen) => {
-                    console.log('citizen', citizen);
                     this.citizen = citizen;
                 }
             });
@@ -79,8 +84,8 @@ export class CitizenMenuComponent implements OnInit {
                 next: (items: Item[]) => {
                     this.all_items = items;
                     this.bag_lists = [
-                        {label: $localize`Tous`, list: this.all_items}
-                    ]
+                        { label: $localize`Tous`, list: this.all_items }
+                    ];
                 }
             });
 
@@ -221,26 +226,46 @@ export class CitizenMenuComponent implements OnInit {
     }
 
     public dailyBathTaken(): boolean {
-        return this.citizen.baths.some((bath: Bath) => bath.day === this.current_day && bath.last_update_info);
+        return this.citizen.baths.some((bath: Bath) => bath.day === this.current_day && bath.update_info);
     }
 
     public saveBath(event: MatCheckboxChange): void {
         if (event.checked) {
             this.town_service
                 .addBath(this.citizen)
-                .subscribe()
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (this.citizen.chamanic_detail) {
+                            this.citizen.chamanic_detail.update_info.username = getUser().username;
+                            this.citizen.chamanic_detail.update_info.update_time = update_info.update_time;
+                        }
+                    }
+                });
         } else {
             this.town_service
                 .removeBath(this.citizen)
-                .subscribe()
+                .subscribe();
         }
+    }
+
+    public saveChamanicDetails(citizen: Citizen): void {
+        this.town_service
+            .saveChamanicDetails(citizen)
+            .subscribe({
+                next: (update_info: UpdateInfo) => {
+                    if (citizen.chamanic_detail) {
+                        citizen.chamanic_detail.update_info.username = getUser().username;
+                        citizen.chamanic_detail.update_info.update_time = update_info.update_time;
+                    }
+                }
+            });
     }
 
     /**
      * On met à jour la liste des actions héroiques
      *
      * @param {HeroicActionsWithValue} element
-     * @param {MatCheckboxChange | MatSelectChange} event
+     * @param {MatCheckboxChange | number} event
      */
     public updateActions(element: HeroicActionsWithValue, event: MatCheckboxChange | number): void {
         const old_element_value: boolean | number = element.value;

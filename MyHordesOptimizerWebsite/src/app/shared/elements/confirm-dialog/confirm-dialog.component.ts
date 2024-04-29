@@ -1,14 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostBinding, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { Imports } from '../../../_abstract_model/types/_types';
+
+const angular_common: Imports = [CommonModule];
+const components: Imports = [];
+const pipes: Imports = [];
+const material_modules: Imports = [MatButtonModule, MatDialogModule];
 
 @Component({
     selector: 'mho-confirm-dialog',
     templateUrl: './confirm-dialog.component.html',
     styleUrls: ['./confirm-dialog.component.scss'],
     standalone: true,
-    imports: [CommonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatButtonModule, MatDialogClose]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ConfirmDialogComponent {
     @HostBinding('style.display') display: string = 'contents';

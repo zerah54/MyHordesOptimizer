@@ -6,18 +6,24 @@ import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { WishlistService } from '../../../_abstract_model/services/wishlist.service';
+import { Imports } from '../../../_abstract_model/types/_types';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { AutoDestroy } from '../../decorators/autodestroy.decorator';
 import { getTown } from '../../utilities/localstorage.util';
 import { RecipeComponent } from '../recipe/recipe.component';
 
+const angular_common: Imports = [CommonModule, NgClass, NgOptimizedImage];
+const components: Imports = [RecipeComponent];
+const pipes: Imports = [DecimalPipe];
+const material_modules: Imports = [MatButtonModule, MatDividerModule];
+
 @Component({
     selector: 'mho-item',
     templateUrl: './item.component.html',
     styleUrls: ['./item.component.scss'],
     standalone: true,
-    imports: [CommonModule, NgClass, MatButtonModule, NgOptimizedImage, MatDividerModule, RecipeComponent, DecimalPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class ItemComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -25,7 +31,7 @@ export class ItemComponent implements OnInit {
     /** L'élément à afficher si c'est un objet standard */
     @Input() item!: Item;
     /** Force l'ouverture de l'élément */
-    @Input({transform: booleanAttribute}) forceOpen: boolean = false;
+    @Input({ transform: booleanAttribute }) forceOpen: boolean = false;
 
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;

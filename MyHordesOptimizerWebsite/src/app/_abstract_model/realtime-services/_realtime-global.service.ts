@@ -23,6 +23,9 @@ export abstract class RealtimeGlobalService {
             // TODO recharger le token si il n'est pas valide
             return token?.token.access_token ?? '';
         },
+        headers: {
+            'Mho-Origin': 'website'
+        }
         // skipNegotiation: true,
         // transport: HttpTransportType.WebSockets,
     };
@@ -36,7 +39,6 @@ export abstract class RealtimeGlobalService {
             .withUrl(this.HUB_URL + part, this.options)
             .build();
 
-        this.hubConnection.onclose(() => this.startConnexion());
         await this.startConnexion();
     }
 
@@ -48,5 +50,15 @@ export abstract class RealtimeGlobalService {
                 this.snackbar.errorSnackbar($localize`Une erreur s'est produite lors de la connexion`);
                 console.warn($localize`Une erreur s'est produite lors de la connexion`, err);
             });
+    }
+
+    protected async invokeHub(methodName: string, ...args: unknown[]): Promise<void> {
+        if (this.hubConnection.state === 'Disconnected') {
+            this.startConnexion().then(async () => {
+                await this.hubConnection.invoke(methodName, ...args);
+            });
+        } else {
+            await this.hubConnection.invoke(methodName, ...args);
+        }
     }
 }

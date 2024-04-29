@@ -6,6 +6,7 @@ import { BuildingsComponent } from './buildings/buildings.component';
 import { CampingsComponent } from './campings/campings.component';
 import { CitizensDigsComponent } from './citizens/citizens-digs/citizens-digs.component';
 import { CitizensDispoComponent } from './citizens/citizens-dispo/citizens-dispo.component';
+import { CitizensImmuneComponent } from './citizens/citizens-immune/citizens-immune.component';
 import { CitizensListComponent } from './citizens/citizens-list/citizens-list.component';
 import { CitizensWatchComponent } from './citizens/citizens-watch/citizens-watch.component';
 import { CitizensComponent } from './citizens/citizens.component';
@@ -56,7 +57,12 @@ export default [
             {
                 path: 'watch',
                 component: CitizensWatchComponent,
-                canActivate: [(): boolean => inject(InDevModeGuard).canActivate()],
+                canActivate: [],
+            },
+            {
+                path: 'immune',
+                component: CitizensImmuneComponent,
+                canActivate: [],
             },
             {
                 path: 'dispo',

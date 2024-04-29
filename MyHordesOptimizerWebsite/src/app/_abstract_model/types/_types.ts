@@ -1,8 +1,11 @@
+import { ComponentType } from '@angular/cdk/overlay';
 import { ModuleWithProviders, Type } from '@angular/core';
 import { StatusEnum } from '../enum/status.enum';
 import { Item } from './item.class';
 
 export type Modules = Type<unknown>[] | ModuleWithProviders<unknown>[];
+export type Components = ComponentType<unknown>[] | Type<unknown>[];
+export type Imports = (readonly unknown[] | Type<unknown>)[];
 
 export interface ToolsToUpdate {
     isBigBrothHordes: 'none' | 'cell' | 'api';

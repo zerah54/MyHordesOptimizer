@@ -4,22 +4,21 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Imports } from '../../../_abstract_model/types/_types';
 import { AccordionComponent, AccordionItem } from '../../../shared/elements/accordion/accordion.component';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
+
+const angular_common: Imports = [];
+const components: Imports = [AccordionComponent];
+const pipes: Imports = [];
+const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule, MatMenuModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-tuto-script-alerts',
     templateUrl: './tuto-script-alerts.component.html',
     styleUrls: ['./tuto-script-alerts.component.scss'],
     standalone: true,
-    imports: [
-        MatCardModule,
-        MatButtonModule,
-        MatTooltipModule,
-        MatMenuModule,
-        MatIconModule,
-        AccordionComponent,
-    ],
+    imports: [...angular_common, ...components, ...material_modules, ...pipes],
 })
 export class TutoScriptAlertsComponent {
     @HostBinding('style.display') display: string = 'contents';

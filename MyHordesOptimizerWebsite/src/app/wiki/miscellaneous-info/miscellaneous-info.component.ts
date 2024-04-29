@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
 import { Misc } from '../../_abstract_model/interfaces';
+import { Imports } from '../../_abstract_model/types/_types';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { getMaxAttack, getMinAttack } from '../../shared/utilities/estimations.util';
@@ -15,13 +16,18 @@ import { DespairDeathsCalculatorComponent } from './despair-deaths-calculator/de
 import { MaxActiveCalculatorComponent } from './max-active-calculator/max-active-calculator.component';
 import { IsTodayMiscRowPipe } from './miscellaneous-info.pipe';
 
+const angular_common: Imports = [CommonModule];
+const components: Imports = [];
+const pipes: Imports = [ColumnIdPipe, IsTodayMiscRowPipe];
+const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule, MatTableModule];
+
 @Component({
     selector: 'mho-miscellaneous-info',
     templateUrl: './miscellaneous-info.component.html',
     styleUrls: ['./miscellaneous-info.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatCardModule, CommonModule, MatButtonModule, MatIconModule, MatTableModule, ColumnIdPipe, IsTodayMiscRowPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class MiscellaneousInfoComponent {
     @HostBinding('style.display') display: string = 'contents';

@@ -4,9 +4,15 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import * as moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Entry } from '../../../../_abstract_model/interfaces';
+import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
 import { BankCleanEntriesPipe, BankDiffPipe } from './bank-gift.pipe';
+
+const angular_common: Imports = [CommonModule, NgOptimizedImage];
+const components: Imports = [];
+const pipes: Imports = [BankCleanEntriesPipe, BankDiffPipe];
+const material_modules: Imports = [MatSlideToggleModule];
 
 @Component({
     selector: 'mho-registry-bank-diff',
@@ -14,7 +20,7 @@ import { BankCleanEntriesPipe, BankDiffPipe } from './bank-gift.pipe';
     styleUrls: ['./bank-diff-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatSlideToggleModule, CommonModule, NgOptimizedImage, BankDiffPipe, BankCleanEntriesPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class BankDiffRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';

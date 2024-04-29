@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatOptionModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableModule } from '@angular/material/table';
@@ -16,8 +17,7 @@ import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
-import { ListForAddRemove } from '../../../_abstract_model/types/_types';
-import { Bath } from '../../../_abstract_model/types/bath.class';
+import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Cadaver } from '../../../_abstract_model/types/cadaver.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -27,12 +27,19 @@ import { Item } from '../../../_abstract_model/types/item.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { AvatarComponent } from '../../../shared/elements/avatar/avatar.component';
+import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
 import { LastUpdateComponent } from '../../../shared/elements/last-update/last-update.component';
 import { ListElementAddRemoveComponent } from '../../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
 import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
 import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
+import { BathForDayPipe } from '../bath-for-day.pipe';
 import { TypeRowPipe } from './type-row.pipe';
+
+const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
+const components: Imports = [AvatarComponent, CitizenInfoComponent, HeaderWithSelectFilterComponent, LastUpdateComponent, ListElementAddRemoveComponent];
+const pipes: Imports = [BathForDayPipe, ColumnIdPipe, TypeRowPipe];
+const material_modules: Imports = [CdkVirtualScrollViewport, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, MatSortModule, MatTableModule];
 
 @Component({
     selector: 'mho-citizens-list',
@@ -40,7 +47,7 @@ import { TypeRowPipe } from './type-row.pipe';
     styleUrls: ['./citizens-list.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [CdkVirtualScrollViewport, TableVirtualScrollModule, MatTableModule, MatSortModule, CommonModule, NgClass, HeaderWithSelectFilterComponent, AvatarComponent, ListElementAddRemoveComponent, LastUpdateComponent, MatFormFieldModule, MatSelectModule, FormsModule, MatOptionModule, MatCheckboxModule, NgOptimizedImage, ColumnIdPipe, TypeRowPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes, TableVirtualScrollModule]
 })
 export class CitizensListComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -73,15 +80,15 @@ export class CitizensListComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly citizen_list_columns: StandardColumn[] = [
-        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
-        {id: 'more_status', header: $localize`États`, class: ''},
-        {id: 'heroic_actions', header: $localize`Actions héroïques`, class: ''},
-        {id: 'home', header: $localize`Améliorations`, class: ''},
+        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
+        { id: 'more_status', header: $localize`États`, class: '' },
+        { id: 'heroic_actions', header: $localize`Actions héroïques`, class: '' },
+        { id: 'home', header: $localize`Améliorations`, class: '' },
         // { id: 'chest', header: $localize`Coffre` },
     ];
     /** La liste des colonnes pour les citoyens morts */
     public readonly dead_citizen_list_columns: StandardColumn[] = [
-        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
+        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
     ];
 
     public readonly all_status: StatusEnum[] = StatusEnum.getAllValues();
@@ -90,7 +97,7 @@ export class CitizensListComponent implements OnInit {
     public bag_lists: ListForAddRemove[] = [];
     /** La liste des listes disponibles dans les status */
     public readonly status_lists: ListForAddRemove[] = [
-        {label: $localize`Tous`, list: this.all_status}
+        { label: $localize`Tous`, list: this.all_status }
     ];
 
     private api_service: ApiService = inject(ApiService);
@@ -120,8 +127,8 @@ export class CitizensListComponent implements OnInit {
                 next: (items: Item[]) => {
                     this.all_items = items;
                     this.bag_lists = [
-                        {label: $localize`Tous`, list: this.all_items}
-                    ]
+                        { label: $localize`Tous`, list: this.all_items }
+                    ];
                 }
             });
 
@@ -348,20 +355,40 @@ export class CitizensListComponent implements OnInit {
         }
     }
 
-    public dailyBathTaken(row: Citizen): boolean {
-        return row.baths.some((bath: Bath) => bath.day === this.current_day && bath.last_update_info);
-    }
-
     public saveBath(citizen: Citizen, event: MatCheckboxChange): void {
         if (event.checked) {
             this.town_service
                 .addBath(citizen)
-                .subscribe()
+                .subscribe({
+                    next: (update_info: UpdateInfo) => {
+                        if (citizen.chamanic_detail) {
+                            citizen.chamanic_detail.update_info.username = getUser().username;
+                            citizen.chamanic_detail.update_info.update_time = update_info.update_time;
+                        }
+                    }
+                });
         } else {
             this.town_service
                 .removeBath(citizen)
-                .subscribe()
+                .subscribe({
+                    next: () => {
+
+                    }
+                });
         }
+    }
+
+    public saveChamanicDetails(citizen: Citizen): void {
+        this.town_service
+            .saveChamanicDetails(citizen)
+            .subscribe({
+                next: (update_info: UpdateInfo) => {
+                    if (citizen.chamanic_detail) {
+                        citizen.chamanic_detail.update_info.username = getUser().username;
+                        citizen.chamanic_detail.update_info.update_time = update_info.update_time;
+                    }
+                }
+            });
     }
 
     /** Remplace la fonction qui vérifie si un élément doit être remonté par le filtre */

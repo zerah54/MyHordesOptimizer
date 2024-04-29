@@ -30,10 +30,12 @@
                                         <div style="display: flex; align-items: center">
                                             @if (preRegisteredJobs; as pre_registered_jobs) {
                                                 @for (job of pre_registered_jobs; track job?.job; let i = $index) {
-                                                    {{ job.count }}&nbsp;<img [ngSrc]="HORDES_IMG_REPO + (job?.job | jobFromId)?.value?.img" width="16"
-                                                                              height="16">
-                                                    @if (i < pre_registered_jobs.length - 1) {
-                                                        &nbsp;
+                                                    @if (job && job.job) {
+                                                        {{ job.count }}&nbsp;<img [ngSrc]="HORDES_IMG_REPO + (job?.job | jobFromId)?.value?.img"
+                                                                                  width="16" height="16">
+                                                        @if (i < pre_registered_jobs.length - 1) {
+                                                            &nbsp;
+                                                        }
                                                     }
                                                 }
                                             }

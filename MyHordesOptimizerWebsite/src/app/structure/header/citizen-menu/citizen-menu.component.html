@@ -2,11 +2,7 @@
     <div class="header-menu-citizen-part">
         <div mat-menu-item class="pseudo" disabled>
             <div>
-                <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">
-                {{ citizen.name }}
-                @if (citizen.is_shunned) {
-                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/banished.gif'" width="16" height="16">
-                }
+                <mho-citizen-info [citizen]="citizen"></mho-citizen-info>
             </div>
         </div>
         <div mat-menu-item #statusItem [matMenuTriggerFor]="status" [role]="'menuitem'" i18n>États</div>
@@ -29,6 +25,24 @@
         </div>
         <div class="bath" (click)="$event.stopPropagation();">
             <mat-checkbox [checked]="dailyBathTaken()" (change)="saveBath($event)" i18n>Bain pris</mat-checkbox>
+        </div>
+        <div class="chamanic">
+            <div class="fields">
+                <mat-form-field [appearance]="'outline'" class="short-bottom compact-field" (click)="$event.stopPropagation();">
+                    <mat-label>
+                        <img [ngSrc]="HORDES_IMG_REPO + 'item/item_potion.gif'" width="16" height="16">
+                        <ng-container i18n>Potions bues</ng-container>
+                    </mat-label>
+                    <input matInput type="number" [(ngModel)]="citizen.chamanic_detail.nb_potion_shaman"
+                           (ngModelChange)="saveChamanicDetails(citizen)">
+                </mat-form-field>
+
+                <mat-checkbox [(ngModel)]="citizen.chamanic_detail.is_immune_to_soul"
+                              (ngModelChange)="saveChamanicDetails(citizen)">
+                    <img [ngSrc]="HORDES_IMG_REPO + 'item/item_potion.gif'" width="16" height="16">
+                    <ng-container i18n>Immunisé</ng-container>
+                </mat-checkbox>
+            </div>
         </div>
     </mat-menu>
     <mat-menu #bag (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"

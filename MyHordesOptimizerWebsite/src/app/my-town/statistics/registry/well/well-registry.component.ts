@@ -2,8 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { Entry } from '../../../../_abstract_model/interfaces';
+import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { WellPipe } from './well.pipe';
+
+const angular_common: Imports = [CommonModule];
+const components: Imports = [];
+const pipes: Imports = [WellPipe];
+const material_modules: Imports = [MatDividerModule];
 
 @Component({
     selector: 'mho-registry-well',
@@ -11,7 +17,7 @@ import { WellPipe } from './well.pipe';
     styleUrls: ['./well-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [CommonModule, MatDividerModule, WellPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class WellRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';

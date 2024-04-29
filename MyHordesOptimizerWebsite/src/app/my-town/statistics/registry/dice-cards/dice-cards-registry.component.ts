@@ -3,9 +3,15 @@ import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core'
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Entry } from '../../../../_abstract_model/interfaces';
+import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { CitizenUseDiceOrCardsPipe } from './dice-cards.pipe';
+
+const angular_common: Imports = [CommonModule, NgOptimizedImage, NgTemplateOutlet];
+const components: Imports = [];
+const pipes: Imports = [CitizenUseDiceOrCardsPipe];
+const material_modules: Imports = [MatTabsModule];
 
 @Component({
     selector: 'mho-registry-dice-cards',
@@ -13,7 +19,7 @@ import { CitizenUseDiceOrCardsPipe } from './dice-cards.pipe';
     styleUrls: ['./dice-cards-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatTabsModule, NgOptimizedImage, NgTemplateOutlet, CommonModule, CitizenUseDiceOrCardsPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DiceCardsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';

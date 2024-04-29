@@ -29,6 +29,7 @@ import { WishlistPriority } from '../../_abstract_model/enum/wishlist-priority.e
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { WishlistService } from '../../_abstract_model/services/wishlist.service';
+import { Imports } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
@@ -42,13 +43,18 @@ import { CustomKeyValuePipe } from '../../shared/pipes/key-value.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
 import { IsItemDisplayedPipe } from './is-item-displayed.pipe';
 
+const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
+const components: Imports = [HeaderWithStringFilterComponent, LastUpdateComponent, SelectComponent];
+const pipes: Imports = [ColumnIdPipe, CustomKeyValuePipe, IsItemDisplayedPipe];
+const material_modules: Imports = [CdkVirtualScrollViewport, DragDropModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSlideToggleModule, MatTableModule, MatTabsModule, MatTooltipModule];
+
 @Component({
     selector: 'mho-wishlist',
     templateUrl: './wishlist.component.html',
     styleUrls: ['./wishlist.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [MatCardModule, MatButtonModule, MatTooltipModule, MatIconModule, MatMenuModule, MatSlideToggleModule, FormsModule, CommonModule, MatTabsModule, MatFormFieldModule, SelectComponent, CdkVirtualScrollViewport, TableVirtualScrollModule, MatTableModule, HeaderWithStringFilterComponent, NgOptimizedImage, MatSelectModule, MatOptionModule, MatInputModule, MatCheckboxModule, DragDropModule, LastUpdateComponent, CustomKeyValuePipe, ColumnIdPipe, IsItemDisplayedPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes, TableVirtualScrollModule]
 })
 export class WishlistComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -68,17 +74,17 @@ export class WishlistComponent implements OnInit {
     public readonly locale: string = moment.locale();
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        {id: 'sort', header: '', displayed: (): boolean => this.edition_mode},
-        {id: 'name', header: $localize`Objet`, sticky: true},
-        {id: 'heaver', header: ''},
-        {id: 'priority', header: $localize`Priorité`},
-        {id: 'depot', header: $localize`Dépôt`},
-        {id: 'bank_count', header: $localize`Banque`},
-        {id: 'bag_count', header: $localize`Sacs`},
-        {id: 'count', header: $localize`Stock souhaité`},
-        {id: 'needed', header: $localize`Quantité manquante`},
-        {id: 'should_signal', header: $localize`Signaler`},
-        {id: 'delete', header: '', displayed: (): boolean => this.edition_mode},
+        { id: 'sort', header: '', displayed: (): boolean => this.edition_mode },
+        { id: 'name', header: $localize`Objet`, sticky: true },
+        { id: 'heaver', header: '' },
+        { id: 'priority', header: $localize`Priorité` },
+        { id: 'depot', header: $localize`Dépôt` },
+        { id: 'bank_count', header: $localize`Banque` },
+        { id: 'bag_count', header: $localize`Sacs` },
+        { id: 'count', header: $localize`Stock souhaité` },
+        { id: 'needed', header: $localize`Quantité manquante` },
+        { id: 'should_signal', header: $localize`Signaler` },
+        { id: 'delete', header: '', displayed: (): boolean => this.edition_mode },
     ];
 
     public readonly basic_list_label: string = $localize`Toute la carte`;
@@ -282,13 +288,13 @@ export class WishlistComponent implements OnInit {
                 final_item[this.excel_headers['depot'].label] = item.depot.value.count;
                 return final_item;
             });
-            const data: WorkSheet = utils.json_to_sheet(simplify_item, {cellStyles: true});
+            const data: WorkSheet = utils.json_to_sheet(simplify_item, { cellStyles: true });
             workbook.SheetNames.push(zone_items_key);
             workbook.Sheets[zone_items_key] = data;
         }
 
-        const u8: Uint8Array = write(workbook, {type: 'buffer', bookType: 'xlsx'});
-        const blob: Blob = new Blob([u8], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        const u8: Uint8Array = write(workbook, { type: 'buffer', bookType: 'xlsx' });
+        const blob: Blob = new Blob([u8], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
         const url: string = URL.createObjectURL(blob);
         const hidden_link: HTMLAnchorElement = this.document.createElement('a');

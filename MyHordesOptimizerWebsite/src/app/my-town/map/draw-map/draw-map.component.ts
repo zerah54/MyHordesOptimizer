@@ -1,5 +1,6 @@
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, Input } from '@angular/core';
+import { Imports } from '../../../_abstract_model/types/_types';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../_abstract_model/types/item.class';
@@ -11,12 +12,17 @@ import { MapOptions } from '../map.component';
 import { MapBorderComponent } from './map-border/map-border.component';
 import { MapCellComponent } from './map-cell/map-cell.component';
 
+const angular_common: Imports = [CommonModule, NgTemplateOutlet];
+const components: Imports = [MapBorderComponent, MapCellComponent];
+const pipes: Imports = [];
+const material_modules: Imports = [];
+
 @Component({
     selector: 'mho-draw-map',
     templateUrl: './draw-map.component.html',
     styleUrls: ['./draw-map.component.scss'],
     standalone: true,
-    imports: [CommonModule, NgTemplateOutlet, MapBorderComponent, MapCellComponent]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class DrawMapComponent {
     @HostBinding('style.display') display: string = 'contents';
@@ -30,8 +36,8 @@ export class DrawMapComponent {
         if (map) {
             console.log('map', map);
             this.complete_map = map;
-            this.x_row = Array.from({length: map?.map_width}, (_: unknown, i: number) => i - +map.town_x);
-            console.log('x-row', this.x_row)
+            this.x_row = Array.from({ length: map?.map_width }, (_: unknown, i: number) => i - +map.town_x);
+            console.log('x-row', this.x_row);
             const rows: Cell[][] = groupBy(map?.cells || [], (cell: Cell) => cell.y);
 
             rows.forEach((row: Cell[]) => {

@@ -3,14 +3,20 @@ import { Component, EventEmitter, HostBinding, Input, Output, ViewChild } from '
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { Imports } from '../../../../_abstract_model/types/_types';
 import { SelectComponent } from '../../select/select.component';
+
+const angular_common: Imports = [CommonModule, FormsModule];
+const components: Imports = [SelectComponent];
+const pipes: Imports = [];
+const material_modules: Imports = [MatFormFieldModule, MatIconModule];
 
 @Component({
     selector: 'mho-header-with-select-filter',
     templateUrl: './header-with-select-filter.component.html',
     styleUrls: ['./header-with-select-filter.component.scss'],
     standalone: true,
-    imports: [CommonModule, MatIconModule, MatFormFieldModule, SelectComponent, FormsModule]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeaderWithSelectFilterComponent<T> {
     @HostBinding('style.display') display: string = 'contents';
