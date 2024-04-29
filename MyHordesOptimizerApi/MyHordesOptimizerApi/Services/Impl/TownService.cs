@@ -41,7 +41,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .Where(cadaver => cadaver.IdUser == userId)
                     .Include(cadaver => cadaver.IdUserNavigation)
                     .FirstOrDefault();
-                if(cadaver is null)
+                if (cadaver is null)
                 {
                     throw new MhoTechnicalException($"Aucun citizen ou cadavre trouvé pour la ville {townId} et l'utilisateur {userId}");
                 }
@@ -54,18 +54,22 @@ namespace MyHordesOptimizerApi.Services.Impl
             return citizenDto;
         }
 
-        public CitizenDto AddCitizenBath(int townId, int userId, int day)
+        public LastUpdateInfoDto AddCitizenBath(int townId, int userId, int day)
         {
             var bath = DbContext.TownCitizenBaths
                 .Where(townCitizenBath => townCitizenBath.IdTown == townId)
                 .Where(townCitizenBath => townCitizenBath.IdUser == userId)
                 .Where(townCitizenBath => townCitizenBath.Day == day)
+                .Include(townCitizenBath => townCitizenBath.IdLastUpdateInfoNavigation)
+                    .ThenInclude(lastUpdateInfo => lastUpdateInfo.IdUserNavigation)
                 .FirstOrDefault();
+            LastUpdateInfoDto result;
             if (bath == null)
             {
                 DbContext.ChangeTracker.Clear();
                 using var transaction = DbContext.Database.BeginTransaction();
-                LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+                var lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
+                result = lastUpdateInfoDto;
                 var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
                 DbContext.SaveChanges();
                 DbContext.ChangeTracker.Clear();
@@ -80,7 +84,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                 DbContext.SaveChanges();
                 transaction.Commit();
             }
-            return GetTownCitizen(townId, userId);
+            else
+            {
+                result = Mapper.Map<LastUpdateInfoDto>(bath.IdLastUpdateInfoNavigation);
+            }
+            return result;
         }
 
         public CitizenDto DeleteCitizenBath(int townId, int userId, int day)
@@ -98,7 +106,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             return GetTownCitizen(townId, userId);
         }
 
-        public CitizenDto UpdateCitizenChamanicDetail(int townId, int userId, CitizenChamanicDetailDto chamanicDetailDto)
+        public LastUpdateInfoDto UpdateCitizenChamanicDetail(int townId, int userId, CitizenChamanicDetailDto chamanicDetailDto)
         {
             var citizen = DbContext.TownCitizens.Where(townCitizen => townCitizen.IdTown == townId)
                  .Where(townCitizen => townCitizen.IdUser == userId)
@@ -120,7 +128,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.SaveChanges();
             transaction.Commit();
 
-            return GetTownCitizen(townId, userId);
+            return lastUpdateInfoDto;
         }
     }
 }

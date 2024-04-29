@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
@@ -30,7 +31,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("{townId}/user/{userId}/bath")]
-        public ActionResult<CitizenDto> AddCitizenBath([FromRoute] int townId, [FromRoute] int userId, [FromQuery] int? day)
+        public ActionResult<LastUpdateInfoDto> AddCitizenBath([FromRoute] int townId, [FromRoute] int userId, [FromQuery] int? day)
         {
             if(!day.HasValue)
             {
@@ -64,7 +65,7 @@ namespace MyHordesOptimizerApi.Controllers
 
         [HttpPost]
         [Route("{townId}/user/{userId}/chamanicDetail")]
-        public ActionResult<CitizenDto> UpdateCitizenChamanicDetail([FromRoute] int townId, [FromRoute] int userId, [FromBody] CitizenChamanicDetailDto chamanicDetailDto)
+        public ActionResult<LastUpdateInfoDto> UpdateCitizenChamanicDetail([FromRoute] int townId, [FromRoute] int userId, [FromBody] CitizenChamanicDetailDto chamanicDetailDto)
         {
             var updatedCitizen = TownService.UpdateCitizenChamanicDetail(townId, userId, chamanicDetailDto);
             return Ok(updatedCitizen);
