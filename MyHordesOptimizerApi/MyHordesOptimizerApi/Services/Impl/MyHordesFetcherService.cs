@@ -405,7 +405,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
             catch (Exception e)
             {
-                Logger.LogError($"Erreur lors de l'enregistrement de la bank depuis MH : {e}");
+                Logger.LogError(e, $"Erreur lors de l'enregistrement de la bank depuis MH : {e}");
             }
             var townDetail = UserInfoProvider.TownDetail;
             var townId = townDetail.TownId;

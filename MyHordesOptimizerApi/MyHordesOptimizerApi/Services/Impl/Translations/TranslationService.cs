@@ -44,7 +44,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
             }
             catch (Exception e)
             {
-                Logger.LogError("Erreur lors de la récupération des fichiers de traduction github", e.ToString());
+                Logger.LogError(e,"Erreur lors de la récupération des fichiers de traduction github");
             }
             _initLock.Release();
         }

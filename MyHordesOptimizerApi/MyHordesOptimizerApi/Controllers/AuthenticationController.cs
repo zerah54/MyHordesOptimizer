@@ -4,18 +4,19 @@ using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Authentication;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Controllers
 {
     [ApiController]
     [Route("Authentication")]
-    public class MyHordesOptimizerAuthenticationController : AbstractMyHordesOptimizerControllerBase
+    public class AuthenticationController : AbstractMyHordesOptimizerControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly IMyHordesFetcherService _myHordesFetcherService;
 
-        public MyHordesOptimizerAuthenticationController(ILogger<MyHordesFetcherController> logger,
+        public AuthenticationController(ILogger<MyHordesFetcherController> logger,
             IAuthenticationService authenticationService,
             IMyHordesFetcherService myHordesFetcherService,
             IUserInfoProvider userKeyProvider) : base(logger, userKeyProvider)

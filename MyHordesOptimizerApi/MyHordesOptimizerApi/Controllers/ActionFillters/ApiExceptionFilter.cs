@@ -1,12 +1,10 @@
-﻿using System;
-using System.Net;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Exception;
 using MyHordesOptimizerApi.Exceptions;
-using MyHordesOptimizerApi.Extensions;
+using System.Net;
 
 namespace MyHordesOptimizerApi.Controllers.ActionFillters;
 
@@ -31,22 +29,28 @@ public class ApiExceptionFilter : ExceptionFilterAttribute
             var result = new ObjectResult(exception.Message);
             result.StatusCode = (int)mhException.StatusCode;
             context.Result = result;
-            
-        } 
+
+        }
         else if (exception is WebApiException)
         {
-            Logger.LogError(exception.ToString());
+            Logger.LogError(exception, $"WebApiException exception : {exception}");
             var result = new ObjectResult(exception.ToString());
             result.StatusCode = (int)HttpStatusCode.FailedDependency;
             context.Result = result;
         }
-        else if(exception is MhoFunctionalException)
+        else if (exception is MhoFunctionalException)
         {
             Logger.LogInformation(exception.ToString());
             var result = new ObjectResult(Mapper.Map<ExceptionDto>(exception));
             result.StatusCode = (int)HttpStatusCode.OK;
             context.Result = result;
         }
-        base.OnException(context);
+        else
+        {
+            Logger.LogError(exception, $"Erreur inatendue ! : {exception}", exception);
+            var result = new ObjectResult(null);
+            result.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Result = result;
+        }
     }
 }
