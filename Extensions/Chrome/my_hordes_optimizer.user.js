@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.17.0
+// @version      1.0.18.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,10 +32,8 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Corretif] La récupération automatique de l'identifiant externe est de nouveau disponible\n\n`
-    + `[Amélioration] Diverses améliorations de performance (en tout cas on espère :D)\n\n`
-    + `[Nouveauté] Ajout d'une option permettant de pré-remplir un message dans la maison quand vous souhaitez envoyer un objet et que le message est vide. Le message est pré-rempli avec des valeurs prises au hasard parmi celles dispo pour votre langue. Actuellement, il n'y a qu'un seul message par langue mais vous pouvez me faire vos suggestions pour que j'en ajoute ;)\n`
-    + `[Nouveauté] Ajout d'une option pour afficher en jeu les expéditions issues de MHO sur lesquelles vous êtes inscrit\n`;
+    + `[Corretif] Problèmes d'affichage`
+    + `[Corretif] Erreur lors de l'ajout d'un objet à la liste de courses`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -1582,7 +1580,7 @@ let params_categories = [
             //         de: `Speichert Benachrichtigungen, bis sie gelöscht werden`,
             //         es: `Almacena notificaciones hasta que se borran`
             //     },
-            // }
+            // },
             {
                 id: `display_my_expeditions`,
                 label: {
@@ -7705,19 +7703,21 @@ function dispatchExpeditionContent(expedition, citizens) {
         let part_content_path = document.createElement('h5');
         part_content_path.innerText = part.path;
         part_content.appendChild(part_content_path);
+
         switch (part.direction) {
             case 'Süden':
-                part_content_path.innerText += ' ↓';
+                part_content_path.innerText += ' ⇩';
                 break;
             case 'Westen':
-                part_content_path.innerText += ' ←';
+                part_content_path.innerText += ' ⇦';
                 break;
             case 'Osten':
-                part_content_path.innerText += ' →';
+                part_content_path.innerText += ' ⇨';
                 break;
             case 'Norden':
+                part_content_path.innerText += ' ⇧';
+                break;
             default:
-                part_content_path.innerText += ' ↑';
                 break;
         }
 
@@ -7810,7 +7810,7 @@ function dispatchExpeditionContent(expedition, citizens) {
                     case 'orders':
                         citizen_part.orders.forEach((order) => {
                             let order_html = document.createElement('div');
-                            order_html.innerText = order.text;
+                            order_html.innerHTML = order.text;
                             cell.appendChild(order_html);
                         });
                         break;
@@ -7832,7 +7832,7 @@ function dispatchExpeditionContent(expedition, citizens) {
         part_orders.style.width = '100%';
         part.orders.forEach((order) => {
             let order_html = document.createElement('div');
-            order_html.innerText = order.text;
+            order_html.innerHTML = order.text;
             part_orders.appendChild(order_html);
         });
         part_content.appendChild(part_orders);
@@ -9440,7 +9440,7 @@ function addItemToWishlist(item) {
         })
             .then((response) => {
                 if (response.status === 200) {
-                    return response.json();
+                    return response.text();
                 } else {
                     return convertResponsePromiseToError(response);
                 }
