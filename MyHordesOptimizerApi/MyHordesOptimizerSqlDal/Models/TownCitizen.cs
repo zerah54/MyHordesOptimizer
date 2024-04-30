@@ -214,7 +214,7 @@ public partial class TownCitizen
     public bool? IsImmuneToSoul { get; set; }
 
     [Column("nbPotionChamanique", TypeName = "int(11)")]
-    public int NbPotionChamanique { get; set; }
+    public int? NbPotionChamanique { get; set; }
 
     [Column("idLastUpdateChamanic", TypeName = "int(11)")]
     public int? IdLastUpdateChamanic { get; set; }

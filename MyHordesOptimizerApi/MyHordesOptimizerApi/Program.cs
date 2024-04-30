@@ -5,7 +5,9 @@ using Discord.WebSocket;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MyHordesOptimizerApi;
@@ -36,10 +38,12 @@ using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
 using Serilog;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +53,10 @@ builder.Host.UseSerilog((context, services, configuration) =>
                              .Enrich.With(services.GetService<MyHordesOptimizerEnricher>()));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
+builder.Services.AddHttpClient(nameof(MyHordesApiRepository), client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 builder.Services.AddHttpClient(nameof(GestHordesRepository)).ConfigurePrimaryHttpMessageHandler(() =>
 {
     return new HttpClientHandler()
@@ -145,6 +153,16 @@ builder.Services.AddHttpLogging(logging =>
 
 builder.Services.AddBearerAuthentication(builder.Configuration);
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddConcurrencyLimiter(policyName: "MhoInRice", options =>
+     {
+         options.PermitLimit = builder.Configuration.GetSection("MhoApiLimit").GetValue<int>("PermitLimit");
+         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+         options.QueueLimit = builder.Configuration.GetSection("MhoApiLimit").GetValue<int>("QueueLimit");
+     });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -163,7 +181,7 @@ app.Use((context, next) =>
 });
 
 app.UseHttpsRedirection();
-
+app.UseRateLimiter();
 app.UseRouting();
 
 app.UseAuthentication();

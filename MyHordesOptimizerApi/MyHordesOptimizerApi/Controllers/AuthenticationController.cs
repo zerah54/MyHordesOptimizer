@@ -16,7 +16,7 @@ namespace MyHordesOptimizerApi.Controllers
         private readonly IAuthenticationService _authenticationService;
         private readonly IMyHordesFetcherService _myHordesFetcherService;
 
-        public AuthenticationController(ILogger<MyHordesFetcherController> logger,
+        public AuthenticationController(ILogger<FetcherController> logger,
             IAuthenticationService authenticationService,
             IMyHordesFetcherService myHordesFetcherService,
             IUserInfoProvider userKeyProvider) : base(logger, userKeyProvider)

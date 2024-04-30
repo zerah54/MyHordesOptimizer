@@ -15,11 +15,11 @@ namespace MyHordesOptimizerApi.Controllers
 {
     [ApiController]
     [Route("Fetcher")]
-    public class MyHordesFetcherController : AbstractMyHordesOptimizerControllerBase
+    public class FetcherController : AbstractMyHordesOptimizerControllerBase
     {
         private readonly IMyHordesFetcherService _myHordesFetcherService;
 
-        public MyHordesFetcherController(ILogger<MyHordesFetcherController> logger,
+        public FetcherController(ILogger<FetcherController> logger,
             IMyHordesFetcherService myHordesFetcherService,
             IUserInfoProvider userKeyProvider) : base(logger, userKeyProvider)
         {

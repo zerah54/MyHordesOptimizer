@@ -1,12 +1,14 @@
 ﻿using Common.Core.Repository.Interfaces;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace MyHordesOptimizerApi.Repository.Abstract
@@ -50,19 +52,36 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             Dictionary<string, string> customHeaders = null,
             string mediaTypeIn = MediaTypeNames.Application.Json)
         {
-            var client = CreateClient();
-            AddCustomHeaders(client, customHeaders);
-            Logger.LogDebug($"POST call initiated [HttpRequestUrl={url}]");
-            var content = GenerateContent(mediaTypeIn, body);
-            var response = client.PostAsync(url, content).Result;
-            Logger.LogDebug($"Async POST call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
-
-            if (ensureStatusCode)
+            try
             {
-                response.EnsureSuccessStatusCodeEnriched();
-            }
+                var client = CreateClient();
+                AddCustomHeaders(client, customHeaders);
+                Logger.LogDebug($"POST call initiated [HttpRequestUrl={url}]");
+                var content = GenerateContent(mediaTypeIn, body);
+                var response = client.PostAsync(url, content).Result;
+                Logger.LogDebug($"Async POST call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
 
-            return response;
+                if (ensureStatusCode)
+                {
+                    response.EnsureSuccessStatusCodeEnriched();
+                }
+
+                return response;
+            }
+            catch (AggregateException e)
+            {
+                var uri = new Uri(url);
+                if (e.InnerExceptions.Count == 1 && e.InnerException is TaskCanceledException)
+                {
+                    throw new MhoTechnicalException($"Timeout sur l'appel POST à l'url {uri.GetLeftPart(UriPartial.Path)} : {e.Message}", e);
+                }
+                throw;
+            }
+            catch (TaskCanceledException e)
+            {
+                var uri = new Uri(url);
+                throw new MhoTechnicalException($"Timeout sur l'appel POST à l'url {uri.GetLeftPart(UriPartial.Path)} : {e.Message}", e);
+            }
         }
 
         #endregion
@@ -92,19 +111,36 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             Dictionary<string, string> customHeaders = null,
             string mediaTypeIn = MediaTypeNames.Application.Json)
         {
-            var client = CreateClient();
-            AddCustomHeaders(client, customHeaders);
-            Logger.LogDebug($"PATCH call initiated [HttpRequestUrl={url}]");
-            var content = GenerateContent(mediaTypeIn, body);
-            var response = client.PatchAsync(url, content).Result;
-            Logger.LogDebug($"Async PATCH call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
-
-            if (ensureStatusCode)
+            try
             {
-                response.EnsureSuccessStatusCodeEnriched();
-            }
+                var client = CreateClient();
+                AddCustomHeaders(client, customHeaders);
+                Logger.LogDebug($"PATCH call initiated [HttpRequestUrl={url}]");
+                var content = GenerateContent(mediaTypeIn, body);
+                var response = client.PatchAsync(url, content).Result;
+                Logger.LogDebug($"Async PATCH call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
 
-            return response;
+                if (ensureStatusCode)
+                {
+                    response.EnsureSuccessStatusCodeEnriched();
+                }
+
+                return response;
+            }
+            catch (AggregateException e)
+            {
+                var uri = new Uri(url);
+                if (e.InnerExceptions.Count == 1 && e.InnerException is TaskCanceledException)
+                {
+                    throw new MhoTechnicalException($"Timeout sur l'appel PATCH à l'url {uri.GetLeftPart(UriPartial.Path)} : {e.Message}", e);
+                }
+                throw;
+            }
+            catch (TaskCanceledException e)
+            {
+                var uri = new Uri(url);
+                throw new MhoTechnicalException($"Timeout sur l'appel PATCH à l'url {uri.GetLeftPart(UriPartial.Path)} : {e.Message}", e);
+            }
         }
 
         #endregion
@@ -133,19 +169,36 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             Dictionary<string, string> customHeaders = null,
             string mediaTypeIn = MediaTypeNames.Application.Json)
         {
-            var client = CreateClient();
-            AddCustomHeaders(client, customHeaders);
-            Logger.LogDebug($"PUT call initiated [HttpRequestUrl={url}]");
-            var content = GenerateContent(mediaTypeIn, body);
-            var response = client.PutAsync(url, content).Result;
-            Logger.LogDebug($"Async PUT call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
-
-            if (ensureStatusCode)
+            try
             {
-                response.EnsureSuccessStatusCodeEnriched();
-            }
+                var client = CreateClient();
+                AddCustomHeaders(client, customHeaders);
+                Logger.LogDebug($"PUT call initiated [HttpRequestUrl={url}]");
+                var content = GenerateContent(mediaTypeIn, body);
+                var response = client.PutAsync(url, content).Result;
+                Logger.LogDebug($"Async PUT call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
 
-            return response;
+                if (ensureStatusCode)
+                {
+                    response.EnsureSuccessStatusCodeEnriched();
+                }
+
+                return response;
+            }
+            catch (AggregateException e)
+            {
+                var uri = new Uri(url);
+                if (e.InnerExceptions.Count == 1 && e.InnerException is TaskCanceledException)
+                {
+                    throw new MhoTechnicalException($"Timeout sur l'appel PUT à l'url {uri.GetLeftPart(UriPartial.Path)} : {e.Message}", e);
+                }
+                throw;
+            }
+            catch (TaskCanceledException e)
+            {
+                var uri = new Uri(url);
+                throw new MhoTechnicalException($"Timeout sur l'appel PUT à l'url {uri.GetLeftPart(UriPartial.Path)} : {e.Message}", e);
+            }
         }
 
         #endregion
@@ -171,19 +224,36 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             bool ensureStatusCode = true,
             Dictionary<string, string> customHeaders = null)
         {
-            var client = CreateClient();
-            AddCustomHeaders(client, customHeaders);
-            Logger.LogDebug($"GET call initiated [HttpRequestUrl={url}]");
-            var query = parameters != null ? QueryHelpers.AddQueryString(url, parameters) : url;
-            var response = client.GetAsync(query).Result;
-            Logger.LogDebug($"Async GET call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
-
-            if (ensureStatusCode)
+            try
             {
-                response.EnsureSuccessStatusCodeEnriched();
-            }
+                var client = CreateClient();
+                AddCustomHeaders(client, customHeaders);
+                Logger.LogDebug($"GET call initiated [HttpRequestUrl={url}]");
+                var query = parameters != null ? QueryHelpers.AddQueryString(url, parameters) : url;
+                var response = client.GetAsync(query).Result;
+                Logger.LogDebug($"Async GET call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
 
-            return response;
+                if (ensureStatusCode)
+                {
+                    response.EnsureSuccessStatusCodeEnriched();
+                }
+
+                return response;
+            }
+            catch (AggregateException e)
+            {
+                var uri = new Uri(url);
+                if(e.InnerExceptions.Count == 1 && e.InnerException is TaskCanceledException)
+                {
+                    throw new MhoTechnicalException($"Timeout sur l'appel GET à l'url {uri.GetLeftPart(UriPartial.Path)} : {e.Message}", e);
+                }
+                throw;
+            }
+            catch(TaskCanceledException e)
+            {
+                var uri = new Uri(url);
+                throw new MhoTechnicalException($"Timeout sur l'appel GET à l'url {uri.GetLeftPart(UriPartial.Path)} : {e.Message}", e);
+            }
         }
 
         #endregion
