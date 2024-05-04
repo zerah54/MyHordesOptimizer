@@ -209,7 +209,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                         DbContext.RemoveRange(existingTown.TownCadavers);
                         DbContext.AddRange(cadavers);
                         // On maj les cellsdigs
-                        if (DbContext.MapCellDigUpdates.FirstOrDefault(x => x.IdTown == town.IdTown) == null) // Si on a déjà fait la maj de la regen, il faut pas la refaire
+                        if (DbContext.MapCellDigUpdates.FirstOrDefault(x => x.IdTown == town.IdTown && x.Day == town.Day) == null) // Si on a déjà fait la maj de la regen, il faut pas la refaire
                         {
                             var scrutLevel = 0;
                             var scrut = myHordeMeResponse.Map.City.Buildings.SingleOrDefault(building => building.Id == MyHordesScrutateurConfiguration.Id);
