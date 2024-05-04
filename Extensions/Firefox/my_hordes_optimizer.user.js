@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.16.0
+// @version      1.0.18.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -18,8 +18,8 @@
 // @match        *://myhordes.de/*
 // @match        *://myhordes.eu/*
 // @match        *://myhord.es/*
+// @match        *://myhordes.fr/*
 // @match        *://myhordes.localhost/*
-// @match        *://staging.myhordes.de/*
 //
 // @match        https://bbh.fred26.fr/*
 // @match        https://gest-hordes2.eragaming.fr/*
@@ -32,11 +32,11 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Corretif] Déploiement d'un hotfix suite à l'introduction d'un bug. La récupération automatique de votre identifiant externe pour les apps n'est pour l'instant plus disponible.\n`;
+    + `[Corretif] Problèmes d'affichage`
+    + `[Corretif] Erreur lors de l'ajout d'un objet à la liste de courses`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
-// const is_mh_beta = document.URL.indexOf('staging') >= 0;
 const is_mh_beta = false;
 const website = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
 
@@ -80,7 +80,7 @@ getStorageItem(mho_token_key).then((saved_token) => {
 ////////////////////
 
 const api_url = 'https://api.myhordesoptimizer.fr' + (is_mh_beta ? '/beta' : '');
-// const api_url = 'https://myhordesoptimizerapi.azurewebsites.net';
+// const api_url = 'https://api.myhordesoptimizer.fr/dev';
 
 ///////////////////////////////////////////
 // Listes de constantes / Constants list //
@@ -94,6 +94,7 @@ const mh_optimizer_icon = 'https://myhordes-optimizer.web.app/assets/img/logo/lo
 
 const mh_optimizer_window_id = 'optimizer-window';
 const mh_optimizer_map_window_id = 'optimizer-map-window';
+const mho_expeditions_window_id = 'mho-expeditions-window';
 const btn_id = 'optimizer-btn';
 const content_btn_id = 'optimizer-content-btn';
 const mh_header_id = 'header-reload-area';
@@ -106,9 +107,10 @@ const zone_info_zombies_id = 'zone-info-zombies';
 const nb_dead_zombies_id = 'nb-dead-zombies';
 const despair_deaths_id = 'despair-deaths';
 const mho_copy_map_id = 'mho-copy-map';
-const mho_opti_map_id = 'mho-opti-map';
-const mho_header_space_id = 'mho-header-space'
+const mho_header_space_id = 'mho-header-space';
 const mho_display_map_id = 'mho-display-map';
+const mho_display_expeditions_id = 'mho-display-expeditions';
+const mho_store_notifications_id = 'mho-store-notifications';
 const mho_search_building_field_id = 'mho-search-building-field';
 const mho_search_recipient_field_id = 'mho-search-recipient-field';
 const mho_search_dump_field_id = 'mho-search-dump-field';
@@ -131,13 +133,13 @@ let wishlist;
 let parameters;
 let map;
 let current_cell;
+let my_expeditions;
 
 ///////////////////
 // Les variables //
 ///////////////////
 
 let is_refresh_wishlist;
-let count_pending_notifications;
 /** true quand le changelog est nouveau et qu'il faut afficher une pastille sur le menu */
 let has_new_changelog = false;
 /** True quand une erreur vient d'être affichée. Repasse à false au bout d'une seconde, pour éviter le spam d'erreurs */
@@ -904,6 +906,21 @@ const wishlist_headers = [
     },
 ];
 
+let fill_items_messages_pool = {
+    en: [
+        {title: 'Hi', content: ':iloveu:'}
+    ],
+    fr: [
+        {title: 'Coucou', content: ':iloveu:'}
+    ],
+    de: [
+        {title: 'Hallo', content: ':iloveu:'}
+    ],
+    es: [
+        {title: 'Hola', content: ':iloveu:'}
+    ]
+}
+
 //////////////////////////////////
 // La liste des onglets du wiki //
 //////////////////////////////////
@@ -1563,7 +1580,25 @@ let params_categories = [
             //         de: `Speichert Benachrichtigungen, bis sie gelöscht werden`,
             //         es: `Almacena notificaciones hasta que se borran`
             //     },
-            // }
+            // },
+            {
+                id: `display_my_expeditions`,
+                label: {
+                    en: `Shows details of expeditions I am registered for`,
+                    fr: `Affiche les détails des expéditions auxquelles je suis inscrit`,
+                    de: `Zeigt Details zu Expeditionen an, für die ich registriert bin`,
+                    es: `Muestra detalles de las expediciones para las que estoy registrado.`
+                },
+            },
+            {
+                id: `fill_items_messages`,
+                label: {
+                    en: `Pre-populate the contents of empty messages containing items`,
+                    fr: `Pré-remplir le contenu des messages vides contenant des objets`,
+                    de: `Füllen Sie den Inhalt leerer Nachrichten mit Gegenstand vorab aus`,
+                    es: `Complete previamente el contenido de mensajes vacíos que contengan objetos`
+                },
+            }
             // {
             //     id: `block_users`,
             //     label: {
@@ -1996,6 +2031,7 @@ function isScriptVersionLastVersion() {
 
     const current_script_version = getScriptInfo().version;
     const base_script_version = parameters?.find((param) => param.name === 'ScriptVersion')?.value;
+    if (!base_script_version) return true;
 
     const comparison_regex = /(\d+)/g;
     const splitted_current = current_script_version.match(comparison_regex);
@@ -2268,18 +2304,12 @@ function getItemFromImg(img_src) {
 }
 
 function initOptionsWithLoginNeeded() {
-    /** Gère le bouton de mise à jour des outils externes) */
-    if (!buttonOptimizerElement()) {
-        setTimeout(() => {
-            createOptimizerBtn();
-        }, 100)
-        createWindow();
-    }
 
-    createDisplayMapButton();
+
     displayWishlistInApp();
     displayPriorityOnItems();
     createUpdateExternalToolsButton();
+    createExpeditionsBtn();
     setTimeout(() => {
         displayCellDetailsOnPage();
     }, 500)
@@ -2288,6 +2318,13 @@ function initOptionsWithLoginNeeded() {
 
 
 function initOptionsWithoutLoginNeeded() {
+    /** Gère le bouton de mise à jour des outils externes) */
+    if (!buttonOptimizerElement()) {
+        setTimeout(() => {
+            createOptimizerBtn();
+        }, 100)
+        createWikiToolsWindow();
+    }
     preventFromLeaving();
     alertIfInactiveAndNoEscort();
     clickOnVotedToRedirect();
@@ -2304,9 +2341,11 @@ function initOptionsWithoutLoginNeeded() {
     changeDefaultEscortOptions();
     displayGhoulVoracityPercent();
     addExternalLinksToProfiles();
+    createDisplayMapButton();
+    fillItemsMessages();
+    // createStoreNotificationsBtn();
     // addExternalLinksToTowns();
     // blockUsersPosts();
-    count_pending_notifications = document.querySelector('#postbox-new-msg-counter')?.innerText;
 }
 
 function updateFetchRequestOptions(options) {
@@ -2584,7 +2623,7 @@ function createOptimizerButtonContent() {
 
     } else {
         let no_external_app_id = document.createElement('div');
-        no_external_app_id.innerText = getI18N(texts.external_app_id_help);
+        no_external_app_id.innerHTML = getI18N(texts.external_app_id_help);
         content.appendChild(no_external_app_id);
     }
 }
@@ -2844,55 +2883,110 @@ function createMhoHeaderSpace() {
     }, 100);
 }
 
-/** Crée la fenêtre de wiki */
-function createWindow() {
-    let window = document.querySelector(`#${mh_optimizer_window_id}`);
+function createWindow(id, full_size) {
+    let window = document.querySelector(`#${id}`);
+    if (window) return;
 
-    if (!window) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
-        let window_content = document.createElement('div');
-        window_content.id = mh_optimizer_window_id + '-content';
-        let window_overlay_img = document.createElement('img');
-        window_overlay_img.alt = '(X)';
-        window_overlay_img.src = repo_img_hordes_url + 'icons/b_close.png';
-        let window_overlay_li = document.createElement('li');
-        window_overlay_li.appendChild(window_overlay_img);
-        let window_overlay_ul = document.createElement('ul');
-        window_overlay_ul.appendChild(window_overlay_li);
-
-        let window_overlay = document.createElement('div');
-        window_overlay.id = mh_optimizer_window_id + '-overlay';
-        window_overlay.appendChild(window_overlay_ul);
-
-        let window_box = document.createElement('div');
-        window_box.id = mh_optimizer_window_id + '-box';
-        window_box.appendChild(window_content);
-        window_box.appendChild(window_overlay);
-
-        window = document.createElement('div');
-        window.id = mh_optimizer_window_id;
-        window.appendChild(window_box);
-
-        let post_office = document.getElementById('post-office');
-        if (post_office) {
-            post_office.parentNode.insertBefore(window, post_office.nextSibling);
-        }
-        window_overlay_img.addEventListener('click', () => {
-            window.classList.remove('visible');
-            let body = document.getElementsByTagName('body')[0];
-            body.removeAttribute('style', 'overflow: hidden');
-        });
+    window = document.createElement('div');
+    window.id = id;
+    window.classList.add('mho-window');
+    if (full_size) {
+        window.classList.add('fullsize');
     }
+
+    let window_box = document.createElement('div');
+    window_box.id = id + '-box';
+    window_box.classList.add('mho-window-box');
+    window.appendChild(window_box);
+
+    let window_drag_handler = document.createElement('div');
+    window_drag_handler.id = id + '-drag-handle';
+    if (!full_size) {
+        window_drag_handler.style.cursor = 'move';
+    }
+    window_drag_handler.classList.add('mho-window-drag-handle');
+    window_box.appendChild(window_drag_handler);
+
+    let window_content = document.createElement('div');
+    window_content.id = id + '-content';
+    window_content.classList.add('mho-window-content');
+    window_box.appendChild(window_content);
+
+    let window_overlay = document.createElement('div');
+    window_overlay.id = id + '-overlay';
+    window_overlay.classList.add('mho-window-overlay');
+    window_box.appendChild(window_overlay);
+
+    let window_overlay_ul = document.createElement('ul');
+    window_overlay.appendChild(window_overlay_ul);
+
+    let window_overlay_li = document.createElement('li');
+    window_overlay_ul.appendChild(window_overlay_li);
+
+    let window_overlay_img = document.createElement('img');
+    window_overlay_img.alt = '(X)';
+    window_overlay_img.src = repo_img_hordes_url + 'icons/b_close.png';
+    window_overlay_li.appendChild(window_overlay_img);
+
+    window_overlay_img.addEventListener('click', () => {
+        window.classList.remove('visible');
+        let body = document.getElementsByTagName('body')[0];
+        body.removeAttribute('style', 'overflow: hidden');
+    });
+
+    let post_office = document.getElementById('post-office');
+    if (post_office) {
+        post_office.parentNode.insertBefore(window, post_office.nextSibling);
+    }
+
+    if (!full_size) {
+        window_drag_handler.onmousedown = (e) => {
+            e = e || window.event;
+            e.preventDefault();
+            // get the mouse cursor position at startup:
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = () => {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            };
+            // call a function whenever the cursor moves:
+            document.onmousemove = (e) => {
+                e = e || window.event;
+                e.preventDefault();
+                // calculate the new cursor position:
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                // set the element's new position:
+                window.style.top = (window.offsetTop - pos2) + "px";
+                window.style.left = (window.offsetLeft - pos1) + "px";
+            };
+        }
+    }
+
+}
+
+/** Crée la fenêtre de wiki */
+function createWikiToolsWindow() {
+    createWindow(mh_optimizer_window_id, true);
 }
 
 /**
  * Crée la liste des onglets de la page de wiki
  * @param {string} window_type
  */
-function createTabs(window_type) {
+function createWikiToolsTabs(window_type) {
     let window_content = document.getElementById(mh_optimizer_window_id + '-content');
     window_content.innerHTML = '';
 
+    let tabs_div = document.createElement('div');
+    tabs_div.id = 'tabs';
+
+    window_content.appendChild(tabs_div);
     let tabs_ul = document.createElement('ul');
 
     let current_tabs_list = tabs_list[window_type]
@@ -2923,10 +3017,10 @@ function createTabs(window_type) {
 
         if (index === 0) {
             tab_li.classList.add('selected');
-            dispatchContent(window_type, tab);
+            dispatchWikiToolsContent(window_type, tab);
         }
 
-        const tab_content = document.getElementById('tab-content');
+        const tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
         tab_li.addEventListener('click', () => {
             if (!tab_li.classList.contains('selected') && tab_content !== '' && tab_content !== undefined && tab_content !== null) {
                 for (let li of tabs_ul.children) {
@@ -2934,17 +3028,12 @@ function createTabs(window_type) {
                 }
                 tab_li.classList.add('selected');
             }
-            dispatchContent(window_type, tab);
+            dispatchWikiToolsContent(window_type, tab);
         })
 
         tabs_ul.appendChild(tab_li);
     })
-
-    let tabs_div = document.createElement('div');
-    tabs_div.id = 'tabs';
-    tabs_div.appendChild(tabs_ul)
-
-    window_content.appendChild(tabs_div);
+    tabs_div.appendChild(tabs_ul);
 
 }
 
@@ -2974,6 +3063,8 @@ function createMapWindow() {
     window_box.draggable = true;
 
     let window = document.createElement('div');
+    window.style.minWidth = '150px;'
+    window.style.minHeight = '150px;'
     window.id = mh_optimizer_map_window_id;
 
     window_overlay.onmousedown = (e) => {
@@ -3025,22 +3116,23 @@ function displayWindow(window_type) {
     document.getElementById(mh_optimizer_window_id).classList.add('visible');
     let body = document.getElementsByTagName('body')[0];
     body.setAttribute('style', 'overflow: hidden');
-    createTabs(window_type);
+    createWikiToolsTabs(window_type);
 }
 
 /**
  * Crée le bloc de contenu de la page
  * @param {string} window_tyme     Le type de fenêtre à afficher, correspondant au nom utilisé dans la liste des onglets
  */
-function createTabContent(window_type) {
+function createWikiToolsTabContent(window_type) {
     let window_content = document.getElementById(mh_optimizer_window_id + '-content');
 
-    let tab_content = document.getElementById('tab-content');
+    let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
     if (tab_content) {
         tab_content.remove();
     }
     tab_content = document.createElement('div');
-    tab_content.id = 'tab-content';
+    tab_content.classList.add('tab-content');
+    tab_content.id = mh_optimizer_window_id + '-tab-content';
 
     window_content.appendChild(tab_content);
 }
@@ -3050,11 +3142,11 @@ function createTabContent(window_type) {
  * @param {string} window_type     Le type de l'onglet
  * @param tab                      L'onglet à afficher
  */
-function dispatchContent(window_type, tab) {
+function dispatchWikiToolsContent(window_type, tab) {
 
-    createTabContent(window_type);
+    createWikiToolsTabContent(window_type);
 
-    let list = document.getElementById('tab-content');
+    let list = document.getElementById(mh_optimizer_window_id + '-tab-content');
     if (list) {
         list.innerHTML = '';
     }
@@ -3107,7 +3199,7 @@ function displayBank(tab_id) {
 
 /** Affiche les éléments présents dans la liste de courses */
 function displayWishlist() {
-    let tab_content = document.getElementById('tab-content');
+    let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
 
     let explanation = document.createElement('div');
     explanation.innerText = getI18N(texts.wishlist_moved);
@@ -3127,7 +3219,7 @@ function displayWishlist() {
  * @param {string} tab_id l'onglet dans lequel on se trouve
  */
 function displayItems(filtered_items, tab_id) {
-    let tab_content = document.getElementById('tab-content');
+    let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
 
     let item_list = document.createElement('ul');
     item_list.id = 'item-list';
@@ -3220,7 +3312,7 @@ function displayItems(filtered_items, tab_id) {
 function displayCitizens() {
     citizens = undefined;
     getCitizens().then(() => {
-        let tab_content = document.getElementById('tab-content');
+        let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
         if (citizens && hero_skills) {
             console.log('heroskills', hero_skills);
 
@@ -3308,7 +3400,7 @@ function displayCamping() {
         let all_ruins = [...added_ruins];
         all_ruins = all_ruins.concat(ruins);
 
-        let tab_content = document.getElementById('tab-content');
+        let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
 
         let camping_tab_content = document.createElement('div');
         camping_tab_content.style.padding = '0 0.5em';
@@ -3760,7 +3852,7 @@ function displayCamping() {
 /** Affiche la liste des pouvoirs */
 function displaySkills() {
     getHeroSkills().then((hero_skills) => {
-        let tab_content = document.getElementById('tab-content');
+        let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
 
         let header_cells = [...table_skills_headers];
 
@@ -3809,7 +3901,7 @@ function displaySkills() {
 function displayRuins() {
     getRuins().then((ruins) => {
         if (ruins) {
-            let tab_content = document.getElementById('tab-content');
+            let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
 
             let header_cells = [...table_ruins_headers];
 
@@ -3899,7 +3991,7 @@ function displayRuins() {
 function displayRecipes() {
     getRecipes().then((recipes) => {
         if (recipes) {
-            let tab_content = document.getElementById('tab-content');
+            let tab_content = document.getElementById(mh_optimizer_window_id + '-tab-content');
 
             let recipes_list = document.createElement('ul');
             recipes_list.id = 'recipes-list';
@@ -5701,16 +5793,16 @@ function displayMap() {
                     path.style.backgroundColor = 'grey';
                     if (cell.borders === 'exit') {
                         path.style.boxShadow = 'inset 0px 5px 6px lightyellow';
-                        path.style.left = '5px';
-                        path.style.top = '5px';
-                        path.style.right = '5px';
+                        path.style.left = '4px';
+                        path.style.top = '4px';
+                        path.style.right = '4px';
                         path.style.bottom = '0';
                         td.classList.add('exit');
                     } else {
-                        path.style.left = cell.borders[0] === '0' ? '5px' : '0';
-                        path.style.top = cell.borders[1] === '0' ? '5px' : '0';
-                        path.style.right = cell.borders[2] === '0' ? '5px' : '0';
-                        path.style.bottom = cell.borders[3] === '0' ? '5px' : '0';
+                        path.style.left = cell.borders[0] === '0' ? '4px' : '0';
+                        path.style.top = cell.borders[1] === '0' ? '4px' : '0';
+                        path.style.right = cell.borders[2] === '0' ? '4px' : '0';
+                        path.style.bottom = cell.borders[3] === '0' ? '4px' : '0';
                     }
                     td_content.appendChild(path);
                 } else {
@@ -5721,8 +5813,8 @@ function displayMap() {
                     let zombies = document.createElement('div');
                     zombies.innerText = cell.zombies;
                     zombies.style.position = 'absolute';
-                    zombies.style.bottom = '5px';
-                    zombies.style.right = '5px';
+                    zombies.style.bottom = '4px';
+                    zombies.style.right = '4px';
                     zombies.style.fontSize = '10px';
                     zombies.style.lineHeight = '10px';
                     td_content.appendChild(zombies);
@@ -6813,7 +6905,10 @@ function displayCampingPredict() {
                 let zone_camp_info = zone_camp.querySelector('.zone-camp-info');
                 let zone_camp_label = zone_camp.querySelector('label');
                 zone_camp_label.addEventListener('click', () => {
-                    camping_predict_container.style.display = camping_predict_container.style.display === 'none' ? 'block' : 'none'
+                    camping_predict_container.style.display = camping_predict_container.style.display === 'none' ? 'block' : 'none';
+                    if (camping_predict_container.style.display !== 'none') {
+                        calculateCamping(conf);
+                    }
                 });
 
                 camping_predict_container = document.createElement('div');
@@ -7187,8 +7282,9 @@ function displayCampingPredict() {
                 phare_div.appendChild(phare);
                 phare_div.appendChild(phare_label);
 
-
-                calculateCamping(conf);
+                if (camping_predict_container.style.display !== 'none') {
+                    calculateCamping(conf);
+                }
             });
 
         } else if (camping_predict_container) {
@@ -7420,6 +7516,334 @@ function addExternalLinksToTowns() {
     }
 }
 
+function fillItemsMessages() {
+    if (mho_parameters.fill_items_messages && pageIsMsgReceived()) {
+        let row_send = document.querySelector('#rows-send');
+        if (!row_send) return;
+
+        let sendable_items = row_send.querySelector('.sendable-items');
+        if (!sendable_items) return;
+
+        let editor_block = document.querySelector('#pm-forum-editor');
+        if (!editor_block) return;
+
+        setTimeout(() => {
+
+            let editor = editor_block.querySelector('hordes-twino-editor');
+            if (!editor) return;
+
+            let items = sendable_items.querySelectorAll('li.item');
+            Array.from(items).forEach((item) => {
+                item.addEventListener('click', () => {
+                    let message_title = editor.querySelector('input');
+                    let message_content = editor.querySelector('textarea');
+                    if ((message_title.value === undefined || message_title.value === null || message_title.value === '')
+                        && (message_content.value === undefined || message_content.value === null || message_content.value === '')) {
+                        let lang_fillers = fill_items_messages_pool[lang];
+                        let random_filler = lang_fillers[Math.floor(Math.random() * lang_fillers.length)];
+
+                        message_title.setAttribute('value', random_filler.title);
+                        message_title.dispatchEvent(new Event('input', {bubbles: true}));
+
+                        message_content.value = random_filler.content;
+                        message_content.dispatchEvent(new Event('input', {bubbles: true}));
+                    }
+                }, {once: true});
+            });
+        }, 250);
+    }
+}
+
+function createStoreNotificationsBtn() {
+    let stored_notifications_btn = document.getElementById(mho_store_notifications_id);
+    if (mho_parameters.store_notifications) {
+        const mho_header_space = document.getElementById(mho_header_space_id);
+        if (stored_notifications_btn || !mho_header_space) return;
+
+        let btn_container = document.createElement('div');
+        btn_container.id = mho_store_notifications_id;
+
+        let postbox_img = document.querySelector('#postbox img');
+
+        let btn_mho_img = document.createElement('img');
+        btn_mho_img.src = mh_optimizer_icon;
+        btn_mho_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
+        btn_container.appendChild(btn_mho_img);
+
+        let btn_img = document.createElement('img');
+        btn_img.src = repo_img_hordes_url + '/icons/news.gif';
+        btn_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
+        btn_container.appendChild(btn_img);
+
+        btn_container.addEventListener('click', (event) => {
+            event.stopPropagation();
+            event.preventDefault();
+        });
+
+        console.log('rdy');
+
+        document.querySelector('#modal-backdrop').addEventListener('pop', (event) => {
+            console.log('pop', event);
+        });
+
+        mho_header_space.appendChild(btn_container);
+    } else if (stored_notifications_btn) {
+        stored_notifications_btn.remove();
+    }
+}
+
+function createExpeditionsBtn() {
+    let expeditions_btn = document.getElementById(mho_display_expeditions_id);
+    if (mho_parameters.display_my_expeditions) {
+        createWindow(mho_expeditions_window_id, false);
+
+        const mho_header_space = document.getElementById(mho_header_space_id);
+        if (expeditions_btn || !mho_header_space) return;
+
+        let btn_container = document.createElement('div');
+        btn_container.id = mho_display_expeditions_id;
+
+        let postbox_img = document.querySelector('#postbox img');
+
+        let btn_mho_img = document.createElement('img');
+        btn_mho_img.src = mh_optimizer_icon;
+        btn_mho_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
+        btn_container.appendChild(btn_mho_img);
+
+        let btn_img = document.createElement('img');
+        btn_img.src = repo_img_hordes_url + '/icons/planner.gif';
+        btn_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
+        btn_container.appendChild(btn_img);
+        mho_header_space.appendChild(btn_container);
+
+        btn_container.addEventListener('click', (event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            document.getElementById(mho_expeditions_window_id).classList.add('visible');
+            createExpeditionsWindowContent();
+        });
+
+    } else if (expeditions_btn) {
+        expeditions_btn.remove();
+    }
+}
+
+function createExpeditionsWindowContent() {
+    let get_my_expeditions_promise = getMyExpeditions()
+    let get_citizens_promize = getCitizens();
+
+    Promise.all([get_my_expeditions_promise, get_citizens_promize]).then(([expeditions, citizens]) => {
+        let window_content = document.querySelector(`#${mho_expeditions_window_id}-content`);
+        window_content.innerHTML = '';
+
+        let tabs_ul = document.createElement('ul');
+
+        expeditions.forEach((expedition, index) => {
+            let tab_link = document.createElement('div');
+
+            let tab_text = document.createTextNode(expedition.label || ' ');
+            tab_link.appendChild(tab_text);
+
+            let tab_li = document.createElement('li');
+            tab_li.appendChild(tab_link);
+
+            if (index === 0) {
+                tab_li.classList.add('selected');
+                dispatchExpeditionContent(expedition, citizens.citizens);
+            }
+
+            const tab_content = document.getElementById(mho_expeditions_window_id + '-tab-content');
+            tab_li.addEventListener('click', () => {
+                if (!tab_li.classList.contains('selected') && tab_content !== '' && tab_content !== undefined && tab_content !== null) {
+                    for (let li of tabs_ul.children) {
+                        li.classList.remove('selected');
+                    }
+                    tab_li.classList.add('selected');
+                }
+
+                dispatchExpeditionContent(expedition, citizens.citizens);
+            })
+
+            tabs_ul.appendChild(tab_li);
+        })
+
+        let tabs_div = document.createElement('div');
+        tabs_div.id = 'tabs';
+        tabs_div.appendChild(tabs_ul)
+
+        window_content.appendChild(tabs_div);
+    });
+}
+
+function dispatchExpeditionContent(expedition, citizens) {
+    let window_content = document.getElementById(mho_expeditions_window_id + '-content');
+
+    let tab_content = document.getElementById(mho_expeditions_window_id + '-tab-content');
+    if (tab_content) {
+        tab_content.remove();
+    }
+    tab_content = document.createElement('div');
+    tab_content.id = mho_expeditions_window_id + '-tab-content';
+    tab_content.classList.add('tab-content');
+
+    window_content.appendChild(tab_content);
+
+    console.log('expedition', expedition);
+    expedition.parts.forEach((part, index) => {
+        console.log('part', part);
+        let part_content = document.createElement('div');
+        tab_content.appendChild(part_content);
+
+        if (part.label) {
+            let part_content_header = document.createElement('h2');
+            part_content_header.innerText = part.label;
+            part_content.appendChild(part_content_header);
+        }
+
+        let part_content_path = document.createElement('h5');
+        part_content_path.innerText = part.path;
+        part_content.appendChild(part_content_path);
+
+        switch (part.direction) {
+            case 'Süden':
+                part_content_path.innerText += ' ⇩';
+                break;
+            case 'Westen':
+                part_content_path.innerText += ' ⇦';
+                break;
+            case 'Osten':
+                part_content_path.innerText += ' ⇨';
+                break;
+            case 'Norden':
+                part_content_path.innerText += ' ⇧';
+                break;
+            default:
+                break;
+        }
+
+        let table = document.createElement('table');
+        table.style.width = '100%';
+        table.classList.add('mho-table');
+        part_content.appendChild(table);
+
+        let header = document.createElement('thead');
+        table.appendChild(header);
+
+        let header_row = document.createElement('tr');
+        header_row.classList.add('mho-header');
+        header.appendChild(header_row);
+
+        let header_cells = [
+            {
+                id: 'citizen',
+                label: {
+                    de: 'Bürger',
+                    en: 'Citizen',
+                    es: 'Habitante',
+                    fr: 'Citoyens'
+                }
+            },
+            {
+                id: 'isThirsty',
+                label: {
+                    de: `<img src="${repo_img_hordes_url}/status/status_thirst1.gif">`,
+                    en: `<img src="${repo_img_hordes_url}/status/status_thirst1.gif">`,
+                    es: `<img src="${repo_img_hordes_url}/status/status_thirst1.gif">`,
+                    fr: `<img src="${repo_img_hordes_url}/status/status_thirst1.gif">`
+                }
+            },
+            {
+                id: 'starts7ap',
+                label: {
+                    de: `7<img src="${repo_img_hordes_url}/icons/ap_small.gif">`,
+                    en: `7<img src="${repo_img_hordes_url}/icons/ap_small_en.gif">`,
+                    es: `7<img src="${repo_img_hordes_url}/icons/ap_small_es.gif">`,
+                    fr: `7<img src="${repo_img_hordes_url}/icons/ap_small_fr.gif">`
+                }
+            },
+            {
+                id: 'orders',
+                label: {
+                    de: `Anweisungen`,
+                    en: `Instructions`,
+                    es: `Instrucciones`,
+                    fr: `Consignes`
+                }
+            },
+            {
+                id: 'bag',
+                label: {
+                    de: `Rucksack`,
+                    en: `Backpack`,
+                    es: `Mochila`,
+                    fr: `Sac`
+                }
+            }
+        ]
+        header_cells.forEach((header_cell) => {
+            let header_cell_html = document.createElement('th');
+            header_cell_html.innerHTML = header_cell.label[lang];
+            header_row.appendChild(header_cell_html);
+        });
+
+        let body = document.createElement('tbody');
+        table.appendChild(body);
+
+        part.citizens.forEach((citizen_part) => {
+            let citizen_row = document.createElement('tr');
+            body.appendChild(citizen_row);
+
+            header_cells.forEach((header_cell) => {
+                let cell = document.createElement('td');
+                switch (header_cell.id) {
+                    case 'citizen':
+                        cell.innerText = citizens.find((citizen) => citizen.id === citizen_part.idUser)?.name ?? '';
+                        break;
+                    case 'isThirsty':
+                        cell.innerHTML = citizen_part.isThirsty ? `<img src="${repo_img_hordes_url}status/status_thirst1.gif">` : '';
+                        cell.style.textAlign = 'center';
+                        break;
+                    case 'starts7ap':
+                        cell.innerHTML = citizen_part.nombrePaDepart === 7 ? `✓` : (citizen_part.nombrePaDepart === 6 ? '𐄂' : '');
+                        cell.style.textAlign = 'center';
+                        break;
+                    case 'orders':
+                        citizen_part.orders.forEach((order) => {
+                            let order_html = document.createElement('div');
+                            order_html.innerHTML = order.text;
+                            cell.appendChild(order_html);
+                        });
+                        break;
+                    case 'bag':
+                        citizen_part.bag?.items?.forEach((item) => {
+                            let bag_item = document.createElement('span');
+                            bag_item.innerHTML = `<img src="${repo_img_hordes_url}${item.item.img}">`;
+                            cell.appendChild(bag_item);
+                        });
+                        break;
+                    default:
+                        break;
+                }
+                citizen_row.appendChild(cell);
+            });
+        });
+
+        let part_orders = document.createElement('div');
+        part_orders.style.width = '100%';
+        part.orders.forEach((order) => {
+            let order_html = document.createElement('div');
+            order_html.innerHTML = order.text;
+            part_orders.appendChild(order_html);
+        });
+        part_content.appendChild(part_orders);
+
+        if (index < expedition.parts.length - 1) {
+            let separator = document.createElement('hr');
+            tab_content.appendChild(separator);
+        }
+    });
+}
+
 /** Permet de bloquer / débloquer des utilisateurs et de masquer les posts des utilisateurs bloqués */
 function blockUsersPosts() {
     if (mho_parameters.block_users && pageIsForum()) {
@@ -7563,244 +7987,235 @@ function createStyles() {
         + `margin-left: auto;`
         + `}`;
 
-    const btn_style = `#${btn_id} {`
-        + 'background-color: #5c2b20;'
-        + 'border: 1px solid #f0d79e;'
-        + 'outline: 1px solid #000;'
-        + 'position: absolute;'
-        + 'top: 10px;'
-        + 'z-index: 997;'
-        + '}';
+    const btn_style = `
+    #${btn_id} {
+        background-color: #5c2b20;
+        border: 1px solid #f0d79e;
+        outline: 1px solid #000;
+        position: absolute;
+        top: 10px;
+        z-index: 997;
+    }
+    #${btn_id}.mho-btn-opened h1 span, #${btn_id}.mho-btn-opened h1 a, #${btn_id}.mho-btn-opened h1 img.close {
+        display: inline;
+    }
+    #${btn_id}.mho-btn-opened div {
+        display: block;
+    }
+    #${btn_id} h1 {
+        height: auto;
+        font-size: 8pt;
+        text-transform: none;
+        font-variant: small-caps;
+        background: none;
+        cursor: help;
+        margin: 0 5px;
+        padding: 0;
+        line-height: 17px;
+        color: #f0d79e;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    #${btn_id} h1 > div > img {
+        vertical-align: -9%;
+    }
+    #${btn_id}.mho-btn-opened h1 {
+        border-bottom: 1px solid #b37c4a;
+        margin-bottom: 5px;
+    }
+    #${btn_id} h1 span, #${btn_id} h1 a, #${btn_id} h1 img.close {
+        color: #f0d79e;
+        cursor: help;
+        font-family: Trebuchet MS,Arial,Verdana,sans-serif;
+        letter-spacing: 1px;
+        line-height: 17px;
+        text-align: left;
+        text-transform: none;
+        margin-left: 1em;
+        display: none;
+    }
+    #${btn_id} > div {
+        display: none;
+        margin: 0 5px 8px 5px;
+        font-size: 0.9em;
+        width: 350px;
+    }
+    `;
 
-    const btn_hover_h1_span_style = `#${btn_id}.mho-btn-opened h1 span, #${btn_id}.mho-btn-opened h1 a, #${btn_id}.mho-btn-opened h1 img.close {`
-        + 'display: inline;'
-        + '}';
+    const mho_window_style = `
+    .mho-window {
+        opacity: 1;
+        transition: opacity 1s ease;
+        z-index: 999;
+        padding: 0;
+        position: fixed;
+        min-width: 150px;
+        min-height: 150px;
+    }
+    .mho-window:not(.fullsize) .mho-window-box {
+        resize: both;
+        overflow: auto;
+    }
+    .mho-window.fullsize {
+        background: url(${repo_img_hordes_url}background/mask.png);
+        height: 100%;
+        width: 100%;
+        resize: none;
+    }
+    .mho-window:not(.visible), #${mh_optimizer_map_window_id}:not(.visible) {
+        opacity: 0;
+        pointer-events: none;
+        }
+    .mho-window:not(.visible) .mho-window-box, .mho-window:not(.visible) #${mh_optimizer_map_window_id}-box {
+        transform: scale(0) translateY(1000px);
+    }
+    .mho-window .mho-window-box {
+        background: url(${repo_img_hordes_url}background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(${repo_img_hordes_url}background/bg_content2.jpg) repeat-y 100% 0/900px 263px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #000;
+        display: flex;
+        flex-direction: row;
+        position: absolute;
+        top: 10px;
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        transform: scale(1) translateY(0);
+        transition: transform .5s ease;
+    }
+    #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box {
+        background: url(${repo_img_hordes_url}background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(${repo_img_hordes_url}background/bg_content2.jpg) repeat-y 100% 0/900px 263px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #000;
+        position: absolute;
+        transform: scale(1) translateY(0);
+        transition: transform .5s ease;
+        resize: both;
+        overflow: auto;
+        z-index: 9999;
+    }
+    .mho-window .mho-window-box .mho-window-overlay, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay {
+        position: absolute;
+        right: 6px;
+        top: 6px;
+        text-align: right;
+    }
+    .mho-window .mho-window-box .mho-window-overlay ul, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay ul {
+        margin: 2px;
+        padding: 0;
+    }
+    .mho-window .mho-window-box .mho-window-overlay ul li, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay ul li {
+        cursor: pointer;
+        display: inline-block;
+    }
+    .mho-window .mho-window-drag-handle {
+        width: 18px;
+        height: 100%;
+    }
+    .mho-window-content, #${mh_optimizer_map_window_id}-content {
+        flex: 1;
+        color: #fff;
+        overflow: auto;
+        background: url(${repo_img_hordes_url}background/box/panel_00.gif) 0 0 no-repeat,url(${repo_img_hordes_url}background/box/panel_02.gif) 100% 0 no-repeat,url(${repo_img_hordes_url}background/box/panel_20.gif) 0 100% no-repeat,url(${repo_img_hordes_url}background/box/panel_22.gif) 100% 100% no-repeat,url(${repo_img_hordes_url}background/box/panel_01.gif) 0 0 repeat-x,url(${repo_img_hordes_url}background/box/panel_10.gif) 0 0 repeat-y,url(${repo_img_hordes_url}background/box/panel_12.gif) 100% 0 repeat-y,url(${repo_img_hordes_url}background/box/panel_21.gif) 0 100% repeat-x,#7e4d2a;
+        border-radius: 12px;
+        padding: 8px;
+   }
+   `;
 
-    const btn_hover_div_style = `#${btn_id}.mho-btn-opened div {`
-        + 'display: block;'
-        + '}';
+    const mho_window_style_tabs = `
+    #tabs {
+        color: #ddab76;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        position: relative;
+        height: 25px;
+        order-bottom: 1px solid #ddab76;
+    }
+    #tabs ul {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+        background: url(${repo_img_hordes_url}background/tabs-header-plain.gif) 0 100% round;
+        background-size: cover;
+        height: 24px;
+        margin-top: 2px;
+        margin-right: 20px;
+        padding-left: 0.5em;
+    }
+    #tabs > ul > li {
+        cursor: pointer;
+        display: inline-block;
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+    #tabs > ul > li > div > img {
+        margin-right: 0.5em;
+    }
+    #tabs > ul > li > div {
+        background-image: url(${repo_img_hordes_url}background/tab.gif);
+        background-position: 0 0;
+        background-repeat: no-repeat;
+        border-left: 1px solid #694023;
+        border-right: 1px solid #694023;
+        color: #f0d79e;
+        cursor: pointer;
+        float: right;
+        font-family: Arial,sans-serif;
+        font-size: 1rem;
+        font-variant: small-caps;
+        height: 21px;
+        margin-left: 2px;
+        margin-right: 0;
+        margin-top: 3px;
+        padding: 2px 4px 0;
+        text-decoration: underline;
+        white-space: nowrap;
+    }
+    #tabs > ul > li > div:hover {
+        outline: 1px solid #f0d79e;
+        text-decoration: underline;
+    }
+    #tabs > ul > li.selected {
+        position: relative;
+        top: 2px;
+    }
+    `;
 
-    const btn_h1_style = `#${btn_id} h1 {`
-        + 'height: auto;'
-        + 'font-size: 8pt;'
-        + 'text-transform: none;'
-        + 'font-variant: small-caps;'
-        + 'background: none;'
-        + 'cursor: help;'
-        + 'margin: 0 5px;'
-        + 'padding: 0;'
-        + 'line-height: 17px;'
-        + 'color: #f0d79e;'
-        + 'display: flex;'
-        + 'justify-content: space-between;'
-        + 'align-items: center;'
-        + '}';
-
-    const btn_h1_img_style = `#${btn_id} h1 > div > img {`
-        + 'vertical-align: -9%;'
-        + '}';
-
-    const btn_h1_hover_style = `#${btn_id}.mho-btn-opened h1 {`
-        + 'border-bottom: 1px solid #b37c4a;'
-        + 'margin-bottom: 5px;'
-        + '}'
-
-    const btn_h1_span_style = `#${btn_id} h1 span, #${btn_id} h1 a, #${btn_id} h1 img.close {`
-        + 'color: #f0d79e;'
-        + 'cursor: help;'
-        + 'font-family: Trebuchet MS,Arial,Verdana,sans-serif;'
-        + 'letter-spacing: 1px;'
-        + 'line-height: 17px;'
-        + 'text-align: left;'
-        + 'text-transform: none;'
-        + 'margin-left: 1em;'
-        + 'display: none;'
-        + '}';
-
-    const btn_div_style = '#' + btn_id + ' > div {'
-        + 'display: none;'
-        + 'margin: 0 5px 8px 5px;'
-        + 'font-size: 0.9em;'
-        + 'width: 350px;'
-        + '}';
-
-    const mh_optimizer_window_style = '#' + mh_optimizer_window_id + '{'
-        + 'background: url(' + repo_img_hordes_url + 'background/mask.png);'
-        + 'height: 100%;'
-        + 'opacity: 1;'
-        + 'position: fixed;'
-        + 'transition: opacity 1s ease;'
-        + 'width: 100%;'
-        + 'z-index: 999;'
-        + 'padding: 0;'
-        + '}';
-
-    const mh_optimizer_window_hidden = `#${mh_optimizer_window_id}:not(.visible), #${mh_optimizer_map_window_id}:not(.visible) {`
-        + 'opacity: 0;'
-        + 'pointer-events: none;'
-        + '}';
-
-    const mh_optimizer_window_box_style_hidden = `#${mh_optimizer_window_id}:not(.visible) #${mh_optimizer_window_id}-box, #${mh_optimizer_map_window_id}:not(.visible) #${mh_optimizer_map_window_id}-box {`
-        + 'transform: scale(0) translateY(1000px);'
-        + '}';
-
-    const mh_optimizer_window_box_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box {`
-        + 'background: url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
-        + 'border-radius: 8px;'
-        + 'box-shadow: 0 0 10px #000;'
-        + 'left: calc(50% - 750px);'
-        + 'position: absolute;'
-        + 'top: 10px;'
-        + 'bottom: 10px;'
-        + 'right: 10px;'
-        + 'left: 10px;'
-        + 'transform: scale(1) translateY(0);'
-        + 'transition: transform .5s ease;'
-        + '}';
-
-    const mh_optimizer_map_window_box_style = `#${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box {`
-        + 'background: url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 0 0/900px 263px,url(' + repo_img_hordes_url + 'background/bg_content2.jpg) repeat-y 100% 0/900px 263px;'
-        + 'border-radius: 8px;'
-        + 'box-shadow: 0 0 10px #000;'
-        + 'position: absolute;'
-        + 'transform: scale(1) translateY(0);'
-        + 'transition: transform .5s ease;'
-        + 'resize: both;'
-        + 'overflow: auto;'
-        + 'z-index: 9999;'
-        + '}';
-
-    const mh_optimizer_window_overlay_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box #${mh_optimizer_window_id}-overlay, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay {`
-        + 'position: absolute;'
-        + 'right: 12px;'
-        + 'top: -6px;'
-        + 'text-align: right;'
-        + '}'
-
-    const wiki_window_overlay_ul_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box #${mh_optimizer_window_id}-overlay ul, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay ul {`
-        + 'margin: 2px;'
-        + 'padding: 0;'
-        + '}'
-
-    const mh_optimizer_window_overlay_ul_li_style = `#${mh_optimizer_window_id} #${mh_optimizer_window_id}-box #${mh_optimizer_window_id}-overlay ul li, #${mh_optimizer_map_window_id} #${mh_optimizer_map_window_id}-box #${mh_optimizer_map_window_id}-overlay ul li {`
-        + 'cursor: pointer;'
-        + 'display: inline-block;'
-        + '}'
-
-    const mh_optimizer_window_content = `#${mh_optimizer_window_id}-content, #${mh_optimizer_map_window_id}-content {`
-        + 'background: #7e4d2a;'
-        + 'bottom: 0;'
-        + 'color: #fff;'
-        + 'left: 0;'
-        + 'overflow: auto;'
-        + 'padding: 2px;'
-        + 'position: absolute;'
-        + 'right: 0;'
-        + 'top: 0;'
-        + 'background: url(' + repo_img_hordes_url + 'background/box/panel_00.gif) 0 0 no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_02.gif) 100% 0 no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_20.gif) 0 100% no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_22.gif) 100% 100% no-repeat,url(' + repo_img_hordes_url + 'background/box/panel_01.gif) 0 0 repeat-x,url(' + repo_img_hordes_url + 'background/box/panel_10.gif) 0 0 repeat-y,url(' + repo_img_hordes_url + 'background/box/panel_12.gif) 100% 0 repeat-y,url(' + repo_img_hordes_url + 'background/box/panel_21.gif) 0 100% repeat-x,#7e4d2a;'
-        + 'border-radius: 12px;'
-        + 'left: 18px;'
-        + 'padding: 8px;'
-        + 'right: 5px;'
-        + '}';
-
-    const tabs_style = '#tabs {'
-        + 'color: #ddab76;'
-        + 'font-size: 1.2rem;'
-        + 'margin-bottom: 20px;'
-        + 'position: relative;'
-        + 'height: 25px;'
-        + 'border-bottom: 1px solid #ddab76;'
-        + '}';
-
-    const tabs_ul_style = '#tabs ul {'
-        + 'display: flex;'
-        + 'flex-wrap: wrap;'
-        + 'padding: 0;'
-        + `background: url(${repo_img_hordes_url}background/tabs-header-plain.gif) 0 100% round;`
-        + 'background-size: cover;'
-        + 'height: 24px;'
-        + 'margin-top: 2px;'
-        + 'margin-right: 20px;'
-        + 'padding-left: 0.5em;'
-        + '}';
-
-    const tabs_ul_li_style = '#tabs > ul > li {'
-        + 'cursor: pointer;'
-        + 'display: inline-block;'
-        + 'margin-top: auto;'
-        + 'margin-bottom: auto;'
-        + '}';
-
-    const tabs_ul_li_spacing_style = '#tabs > ul > li > div > img {'
-        + 'margin-right: 0.5em;'
-        + '}';
-
-    const tabs_ul_li_div_style = '#tabs > ul > li > div {'
-        + 'background-image: url(' + repo_img_hordes_url + 'background/tab.gif);'
-        + 'background-position: 0 0;'
-        + 'background-repeat: no-repeat;'
-        + 'border-left: 1px solid #694023;'
-        + 'border-right: 1px solid #694023;'
-        + 'color: #f0d79e;'
-        + 'cursor: pointer;'
-        + 'float: right;'
-        + 'font-family: Arial,sans-serif;'
-        + 'font-size: 1rem;'
-        + 'font-variant: small-caps;'
-        + 'height: 21px;'
-        + 'margin-left: 2px;'
-        + 'margin-right: 0;'
-        + 'margin-top: 3px;'
-        + 'padding: 2px 4px 0;'
-        + 'text-decoration: underline;'
-        + 'white-space: nowrap;'
-        + '}';
-
-    const tabs_ul_li_div_hover_style = '#tabs > ul > li > div:hover {'
-        + 'outline: 1px solid #f0d79e;'
-        + 'text-decoration: underline;'
-        + '}';
-
-    const tabs_ul_li_selected_style = '#tabs > ul > li.selected {'
-        + 'position: relative;'
-        + 'top: 2px;'
-        + '}';
-
-    const tab_content_style = '#tab-content {'
+    const tab_content_style = '.tab-content {'
         + 'position: absolute;'
         + 'bottom: 10px;'
-        + 'left: 10px;'
+        + 'left: 28px;'
         + 'right: 8px;'
         + 'top: 40px;'
         + 'overflow: auto;'
         + '}';
 
-    const tab_content_item_list_style = '#tab-content > ul {'
+    const tab_content_item_list_style = '.tab-content > ul {'
         + 'display: flex;'
         + 'flex-wrap: wrap;'
         + 'padding: 0;'
         + 'margin: 0 0.5em;'
         + '}';
 
-    const tab_content_item_list_item_style = '#tab-content > ul > li {'
+    const tab_content_item_list_item_style = '.tab-content > ul > li {'
         + 'min-width: 300px;'
         + 'flex-basis: min-content;'
         + 'padding: 0.125em 0.5em;'
         + 'margin: 0;'
         + '}';
 
-    const tab_content_item_list_item_selected_style = '#tab-content > ul > li.selected {'
+    const tab_content_item_list_item_selected_style = '.tab-content > ul > li.selected {'
         + 'flex-basis: 100%;'
         + 'padding: 0.25em;'
         + 'margin: 0.25em 1px;'
         + '}';
 
-    const tab_content_item_list_item_not_selected_properties_style = '#tab-content > ul > li:not(.selected) .properties {'
+    const tab_content_item_list_item_not_selected_properties_style = '.tab-content > ul > li:not(.selected) .properties {'
         + 'display: none;'
         + '}';
 
-    const item_category = '#tab-content > ul div.mho-category {'
+    const item_category = '.tab-content > ul div.mho-category {'
         + 'width: 100%;'
         + 'border-bottom: 1px solid;'
         + 'margin: 1em 0 0.5em;'
@@ -7812,7 +8227,7 @@ function createStyles() {
         + 'color: #f0d79e;'
         + '}';
 
-    const li_style = '#categories > ul > li, ul.parameters > li, #tab-content ul > li, #informations ul > li {'
+    const li_style = '#categories > ul > li, ul.parameters > li, .tab-content ul > li, #informations ul > li {'
         + 'list-style: none;'
         + '}';
 
@@ -7845,7 +8260,7 @@ function createStyles() {
         + 'font-size: 9pt;'
         + '}';
 
-    const recipe_style = '#tab-content #recipes-list > li, #wishlist > li {'
+    const recipe_style = '.tab-content #recipes-list > li, #wishlist > li {'
         + 'min-width: 100% !important;'
         + 'display: flex;'
         + '}';
@@ -7880,7 +8295,7 @@ function createStyles() {
         + 'width: 100%;'
         + '}';
 
-    const wishlist_even = '#tab-content #recipes-list > li:nth-child(even), #wishlist > li:nth-child(even) {'
+    const wishlist_even = '.tab-content #recipes-list > li:nth-child(even), #wishlist > li:nth-child(even) {'
         + 'background-color: #5c2b20;'
         + '}';
 
@@ -7975,7 +8390,7 @@ function createStyles() {
         + `height: 36px;`
         + '}';
 
-    const display_map_btn = `#${mho_display_map_id} {`
+    const display_map_btn = `#${mho_display_map_id}, #${mho_store_notifications_id}, #${mho_display_expeditions_id} {`
         + 'background-color: rgba(62,36,23,.75);'
         + 'border-radius: 6px;'
         + 'color: #ddab76;'
@@ -7985,7 +8400,7 @@ function createStyles() {
         + 'transition: background-color .5s ease-in-out;'
         + 'display: flex;'
         + 'gap: 0.5em;'
-        + '}'
+        + '}';
 
     const mho_map_td = `.mho-map tr td {`
         + `border: 1px dotted;`
@@ -7999,10 +8414,10 @@ function createStyles() {
 
     const mho_ruin_td = `.mho-ruin tr td {`
         + `border: 1px dotted;`
-        + `width: 30px;`
-        + `min-width: 30px;`
-        + `height: 30px;`
-        + `min-height: 30px;`
+        + `width: 25px;`
+        + `min-width: 25px;`
+        + `height: 25px;`
+        + `min-height: 25px;`
         + `text-align: center;`
         + `vertical-align: middle;`
         + `}`;
@@ -8079,57 +8494,54 @@ function createStyles() {
         + `height: unset !important;`
         + `}`;
 
-    let main_new_changelog = `div.mho-new-changelog::before {`
-        + `position: absolute;`
-        + `top: -3px;`
-        + `left: -3px;`
-        + `}`;
+    let new_changelog = `
+    div.mho-new-changelog::before {
+        position: absolute;
+        top: -3px;
+        left: -3px;
+    }
+    a.mho-new-changelog::before {
+        position: relative;
+        top: 0;
+        left: 0;
+    }
+    .mho-new-changelog::before {
+        content: '';
+        width: 6px;
+        aspect-ratio: 1;
+        background: #4B107B;
+        border-radius: 50%;
+        box-shadow: 0px 0px 6px 3px #BF61CF;
+        display: inline-block;
+    }
+    `;
 
-    let item_new_changelog = `a.mho-new-changelog::before {`
-        + `position: relative;`
-        + `top: 0;`
-        + `left: 0;`
-        + `}`;
+    let new_version = `
+    div.mho-new-version::before {
+        position: absolute;
+        top: -3px;
+        left: -3px;
+    }
+    .mho-new-version::before {
+        content: '';
+        width: 8px;
+        aspect-ratio: 1;
+        background: #BF61CF;
+        border-radius: 50%;
+        box-shadow: 0px 0px 8px 4px #4B107B;
+        display: inline-block;
+    }
+    `;
 
-    let new_changelog = `.mho-new-changelog::before {`
-        + `content: '';`
-        + `width: 6px;`
-        + `aspect-ratio: 1;`
-        + `background: #4B107B;`
-        + `border-radius: 50%;`
-        + `box-shadow: 0px 0px 6px 3px #BF61CF;`
-        + `display: inline-block;`
-        + `}`;
-
-    let main_new_version = `div.mho-new-version::before {`
-        + `position: absolute;`
-        + `top: -3px;`
-        + `left: -3px;`
-        + `}`;
-
-    let new_version = `.mho-new-version::before {`
-        + `content: '';`
-        + `width: 8px;`
-        + `aspect-ratio: 1;`
-        + `background: #BF61CF;`
-        + `border-radius: 50%;`
-        + `box-shadow: 0px 0px 8px 4px #4B107B;`
-        + `display: inline-block;`
-        + `}`;
-
-
-    let css = params_style + btn_style + btn_hover_h1_span_style + btn_h1_style + btn_h1_img_style + btn_h1_hover_style + btn_h1_span_style + btn_div_style + btn_hover_div_style
-        + mh_optimizer_window_style + mh_optimizer_window_hidden + mh_optimizer_window_box_style_hidden + mh_optimizer_window_box_style
-        + mh_optimizer_window_overlay_style + mh_optimizer_window_overlay_ul_li_style + mh_optimizer_window_content
-        + tabs_style + tabs_ul_style + tabs_ul_li_style + tabs_ul_li_spacing_style + tabs_ul_li_div_style + tabs_ul_li_div_hover_style + tabs_ul_li_selected_style
-        + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
+    let css = params_style + btn_style + mho_window_style + new_changelog + new_version
+        + mho_window_style_tabs + tab_content_style + tab_content_item_list_style + tab_content_item_list_item_style + tab_content_item_list_item_selected_style + tab_content_item_list_item_not_selected_properties_style + item_category
         + parameters_informations_ul_style + li_style + recipe_style + input_number_webkit_style + input_number_firefox_style
         + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style + label_text
         + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + item_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
         + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
         + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
-        + display_map_btn + mh_optimizer_map_window_box_style + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
-        + citizen_list_more_info_header_content + hidden + item_tag + main_new_changelog + item_new_changelog + new_changelog + main_new_version + new_version;
+        + display_map_btn + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
+        + citizen_list_more_info_header_content + hidden + item_tag;
 
     let style = document.createElement('style');
 
@@ -8848,14 +9260,17 @@ function getToken(force, stop) {
             let tokenReceived = async () => {
                 console.log('MHO - I am...', mh_user);
 
-                let get_items_promise = getItems()
-                let get_ruins_promise = getRuins();
                 if (mh_user !== '' && mh_user.townDetails.townId) {
-                    let get_wishlist_promise = getWishlist()
-                    let get_map_promise = getMap();
-                    await Promise.all([get_items_promise, get_ruins_promise, get_wishlist_promise, get_map_promise]);
-                } else {
-                    await Promise.all([get_items_promise, get_ruins_promise]);
+                    let get_items_promise = getItems();
+                    let get_wishlist_promise = getWishlist();
+                    if (pageIsDesert()) {
+                        let get_ruins_promise = getRuins();
+                        let get_map_promise = getMap();
+                        await Promise.all([get_items_promise, get_ruins_promise, get_wishlist_promise, get_map_promise]);
+                    } else {
+                        let get_wishlist_promise = getWishlist()
+                        await Promise.all([get_items_promise, get_wishlist_promise]);
+                    }
                 }
             }
 
@@ -9025,7 +9440,7 @@ function addItemToWishlist(item) {
         })
             .then((response) => {
                 if (response.status === 200) {
-                    return response.json();
+                    return response.text();
                 } else {
                     return convertResponsePromiseToError(response);
                 }
@@ -9423,7 +9838,7 @@ function updateExternalTools() {
                 }
             })
             .then((response) => {
-                getItems();
+                getWishlist();
                 getMap();
                 resolve(response);
             })
@@ -9553,7 +9968,7 @@ function getParameters() {
             })
             .catch((error) => {
                 addError(error);
-                resolve(error);
+                reject(error);
             });
     });
 }
@@ -9706,10 +10121,36 @@ function calculateCamping(camping_parameters) {
     });
 }
 
-function getApiKey() {
-    console.log('getAPIKey1');
+function getMyExpeditions() {
     return new Promise((resolve, reject) => {
-        console.log('getAPIKey2');
+        fetcher(api_url + `/expeditions/me/${mh_user.townDetails.day}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
+            .then((expeditions) => {
+                my_expeditions = expeditions;
+                console.log('expeditions', expeditions);
+                resolve(expeditions);
+            })
+            .catch((error) => {
+                addError(error);
+                reject(error);
+            });
+    });
+}
+
+function getApiKey() {
+    return new Promise((resolve, reject) => {
         if (!external_app_id || external_app_id === '') {
 
             fetcherWithoutBearer(location.origin + `/jx/soul/settings`, {
@@ -9748,9 +10189,6 @@ function getApiKey() {
                         if (id && id !== '' && id !== 'not set' && id.value && id.value !== '' && id.value !== 'not set') {
                             external_app_id = id.value;
                             setStorageItem(gm_mh_external_app_id_key, external_app_id);
-                            getStorageItem(gm_mh_external_app_id_key).then((new_external_app_id) => {
-                                console.log('external_app_id after', new_external_app_id)
-                            })
                             resolve(external_app_id);
                         } else {
                             manual();
@@ -9862,10 +10300,8 @@ function getApiKey() {
             initOptionsWithoutLoginNeeded();
 
             getParameters().then(() => {
-
                 getApiKey().then(() => {
                     getToken().then(() => {
-
                         setTimeout(() => {
                             initOptionsWithLoginNeeded();
                             initOptionsWithoutLoginNeeded();
@@ -9890,7 +10326,10 @@ function getApiKey() {
                         }, 10);
                     });
                 });
-            });
+            })
+                .catch(() => {
+                    initOptionsWithoutLoginNeeded();
+                });
         });
     }
 })();
