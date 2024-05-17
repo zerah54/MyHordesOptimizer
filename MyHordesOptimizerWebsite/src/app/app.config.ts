@@ -26,8 +26,8 @@ export const appConfig: ApplicationConfig = {
             ...angular_modules,
             AngularFireModule.initializeApp(environment.firebase_config),
             AngularFireAnalyticsModule,
-            provideFirebaseApp(() => initializeApp(environment.firebase_config))
         ),
+        provideFirebaseApp(() => initializeApp(environment.firebase_config)),
         provideHttpClient(withInterceptors([headersInterceptor, loadingInterceptor, errorInterceptor])),
         {
             provide: LOCALE_ID,
