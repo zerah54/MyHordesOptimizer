@@ -29,7 +29,7 @@
                             }
                             @default {
                                 @if (row.baths) {
-                                    <mat-checkbox [checked]="row.baths | bathForDay:+column.id" (change)="saveBath(row, $event)">
+                                    <mat-checkbox [checked]="row.baths | bathForDay:+column.id" (change)="saveBath(row, $event, +column.id)">
                                         <!--                                        [disabled]="+column.id !== current_day"-->
                                         <ng-container i18n>Bain pris</ng-container>
                                     </mat-checkbox>

@@ -22,7 +22,7 @@ import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
 import { GlobalService } from './_global.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class TownService extends GlobalService {
 
     /** La locale */
@@ -81,7 +81,7 @@ export class TownService extends GlobalService {
 
         super.post(this.API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`,
             JSON.stringify({
-                map: { toolsToUpdate: tools_to_update },
+                map: {toolsToUpdate: tools_to_update},
                 townDetails: town_details
             })
         )
@@ -240,9 +240,9 @@ export class TownService extends GlobalService {
         });
     }
 
-    public addBath(citizen: Citizen): Observable<UpdateInfo> {
+    public addBath(citizen: Citizen, day?: number): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/bath?day=${getTown()?.day}`)
+            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/bath?day=${day ?? getTown()?.day}`)
                 .subscribe({
                     next: (update_info: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(update_info));

@@ -53,8 +53,8 @@ export class CitizensWatchComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
-        ...Array.from({ length: getTown()?.day || 1 }, (_: unknown, i: number): StandardColumn => {
+        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
+        ...Array.from({length: getTown()?.day || 1}, (_: unknown, i: number): StandardColumn => {
             return {
                 id: (i + 1).toString(10),
                 header: $localize`Jour` + ' ' + (i + 1).toString(10),
@@ -89,10 +89,10 @@ export class CitizensWatchComponent implements OnInit {
         this.getCitizens();
     }
 
-    public saveBath(citizen: Citizen, event: MatCheckboxChange): void {
+    public saveBath(citizen: Citizen, event: MatCheckboxChange, day: number): void {
         if (event.checked) {
             this.town_service
-                .addBath(citizen)
+                .addBath(citizen, day)
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.chamanic_detail) {
