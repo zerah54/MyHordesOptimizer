@@ -2,6 +2,22 @@
     height: 100%;
     overflow: auto;
 
+    .header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1em;
+    }
+
+    .bath-states {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        gap: 1em;
+    }
+
     table {
         width: 100%;
 
