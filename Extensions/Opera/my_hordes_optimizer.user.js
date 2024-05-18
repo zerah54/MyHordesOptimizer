@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MyHordes Optimizer
-// @version      1.0.18.0
+// @version      1.0.19.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,11 +32,11 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Corretif] Problèmes d'affichage`
-    + `[Corretif] Erreur lors de l'ajout d'un objet à la liste de courses`;
+    + `[Corretif] Le compteur personnalisé de l'anti-abus ne comptait qu'une minute`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
+/* const is_mh_beta = document.URL.indexOf('staging') >= 0; */
 const is_mh_beta = false;
 const website = is_mh_beta ? `https://myhordes-optimizer-beta.web.app/` : `https://myhordes-optimizer.web.app/`;
 
@@ -6739,7 +6739,7 @@ function displayAntiAbuseCounter() {
             let define_row = (counter_value, index, new_content, fictive) => {
                 let is_time_invalid = (_counter_value, _index) => {
                     let since = (Date.now() - parseInt(_counter_value.take_at))
-                    let time_left = new Date(((fictive ? 1 : 15) * 60000) - since);
+                    let time_left = new Date(((15) * 60000) - since);
                     if (time_left < 0) {
                         console.log('_counter_value', _counter_value);
                         console.log('_index', _index);
@@ -6768,7 +6768,7 @@ function displayAntiAbuseCounter() {
                     item_counter.style.width = '50px';
                     let interval = setInterval(() => {
                         let since = (Date.now() - parseInt(counter_value.take_at))
-                        let time_left = new Date(((fictive ? 1 : 15) * 60000) - since);
+                        let time_left = new Date(((15) * 60000) - since);
                         if (is_time_invalid(counter_value, index)) {
                             clearInterval(interval);
                             if (value_in_list) {
@@ -10307,7 +10307,7 @@ function getApiKey() {
                             initOptionsWithoutLoginNeeded();
                         });
 
-                        ['mh-navigation-complete'/*, 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
+                        ['mh-navigation-complete', /*'pop', 'load', 'popstate', 'error', 'push', , 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
                             document.addEventListener(event_name, (event) => {
                                 // console.trace('event', event_name, event);
                                 if (shouldRefreshMe()) {
