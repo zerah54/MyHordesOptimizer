@@ -12,6 +12,7 @@ import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
+import { Bath } from '../../../_abstract_model/types/bath.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
@@ -22,7 +23,7 @@ import {
 } from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
 import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
-import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
+import { getTown } from '../../../shared/utilities/localstorage.util';
 import { BathForDayPipe } from '../bath-for-day.pipe';
 import { CitizenGroupByBathStatePipe } from './citizen-group-by-bath_state.pipe';
 
@@ -57,8 +58,8 @@ export class CitizensWatchComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
-        ...Array.from({length: getTown()?.day || 1}, (_: unknown, i: number): StandardColumn => {
+        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
+        ...Array.from({ length: getTown()?.day || 1 }, (_: unknown, i: number): StandardColumn => {
             return {
                 id: (i + 1).toString(10),
                 header: $localize`Jour` + ' ' + (i + 1).toString(10),
@@ -97,21 +98,27 @@ export class CitizensWatchComponent implements OnInit {
     }
 
     public saveBath(citizen: Citizen, event: MatCheckboxChange, day: number): void {
+        const bath_to_update_index: number = citizen.baths.findIndex((bath: Bath) => bath.day === day);
         if (event.checked) {
             this.town_service
                 .addBath(citizen, day)
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
-                        if (citizen.chamanic_detail) {
-                            citizen.chamanic_detail.update_info.username = getUser().username;
-                            citizen.chamanic_detail.update_info.update_time = update_info.update_time;
+                        if (bath_to_update_index > -1) {
+                            citizen.baths[bath_to_update_index].update_info = update_info;
+                        } else {
+                            citizen.baths.push(new Bath({ day: day, lastUpdateInfo: update_info.modelToDto() }));
                         }
                     }
                 });
         } else {
             this.town_service
                 .removeBath(citizen)
-                .subscribe();
+                .subscribe(() => {
+                    if (bath_to_update_index > -1) {
+                        citizen.baths.splice(bath_to_update_index, 1);
+                    }
+                });
         }
     }
 
