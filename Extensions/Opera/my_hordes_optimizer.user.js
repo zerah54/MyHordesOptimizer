@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name         MyHordes Optimizer
-// @version      1.0.19.0
+// @name         MHO Addon
+// @version      1.0.20.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Corretif] Le compteur personnalisé de l'anti-abus ne comptait qu'une minute`;
+    + `[Mise à jour du nom du script] Le script s'appellera désormais MHO Addon`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -8740,6 +8740,11 @@ function getGHRuin() {
                                     zombies: cell.firstElementChild.getAttribute('data-z')
                                 };
 
+// 16 => 17
+// 19 => 0
+// 18 => 19
+// 20 => 25
+// 21 => 21
                                 let img_path = cell.querySelector('.ruineCarte')?.firstElementChild.href.baseVal.replace(/^(.*)#/, '');
                                 switch (img_path) {
                                     case 'ruineCarte_16':
