@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.20.0
+// @version      1.0.21.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Mise à jour du nom du script] Le script s'appellera désormais MHO Addon`;
+    + `[Nouveauté] La mise à jour des outils externes avec l'option statut activé met également à jour l'information indiquant si le bain a été pris ou non`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -8740,11 +8740,6 @@ function getGHRuin() {
                                     zombies: cell.firstElementChild.getAttribute('data-z')
                                 };
 
-// 16 => 17
-// 19 => 0
-// 18 => 19
-// 20 => 25
-// 21 => 21
                                 let img_path = cell.querySelector('.ruineCarte')?.firstElementChild.href.baseVal.replace(/^(.*)#/, '');
                                 switch (img_path) {
                                     case 'ruineCarte_16':
@@ -9825,7 +9820,23 @@ function updateExternalTools() {
                 });
         }
 
+        /** Récupération du bain */
+        let bath_taken;
+        if ((mho_parameters.update_mho && mho_parameters.update_mho_status) && pageIsHouse()) {
+            let bath_row = document.querySelector('.heroic_action img[src*=pool]')?.parentElement;
+            if (bath_row) {
+                if (bath_row.attributes.disabled) {
+                    // si barré = le chantier est construit et le bain a été pris
+                    bath_taken = true;
+                } else {
+                    bath_taken = false;
+                    // si pas barré = le chantier est construit et le bain n'a pas été pris
+                }
+            }
+            await saveBath(bath_taken);
+        }
 
+        /** Envoi des informations */
         console.log('MHO - Envoyé pour enregistrement :', data);
 
         fetcher(api_url + '/externaltools/update?userKey=' + external_app_id + '&userId=' + mh_user.id, {
@@ -10146,6 +10157,31 @@ function getMyExpeditions() {
                 my_expeditions = expeditions;
                 console.log('expeditions', expeditions);
                 resolve(expeditions);
+            })
+            .catch((error) => {
+                addError(error);
+                reject(error);
+            });
+    });
+}
+
+function saveBath(bath_taken) {
+    if (bath_taken === undefined) return;
+
+    return new Promise((resolve, reject) => {
+        fetcher(api_url + `/town/${mh_user.townDetails.townId}/user/${mh_user.id}/bath?day=${mh_user.townDetails.day}`,
+            {
+                method: bath_taken ? 'POST' : 'DELETE',
+            })
+            .then((response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else {
+                    return convertResponsePromiseToError(response);
+                }
+            })
+            .then(() => {
+                resolve();
             })
             .catch((error) => {
                 addError(error);
