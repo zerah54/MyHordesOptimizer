@@ -1,10 +1,10 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, HostBinding, HostListener, inject, Inject, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, HostListener, inject, Inject, LOCALE_ID, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenavContainer, MatSidenavModule } from '@angular/material/sidenav';
 import { Event, NavigationCancel, NavigationEnd, NavigationSkipped, NavigationStart, Router, RouterOutlet } from '@angular/router';
 import * as moment from 'moment/moment';
 import { filter, Subject, takeUntil } from 'rxjs';
@@ -32,6 +32,8 @@ const material_modules: Imports = [MatCardModule, MatProgressSpinnerModule, MatS
 })
 export class AppComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
+
+    @ViewChild('sidenavContainer') sidenav_container!: MatSidenavContainer;
 
     public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     public is_loading: boolean = false;
@@ -62,6 +64,12 @@ export class AppComponent implements OnInit {
                     this.is_loading = is_loading;
                 }
             });
+
+        this.router.events.subscribe(() => {
+            if (!this.is_gt_xs) {
+                this.sidenav_container.close();
+            }
+        });
 
         if (this.theme) {
             this.overlay_container.getContainerElement().classList.add(this.theme);
