@@ -1,6 +1,6 @@
 <div class="app-menu">
     <mat-list>
-        @for (route of routes; track route.path) {
+        @for (route of routes; track $index) {
             <ng-container *ngTemplateOutlet="routeTemplate; context: {$implicit: route}"></ng-container>
             <mat-divider></mat-divider>
         }
