@@ -1,54 +1,81 @@
 @if (citizen_info) {
     <div class="mho-citizens-watch">
-        <table mat-table [dataSource]="datasource" matSort>
-
-            @for (column of columns; track column.id) {
-                <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
-                    <th mat-header-cell *matHeaderCellDef [ngClass]="[column.class || '']">
-                        @switch (column.id) {
-                            @case ('avatar_name') {
-                                <mho-header-with-select-filter [header]="column.header"
-                                                               [(filterValue)]="filters.citizen"
-                                                               (filterValueChange)="citizen_filter_change.next()"
-                                                               [options]="citizen_info.citizens" [bindLabel]="'name'">
-                                </mho-header-with-select-filter>
-                            }
-                            @default {
-                                {{ column.header }}
-                            }
-                        }
-                    </th>
-
-                    <td mat-cell *matCellDef="let row" [ngClass]="[column.id, column.class || '']">
-                        @switch (column.id) {
-                            @case ('avatar_name') {
-                                @if (row.avatar && row.avatar !== 'False') {
-                                    <img [src]="row.avatar" width="100">
-                                }
-                                <div>{{ row.name }}</div>
-                            }
-                            @default {
-                                @if (row.baths) {
-                                    <mat-checkbox [checked]="row.baths | bathForDay:+column.id" (change)="saveBath(row, $event)"
-                                                  [disabled]="+column.id !== current_day">
-                                        <ng-container i18n>Bain pris</ng-container>
-                                    </mat-checkbox>
-                                }
-                            }
-                        }
-                    </td>
-                </ng-container>
+        <div class="header">
+            <mat-slide-toggle i18n [(ngModel)]="list_mode">Mode liste</mat-slide-toggle>
+            @if (list_mode) {
+                <mat-button-toggle-group [(ngModel)]="display_pseudo" name="fontStyle" aria-label="Font Style">
+                    <mat-button-toggle value="simple">Pseudo</mat-button-toggle>
+                    <mat-button-toggle value="mh_id">Identifiant MyHordes</mat-button-toggle>
+                </mat-button-toggle-group>
             }
-            <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
-            <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->
+        </div>
+        <div class="content">
+            @if (list_mode) {
+                <mho-header-with-number-previous-next-filter class="previous-next" [(filterValue)]="selected_day" [min]="1" [max]="current_day">
+                </mho-header-with-number-previous-next-filter>
+                <div class="bath-states">
+                    @for (bath_state of datasource.data | citizenGroupByBathState:selected_day; track bath_state) {
+                        <div class="bath-state">
+                            <h4 class="label">{{ bath_state.label }}</h4>
+                            <div class="citizen">
+                                @for (citizen of bath_state.citizen; track citizen.id) {
+                                    <div>{{ display_pseudo === 'simple' ? citizen.name : citizen.getTag() }}</div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            } @else {
+                <table mat-table [dataSource]="datasource" matSort>
+                    @for (column of columns; track column.id) {
+                        <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
+                            <th mat-header-cell *matHeaderCellDef [ngClass]="[column.class || '']">
+                                @switch (column.id) {
+                                    @case ('avatar_name') {
+                                        <mho-header-with-select-filter [header]="column.header"
+                                                                       [(filterValue)]="filters.citizen"
+                                                                       (filterValueChange)="citizen_filter_change.next()"
+                                                                       [options]="citizen_info.citizens" [bindLabel]="'name'">
+                                        </mho-header-with-select-filter>
+                                    }
+                                    @default {
+                                        {{ column.header }}
+                                    }
+                                }
+                            </th>
 
-            <!-- Row shown when there is no matching data. -->
-            <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell" [attr.colspan]="'100%'">
-                    <ng-container i18n>La liste est vide</ng-container>
-                </td>
-            </tr>
-        </table>
+                            <td mat-cell *matCellDef="let row" [ngClass]="[column.id, column.class || '']">
+                                @switch (column.id) {
+                                    @case ('avatar_name') {
+                                        @if (row.avatar && row.avatar !== 'False') {
+                                            <img [src]="row.avatar" width="100">
+                                        }
+                                        <div>{{ row.name }}</div>
+                                    }
+                                    @default {
+                                        @if (row.baths) {
+                                            <mat-checkbox [checked]="row.baths | bathForDay:+column.id" (change)="saveBath(row, $event, +column.id)">
+                                                <!--                                        [disabled]="+column.id !== current_day"-->
+                                                <ng-container i18n>Bain pris</ng-container>
+                                            </mat-checkbox>
+                                        }
+                                    }
+                                }
+                            </td>
+                        </ng-container>
+                    }
+                    <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
+                    <!-- <tr mat-footer-row *matFooterRowDef="['save']; sticky: true"></tr> -->
+
+                    <!-- Row shown when there is no matching data. -->
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" [attr.colspan]="'100%'">
+                            <ng-container i18n>La liste est vide</ng-container>
+                        </td>
+                    </tr>
+                </table>
+            }
+        </div>
     </div>
 }

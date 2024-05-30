@@ -7,9 +7,9 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
     public class EmbedMessagesModule : InteractionModuleBase<SocketInteractionContext>
     {
-        
+
         [DefaultMemberPermissions(GuildPermission.Administrator)]
-        [EnabledInDm(false)]
+        [CommandContextType([InteractionContextType.Guild, InteractionContextType.PrivateChannel])]
         [SlashCommand(name: "instructions", description: "Make your instructions clearly visible and longer")]
         public async Task CreateInstructionsAsync()
         {
@@ -20,7 +20,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 .WithColor(Color.Red);
             await ModifyOriginalResponseAsync(props =>
             {
-                props.Embed = embed.Build(); 
+                props.Embed = embed.Build();
                 props.Components = CreateComponents(embed.Build());
             });
         }
@@ -156,7 +156,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 .WithCustomId("update_description_btn")
                 .WithLabel("Modifier la description")
                 .WithStyle(ButtonStyle.Secondary);
-            
+
             var addSectionBtn = new ButtonBuilder()
                 .WithCustomId("add_section_btn")
                 .WithLabel("Ajouter une section")

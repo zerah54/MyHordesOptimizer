@@ -1,6 +1,9 @@
 import { CommonModule, NgClass } from '@angular/common';
 import { Component, EventEmitter, HostBinding, inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import * as moment from 'moment';
@@ -9,6 +12,7 @@ import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
+import { Bath } from '../../../_abstract_model/types/bath.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
@@ -19,13 +23,14 @@ import {
 } from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
 import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
-import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
+import { getTown } from '../../../shared/utilities/localstorage.util';
 import { BathForDayPipe } from '../bath-for-day.pipe';
+import { CitizenGroupByBathStatePipe } from './citizen-group-by-bath_state.pipe';
 
-const angular_common: Imports = [CommonModule, NgClass];
+const angular_common: Imports = [CommonModule, FormsModule, NgClass];
 const components: Imports = [DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent];
-const pipes: Imports = [BathForDayPipe, ColumnIdPipe];
-const material_modules: Imports = [MatCheckboxModule, MatSortModule, MatTableModule];
+const pipes: Imports = [BathForDayPipe, CitizenGroupByBathStatePipe, ColumnIdPipe];
+const material_modules: Imports = [MatCheckboxModule, MatSlideToggleModule, MatSortModule, MatTableModule, MatButtonToggleModule];
 
 @Component({
     selector: 'mho-citizens-watch',
@@ -67,6 +72,9 @@ export class CitizensWatchComponent implements OnInit {
     public filters: WatchFilter = {
         citizen: []
     };
+    public list_mode: boolean = false;
+    public display_pseudo: 'simple' | 'mh_id' = 'simple';
+    public selected_day: number = this.current_day;
 
     private town_service: TownService = inject(TownService);
 
@@ -89,22 +97,28 @@ export class CitizensWatchComponent implements OnInit {
         this.getCitizens();
     }
 
-    public saveBath(citizen: Citizen, event: MatCheckboxChange): void {
+    public saveBath(citizen: Citizen, event: MatCheckboxChange, day: number): void {
+        const bath_to_update_index: number = citizen.baths.findIndex((bath: Bath) => bath.day === day);
         if (event.checked) {
             this.town_service
-                .addBath(citizen)
+                .addBath(citizen, day)
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
-                        if (citizen.chamanic_detail) {
-                            citizen.chamanic_detail.update_info.username = getUser().username;
-                            citizen.chamanic_detail.update_info.update_time = update_info.update_time;
+                        if (bath_to_update_index > -1) {
+                            citizen.baths[bath_to_update_index].update_info = update_info;
+                        } else {
+                            citizen.baths.push(new Bath({ day: day, lastUpdateInfo: update_info.modelToDto() }));
                         }
                     }
                 });
         } else {
             this.town_service
                 .removeBath(citizen)
-                .subscribe();
+                .subscribe(() => {
+                    if (bath_to_update_index > -1) {
+                        citizen.baths.splice(bath_to_update_index, 1);
+                    }
+                });
         }
     }
 

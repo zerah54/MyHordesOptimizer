@@ -11,8 +11,9 @@ import { TokenWithMe } from '../types/token-with-me.class';
     providedIn: 'root'
 })
 export abstract class RealtimeGlobalService {
+    public hubConnection!: signalR.HubConnection;
+
     protected readonly HUB_URL: string = environment.api_url + '/hub/';
-    protected hubConnection!: signalR.HubConnection;
 
     protected options: IHttpConnectionOptions = {
         accessTokenFactory: () => {

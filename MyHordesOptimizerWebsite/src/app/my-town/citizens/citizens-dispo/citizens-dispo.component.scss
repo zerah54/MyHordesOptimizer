@@ -1,8 +1,12 @@
-.mho-citizens-digs {
+.mho-citizens-dispo {
     height: 100%;
 
     table {
         width: 100%;
+
+        .avatar_name {
+            width: 200px;
+        }
 
         tr {
 

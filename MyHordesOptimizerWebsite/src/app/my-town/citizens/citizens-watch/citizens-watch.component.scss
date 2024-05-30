@@ -1,43 +1,65 @@
 .mho-citizens-watch {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    overflow: auto;
 
-    table {
-        width: 100%;
+    .header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1em;
+    }
 
-        tr {
+    .content {
+        height: 100%;
+        overflow: auto;
 
-            > td {
-                padding: 0 0.5em;
-
-                &.center {
-                    text-align: center;
-                }
-
-                &.avatar_name {
-                    > img {
-                        max-width: 100px;
-                    }
-
-                    > div {
-                        text-align: center;
-                        margin: auto;
-                    }
-                }
-            }
-
-            th,
-            td {
-                &:not(.avatar_name) {
-                    padding: 0.5em;
-                }
-
-            }
+        .bath-states {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 1em;
         }
 
-        .table-filters {
-            display: flex;
-            justify-content: space-between;
+        table {
+            width: 100%;
+
+            tr {
+
+                > td {
+                    padding: 0 0.5em;
+
+                    &.center {
+                        text-align: center;
+                    }
+
+                    &.avatar_name {
+                        > img {
+                            max-width: 100px;
+                        }
+
+                        > div {
+                            text-align: center;
+                            margin: auto;
+                        }
+                    }
+                }
+
+                th,
+                td {
+                    &:not(.avatar_name) {
+                        padding: 0.5em;
+                    }
+
+                }
+            }
+
+            .table-filters {
+                display: flex;
+                justify-content: space-between;
+            }
         }
     }
 }

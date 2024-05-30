@@ -96,7 +96,6 @@ function copyLogos(url_part) {
 }
 
 function writeManifest(manifest, url_part) {
-    console.log(`${url_part} manifest`, manifest);
     fs.writeFile(target_dir + url_part + '/manifest.json', JSON.stringify(manifest), (write_file_err) => {
             if (write_file_err) {
                 console.error(`Erreur lors de la génération du fichier "${url_part}/manifest.json" : \n`, write_file_err);
