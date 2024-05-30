@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Interactions;
@@ -9,9 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.DiscordBot.Enums;
 using MyHordesOptimizerApi.DiscordBot.Utility;
-using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
-using MyHordesOptimizerApi.Repository.Interfaces;
+using MyHordesOptimizerApi.Services.Interfaces;
 
 namespace MyHordesOptimizerApi.DiscordBot.Modules
 {
@@ -23,7 +21,9 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
         public RecipesModule(ILogger<RecipesModule> logger, IServiceScopeFactory serviceScopeFactory)
         {
             _logger = logger;
-            //_recipes = recipesService.GetRecipes();
+            using var scope = serviceScopeFactory.CreateScope();
+            var recipesService = scope.ServiceProvider.GetRequiredService<IMyHordesFetcherService>();
+            _recipes = recipesService.GetRecipes();
         }
 
         [SlashCommand(name: "recipe", description: "Find the recipe for an item and the recipes that lead to it")]
@@ -39,6 +39,23 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             await DeferAsync(ephemeral: privateMsg);
             try
             {
+                if (searchValue == null)
+                {
+                    ModifyOriginalResponseAsync(response =>
+                    {
+                        response.Content =
+                            $"Une erreur s'est produite lors de la récupération de l'objet\n```La valeur recherchée ne peut pas être vide```";
+                    });
+                }
+
+                if (locale == null)
+                {
+                    ModifyOriginalResponseAsync(response =>
+                    {
+                        response.Content =
+                            $"Une erreur s'est produite lors de la récupération de l'objet\n```La langue de recherche ne peut pas être vide```";
+                    });
+                }
                 var filteredRecipes = GetRecipesFromResultItemName(searchValue, locale);
 
                 var embedBuilders = new List<Embed>();
@@ -80,7 +97,11 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
         private List<ItemRecipeDto> GetRecipesFromResultItemName(string searchValue, Locales locale)
         {
             var filteredRecipes = _recipes
-                .Where(recipe => GetItemResultFromRecipe(searchValue, locale, recipe) != null)
+                .Where((recipe) =>
+                {
+                    _logger.LogDebug($"RECIPE{recipe}");
+                    return GetItemResultFromRecipe(searchValue, locale, recipe) != null;
+                })
                 .ToList();
 
             return filteredRecipes;

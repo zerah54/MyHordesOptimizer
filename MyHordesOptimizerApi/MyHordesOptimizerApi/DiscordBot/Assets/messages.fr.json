@@ -1,142 +1,162 @@
 {
-  "aa": {
-    "name": "anti-abus",
-    "description": "Lance un compteur de 15 minutes",
-    "private-msg": {
-      "name": "message-privé",
-      "description": "Vrai si le message ne doit pas être vu de tous"
+    "aa": {
+        "name": "anti-abus",
+        "description": "Lance un compteur de 15 minutes",
+        "private-msg": {
+            "name": "message-privé",
+            "description": "Vrai si le message ne doit pas être vu de tous"
+        }
+    },
+    "timer": {
+        "name": "minuteur",
+        "description": "Lance un compteur d'une durée personnalisable (Exemple : 1h 25m 12s)",
+        "time": {
+            "name": "durée",
+            "description": "La durée du compteur (Exemple : 1h 25m 12s)"
+        },
+        "reason": {
+            "name": "raison",
+            "description": "La raison du compteur. C'est ce message qui sera envoyé à la fin du compteur"
+        },
+        "private-msg": {
+            "name": "message-privé",
+            "description": "Vrai si le message ne doit pas être vu de tous"
+        }
+    },
+    "faq": {
+        "name": "faq",
+        "description": "Foire aux questions",
+        "website": {
+            "name": "site-web",
+            "description": "L'adresse du site web",
+            "private-msg": {
+                "name": "message-privé",
+                "description": "Vrai si le message ne doit pas être vu de tous"
+            }
+        },
+        "script": {
+            "name": "script",
+            "description": "L'adresse du script",
+            "private-msg": {
+                "name": "message-privé",
+                "description": "Vrai si le message ne doit pas être vu de tous"
+            }
+        },
+        "become-ghoul": {
+            "name": "devenir-goule",
+            "description": "Différentes méthode pour se transformer en goule",
+            "private-msg": {
+                "name": "message-privé",
+                "description": "Vrai si le message ne doit pas être vu de tous"
+            }
+        },
+        "mse": {
+            "name": "résultats-mse",
+            "description": "Les différents résultats possibles lors de la consommation d'un Médicament sans étiquette",
+            "private-msg": {
+                "name": "message-privé",
+                "description": "Vrai si le message ne doit pas être vu de tous"
+            }
+        },
+        "discord-cheat-sheet": {
+            "name": "mise-en-forme-discord",
+            "description": "Liste des raccourcis de mise en forme Discord",
+            "private-msg": {
+                "name": "message-privé",
+                "description": "Vrai si le message ne doit pas être vu de tous"
+            }
+        }
+    },
+    "translate": {
+        "name": "traduire",
+        "description": "Trouve les correspondances des termes de MyHordes dans d'autres langues",
+        "language": {
+            "name": "langue",
+            "description": "La langue du texte source"
+        },
+        "text-to-translate": {
+            "name": "texte-à-traduire",
+            "description": "Le texte dont on veut la traduction"
+        },
+        "only-exact-match": {
+            "name": "résultats-exacts-uniquement",
+            "description": "Si vrai et si il existe des résultats exacts, seuls les résultats exacts sont renvoyés"
+        },
+        "private-msg": {
+            "name": "message-privé",
+            "description": "Vrai si le message ne doit pas être vu de tous"
+        }
+    },
+    "glossary": {
+        "name": "glossaire",
+        "description": "Définitions associées à un texte donné",
+        "text": {
+            "name": "texte",
+            "description": "Le texte recherché"
+        },
+        "language": {
+            "name": "langue",
+            "description": "La langue du texte recherché"
+        },
+        "private-msg": {
+            "name": "message-privé",
+            "description": "Vrai si le message ne doit pas être vu de tous"
+        }
+    },
+    "recipe": {
+        "name": "recette",
+        "description": "Trouve la recette d'un objet et les recettes qui y amènent",
+        "text": {
+            "name": "texte",
+            "description": "Le texte recherché"
+        },
+        "language": {
+            "name": "langue",
+            "description": "La langue du texte recherché"
+        },
+        "private-msg": {
+            "name": "message-privé",
+            "description": "Vrai si le message ne doit pas être vu de tous"
+        }
+    },
+    "play": {
+        "name": "jouer",
+        "description": "Les mêmes jeux que sur MyHordes, mais sur Discord",
+        "text": {
+            "name": "texte",
+            "description": "Utilisez les mêmes mots clés que dans MyHordes. (Exemple: {d100}{d20})"
+        }
+    },
+    "instructions": {
+        "name": "instructions",
+        "description": "Rendez vos instructions clairement visibles et plus longues"
+    },
+    "suggestion": {
+        "name": "suggestion",
+        "description": "Poster une suggestion dans notre boîte à idées"
+    },
+    "bug": {
+        "name": "bug",
+        "description": "Signaler un bug"
+    },
+    "attack": {
+        "name": "attaque",
+        "description": "Outils liés à l'estimation de l'ataque",
+        "get": {
+            "name": "récupérer",
+            "description": "Récupère l'estimation calculée et la liste enregistrée des estimations pour le jour et la ville choisis",
+            "town-id": {
+                "name": "identifiant-de-la-ville",
+                "description": "L'identifiant de la ville pour laquelle vous souhaitez l'estimation"
+            },
+            "day": {
+                "name": "jour",
+                "description": "Le jour pour lequel vous voulez l'estimation"
+            },
+            "private-msg": {
+                "name": "message-privé",
+                "description": "Vrai si le message ne doit pas être vu de tous"
+            }
+        }
     }
-  },
-  "timer": {
-    "name": "minuteur",
-    "description": "Lance un compteur d'une durée personnalisable (Exemple : 1h 25m 12s)",
-    "time": {
-      "name": "durée",
-      "description": "La durée du compteur (Exemple : 1h 25m 12s)"
-    },
-    "reason": {
-      "name": "raison",
-      "description": "La raison du compteur. C'est ce message qui sera envoyé à la fin du compteur"
-    },
-    "private-msg": {
-      "name": "message-privé",
-      "description": "Vrai si le message ne doit pas être vu de tous"
-    }
-  },
-  "faq": {
-    "name": "faq",
-    "description": "Foire aux questions",
-    "website": {
-      "name": "site-web",
-      "description": "L'adresse du site web",
-      "private-msg": {
-        "name": "message-privé",
-        "description": "Vrai si le message ne doit pas être vu de tous"
-      }
-    },
-    "script": {
-      "name": "script",
-      "description": "L'adresse du script",
-      "private-msg": {
-        "name": "message-privé",
-        "description": "Vrai si le message ne doit pas être vu de tous"
-      }
-    },
-    "become-ghoul": {
-      "name": "devenir-goule",
-      "description": "Différentes méthode pour se transformer en goule",
-      "private-msg": {
-        "name": "message-privé",
-        "description": "Vrai si le message ne doit pas être vu de tous"
-      }
-    },
-    "mse": {
-      "name": "résultats-mse",
-      "description": "Les différents résultats possibles lors de la consommation d'un Médicament sans étiquette",
-      "private-msg": {
-        "name": "message-privé",
-        "description": "Vrai si le message ne doit pas être vu de tous"
-      }
-    },
-    "discord-cheat-sheet": {
-      "name": "mise-en-forme-discord",
-      "description": "Liste des raccourcis de mise en forme Discord",
-      "private-msg": {
-        "name": "message-privé",
-        "description": "Vrai si le message ne doit pas être vu de tous"
-      }
-    }
-  },
-  "translate": {
-    "name": "traduire",
-    "description": "Trouve les correspondances des termes de MyHordes dans d'autres langues",
-    "language": {
-      "name": "langue",
-      "description": "La langue du texte source"
-    },
-    "text-to-translate": {
-      "name": "texte-à-traduire",
-      "description": "Le texte dont on veut la traduction"
-    },
-    "only-exact-match": {
-      "name": "résultats-exacts-uniquement",
-      "description": "Si vrai et si il existe des résultats exacts, seuls les résultats exacts sont renvoyés"
-    },
-    "private-msg": {
-      "name": "message-privé",
-      "description": "Vrai si le message ne doit pas être vu de tous"
-    }
-  },
-  "glossary": {
-    "name": "glossaire",
-    "description": "Définitions associées à un texte donné",
-    "text": {
-      "name": "texte",
-      "description": "Le texte recherché"
-    },
-    "language": {
-      "name": "langue",
-      "description": "La langue du texte recherché"
-    },
-    "private-msg": {
-      "name": "message-privé",
-      "description": "Vrai si le message ne doit pas être vu de tous"
-    }
-  },
-  "recipe": {
-    "name": "recette",
-    "description": "Trouve la recette d'un objet et les recettes qui y amènent",
-    "text": {
-      "name": "texte",
-      "description": "Le texte recherché"
-    },
-    "language": {
-      "name": "langue",
-      "description": "La langue du texte recherché"
-    },
-    "private-msg": {
-      "name": "message-privé",
-      "description": "Vrai si le message ne doit pas être vu de tous"
-    }
-  },
-  "play": {
-    "name": "jouer",
-    "description": "Les mêmes jeux que sur MyHordes, mais sur Discord",
-    "text": {
-      "name": "texte",
-      "description": "Utilisez les mêmes mots clés que dans MyHordes. (Exemple: {d100}{d20})"
-    }
-  },
-  "instructions": {
-    "name": "instructions",
-    "description": "Rendez vos instructions clairement visibles et plus longues"
-  },
-  "suggestion": {
-    "name": "suggestion",
-    "description": "Poster une suggestion dans notre boîte à idées"
-  },
-  "bug": {
-    "name": "bug",
-    "description": "Signaler un bug"
-  }
 }

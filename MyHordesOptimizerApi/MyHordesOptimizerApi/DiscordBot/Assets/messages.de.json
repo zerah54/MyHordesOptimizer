@@ -1,142 +1,162 @@
 {
-  "aa": {
-    "name": "anti-missbrauch",
-    "description": "Startet einen 15-Minuten-Zähler",
-    "private-msg": {
-      "name": "private-nachricht",
-      "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+    "aa": {
+        "name": "anti-missbrauch",
+        "description": "Startet einen 15-Minuten-Zähler",
+        "private-msg": {
+            "name": "private-nachricht",
+            "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+        }
+    },
+    "timer": {
+        "name": "timer",
+        "description": "Startet einen Zähler mit anpassbarer Dauer (Beispiel: 1h 25m 12s)",
+        "time": {
+            "name": "dauer",
+            "description": "Die Dauer des Timers (Beispiel: 1h 25m 12s)"
+        },
+        "reason": {
+            "name": "grund",
+            "description": "Der Grund für den Timer. Diese Nachricht wird am Ende des Zählers gesendet"
+        },
+        "private-msg": {
+            "name": "private-nachricht",
+            "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+        }
+    },
+    "faq": {
+        "name": "faq",
+        "description": "Häufig gestellte Fragen",
+        "website": {
+            "name": "website",
+            "description": "Die Website-Adresse",
+            "private-msg": {
+                "name": "private-nachricht",
+                "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+            }
+        },
+        "script": {
+            "name": "script",
+            "description": "Die Skriptadresse",
+            "private-msg": {
+                "name": "private-nachricht",
+                "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+            }
+        },
+        "become-ghoul": {
+            "name": "werde-ghul",
+            "description": "Verschiedene Möglichkeiten, sich in einen Ghul zu verwandeln",
+            "private-msg": {
+                "name": "private-nachricht",
+                "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+            }
+        },
+        "mse": {
+            "name": "em-ergebnisse",
+            "description": "Die unterschiedlichen möglichen Ergebnisse bei der Einnahme eines Etikettenloses Medikament",
+            "private-msg": {
+                "name": "private-nachricht",
+                "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+            }
+        },
+        "discord-cheat-sheet": {
+            "name": "discord-gestaltung",
+            "description": "Liste der Discord-Shaping-Verknüpfungen",
+            "private-msg": {
+                "name": "private-nachricht",
+                "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+            }
+        }
+    },
+    "translate": {
+        "name": "übersetzen",
+        "description": "Finden Sie Übereinstimmungen für MyHordes-Begriffe in anderen Sprachen",
+        "language": {
+            "name": "sprache",
+            "description": "Die Sprache des Quelltextes"
+        },
+        "text-to-translate": {
+            "name": "text-zum-übersetzen",
+            "description": "Der zu übersetzende Text"
+        },
+        "only-exact-match": {
+            "name": "nur-genaue-ergebnisse",
+            "description": "Wenn „true“ und es exakte Ergebnisse gibt, werden nur exakte Ergebnisse zurückgegeben"
+        },
+        "private-msg": {
+            "name": "private-nachricht",
+            "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+        }
+    },
+    "glossary": {
+        "name": "glossar",
+        "description": "Definitionen, die einem bestimmten Text zugeordnet sind",
+        "text": {
+            "name": "text",
+            "description": "Der gesuchte Text"
+        },
+        "language": {
+            "name": "sprache",
+            "description": "Die Sprache des gesuchten Textes"
+        },
+        "private-msg": {
+            "name": "private-nachricht",
+            "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+        }
+    },
+    "recipe": {
+        "name": "rezepte",
+        "description": "Finden Sie das Rezept für einen Artikel und die Rezepte, die dazu führen",
+        "text": {
+            "name": "text",
+            "description": "Der gesuchte Text"
+        },
+        "language": {
+            "name": "sprache",
+            "description": "Die Sprache des gesuchten Textes"
+        },
+        "private-msg": {
+            "name": "private-nachricht",
+            "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+        }
+    },
+    "play": {
+        "name": "spielen",
+        "description": "Die gleichen Spiele wie auf MyHordes, aber auf Discord",
+        "text": {
+            "name": "text",
+            "description": "Verwenden Sie dieselben Schlüsselwörter wie in MyHordes. (Beispiel: {d100}{d20})"
+        }
+    },
+    "instructions": {
+        "name": "anweisungen",
+        "description": "Machen Sie Ihre Anweisungen deutlich sichtbar und länger"
+    },
+    "suggestion": {
+        "name": "anweisungen",
+        "description": "Posten Sie einen Vorschlag in unserem Vorschlagsfeld"
+    },
+    "bug": {
+        "name": "bug",
+        "description": "Melde einen Fehler"
+    },
+    "attack": {
+        "name": "attacke",
+        "description": "Tools zur Angriffsschätzung",
+        "get": {
+            "name": "erholen",
+            "description": "Ruft die berechnete Schätzung und die gespeicherte Liste der Schätzungen für den ausgewählten Tag und die ausgewählte Stadt ab",
+            "town-id": {
+                "name": "stadt-id",
+                "description": "Die Kennung der Stadt, für die Sie die Schätzung wünschen"
+            },
+            "day": {
+                "name": "tag",
+                "description": "Der Tag, für den Sie den Kostenvoranschlag wünschen"
+            },
+            "private-msg": {
+                "name": "private-nachricht",
+                "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
+            }
+        }
     }
-  },
-  "timer": {
-    "name": "timer",
-    "description": "Startet einen Zähler mit anpassbarer Dauer (Beispiel: 1h 25m 12s)",
-    "time": {
-      "name": "dauer",
-      "description": "Die Dauer des Timers (Beispiel: 1h 25m 12s)"
-    },
-    "reason": {
-      "name": "grund",
-      "description": "Der Grund für den Timer. Diese Nachricht wird am Ende des Zählers gesendet"
-    },
-    "private-msg": {
-      "name": "private-nachricht",
-      "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
-    }
-  },
-  "faq": {
-    "name": "faq",
-    "description": "Häufig gestellte Fragen",
-    "website": {
-      "name": "website",
-      "description": "Die Website-Adresse",
-      "private-msg": {
-        "name": "private-nachricht",
-        "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
-      }
-    },
-    "script": {
-      "name": "script",
-      "description": "Die Skriptadresse",
-      "private-msg": {
-        "name": "private-nachricht",
-        "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
-      }
-    },
-    "become-ghoul": {
-      "name": "werde-ghul",
-      "description": "Verschiedene Möglichkeiten, sich in einen Ghul zu verwandeln",
-      "private-msg": {
-        "name": "private-nachricht",
-        "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
-      }
-    },
-    "mse": {
-      "name": "em-ergebnisse",
-      "description": "Die unterschiedlichen möglichen Ergebnisse bei der Einnahme eines Etikettenloses Medikament",
-      "private-msg": {
-        "name": "private-nachricht",
-        "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
-      }
-    },
-    "discord-cheat-sheet": {
-      "name": "discord-gestaltung",
-      "description": "Liste der Discord-Shaping-Verknüpfungen",
-      "private-msg": {
-        "name": "private-nachricht",
-        "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
-      }
-    }
-  },
-  "translate": {
-    "name": "übersetzen",
-    "description": "Finden Sie Übereinstimmungen für MyHordes-Begriffe in anderen Sprachen",
-    "language": {
-      "name": "sprache",
-      "description": "Die Sprache des Quelltextes"
-    },
-    "text-to-translate": {
-      "name": "text-zum-übersetzen",
-      "description": "Der zu übersetzende Text"
-    },
-    "only-exact-match": {
-      "name": "nur-genaue-ergebnisse",
-      "description": "Wenn „true“ und es exakte Ergebnisse gibt, werden nur exakte Ergebnisse zurückgegeben"
-    },
-    "private-msg": {
-      "name": "private-nachricht",
-      "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
-    }
-  },
-  "glossary": {
-    "name": "glossar",
-    "description": "Definitionen, die einem bestimmten Text zugeordnet sind",
-    "text": {
-      "name": "text",
-      "description": "Der gesuchte Text"
-    },
-    "language": {
-      "name": "sprache",
-      "description": "Die Sprache des gesuchten Textes"
-    },
-    "private-msg": {
-      "name": "private-nachricht",
-      "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
-    }
-  },
-  "recipe": {
-    "name": "rezepte",
-    "description": "Finden Sie das Rezept für einen Artikel und die Rezepte, die dazu führen",
-    "text": {
-      "name": "text",
-      "description": "Der gesuchte Text"
-    },
-    "language": {
-      "name": "sprache",
-      "description": "Die Sprache des gesuchten Textes"
-    },
-    "private-msg": {
-      "name": "private-nachricht",
-      "description": "True, wenn die Nachricht nicht für alle sichtbar sein soll"
-    }
-  },
-  "play": {
-    "name": "spielen",
-    "description": "Die gleichen Spiele wie auf MyHordes, aber auf Discord",
-    "text": {
-      "name": "text",
-      "description": "Verwenden Sie dieselben Schlüsselwörter wie in MyHordes. (Beispiel: {d100}{d20})"
-    }
-  },
-  "instructions": {
-    "name": "anweisungen",
-    "description": "Machen Sie Ihre Anweisungen deutlich sichtbar und länger"
-  },
-  "suggestion": {
-    "name": "anweisungen",
-    "description": "Posten Sie einen Vorschlag in unserem Vorschlagsfeld"
-  },
-  "bug": {
-    "name": "bug",
-    "description": "Melde einen Fehler"
-  }
 }
