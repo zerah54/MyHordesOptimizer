@@ -1,5 +1,4 @@
-import * as moment from 'moment';
-import { Moment } from 'moment';
+import moment, { Moment } from 'moment';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
 import { CommonModel } from './_common.class';
 

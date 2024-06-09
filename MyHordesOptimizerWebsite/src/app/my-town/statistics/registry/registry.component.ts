@@ -6,7 +6,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import * as moment from 'moment/moment';
+import moment from 'moment/moment';
 import { environment } from '../../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { Entry } from '../../../_abstract_model/interfaces';

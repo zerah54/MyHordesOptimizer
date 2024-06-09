@@ -12,7 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO, NO_RUIN } from '../../_abstract_model/const';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
@@ -297,13 +297,13 @@ export class CampingComponent implements OnInit {
                  * Nombre d'améliorations simples sur la case
                  * @see ActionDataService.php : 'improve'
                  */
-                total_improve = +this.configuration_form.get('improve')?.value ?? 0;
+                total_improve = +this.configuration_form.get('improve')?.value;
 
                 /**
                  * Nombre d'objets de défense installés sur la case
                  * @see ActionDataService.php : 'cm_campsite_improve'
                  */
-                total_object_improve = +this.configuration_form.get('object_improve')?.value ?? 0;
+                total_object_improve = +this.configuration_form.get('object_improve')?.value;
             }
         }
 
@@ -385,7 +385,7 @@ export class CampingComponent implements OnInit {
     }
 
     private calculateObjectsFromTotal(): { improve: number, improve_objects: number } {
-        const complete_improve: number = this.configuration_form.get('complete_improve')?.value ?? 0;
+        const complete_improve: number = this.configuration_form.get('complete_improve')?.value;
         for (let i: number = 0; i <= Math.floor(complete_improve); i += (this.display_bonus_ap ? 1 : this.bonus.improve)) {
             const tested_improve_objects: number = (complete_improve * 100 - i * 100) / 100 / (this.display_bonus_ap ? (this.bonus.object_improve / this.bonus.improve) : this.bonus.object_improve);
             if (Number.isInteger(tested_improve_objects)) {

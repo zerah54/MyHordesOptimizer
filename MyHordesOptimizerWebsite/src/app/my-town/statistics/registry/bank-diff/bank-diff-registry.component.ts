@@ -1,7 +1,7 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import * as moment from 'moment';
+import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';

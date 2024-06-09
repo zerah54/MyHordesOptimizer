@@ -2,7 +2,7 @@ import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/c
 import { booleanAttribute, Component, HostBinding, Input, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { WishlistService } from '../../../_abstract_model/services/wishlist.service';

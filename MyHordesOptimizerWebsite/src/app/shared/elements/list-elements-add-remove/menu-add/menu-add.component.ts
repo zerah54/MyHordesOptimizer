@@ -4,7 +4,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenu, MatMenuModule } from '@angular/material/menu';
 import { MatTabsModule } from '@angular/material/tabs';
-import * as moment from 'moment';
+import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { DebugLogPipe } from '../../../pipes/debug-log.pipe';

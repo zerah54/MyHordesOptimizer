@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
-import * as moment from 'moment';
+import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { HeroicActionEnum } from '../../../../../_abstract_model/enum/heroic-action.enum';
 import { Imports } from '../../../../../_abstract_model/types/_types';

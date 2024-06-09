@@ -18,7 +18,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatTabChangeEvent, MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import * as moment from 'moment';
+import moment from 'moment';
 import { TableVirtualScrollDataSource, TableVirtualScrollModule } from 'ng-table-virtual-scroll';
 import { Subject, takeUntil } from 'rxjs';
 import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';

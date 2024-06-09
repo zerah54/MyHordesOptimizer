@@ -3,7 +3,7 @@ import { Component, HostBinding, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { Action } from '../../_abstract_model/enum/action.enum';
 import { Property } from '../../_abstract_model/enum/property.enum';

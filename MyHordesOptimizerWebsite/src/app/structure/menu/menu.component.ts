@@ -8,7 +8,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavContainer } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import * as moment from 'moment';
+import moment from 'moment';
 import { environment } from '../../../environments/environment';
 import { Theme } from '../../_abstract_model/interfaces';
 import { Imports } from '../../_abstract_model/types/_types';

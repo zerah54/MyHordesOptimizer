@@ -1,7 +1,7 @@
 import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
-import * as moment from 'moment';
+import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types';

@@ -6,7 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSidenavContainer, MatSidenavModule } from '@angular/material/sidenav';
 import { Event, NavigationCancel, NavigationEnd, NavigationSkipped, NavigationStart, Router, RouterOutlet } from '@angular/router';
-import * as moment from 'moment/moment';
+import moment from 'moment/moment';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { BREAKPOINTS } from './_abstract_model/const';
 import { AuthenticationService } from './_abstract_model/services/authentication.service';

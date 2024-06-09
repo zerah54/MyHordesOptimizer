@@ -6,7 +6,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Imports } from '../../../_abstract_model/types/_types';
 
 const angular_common: Imports = [CommonModule, FormsModule];

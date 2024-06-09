@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostBinding, Input, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Scale, TooltipItem } from 'chart.js';
 import Chart from 'chart.js/auto';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Entry } from '../../../../_abstract_model/interfaces';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';

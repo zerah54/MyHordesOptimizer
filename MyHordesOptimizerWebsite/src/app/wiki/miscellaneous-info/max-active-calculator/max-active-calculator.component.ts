@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Misc } from '../../../_abstract_model/interfaces';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';

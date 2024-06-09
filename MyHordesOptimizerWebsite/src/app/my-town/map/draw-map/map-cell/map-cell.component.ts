@@ -2,7 +2,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';

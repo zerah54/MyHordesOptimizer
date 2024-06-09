@@ -1,8 +1,7 @@
 import { CommonModule, DatePipe, NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, Input } from '@angular/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import * as moment from 'moment';
-import { Moment } from 'moment';
+import moment, { Moment } from 'moment';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 

@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { getBankWithExpirationDate, getExternalAppId, getTown, getUserId, setBankWithExpirationDate, } from '../../shared/utilities/localstorage.util';
@@ -22,7 +22,7 @@ import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
 import { GlobalService } from './_global.service';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class TownService extends GlobalService {
 
     /** La locale */
@@ -81,7 +81,7 @@ export class TownService extends GlobalService {
 
         super.post(this.API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`,
             JSON.stringify({
-                map: {toolsToUpdate: tools_to_update},
+                map: { toolsToUpdate: tools_to_update },
                 townDetails: town_details
             })
         )
