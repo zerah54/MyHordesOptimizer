@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "MHO Addon",
     "short_name": "MHOA",
-    "version": "1.0.21.0",
+    "version": "1.0.22.0",
     "description": "Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels",
     "author": "Zerah",
     "homepage_url": "https://myhordes-optimizer.web.app/tutorials/script/installation",

@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.21.0
+// @version      1.0.22.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Nouveauté] La mise à jour des outils externes avec l'option statut activé met également à jour l'information indiquant si le bain a été pris ou non`;
+    + `[Correctif] Divers bugs d'affichage`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -2448,7 +2448,7 @@ function createOptimizerBtn() {
     if (!optimizer_btn) {
         let content_zone = document.getElementById(mh_content_id);
         let header_zone = document.getElementById(mh_header_id);
-        let last_header_child = header_zone.lastChild;
+        let last_header_child = header_zone?.lastChild;
         let mhe_button = document.querySelector('#mhe_button')
         let left_position = last_header_child ? last_header_child.offsetLeft + last_header_child.offsetWidth + 5 : (mhe_button ? mhe_button.offsetLeft + mhe_button.offsetWidth + 5 : document.querySelector('#apps')?.getBoundingClientRect().width + 16);
 
@@ -4093,7 +4093,7 @@ function createHelpButton(text_to_display) {
     let help_tooltip = document.createElement('div')
     help_tooltip.classList.add('tooltip', 'help', 'hidden', 'mho');
     help_tooltip.setAttribute('style', `text-transform: initial; display: block; position: absolute; width: 250px;`);
-    help_tooltip.innerText = text_to_display;
+    help_tooltip.innerHTML = text_to_display;
     help_button.appendChild(help_tooltip);
 
     help_button.addEventListener('mouseenter', function () {
@@ -5263,7 +5263,7 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             break;
         case 'smokebomb':
             item_action.classList.add(`item-tag-smokebomb`);
-            item_action.innerText = `Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)`
+            item_action.innerHTML = `Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)`
             break;
         case 'improve':
             item_action.innerText = `Permet d'aménager un campement`
@@ -10213,13 +10213,15 @@ function getApiKey() {
                 })
                 .then((response) => {
                     let manual = () => {
-                        let manual_app_id_key = prompt(getI18N(texts.manually_add_app_id_key));
-                        if (manual_app_id_key) {
-                            external_app_id = manual_app_id_key;
-                            setStorageItem(gm_mh_external_app_id_key, external_app_id);
-                            resolve(external_app_id);
-                        } else {
-                            reject(response);
+                        if (document.querySelector('.soul')) {
+                            let manual_app_id_key = prompt(getI18N(texts.manually_add_app_id_key));
+                            if (manual_app_id_key) {
+                                external_app_id = manual_app_id_key;
+                                setStorageItem(gm_mh_external_app_id_key, external_app_id);
+                                resolve(external_app_id);
+                            } else {
+                                reject(response);
+                            }
                         }
                     }
                     let temp_body = document.createElement('body');
