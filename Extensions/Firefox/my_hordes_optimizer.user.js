@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.22.0
+// @version      1.0.23.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -32,7 +32,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Divers bugs d'affichage`;
+    + `[Correctif] On essaye de faire en sorte que les barres de réparation en pandé s'affichent tout le temps, et pas juste quand elles ont envie`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -134,6 +134,7 @@ let parameters;
 let map;
 let current_cell;
 let my_expeditions;
+let tooltips_observer;
 
 ///////////////////
 // Les variables //
@@ -4695,55 +4696,85 @@ function displaySearchFieldOnRegistry() {
 
 /** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */
 function displayMinApOnBuildings() {
+
+    tooltips_observer?.disconnect();
     if (mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
         let complete_buildings = document.querySelectorAll('.building.complete');
         if (!complete_buildings || complete_buildings.length === 0) return;
 
-        let broken_buildings = Array.from(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
+        ///////////////////////// Observe les modifications sur les tooltips pour mieux alimenter les barres /////////////////////////
+        // Selectionne le noeud dont les mutations seront observées
+        let tooltip_container = document.querySelector('#tooltip_container');
+        // Options de l'observateur (quelles sont les mutations à observer)
+        let config = {childList: true, subtree: true};
 
-        if (!broken_buildings || broken_buildings.length === 0) return;
+        // Fonction callback à éxécuter quand une mutation est observée
+        let callback = function (mutationsList) {
+            if (mho_parameters.display_missing_ap_for_buildings_to_be_safe && pageIsConstructions()) {
+                let broken_buildings = Array.from(complete_buildings).filter((complete_building) => complete_building.querySelector('.to_repair'));
 
-        broken_buildings.forEach((broken_building) => {
-            let bar_element = broken_building.querySelector('.ap-bar');
-            let nb_ap_element = broken_building.querySelector('.build-req');
+                if (!broken_buildings || broken_buildings.length === 0) return;
 
-            bar_element.dispatchEvent(new Event('mouseenter'));
-            let tooltip = new Object(document.querySelector('.tooltip:not(.mho)[style*="display: block"]'));
-            bar_element.dispatchEvent(new Event('mouseleave'));
+                broken_buildings.forEach((broken_building) => {
+                    let bar_element = broken_building.querySelector('.ap-bar');
+                    let nb_ap_element = broken_building.querySelector('.build-req');
 
-            if (!tooltip || !tooltip.innerHTML) return;
+                    bar_element.dispatchEvent(new Event('mouseenter'));
+                    let tooltip = new Object(document.querySelector('.tooltip:not(.mho)[style*="display: block"]'));
+                    bar_element.dispatchEvent(new Event('mouseleave'));
 
-            let status = tooltip.innerText.match(/[0-9]+\/[0-9]+/)[0]?.split('/');
+                    if (!tooltip || !tooltip.innerHTML) return;
 
-            let nb_pts_per_ap = parseInt(tooltip.innerHTML.match(/<b>[0-9]+<\/b>/)[0].match(/[0-9]+/)[0], 10);
-            let current_pv = parseInt(status[0], 10);
-            let total_pv = parseInt(status[1], 10);
 
-            let minimum_safe = Math.ceil(total_pv * 70 / 100) + 1
-            if (minimum_safe <= current_pv) return;
+                    let tooltip_status_match = tooltip.innerText.match(/[0-9]+\/[0-9]+/);
+                    if (!tooltip_status_match || tooltip_status_match.length <= 0) return;
+                    let status = tooltip_status_match[0]?.split('/');
 
-            let missing_pts = minimum_safe - current_pv;
+                    let tooltip_match = tooltip.innerHTML.match(/<b>[0-9]+<\/b>/);
+                    if (!tooltip_match || tooltip_match.length <= 0) return;
 
-            bar_element.style.display = 'flex';
-            let new_ap_bar = bar_element.querySelector('.mho-safe-ap');
-            if (!new_ap_bar) {
-                new_ap_bar = document.createElement('div');
-                new_ap_bar.classList.add('mho-safe-ap');
+                    let nb_pts_per_ap = parseInt(tooltip_match[0].match(/[0-9]+/)[0], 10);
+                    let current_pv = parseInt(status[0], 10);
+                    let total_pv = parseInt(status[1], 10);
+
+                    let minimum_safe = Math.ceil(total_pv * 70 / 100) + 1
+                    if (minimum_safe <= current_pv) return;
+
+                    let missing_pts = minimum_safe - current_pv;
+
+                    bar_element.style.display = 'flex';
+                    let new_ap_bar = bar_element.querySelector('.mho-safe-ap');
+                    if (!new_ap_bar) {
+                        new_ap_bar = document.createElement('div');
+                        new_ap_bar.classList.add('mho-safe-ap');
+                    }
+                    new_ap_bar.style.background = 'yellow';
+                    new_ap_bar.style.width = missing_pts / total_pv * 100 + '%';
+                    bar_element.appendChild(new_ap_bar);
+
+                    let missing_ap_info = nb_ap_element.querySelector('.mho-missing-ap');
+                    if (!missing_ap_info) {
+                        missing_ap_info = document.createElement('span')
+                        missing_ap_info.classList.add('mho-missing-ap');
+                    }
+                    missing_ap_info.style.fontWeight = 'initial';
+                    missing_ap_info.style.fontSize = '0.8em';
+                    missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
+                    nb_ap_element.appendChild(missing_ap_info);
+                });
+            } else {
+                tooltips_observer?.disconnect();
             }
-            new_ap_bar.style.background = 'yellow';
-            new_ap_bar.style.width = missing_pts / total_pv * 100 + '%';
-            bar_element.appendChild(new_ap_bar);
+        };
 
-            let missing_ap_info = nb_ap_element.querySelector('.mho-missing-ap');
-            if (!missing_ap_info) {
-                missing_ap_info = document.createElement('span')
-                missing_ap_info.classList.add('mho-missing-ap');
-            }
-            missing_ap_info.style.fontWeight = 'initial';
-            missing_ap_info.style.fontSize = '0.8em';
-            missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
-            nb_ap_element.appendChild(missing_ap_info);
-        });
+        // Créé une instance de l'observateur lié à la fonction de callback
+        tooltips_observer = new MutationObserver(callback);
+        // Commence à observer le noeud cible pour les mutations précédemment configurées
+        tooltips_observer.observe(tooltip_container, config);
+
+        ////////////////////////////////////////////////////////
+
+
     } else if (pageIsConstructions()) {
         let missing_ap_infos = document.querySelectorAll('.mho-missing-ap');
         if (!missing_ap_infos) return;
