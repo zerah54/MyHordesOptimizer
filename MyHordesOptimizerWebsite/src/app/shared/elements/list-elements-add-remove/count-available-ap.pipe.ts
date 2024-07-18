@@ -77,7 +77,7 @@ export class CountAvailableApPipe implements PipeTransform {
                 return action.key === Action.DRUG_8AP_1.key;
             });
             if (is_8ap) {
-                ap += max_ap;
+                ap += max_ap + 2;
             }
         });
         return ap;

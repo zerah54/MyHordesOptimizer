@@ -70,7 +70,7 @@
                                 @for (expedition of expeditions(); track expedition.id) {
                                     <mat-expansion-panel [ngClass]="['expedition', expedition.state]"
                                                          [expanded]="isDefaultExpanded(expedition)">
-                                        <mat-expansion-panel-header class="header">
+                                        <mat-expansion-panel-header class="header" (keydown.space)="$event.stopPropagation()">
                                             <div class="label">
                                                 @if (edition_mode && editable) {
                                                     <mat-form-field [appearance]="'outline'" class="no-bottom compact-field" (click)="$event.stopPropagation()">
