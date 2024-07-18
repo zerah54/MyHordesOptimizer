@@ -655,9 +655,10 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     public get formatedPreRegistered(): string {
+        console.log('test', this.preRegistered);
         return this.preRegistered.map((citizen: Citizen) => {
             if (citizen.job) {
-                return `<img src="${HORDES_IMG_REPO}/${citizen.job?.value.img}">&nbsp;${citizen.name}`;
+                return `<img src="${HORDES_IMG_REPO}${citizen.job?.value.img}">&nbsp;${citizen.name}`;
             } else {
                 return citizen.name;
             }
@@ -726,6 +727,7 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     public async saveCitizen(expedition_part: ExpeditionPart, citizen: CitizenExpedition, expedition_part_index?: number, expedition?: Expedition, citizen_index?: number): Promise<void> {
+        console.log('expedition_part', expedition_part);
         if (expedition && expedition_part_index !== undefined && expedition_part_index !== null && citizen_index !== undefined && citizen_index !== null) {
             if (expedition_part_index === 0 && expedition?.parts.length > 1) {
                 await this.realtime_expeditions_service.updateExpeditionCitizen(expedition_part, citizen);
@@ -753,8 +755,8 @@ export class ExpeditionsComponent implements OnInit {
     public shareExpeditionForum(): void {
         let text: string = `[big][b][i]${$localize`Expéditions (J${this.selected_tab_index + 1})`}[/i][/b][/big]\n`;
 
-        const pre_registered: Citizen[] = this.preRegistered;
-        text += `\n[rp=${$localize`Préinscrits`}]\n`;
+        const pre_registered: Citizen[] = this.registered;
+        text += `\n[rp=${$localize`Inscrits`}]\n`;
         if (pre_registered.length > 0) {
             pre_registered.forEach((citizen: Citizen, expedition_index: number, array: Citizen[]) => {
                 text += `:${citizen.job?.value.id}: ${citizen.name}${expedition_index < array.length - 1 ? ', ' : ''}`;
@@ -773,9 +775,9 @@ export class ExpeditionsComponent implements OnInit {
                     text += '\n:middot: ';
                     if (citizen_expedition.preinscrit) {
                         const citizen: Citizen | undefined = this.all_citizens.find((_citizen: Citizen) => _citizen.id === citizen_expedition.citizen_id);
-                        text += citizen?.name || '';
+                        text += `:${getCitizenFromId(this.all_citizens, citizen_expedition.citizen_id)?.job?.value.id}: ` + citizen?.name || '';
                     } else if (citizen_expedition.preinscrit_job) {
-                        text += `:${(<JobEnum>JobEnum.getByKey(citizen_expedition.preinscrit_job))?.value.img}:`;
+                        text += `:${getCitizenFromId(this.all_citizens, citizen_expedition.citizen_id)?.job?.value.id}:`;
                     }
                 });
 
@@ -783,7 +785,7 @@ export class ExpeditionsComponent implements OnInit {
                     text += '\n{hr}';
                 }
             });
-            text += '[/collapse]\n';
+            text += '\n[/collapse]\n';
 
         });
 
@@ -857,6 +859,21 @@ export class ExpeditionsComponent implements OnInit {
             });
         });
         return pre_registered;
+    }
+
+    private get registered(): Citizen[] {
+        const registered: Citizen[] = [];
+        this.expeditions()?.forEach((expedition: Expedition) => {
+            expedition.parts.forEach((part: ExpeditionPart) => {
+                part.citizens.forEach((citizen: CitizenExpedition) => {
+                    if (getCitizenFromId(this.all_citizens, citizen.citizen_id)
+                        && !registered.some((pre_registered_citizen: Citizen) => pre_registered_citizen.id === citizen.citizen_id)) {
+                        registered.push(<Citizen>getCitizenFromId(this.all_citizens, citizen.citizen_id));
+                    }
+                });
+            });
+        });
+        return registered;
     }
 }
 

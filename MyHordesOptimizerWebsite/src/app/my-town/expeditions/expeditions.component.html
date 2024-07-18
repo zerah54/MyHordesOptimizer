@@ -25,7 +25,10 @@
                             @if (edition_mode && editable) {
                                 <div class="actions">
                                     <div class="left-actions">
-                                        <button mat-button type="button" (click)="addNewExpedition()" i18n>Créer une expédition</button>
+                                        <button mat-button type="button" (click)="addNewExpedition()">
+                                            <mat-icon>add</mat-icon>
+                                            <ng-container i18n>Créer une expédition</ng-container>
+                                        </button>
                                         <div><span i18n>Places&nbsp;:&nbsp;</span>{{ spots }}/{{ all_citizens.length }}</div>
                                         <div style="display: flex; align-items: center">
                                             @if (preRegisteredJobs; as pre_registered_jobs) {
@@ -199,7 +202,7 @@
                                                                                             [bindValue]="'id'"
                                                                                             [bindIcon]="'job.value.img'"
                                                                                             [(ngModel)]="expedition_citizen.citizen_id"
-                                                                                            (ngModelChange)="expedition_citizen.preinscrit = !expedition_citizen.citizen_id; saveCitizen(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
+                                                                                            (ngModelChange)="expedition_citizen.preinscrit = edition_mode; saveCitizen(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)"></mho-select>
                                                                             </mat-form-field>
                                                                         } @else if (expedition.state === 'ready' && !expedition_citizen.citizen_id && (!expedition_citizen.preinscrit_job || expedition_citizen.preinscrit_job === (me.id| citizenFromId:all_citizens)?.job?.key)) {
                                                                             <button mat-button
@@ -356,10 +359,12 @@
                                         @if (edition_mode && editable) {
                                             <div class="footer">
                                                 <button mat-button type="button" (click)="addNewExpeditionPart(expedition)">
+                                                    <mat-icon>add</mat-icon>
                                                     <ng-container i18n>Ajouter une partie à l'expédition</ng-container>
                                                 </button>
                                                 @if (expedition.parts.length > 1) {
                                                     <button mat-button type="button" (click)="addNewMemberToExpedition(expedition)">
+                                                        <mat-icon>add</mat-icon>
                                                         <ng-container i18n>Ajouter un membre à l'expédition</ng-container>
                                                     </button>
                                                 }
