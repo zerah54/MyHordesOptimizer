@@ -70,14 +70,16 @@
                                 @for (expedition of expeditions(); track expedition.id) {
                                     <mat-expansion-panel [ngClass]="['expedition', expedition.state]"
                                                          [expanded]="isDefaultExpanded(expedition)">
-                                        <mat-expansion-panel-header class="header" (keydown.space)="$event.stopPropagation()">
+                                        <mat-expansion-panel-header class="header">
                                             <div class="label">
                                                 @if (edition_mode && editable) {
-                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field" (click)="$event.stopPropagation()">
+                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field"
+                                                                    (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()">
                                                         <mat-label i18n>Nom de l'expédition</mat-label>
                                                         <input matInput [(ngModel)]="expedition.label" (change)="saveExpedition(expedition)">
                                                     </mat-form-field>
-                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field" (click)="$event.stopPropagation()">
+                                                    <mat-form-field [appearance]="'outline'" class="no-bottom compact-field"
+                                                                    (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()">
                                                         <mat-label i18n>Points de contrôles requis</mat-label>
                                                         <input matInput type="number" [(ngModel)]="expedition.min_pdc" (change)="saveExpedition(expedition)">
                                                     </mat-form-field>
