@@ -34,6 +34,7 @@ import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.clas
 import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { Me } from '../../_abstract_model/types/me.class';
+import { patchableSignal, PatchableSignal } from '../../_abstract_model/types/patchable-signal.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ActiveCitizensComponent } from '../../shared/elements/active-citizens/active-citizens.component';
 import { CompassRoseComponent } from '../../shared/elements/compass-rose/compass-rose.component';
@@ -45,7 +46,6 @@ import { CitizenFromIdPipe } from '../../shared/pipes/citizens-from-id.pipe';
 import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
 import { JobFromIdPipe } from '../../shared/pipes/job-from-id.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
-import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { getCitizenFromId } from '../../shared/utilities/citizen.util';
 import { getTown, getUser } from '../../shared/utilities/localstorage.util';
 import { CitizensForExpePipe, FormatPreRegisteredPipe, SomeHeroicActionNeededPipe } from './citizens-for-expe.pipe';
