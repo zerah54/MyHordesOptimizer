@@ -108,7 +108,7 @@ export class ExpeditionsComponent implements OnInit {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe({
                 next: (citizens: CitizenInfo): void => {
-                    this.all_citizens = citizens.citizens;
+                    this.all_citizens = [...citizens.citizens];
                     this.all_citizens_job = (JobEnum.getAllValues<JobEnum>())
                         .filter((job_enum: JobEnum) => this.all_citizens.some((citizen: Citizen): boolean => citizen.job?.key === job_enum.key));
                 }
@@ -118,7 +118,7 @@ export class ExpeditionsComponent implements OnInit {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe({
                 next: (items: Item[]) => {
-                    this.all_items = items;
+                    this.all_items = [...items];
                 }
             });
 
@@ -127,7 +127,7 @@ export class ExpeditionsComponent implements OnInit {
             .pipe(takeUntil(this.destroy_sub))
             .subscribe({
                 next: (bank: BankInfo) => {
-                    this.bank_items = bank.items;
+                    this.bank_items = [...bank.items];
                 }
             });
 
