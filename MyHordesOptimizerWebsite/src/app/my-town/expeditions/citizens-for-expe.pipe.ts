@@ -1,6 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { Expedition } from '../../_abstract_model/types/expedition.class';
+import { getPreRegistered } from './expeditions.utils';
 
 
 @Pipe({
@@ -50,5 +53,22 @@ export class SomeHeroicActionNeededPipe implements PipeTransform {
     transform(expedition_citizen: CitizenExpedition[]): boolean {
         if (!expedition_citizen) return false;
         return expedition_citizen.some((citizen: CitizenExpedition): boolean => citizen.preinscrit_job !== undefined && citizen.preinscrit_job !== null);
+    }
+}
+
+@Pipe({
+    name: 'formatPreRegistered',
+    pure: false,
+    standalone: true
+})
+export class FormatPreRegisteredPipe implements PipeTransform {
+    transform(expeditions: Expedition[], all_citizen: Citizen[]): string {
+        return getPreRegistered(expeditions, all_citizen).map((citizen: Citizen) => {
+            if (citizen.job) {
+                return `<img src="${HORDES_IMG_REPO}${citizen.job?.value.img}">&nbsp;${citizen.name}`;
+            } else {
+                return citizen.name;
+            }
+        }).join(', ');
     }
 }

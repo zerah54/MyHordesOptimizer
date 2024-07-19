@@ -1,5 +1,5 @@
 import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, inject, OnInit, signal, ViewEncapsulation, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostBinding, inject, OnInit, signal, ViewEncapsulation, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -34,6 +34,7 @@ import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.clas
 import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { Me } from '../../_abstract_model/types/me.class';
+import { patchableSignal, PatchableSignal } from '../../_abstract_model/types/patchable-signal.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ActiveCitizensComponent } from '../../shared/elements/active-citizens/active-citizens.component';
 import { CompassRoseComponent } from '../../shared/elements/compass-rose/compass-rose.component';
@@ -45,16 +46,17 @@ import { CitizenFromIdPipe } from '../../shared/pipes/citizens-from-id.pipe';
 import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
 import { JobFromIdPipe } from '../../shared/pipes/job-from-id.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { getCitizenFromId } from '../../shared/utilities/citizen.util';
 import { getTown, getUser } from '../../shared/utilities/localstorage.util';
-import { CitizensForExpePipe, SomeHeroicActionNeededPipe } from './citizens-for-expe.pipe';
+import { CitizensForExpePipe, FormatPreRegisteredPipe, SomeHeroicActionNeededPipe } from './citizens-for-expe.pipe';
 import { EditOrdersComponent, EditOrdersData } from './edit-orders/edit-orders.component';
 import { EditPositionsComponent, EditPositionsData } from './edit-positions/edit-positions.component';
 import { TotalPdcPipe } from './total-pdc.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgClass, NgOptimizedImage];
 const components: Imports = [ActiveCitizensComponent, IconApComponent, ListElementAddRemoveComponent, SelectComponent];
-const pipes: Imports = [CitizensForExpePipe, CitizenFromIdPipe, CompassRoseComponent, DebugLogPipe, JobFromIdPipe, SomeHeroicActionNeededPipe, TotalPdcPipe];
+const pipes: Imports = [CitizensForExpePipe, CitizenFromIdPipe, CompassRoseComponent, DebugLogPipe, FormatPreRegisteredPipe, JobFromIdPipe, SomeHeroicActionNeededPipe, TotalPdcPipe];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSlideToggleModule, MatTabsModule, MatTooltipModule];
 
 @Component({
@@ -99,7 +101,7 @@ export class ExpeditionsComponent implements OnInit {
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
-    public constructor(private clipboard: ClipboardService, private dialog: MatDialog, private cdr: ChangeDetectorRef) {
+    public constructor(private clipboard: ClipboardService, private dialog: MatDialog) {
     }
 
     public async ngOnInit(): Promise<void> {
@@ -111,7 +113,6 @@ export class ExpeditionsComponent implements OnInit {
                     this.all_citizens = citizens.citizens;
                     this.all_citizens_job = (JobEnum.getAllValues<JobEnum>())
                         .filter((job_enum: JobEnum) => this.all_citizens.some((citizen: Citizen): boolean => citizen.job?.key === job_enum.key));
-                    this.cdr.detectChanges();
                 }
             });
         this.api_service
@@ -120,7 +121,6 @@ export class ExpeditionsComponent implements OnInit {
             .subscribe({
                 next: (items: Item[]) => {
                     this.all_items = items;
-                    this.cdr.detectChanges();
                 }
             });
 
@@ -130,13 +130,11 @@ export class ExpeditionsComponent implements OnInit {
             .subscribe({
                 next: (bank: BankInfo) => {
                     this.bank_items = bank.items;
-                    this.cdr.detectChanges();
                 }
             });
 
         const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_tab_index + 1));
         this.expeditions.set([...existing_expeditions]);
-        this.cdr.detectChanges();
 
         this.realtime_expeditions_service.expedition_updated$
             .pipe(takeUntil(this.destroy_sub))
@@ -155,16 +153,14 @@ export class ExpeditionsComponent implements OnInit {
                         if (expedition_a.position > expedition_b.position) return 1;
                         return 0;
                     });
-                    return current_expeditions;
+                    return [...current_expeditions];
                 });
-                this.cdr.detectChanges();
             });
 
         this.realtime_expeditions_service.expeditions_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expeditions: Expedition[]) => {
                 this.expeditions.set([...expeditions]);
-                this.cdr.detectChanges();
             });
 
         this.realtime_expeditions_service.expedition_deleted$
@@ -177,9 +173,8 @@ export class ExpeditionsComponent implements OnInit {
 
                     current_expeditions.splice(expedition_to_delete, 1);
 
-                    return current_expeditions;
+                    return [...current_expeditions];
                 });
-                this.cdr.detectChanges();
             });
 
         this.realtime_expeditions_service.expedition_part_updated$
@@ -211,9 +206,8 @@ export class ExpeditionsComponent implements OnInit {
                         if (expedition_part_a.position > expedition_part_b.position) return 1;
                         return 0;
                     });
-                    return current_expeditions;
+                    return [...current_expeditions];
                 });
-                this.cdr.detectChanges();
             });
 
         this.realtime_expeditions_service.expedition_part_deleted$
@@ -227,9 +221,8 @@ export class ExpeditionsComponent implements OnInit {
                             current_expedition.parts.splice(part_to_delete, 1);
                         }
                     });
-                    return current_expeditions;
+                    return [...current_expeditions];
                 });
-                this.cdr.detectChanges();
             });
 
         this.realtime_expeditions_service.expedition_citizen_updated$
@@ -254,9 +247,8 @@ export class ExpeditionsComponent implements OnInit {
                     } else {
                         current_expedition_part.citizens[citizen_to_update] = expedition_citizen;
                     }
-                    return current_expeditions;
+                    return [...current_expeditions];
                 });
-                this.cdr.detectChanges();
             });
 
         this.realtime_expeditions_service.expedition_citizen_deleted$
@@ -272,9 +264,8 @@ export class ExpeditionsComponent implements OnInit {
                             }
                         });
                     });
-                    return current_expeditions;
+                    return [...current_expeditions];
                 });
-                this.cdr.detectChanges();
             });
 
         this.realtime_expeditions_service.expedition_part_orders_updated$
@@ -305,9 +296,8 @@ export class ExpeditionsComponent implements OnInit {
                             return 0;
                         });
                     }
-                    return current_expeditions;
+                    return [...current_expeditions];
                 });
-                this.cdr.detectChanges();
             });
 
         this.realtime_expeditions_service.expedition_citizen_orders_updated$
@@ -344,9 +334,8 @@ export class ExpeditionsComponent implements OnInit {
                             return 0;
                         });
                     }
-                    return current_expeditions;
+                    return [...current_expeditions];
                 });
-                this.cdr.detectChanges();
             });
 
         // // TODO
@@ -406,9 +395,8 @@ export class ExpeditionsComponent implements OnInit {
                             return 0;
                         });
                     }
-                    return current_expeditions;
+                    return [...current_expeditions];
                 });
-                this.cdr.detectChanges();
             });
 
         this.realtime_expeditions_service.expedition_bag_updated$
@@ -433,9 +421,8 @@ export class ExpeditionsComponent implements OnInit {
 
                     current_expedition_citizen.bag = expedition_bag;
 
-                    return current_expeditions;
+                    return [...current_expeditions];
                 });
-                this.cdr.detectChanges();
             });
 
         this.realtime_expeditions_service.expedition_bag_deleted$
@@ -452,23 +439,20 @@ export class ExpeditionsComponent implements OnInit {
                             });
                         });
                     });
-                    return current_expeditions;
+                    return [...current_expeditions];
                 });
-                this.cdr.detectChanges();
             });
 
         this.realtime_expeditions_service.user_joined$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((user_ids: number[]) => {
                 this.active_citizens_list.set([...user_ids]);
-                this.cdr.detectChanges();
             });
 
         this.realtime_expeditions_service.user_left$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((user_ids: number[]) => {
                 this.active_citizens_list.set([...user_ids]);
-                this.cdr.detectChanges();
             });
     }
 
@@ -654,17 +638,6 @@ export class ExpeditionsComponent implements OnInit {
             });
     }
 
-    public get formatedPreRegistered(): string {
-        console.log('test', this.preRegistered);
-        return this.preRegistered.map((citizen: Citizen) => {
-            if (citizen.job) {
-                return `<img src="${HORDES_IMG_REPO}${citizen.job?.value.img}">&nbsp;${citizen.name}`;
-            } else {
-                return citizen.name;
-            }
-        }).join(', ');
-    }
-
     public get spots(): number {
         let spots: number = 0;
         this.expeditions()?.forEach((expedition: Expedition) => {
@@ -844,21 +817,6 @@ export class ExpeditionsComponent implements OnInit {
             }
         });
         return pre_registered_jobs;
-    }
-
-    private get preRegistered(): Citizen[] {
-        const pre_registered: Citizen[] = [];
-        this.expeditions()?.forEach((expedition: Expedition) => {
-            expedition.parts.forEach((part: ExpeditionPart) => {
-                part.citizens.forEach((citizen: CitizenExpedition) => {
-                    if (citizen.preinscrit && getCitizenFromId(this.all_citizens, citizen.citizen_id)
-                        && !pre_registered.some((pre_registered_citizen: Citizen) => pre_registered_citizen.id === citizen.citizen_id)) {
-                        pre_registered.push(<Citizen>getCitizenFromId(this.all_citizens, citizen.citizen_id));
-                    }
-                });
-            });
-        });
-        return pre_registered;
     }
 
     private get registered(): Citizen[] {

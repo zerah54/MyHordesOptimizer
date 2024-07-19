@@ -20,7 +20,7 @@
                     <ng-template matTabContent>
                         <div class="container">
                             <div class="header">
-                                <h2><span i18n>Préinscrits&nbsp;:&nbsp;</span><span [innerHTML]="formatedPreRegistered"></span></h2>
+                                <h2><span i18n>Préinscrits&nbsp;:&nbsp;</span><span [innerHTML]="expeditions() | formatPreRegistered:all_citizens"></span></h2>
                             </div>
                             @if (edition_mode && editable) {
                                 <div class="actions">
@@ -93,7 +93,7 @@
                                             @if (edition_mode && editable) {
                                                 <div class="actions" (click)="$event.stopPropagation()">
                                                     <mat-slide-toggle [ngModel]="expedition.state === 'ready'"
-                                                                      (ngModelChange)="changeExpeditionState(expedition, $event);">
+                                                                      (change)="changeExpeditionState(expedition, $event.checked);">
                                                         <ng-container i18n>Expédition prête</ng-container>
                                                     </mat-slide-toggle>
                                                     <button mat-icon-button type="button" matTooltip="Supprimer l'expédition" i18n-matTooltip
