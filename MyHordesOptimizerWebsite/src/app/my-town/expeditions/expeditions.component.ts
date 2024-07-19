@@ -34,7 +34,6 @@ import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.clas
 import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { Me } from '../../_abstract_model/types/me.class';
-import { patchableSignal, PatchableSignal } from '../../_abstract_model/types/patchable-signal.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ActiveCitizensComponent } from '../../shared/elements/active-citizens/active-citizens.component';
 import { CompassRoseComponent } from '../../shared/elements/compass-rose/compass-rose.component';
