@@ -45,7 +45,6 @@ import { CitizenFromIdPipe } from '../../shared/pipes/citizens-from-id.pipe';
 import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
 import { JobFromIdPipe } from '../../shared/pipes/job-from-id.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
-import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { getCitizenFromId } from '../../shared/utilities/citizen.util';
 import { getTown, getUser } from '../../shared/utilities/localstorage.util';
 import { CitizensForExpePipe, FormatPreRegisteredPipe, SomeHeroicActionNeededPipe } from './citizens-for-expe.pipe';
