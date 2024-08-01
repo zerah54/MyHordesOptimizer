@@ -5,7 +5,7 @@ export const ROUTES: Route[] = [
     { path: 'tools', loadChildren: () => import('./tools/tools.routes') },
     { path: 'tutorials', loadChildren: () => import('./tutorials/tutorials.routes') },
     { path: 'wiki', loadChildren: () => import('./wiki/wiki.routes') },
-    { path: 'games', loadChildren: () => import('./games/games.routes') },
+    // { path: 'games', loadChildren: () => import('./games/games.routes') },
     {
         path: '',
         pathMatch: 'full',
