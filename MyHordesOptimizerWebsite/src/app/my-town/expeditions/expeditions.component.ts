@@ -469,7 +469,7 @@ export class ExpeditionsComponent implements OnInit {
 
     public async changeTab(event: MatTabChangeEvent): Promise<void> {
         const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_tab_index + 1));
-        this.new_expeditions = existing_expeditions.map((expedition: Expedition) => patchableSignal(expedition, { equal: (a: Expedition, b: Expedition) => a.id === b.id }));
+        this.new_expeditions = existing_expeditions.map((expedition: Expedition) => patchableSignal(expedition, {equal: (a: Expedition, b: Expedition) => a.id === b.id}));
         this.editable = event.index >= this.current_day - 1;
     }
 
@@ -618,7 +618,7 @@ export class ExpeditionsComponent implements OnInit {
     public openReorganize(): void {
         this.dialog
             .open<EditPositionsComponent, EditPositionsData>(EditPositionsComponent, {
-                data: { expeditions: this.new_expeditions },
+                data: {expeditions: this.expeditions()},
                 width: '500px'
             })
             .afterClosed()
@@ -665,8 +665,8 @@ export class ExpeditionsComponent implements OnInit {
                     return FAVORITE_EXPEDITION_ITEMS_UID.some((uid: string) => uid === item.uid);
                 })
             },
-            { label: $localize`Banque`, list: this.bank_items },
-            { label: $localize`Tous`, list: this.all_items },
+            {label: $localize`Banque`, list: this.bank_items},
+            {label: $localize`Tous`, list: this.all_items},
         ];
     }
 
@@ -807,7 +807,7 @@ export class ExpeditionsComponent implements OnInit {
                         if (pre_registered_job) {
                             pre_registered_job.count += 1;
                         } else {
-                            pre_registered_jobs.push({ count: 1, job: citizen?.preinscrit_job });
+                            pre_registered_jobs.push({count: 1, job: citizen?.preinscrit_job});
                         }
                     } else if (citizen.preinscrit) {
                         const pre_registered_citizen: Citizen = <Citizen>getCitizenFromId(this.all_citizens, citizen.citizen_id);
@@ -820,7 +820,7 @@ export class ExpeditionsComponent implements OnInit {
                         if (pre_registered_job) {
                             pre_registered_job.count += 1;
                         } else {
-                            pre_registered_jobs.push({ count: 1, job: <string>pre_registered_citizen?.job?.key });
+                            pre_registered_jobs.push({count: 1, job: <string>pre_registered_citizen?.job?.key});
                         }
                     }
                 });
