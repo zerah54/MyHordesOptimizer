@@ -2,8 +2,7 @@ import 'zone.js/node';
 
 import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine } from '@angular/ssr';
-import * as express from 'express';
-import { Express, NextFunction, Request, Response } from 'express';
+import express, { Express, NextFunction, Request, Response } from 'express';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import bootstrap from './src/main.server';
