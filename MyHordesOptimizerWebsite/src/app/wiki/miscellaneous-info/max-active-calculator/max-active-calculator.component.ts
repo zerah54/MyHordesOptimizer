@@ -1,5 +1,5 @@
 import { CommonModule, formatNumber } from '@angular/common';
-import { Component, HostBinding, OnInit } from '@angular/core';
+import { Component, HostBinding, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -12,6 +12,7 @@ import { Misc } from '../../../_abstract_model/interfaces';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
+import { LocalStorageService } from '../../../shared/services/localstorage.service';
 import { getTown } from '../../../shared/utilities/localstorage.util';
 
 const angular_common: Imports = [CommonModule, FormsModule];
@@ -29,11 +30,13 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFiel
 export class MaxActiveCalculatorComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
+    private local_storage: LocalStorageService = inject(LocalStorageService);
+
     public readonly locale: string = moment.locale();
 
     public nb_citizen: number = 40;
     public day: number = 1;
-    public my_town: TownDetails | null = getTown();
+    public my_town: TownDetails | null = getTown(this.local_storage);
 
     public max_active_by_day: Misc = {
         header: '',

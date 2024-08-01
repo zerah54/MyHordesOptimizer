@@ -1,4 +1,4 @@
-import { FirebaseOptions } from '@firebase/app';
+import { Environment } from './environment.type';
 
 export const environment: Environment = {
     production: true,
@@ -13,10 +13,3 @@ export const environment: Environment = {
         appId: '1:711281495109:web:eb6a5d2e2b110a2b12672c'
     }
 };
-
-interface Environment {
-    production: boolean;
-    api_url: string;
-    website_url: string;
-    firebase_config: FirebaseOptions;
-}

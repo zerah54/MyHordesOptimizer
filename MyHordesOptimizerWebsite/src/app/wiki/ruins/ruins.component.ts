@@ -24,6 +24,7 @@ import { HeaderWithNumberFilterComponent } from '../../shared/elements/lists/hea
 import { HeaderWithSelectFilterComponent } from '../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { HeaderWithStringFilterComponent } from '../../shared/elements/lists/header-with-string-filter/header-with-string-filter.component';
 import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { getTown } from '../../shared/utilities/localstorage.util';
 import { normalizeString } from '../../shared/utilities/string.utils';
 
@@ -44,12 +45,16 @@ export class RuinsComponent implements OnInit {
 
     @ViewChild(MatSort) sort!: MatSort;
 
+    private town_service: TownService = inject(TownService);
+    private api_service: ApiService = inject(ApiService);
+    private local_storage: LocalStorageService = inject(LocalStorageService);
+
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** La ville actuelle */
-    public readonly town: TownDetails | null = getTown();
+    public readonly town: TownDetails | null = getTown(this.local_storage);
 
     /** La liste des bâtiments du jeu */
     public ruins!: Ruin[];
@@ -80,9 +85,6 @@ export class RuinsComponent implements OnInit {
 
     public ruins_filters_change: EventEmitter<void> = new EventEmitter();
 
-    private town_service: TownService = inject(TownService);
-    private api_service: ApiService = inject(ApiService);
-
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
     public ngOnInit(): void {
@@ -92,7 +94,7 @@ export class RuinsComponent implements OnInit {
             .subscribe({
                 next: (ruins: Ruin[]) => {
                     this.ruins = ruins;
-                    getTown();
+                    getTown(this.local_storage);
                     this.ruins_filters_change
                         .pipe(takeUntil(this.destroy_sub))
                         .subscribe(() => {

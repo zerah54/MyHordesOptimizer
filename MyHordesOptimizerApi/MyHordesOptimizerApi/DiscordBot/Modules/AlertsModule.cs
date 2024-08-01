@@ -36,12 +36,12 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 var expirationFieldExpiration = new EmbedFieldBuilder();
                 expirationFieldExpiration.Name = "Expiration";
                 expirationFieldExpiration.Value = $"<t:{Math.Floor((alert.ToUniversalTime() - DateTime.UnixEpoch.ToUniversalTime()).TotalSeconds)}:R>";
-                
+
                 var embedBuilder = new EmbedBuilder()
                     .WithDescription(msg)
                     .WithFields(expirationFieldExpiration)
                     .WithColor(DiscordBotConsts.MhoColorPink);
-                
+
                 await RespondAsync(embed: embedBuilder.Build(), ephemeral: true);
                 await Task.Delay(alert - now);
 
@@ -64,22 +64,22 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             }
         }
 
-        [SlashCommand(name: "timer", description: "Launches a custom counter. Example: 1h 25m 12s")]
+        [SlashCommand(name: "timer", description: "Launches a custom counter. Example: 1Y 3M 2D 1h 25m 12s")]
         public async Task CounterAsync(
-            [Summary(name:"time", description: "The duration of the counter (Example: 1h 25m 12s)")]
-            string time, 
+            [Summary(name:"time", description: "The duration of the counter (Example: 1Y 3M 2D 1h 25m 12s)")]
+            string time,
             [Summary(name:"reason", description: "The reason for the counter. It is this message that will be sent at the end of the counter")]
-            string reason, 
+            string reason,
             [Summary(name:"private-msg", description: "True if the message should not be seen by all")]
             bool privateMsg = false
             )
         {
-            
+
             await DeferAsync(ephemeral: true);
             try
             {
                 var splittedTime = time.Split(" ");
-                
+
                 var years = Array.Find(splittedTime, (timePart) => timePart.EndsWith("Y"));
                 var months = Array.Find(splittedTime, (timePart) => timePart.EndsWith("M"));
                 var days = Array.Find(splittedTime, (timePart) => timePart.EndsWith("D"));
@@ -93,7 +93,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 var hoursInt = hours != null ? int.Parse(hours.Replace("h", "")) : 0;
                 var minutesInt = minutes != null ? int.Parse(minutes.Replace("m", "")) : 0;
                 var secondsInt = seconds != null ? int.Parse(seconds.Replace("s", "")) : 0;
-                
+
                 var now = DateTime.Now;
                 var alert = DateTime.Now
                     .AddYears(yearsInt)
@@ -105,7 +105,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
 
                 var msg = "Votre compteur a bien été programmé !";
                 msg += privateMsg ? " Vous serez notifié par message privé." : "";
-                
+
                 var expirationFieldReason = new EmbedFieldBuilder();
                 expirationFieldReason.Name = "Raison";
                 expirationFieldReason.Value = reason;
@@ -119,7 +119,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                     .WithFields(expirationFieldReason)
                     .WithFields(expirationFieldExpiration)
                     .WithColor(DiscordBotConsts.MhoColorPink);
-                
+
                 await ModifyOriginalResponseAsync(props => props.Embed = embedBuilder.Build());
                 await Task.Delay(alert - now);
 

@@ -15,14 +15,15 @@
             "prefix": "mho",
             "architect": {
                 "build": {
-                    "builder": "@angular-devkit/build-angular:browser",
+                    "builder": "@angular-devkit/build-angular:application",
                     "options": {
                         "preserveSymlinks": true,
-                        "outputPath": "dist/MyHordesOptimizerWebsite/browser",
+                        "outputPath": "dist/MyHordesOptimizerWebsite",
                         "index": "src/index.html",
-                        "main": "src/main.ts",
+                        "browser": "src/main.ts",
                         "polyfills": [
-                            "zone.js"
+                            "zone.js",
+                            "@angular/localize/init"
                         ],
                         "tsConfig": "tsconfig.app.json",
                         "inlineStyleLanguage": "scss",
@@ -35,8 +36,7 @@
                         "styles": [
                             "node_modules/material-icons/iconfont/material-icons.css",
                             "node_modules/@fortawesome/fontawesome-free/css/all.css",
-                            "src/styles.scss",
-                            "src/assets/scss/material-theme/theming.scss"
+                            "src/styles.scss"
                         ],
                         "stylePreprocessorOptions": {
                             "includePaths": [
@@ -46,7 +46,12 @@
                                 "src/assets/scss/halloween"
                             ]
                         },
-                        "scripts": []
+                        "scripts": [],
+                        "server": "src/main.server.ts",
+                        "prerender": true,
+                        "ssr": {
+                            "entry": "server.ts"
+                        }
                     },
                     "configurations": {
                         "production": {
@@ -71,12 +76,9 @@
                             "outputHashing": "all"
                         },
                         "development": {
-                            "buildOptimizer": false,
                             "optimization": false,
-                            "vendorChunk": true,
                             "extractLicenses": false,
-                            "sourceMap": true,
-                            "namedChunks": true
+                            "sourceMap": true
                         },
                         "staging": {
                             "budgets": [
@@ -131,7 +133,8 @@
                     "options": {
                         "polyfills": [
                             "zone.js",
-                            "zone.js.testing"
+                            "zone.js.testing",
+                            "@angular/localize/init"
                         ],
                         "tsConfig": "tsconfig.spec.json",
                         "inlineStyleLanguage": "scss",
@@ -155,91 +158,6 @@
                         },
                         "scripts": []
                     }
-                },
-                "server": {
-                    "builder": "@angular-devkit/build-angular:server",
-                    "options": {
-                        "outputPath": "dist/MyHordesOptimizerWebsite/server",
-                        "main": "server.ts",
-                        "tsConfig": "tsconfig.server.json",
-                        "stylePreprocessorOptions": {
-                            "includePaths": [
-                                "src/assets/scss",
-                                "src/assets/scss/**/"
-                            ]
-                        },
-                        "preserveSymlinks": true,
-                        "inlineStyleLanguage": "scss"
-                    },
-                    "configurations": {
-                        "production": {
-                            "outputHashing": "media",
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.prod.ts"
-                                }
-                            ]
-                        },
-                        "development": {
-                            "buildOptimizer": false,
-                            "optimization": false,
-                            "sourceMap": true,
-                            "extractLicenses": false,
-                            "vendorChunk": true
-                        },
-                        "staging": {
-                            "outputHashing": "media",
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.staging.ts"
-                                }
-                            ]
-                        }
-                    },
-                    "defaultConfiguration": "production"
-                },
-                "serve-ssr": {
-                    "builder": "@angular-devkit/build-angular:ssr-dev-server",
-                    "configurations": {
-                        "production": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:production",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:production"
-                        },
-                        "development": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:development",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:development"
-                        },
-                        "staging": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:staging",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:staging"
-                        }
-                    },
-                    "defaultConfiguration": "development"
-                },
-                "prerender": {
-                    "builder": "@angular-devkit/build-angular:prerender",
-                    "options": {
-                        "routes": [
-                            "/"
-                        ]
-                    },
-                    "configurations": {
-                        "production": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:production",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:production"
-                        },
-                        "development": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:development",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:development"
-                        },
-                        "staging": {
-                            "browserTarget": "MyHordesOptimizerWebsite:build:staging",
-                            "serverTarget": "MyHordesOptimizerWebsite:server:staging"
-                        }
-                    },
-                    "defaultConfiguration": "production"
                 }
             },
             "i18n": {

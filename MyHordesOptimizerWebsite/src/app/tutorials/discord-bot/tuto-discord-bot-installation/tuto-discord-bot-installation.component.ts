@@ -24,7 +24,7 @@ export class TutoDiscordBotInstallationComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     public readonly title: string = $localize`Installation du Bot sur un serveur Discord`;
-    public readonly download_link: string = $localize`<a color="accent" href="https://discord.com/api/oauth2/authorize?client_id=1140035117746765914&permissions=277025459200&scope=bot" target="_blank">lien d'installation du bot</a>`;
+    public readonly download_link: string = $localize`<a color="accent" href="https://discord.com/oauth2/authorize?client_id=1140035117746765914" target="_blank">lien d'installation du bot</a>`;
     public text_1: string = $localize`Vous devez être propriétaire ou avoir les droits d'administration sur le serveur Discord sur lequel vous voulez inviter le Bot.`;
     public text_2: string = $localize`En cliquant sur le ${this.download_link}, vous serez redirigé vers une page d'installation.`;
 

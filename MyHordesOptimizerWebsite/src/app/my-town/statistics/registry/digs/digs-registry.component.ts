@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, inject, Input, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import moment, { Moment } from 'moment';
@@ -12,6 +12,7 @@ import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../_abstract_model/types/dig.class';
 import { DigComponent } from '../../../../shared/elements/dig/dig.component';
 import { SelectComponent } from '../../../../shared/elements/select/select.component';
+import { LocalStorageService } from '../../../../shared/services/localstorage.service';
 import { getTown } from '../../../../shared/utilities/localstorage.util';
 import { CitizenForDigPipe, CitizenNotInDigListPipe } from './citizen-for-dig.pipe';
 
@@ -35,7 +36,7 @@ export class DigsRegistryComponent {
     @Input({ required: true }) displayPseudo!: 'simple' | 'id_mh';
 
     @Input({ required: true }) set registry(registry: Entry[] | undefined) {
-        this.current_day = getTown()?.day || 1;
+        this.current_day = getTown(this.local_storage)?.day || 1;
 
         if (registry) {
 
@@ -101,6 +102,8 @@ export class DigsRegistryComponent {
             this.entries = [];
         }
     }
+
+    private local_storage: LocalStorageService = inject(LocalStorageService);
 
     protected entries: Entry[] = [];
     protected digs: Dig[] = [];

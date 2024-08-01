@@ -5,6 +5,7 @@
         "pathRewrite": {
             "^/api": ""
         },
+        "cookieDomainRewrite": "localhost",
         "ws": true
     }
 }

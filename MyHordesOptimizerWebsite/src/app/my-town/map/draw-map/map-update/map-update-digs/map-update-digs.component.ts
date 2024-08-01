@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,6 +16,7 @@ import { Dig } from '../../../../../_abstract_model/types/dig.class';
 import {
     HeaderWithNumberPreviousNextFilterComponent
 } from '../../../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
+import { LocalStorageService } from '../../../../../shared/services/localstorage.service';
 import { getTown } from '../../../../../shared/utilities/localstorage.util';
 import { DigsPerDayPipe } from './digs-per-day.pipe';
 import { NotInListCitizenDigPipe } from './not-in-list-citizen.pipe';
@@ -41,9 +42,11 @@ export class MapUpdateDigsComponent {
 
     @Output() digsChange: EventEmitter<Dig[]> = new EventEmitter();
 
+    private local_storage: LocalStorageService = inject(LocalStorageService);
+
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
-    public readonly current_day: number = getTown()?.day || 1;
+    public readonly current_day: number = getTown(this.local_storage)?.day || 1;
     public selected_day: number = this.current_day;
 
     public addCitizen(citizen: Citizen): void {

@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/htt
 import { Injectable } from '@angular/core';
 import moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import {
     getItemsWithExpirationDate,
     getRuinsWithExpirationDate,
@@ -26,7 +27,7 @@ export class ApiService extends GlobalService {
     /** La locale */
     private readonly locale: string = moment.locale();
 
-    constructor(_http: HttpClient) {
+    constructor(_http: HttpClient, private local_storage: LocalStorageService) {
         super(_http);
     }
 
@@ -37,15 +38,15 @@ export class ApiService extends GlobalService {
      */
     public getItems(force?: boolean): Observable<Item[]> {
         return new Observable((sub: Subscriber<Item[]>) => {
-            const saved_items: Item[] = getItemsWithExpirationDate();
+            const saved_items: Item[] = getItemsWithExpirationDate(this.local_storage);
             if (saved_items && saved_items.length > 0 && !force) {
                 sub.next(saved_items);
             } else {
-                super.get<ItemDTO[]>(this.API_URL + `/Fetcher/items?${getTown()?.town_id ? 'townId=' + getTown()?.town_id : ''}`)
+                super.get<ItemDTO[]>(this.API_URL + `/Fetcher/items?${getTown(this.local_storage)?.town_id ? 'townId=' + getTown(this.local_storage)?.town_id : ''}`)
                     .subscribe({
                         next: (response: HttpResponse<ItemDTO[]>) => {
                             const items: Item[] = dtoToModelArray(Item, response.body).filter((item: Item) => item.id !== 302);
-                            setItemsWithExpirationDate(items);
+                            setItemsWithExpirationDate(items, this.local_storage);
                             sub.next(items);
                         },
                         error: (error: HttpErrorResponse) => {
@@ -63,7 +64,7 @@ export class ApiService extends GlobalService {
      */
     public getRuins(force?: boolean): Observable<Ruin[]> {
         return new Observable((sub: Subscriber<Ruin[]>) => {
-            const saved_ruins: Ruin[] = getRuinsWithExpirationDate();
+            const saved_ruins: Ruin[] = getRuinsWithExpirationDate(this.local_storage);
             if (saved_ruins && saved_ruins.length > 0 && !force) {
                 sub.next(saved_ruins);
             } else {
@@ -79,7 +80,7 @@ export class ApiService extends GlobalService {
                                 }
                                 return 0;
                             });
-                            setRuinsWithExpirationDate(ruins);
+                            setRuinsWithExpirationDate(ruins, this.local_storage);
 
                             sub.next(ruins);
                         },

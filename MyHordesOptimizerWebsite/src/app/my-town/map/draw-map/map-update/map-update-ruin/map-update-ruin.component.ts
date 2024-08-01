@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
@@ -14,6 +14,7 @@ import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Ruin } from '../../../../../_abstract_model/types/ruin.class';
 import { AutoDestroy } from '../../../../../shared/decorators/autodestroy.decorator';
 import { FilterRuinsByKmPipe } from '../../../../../shared/pipes/filter-ruins-by-km.pipe';
+import { LocalStorageService } from '../../../../../shared/services/localstorage.service';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, ReactiveFormsModule];
 const components: Imports = [];
@@ -35,6 +36,8 @@ export class MapUpdateRuinComponent implements OnInit {
     @Input() cell!: Cell;
 
     @Output() cellChange: EventEmitter<Cell> = new EventEmitter();
+
+    protected local_storage: LocalStorageService = inject(LocalStorageService);
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();

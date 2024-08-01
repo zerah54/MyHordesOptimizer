@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, Input, Output, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
@@ -12,6 +12,7 @@ import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
 import { AutoDestroy } from '../../../../shared/decorators/autodestroy.decorator';
+import { LocalStorageService } from '../../../../shared/services/localstorage.service';
 import { MapOptions } from '../../map.component';
 import { MapCellDetailsComponent } from '../map-cell-details/map-cell-details.component';
 import { MapUpdateComponent, MapUpdateData } from '../map-update/map-update.component';
@@ -64,11 +65,13 @@ export class MapCellComponent {
     @Output() cellChange: EventEmitter<Cell> = new EventEmitter();
     @Output() currentHoveredCellChange: EventEmitter<Cell | undefined> = new EventEmitter();
 
+    protected local_storage: LocalStorageService = inject(LocalStorageService);
+
     public current_cell?: Cell;
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
-    public readonly is_dev: boolean = !environment.production;
+    public readonly is_dev_mode: boolean = !environment.production;
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 

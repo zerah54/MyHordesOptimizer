@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { IHttpConnectionOptions } from '@microsoft/signalr';
 import { environment } from '../../../environments/environment';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { getTokenWithMeWithExpirationDate } from '../../shared/utilities/localstorage.util';
 import { isValidToken } from '../../shared/utilities/token.util';
@@ -13,11 +14,13 @@ import { TokenWithMe } from '../types/token-with-me.class';
 export abstract class RealtimeGlobalService {
     public hubConnection!: signalR.HubConnection;
 
+    protected local_storage: LocalStorageService = inject(LocalStorageService);
+
     protected readonly HUB_URL: string = environment.api_url + '/hub/';
 
     protected options: IHttpConnectionOptions = {
         accessTokenFactory: () => {
-            const token: TokenWithMe | null = getTokenWithMeWithExpirationDate();
+            const token: TokenWithMe | null = getTokenWithMeWithExpirationDate(this.local_storage);
             if (isValidToken(token)) {
                 return token?.token.access_token ?? '';
             }

@@ -26,7 +26,7 @@ export function errorInterceptor(request: HttpRequest<unknown>, next: HttpHandle
 function handleError(error: HttpErrorResponse, snackbar: SnackbarService, authentication_service: AuthenticationService): Observable<never> {
     if (error.status === 0) {
         /** A client-side or network error occurred. Handle it accordingly. */
-        console.error(`Erreur ${error.status} du client ou de réseau : \n`, error.error);
+        console.error(`Erreur ${error.status} du client ou de réseau : \n`, { ...error });
     } else if (error.status === 401) {
         authentication_service.getMe(true).subscribe(() => {
             return retry(1);
@@ -36,7 +36,7 @@ function handleError(error: HttpErrorResponse, snackbar: SnackbarService, authen
          * The backend returned an unsuccessful response code.
          * The response body may contain clues as to what went wrong.
          */
-        console.error(`Erreur ${error.status} retournée par le backend : \n`, error.error);
+        console.error(`Erreur ${typeof error === 'string' ? '' : error.status} retournée par le backend : \n`, error);
     }
     /** Return an observable with a user-facing error message. */
     return throwError(() => {

@@ -1,5 +1,5 @@
 import { CommonModule, formatNumber } from '@angular/common';
-import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, inject, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -10,6 +10,7 @@ import { Misc } from '../../_abstract_model/interfaces';
 import { Imports } from '../../_abstract_model/types/_types';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { getMaxAttack, getMinAttack } from '../../shared/utilities/estimations.util';
 import { getTown } from '../../shared/utilities/localstorage.util';
 import { DespairDeathsCalculatorComponent } from './despair-deaths-calculator/despair-deaths-calculator.component';
@@ -32,8 +33,10 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule
 export class MiscellaneousInfoComponent {
     @HostBinding('style.display') display: string = 'contents';
 
+    private local_storage: LocalStorageService = inject(LocalStorageService);
+
     public readonly locale: string = moment.locale();
-    public readonly my_town: TownDetails | null = getTown();
+    public readonly my_town: TownDetails | null = getTown(this.local_storage);
 
     public misc: Misc[] = [
         {

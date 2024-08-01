@@ -34,6 +34,7 @@ import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.clas
 import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { Me } from '../../_abstract_model/types/me.class';
+import { patchableSignal, PatchableSignal } from '../../_abstract_model/types/patchable-signal.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ActiveCitizensComponent } from '../../shared/elements/active-citizens/active-citizens.component';
 import { CompassRoseComponent } from '../../shared/elements/compass-rose/compass-rose.component';
@@ -45,6 +46,7 @@ import { CitizenFromIdPipe } from '../../shared/pipes/citizens-from-id.pipe';
 import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
 import { JobFromIdPipe } from '../../shared/pipes/job-from-id.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { getCitizenFromId } from '../../shared/utilities/citizen.util';
 import { getTown, getUser } from '../../shared/utilities/localstorage.util';
 import { CitizensForExpePipe, FormatPreRegisteredPipe, SomeHeroicActionNeededPipe } from './citizens-for-expe.pipe';
@@ -69,12 +71,15 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
 export class ExpeditionsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
+    private local_storage: LocalStorageService = inject(LocalStorageService);
+
     /** La langue du site */
     public readonly locale: string = moment.locale();
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    protected readonly current_day: number = getTown()?.day || 1;
-    protected edition_mode: boolean = JSON.parse(localStorage.getItem(EXPEDITIONS_EDITION_MODE_KEY) || 'false');
+    protected readonly current_day: number = getTown(this.local_storage)?.day || 1;
+
+    protected edition_mode: boolean = JSON.parse(this.local_storage?.getItem(EXPEDITIONS_EDITION_MODE_KEY) || 'false');
     protected editable: boolean = true;
     protected selected_tab_index: number = this.current_day - 1;
     protected all_citizens!: Citizen[];
@@ -90,7 +95,7 @@ export class ExpeditionsComponent implements OnInit {
     protected expeditions: WritableSignal<Expedition[]> = signal([]);
     protected active_citizens_list: WritableSignal<number[]> = signal([]);
 
-    protected readonly me: Me = getUser();
+    protected readonly me: Me = getUser(this.local_storage);
 
     private api_service: ApiService = inject(ApiService);
     private town_service: TownService = inject(TownService);
@@ -132,208 +137,197 @@ export class ExpeditionsComponent implements OnInit {
             });
 
         const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_tab_index + 1));
-        this.expeditions.set([...existing_expeditions]);
+        this.new_expeditions = existing_expeditions
+            .map((expedition: Expedition) => patchableSignal(expedition, { equal: (a: Expedition, b: Expedition) => a.id === b.id }));
 
         this.realtime_expeditions_service.expedition_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition: Expedition) => {
-                this.expeditions.update((current_expeditions: Expedition[]) => {
-                    const expedition_to_update: number = current_expeditions
-                        .findIndex((_expedition_to_update: Expedition) => _expedition_to_update.id === expedition.id);
-                    if (expedition_to_update < 0) {
-                        current_expeditions.push(expedition);
-                        this.addNewExpeditionPart(expedition);
-                    } else {
-                        current_expeditions[expedition_to_update] = expedition;
-                    }
-                    current_expeditions.sort((expedition_a: Expedition, expedition_b: Expedition) => {
-                        if (expedition_a.position < expedition_b.position) return -1;
-                        if (expedition_a.position > expedition_b.position) return 1;
-                        return 0;
-                    });
-                    return [...current_expeditions];
+                const expedition_to_update: PatchableSignal<Expedition> | undefined = this.new_expeditions
+                    .find((_expedition_to_update: PatchableSignal<Expedition>) => _expedition_to_update().id === expedition.id);
+                if (!expedition_to_update) {
+                    const new_expedition: PatchableSignal<Expedition> = patchableSignal(expedition, { equal: (a: Expedition, b: Expedition) => a.id === b.id });
+                    this.new_expeditions.push(new_expedition);
+                } else {
+                    expedition_to_update.set(expedition);
+                }
+
+                this.new_expeditions.sort((expedition_a: PatchableSignal<Expedition>, expedition_b: PatchableSignal<Expedition>) => {
+                    if (expedition_a().position < expedition_b().position) return -1;
+                    if (expedition_a().position > expedition_b().position) return 1;
+                    return 0;
                 });
             });
 
         this.realtime_expeditions_service.expeditions_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expeditions: Expedition[]) => {
-                this.expeditions.set([...expeditions]);
+                this.new_expeditions = expeditions.map((expedition: Expedition) => patchableSignal(expedition, { equal: (a: Expedition, b: Expedition) => a.id === b.id }));
             });
 
         this.realtime_expeditions_service.expedition_deleted$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_id: number) => {
-                this.expeditions.update((current_expeditions: Expedition[]) => {
-                    const expedition_to_delete: number = current_expeditions
-                        .findIndex((_expedition_to_delete: Expedition) => _expedition_to_delete.id === expedition_id);
-                    if (expedition_to_delete < 0) return current_expeditions;
-
-                    current_expeditions.splice(expedition_to_delete, 1);
-
-                    return [...current_expeditions];
-                });
+                const expedition_to_delete: number = this.new_expeditions
+                    .findIndex((_expedition_to_delete: PatchableSignal<Expedition>) => _expedition_to_delete().id === expedition_id);
+                if (expedition_to_delete > 0) {
+                    this.new_expeditions.splice(expedition_to_delete, 1);
+                    this.new_expeditions = [...this.new_expeditions];
+                }
             });
 
         this.realtime_expeditions_service.expedition_part_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_part: ExpeditionPart) => {
-                this.expeditions.update((current_expeditions: Expedition[]) => {
-                    const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
-                        return _current_expedition.id === expedition_part.expedition_id;
-                    });
-                    if (!current_expedition) return current_expeditions;
-
-                    const part_to_update: number = current_expedition.parts
+                const current_expeditions: PatchableSignal<Expedition>[] = [...this.new_expeditions];
+                const current_expedition_index: number = current_expeditions
+                    .findIndex((_current_expedition: PatchableSignal<Expedition>) => _current_expedition().id === expedition_part.expedition_id);
+                if (current_expedition_index > -1) {
+                    const parts: ExpeditionPart[] = current_expeditions[current_expedition_index]().parts;
+                    const part_to_update: number = parts
                         .findIndex((_part_to_update: ExpeditionPart) => _part_to_update.id === expedition_part.id);
                     if (part_to_update < 0) {
-                        current_expedition.parts.push(expedition_part);
-                        if (current_expedition.parts.length > 1) {
-                            current_expedition.parts[0].citizens.forEach((existing_citizen: CitizenExpedition) => {
+                        parts.push(expedition_part);
+                        if (parts.length > 1) {
+                            parts[0].citizens.forEach((existing_citizen: CitizenExpedition) => {
                                 this.addNewMemberToPart(expedition_part, existing_citizen);
                             });
                         } else {
                             this.addNewMemberToPart(expedition_part);
                         }
                     } else {
-                        current_expedition.parts[part_to_update] = expedition_part;
+                        parts[part_to_update] = expedition_part;
                     }
 
-                    current_expedition.parts.sort((expedition_part_a: ExpeditionPart, expedition_part_b: ExpeditionPart) => {
+                    parts.sort((expedition_part_a: ExpeditionPart, expedition_part_b: ExpeditionPart) => {
                         if (expedition_part_a.position < expedition_part_b.position) return -1;
                         if (expedition_part_a.position > expedition_part_b.position) return 1;
                         return 0;
                     });
-                    return [...current_expeditions];
-                });
+
+                    this.new_expeditions[current_expedition_index].patch({ parts: parts });
+                }
             });
 
         this.realtime_expeditions_service.expedition_part_deleted$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_part_id: number) => {
-                this.expeditions.update((current_expeditions: Expedition[]) => {
-                    current_expeditions.forEach((current_expedition: Expedition) => {
-                        const part_to_delete: number = current_expedition.parts
-                            .findIndex((_part_to_delete: ExpeditionPart) => _part_to_delete.id === expedition_part_id);
-                        if (part_to_delete > -1) {
-                            current_expedition.parts.splice(part_to_delete, 1);
-                        }
-                    });
-                    return [...current_expeditions];
+                const current_expeditions: PatchableSignal<Expedition>[] = [...this.new_expeditions];
+                current_expeditions.forEach((current_expedition: PatchableSignal<Expedition>, current_expedition_index: number) => {
+                    const part_to_delete: number = current_expedition().parts
+                        .findIndex((_part_to_delete: ExpeditionPart) => _part_to_delete.id === expedition_part_id);
+                    if (part_to_delete > -1) {
+                        this.new_expeditions[current_expedition_index]().parts.splice(part_to_delete, 1);
+                    }
                 });
             });
 
         this.realtime_expeditions_service.expedition_citizen_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_citizen: CitizenExpedition) => {
-                this.expeditions.update((current_expeditions: Expedition[]) => {
-                    const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
-                        return _current_expedition.id === expedition_citizen.expedition_id;
-                    });
-                    if (!current_expedition) return current_expeditions;
+                const current_expeditions: PatchableSignal<Expedition>[] = [...this.new_expeditions];
+                const current_expedition_index: number = current_expeditions
+                    .findIndex((_current_expedition: PatchableSignal<Expedition>) => _current_expedition().id === expedition_citizen.expedition_id);
+                if (current_expedition_index > -1) {
+                    const parts: ExpeditionPart[] = current_expeditions[current_expedition_index]().parts;
+                    const current_expedition_part: ExpeditionPart | undefined = parts
+                        .find((_current_expedition_part: ExpeditionPart) => _current_expedition_part.id === expedition_citizen.expedition_part_id);
+                    if (current_expedition_part) {
+                        const citizen_to_update: number = current_expedition_part.citizens
+                            .findIndex((_citizen_to_update: CitizenExpedition) => _citizen_to_update.id === expedition_citizen.id);
 
-                    const current_expedition_part: ExpeditionPart | undefined = current_expedition.parts.find((_current_expedition_part: ExpeditionPart) => {
-                        return _current_expedition_part.id === expedition_citizen.expedition_part_id;
-                    });
-                    if (!current_expedition_part) return current_expeditions;
-
-                    const citizen_to_update: number = current_expedition_part.citizens
-                        .findIndex((_citizen_to_update: CitizenExpedition) => _citizen_to_update.id === expedition_citizen.id);
-
-                    if (citizen_to_update < 0) {
-                        current_expedition_part.citizens.push(expedition_citizen);
-                    } else {
-                        current_expedition_part.citizens[citizen_to_update] = expedition_citizen;
+                        if (citizen_to_update < 0) {
+                            current_expedition_part.citizens.push(expedition_citizen);
+                        } else {
+                            current_expedition_part.citizens[citizen_to_update] = expedition_citizen;
+                        }
                     }
-                    return [...current_expeditions];
-                });
+                    this.new_expeditions[current_expedition_index].patch({ parts: parts });
+                }
             });
 
         this.realtime_expeditions_service.expedition_citizen_deleted$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_citizen_id: number) => {
-                this.expeditions.update((current_expeditions: Expedition[]) => {
-                    current_expeditions.forEach((current_expedition: Expedition) => {
-                        current_expedition.parts.forEach((current_expedition_part: ExpeditionPart) => {
-                            const citizen_to_delete: number = current_expedition_part.citizens
-                                .findIndex((_citizen_to_delete: CitizenExpedition) => _citizen_to_delete.id === expedition_citizen_id);
-                            if (citizen_to_delete > -1) {
-                                current_expedition_part.citizens.splice(citizen_to_delete, 1);
-                            }
-                        });
+                const current_expeditions: PatchableSignal<Expedition>[] = [...this.new_expeditions];
+                current_expeditions.forEach((current_expedition: PatchableSignal<Expedition>, current_expedition_index: number) => {
+                    const parts: ExpeditionPart[] = current_expedition().parts;
+                    parts.forEach((current_expedition_part: ExpeditionPart) => {
+                        const citizen_to_delete: number = current_expedition_part.citizens
+                            .findIndex((_citizen_to_delete: CitizenExpedition) => _citizen_to_delete.id === expedition_citizen_id);
+                        if (citizen_to_delete > -1) {
+                            current_expedition_part.citizens.splice(citizen_to_delete, 1);
+                            this.new_expeditions[current_expedition_index].patch({ parts: parts });
+                        }
                     });
-                    return [...current_expeditions];
                 });
             });
 
         this.realtime_expeditions_service.expedition_part_orders_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_orders: ExpeditionOrder[]) => {
-                this.expeditions.update((current_expeditions: Expedition[]) => {
-                    for (const expedition_order of expedition_orders) {
-                        const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
-                            return _current_expedition.id === expedition_order.expeditions_id;
-                        });
-                        if (!current_expedition) break;
+                const current_expeditions: PatchableSignal<Expedition>[] = [...this.new_expeditions];
+                for (const expedition_order of expedition_orders) {
+                    const current_expedition_index: number = current_expeditions
+                        .findIndex((_current_expedition: PatchableSignal<Expedition>) => _current_expedition().id === expedition_order.expeditions_id);
+                    if (current_expedition_index < 0) break;
 
-                        const current_expedition_part: ExpeditionPart | undefined = current_expedition.parts.find((_current_expedition_part: ExpeditionPart) => {
-                            return _current_expedition_part.id === expedition_order.expedition_parts_id;
-                        });
-                        if (!current_expedition_part) break;
+                    const parts: ExpeditionPart[] = current_expeditions[current_expedition_index]().parts;
+                    const current_expedition_part: ExpeditionPart | undefined = parts
+                        .find((_current_expedition_part: ExpeditionPart) => _current_expedition_part.id === expedition_order.expedition_parts_id);
+                    if (!current_expedition_part) break;
 
-                        const order_to_update: number = current_expedition_part.orders
-                            .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
-                        if (order_to_update > -1) {
-                            current_expedition_part.orders[order_to_update] = expedition_order;
-                        } else {
-                            current_expedition_part.orders.push(expedition_order);
-                        }
-                        current_expedition_part.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
-                            if (order_a.position < order_b.position) return -1;
-                            if (order_a.position > order_b.position) return 1;
-                            return 0;
-                        });
+                    const order_to_update: number = current_expedition_part.orders
+                        .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
+                    if (order_to_update > -1) {
+                        current_expedition_part.orders[order_to_update] = expedition_order;
+                    } else {
+                        current_expedition_part.orders.push(expedition_order);
                     }
-                    return [...current_expeditions];
-                });
+                    current_expedition_part.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
+                        if (order_a.position < order_b.position) return -1;
+                        if (order_a.position > order_b.position) return 1;
+                        return 0;
+                    });
+                    this.new_expeditions[current_expedition_index].patch({ parts: parts });
+                }
             });
 
         this.realtime_expeditions_service.expedition_citizen_orders_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_orders: ExpeditionOrder[]) => {
-                this.expeditions.update((current_expeditions: Expedition[]) => {
-                    for (const expedition_order of expedition_orders) {
-                        const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
-                            return _current_expedition.id === expedition_order.expeditions_id;
-                        });
-                        if (!current_expedition) break;
+                const current_expeditions: PatchableSignal<Expedition>[] = [...this.new_expeditions];
+                for (const expedition_order of expedition_orders) {
+                    const current_expedition_index: number = current_expeditions
+                        .findIndex((_current_expedition: PatchableSignal<Expedition>) => _current_expedition().id === expedition_order.expeditions_id);
+                    if (current_expedition_index < 0) break;
 
-                        const current_expedition_part: ExpeditionPart | undefined = current_expedition.parts.find((_current_expedition_part: ExpeditionPart) => {
-                            return _current_expedition_part.id === expedition_order.expedition_parts_id;
-                        });
-                        if (!current_expedition_part) break;
+                    const parts: ExpeditionPart[] = current_expeditions[current_expedition_index]().parts;
+                    const current_expedition_part: ExpeditionPart | undefined = parts
+                        .find((_current_expedition_part: ExpeditionPart) => _current_expedition_part.id === expedition_order.expedition_parts_id);
+                    if (!current_expedition_part) break;
 
-                        const current_expedition_citizen: CitizenExpedition | undefined = current_expedition_part.citizens
-                            .find((_current_expedition_citizen: CitizenExpedition) => {
-                                return _current_expedition_citizen.id === expedition_order.expedition_citizen_id;
-                            });
-                        if (!current_expedition_citizen) break;
-
-                        const order_to_update: number = current_expedition_citizen.orders
-                            .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
-                        if (order_to_update > -1) {
-                            current_expedition_citizen.orders[order_to_update] = expedition_order;
-                        } else {
-                            current_expedition_citizen.orders.push(expedition_order);
-                        }
-                        current_expedition_citizen.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
-                            if (order_a.position < order_b.position) return -1;
-                            if (order_a.position > order_b.position) return 1;
-                            return 0;
+                    const current_expedition_citizen: CitizenExpedition | undefined = current_expedition_part.citizens
+                        .find((_current_expedition_citizen: CitizenExpedition) => {
+                            return _current_expedition_citizen.id === expedition_order.expedition_citizen_id;
                         });
+                    if (!current_expedition_citizen) break;
+
+                    const order_to_update: number = current_expedition_citizen.orders
+                        .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
+                    if (order_to_update > -1) {
+                        current_expedition_citizen.orders[order_to_update] = expedition_order;
+                    } else {
+                        current_expedition_citizen.orders.push(expedition_order);
                     }
-                    return [...current_expeditions];
-                });
+                    current_expedition_citizen.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
+                        if (order_a.position < order_b.position) return -1;
+                        if (order_a.position > order_b.position) return 1;
+                        return 0;
+                    });
+
+                    this.new_expeditions[current_expedition_index].patch({ parts: parts });
+                }
             });
 
         // // TODO
@@ -351,93 +345,94 @@ export class ExpeditionsComponent implements OnInit {
         this.realtime_expeditions_service.expedition_order_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_order: ExpeditionOrder) => {
-                this.expeditions.update((current_expeditions: Expedition[]) => {
-                    const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
-                        return _current_expedition.id === expedition_order.expeditions_id;
-                    });
-                    if (!current_expedition) return current_expeditions;
+                const current_expeditions: PatchableSignal<Expedition>[] = [...this.new_expeditions];
+                const current_expedition_index: number = current_expeditions
+                    .findIndex((_current_expedition: PatchableSignal<Expedition>) => _current_expedition().id === expedition_order.expeditions_id);
 
-                    const current_expedition_part: ExpeditionPart | undefined = current_expedition.parts.find((_current_expedition_part: ExpeditionPart) => {
-                        return _current_expedition_part.id === expedition_order.expedition_parts_id;
-                    });
-                    if (!current_expedition_part) return current_expeditions;
+                if (current_expedition_index > -1) {
+                    const parts: ExpeditionPart[] = current_expeditions[current_expedition_index]().parts;
+                    const current_expedition_part: ExpeditionPart | undefined = parts
+                        .find((_current_expedition_part: ExpeditionPart) => _current_expedition_part.id === expedition_order.expedition_parts_id);
 
-                    const current_expedition_citizen: CitizenExpedition | undefined = current_expedition_part.citizens
-                        .find((_current_expedition_citizen: CitizenExpedition) => {
-                            return _current_expedition_citizen.id === expedition_order.expedition_citizen_id;
-                        });
-                    if (!current_expedition_citizen) {
-                        const order_to_update: number = current_expedition_part.orders
-                            .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
-                        if (order_to_update > -1) {
-                            current_expedition_part.orders[order_to_update] = expedition_order;
+                    if (current_expedition_part) {
+
+                        const current_expedition_citizen: CitizenExpedition | undefined = current_expedition_part.citizens
+                            .find((_current_expedition_citizen: CitizenExpedition) => {
+                                return _current_expedition_citizen.id === expedition_order.expedition_citizen_id;
+                            });
+                        if (!current_expedition_citizen) {
+                            const order_to_update: number = current_expedition_part.orders
+                                .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
+                            if (order_to_update > -1) {
+                                current_expedition_part.orders[order_to_update] = expedition_order;
+                            } else {
+                                current_expedition_part.orders.push(expedition_order);
+                            }
+                            current_expedition_part.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
+                                if (order_a.position < order_b.position) return -1;
+                                if (order_a.position > order_b.position) return 1;
+                                return 0;
+                            });
                         } else {
-                            current_expedition_part.orders.push(expedition_order);
+                            const order_to_update: number = current_expedition_citizen.orders
+                                .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
+                            if (order_to_update > -1) {
+                                current_expedition_citizen.orders[order_to_update] = expedition_order;
+                            } else {
+                                current_expedition_citizen.orders.push(expedition_order);
+                            }
+                            current_expedition_citizen.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
+                                if (order_a.position < order_b.position) return -1;
+                                if (order_a.position > order_b.position) return 1;
+                                return 0;
+                            });
                         }
-                        current_expedition_part.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
-                            if (order_a.position < order_b.position) return -1;
-                            if (order_a.position > order_b.position) return 1;
-                            return 0;
-                        });
-                    } else {
-                        const order_to_update: number = current_expedition_citizen.orders
-                            .findIndex((_order_to_update: ExpeditionOrder) => _order_to_update.id === expedition_order.id);
-                        if (order_to_update > -1) {
-                            current_expedition_citizen.orders[order_to_update] = expedition_order;
-                        } else {
-                            current_expedition_citizen.orders.push(expedition_order);
-                        }
-                        current_expedition_citizen.orders.sort((order_a: ExpeditionOrder, order_b: ExpeditionOrder) => {
-                            if (order_a.position < order_b.position) return -1;
-                            if (order_a.position > order_b.position) return 1;
-                            return 0;
-                        });
+                        this.new_expeditions[current_expedition_index].patch({ parts: parts });
                     }
-                    return [...current_expeditions];
-                });
+                }
             });
 
         this.realtime_expeditions_service.expedition_bag_updated$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((expedition_bag: CitizenExpeditionBag) => {
-                this.expeditions.update((current_expeditions: Expedition[]) => {
-                    const current_expedition: Expedition | undefined = current_expeditions.find((_current_expedition: Expedition) => {
-                        return _current_expedition.id === expedition_bag.expeditions_id;
-                    });
-                    if (!current_expedition) return current_expeditions;
+                const current_expeditions: PatchableSignal<Expedition>[] = [...this.new_expeditions];
+                const current_expedition_index: number = current_expeditions
+                    .findIndex((_current_expedition: PatchableSignal<Expedition>) => _current_expedition().id === expedition_bag.expeditions_id);
 
-                    const current_expedition_part: ExpeditionPart | undefined = current_expedition.parts.find((_current_expedition_part: ExpeditionPart) => {
-                        return _current_expedition_part.id === expedition_bag.expeditions_part_id;
-                    });
-                    if (!current_expedition_part) return current_expeditions;
+                if (current_expedition_index > -1) {
+                    const parts: ExpeditionPart[] = current_expeditions[current_expedition_index]().parts;
+                    const current_expedition_part: ExpeditionPart | undefined = parts
+                        .find((_current_expedition_part: ExpeditionPart) => _current_expedition_part.id === expedition_bag.expeditions_part_id);
 
-                    const current_expedition_citizen: CitizenExpedition | undefined = current_expedition_part.citizens
-                        .find((_current_expedition_citizen: CitizenExpedition) => {
-                            return _current_expedition_citizen.id === expedition_bag.expeditions_citizen_id;
-                        });
-                    if (!current_expedition_citizen) return current_expeditions;
+                    if (current_expedition_part) {
+                        const current_expedition_citizen: CitizenExpedition | undefined = current_expedition_part.citizens
+                            .find((_current_expedition_citizen: CitizenExpedition) => {
+                                return _current_expedition_citizen.id === expedition_bag.expeditions_citizen_id;
+                            });
+                        if (current_expedition_citizen) {
 
-                    current_expedition_citizen.bag = expedition_bag;
-
-                    return [...current_expeditions];
-                });
+                            current_expedition_citizen.bag = expedition_bag;
+                            this.new_expeditions[current_expedition_index].patch({ parts: parts });
+                        }
+                    }
+                }
             });
 
         this.realtime_expeditions_service.expedition_bag_deleted$
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((bag_id: number) => {
-                this.expeditions.update((current_expeditions: Expedition[]) => {
-                    current_expeditions.forEach((current_expedition: Expedition) => {
-                        current_expedition.parts.forEach((current_expedition_part: ExpeditionPart) => {
-                            current_expedition_part.citizens.forEach((current_expedition_citizen: CitizenExpedition) => {
-                                if (bag_id === current_expedition_citizen.bag.bag_id) {
-                                    current_expedition_citizen.bag = new CitizenExpeditionBag();
-                                    this.saveBag(current_expedition_citizen);
-                                }
-                            });
+                const current_expeditions: PatchableSignal<Expedition>[] = [...this.new_expeditions];
+                current_expeditions.forEach((current_expedition: PatchableSignal<Expedition>, current_expedition_index: number) => {
+                    const parts: ExpeditionPart[] = current_expedition().parts;
+                    parts.forEach((current_expedition_part: ExpeditionPart) => {
+                        current_expedition_part.citizens.forEach((current_expedition_citizen: CitizenExpedition) => {
+                            if (bag_id === current_expedition_citizen.bag.bag_id) {
+                                current_expedition_citizen.bag = new CitizenExpeditionBag();
+                                this.saveBag(current_expedition_citizen);
+                            }
                         });
                     });
-                    return [...current_expeditions];
+                    this.new_expeditions[current_expedition_index].patch({ parts: parts });
                 });
             });
 
@@ -458,12 +453,12 @@ export class ExpeditionsComponent implements OnInit {
      * Enregistre le mode d'affichage des expéditions
      */
     public changeEditionMode(): void {
-        localStorage.setItem(EXPEDITIONS_EDITION_MODE_KEY, JSON.stringify(this.edition_mode));
+        this.local_storage?.setItem(EXPEDITIONS_EDITION_MODE_KEY, JSON.stringify(this.edition_mode));
     }
 
     public async changeTab(event: MatTabChangeEvent): Promise<void> {
         const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(this.selected_tab_index + 1));
-        this.expeditions.set([...existing_expeditions]);
+        this.new_expeditions = existing_expeditions.map((expedition: Expedition) => patchableSignal(expedition, { equal: (a: Expedition, b: Expedition) => a.id === b.id }));
         this.editable = event.index >= this.current_day - 1;
     }
 
@@ -488,12 +483,18 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     public async addNewExpedition(): Promise<void> {
+        console.log('add');
         await this.realtime_expeditions_service.updateExpedition(this.selected_tab_index + 1, new Expedition());
     }
 
-    public async addNewExpeditionPart(expedition: Expedition): Promise<void> {
+    public async addNewExpeditionPart(expedition: Expedition | PatchableSignal<Expedition>): Promise<void> {
+        console.log('add part');
         const new_part: ExpeditionPart = new ExpeditionPart();
-        await this.realtime_expeditions_service.updateExpeditionPart(expedition, new_part);
+        if (expedition instanceof Expedition) {
+            await this.realtime_expeditions_service.updateExpeditionPart(expedition, new_part);
+        } else {
+            await this.realtime_expeditions_service.updateExpeditionPart(expedition(), new_part);
+        }
     }
 
     public async removeCitizenFromPart(citizen: CitizenExpedition): Promise<void> {
@@ -606,7 +607,7 @@ export class ExpeditionsComponent implements OnInit {
     public openReorganize(): void {
         this.dialog
             .open<EditPositionsComponent, EditPositionsData>(EditPositionsComponent, {
-                data: { expeditions: this.expeditions() },
+                data: { expeditions: this.new_expeditions },
                 width: '500px'
             })
             .afterClosed()
@@ -638,9 +639,9 @@ export class ExpeditionsComponent implements OnInit {
 
     public get spots(): number {
         let spots: number = 0;
-        this.expeditions()?.forEach((expedition: Expedition) => {
-            if (expedition.parts && expedition.parts.length > 0) {
-                spots += expedition.parts[0].citizens.length || 0;
+        this.new_expeditions?.forEach((expedition: PatchableSignal<Expedition>) => {
+            if (expedition().parts && expedition().parts.length > 0) {
+                spots += expedition().parts[0].citizens.length || 0;
             }
         });
         return spots;
@@ -735,10 +736,10 @@ export class ExpeditionsComponent implements OnInit {
         }
         text += '\n[/rp]\n';
 
-        this.expeditions().forEach((expedition: Expedition, expedition_index: number) => {
-            text += `\n[collapse=${expedition.label || expedition_index + 1}]\n`;
-            expedition.parts.forEach((part: ExpeditionPart, part_index: number) => {
-                if (expedition.parts.length > 1) {
+        this.new_expeditions.forEach((expedition: PatchableSignal<Expedition>, expedition_index: number) => {
+            text += `\n[collapse=${expedition().label || expedition_index + 1}]\n`;
+            expedition().parts.forEach((part: ExpeditionPart, part_index: number) => {
+                if (expedition().parts.length > 1) {
                     text += part.path || '';
                 }
 
@@ -752,7 +753,7 @@ export class ExpeditionsComponent implements OnInit {
                     }
                 });
 
-                if (expedition.parts.length > 1 && part_index < expedition.parts.length - 1) {
+                if (expedition().parts.length > 1 && part_index < expedition().parts.length - 1) {
                     text += '\n{hr}';
                 }
             });
@@ -771,8 +772,8 @@ export class ExpeditionsComponent implements OnInit {
         const my_expedition: boolean = expedition.parts
             .some((part: ExpeditionPart) => part.citizens.some((citizen: CitizenExpedition) => citizen.citizen_id === this.me.id));
         if (my_expedition) return true;
-        const am_i_somewhere: boolean = this.expeditions()
-            .some((some_expedition: Expedition) => some_expedition.parts
+        const am_i_somewhere: boolean = this.new_expeditions
+            .some((some_expedition: PatchableSignal<Expedition>) => some_expedition().parts
                 .some((part: ExpeditionPart) => part.citizens
                     .some((citizen: CitizenExpedition) => citizen.citizen_id === this.me.id)
                 )
@@ -783,9 +784,9 @@ export class ExpeditionsComponent implements OnInit {
 
     public get preRegisteredJobs(): { count: number, job: string }[] {
         const pre_registered_jobs: { count: number, job: string }[] = [];
-        this.expeditions()?.forEach((expedition: Expedition) => {
-            if (expedition.parts && expedition.parts.length > 0) {
-                const part: ExpeditionPart = expedition.parts[0];
+        this.new_expeditions?.forEach((expedition: PatchableSignal<Expedition>) => {
+            if (expedition().parts && expedition().parts.length > 0) {
+                const part: ExpeditionPart = expedition().parts[0];
                 part.citizens.forEach((citizen: CitizenExpedition) => {
                     let pre_registered_job: { count: number, job: string } | undefined;
                     if (citizen.preinscrit_job) {

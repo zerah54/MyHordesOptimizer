@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { getTown, getUserId, } from '../../shared/utilities/localstorage.util';
 import { EstimationsDTO } from '../dto/estimations.dto';
 import { RegenDTO } from '../dto/regen.dto';
@@ -13,13 +14,13 @@ import { GlobalService } from './_global.service';
 @Injectable({ providedIn: 'root' })
 export class TownStatisticsService extends GlobalService {
 
-    constructor(_http: HttpClient) {
+    constructor(_http: HttpClient, private local_storage: LocalStorageService) {
         super(_http);
     }
 
     public getApofooAttackCalculation(day: number, beta: boolean): Observable<MinMax | null> {
         return new Observable((sub: Subscriber<MinMax | null>) => {
-            super.get<MinMax>(this.API_URL + `/attaqueEstimation/apofooAttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${getTown()?.town_id}`)
+            super.get<MinMax>(this.API_URL + `/attaqueEstimation/apofooAttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${getTown(this.local_storage)?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<MinMax>) => {
                         sub.next(response.body);
@@ -33,7 +34,7 @@ export class TownStatisticsService extends GlobalService {
 
     public getScrutList(): Observable<Regen[]> {
         return new Observable((sub: Subscriber<Regen[]>) => {
-            super.get<RegenDTO[]>(this.API_URL + `/Fetcher/MapUpdates?townid=${getTown()?.town_id}`)
+            super.get<RegenDTO[]>(this.API_URL + `/Fetcher/MapUpdates?townid=${getTown(this.local_storage)?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<RegenDTO[]>) => {
                         sub.next(dtoToModelArray(Regen, response.body));
@@ -47,7 +48,7 @@ export class TownStatisticsService extends GlobalService {
 
     public getEstimations(day: number): Observable<Estimations> {
         return new Observable((sub: Subscriber<Estimations>) => {
-            super.get<EstimationsDTO>(this.API_URL + `/AttaqueEstimation/Estimations/${day}?townid=${getTown()?.town_id}`)
+            super.get<EstimationsDTO>(this.API_URL + `/AttaqueEstimation/Estimations/${day}?townid=${getTown(this.local_storage)?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<EstimationsDTO>) => {
                         sub.next(new Estimations(response.body));
@@ -61,7 +62,7 @@ export class TownStatisticsService extends GlobalService {
 
     public saveEstimations(estimations: Estimations): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.post<EstimationsDTO>(this.API_URL + `/AttaqueEstimation/Estimations?townid=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(estimations.modelToDto()))
+            super.post<EstimationsDTO>(this.API_URL + `/AttaqueEstimation/Estimations?townid=${getTown(this.local_storage)?.town_id}&userId=${getUserId(this.local_storage)}`, JSON.stringify(estimations.modelToDto()))
                 .subscribe({
                     next: () => {
                         sub.next();

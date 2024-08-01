@@ -1,4 +1,4 @@
-import { FirebaseOptions } from '@firebase/app';
+import { Environment } from './environment.type';
 
 export const environment: Environment = {
     production: true,
@@ -14,10 +14,3 @@ export const environment: Environment = {
         measurementId: 'G-8TJ97WXDZR'
     }
 };
-
-interface Environment {
-    production: boolean;
-    api_url: string;
-    website_url: string;
-    firebase_config: FirebaseOptions;
-}

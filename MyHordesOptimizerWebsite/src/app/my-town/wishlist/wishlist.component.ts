@@ -1,7 +1,7 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { CommonModule, DOCUMENT, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, Inject, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -41,6 +41,7 @@ import { SelectComponent } from '../../shared/elements/select/select.component';
 import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
 import { CustomKeyValuePipe } from '../../shared/pipes/key-value.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { IsItemDisplayedPipe } from './is-item-displayed.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
@@ -92,7 +93,8 @@ export class WishlistComponent implements OnInit {
     public selected_tab_key: string = '0';
     public selected_tab_index: number = 0;
 
-    public edition_mode: boolean = JSON.parse(localStorage.getItem(WISHLIST_EDITION_MODE_KEY) || 'false');
+    public local_storage: LocalStorageService = inject(LocalStorageService);
+    public edition_mode: boolean = JSON.parse(this.local_storage?.getItem(WISHLIST_EDITION_MODE_KEY) || 'false');
 
     public items: Item[] = [];
 
@@ -414,7 +416,7 @@ export class WishlistComponent implements OnInit {
      * Enregistre le mode d'affichage de la liste de courses
      */
     public changeEditionMode(): void {
-        localStorage.setItem(WISHLIST_EDITION_MODE_KEY, JSON.stringify(this.edition_mode));
+        this.local_storage?.setItem(WISHLIST_EDITION_MODE_KEY, JSON.stringify(this.edition_mode));
     }
 
     public compareWith(option: WishlistDepot | WishlistPriority, selected: WishlistDepot | WishlistPriority): boolean {

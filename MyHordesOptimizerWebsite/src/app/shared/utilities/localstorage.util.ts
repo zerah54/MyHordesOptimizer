@@ -12,42 +12,43 @@ import { Me } from '../../_abstract_model/types/me.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { TokenWithMe } from '../../_abstract_model/types/token-with-me.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
+import { LocalStorageService } from '../services/localstorage.service';
 import { isValidToken } from './token.util';
 
-export function setUser(user: Me | null): void {
-    localStorage.setItem(USER_KEY, user ? JSON.stringify(user) : '');
+export function setUser(user: Me | null, local_storage: LocalStorageService): void {
+    local_storage?.setItem(USER_KEY, user ? JSON.stringify(user) : '');
 }
 
-export function getUser(): Me {
-    const user: string | null = localStorage.getItem(USER_KEY);
+export function getUser(local_storage: LocalStorageService): Me {
+    const user: string | null = local_storage?.getItem(USER_KEY);
     return user ? JSON.parse(user) : null;
 }
 
-export function getUserId(): number | null {
-    const user_id: number | undefined = getUser()?.id;
+export function getUserId(local_storage: LocalStorageService): number | null {
+    const user_id: number | undefined = getUser(local_storage)?.id;
     return user_id ? +user_id : null;
 }
 
-export function getExternalAppId(): string | null {
-    return localStorage.getItem(EXTERNAL_APP_ID_KEY);
+export function getExternalAppId(local_storage: LocalStorageService): string | null {
+    return local_storage?.getItem(EXTERNAL_APP_ID_KEY);
 }
 
-export function setExternalAppId(id: string | null): void {
-    localStorage.setItem(EXTERNAL_APP_ID_KEY, id ? id : '');
+export function setExternalAppId(id: string | null, local_storage: LocalStorageService): void {
+    local_storage?.setItem(EXTERNAL_APP_ID_KEY, id ? id : '');
 }
 
-export function getTown(): TownDetails | null {
-    const town: string | null = localStorage.getItem(TOWN_KEY);
+export function getTown(local_storage: LocalStorageService): TownDetails | null {
+    const town: string | null = local_storage?.getItem(TOWN_KEY);
     return town ? JSON.parse(town) : null;
 }
 
-export function setTown(town: TownDetails | null): void {
-    localStorage.setItem(TOWN_KEY, town ? JSON.stringify(town) : '');
+export function setTown(town: TownDetails | null, local_storage: LocalStorageService): void {
+    local_storage?.setItem(TOWN_KEY, town ? JSON.stringify(town) : '');
 }
 
-export function getItemsWithExpirationDate(): Item[] {
-    const local_storage: string | null = localStorage.getItem(ITEMS_KEY) || '';
-    const element_with_expiration: ElementWithExpiration<ItemDTO[]> = local_storage ? JSON.parse(local_storage) : undefined;
+export function getItemsWithExpirationDate(local_storage: LocalStorageService): Item[] {
+    const local_storage_item: string | null = local_storage?.getItem(ITEMS_KEY) || '';
+    const element_with_expiration: ElementWithExpiration<ItemDTO[]> = local_storage_item ? JSON.parse(local_storage_item) : undefined;
     if (!element_with_expiration || moment(element_with_expiration.expire_at).isBefore(moment())) {
         return [];
     } else {
@@ -55,17 +56,17 @@ export function getItemsWithExpirationDate(): Item[] {
     }
 }
 
-export function setItemsWithExpirationDate(items: Item[]): void {
+export function setItemsWithExpirationDate(items: Item[], local_storage: LocalStorageService): void {
     const element_with_expiration: ElementWithExpiration<ItemDTO[] | null> = {
         expire_at: moment().utc().tz('Europe/Paris').endOf('day'),
         element: modelToDtoArray(items)
     };
-    localStorage.setItem(ITEMS_KEY, JSON.stringify(element_with_expiration));
+    local_storage?.setItem(ITEMS_KEY, JSON.stringify(element_with_expiration));
 }
 
-export function getBankWithExpirationDate(): BankInfo | undefined {
-    const local_storage: string | null = localStorage.getItem(BANK_KEY) || '';
-    const element_with_expiration: ElementWithExpiration<BankInfoDTO> = local_storage ? JSON.parse(local_storage) : undefined;
+export function getBankWithExpirationDate(local_storage: LocalStorageService): BankInfo | undefined {
+    const local_storage_item: string | null = local_storage?.getItem(BANK_KEY) || '';
+    const element_with_expiration: ElementWithExpiration<BankInfoDTO> = local_storage_item ? JSON.parse(local_storage_item) : undefined;
     if (!element_with_expiration || moment(element_with_expiration.expire_at).isBefore(moment())) {
         return undefined;
     } else {
@@ -73,17 +74,17 @@ export function getBankWithExpirationDate(): BankInfo | undefined {
     }
 }
 
-export function setBankWithExpirationDate(bank: BankInfo): void {
+export function setBankWithExpirationDate(bank: BankInfo, local_storage: LocalStorageService): void {
     const element_with_expiration: ElementWithExpiration<BankInfoDTO | null> = {
         expire_at: moment().utc().tz('Europe/Paris').endOf('day'),
         element: bank.modelToDto()
     };
-    localStorage.setItem(BANK_KEY, JSON.stringify(element_with_expiration));
+    local_storage?.setItem(BANK_KEY, JSON.stringify(element_with_expiration));
 }
 
-export function getRuinsWithExpirationDate(): Ruin[] {
-    const local_storage: string | null = localStorage.getItem(RUINS_KEY) || '';
-    const element_with_expiration: ElementWithExpiration<RuinDTO[]> = local_storage ? JSON.parse(local_storage) : undefined;
+export function getRuinsWithExpirationDate(local_storage: LocalStorageService): Ruin[] {
+    const local_storage_item: string | null = local_storage?.getItem(RUINS_KEY) || '';
+    const element_with_expiration: ElementWithExpiration<RuinDTO[]> = local_storage_item ? JSON.parse(local_storage_item) : undefined;
     if (!element_with_expiration || moment(element_with_expiration.expire_at).isBefore(moment())) {
         return [];
     } else {
@@ -91,18 +92,18 @@ export function getRuinsWithExpirationDate(): Ruin[] {
     }
 }
 
-export function setRuinsWithExpirationDate(items: Ruin[]): void {
+export function setRuinsWithExpirationDate(items: Ruin[], local_storage: LocalStorageService): void {
     const element_with_expiration: ElementWithExpiration<RuinDTO[] | null> = {
         expire_at: moment().utc().tz('Europe/Paris').endOf('day'),
         element: modelToDtoArray(items)
     };
-    localStorage.setItem(RUINS_KEY, JSON.stringify(element_with_expiration));
+    local_storage?.setItem(RUINS_KEY, JSON.stringify(element_with_expiration));
 }
 
 
-export function getTokenWithMeWithExpirationDate(): TokenWithMe | null {
-    const local_storage: string | null = localStorage.getItem(TOKEN_KEY) || '';
-    const element_with_expiration: ElementWithExpiration<TokenWithMeDTO> = local_storage ? JSON.parse(local_storage) : undefined;
+export function getTokenWithMeWithExpirationDate(local_storage: LocalStorageService): TokenWithMe | null {
+    const local_storage_item: string | null = local_storage.getItem(TOKEN_KEY) || '';
+    const element_with_expiration: ElementWithExpiration<TokenWithMeDTO> = local_storage_item ? JSON.parse(local_storage_item) : undefined;
     if (!element_with_expiration) return null;
     if (!isValidToken(new TokenWithMe(element_with_expiration.element))) {
         return null;
@@ -111,12 +112,12 @@ export function getTokenWithMeWithExpirationDate(): TokenWithMe | null {
     }
 }
 
-export function setTokenWithMeWithExpirationDate(token: TokenWithMe): void {
+export function setTokenWithMeWithExpirationDate(token: TokenWithMe, local_storage: LocalStorageService): void {
     const element_with_expiration: ElementWithExpiration<TokenWithMeDTO | null> = {
         expire_at: moment(token.token.valid_to),
         element: token.modelToDto()
     };
-    localStorage.setItem(TOKEN_KEY, JSON.stringify(element_with_expiration));
+    local_storage?.setItem(TOKEN_KEY, JSON.stringify(element_with_expiration));
 }
 
 interface ElementWithExpiration<T> {

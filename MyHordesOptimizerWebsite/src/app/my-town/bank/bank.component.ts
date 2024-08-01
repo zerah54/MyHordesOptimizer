@@ -19,6 +19,7 @@ import { FilterFieldComponent } from '../../shared/elements/filter-field/filter-
 import { ItemComponent } from '../../shared/elements/item/item.component';
 import { SelectComponent } from '../../shared/elements/select/select.component';
 import { ItemsGroupByCategoryPipe } from '../../shared/pipes/items-group-by-category.pipe';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { normalizeString } from '../../shared/utilities/string.utils';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
@@ -50,7 +51,9 @@ export class BankComponent implements OnInit {
     /** Le champ de filtres sur les propriétés */
     public select_value: (Property | Action)[] = [];
 
-    public condensed_display: boolean = JSON.parse(localStorage.getItem(BANK_CONDENSED_DISPLAY_KEY) || 'false');
+
+    public local_storage: LocalStorageService = inject(LocalStorageService);
+    public condensed_display: boolean = JSON.parse(this.local_storage?.getItem(BANK_CONDENSED_DISPLAY_KEY) || 'false');
 
     /** La liste des filtres */
     public options: (Property | Action)[] = [...<Property[]>Property.getAllValues(), ...<Action[]>Action.getAllValues()];
@@ -112,6 +115,6 @@ export class BankComponent implements OnInit {
      * Enregistre le mode d'affichage de la banque
      */
     public changeCondensedDisplay(): void {
-        localStorage.setItem(BANK_CONDENSED_DISPLAY_KEY, JSON.stringify(this.condensed_display));
+        this.local_storage?.setItem(BANK_CONDENSED_DISPLAY_KEY, JSON.stringify(this.condensed_display));
     }
 }

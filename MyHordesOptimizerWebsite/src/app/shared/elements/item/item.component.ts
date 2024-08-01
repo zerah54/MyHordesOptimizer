@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
-import { booleanAttribute, Component, HostBinding, Input, OnInit } from '@angular/core';
+import { booleanAttribute, Component, HostBinding, inject, Input, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import moment from 'moment';
@@ -10,6 +10,7 @@ import { Imports } from '../../../_abstract_model/types/_types';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { AutoDestroy } from '../../decorators/autodestroy.decorator';
+import { LocalStorageService } from '../../services/localstorage.service';
 import { getTown } from '../../utilities/localstorage.util';
 import { RecipeComponent } from '../recipe/recipe.component';
 
@@ -33,13 +34,15 @@ export class ItemComponent implements OnInit {
     /** Force l'ouverture de l'élément */
     @Input({ transform: booleanAttribute }) forceOpen: boolean = false;
 
+    private local_storage: LocalStorageService = inject(LocalStorageService);
+
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
     public readonly locale: string = moment.locale();
 
     public display_mode: 'simple' | 'advanced' = 'simple';
-    public town: TownDetails | null = getTown();
+    public town: TownDetails | null = getTown(this.local_storage);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 

@@ -60,7 +60,7 @@
             <mat-divider></mat-divider>
             <h4 i18n>Liste des bâtiments possibles</h4>
             <mat-list>
-                @for (ruin of (allRuins | filterRuinsByKm:cell.nb_km); track ruin.id) {
+                @for (ruin of (allRuins | filterRuinsByKm:cell.nb_km:local_storage); track ruin.id) {
                     @if (ruin.id > -1) {
                         <mat-list-item>
                             <span matListItemTitle>{{ ruin.label[locale] }}</span>

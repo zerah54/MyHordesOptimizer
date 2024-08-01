@@ -19,7 +19,7 @@
                     <div class="category">
                         <h2>{{ category.category.label[locale] }}</h2>
                         <div class="items">
-                            @for (bank_item of category.items; track bank_item.id) {
+                            @for (bank_item of category.items; track $index) {
                                 <mho-item [item]="bank_item"></mho-item>
                             }
                         </div>

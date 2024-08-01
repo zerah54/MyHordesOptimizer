@@ -150,8 +150,8 @@ export class RealtimeExpeditionsService extends RealtimeGlobalService {
     }
 
     public async updateExpedition(day: number, expedition: Expedition): Promise<void> {
-        console.log('send', 'PostExpedition', getTown()?.town_id, day, expedition.modelToDtoShort());
-        await this.invokeHub('PostExpedition', getTown()?.town_id, day, JSON.stringify(expedition.modelToDtoShort()));
+        console.log('send', 'PostExpedition', getTown(this.local_storage)?.town_id, day, expedition.modelToDtoShort());
+        await this.invokeHub('PostExpedition', getTown(this.local_storage)?.town_id, day, JSON.stringify(expedition.modelToDtoShort()));
     }
 
     public async deleteExpedition(expedition: Expedition): Promise<void> {
@@ -160,8 +160,8 @@ export class RealtimeExpeditionsService extends RealtimeGlobalService {
     }
 
     public async copyExpeditions(from_day: number, to_day: number): Promise<void> {
-        console.log('send', 'CopyExpeditions', getTown()?.town_id, from_day, to_day);
-        await this.invokeHub('CopyExpeditions', getTown()?.town_id, from_day, to_day);
+        console.log('send', 'CopyExpeditions', getTown(this.local_storage)?.town_id, from_day, to_day);
+        await this.invokeHub('CopyExpeditions', getTown(this.local_storage)?.town_id, from_day, to_day);
     }
 
     public async updateExpeditionPart(expedition: Expedition, part: ExpeditionPart): Promise<void> {

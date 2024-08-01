@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/htt
 import { Injectable } from '@angular/core';
 import moment from 'moment';
 import { Observable, Subscriber } from 'rxjs';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { getBankWithExpirationDate, getExternalAppId, getTown, getUserId, setBankWithExpirationDate, } from '../../shared/utilities/localstorage.util';
 import { BankInfoDTO } from '../dto/bank-info.dto';
@@ -18,6 +19,7 @@ import { Cell } from '../types/cell.class';
 import { CitizenInfo } from '../types/citizen-info.class';
 import { Citizen } from '../types/citizen.class';
 import { Ruin } from '../types/ruin.class';
+import { TownDetails } from '../types/town-details.class';
 import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
 import { GlobalService } from './_global.service';
@@ -28,7 +30,7 @@ export class TownService extends GlobalService {
     /** La locale */
     private readonly locale: string = moment.locale();
 
-    constructor(_http: HttpClient, private snackbar: SnackbarService) {
+    constructor(_http: HttpClient, private snackbar: SnackbarService, private local_storage: LocalStorageService) {
         super(_http);
     }
 
@@ -39,7 +41,7 @@ export class TownService extends GlobalService {
      */
     public getBank(force?: boolean): Observable<BankInfo> {
         return new Observable((sub: Subscriber<BankInfo>) => {
-            const saved_bank: BankInfo | undefined = getBankWithExpirationDate();
+            const saved_bank: BankInfo | undefined = getBankWithExpirationDate(this.local_storage);
             if (saved_bank && saved_bank.items.length > 0 && !force) {
                 sub.next(saved_bank);
             } else {
@@ -47,7 +49,7 @@ export class TownService extends GlobalService {
                     .subscribe({
                         next: (response: HttpResponse<BankInfoDTO>) => {
                             const bank: BankInfo = new BankInfo(response.body);
-                            setBankWithExpirationDate(bank);
+                            setBankWithExpirationDate(bank, this.local_storage);
                             sub.next(bank);
                         },
                         error: (error: HttpErrorResponse) => {
@@ -67,19 +69,20 @@ export class TownService extends GlobalService {
             isMyHordesOptimizer: 'api'
         };
 
+        const town: TownDetails | null = getTown(this.local_storage);
         const town_details: {
             townX: number,
             townY: number,
             isDevaste: boolean,
             townId: number
         } = {
-            townX: getTown()?.town_x || 0,
-            townY: getTown()?.town_y || 0,
-            isDevaste: getTown()?.is_devaste || false,
-            townId: getTown()?.town_id || 0
+            townX: town?.town_x || 0,
+            townY: town?.town_y || 0,
+            isDevaste: town?.is_devaste || false,
+            townId: town?.town_id || 0
         };
 
-        super.post(this.API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`,
+        super.post(this.API_URL + `/externaltools/update?userKey=${getExternalAppId(this.local_storage)}&userId=${getUserId(this.local_storage)}`,
             JSON.stringify({
                 map: { toolsToUpdate: tools_to_update },
                 townDetails: town_details
@@ -95,7 +98,7 @@ export class TownService extends GlobalService {
     public getTownRuins(): Observable<Ruin[]> {
         return new Observable((sub: Subscriber<Ruin[]>) => {
 
-            super.get<RuinDTO[]>(this.API_URL + `/Fetcher/ruins?townId=${getTown()?.town_id}`)
+            super.get<RuinDTO[]>(this.API_URL + `/Fetcher/ruins?townId=${getTown(this.local_storage)?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<RuinDTO[]>) => {
                         const ruins: Ruin[] = dtoToModelArray(Ruin, response.body).sort((a: Ruin, b: Ruin) => {
@@ -124,7 +127,7 @@ export class TownService extends GlobalService {
      */
     public getCitizens(): Observable<CitizenInfo> {
         return new Observable((sub: Subscriber<CitizenInfo>) => {
-            super.get<CitizenInfoDTO>(this.API_URL + `/Fetcher/citizens?townId=${getTown()?.town_id}&userId=${getUserId()}`)
+            super.get<CitizenInfoDTO>(this.API_URL + `/Fetcher/citizens?townId=${getTown(this.local_storage)?.town_id}&userId=${getUserId(this.local_storage)}`)
                 .subscribe({
                     next: (response: HttpResponse<CitizenInfoDTO>) => {
                         sub.next(new CitizenInfo(response.body));
@@ -143,7 +146,7 @@ export class TownService extends GlobalService {
      */
     public getCitizen(id: number): Observable<Citizen> {
         return new Observable((sub: Subscriber<Citizen>) => {
-            super.get<CitizenDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${id}`)
+            super.get<CitizenDTO>(this.API_URL + `/town/${getTown(this.local_storage)?.town_id}/user/${id}`)
                 .subscribe({
                     next: (response: HttpResponse<CitizenDTO>) => {
                         sub.next(new Citizen(response.body || undefined));
@@ -157,7 +160,7 @@ export class TownService extends GlobalService {
 
     public getMap(): Observable<Town> {
         return new Observable((sub: Subscriber<Town>) => {
-            super.get<TownDTO>(this.API_URL + `/Fetcher/map?townId=${getTown()?.town_id}`)
+            super.get<TownDTO>(this.API_URL + `/Fetcher/map?townId=${getTown(this.local_storage)?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<TownDTO>) => {
                         sub.next(new Town(response.body));
@@ -171,7 +174,7 @@ export class TownService extends GlobalService {
 
     public updateBag(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Bag?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenBagDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Bag?townId=${getTown(this.local_storage)?.town_id}&userId=${getUserId(this.local_storage)}`, JSON.stringify(citizen.toCitizenBagDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -185,7 +188,7 @@ export class TownService extends GlobalService {
 
     public updateStatus(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Status?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenStatusDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Status?townId=${getTown(this.local_storage)?.town_id}&userId=${getUserId(this.local_storage)}`, JSON.stringify(citizen.toCitizenStatusDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -199,7 +202,7 @@ export class TownService extends GlobalService {
 
     public updateHome(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/home?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenHomeDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/home?townId=${getTown(this.local_storage)?.town_id}&userId=${getUserId(this.local_storage)}`, JSON.stringify(citizen.toCitizenHomeDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -213,7 +216,7 @@ export class TownService extends GlobalService {
 
     public updateHeroicActions(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/HeroicActions?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(citizen.toCitizenHeroicActionsDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/HeroicActions?townId=${getTown(this.local_storage)?.town_id}&userId=${getUserId(this.local_storage)}`, JSON.stringify(citizen.toCitizenHeroicActionsDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));
@@ -227,7 +230,7 @@ export class TownService extends GlobalService {
 
     public saveCell(cell: Cell): Observable<Cell> {
         return new Observable((sub: Subscriber<Cell>) => {
-            super.post<CellDTO>(this.API_URL + `/Map/cell?townid=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(cell.toSaveCellDTO()))
+            super.post<CellDTO>(this.API_URL + `/Map/cell?townid=${getTown(this.local_storage)?.town_id}&userId=${getUserId(this.local_storage)}`, JSON.stringify(cell.toSaveCellDTO()))
                 .subscribe({
                     next: (response: CellDTO) => {
                         this.snackbar.successSnackbar($localize`La cellule a bien été modifiée`);
@@ -242,7 +245,7 @@ export class TownService extends GlobalService {
 
     public addBath(citizen: Citizen, day?: number): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/bath?day=${day ?? getTown()?.day}`)
+            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getTown(this.local_storage)?.town_id}/user/${citizen.id}/bath?day=${day ?? getTown(this.local_storage)?.day}`)
                 .subscribe({
                     next: (update_info: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(update_info));
@@ -256,7 +259,7 @@ export class TownService extends GlobalService {
 
     public removeBath(citizen: Citizen): Observable<void> {
         return new Observable((sub: Subscriber<void>) => {
-            super.delete(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/bath?day=${getTown()?.day}`)
+            super.delete(this.API_URL + `/town/${getTown(this.local_storage)?.town_id}/user/${citizen.id}/bath?day=${getTown(this.local_storage)?.day}`)
                 .subscribe({
                     next: () => {
                         sub.next();
@@ -270,7 +273,7 @@ export class TownService extends GlobalService {
 
     public saveChamanicDetails(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
-            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getTown()?.town_id}/user/${citizen.id}/chamanicDetail`, JSON.stringify(citizen.chamanic_detail.modelToDto()))
+            super.post<UpdateInfoDTO>(this.API_URL + `/town/${getTown(this.local_storage)?.town_id}/user/${citizen.id}/chamanicDetail`, JSON.stringify(citizen.chamanic_detail.modelToDto()))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));

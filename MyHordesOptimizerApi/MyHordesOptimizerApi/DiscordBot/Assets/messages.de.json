@@ -9,10 +9,10 @@
     },
     "timer": {
         "name": "timer",
-        "description": "Startet einen Zähler mit anpassbarer Dauer (Beispiel: 1h 25m 12s)",
+        "description": "Startet einen Zähler mit anpassbarer Dauer (Beispiel: 1Y 3M 2D 1h 25m 12s)",
         "time": {
             "name": "dauer",
-            "description": "Die Dauer des Timers (Beispiel: 1h 25m 12s)"
+            "description": "Die Dauer des Timers (Beispiel: 1Y 3M 2D 1h 25m 12s)"
         },
         "reason": {
             "name": "grund",

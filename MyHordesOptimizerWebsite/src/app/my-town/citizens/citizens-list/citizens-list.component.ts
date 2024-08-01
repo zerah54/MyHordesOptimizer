@@ -32,6 +32,7 @@ import { LastUpdateComponent } from '../../../shared/elements/last-update/last-u
 import { ListElementAddRemoveComponent } from '../../../shared/elements/list-elements-add-remove/list-element-add-remove.component';
 import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
+import { LocalStorageService } from '../../../shared/services/localstorage.service';
 import { getTown, getUser } from '../../../shared/utilities/localstorage.util';
 import { BathForDayPipe } from '../bath-for-day.pipe';
 import { TypeRowPipe } from './type-row.pipe';
@@ -58,6 +59,8 @@ export class CitizensListComponent implements OnInit {
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
 
+    private local_storage: LocalStorageService = inject(LocalStorageService);
+
     /** La liste des citoyens en vie */
     public alive_citizen_info!: CitizenInfo;
     /** La liste des citoyens morts */
@@ -71,7 +74,7 @@ export class CitizensListComponent implements OnInit {
     public all_items: Item[] = [];
     /** Le dossier dans lequel sont stockées les images */
     public HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    public readonly current_day: number = getTown()?.day || 1;
+    public readonly current_day: number = getTown(this.local_storage)?.day || 1;
     /** La locale */
     public readonly locale: string = moment.locale();
     /** Les filtres de la liste des citoyens */
@@ -153,7 +156,7 @@ export class CitizensListComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo): void => {
                         if (citizen.bag) {
-                            citizen.bag.update_info.username = getUser().username;
+                            citizen.bag.update_info.username = getUser(this.local_storage).username;
                             citizen.bag.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -181,7 +184,7 @@ export class CitizensListComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.bag) {
-                            citizen.bag.update_info.username = getUser().username;
+                            citizen.bag.update_info.username = getUser(this.local_storage).username;
                             citizen.bag.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -204,7 +207,7 @@ export class CitizensListComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.bag) {
-                            citizen.bag.update_info.username = getUser().username;
+                            citizen.bag.update_info.username = getUser(this.local_storage).username;
                             citizen.bag.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -229,7 +232,7 @@ export class CitizensListComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.status) {
-                            citizen.status.update_info.username = getUser().username;
+                            citizen.status.update_info.username = getUser(this.local_storage).username;
                             citizen.status.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -256,7 +259,7 @@ export class CitizensListComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.status) {
-                            citizen.status.update_info.username = getUser().username;
+                            citizen.status.update_info.username = getUser(this.local_storage).username;
                             citizen.status.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -279,7 +282,7 @@ export class CitizensListComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.status) {
-                            citizen.status.update_info.username = getUser().username;
+                            citizen.status.update_info.username = getUser(this.local_storage).username;
                             citizen.status.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -310,7 +313,7 @@ export class CitizensListComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.home) {
-                            citizen.home.update_info.username = getUser().username;
+                            citizen.home.update_info.username = getUser(this.local_storage).username;
                             citizen.home.update_info.update_time = update_info.update_time;
                         }
                     },
@@ -344,7 +347,7 @@ export class CitizensListComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.heroic_actions) {
-                            citizen.heroic_actions.update_info.username = getUser().username;
+                            citizen.heroic_actions.update_info.username = getUser(this.local_storage).username;
                             citizen.heroic_actions.update_info.update_time = update_info.update_time;
                         }
                     },
@@ -362,7 +365,7 @@ export class CitizensListComponent implements OnInit {
                 .subscribe({
                     next: (update_info: UpdateInfo) => {
                         if (citizen.chamanic_detail) {
-                            citizen.chamanic_detail.update_info.username = getUser().username;
+                            citizen.chamanic_detail.update_info.username = getUser(this.local_storage).username;
                             citizen.chamanic_detail.update_info.update_time = update_info.update_time;
                         }
                     }
@@ -384,7 +387,7 @@ export class CitizensListComponent implements OnInit {
             .subscribe({
                 next: (update_info: UpdateInfo) => {
                     if (citizen.chamanic_detail) {
-                        citizen.chamanic_detail.update_info.username = getUser().username;
+                        citizen.chamanic_detail.update_info.username = getUser(this.local_storage).username;
                         citizen.chamanic_detail.update_info.update_time = update_info.update_time;
                     }
                 }

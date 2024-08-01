@@ -1,6 +1,7 @@
 @use 'variables';
 @use 'tables';
 @use 'scrollbars';
+@use 'theming';
 
 * {
     div[data-lastpass-icon-root] {

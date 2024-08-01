@@ -1,5 +1,5 @@
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { ApplicationConfig, importProvidersFrom, LOCALE_ID } from '@angular/core';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireAnalyticsModule } from '@angular/fire/compat/analytics';
@@ -28,11 +28,7 @@ export const appConfig: ApplicationConfig = {
             AngularFireAnalyticsModule,
         ),
         provideFirebaseApp(() => initializeApp(environment.firebase_config)),
-        provideHttpClient(withInterceptors([headersInterceptor, loadingInterceptor, errorInterceptor])),
-        {
-            provide: LOCALE_ID,
-            useFactory: (): string | null => localStorage.getItem('mho-locale') || 'fr'
-        },
+        provideHttpClient(withInterceptors([headersInterceptor, loadingInterceptor, errorInterceptor]), withFetch()),
     ]
 
 };

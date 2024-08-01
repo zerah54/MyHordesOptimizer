@@ -1,7 +1,7 @@
-<div [ngClass]="['mho-main', theme ? theme : '']">
+<div [ngClass]="['mho-main', theme()?.class ?? '']">
     <mho-header #header (changeSidenavStatus)="sidenav.toggle()"></mho-header>
 
-    @if (theme === 'noel') {
+    @if (theme()?.class === 'noel') {
         <ul class="lightrope">
             @for (i of [].constructor(50); track i) {
                 <li></li>
@@ -9,7 +9,7 @@
         </ul>
     }
 
-    @if (theme === 'halloween') {
+    @if (theme()?.class === 'halloween') {
         <div class="web-spider">
             <div class="web">
                 <img [ngSrc]="'assets/img/halloween/spider-web.png'" height="1000" width="1000">
@@ -31,7 +31,7 @@
 
     <mat-sidenav-container #sidenavContainer class="mho-container">
         <mat-sidenav #sidenav [mode]="is_gt_xs ? 'side' : 'over'" [opened]="is_gt_xs">
-            <mho-menu [sidenavContainer]="sidenavContainer"></mho-menu>
+            <mho-menu (themeChange)="changeTheme($event)" [sidenavContainer]="sidenavContainer"></mho-menu>
         </mat-sidenav>
         <mat-sidenav-content class="mho-content">
             <mat-card>
@@ -46,7 +46,7 @@
 
     @if (is_loading) {
         <div class="mho-loading">
-            @switch (theme) {
+            @switch (theme()?.class) {
                 @case ('halloween') {
                     <div class="ghost-container">
                         <div class="ghost animate-hover">

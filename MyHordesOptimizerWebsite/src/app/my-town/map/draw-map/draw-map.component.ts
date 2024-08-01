@@ -1,11 +1,12 @@
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, Input } from '@angular/core';
+import { Component, HostBinding, inject, Input } from '@angular/core';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../_abstract_model/types/town.class';
+import { LocalStorageService } from '../../../shared/services/localstorage.service';
 import { groupBy } from '../../../shared/utilities/array.util';
 import { getUserId } from '../../../shared/utilities/localstorage.util';
 import { MapOptions } from '../map.component';
@@ -54,11 +55,13 @@ export class DrawMapComponent {
                 return 0;
             });
 
-            this.my_cell = map.cells.find((cell: Cell) => cell.citizens.some((citizen: Citizen) => citizen.id === getUserId()));
+            this.my_cell = map.cells.find((cell: Cell) => cell.citizens.some((citizen: Citizen) => citizen.id === getUserId(this.local_storage)));
 
             this.drawed_map = rows;
         }
     }
+
+    private local_storage: LocalStorageService = inject(LocalStorageService);
 
     public x_row: number[] = [];
 

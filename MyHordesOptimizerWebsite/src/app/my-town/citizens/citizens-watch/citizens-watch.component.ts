@@ -23,6 +23,7 @@ import {
 } from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
 import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
+import { LocalStorageService } from '../../../shared/services/localstorage.service';
 import { getTown } from '../../../shared/utilities/localstorage.util';
 import { BathForDayPipe } from '../bath-for-day.pipe';
 import { CitizenGroupByBathStatePipe } from './citizen-group-by-bath_state.pipe';
@@ -46,6 +47,8 @@ export class CitizensWatchComponent implements OnInit {
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
 
+    private local_storage: LocalStorageService = inject(LocalStorageService);
+
     /** La liste des citoyens */
     public citizen_info!: CitizenInfo;
     /** La datasource pour le tableau */
@@ -59,7 +62,7 @@ export class CitizensWatchComponent implements OnInit {
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
         { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
-        ...Array.from({ length: getTown()?.day || 1 }, (_: unknown, i: number): StandardColumn => {
+        ...Array.from({ length: getTown(this.local_storage)?.day || 1 }, (_: unknown, i: number): StandardColumn => {
             return {
                 id: (i + 1).toString(10),
                 header: $localize`Jour` + ' ' + (i + 1).toString(10),
@@ -68,7 +71,7 @@ export class CitizensWatchComponent implements OnInit {
             };
         }),
     ];
-    public readonly current_day: number = getTown()?.day || 1;
+    public readonly current_day: number = getTown(this.local_storage)?.day || 1;
     public filters: WatchFilter = {
         citizen: []
     };

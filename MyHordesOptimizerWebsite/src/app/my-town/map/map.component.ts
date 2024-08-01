@@ -27,6 +27,7 @@ import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { Town } from '../../_abstract_model/types/town.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { CompassRoseComponent } from '../../shared/elements/compass-rose/compass-rose.component';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { DrawMapComponent } from './draw-map/draw-map.component';
 
 const angular_common: Imports = [CommonModule, FormsModule];
@@ -52,7 +53,7 @@ export class MapComponent implements OnInit {
     public all_citizens!: Citizen[];
 
     public options!: MapOptions;
-    public readonly is_dev: boolean = !environment.production;
+    public readonly is_dev_mode: boolean = !environment.production;
 
     public new_distance_option: Distance = {
         value: 1,
@@ -71,6 +72,8 @@ export class MapComponent implements OnInit {
 
     private api_service: ApiService = inject(ApiService);
     private town_service: TownService = inject(TownService);
+
+    private local_storage: LocalStorageService = inject(LocalStorageService);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
@@ -118,7 +121,7 @@ export class MapComponent implements OnInit {
                 }
             });
 
-        this.options = JSON.parse(localStorage.getItem('MAP_OPTIONS') || JSON.stringify(this.default_options));
+        this.options = JSON.parse(this.local_storage?.getItem('MAP_OPTIONS') || JSON.stringify(this.default_options));
         this.checkIfAllOptionsExist();
     }
 
@@ -171,7 +174,7 @@ export class MapComponent implements OnInit {
         (<{ [key: string]: unknown }><unknown>this.options)[key] = value;
         setTimeout(() => {
             this.options = { ...this.options };
-            localStorage.setItem('MAP_OPTIONS', JSON.stringify(this.options));
+            this.local_storage?.setItem('MAP_OPTIONS', JSON.stringify(this.options));
         });
     }
 

@@ -22,6 +22,7 @@ import {
     HeaderWithNumberPreviousNextFilterComponent
 } from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
 import { ClipboardService } from '../../../shared/services/clipboard.service';
+import { LocalStorageService } from '../../../shared/services/localstorage.service';
 import { getMaxAttack, getMinAttack } from '../../../shared/utilities/estimations.util';
 import { getTown } from '../../../shared/utilities/localstorage.util';
 
@@ -54,9 +55,11 @@ export class EstimationsComponent implements OnInit {
     @ViewChild('todayCanvas') today_canvas!: ElementRef;
     @ViewChild('tomorrowCanvas') tomorrow_canvas!: ElementRef;
 
+    private local_storage: LocalStorageService = inject(LocalStorageService);
+
     public readonly tdg_values: number[] = TDG_VALUES;
     public readonly planif_values: number[] = PLANIF_VALUES;
-    public readonly current_day: number = getTown()?.day || 1;
+    public readonly current_day: number = getTown(this.local_storage)?.day || 1;
 
     public selected_day: number = this.current_day;
     public estimations!: Estimations;
@@ -250,7 +253,7 @@ export class EstimationsComponent implements OnInit {
                 datasets: [
                     {
                         label: $localize`Attaque théorique - Min`,
-                        data: Array(PERCENTS.length).fill(getMinAttack(day, getTown()?.town_type || 'RE')),
+                        data: Array(PERCENTS.length).fill(getMinAttack(day, getTown(this.local_storage)?.town_type || 'RE')),
                         spanGaps: true,
                         borderColor: '#36A2EB',
                         backgroundColor: '#36A2EB88',
@@ -259,7 +262,7 @@ export class EstimationsComponent implements OnInit {
                     },
                     {
                         label: $localize`Attaque théorique - Max`,
-                        data: Array(PERCENTS.length).fill(getMaxAttack(day, getTown()?.town_type || 'RE')),
+                        data: Array(PERCENTS.length).fill(getMaxAttack(day, getTown(this.local_storage)?.town_type || 'RE')),
                         spanGaps: true,
                         borderColor: '#36A2EB',
                         backgroundColor: '#36A2EB88',

@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { getTown, getUserId } from '../../shared/utilities/localstorage.util';
 import { DigDTO } from '../dto/dig.dto';
@@ -12,13 +13,13 @@ import { GlobalService } from './_global.service';
 @Injectable({ providedIn: 'root' })
 export class DigsService extends GlobalService {
 
-    constructor(_http: HttpClient, private snackbar: SnackbarService) {
+    constructor(_http: HttpClient, private snackbar: SnackbarService, private local_storage: LocalStorageService) {
         super(_http);
     }
 
     public getDigs(): Observable<Dig[]> {
         return new Observable((sub: Subscriber<Dig[]>) => {
-            super.get<DigDTO[]>(this.API_URL + `/Fetcher/MapDigs?townId=${getTown()?.town_id}`)
+            super.get<DigDTO[]>(this.API_URL + `/Fetcher/MapDigs?townId=${getTown(this.local_storage)?.town_id}`)
                 .subscribe({
                     next: (response: HttpResponse<DigDTO[]>) => {
                         let digs: Dig[] = dtoToModelArray(Dig, response.body);
@@ -53,7 +54,7 @@ export class DigsService extends GlobalService {
 
     public updateDig(digs: Dig[]): Observable<Dig[]> {
         return new Observable((sub: Subscriber<Dig[]>) => {
-            super.post<DigDTO[]>(this.API_URL + `/Fetcher/MapDigs?townId=${getTown()?.town_id}&userId=${getUserId()}`, JSON.stringify(modelToDtoArray(digs)))
+            super.post<DigDTO[]>(this.API_URL + `/Fetcher/MapDigs?townId=${getTown(this.local_storage)?.town_id}&userId=${getUserId(this.local_storage)}`, JSON.stringify(modelToDtoArray(digs)))
                 .subscribe({
                     next: (response: DigDTO[]) => {
                         this.snackbar.successSnackbar($localize`La fouille a bien été mise à jour`);

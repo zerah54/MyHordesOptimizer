@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, HostListener, inject, Output, ViewChild } from '@angular/core';
+import { CommonModule, DOCUMENT, NgOptimizedImage } from '@angular/common';
+import { Component, EventEmitter, HostBinding, HostListener, Inject, inject, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -20,6 +20,7 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { Me } from '../../_abstract_model/types/me.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { getExternalAppId, getTown, getUser, setExternalAppId } from '../../shared/utilities/localstorage.util';
 import { CitizenMenuComponent } from './citizen-menu/citizen-menu.component';
 
@@ -42,18 +43,20 @@ export class HeaderComponent {
 
     @Output() changeSidenavStatus: EventEmitter<void> = new EventEmitter();
 
+    private local_storage: LocalStorageService = inject(LocalStorageService);
+
     /** Le titre de l'application */
     public title: string = '';
 
     /** La valeur du champ d'identifiant d'app externe */
     public external_app_id_field_value: string | null = null;
     /** L'idendifiant d'app externe si il existe */
-    public saved_external_app_id: string | null = getExternalAppId();
+    public saved_external_app_id: string | null = getExternalAppId(this.local_storage);
     /** Les informations de l'utilisateur */
-    public me: Me = getUser();
-    public readonly is_dev: boolean = !environment.production;
+    public me: Me = getUser(this.local_storage);
+    public readonly is_dev_mode: boolean = !environment.production;
 
-    public is_in_town: boolean = !!getTown()?.town_id;
+    public is_in_town: boolean = !!getTown(this.local_storage)?.town_id;
 
     public is_gt_xs: boolean = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
 
@@ -68,19 +71,19 @@ export class HeaderComponent {
         this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     }
 
-    public constructor(private breakpoint_observer: BreakpointObserver) {
+    public constructor(private breakpoint_observer: BreakpointObserver, @Inject(DOCUMENT) private document: Document) {
         this.title = this.title_service.getTitle();
     }
 
     /** Enregistre le nouvel id d'app externe */
     public saveExternalAppId(): void {
-        setExternalAppId(this.external_app_id_field_value);
+        setExternalAppId(this.external_app_id_field_value, this.local_storage);
         this.updateMe();
     }
 
     /** Supprime l'identifiant d'app externe */
     public disconnect(): void {
-        setExternalAppId(null);
+        setExternalAppId(null, this.local_storage);
         this.updateMe();
     }
 
@@ -92,12 +95,14 @@ export class HeaderComponent {
     private updateMe(): void {
         this.authentication_api.getMe(true)
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe(() => {
-                this.me = getUser();
-                this.external_app_id_field_value = null;
-                this.saved_external_app_id = getExternalAppId();
-                this.is_in_town = !!getTown()?.town_id;
-                location.reload();
+            .subscribe({
+                next: () => {
+                    this.me = getUser(this.local_storage);
+                    this.external_app_id_field_value = null;
+                    this.saved_external_app_id = getExternalAppId(this.local_storage);
+                    this.is_in_town = !!getTown(this.local_storage)?.town_id;
+                    this.document.location.reload();
+                }
             });
     }
 }

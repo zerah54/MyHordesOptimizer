@@ -1,5 +1,5 @@
 import { CommonModule, DOCUMENT, NgClass, NgTemplateOutlet } from '@angular/common';
-import { Component, HostBinding, inject, Inject, Input, LOCALE_ID, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostBinding, inject, Inject, Input, LOCALE_ID, OnInit, output, OutputEmitterRef, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +14,7 @@ import { Theme } from '../../_abstract_model/interfaces';
 import { Imports } from '../../_abstract_model/types/_types';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { ChartsThemingService } from '../../shared/services/charts-theming.service';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { getTown } from '../../shared/utilities/localstorage.util';
 
 const angular_common: Imports = [CommonModule, NgClass, NgTemplateOutlet, RouterLink, RouterLinkActive];
@@ -33,6 +34,7 @@ export class MenuComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input({ required: true }) sidenavContainer!: MatSidenavContainer;
+    public themeChange: OutputEmitterRef<Theme | undefined> = output<Theme | undefined>();
 
     public charts_theming_service: ChartsThemingService = inject(ChartsThemingService);
 
@@ -42,7 +44,7 @@ export class MenuComponent implements OnInit {
         { label: $localize`Brun`, class: 'brown' },
     ];
 
-    public selected_theme: Theme | undefined = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
+    public selected_theme: Theme | undefined = this.themes.find((theme: Theme) => this.local_storage?.storage ? theme.class === this.local_storage?.getItem('theme') : false);
 
     /** La liste des langues disponibles */
     public language_list: Language[] = [
@@ -148,11 +150,15 @@ export class MenuComponent implements OnInit {
         }
     ];
 
-    constructor(@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document) {
+    private local_storage: LocalStorageService = inject(LocalStorageService);
 
+    constructor(@Inject(LOCALE_ID) private locale_id: string, @Inject(DOCUMENT) private document: Document) {
+        console.log('locale_id', locale_id);
     }
 
     public ngOnInit(): void {
+        if (!this.local_storage?.storage) return;
+
         /** Si il y a une langue enregistrée, on l'utilise, sinon on utilise le français */
         const used_locale: string = this.locale_id;
         /** Si dans la liste des langues supportées on trouve la langue ci-dessus, on l'utilise, sinon on utilise le français */
@@ -180,12 +186,13 @@ export class MenuComponent implements OnInit {
         }
     }
 
-    public changeTheme(new_theme: Theme): void {
+    public changeTheme(new_theme: Theme | undefined): void {
+        if (!this.local_storage?.storage) return;
+        if (!new_theme) return;
+
         this.selected_theme = new_theme;
-        localStorage.setItem('theme', new_theme.class);
-        setTimeout(() => {
-            this.document.location.reload();
-        });
+        this.themeChange.emit(new_theme);
+        this.local_storage?.setItem('theme', new_theme.class);
     }
 
     /**
@@ -195,7 +202,7 @@ export class MenuComponent implements OnInit {
      */
     public changeLanguage(new_language: Language): void {
         this.site_language = new_language;
-        localStorage.setItem('mho-locale', new_language.code);
+        this.local_storage?.setItem('mho-locale', new_language.code);
         setTimeout(() => {
             this.document.location.reload();
         });
@@ -203,7 +210,7 @@ export class MenuComponent implements OnInit {
 
     private isInTown(): boolean {
         if (!environment.production) return true;
-        const town: TownDetails | null = getTown();
+        const town: TownDetails | null = getTown(this.local_storage);
         if (!town) return false;
         return town.town_id !== null && town.town_id !== undefined && town.town_id !== 0;
     }
@@ -216,12 +223,14 @@ export class MenuComponent implements OnInit {
     }
 
     private defineThemes(): void {
+        if (!this.local_storage?.storage) return;
+
         /** Noël */
         if (this.isNoel()) {
             this.themes.push({ label: $localize`Noël`, class: 'noel' });
             this.themes.splice(0, 1);
             this.useEventTheme();
-        } else if (this.isNothing() && (this.selected_theme?.class === 'noel' || !this.selected_theme)) {
+        } else if (this.isNothing() && this.selected_theme?.class === 'noel') {
             setTimeout(() => {
                 this.changeTheme(this.themes[0]);
             });
@@ -232,16 +241,16 @@ export class MenuComponent implements OnInit {
             this.themes.push({ label: $localize`Halloween`, class: 'halloween' });
             this.themes.splice(0, 1);
             this.useEventTheme();
-        } else if (this.isNothing() && (this.selected_theme?.class === 'halloween' || !this.selected_theme)) {
+        } else if (this.isNothing() && this.selected_theme?.class === 'halloween') {
             setTimeout(() => {
                 this.changeTheme(this.themes[0]);
             });
         }
 
+        this.selected_theme = this.themes.find((theme: Theme) => theme.class === this.local_storage?.getItem('theme'))
+            ?? this.themes.find((theme: Theme) => theme.class === '');
 
-        this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'))
-            || this.themes.find((theme: Theme) => theme.class === '');
-
+        this.changeTheme(this.selected_theme);
 
         this.charts_theming_service.defineColorsWithTheme(this.selected_theme);
     }
@@ -261,7 +270,7 @@ export class MenuComponent implements OnInit {
     }
 
     private useEventTheme(): void {
-        this.selected_theme = this.themes.find((theme: Theme) => theme.class === localStorage.getItem('theme'));
+        this.selected_theme = this.themes.find((theme: Theme) => theme.class === this.local_storage?.getItem('theme'));
         if (this.selected_theme?.class === '' || !this.selected_theme) {
             setTimeout(() => {
                 this.changeTheme(this.themes[this.themes.length - 1]);

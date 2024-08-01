@@ -117,7 +117,8 @@
 
                         <mat-form-field appearance="outline" class="short-bottom">
                             <mat-label i18n>Bâtiment</mat-label>
-                            <mho-select [formControlName]="'ruin'" [options]="(in_town_camping ? town_ruins : ruins) | filterRuinsByKm:townDistance.value"
+                            <mho-select [formControlName]="'ruin'"
+                                        [options]="(in_town_camping ? town_ruins : ruins) | filterRuinsByKm:townDistance.value:local_storage"
                                         [bindLabel]="'label.' + locale" [bindIcon]="'formatted_img'" [moreInfo]="getMoreRuinInfoFn">
                             </mho-select>
                             <mat-icon matSuffix [matTooltip]="help_ruins" style="vertical-align: middle" [color]="'primary'">help_outline</mat-icon>

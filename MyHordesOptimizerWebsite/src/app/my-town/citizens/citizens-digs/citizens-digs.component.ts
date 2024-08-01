@@ -19,6 +19,7 @@ import {
 } from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
 import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
+import { LocalStorageService } from '../../../shared/services/localstorage.service';
 import { getTown } from '../../../shared/utilities/localstorage.util';
 
 const angular_common: Imports = [CommonModule, NgClass];
@@ -41,6 +42,8 @@ export class CitizensDigsComponent implements OnInit {
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
 
+    private local_storage: LocalStorageService = inject(LocalStorageService);
+
     /** La liste des citoyens */
     public citizen_info!: CitizenInfo;
     /** La liste des fouilles */
@@ -58,7 +61,7 @@ export class CitizensDigsComponent implements OnInit {
         { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
         { id: 'today_digs', header: $localize`Fouilles du jour`, class: '' },
     ];
-    public readonly current_day: number = getTown()?.day || 1;
+    public readonly current_day: number = getTown(this.local_storage)?.day || 1;
     public filters: DigFilter = {
         selected_day: this.current_day,
         citizen: []

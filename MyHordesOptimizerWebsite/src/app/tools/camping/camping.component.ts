@@ -29,6 +29,7 @@ import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { SelectComponent } from '../../shared/elements/select/select.component';
 import { FilterRuinsByKmPipe } from '../../shared/pipes/filter-ruins-by-km.pipe';
 import { ClipboardService } from '../../shared/services/clipboard.service';
+import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { getTown } from '../../shared/utilities/localstorage.util';
 import { CampingDisplayBonusPipe } from './camping-display-bonus.pipe';
 
@@ -48,9 +49,12 @@ const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCa
 export class CampingComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
+    protected town_service: TownService = inject(TownService);
+    protected local_storage: LocalStorageService = inject(LocalStorageService);
+
     public ruins: Ruin[] = [];
     public town_ruins: Ruin[] = [];
-    public town: TownDetails | null = getTown();
+    public town: TownDetails | null = getTown(this.local_storage);
     public and_amelio: boolean = true;
     public display_bonus_ap: boolean = false;
 
@@ -86,8 +90,6 @@ export class CampingComponent implements OnInit {
     private camping_service: CampingService = inject(CampingService);
     private api: ApiService = inject(ApiService);
     private readonly no_ruin: Ruin = new Ruin(NO_RUIN);
-
-    private town_service: TownService = inject(TownService);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 

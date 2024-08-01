@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostBinding, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -12,6 +12,7 @@ import { Imports } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { AutoDestroy } from '../../decorators/autodestroy.decorator';
+import { LocalStorageService } from '../../services/localstorage.service';
 import { getTown } from '../../utilities/localstorage.util';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../confirm-dialog/confirm-dialog.component';
 
@@ -53,6 +54,8 @@ export class DigComponent {
 
     @Output() deletedDig: EventEmitter<Dig> = new EventEmitter<Dig>();
     @Output() updatedDig: EventEmitter<Dig[]> = new EventEmitter<Dig[]>();
+
+    private local_storage: LocalStorageService = inject(LocalStorageService);
 
     protected current_dig!: Dig;
     protected updated_dig?: Dig;
@@ -99,8 +102,8 @@ export class DigComponent {
                 diggerName: citizen.name,
                 nbSucces: 0,
                 nbTotalDig: 0,
-                x: getTown()?.town_x || 0,
-                y: getTown()?.town_y || 0
+                x: getTown(this.local_storage)?.town_x || 0,
+                y: getTown(this.local_storage)?.town_y || 0
             });
         }
     }

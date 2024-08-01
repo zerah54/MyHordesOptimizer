@@ -17,6 +17,7 @@ import {
 } from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
 import { HeaderWithSelectFilterComponent } from '../../../shared/elements/lists/header-with-select-filter/header-with-select-filter.component';
 import { ColumnIdPipe } from '../../../shared/pipes/column-id.pipe';
+import { LocalStorageService } from '../../../shared/services/localstorage.service';
 import { getTown } from '../../../shared/utilities/localstorage.util';
 
 const angular_common: Imports = [CommonModule, NgClass];
@@ -36,6 +37,8 @@ const material_modules: Imports = [MatSortModule, MatTableModule];
 export class CitizensDispoComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
+    private local_storage: LocalStorageService = inject(LocalStorageService);
+
     @ViewChild(MatSort) sort!: MatSort;
     @ViewChild(MatTable) table!: MatTable<Citizen>;
 
@@ -54,7 +57,7 @@ export class CitizensDispoComponent implements OnInit {
         { id: 'avatar_name', header: $localize`Citoyen`, class: 'center' },
         { id: 'today_dispo', header: $localize`Disponibilités du jour`, class: '' },
     ];
-    public readonly current_day: number = getTown()?.day || 1;
+    public readonly current_day: number = getTown(this.local_storage)?.day || 1;
     public filters: DispoFilter = {
         selected_day: this.current_day,
         citizen: []

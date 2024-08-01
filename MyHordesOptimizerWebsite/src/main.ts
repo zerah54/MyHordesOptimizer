@@ -1,16 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference types="@angular/localize" />
-
-import '@angular/localize/init';
-import 'zone.js';
-
 import { registerLocaleData } from '@angular/common';
 import localeDE from '@angular/common/locales/de';
 import localeEN from '@angular/common/locales/en';
 import localeES from '@angular/common/locales/es';
 import localeFR from '@angular/common/locales/fr';
 
-import { enableProdMode } from '@angular/core';
+import { enableProdMode, LOCALE_ID } from '@angular/core';
 import { loadTranslations } from '@angular/localize';
 import { bootstrapApplication } from '@angular/platform-browser';
 
@@ -28,7 +22,11 @@ if (environment.production) {
     enableProdMode();
 }
 
-const lang: string = localStorage.getItem('mho-locale') ?? 'fr';
+const lang: string = localStorage?.getItem('mho-locale') ?? 'fr';
+appConfig.providers.push({
+    provide: LOCALE_ID,
+    useFactory: (): string | null => lang
+});
 
 initLanguage(lang)
     .then(() => import('./app/app.component'))

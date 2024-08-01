@@ -15,16 +15,14 @@
         </mat-sidenav-content>
         <mat-sidenav #sidenav class="map-settings" [position]="'end'" [mode]="is_gt_xs ? 'side' : 'over'">
             <h1 i18n>Paramètres</h1>
-            @if (is_dev) {
-                <h2 i18n>Type de carte</h2>
-                <mat-chip-listbox>
-                    <mat-chip (click)="changeOptions('map_type', 'digs')" [highlighted]="options.map_type === 'digs'" i18n>Fouilles</mat-chip>
-                    @if (is_dev) {
-                        <mat-chip (click)="changeOptions('map_type', 'danger')" [highlighted]="options.map_type === 'danger'" i18n>Danger</mat-chip>
-                    }
+            <h2 i18n>Type de carte</h2>
+            <mat-chip-listbox>
+                <mat-chip (click)="changeOptions('map_type', 'digs')" [highlighted]="options.map_type === 'digs'" i18n>Fouilles</mat-chip>
+                <mat-chip (click)="changeOptions('map_type', 'danger')" [highlighted]="options.map_type === 'danger'" i18n>Danger</mat-chip>
+                @if (is_dev_mode) {
                     <mat-chip (click)="changeOptions('map_type', 'trash')" [highlighted]="options.map_type === 'trash'" i18n>Décharge</mat-chip>
-                </mat-chip-listbox>
-            }
+                }
+            </mat-chip-listbox>
             @if (options.map_type === 'digs') {
                 <div>
                     <h2 i18n>Fouilles restantes</h2>
