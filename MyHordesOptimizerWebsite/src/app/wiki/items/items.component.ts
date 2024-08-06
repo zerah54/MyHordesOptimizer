@@ -80,7 +80,7 @@ export class ItemsComponent implements OnInit {
             this.displayed_items = this.displayed_items.filter((item: Item) => {
                 const item_actions_and_properties: (Action | Property)[] = [
                     ...item.actions.filter((action: Action) => action),
-                    ...item.properties.filter((property: Property) => property)
+                    ...item.properties?.filter((property: Property) => property)
                 ];
                 const item_has_action_or_property: boolean = item_actions_and_properties.some((action_or_property: Action | Property) => {
                     return this.select_value.some((selected: Action | Property) => selected.key === action_or_property.key);

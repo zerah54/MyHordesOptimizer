@@ -41,8 +41,8 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                 var resultForDay = estimationService.ApofooCalculateAttack(townId: townId, dayAttack: day);
                 var resultForDayBeta = estimationService.ApofooCalculateAttack(townId: townId, dayAttack: day, beta: true);
 
-                var resultForDayDisplay = $"*Attaque J{day} calculée (par Apofoo)* : {resultForDay.Min} - {resultForDay.Max}";
-                var resultForDayBetaDisplay = $"*Attaque J{day} calculée (par Apofoo) (Beta)* : {resultForDayBeta.Min} - {resultForDayBeta.Max}";
+                var resultForDayDisplay = $"*Attaque J{day} calculée (par Apofoo)* : {resultForDay.Result.Min} - {resultForDay.Result.Max}";
+                var resultForDayBetaDisplay = $"*Attaque J{day} calculée (par Apofoo) (Beta)* : {resultForDayBeta.Result.Min} - {resultForDayBeta.Result.Max}";
 
                 var embedBuilder = new EmbedBuilder()
                     .WithTitle($"Estimations pour le jour {day}")

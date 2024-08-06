@@ -6,6 +6,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChartConfiguration, ChartEvent, LegendElement } from 'chart.js';
@@ -16,6 +17,7 @@ import { PLANIF_VALUES, TDG_VALUES } from '../../../_abstract_model/const';
 import { MinMax } from '../../../_abstract_model/interfaces';
 import { TownStatisticsService } from '../../../_abstract_model/services/town-statistics.service';
 import { Dictionary, Imports } from '../../../_abstract_model/types/_types';
+import { EstimationGraphValues, EstimationsResult } from '../../../_abstract_model/types/estimations-result.class';
 import { Estimations } from '../../../_abstract_model/types/estimations.class';
 import { Regen } from '../../../_abstract_model/types/regen.class';
 import {
@@ -36,23 +38,31 @@ const material_modules: Imports = [MatButtonModule, MatExpansionModule, MatFormF
     styleUrls: ['./estimations.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes, MatSlideToggle]
 })
 export class EstimationsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     @HostListener('window:resize', ['$event'])
     onResize(): void {
-        if (this.today_chart) {
-            this.today_chart.resize();
+        if (this.today_estim_chart) {
+            this.today_estim_chart.resize();
         }
-        if (this.tomorrow_chart) {
-            this.tomorrow_chart.resize();
+        if (this.today_offset_chart) {
+            this.today_offset_chart.resize();
+        }
+        if (this.tomorrow_estim_chart) {
+            this.tomorrow_estim_chart.resize();
+        }
+        if (this.tomorrow_offset_chart) {
+            this.tomorrow_offset_chart.resize();
         }
     }
 
-    @ViewChild('todayCanvas') today_canvas!: ElementRef;
-    @ViewChild('tomorrowCanvas') tomorrow_canvas!: ElementRef;
+    @ViewChild('todayEstimCanvas') today_estim_canvas!: ElementRef;
+    @ViewChild('todayOffsetCanvas') today_offset_canvas!: ElementRef;
+    @ViewChild('tomorrowEstimCanvas') tomorrow_estim_canvas!: ElementRef;
+    @ViewChild('tomorrowOffsetCanvas') tomorrow_offset_canvas!: ElementRef;
 
     public readonly tdg_values: number[] = TDG_VALUES;
     public readonly planif_values: number[] = PLANIF_VALUES;
@@ -63,13 +73,17 @@ export class EstimationsComponent implements OnInit {
     /** La datasource pour le tableau */
     public datasource: MatTableDataSource<Regen> = new MatTableDataSource();
 
-    public today_chart!: Chart<'line'>;
-    public tomorrow_chart!: Chart<'line'>;
+    public today_estim_chart!: Chart<'line'>;
+    public today_offset_chart!: Chart<'bar'>;
+    public today_offset_mode!: boolean;
+    public tomorrow_estim_chart!: Chart<'line'>;
+    public tomorrow_offset_chart!: Chart<'bar'>;
+    public tomorrow_offset_mode!: boolean;
 
-    public today_calculated_attack!: MinMax | null;
-    public today_calculated_attack_beta!: MinMax | null;
-    public tomorrow_calculated_attack!: MinMax | null;
-    public tomorrow_calculated_attack_beta!: MinMax | null;
+    public today_calculated_attack!: EstimationsResult | null;
+    public today_calculated_attack_beta!: EstimationsResult | null;
+    public tomorrow_calculated_attack!: EstimationsResult | null;
+    public tomorrow_calculated_attack_beta!: EstimationsResult | null;
 
     public step?: number = 0;
 
@@ -102,12 +116,12 @@ export class EstimationsComponent implements OnInit {
                     this.town_statistics_service
                         .getApofooAttackCalculation(this.selected_day, false)
                         .subscribe({
-                            next: (result: MinMax | null) => {
+                            next: (result: EstimationsResult) => {
                                 this.today_calculated_attack = result;
                                 this.town_statistics_service
                                     .getApofooAttackCalculation(this.selected_day, true)
                                     .subscribe({
-                                        next: (result: MinMax | null) => {
+                                        next: (result: EstimationsResult) => {
                                             this.today_calculated_attack_beta = result;
                                             this.defineTodayCanvas();
                                         }
@@ -117,12 +131,12 @@ export class EstimationsComponent implements OnInit {
                     this.town_statistics_service
                         .getApofooAttackCalculation(this.selected_day + 1, false)
                         .subscribe({
-                            next: (result: MinMax | null) => {
+                            next: (result: EstimationsResult) => {
                                 this.tomorrow_calculated_attack = result;
                                 this.town_statistics_service
                                     .getApofooAttackCalculation(this.selected_day + 1, true)
                                     .subscribe({
-                                        next: (result: MinMax | null) => {
+                                        next: (result: EstimationsResult) => {
                                             this.tomorrow_calculated_attack_beta = result;
                                             this.defineTomorrowCanvas();
                                         }
@@ -137,25 +151,39 @@ export class EstimationsComponent implements OnInit {
         this.step = step;
     }
 
-    private defineTodayCanvas(): void {
-        if (this.today_canvas) {
-            if (this.today_chart) {
-                this.today_chart.destroy();
+    public defineTodayCanvas(): void {
+        if (this.today_estim_canvas) {
+            if (this.today_estim_chart) {
+                this.today_estim_chart.destroy();
             }
+            const today_estim_ctx: CanvasRenderingContext2D = this.today_estim_canvas.nativeElement.getContext('2d');
+            this.today_estim_chart = new Chart<'line'>(today_estim_ctx, this.getEstimConfig(this.selected_day, TDG_VALUES, this.estimations.estim, this.today_calculated_attack?.result, this.today_calculated_attack_beta?.result));
+        }
 
-            const today_ctx: CanvasRenderingContext2D = this.today_canvas.nativeElement.getContext('2d');
-            this.today_chart = new Chart<'line'>(today_ctx, this.getConfig(this.selected_day, TDG_VALUES, this.estimations.estim, this.today_calculated_attack, this.today_calculated_attack_beta));
+        if (this.today_offset_canvas) {
+            if (this.today_offset_chart) {
+                this.today_offset_chart.destroy();
+            }
+            const today_offset_ctx: CanvasRenderingContext2D = this.today_offset_canvas.nativeElement.getContext('2d');
+            this.today_offset_chart = new Chart<'bar'>(today_offset_ctx, this.getOffsetConfig(this.selected_day, this.today_calculated_attack?.min_list, this.today_calculated_attack?.max_list));
         }
     }
 
-    private defineTomorrowCanvas(): void {
-        if (this.tomorrow_canvas) {
-            if (this.tomorrow_chart) {
-                this.tomorrow_chart.destroy();
+    public defineTomorrowCanvas(): void {
+        if (this.tomorrow_estim_canvas) {
+            if (this.tomorrow_estim_chart) {
+                this.tomorrow_estim_chart.destroy();
             }
+            const tomorrow_estim_ctx: CanvasRenderingContext2D = this.tomorrow_estim_canvas.nativeElement.getContext('2d');
+            this.tomorrow_estim_chart = new Chart<'line'>(tomorrow_estim_ctx, this.getEstimConfig(this.selected_day + 1, PLANIF_VALUES, this.estimations.planif, this.tomorrow_calculated_attack?.result, this.tomorrow_calculated_attack_beta?.result));
+        }
 
-            const tomorrow_ctx: CanvasRenderingContext2D = this.tomorrow_canvas.nativeElement.getContext('2d');
-            this.tomorrow_chart = new Chart<'line'>(tomorrow_ctx, this.getConfig(this.selected_day + 1, PLANIF_VALUES, this.estimations.planif, this.tomorrow_calculated_attack, this.tomorrow_calculated_attack_beta));
+        if (this.tomorrow_offset_canvas) {
+            if (this.tomorrow_offset_chart) {
+                this.tomorrow_offset_chart.destroy();
+            }
+            const tomorrow_offset_ctx: CanvasRenderingContext2D = this.tomorrow_offset_canvas.nativeElement.getContext('2d');
+            this.tomorrow_offset_chart = new Chart<'bar'>(tomorrow_offset_ctx, this.getOffsetConfig(this.selected_day + 1, this.tomorrow_calculated_attack?.min_list, this.tomorrow_calculated_attack_beta?.max_list));
         }
     }
 
@@ -241,7 +269,7 @@ export class EstimationsComponent implements OnInit {
             .filter((_ds: LegendItem, i: number) => i % 2);
     }
 
-    private getConfig(day: number, PERCENTS: number[], values: Dictionary<MinMax>, calculated_attack: MinMax | null, calculated_attack_beta: MinMax | null)
+    private getEstimConfig(day: number, PERCENTS: number[], values: Dictionary<MinMax>, calculated_attack: MinMax | undefined, calculated_attack_beta: MinMax | undefined)
         : ChartConfiguration<'line'> {
         return {
             type: 'line',
@@ -267,7 +295,7 @@ export class EstimationsComponent implements OnInit {
                         pointHoverRadius: 0
                     },
                     {
-                        label: $localize`Attaque J${day} calculée (By Apofoo) - Min`,
+                        label: $localize`Attaque J${day} calculée (Par Apofoo) - Min`,
                         data: Array(PERCENTS.length).fill(calculated_attack?.min),
                         spanGaps: true,
                         borderColor: '#FF6384',
@@ -276,7 +304,7 @@ export class EstimationsComponent implements OnInit {
                         pointHoverRadius: 0
                     },
                     {
-                        label: $localize`Attaque J${day} calculée (By Apofoo) - Max`,
+                        label: $localize`Attaque J${day} calculée (Par Apofoo) - Max`,
                         data: Array(PERCENTS.length).fill(calculated_attack?.max),
                         spanGaps: true,
                         borderColor: '#FF6384',
@@ -285,7 +313,7 @@ export class EstimationsComponent implements OnInit {
                         pointHoverRadius: 0
                     },
                     {
-                        label: $localize`Attaque J${day} calculée (By Apofoo) (beta) - Min`,
+                        label: $localize`Attaque J${day} calculée (Par Apofoo) (beta) - Min`,
                         data: Array(PERCENTS.length).fill(calculated_attack_beta?.min),
                         spanGaps: true,
                         borderColor: '#FF6384',
@@ -295,7 +323,7 @@ export class EstimationsComponent implements OnInit {
                         borderDash: [3, 3]
                     },
                     {
-                        label: $localize`Attaque J${day} calculée (By Apofoo) (beta) - Max`,
+                        label: $localize`Attaque J${day} calculée (Par Apofoo) (beta) - Max`,
                         data: Array(PERCENTS.length).fill(calculated_attack_beta?.max),
                         spanGaps: true,
                         borderColor: '#FF6384',
@@ -329,6 +357,33 @@ export class EstimationsComponent implements OnInit {
                         onClick: this.clickOnLegendItem
                     }
                 },
+                interaction: {
+                    intersect: false
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        };
+    }
+
+    private getOffsetConfig(day: number, values_min: EstimationGraphValues[] | undefined, values_max: EstimationGraphValues[] | undefined)
+        : ChartConfiguration<'bar'> {
+        return {
+            type: 'bar',
+            data: {
+                labels: (values_min ?? []).map((value: EstimationGraphValues) => value.value),
+                datasets: [
+                    {
+                        label: $localize`Répartition des valeurs possibles J${day} - Min`,
+                        data: (values_min ?? []).map((value: EstimationGraphValues) => value.count),
+                    },
+                    {
+                        label: $localize`Répartition des valeurs possibles J${day} - Max`,
+                        data: (values_max ?? []).map((value: EstimationGraphValues) => value.count),
+                    }
+                ]
+            },
+            options: {
                 interaction: {
                     intersect: false
                 },

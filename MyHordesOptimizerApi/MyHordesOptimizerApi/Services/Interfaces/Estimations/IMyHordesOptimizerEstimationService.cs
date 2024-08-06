@@ -7,7 +7,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Estimations
     {
         void UpdateEstimations(int townId, EstimationRequestDto request);
         EstimationRequestDto GetEstimations(int townId, int day);
-        EstimationValueDto ApofooCalculateAttack(int townId, int dayAttack, bool beta = false);
+        EstimationResultDto ApofooCalculateAttack(int townId, int dayAttack, bool beta = false);
         EstimationTuple CreateTupleFromValue(string key, EstimationValueDto value);
     }
 }

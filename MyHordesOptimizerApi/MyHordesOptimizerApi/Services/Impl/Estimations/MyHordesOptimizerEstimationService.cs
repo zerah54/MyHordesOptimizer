@@ -84,7 +84,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             }
         }
 
-        public EstimationValueDto ApofooCalculateAttack(int townId, int dayAttack, bool beta = false)
+        public EstimationResultDto ApofooCalculateAttack(int townId, int dayAttack, bool beta = false)
         {
             var estim = GetEstimations(townId, dayAttack).Estim;
             var planif = GetEstimations(townId, dayAttack - 1).Planif;
@@ -115,7 +115,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
 
             var resultsMin = new List<double>();
             var resultsMax = new List<double>();
-            var result = new EstimationValueDto();
+            var result = new EstimationResultDto();
 
             /* Le planif 0% doit exister pour pouvoir pouvoir affiner le résultat de l'attaque */
             if (planif0 != null)
@@ -126,7 +126,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                 var lastMaxDiffFrom100Estim = GetLastMaxDiffFrom100(estim);
                 var lastMaxBehind50Planif = GetLastMaxBehind50(planif);
                 var lastMaxBehind50Estim = GetLastMaxBehind50(estim);
-                var lastDiffFrom100Planif = GetLastDiffFrom100(planif);
 
                 var startOffsetMin = 5;
                 var endOffsetMin = 26;
@@ -190,7 +189,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                             /**
                              * La liste des filtres à passer
                              * Si tous ces filtres sont à true, ça veut dire que la valeur calculée est une valeur possible pour l'attaque
-
                              */
                             if (calculatePlanifMin == planif0.Min
                                 && calculatePlanifMax == planif0.Max
@@ -205,9 +203,9 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                                     targetMax)
                                 && IsValidStagnationFinaleEstimOffsetMin(estim100, lastMaxBehind50Estim, targetMin)
                                 && IsValidStagnationFinaleEstimOffsetMax(estim100, lastMaxBehind50Estim, targetMax)
-                                && IsValidSommeOffsets100AndPrevious(planif100, lastDiffFrom100Planif, targetMin,
+                                && IsValidSommeOffsets100AndPrevious(planif100, lastMinDiffFrom100Planif, lastMaxDiffFrom100Planif, targetMin,
                                     targetMax)
-                                && IsValidAlter(estim, targetMin, targetMax, beta)
+                                && IsValidAlter(estim, targetMin, targetMax)
                                )
                             {
                                 calculateAttackMin = Math.Max(calculateAttackMin, targetMin);
@@ -220,41 +218,49 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                     }
                 }
 
+                result.minList = resultsMin
+                    .Where(result => result >= attaqueMin)
+                    .Select(result => Convert.ToInt32(result))
+                    .ToList();
+                result.maxList = resultsMax
+                    .Where(result => result <= attaqueMax)
+                    .Select(result => Convert.ToInt32(result))
+                    .ToList();
+
                 /**
                  * Si le tableau des résultats possibles a bien été alimenté, alors on peut déterminer un min et un max de l'attaque
                  * On choisi la valeur parmi toutes les valeurs possibles ainsi que la valeur théorique
                  */
                 if (resultsMin.Count > 0 && resultsMax.Count > 0)
                 {
-
-                    result.Min = Convert.ToInt32(Math.Max(resultsMin.Min(), attaqueMin));
-                    result.Max = Convert.ToInt32(Math.Min(resultsMax.Max(), attaqueMax));
+                    result.Result.Min = Convert.ToInt32(Math.Max(resultsMin.Min(), attaqueMin));
+                    result.Result.Max = Convert.ToInt32(Math.Min(resultsMax.Max(), attaqueMax));
                     if (lastEstim != null)
                     {
-                        result.Min = Math.Max(result.Min, lastEstim.Min);
-                        result.Max = Math.Min(result.Max, lastEstim.Max);
+                        result.Result.Min = Math.Max(result.Result.Min, lastEstim.Min);
+                        result.Result.Max = Math.Min(result.Result.Max, lastEstim.Max);
                     }
                     if (lastPlanif != null)
                     {
-                        result.Min = Math.Max(result.Min, lastPlanif.Min);
-                        result.Max = Math.Min(result.Max, lastPlanif.Max);
+                        result.Result.Min = Math.Max(result.Result.Min, lastPlanif.Min);
+                        result.Result.Max = Math.Min(result.Result.Max, lastPlanif.Max);
                     }
                     return result;
                 }
             }
 
             /* Si le planif 0% n'existe pas, ou que la fonction ne renvoie pas de résultat, alors on renvoie le min et le max théorique du jour */
-            result.Min = Convert.ToInt32(attaqueMin);
-            result.Max = Convert.ToInt32(attaqueMax);
+            result.Result.Min = Convert.ToInt32(attaqueMin);
+            result.Result.Max = Convert.ToInt32(attaqueMax);
             if (lastEstim != null)
             {
-                result.Min = Math.Max(result.Min, lastEstim.Min);
-                result.Max = Math.Min(result.Max, lastEstim.Max);
+                result.Result.Min = Math.Max(result.Result.Min, lastEstim.Min);
+                result.Result.Max = Math.Min(result.Result.Max, lastEstim.Max);
             }
             if (lastPlanif != null)
             {
-                result.Min = Math.Max(result.Min, lastPlanif.Min);
-                result.Max = Math.Min(result.Max, lastPlanif.Max);
+                result.Result.Min = Math.Max(result.Result.Min, lastPlanif.Min);
+                result.Result.Max = Math.Min(result.Result.Max, lastPlanif.Max);
             }
             return result;
         }
@@ -403,13 +409,15 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
          * true si deux somme d'offsets de planifs consécutifs sont inférieures au shift
          */
         private bool IsValidSommeOffsets100AndPrevious(EstimationValueDto planif100,
-            EstimationValueDto lastDiffFrom100Planif, double targetMin, double targetMax)
+            EstimationValueDto lastMinDiffFrom100Planif, EstimationValueDto lastMaxDiffFrom100Planif, double targetMin, double targetMax)
         {
-            if (planif100 == null || lastDiffFrom100Planif == null || planif100.Min == 0 || planif100.Max == 0 ||
-                lastDiffFrom100Planif.Min == 0 || lastDiffFrom100Planif.Max == 0) return true;
+            if (planif100 == null || lastMinDiffFrom100Planif == null || lastMaxDiffFrom100Planif == null
+                || planif100.Min == 0 || planif100.Max == 0
+                || lastMinDiffFrom100Planif.Min == 0 || lastMinDiffFrom100Planif.Max == 0
+                || lastMaxDiffFrom100Planif.Min == 0 || lastMaxDiffFrom100Planif.Max == 0) return true;
 
-            var offsetMinPrevious = CalculateOffset("min", targetMin, lastDiffFrom100Planif.Min);
-            var offsetMaxPrevious = CalculateOffset("max", targetMax, lastDiffFrom100Planif.Max);
+            var offsetMinPrevious = CalculateOffset("min", targetMin, lastMinDiffFrom100Planif.Min);
+            var offsetMaxPrevious = CalculateOffset("max", targetMax, lastMaxDiffFrom100Planif.Max);
 
             var offsetMin100 = CalculateOffset("min", targetMin, planif100.Min);
             var offsetMax100 = CalculateOffset("max", targetMax, planif100.Max);
@@ -420,12 +428,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             return !(sommeOffsets100 < _shift && sommeOffsetsPrevious < _shift);
         }
 
-        /*
-         * on skip ce test si on n'est pas en beta
-         */
-        private bool IsValidAlter(EstimationsDto estim, double targetMin, double targetMax, bool beta)
+        private bool IsValidAlter(EstimationsDto estim, double targetMin, double targetMax)
         {
-            if (beta == false) return true;
 
             var values = new List<EstimationTuple>();
             foreach (var tuple in estim.GetType().GetProperties())
