@@ -3,27 +3,28 @@ import { Injectable } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs';
 import { LocalStorageService } from '../../shared/services/localstorage.service';
 import { getTown, getUserId, } from '../../shared/utilities/localstorage.util';
+import { EstimationsResultDTO } from '../dto/estimations-result.dto';
 import { EstimationsDTO } from '../dto/estimations.dto';
 import { RegenDTO } from '../dto/regen.dto';
-import { MinMax } from '../interfaces';
 import { dtoToModelArray } from '../types/_common.class';
+import { EstimationsResult } from '../types/estimations-result.class';
 import { Estimations } from '../types/estimations.class';
 import { Regen } from '../types/regen.class';
 import { GlobalService } from './_global.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class TownStatisticsService extends GlobalService {
 
     constructor(_http: HttpClient, private local_storage: LocalStorageService) {
         super(_http);
     }
 
-    public getApofooAttackCalculation(day: number, beta: boolean): Observable<MinMax | null> {
-        return new Observable((sub: Subscriber<MinMax | null>) => {
-            super.get<MinMax>(this.API_URL + `/attaqueEstimation/apofooAttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${getTown(this.local_storage)?.town_id}`)
+    public getApofooAttackCalculation(day: number, beta: boolean): Observable<EstimationsResult> {
+        return new Observable((sub: Subscriber<EstimationsResult>) => {
+            super.get<EstimationsResultDTO>(this.API_URL + `/attaqueEstimation/apofooAttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${getTown(this.local_storage)?.town_id}`)
                 .subscribe({
-                    next: (response: HttpResponse<MinMax>) => {
-                        sub.next(response.body);
+                    next: (response: HttpResponse<EstimationsResultDTO>) => {
+                        sub.next(new EstimationsResult(response.body));
                     },
                     error: (error: HttpErrorResponse) => {
                         sub.error(error);

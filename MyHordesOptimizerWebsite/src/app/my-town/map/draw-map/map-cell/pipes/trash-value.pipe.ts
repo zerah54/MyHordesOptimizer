@@ -25,7 +25,7 @@ export class TrashValuePipe implements PipeTransform {
                 if (item) {
                     let item_value: number = 0;
                     trashes
-                        .filter((trash: Trash) => item.properties.find((property: Property): boolean => trash.value.property?.key === property.key))
+                        .filter((trash: Trash) => item.properties?.find((property: Property): boolean => trash.value.property?.key === property.key))
                         .forEach((trash: Trash): void => {
                             const specialized: boolean = true;
                             if (option.trash_mode === 'def') {
