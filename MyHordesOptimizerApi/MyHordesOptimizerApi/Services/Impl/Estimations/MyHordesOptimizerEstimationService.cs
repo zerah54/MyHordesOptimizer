@@ -126,7 +126,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                 var lastMaxDiffFrom100Estim = GetLastMaxDiffFrom100(estim);
                 var lastMaxBehind50Planif = GetLastMaxBehind50(planif);
                 var lastMaxBehind50Estim = GetLastMaxBehind50(estim);
-                var lastDiffFrom100Planif = GetLastDiffFrom100(planif);
 
                 var startOffsetMin = 5;
                 var endOffsetMin = 26;
@@ -204,7 +203,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                                     targetMax)
                                 && IsValidStagnationFinaleEstimOffsetMin(estim100, lastMaxBehind50Estim, targetMin)
                                 && IsValidStagnationFinaleEstimOffsetMax(estim100, lastMaxBehind50Estim, targetMax)
-                                && IsValidSommeOffsets100AndPrevious(planif100, lastDiffFrom100Planif, targetMin,
+                                && IsValidSommeOffsets100AndPrevious(planif100, lastMinDiffFrom100Planif, lastMaxDiffFrom100Planif, targetMin,
                                     targetMax)
                                 && IsValidAlter(estim, targetMin, targetMax)
                                )
@@ -410,13 +409,15 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
          * true si deux somme d'offsets de planifs consécutifs sont inférieures au shift
          */
         private bool IsValidSommeOffsets100AndPrevious(EstimationValueDto planif100,
-            EstimationValueDto lastDiffFrom100Planif, double targetMin, double targetMax)
+            EstimationValueDto lastMinDiffFrom100Planif, EstimationValueDto lastMaxDiffFrom100Planif, double targetMin, double targetMax)
         {
-            if (planif100 == null || lastDiffFrom100Planif == null || planif100.Min == 0 || planif100.Max == 0 ||
-                lastDiffFrom100Planif.Min == 0 || lastDiffFrom100Planif.Max == 0) return true;
+            if (planif100 == null || lastMinDiffFrom100Planif == null || lastMaxDiffFrom100Planif == null
+                || planif100.Min == 0 || planif100.Max == 0
+                || lastMinDiffFrom100Planif.Min == 0 || lastMinDiffFrom100Planif.Max == 0
+                || lastMaxDiffFrom100Planif.Min == 0 || lastMaxDiffFrom100Planif.Max == 0) return true;
 
-            var offsetMinPrevious = CalculateOffset("min", targetMin, lastDiffFrom100Planif.Min);
-            var offsetMaxPrevious = CalculateOffset("max", targetMax, lastDiffFrom100Planif.Max);
+            var offsetMinPrevious = CalculateOffset("min", targetMin, lastMinDiffFrom100Planif.Min);
+            var offsetMaxPrevious = CalculateOffset("max", targetMax, lastMaxDiffFrom100Planif.Max);
 
             var offsetMin100 = CalculateOffset("min", targetMin, planif100.Min);
             var offsetMax100 = CalculateOffset("max", targetMax, planif100.Max);
