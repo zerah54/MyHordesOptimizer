@@ -17,7 +17,7 @@
         },
         {
             "target": "dev",
-            "public": "dist/MyHordesOptimizerWebsite/server",
+            "public": "dist/MyHordesOptimizerWebsite/browser",
             "ignore": [
                 "firebase.json",
                 "**/.*",
