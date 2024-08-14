@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.24.0
+// @version      1.0.25.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,8 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] On essaye de faire en sorte que les barres de réparation en pandé ne débordent plus`
-    + `[Correctif] Retrait du localhost dans la liste des matchs`;
+    + `[Correctif] L'enregistrement à la tour de guet ne fait plus planter l'affichange de l'attaque estimée`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -6431,13 +6430,13 @@ function displayEstimationsOnWatchtower() {
                     let calc_attack = calc_block.querySelector('.attack').lastElementChild;
                     if (type === 'estim') {
                         if (calc_attack) {
-                            calc_attack.firstElementChild.innerText = estimations.today_attack.min;
-                            calc_attack.lastElementChild.innerText = estimations.today_attack.max;
+                            calc_attack.firstElementChild.innerText = estimations.today_attack.result.min;
+                            calc_attack.lastElementChild.innerText = estimations.today_attack.result.max;
                         }
                     } else {
                         if (calc_attack) {
-                            calc_attack.firstElementChild.innerText = estimations.tomorrow_attack.min;
-                            calc_attack.lastElementChild.innerText = estimations.tomorrow_attack.max;
+                            calc_attack.firstElementChild.innerText = estimations.tomorrow_attack.result.min;
+                            calc_attack.lastElementChild.innerText = estimations.tomorrow_attack.result.max;
                         }
                     }
                 }
