@@ -17,7 +17,7 @@ jobs:
             -   uses: actions/checkout@main
 
             -   name: Set up .NET Core
-                uses: actions/setup-dotnet@v2
+                uses: actions/setup-dotnet@v4
                 with:
                     dotnet-version: '8.0'
                     include-prerelease: true
@@ -53,7 +53,7 @@ jobs:
                     name: .net-app
 
             -   name: Send to Server
-                uses: appleboy/scp-action@v0.1.4
+                uses: appleboy/scp-action@v0.1.7
                 with:
                     host: ${{ secrets.SSH_HOST }}
                     username: ${{ secrets.SSH_USERNAME }}
@@ -64,7 +64,7 @@ jobs:
                     strip_components: 1
 
             -   name: Restart Server
-                uses: appleboy/ssh-action@v1.0.0
+                uses: appleboy/ssh-action@v1.0.3
                 with:
                     host: ${{ secrets.SSH_HOST }}
                     username: ${{ secrets.SSH_USERNAME }}
