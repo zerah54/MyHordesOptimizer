@@ -25,17 +25,19 @@ jobs:
             -   name: Build with dotnet
                 run: dotnet build --configuration Release
 
-            -   name: pwd
-                run: pwd
-
-            -   name: ls
-                run: ls
+            -   name: echo
+                run: |
+                    pwd
+                    ls
+                    cd /MyHordesOptimizerApi
+                    pwd
+                    ls
 
             -   name: dotnet publish sinks
-                run: dotnet publish -c Release -o /Serilog.Sinks.Discord
+                run: dotnet publish -c Release -o /Serilog.Sinks.Discord/publish
 
             -   name: dotnet publish api
-                run: dotnet publish -c Release -o /MyHordesOptimizerApi
+                run: dotnet publish -c Release -o /MyHordesOptimizerApi/publish
 
             -   name: Upload artifact for deployment job
                 uses: actions/upload-artifact@v2
@@ -57,6 +59,14 @@ jobs:
                 uses: actions/download-artifact@v2
                 with:
                     name: .net-app
+
+            -   name: echo
+                run: |
+                    pwd
+                    ls
+                    cd ./
+                    pwd
+                    ls
 
             -   name: Send to Server
                 uses: appleboy/scp-action@v0.1.7
