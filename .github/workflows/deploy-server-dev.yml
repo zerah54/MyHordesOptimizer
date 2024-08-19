@@ -25,8 +25,8 @@ jobs:
             -   name: Build with dotnet
                 run: dotnet build --configuration Release
 
-            -   name: dotnet publish sinks
-                run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
+            #            -   name: dotnet publish sinks
+            #                run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/Serilog.Sinks.Discord
 
             -   name: dotnet publish api
                 run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/MyHordesOptimizerApi
