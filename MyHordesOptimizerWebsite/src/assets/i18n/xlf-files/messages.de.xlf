@@ -1016,7 +1016,7 @@
           <context context-type="sourcefile">src/app/structure/header/citizen-menu/citizen-menu.component.html</context>
           <context context-type="linenumber">31</context>
         </context-group>
-        <target state="needs-translation">Bain pris</target>
+        <target state="translated">Bad genommen</target>
       </trans-unit>
       <trans-unit id="713605071826573828" datatype="html" approved="yes">
         <source>Actions héroïques</source>
