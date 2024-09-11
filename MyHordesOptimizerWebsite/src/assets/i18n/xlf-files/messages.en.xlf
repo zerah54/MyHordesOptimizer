@@ -1068,7 +1068,7 @@
           <context context-type="sourcefile">src/app/structure/header/citizen-menu/citizen-menu.component.ts</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">Tous</target>
+        <target state="translated">All</target>
       </trans-unit>
       <trans-unit id="6373263061828099513" datatype="html" approved="yes">
         <source>Citoyens</source>
@@ -1276,7 +1276,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">22</context>
         </context-group>
-        <target state="needs-translation">Préinscrits : </target>
+        <target state="translated">Pre-registered :</target>
       </trans-unit>
       <trans-unit id="3740549483385418842" datatype="html">
         <source>Créer une expédition</source>
@@ -1284,7 +1284,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">27</context>
         </context-group>
-        <target state="needs-translation">Créer une expédition</target>
+        <target state="translated">Create an expedition</target>
       </trans-unit>
       <trans-unit id="2061348079638801621" datatype="html">
         <source>Places : </source>
@@ -1292,7 +1292,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
-        <target state="needs-translation">Places : </target>
+        <target state="translated">Spots : </target>
       </trans-unit>
       <trans-unit id="8683123329394930871" datatype="html">
         <source>Importer le jour</source>
@@ -1348,7 +1348,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Nom du tracé</target>
+        <target state="translated">Route name</target>
       </trans-unit>
       <trans-unit id="8773315027797338734" datatype="html">
         <source>Supprimer la partie</source>
@@ -1356,7 +1356,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">124</context>
         </context-group>
-        <target state="needs-translation">Supprimer la partie</target>
+        <target state="translated">Remove part</target>
       </trans-unit>
       <trans-unit id="5833055296319952035" datatype="html" approved="yes">
         <source>Métier</source>
@@ -1376,7 +1376,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">151</context>
         </context-group>
-        <target state="needs-translation">Action héroïque</target>
+        <target state="translated">Heroic action</target>
       </trans-unit>
       <trans-unit id="9201198932056179343" datatype="html">
         <source>Consignes perso</source>
@@ -1392,7 +1392,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">162</context>
         </context-group>
-        <target state="needs-translation">Supprimer la place</target>
+        <target state="translated">Remove spot</target>
       </trans-unit>
       <trans-unit id="7180575964287205441" datatype="html" approved="yes">
         <source>Oui</source>
@@ -1432,7 +1432,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">305</context>
         </context-group>
-        <target state="needs-translation">Consignes de l'expédition</target>
+        <target state="translated">Route instructions</target>
       </trans-unit>
       <trans-unit id="1734510160431147499" datatype="html">
         <source>Ajouter une partie à l&apos;expédition</source>
@@ -1440,7 +1440,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">348</context>
         </context-group>
-        <target state="needs-translation">Ajouter une partie à l'expédition</target>
+        <target state="translated">Add part to the expedition</target>
       </trans-unit>
       <trans-unit id="1753191297685148420" datatype="html">
         <source>Ajouter un membre à l&apos;expédition</source>
@@ -1448,7 +1448,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">352</context>
         </context-group>
-        <target state="needs-translation">Ajouter un membre à l'expédition</target>
+        <target state="translated">Add a spot to the expedition</target>
       </trans-unit>
       <trans-unit id="4247263368529700262" datatype="html" approved="yes">
         <source>Confirmer</source>
