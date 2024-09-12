@@ -32,7 +32,8 @@
                                         @case ('avatar_name') {
                                             <mho-avatar [src]="row.avatar"></mho-avatar>
                                             <div>
-                                                <mho-citizen-info [citizen]="row"></mho-citizen-info>
+                                                <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
+                                                                  [citizen]="row"></mho-citizen-info>
                                             </div>
                                         }
                                         @case ('more_status') {

@@ -9,11 +9,12 @@ import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { HeroicActionEnum } from '../../../../../_abstract_model/enum/heroic-action.enum';
 import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
+import { CitizenInfoComponent } from '../../../../../shared/elements/citizen-info/citizen-info.component';
 import { HasStillHeroicPipe } from './has-still-heroic.pipe';
 import { NotInListCitizenPipe } from './not-in-list-citizen.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
-const components: Imports = [];
+const components: Imports = [CitizenInfoComponent];
 const pipes: Imports = [HasStillHeroicPipe, NotInListCitizenPipe];
 const material_modules: Imports = [MatButtonModule, MatIconModule, MatListModule, MatMenuModule];
 

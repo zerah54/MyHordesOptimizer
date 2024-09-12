@@ -23,6 +23,8 @@ export interface Theme {
     class: string;
 }
 
+export type DisplayPseudoMode = 'simple' | 'id_mh';
+
 export interface Misc {
     header: string;
     highlight_day: boolean;

@@ -46,7 +46,8 @@
             <mat-list class="mho-add-citizen-list">
                 @for (citizen of (allCitizens | notInListCitizenDig:digs); track citizen.id) {
                     <mat-list-item (click)="addCitizen(citizen)">
-                        <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{ citizen.name }}
+                        <mho-citizen-info [displayJob]="true" [displayShunStatus]="false" [displayPseudoMode]="'simple'"
+                                          [citizen]="citizen"></mho-citizen-info>
                     </mat-list-item>
                 }
             </mat-list>

@@ -30,7 +30,10 @@
                                 @if (row.citizen.avatar && row.citizen.avatar !== 'False') {
                                     <img [src]="row.citizen.avatar" width="100">
                                 }
-                                <div>{{ row.citizen.name }}</div>
+                                <div>
+                                    <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
+                                                      [citizen]="row.citizen"></mho-citizen-info>
+                                </div>
                             }
                             @case ('today_digs') {
                                 <div class="digs">

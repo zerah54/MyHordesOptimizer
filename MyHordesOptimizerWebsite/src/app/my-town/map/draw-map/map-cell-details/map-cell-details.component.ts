@@ -8,6 +8,7 @@ import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
+import { CitizenInfoComponent } from '../../../../shared/elements/citizen-info/citizen-info.component';
 import { IconApComponent } from '../../../../shared/elements/icon-ap/icon-ap.component';
 import { LastUpdateComponent } from '../../../../shared/elements/last-update/last-update.component';
 import { CitizensFromShortPipe } from '../../../../shared/pipes/citizens-from-short.pipe';
@@ -17,7 +18,7 @@ import { CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellD
 import { RuinInCell } from './ruin-in-cell.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
-const components: Imports = [LastUpdateComponent, IconApComponent];
+const components: Imports = [LastUpdateComponent, IconApComponent, CitizenInfoComponent];
 const pipes: Imports = [CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe, CitizensFromShortPipe, ItemDetailsPipe, RuinInCell];
 const material_modules: Imports = [MatDividerModule];
 

@@ -27,14 +27,20 @@
     <div class="plays-dices-cards">
         <div class="citizen-plays">
             <h4 i18n>Ont joué</h4>
-            @for (citizen of entries_by_type | citizenUseDiceOrCards:completeCitizenList:displayPseudo; track citizen) {
-                <div>{{ citizen }}</div>
+            @for (citizen of entries_by_type | citizenUseDiceOrCards:completeCitizenList; track citizen) {
+                <div>
+                    <mho-citizen-info [displayJob]="false" [displayShunStatus]="true" [displayPseudoMode]="displayPseudo"
+                                      [citizen]="citizen"></mho-citizen-info>
+                </div>
             }
         </div>
         <div class="citizen-doesnt-play">
             <h4 i18n>N'ont pas joué</h4>
-            @for (citizen of entries_by_type | citizenUseDiceOrCards:completeCitizenList:displayPseudo:true; track citizen) {
-                <div>{{ citizen }}</div>
+            @for (citizen of entries_by_type | citizenUseDiceOrCards:completeCitizenList:true; track citizen) {
+                <div>
+                    <mho-citizen-info [displayJob]="false" [displayShunStatus]="true" [displayPseudoMode]="displayPseudo"
+                                      [citizen]="citizen"></mho-citizen-info>
+                </div>
             }
         </div>
     </div>

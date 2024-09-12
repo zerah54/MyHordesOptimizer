@@ -4,13 +4,12 @@ import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.clas
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { normalizeString } from '../../../../shared/utilities/string.utils';
 
-
 @Pipe({
-    name: 'citizenUseDiceOrCards',
+    name: 'citizenTakeTelescope',
     standalone: true,
 })
-export class CitizenUseDiceOrCardsPipe implements PipeTransform {
-    transform(entries: Entry[], complete_citizen_list: CitizenInfo, reverse?: boolean): Citizen[] {
+export class TelescopePipe implements PipeTransform {
+    transform(entries: Entry[], complete_citizen_list: CitizenInfo, mode: 'taken' | 'not-taken'): Citizen[] {
         const citizen_for_entry: Citizen[] = [];
         let citizen_to_write: Citizen[] = [];
 
@@ -21,7 +20,7 @@ export class CitizenUseDiceOrCardsPipe implements PipeTransform {
             }
         });
 
-        if (reverse) {
+        if (mode === 'not-taken') {
             citizen_to_write = complete_citizen_list.citizens
                 .filter((citizen: Citizen) => {
                     return !citizen_for_entry.some((citizen_in_list: Citizen): boolean => citizen_in_list.id === citizen.id);

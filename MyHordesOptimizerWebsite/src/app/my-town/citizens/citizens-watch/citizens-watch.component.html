@@ -19,7 +19,8 @@
                             <h4 class="label">{{ bath_state.label }}</h4>
                             <div class="citizen">
                                 @for (citizen of bath_state.citizen; track citizen.id) {
-                                    <div>{{ display_pseudo === 'simple' ? citizen.name : citizen.getTag() }}</div>
+                                    <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
+                                                      [citizen]="citizen"></mho-citizen-info>
                                 }
                             </div>
                         </div>
