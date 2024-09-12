@@ -30,6 +30,11 @@ export class CitizenGroupByImmuneStatePipe implements PipeTransform {
                 const sing: string = $localize`${nb} potion bue`;
                 label = nb > 1 ? plur : sing;
             }
+            citizen_by_immune_state.sort((citizen_a: Citizen, citizen_b: Citizen) => {
+                if (citizen_a.name.localeCompare(citizen_b.name) > 0) return 1;
+                if (citizen_a.name.localeCompare(citizen_b.name) < 0) return -1;
+                return 0;
+            });
             return {
                 label: label,
                 citizen: citizen_by_immune_state
