@@ -13,6 +13,7 @@ import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../../../_abstract_model/types/dig.class';
+import { CitizenInfoComponent } from '../../../../../shared/elements/citizen-info/citizen-info.component';
 import {
     HeaderWithNumberPreviousNextFilterComponent
 } from '../../../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
@@ -22,7 +23,7 @@ import { DigsPerDayPipe } from './digs-per-day.pipe';
 import { NotInListCitizenDigPipe } from './not-in-list-citizen.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
-const components: Imports = [HeaderWithNumberPreviousNextFilterComponent];
+const components: Imports = [HeaderWithNumberPreviousNextFilterComponent, CitizenInfoComponent];
 const pipes: Imports = [DigsPerDayPipe, NotInListCitizenDigPipe];
 const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule];
 

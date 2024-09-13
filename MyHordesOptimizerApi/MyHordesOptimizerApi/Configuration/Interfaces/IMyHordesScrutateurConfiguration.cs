@@ -13,7 +13,7 @@
         public int StartItemMax { get; }
         public int MinItemAdd { get; }
         public int MaxItemAdd { get; }
-        public int MaxItemPerCell { get; }
+        public int? MaxItemPerCell { get; }
         public int DigThrottle { get; }
     }
 }

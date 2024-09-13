@@ -28,7 +28,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
         private static string RollDice(int value)
         {
             var random = new Random();
-            return random.Next(0, value).ToString();
+            return random.Next(1, value + 1).ToString();
         }
 
         private static string RollPfc()

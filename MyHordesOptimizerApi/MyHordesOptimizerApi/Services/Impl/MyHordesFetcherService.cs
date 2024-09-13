@@ -289,7 +289,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                                     {
                                         var max = cell.MaxPotentialRemainingDig ?? 0;
                                         var average = cell.AveragePotentialRemainingDig ?? 0;
-                                        if (max < MyHordesScrutateurConfiguration.MaxItemPerCell)
+                                        if (MyHordesScrutateurConfiguration.MaxItemPerCell == null || max < MyHordesScrutateurConfiguration.MaxItemPerCell)
                                         {
                                             var itemToAdd = MyHordesScrutateurConfiguration.MaxItemAdd;
                                             if (max >= MyHordesScrutateurConfiguration.DigThrottle)
@@ -304,7 +304,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                                         }
 
                                         float averageItemAdd = ((float)regenChance / (float)100) * averageNbOfItemAdded;
-                                        if (average < MyHordesScrutateurConfiguration.MaxItemPerCell)
+                                        if (MyHordesScrutateurConfiguration.MaxItemPerCell == null || average < MyHordesScrutateurConfiguration.MaxItemPerCell)
                                         {
                                             if (average >= MyHordesScrutateurConfiguration.DigThrottle)
                                             {

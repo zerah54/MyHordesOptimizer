@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.23.0
+// @version      1.0.25.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -19,7 +19,6 @@
 // @match        *://myhordes.eu/*
 // @match        *://myhord.es/*
 // @match        *://myhordes.fr/*
-// @match        *://myhordes.localhost/*
 //
 // @match        https://bbh.fred26.fr/*
 // @match        https://gest-hordes2.eragaming.fr/*
@@ -32,7 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] On essaye de faire en sorte que les barres de réparation en pandé s'affichent tout le temps, et pas juste quand elles ont envie`;
+    + `[Correctif] L'enregistrement à la tour de guet ne fait plus planter l'affichange de l'attaque estimée`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -1965,6 +1964,8 @@ function addSuccess(message) {
 /** Affiche une notification de warning */
 function addWarning(message) {
     let notifications = document.getElementById('notifications');
+    if (!notifications) return
+
     let notification = document.createElement('div');
     notification.classList.add('warning', 'show');
     notification.innerText = `${getScriptInfo().name} : ${message}`;
@@ -4425,6 +4426,12 @@ function displaySearchFieldOnBuildings() {
                 search_field_div.classList.add('hidden');
             }
 
+            let header_mho_img = document.createElement('img');
+            header_mho_img.src = mh_optimizer_icon;
+            header_mho_img.style.height = '24px';
+            header_mho_img.style.position = 'absolute';
+            search_field_div.appendChild(header_mho_img);
+
             let search_field = document.createElement('input');
             search_field.type = 'text';
             search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
@@ -4463,17 +4470,6 @@ function displaySearchFieldOnBuildings() {
             search_field.addEventListener('keyup', (event) => {
                 filterBuildings();
             });
-
-
-            setTimeout(() => {
-                let header_mho_img = document.createElement('img');
-                header_mho_img.src = mh_optimizer_icon;
-                header_mho_img.style.height = '24px';
-                header_mho_img.style.position = 'absolute';
-                header_mho_img.style.left = `${search_field.offsetLeft}px`;
-                header_mho_img.style.top = `${search_field.offsetTop}px`;
-                search_field_div.appendChild(header_mho_img);
-            }, 250)
         }
     } else if (fields_container) {
         fields_container.remove();
@@ -4759,6 +4755,8 @@ function displayMinApOnBuildings() {
                     }
                     missing_ap_info.style.fontWeight = 'initial';
                     missing_ap_info.style.fontSize = '0.8em';
+                    missing_ap_info.style.overflow = 'hidden';
+                    missing_ap_info.style.textOverflow = 'ellipsis';
                     missing_ap_info.innerText = getI18N(texts.missing_ap_explanation).replace('%VAR%', Math.ceil(missing_pts / nb_pts_per_ap));
                     nb_ap_element.appendChild(missing_ap_info);
                 });
@@ -6395,7 +6393,7 @@ function displayEstimationsOnWatchtower() {
             };
             let createCalculatedAttackRow = (calculated_attack) => {
                 let estim_values_block_title_calculated_text = ``;
-                estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>${getI18N(texts.calculated_attack)} (Apofoo)</b><div><span>${calculated_attack.min}</span> - <span>${calculated_attack.max}</span></div></div>`;
+                estim_values_block_title_calculated_text += `<div class="attack" style="display: flex; justify-content: space-between; gap: 1em;"><b>${getI18N(texts.calculated_attack)} (Apofoo)</b><div><span>${calculated_attack.result.min}</span> - <span>${calculated_attack.result.max}</span></div></div>`;
 
                 return estim_values_block_title_calculated_text;
             }
@@ -6432,13 +6430,13 @@ function displayEstimationsOnWatchtower() {
                     let calc_attack = calc_block.querySelector('.attack').lastElementChild;
                     if (type === 'estim') {
                         if (calc_attack) {
-                            calc_attack.firstElementChild.innerText = estimations.today_attack.min;
-                            calc_attack.lastElementChild.innerText = estimations.today_attack.max;
+                            calc_attack.firstElementChild.innerText = estimations.today_attack.result.min;
+                            calc_attack.lastElementChild.innerText = estimations.today_attack.result.max;
                         }
                     } else {
                         if (calc_attack) {
-                            calc_attack.firstElementChild.innerText = estimations.tomorrow_attack.min;
-                            calc_attack.lastElementChild.innerText = estimations.tomorrow_attack.max;
+                            calc_attack.firstElementChild.innerText = estimations.tomorrow_attack.result.min;
+                            calc_attack.lastElementChild.innerText = estimations.tomorrow_attack.result.max;
                         }
                     }
                 }

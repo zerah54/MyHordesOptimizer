@@ -3,14 +3,15 @@ import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core'
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import moment from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
-import { Entry } from '../../../../_abstract_model/interfaces';
+import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
+import { CitizenInfoComponent } from '../../../../shared/elements/citizen-info/citizen-info.component';
 import { BankCleanEntriesPipe, BankDiffPipe } from './bank-gift.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
-const components: Imports = [];
+const components: Imports = [CitizenInfoComponent];
 const pipes: Imports = [BankCleanEntriesPipe, BankDiffPipe];
 const material_modules: Imports = [MatSlideToggleModule];
 
@@ -26,7 +27,7 @@ export class BankDiffRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input({ required: true }) completeCitizenList!: CitizenInfo;
-    @Input({ required: true }) displayPseudo!: 'simple' | 'id_mh';
+    @Input({ required: true }) displayPseudo!: DisplayPseudoMode;
     @Input({ required: true }) completeItemsList!: Item[];
 
     @Input({ required: true }) set registry(registry: Entry[] | undefined) {

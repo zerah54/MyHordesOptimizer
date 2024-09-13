@@ -2,7 +2,7 @@ import { Component, ElementRef, HostBinding, Input, ViewChild, ViewEncapsulation
 import { Scale, TooltipItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import moment from 'moment';
-import { Entry } from '../../../../_abstract_model/interfaces';
+import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 
@@ -19,7 +19,7 @@ export class DoorsRegistryComponent {
     @ViewChild('doorsCanvas') doors_canvas!: ElementRef;
 
     @Input({ required: true }) completeCitizenList!: CitizenInfo;
-    @Input({ required: true }) displayPseudo!: 'simple' | 'id_mh';
+    @Input({ required: true }) displayPseudo!: DisplayPseudoMode;
 
     @Input({ required: true }) set registry(registry: Entry[] | undefined) {
         if (registry) {

@@ -18,7 +18,8 @@
                 @for (citizen of citizens; track citizen.id) {
                     <tr>
                         <th class="name">
-                            <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{ citizen.name }}
+                            <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
+                                              [citizen]="citizen"></mho-citizen-info>
                         </th>
                         <td class="bag">
                             @for (item of citizen.bag?.items; track item) {
@@ -45,7 +46,8 @@
             <mat-list class="mho-add-citizen-list" style="max-height: 300px">
                 @for (citizen of (allCitizens | notInListCitizen:citizens); track citizen.id) {
                     <mat-list-item (click)="addCitizen(citizen)">
-                        <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">{{ citizen.name }}
+                        <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
+                                          [citizen]="citizen"></mho-citizen-info>
                     </mat-list-item>
                 }
             </mat-list>

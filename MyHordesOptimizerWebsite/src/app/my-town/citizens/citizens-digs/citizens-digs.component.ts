@@ -13,6 +13,7 @@ import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { Dig } from '../../../_abstract_model/types/dig.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
+import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
 import { DigComponent } from '../../../shared/elements/dig/dig.component';
 import {
     HeaderWithNumberPreviousNextFilterComponent
@@ -23,7 +24,7 @@ import { LocalStorageService } from '../../../shared/services/localstorage.servi
 import { getTown } from '../../../shared/utilities/localstorage.util';
 
 const angular_common: Imports = [CommonModule, NgClass];
-const components: Imports = [DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent];
+const components: Imports = [DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
 const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [MatSortModule, MatTableModule];
 
