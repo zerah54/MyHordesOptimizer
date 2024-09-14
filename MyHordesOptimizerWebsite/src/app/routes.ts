@@ -9,11 +9,11 @@ export const ROUTES: Route[] = [
     {
         path: '',
         pathMatch: 'full',
-        redirectTo: () => 'wiki/items'
+        redirectTo: 'wiki/items'
     },
     {
         path: '**',
-        redirectTo: () => 'wiki/items'
+        redirectTo: 'wiki/items'
     },
 
 ];
