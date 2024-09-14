@@ -12,6 +12,14 @@
                 {
                     "source": "**",
                     "destination": "/index.html"
+                },
+                {
+                    "source": "/",
+                    "destination": "/index.html"
+                },
+                {
+                    "source": "404.html",
+                    "destination": "/index.html"
                 }
             ]
         },
