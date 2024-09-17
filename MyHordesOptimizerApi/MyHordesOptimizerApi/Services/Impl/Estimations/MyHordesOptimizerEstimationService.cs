@@ -20,8 +20,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
         protected IMapper Mapper { get; private set; }
         protected MhoContext DbContext { get; set; }
 
-        private double _safetyRatioOffset = 3;
         private double _shift = 10;
+
+        private List<double> _safetyRatioOffsets = new List<double>([5.191, 5.191, 4.273, 3.49, 3.325, 3.223, 3.159, 3.118, 3.088, 3.07, 3.058, 3.045, 3.037, 3.031, 3.027, 3.023, 3.019, 3.016, 3.014, 3.012, 3.011, 3.01, 3.009, 3.008, 3.007, 3.006, 3.006]);
+        private double _safetyRatioOffsetDefault = 3.005;
 
         public MyHordesOptimizerEstimationService(IServiceScopeFactory serviceScopeFactory,
             IUserInfoProvider userInfoProvider,
@@ -104,8 +106,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             var ratioMin = dayAttack <= 3 ? 0.66 : maxRatio;
             var ratioMax = dayAttack <= 3 ? (dayAttack <= 1 ? constRatioBase : constRatioLow) : maxRatio;
 
-            var attaqueMin = Math.Round(ratioMin * Math.Pow(Math.Max(1, dayAttack - 1) * 0.75 + 2.5, 3),
-                MidpointRounding.AwayFromZero);
+            var attaqueMin = Math.Round(ratioMin * Math.Pow(Math.Max(1, dayAttack - 1) * 0.75 + 2.5, 3), MidpointRounding.AwayFromZero);
             var attaqueMax = Math.Round(ratioMax * Math.Pow(dayAttack * 0.75 + 3.5, 3), MidpointRounding.AwayFromZero);
 
             var planif0 = planif._0;
@@ -193,16 +194,16 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                             if (calculatePlanifMin == planif0.Min
                                 && calculatePlanifMax == planif0.Max
                                 && IsValidAttack(targetMin, targetMax, calculateAttackMin, calculateAttackMax)
-                                && IsValidOffsetMinPlanifFinal(planif100, targetMin, lastMinDiffFrom100Planif)
-                                && IsValidOffsetMaxPlanifFinal(planif100, targetMax, lastMaxDiffFrom100Planif)
-                                && IsValidOffsetMinEstimFinal(estim100, targetMin, lastMinDiffFrom100Estim)
-                                && IsValidOffsetMaxEstimFinal(estim100, targetMax, lastMaxDiffFrom100Estim)
+                                && IsValidOffsetMinPlanifFinal(planif100, targetMin, lastMinDiffFrom100Planif, dayAttack)
+                                && IsValidOffsetMaxPlanifFinal(planif100, targetMax, lastMaxDiffFrom100Planif, dayAttack)
+                                && IsValidOffsetMinEstimFinal(estim100, targetMin, lastMinDiffFrom100Estim, dayAttack)
+                                && IsValidOffsetMaxEstimFinal(estim100, targetMax, lastMaxDiffFrom100Estim, dayAttack)
                                 && IsValidStagnationFinalePlanifOffsetMin(planif100, lastMaxBehind50Planif,
-                                    targetMin)
+                                    targetMin, dayAttack)
                                 && IsValidStagnationFinalePlanifOffsetMax(planif100, lastMaxBehind50Planif,
-                                    targetMax)
-                                && IsValidStagnationFinaleEstimOffsetMin(estim100, lastMaxBehind50Estim, targetMin)
-                                && IsValidStagnationFinaleEstimOffsetMax(estim100, lastMaxBehind50Estim, targetMax)
+                                    targetMax, dayAttack)
+                                && IsValidStagnationFinaleEstimOffsetMin(estim100, lastMaxBehind50Estim, targetMin, dayAttack)
+                                && IsValidStagnationFinaleEstimOffsetMax(estim100, lastMaxBehind50Estim, targetMax, dayAttack)
                                 && IsValidSommeOffsets100AndPrevious(planif100, lastMinDiffFrom100Planif, lastMaxDiffFrom100Planif, targetMin,
                                     targetMax)
                                 && IsValidAlter(estim, targetMin, targetMax)
@@ -291,7 +292,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
          * true si deux offsets min de planifs différents consécutifs sont supérieurs à 3
          */
         private bool IsValidOffsetMinPlanifFinal(EstimationValueDto planif100, double targetMin,
-            EstimationValueDto lastMinDiffFrom100Planif)
+            EstimationValueDto lastMinDiffFrom100Planif, int dayAttack)
         {
             if (planif100 == null || lastMinDiffFrom100Planif == null ||
                 planif100.Min == lastMinDiffFrom100Planif.Min) return true;
@@ -299,7 +300,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             var offsetMinPrevious = CalculateOffset("min", targetMin, lastMinDiffFrom100Planif.Min);
             var offsetMin100 = CalculateOffset("min", targetMin, planif100.Min);
 
-            return !(offsetMin100 < _safetyRatioOffset && offsetMinPrevious < _safetyRatioOffset);
+            return !(offsetMin100 < GetSafetyRatioOffset(dayAttack) && offsetMinPrevious < GetSafetyRatioOffset(dayAttack));
         }
 
         /*
@@ -307,7 +308,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
          * true si deux offsets max de planifs différents consécutifs sont supérieurs à 3
          */
         private bool IsValidOffsetMaxPlanifFinal(EstimationValueDto planif100, double targetMax,
-            EstimationValueDto lastMaxDiffFrom100Planif)
+            EstimationValueDto lastMaxDiffFrom100Planif, int dayAttack)
         {
             if (planif100 == null || lastMaxDiffFrom100Planif == null ||
                 planif100.Max == lastMaxDiffFrom100Planif.Max) return true;
@@ -315,7 +316,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             var offsetMaxPrevious = CalculateOffset("max", targetMax, lastMaxDiffFrom100Planif.Max);
             var offsetMax100 = CalculateOffset("max", targetMax, planif100.Max);
 
-            return !(offsetMax100 < _safetyRatioOffset && offsetMaxPrevious < _safetyRatioOffset);
+            return !(offsetMax100 < GetSafetyRatioOffset(dayAttack) && offsetMaxPrevious < GetSafetyRatioOffset(dayAttack));
         }
 
         /*
@@ -323,7 +324,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
          * true si deux offsets min d'estims consécutifs sont supérieurs à 3
          */
         private bool IsValidOffsetMinEstimFinal(EstimationValueDto estim100, double targetMin,
-            EstimationValueDto lastMinDiffFrom100Estim)
+            EstimationValueDto lastMinDiffFrom100Estim, int dayAttack)
         {
             if (estim100 == null || lastMinDiffFrom100Estim == null ||
                 estim100.Min == lastMinDiffFrom100Estim.Min) return true;
@@ -331,7 +332,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             var offsetMinPrevious = CalculateOffset("min", targetMin, lastMinDiffFrom100Estim.Min);
             var offsetMin100 = CalculateOffset("min", targetMin, estim100.Min);
 
-            return !(offsetMin100 < _safetyRatioOffset && offsetMinPrevious < _safetyRatioOffset);
+            return !(offsetMin100 < GetSafetyRatioOffset(dayAttack) && offsetMinPrevious < GetSafetyRatioOffset(dayAttack));
         }
 
         /*
@@ -339,7 +340,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
          * true si deux offsets max d'estims consécutifs sont supérieurs à 3
          */
         private bool IsValidOffsetMaxEstimFinal(EstimationValueDto estim100, double targetMax,
-            EstimationValueDto lastMaxDiffFrom100Estim)
+            EstimationValueDto lastMaxDiffFrom100Estim, int dayAttack)
         {
             if (estim100 == null || lastMaxDiffFrom100Estim == null ||
                 estim100.Max == lastMaxDiffFrom100Estim.Max) return true;
@@ -347,7 +348,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             var offsetMaxPrevious = CalculateOffset("max", targetMax, lastMaxDiffFrom100Estim.Max);
             var offsetMax100 = CalculateOffset("max", targetMax, estim100.Max);
 
-            return !(offsetMax100 < _safetyRatioOffset && offsetMaxPrevious < _safetyRatioOffset);
+            return !(offsetMax100 < GetSafetyRatioOffset(dayAttack) && offsetMaxPrevious < GetSafetyRatioOffset(dayAttack));
         }
 
         /*
@@ -355,13 +356,13 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
          *
          */
         private bool IsValidStagnationFinalePlanifOffsetMin(EstimationValueDto planif100,
-            EstimationValueDto lastMaxBehind50, double targetMin)
+            EstimationValueDto lastMaxBehind50, double targetMin, int dayAttack)
         {
             if (lastMaxBehind50 == null || planif100 == null || lastMaxBehind50.Min != planif100.Min) return true;
 
             var planif100EcartMaxOffsetMin = CalculateOffset("min", targetMin, planif100.Min + 24);
 
-            return planif100EcartMaxOffsetMin < _safetyRatioOffset;
+            return planif100EcartMaxOffsetMin < GetSafetyRatioOffset(dayAttack);
         }
 
         /*
@@ -369,13 +370,13 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
          *
          */
         private bool IsValidStagnationFinalePlanifOffsetMax(EstimationValueDto planif100,
-            EstimationValueDto lastMaxBehind50, double targetMax)
+            EstimationValueDto lastMaxBehind50, double targetMax, int dayAttack)
         {
             if (lastMaxBehind50 == null || planif100 == null || lastMaxBehind50.Max != planif100.Max) return true;
 
             var planif100EcartMaxOffsetMax = CalculateOffset("max", targetMax, planif100.Max - 24);
 
-            return planif100EcartMaxOffsetMax < _safetyRatioOffset;
+            return planif100EcartMaxOffsetMax < GetSafetyRatioOffset(dayAttack);
         }
 
         /*
@@ -383,12 +384,12 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
          *
          */
         private bool IsValidStagnationFinaleEstimOffsetMin(EstimationValueDto estim100,
-            EstimationValueDto lastMaxBehind50, double targetMin)
+            EstimationValueDto lastMaxBehind50, double targetMin, int dayAttack)
         {
             if (lastMaxBehind50 == null || estim100 == null || lastMaxBehind50.Min != estim100.Min) return true;
             var offsetMin100 = CalculateOffset("min", targetMin, estim100.Min);
 
-            return offsetMin100 < _safetyRatioOffset;
+            return offsetMin100 < GetSafetyRatioOffset(dayAttack);
         }
 
         /*
@@ -396,12 +397,12 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
          *
          */
         private bool IsValidStagnationFinaleEstimOffsetMax(EstimationValueDto estim100,
-            EstimationValueDto lastMaxBehind50, double targetMax)
+            EstimationValueDto lastMaxBehind50, double targetMax, int dayAttack)
         {
             if (lastMaxBehind50 == null || estim100 == null || lastMaxBehind50.Max != estim100.Max) return true;
             var offsetMax100 = CalculateOffset("max", targetMax, estim100.Max);
 
-            return offsetMax100 < _safetyRatioOffset;
+            return offsetMax100 < GetSafetyRatioOffset(dayAttack);
         }
 
         /*
@@ -713,6 +714,11 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             }
 
             return false;
+        }
+
+        private double GetSafetyRatioOffset(int currentDay)
+        {
+            return currentDay <= _safetyRatioOffsets.Count && _safetyRatioOffsets[currentDay - 1] != null  ? _safetyRatioOffsets[currentDay - 1] : _safetyRatioOffsetDefault;
         }
     }
 

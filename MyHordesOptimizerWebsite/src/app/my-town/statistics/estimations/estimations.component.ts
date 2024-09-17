@@ -214,10 +214,10 @@ export class EstimationsComponent implements OnInit {
         let text: string = '';
 
         /** Ajout du titre **/
-        text += `[big][b][bad]J${this.current_day}[/bad][/b][/big]{hr}\n`;
+        text += `[big][b][bad]J${this.selected_day}[/bad][/b][/big]{hr}\n`;
 
         /** Ajout du titre "Attaque du jour" */
-        text += `[i]${today_attack_title} (J${this.current_day})[/i]\n`;
+        text += `[i]${today_attack_title} (J${this.selected_day})[/i]\n`;
 
         /** Ajout des valeurs du jour */
         TDG_VALUES.forEach((value_key: number) => {
@@ -230,7 +230,7 @@ export class EstimationsComponent implements OnInit {
         text += '{hr}\n';
 
         /** Ajout du titre "Attaque du lendemain" */
-        text += `[i]${tomorrow_attack_title} (J${this.current_day + 1})[/i]\n`;
+        text += `[i]${tomorrow_attack_title} (J${this.selected_day + 1})[/i]\n`;
 
         /** Ajout des valeurs du lendemain */
         PLANIF_VALUES.forEach((value_key: number) => {
