@@ -1128,7 +1128,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/edit-orders/edit-orders.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
-        <target state="needs-translation">Consignes</target>
+        <target state="translated">Instructions</target>
       </trans-unit>
       <trans-unit id="3994843408559947605" datatype="html">
         <source>Nouvelle consigne</source>
@@ -1136,7 +1136,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/edit-orders/edit-orders.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Nouvelle consigne</target>
+        <target state="translated">New instruction</target>
       </trans-unit>
       <trans-unit id="1711750570766225138" datatype="html" approved="yes">
         <source>Annuler</source>
@@ -1192,7 +1192,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation">Réorganiser</target>
+        <target state="translated">Reorganize</target>
       </trans-unit>
       <trans-unit id="5977326848564608050" datatype="html" approved="yes">
         <source>Expéditions</source>
@@ -1268,7 +1268,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
-        <target state="needs-translation">Jour <x id="INTERPOLATION" equiv-text="{{day_index + 1}}"/></target>
+        <target state="translated">Day <x id="INTERPOLATION" equiv-text="{{day_index + 1}}"/></target>
       </trans-unit>
       <trans-unit id="5629314860074083420" datatype="html">
         <source>Préinscrits : </source>
@@ -1300,7 +1300,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">48</context>
         </context-group>
-        <target state="needs-translation">Importer le jour</target>
+        <target state="translated">Import the day</target>
       </trans-unit>
       <trans-unit id="3322863447605741079" datatype="html">
         <source>Nom de l&apos;expédition</source>
@@ -1324,7 +1324,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">Expédition prête</target>
+        <target state="translated">Expedition ready</target>
       </trans-unit>
       <trans-unit id="4141893192620107742" datatype="html">
         <source>Supprimer l&apos;expédition</source>
@@ -1332,7 +1332,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="needs-translation">Supprimer l'expédition</target>
+        <target state="translated">Delete expedition</target>
       </trans-unit>
       <trans-unit id="6664444658010754432" datatype="html">
         <source>Partie <x id="INTERPOLATION" equiv-text="{{ expedition_part_index + 1 }}"/> : </source>
@@ -1340,7 +1340,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">103</context>
         </context-group>
-        <target state="needs-translation">Partie <x id="INTERPOLATION" equiv-text="{{ expedition_part_index + 1 }}"/> : </target>
+        <target state="translated">Part <x id="INTERPOLATION" equiv-text="{{ expedition_part_index + 1 }}"/>: </target>
       </trans-unit>
       <trans-unit id="6655777237474004024" datatype="html">
         <source>Nom du tracé</source>
@@ -1384,7 +1384,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">153</context>
         </context-group>
-        <target state="needs-translation">Consignes perso</target>
+        <target state="translated">Personal instructions</target>
       </trans-unit>
       <trans-unit id="2086288790931147290" datatype="html">
         <source>Supprimer la place</source>
@@ -1424,7 +1424,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">296</context>
         </context-group>
-        <target state="needs-translation">Ajouter une place</target>
+        <target state="translated">Add a spot</target>
       </trans-unit>
       <trans-unit id="4937605142880264151" datatype="html">
         <source>Consignes de l&apos;expédition</source>
@@ -1476,7 +1476,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.ts</context>
           <context context-type="linenumber">217</context>
         </context-group>
-        <target state="needs-translation">Voulez-vous effacer cette expédition ? Elle sera définitivement perdue.</target>
+        <target state="translated">Do you want to delete this expedition ? It will be definitively lost.</target>
       </trans-unit>
       <trans-unit id="2005506247578499692" datatype="html">
         <source>Voulez-vous effacer cette partie d&apos;expédition ? Elle sera définitivement perdue.</source>
@@ -1484,7 +1484,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.ts</context>
           <context context-type="linenumber">236</context>
         </context-group>
-        <target state="needs-translation">Voulez-vous effacer cette partie d'expédition ? Elle sera définitivement perdue.</target>
+        <target state="translated">Do you want to delete this expedition part ? It will be definitively lost.</target>
       </trans-unit>
       <trans-unit id="588207140585847047" datatype="html">
         <source>Favoris</source>
@@ -1492,7 +1492,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.ts</context>
           <context context-type="linenumber">392</context>
         </context-group>
-        <target state="needs-translation">Favoris</target>
+        <target state="translated">Bookmarks</target>
       </trans-unit>
       <trans-unit id="2150786425933721287" datatype="html">
         <source>Expéditions (J<x id="PH" equiv-text="this.selected_tab_index + 1"/>)</source>
@@ -1500,7 +1500,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.ts</context>
           <context context-type="linenumber">503</context>
         </context-group>
-        <target state="needs-translation">Expéditions (J<x id="PH" equiv-text="this.selected_tab_index + 1"/>)</target>
+        <target state="translated">Expeditions (J<x id="PH" equiv-text="this.selected_tab_index + 1"/>)</target>
       </trans-unit>
       <trans-unit id="680441362651520117" datatype="html">
         <source>Préinscrits</source>
@@ -1508,7 +1508,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.ts</context>
           <context context-type="linenumber">506</context>
         </context-group>
-        <target state="needs-translation">Préinscrits</target>
+        <target state="translated">Pre-registered</target>
       </trans-unit>
       <trans-unit id="7160647639895873995" datatype="html">
         <source>Ce message a été généré à partir du site MyHordes Optimizer. Vous pouvez retrouver les expéditions en suivant [link=<x id="PH" equiv-text="environment.website_url"/>my-town/expeditions]ce lien[/link]</source>
