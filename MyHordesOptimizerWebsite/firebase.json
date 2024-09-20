@@ -8,6 +8,12 @@
                 "**/.*",
                 "**/node_modules/**"
             ],
+            "rewrites": [
+                {
+                    "source": "**",
+                    "destination": "/index.html"
+                }
+            ],
             "redirects": [
                 {
                     "source": "/",
@@ -33,6 +39,12 @@
                 "firebase.json",
                 "**/.*",
                 "**/node_modules/**"
+            ],
+            "rewrites": [
+                {
+                    "source": "**",
+                    "destination": "/index.html"
+                }
             ],
             "redirects": [
                 {
