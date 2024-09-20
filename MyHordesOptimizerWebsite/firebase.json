@@ -13,6 +13,13 @@
                     "source": "**",
                     "destination": "/index.html"
                 }
+            ],
+            "redirects": [
+                {
+                    "source": "/login",
+                    "destination": "https://api.myhordesoptimizer.fr/login",
+                    "type": 301
+                }
             ]
         },
         {
@@ -27,6 +34,13 @@
                 {
                     "source": "**",
                     "destination": "/index.html"
+                }
+            ],
+            "redirects": [
+                {
+                    "source": "/login",
+                    "destination": "https://api.myhordesoptimizer.fr/login",
+                    "type": 301
                 }
             ]
         }
