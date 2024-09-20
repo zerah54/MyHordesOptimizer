@@ -37,7 +37,25 @@
                     "destination": "/index.html"
                 },
                 {
-                    "source": "/login",
+                    "source": "login",
+                    "destination": "https://api.myhordesoptimizer.fr/login"
+                }
+            ],
+            "redirects": [
+                {
+                    "source": "**",
+                    "destination": "/index.html"
+                },
+                {
+                    "source": "/",
+                    "destination": "/index.html"
+                },
+                {
+                    "source": "404.html",
+                    "destination": "/index.html"
+                },
+                {
+                    "source": "login",
                     "destination": "https://api.myhordesoptimizer.fr/login"
                 }
             ]
