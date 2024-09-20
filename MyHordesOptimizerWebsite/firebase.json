@@ -36,11 +36,6 @@
             ],
             "redirects": [
                 {
-                    "source": "**",
-                    "destination": "/",
-                    "type": 301
-                },
-                {
                     "source": "/",
                     "destination": "/wiki/items",
                     "type": 301
