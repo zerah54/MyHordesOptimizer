@@ -8,10 +8,26 @@
                 "**/.*",
                 "**/node_modules/**"
             ],
-            "rewrites": [
+            "redirects": [
                 {
                     "source": "**",
-                    "destination": "/index.html"
+                    "destination": "/",
+                    "type": 301
+                },
+                {
+                    "source": "/",
+                    "destination": "/wiki/items",
+                    "type": 301
+                },
+                {
+                    "source": "404.html",
+                    "destination": "/wiki/items",
+                    "type": 301
+                },
+                {
+                    "source": "login",
+                    "destination": "https://api.myhordesoptimizer.fr/login",
+                    "type": 301
                 }
             ]
         },
@@ -23,38 +39,20 @@
                 "**/.*",
                 "**/node_modules/**"
             ],
-            "rewrites": [
-                {
-                    "source": "**",
-                    "destination": "/index.html"
-                },
-                {
-                    "source": "/",
-                    "destination": "/index.html"
-                },
-                {
-                    "source": "404.html",
-                    "destination": "/index.html"
-                },
-                {
-                    "source": "login",
-                    "destination": "https://api.myhordesoptimizer.fr/login"
-                }
-            ],
             "redirects": [
                 {
                     "source": "**",
-                    "destination": "/index.html",
+                    "destination": "/",
                     "type": 301
                 },
                 {
                     "source": "/",
-                    "destination": "/index.html",
+                    "destination": "/wiki/items",
                     "type": 301
                 },
                 {
                     "source": "404.html",
-                    "destination": "/index.html",
+                    "destination": "/wiki/items",
                     "type": 301
                 },
                 {
