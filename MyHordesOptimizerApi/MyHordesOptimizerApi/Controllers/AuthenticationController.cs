@@ -43,5 +43,18 @@ namespace MyHordesOptimizerApi.Controllers
                 Token = token
             };
         }
+
+        [HttpPost]
+        [Route("Login")]
+        public async Task<ActionResult<AuthenticationResponseDto>> Login([FromBody] string userKey)
+        {
+            if (string.IsNullOrWhiteSpace(userKey))
+            {
+                return BadRequest($"{nameof(userKey)} cannot be empty");
+            }
+            UserInfoProvider.UserKey = userKey;
+            var simpleMe = await _myHordesFetcherService.GetSimpleMeAsync();
+            return Redirect("https://myhordes-optimizer.web.app");
+        }
     }
 }
