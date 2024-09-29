@@ -4,5 +4,6 @@
     display: inline-flex;
     flex-direction: row;
     gap: 0.25em;
-    align-items: flex-start;
+    align-items: center;
+    vertical-align: text-bottom;
 }

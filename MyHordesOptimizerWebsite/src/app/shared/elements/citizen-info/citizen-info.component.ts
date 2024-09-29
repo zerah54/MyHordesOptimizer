@@ -2,6 +2,7 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, Input } from '@angular/core';
 import moment from 'moment/moment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
+import { DisplayPseudoMode } from '../../../_abstract_model/interfaces';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 
@@ -21,6 +22,9 @@ export class CitizenInfoComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input() citizen!: Citizen;
+    @Input() displayPseudoMode: DisplayPseudoMode = 'simple';
+    @Input({ required: true }) displayShunStatus: boolean = true;
+    @Input({ required: true }) displayJob: boolean = true;
 
     /** La langue du site */
     protected readonly locale: string = moment.locale();

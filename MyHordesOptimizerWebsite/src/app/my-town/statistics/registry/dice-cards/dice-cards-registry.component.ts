@@ -2,14 +2,15 @@ import { CommonModule, NgOptimizedImage, NgTemplateOutlet } from '@angular/commo
 import { Component, HostBinding, Input, ViewEncapsulation } from '@angular/core';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
-import { Entry } from '../../../../_abstract_model/interfaces';
+import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { CitizenInfoComponent } from '../../../../shared/elements/citizen-info/citizen-info.component';
 import { CitizenUseDiceOrCardsPipe } from './dice-cards.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage, NgTemplateOutlet];
-const components: Imports = [];
+const components: Imports = [CitizenInfoComponent];
 const pipes: Imports = [CitizenUseDiceOrCardsPipe];
 const material_modules: Imports = [MatTabsModule];
 
@@ -25,7 +26,7 @@ export class DiceCardsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input({ required: true }) completeCitizenList!: CitizenInfo;
-    @Input({ required: true }) displayPseudo!: 'simple' | 'id_mh';
+    @Input({ required: true }) displayPseudo!: DisplayPseudoMode;
 
     @Input({ required: true }) set registry(registry: Entry[] | undefined) {
         if (registry) {

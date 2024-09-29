@@ -10,7 +10,7 @@ import { groupBy } from '../../../../shared/utilities/array.util';
     standalone: true,
 })
 export class WellPipe implements PipeTransform {
-    transform(entries: Entry[], complete_citizen_list: CitizenInfo, display_pseudo: 'simple' | 'id_mh'): { citizen: string, rations: number }[] {
+    transform(entries: Entry[], complete_citizen_list: CitizenInfo): { citizen: Citizen[], rations: number }[] {
 
         const rations_per_citizen: { citizen: Citizen, rations: number }[] = complete_citizen_list.citizens
             .map((citizen: Citizen): { citizen: Citizen, rations: number } => {
@@ -30,9 +30,7 @@ export class WellPipe implements PipeTransform {
             .map((rations: { citizen: Citizen, rations: number }[]) => {
                 return {
                     rations: rations[0].rations,
-                    citizen: rations.map((citizen: { citizen: Citizen, rations: number }) => citizen.citizen).map((citizen: Citizen) => {
-                        return display_pseudo === 'simple' ? citizen.name : citizen.getTag();
-                    }).join(', ')
+                    citizen: rations.map((citizen: { citizen: Citizen, rations: number }) => citizen.citizen).map((citizen: Citizen) => citizen)
                 };
             });
     }

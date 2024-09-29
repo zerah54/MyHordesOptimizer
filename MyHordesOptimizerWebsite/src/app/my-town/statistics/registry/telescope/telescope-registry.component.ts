@@ -5,22 +5,23 @@ import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { CitizenInfoComponent } from '../../../../shared/elements/citizen-info/citizen-info.component';
-import { WellPipe } from './well.pipe';
+import { DebugLogPipe } from '../../../../shared/pipes/debug-log.pipe';
+import { TelescopePipe } from './telescope.pipe';
 
 const angular_common: Imports = [CommonModule];
 const components: Imports = [CitizenInfoComponent];
-const pipes: Imports = [WellPipe];
+const pipes: Imports = [TelescopePipe];
 const material_modules: Imports = [MatDividerModule];
 
 @Component({
-    selector: 'mho-registry-well',
-    templateUrl: './well-registry.component.html',
-    styleUrls: ['./well-registry.component.scss'],
+    selector: 'mho-registry-telescope',
+    templateUrl: './telescope-registry.component.html',
+    styleUrls: ['./telescope-registry.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone: true,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes, DebugLogPipe]
 })
-export class WellRegistryComponent {
+export class TelescopeRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input({ required: true }) completeCitizenList!: CitizenInfo;
@@ -29,7 +30,7 @@ export class WellRegistryComponent {
     @Input({ required: true }) set registry(registry: Entry[] | undefined) {
         if (registry) {
             this.entries = registry.filter((entry: Entry) => {
-                return this.well_keywords.some((well_keywords: string): boolean => entry.entry?.indexOf(' ' + well_keywords + ' ') > -1);
+                return this.telescope_keywords.some((telescope_keyword: string): boolean => entry.entry?.indexOf(telescope_keyword) > -1);
             });
         } else {
             this.entries = [];
@@ -38,9 +39,8 @@ export class WellRegistryComponent {
 
     protected entries: Entry[] = [];
 
-    private readonly well_keywords: string[] = [
-        'a pris une ration', 'hat eine Ration Wasser genommen', 'has taken a ration', 'ha tomado una ración',
-        's\'est permis de prendre plus d\'eau', 'hat mehr Wasser genommen', 'has decided it was ok for them to take more water', 'se ha dado el lujo de tomar más agua',
+    private readonly telescope_keywords: string[] = [
+        'Téléscope', 'Teleskop', 'Telescope', 'Telescopio',
     ];
 
 }

@@ -5,7 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import moment, { Moment } from 'moment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { JobEnum } from '../../../../_abstract_model/enum/job.enum';
-import { Entry } from '../../../../_abstract_model/interfaces';
+import { DisplayPseudoMode, Entry } from '../../../../_abstract_model/interfaces';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
@@ -32,7 +32,7 @@ export class DigsRegistryComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @Input({ required: true }) completeCitizenList!: CitizenInfo;
-    @Input({ required: true }) displayPseudo!: 'simple' | 'id_mh';
+    @Input({ required: true }) displayPseudo!: DisplayPseudoMode;
 
     @Input({ required: true }) set registry(registry: Entry[] | undefined) {
         this.current_day = getTown()?.day || 1;

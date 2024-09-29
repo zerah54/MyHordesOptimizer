@@ -74,6 +74,14 @@ $snow-3: url('/assets/img/noel/s3.png');
                     }
                 }
             }
+
+            .citizen-identity {
+                display: inline-flex;
+                flex-direction: row;
+                gap: 0.25em;
+                flex-wrap: nowrap;
+                align-items: center;
+            }
         }
     }
 

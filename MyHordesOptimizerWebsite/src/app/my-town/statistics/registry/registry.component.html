@@ -14,34 +14,17 @@
             @if (registry && registry !== '') {
                 <div class="actions">
                     <div class="start">
-                        <button mat-icon-button type="button" [class.active]="display_mode === 'plays'" (click)="readLogs('plays')"
-                                matTooltip="Dés / Cartes" matTooltipPosition="before" i18n-matTooltip>
-                            <img [ngSrc]="HORDES_IMG_REPO + 'item/item_game_box.gif'" width="16" height="16"
-                                 [disableOptimizedSrcset]="true">
-                        </button>
-                        <button mat-icon-button type="button" [class.active]="display_mode === 'bank_diff'" (click)="readLogs('bank_diff')"
-                                matTooltip="Différenciel de la banque" matTooltipPosition="before" i18n-matTooltip>
-                            <img [ngSrc]="HORDES_IMG_REPO + 'icons/home.gif'" width="16" height="16" [disableOptimizedSrcset]="true">
-                        </button>
-                        <button mat-icon-button type="button" [class.active]="display_mode === 'well'" (click)="readLogs('well')"
-                                matTooltip="Prises dans le puits" matTooltipPosition="before" i18n-matTooltip>
-                            <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_well.gif'" width="16" height="16"
-                                 [disableOptimizedSrcset]="true">
-                        </button>
-                        <button mat-icon-button type="button" [class.active]="display_mode === 'digs'" (click)="readLogs('digs')"
-                                matTooltip="Fouilles" matTooltipPosition="before" i18n-matTooltip>
-                            <img [ngSrc]="HORDES_IMG_REPO + 'building/small_dig.gif'" width="16" height="16"
-                                 [disableOptimizedSrcset]="true">
-                        </button>
-                        <button mat-icon-button type="button" [class.active]="display_mode === 'doors'" (click)="readLogs('doors')"
-                                matTooltip="Entrées / Sorties" matTooltipPosition="before" i18n-matTooltip>
-                            <img [ngSrc]="HORDES_IMG_REPO + 'log/door_open.gif'" width="16" height="16" [disableOptimizedSrcset]="true">
-                        </button>
+                        @for (tab of tabs; track tab.mode) {
+                            <button mat-icon-button type="button" [class.active]="display_mode === tab.mode" (click)="readLogs(tab.mode)"
+                                    [matTooltip]="tab.label" matTooltipPosition="before">
+                                <img [ngSrc]="HORDES_IMG_REPO + tab.img" width="16" height="16" [disableOptimizedSrcset]="true">
+                            </button>
+                        }
                     </div>
                     <div class="end">
                         <button mat-icon-button type="button" (click)="registry = undefined; registry_entries = undefined; display_mode = undefined"
                                 matTooltip="Vider le champ" matTooltipPosition="before" i18n-matTooltip>
-                            <img [ngSrc]="HORDES_IMG_REPO + 'emotes/trash.gif'" width="16" height="16">
+                            <img [ngSrc]="HORDES_IMG_REPO + 'emotes/trash.gif'" width="16" height="16" [disableOptimizedSrcset]="true">
                         </button>
                     </div>
                 </div>
@@ -69,6 +52,10 @@
                 @case ('doors') {
                     <mho-registry-doors [completeCitizenList]="complete_citizen_list"
                                         [registry]="registry_entries" [displayPseudo]="display_pseudo"></mho-registry-doors>
+                }
+                @case ('telescope') {
+                    <mho-registry-telescope [completeCitizenList]="complete_citizen_list"
+                                            [registry]="registry_entries" [displayPseudo]="display_pseudo"></mho-registry-telescope>
                 }
             }
         </div>

@@ -17,6 +17,7 @@ import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
+import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
 import { DigComponent } from '../../../shared/elements/dig/dig.component';
 import {
     HeaderWithNumberPreviousNextFilterComponent
@@ -28,7 +29,7 @@ import { BathForDayPipe } from '../bath-for-day.pipe';
 import { CitizenGroupByBathStatePipe } from './citizen-group-by-bath_state.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgClass];
-const components: Imports = [DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent];
+const components: Imports = [DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
 const pipes: Imports = [BathForDayPipe, CitizenGroupByBathStatePipe, ColumnIdPipe];
 const material_modules: Imports = [MatCheckboxModule, MatSlideToggleModule, MatSortModule, MatTableModule, MatButtonToggleModule];
 

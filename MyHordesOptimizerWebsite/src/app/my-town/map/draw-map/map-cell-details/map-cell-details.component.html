@@ -46,8 +46,8 @@
             <div class="citizens">
                 @for (citizen of (cell.citizens | citizensFromShort:allCitizens); track citizen.id) {
                     <div>
-                        <img [ngSrc]="HORDES_IMG_REPO + citizen.job?.value?.img" width="16" height="16">
-                        <span>{{ citizen.name }}</span>
+                        <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
+                                          [citizen]="citizen"></mho-citizen-info>
                     </div>
                 }
             </div>

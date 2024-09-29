@@ -9,7 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment/moment';
 import { environment } from '../../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { Entry } from '../../../_abstract_model/interfaces';
+import { DisplayPseudoMode, Entry } from '../../../_abstract_model/interfaces';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
@@ -19,10 +19,12 @@ import { BankDiffRegistryComponent } from './bank-diff/bank-diff-registry.compon
 import { DiceCardsRegistryComponent } from './dice-cards/dice-cards-registry.component';
 import { DigsRegistryComponent } from './digs/digs-registry.component';
 import { DoorsRegistryComponent } from './doors/doors-registry.component';
+import { TelescopeRegistryComponent } from './telescope/telescope-registry.component';
 import { WellRegistryComponent } from './well/well-registry.component';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
-const components: Imports = [BankDiffRegistryComponent, DiceCardsRegistryComponent, DigsRegistryComponent, DoorsRegistryComponent, WellRegistryComponent];
+const components: Imports = [BankDiffRegistryComponent, DiceCardsRegistryComponent, DigsRegistryComponent, DoorsRegistryComponent, WellRegistryComponent,
+    TelescopeRegistryComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatInputModule, MatTooltipModule];
 
@@ -45,7 +47,16 @@ export class RegistryComponent implements OnInit {
 
     public complete_citizen_list!: CitizenInfo;
     public complete_items_list!: Item[];
-    public display_pseudo: 'simple' | 'id_mh' = 'simple';
+    public display_pseudo: DisplayPseudoMode = 'simple';
+
+    public tabs: Tab[] = [
+        { mode: 'plays', label: $localize`Dés / Cartes`, img: 'item/item_game_box.gif' },
+        { mode: 'bank_diff', label: $localize`Différenciel de la banque`, img: 'icons/home.gif' },
+        { mode: 'well', label: $localize`Prises dans le puits`, img: 'icons/small_well.gif' },
+        { mode: 'digs', label: $localize`Fouilles`, img: 'building/small_dig.gif' },
+        { mode: 'doors', label: $localize`Entrées / Sorties`, img: 'log/door_open.gif' },
+        { mode: 'telescope', label: $localize`Téléscope`, img: 'item/item_scope.gif' }
+    ];
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La locale */
@@ -86,4 +97,10 @@ export class RegistryComponent implements OnInit {
 
 }
 
-type RegistryMode = 'dice' | 'card' | 'digs' | 'bank_diff' | 'well' | 'plays' | 'doors' | undefined;
+type RegistryMode = 'dice' | 'card' | 'digs' | 'bank_diff' | 'well' | 'plays' | 'doors' | 'telescope' | undefined;
+
+interface Tab {
+    mode: RegistryMode;
+    label: string;
+    img: string;
+}

@@ -34,7 +34,7 @@ namespace MyHordesOptimizerApi.Configuration.Impl
 
         public int MaxItemAdd => _configuration.GetValue<int>("MaxItemAdd");
 
-        public int? MaxItemPerCell => _configuration.GetValue<int>("MaxItemPerCell");
+        public int? MaxItemPerCell => _configuration.GetValue<int?>("MaxItemPerCell");
 
         public int DigThrottle => _configuration.GetValue<int>("DigThrottle");
     }

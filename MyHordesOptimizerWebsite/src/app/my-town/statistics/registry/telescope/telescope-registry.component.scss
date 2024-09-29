@@ -1,0 +1,22 @@
+.telescope {
+    width: 100%;
+    height: 100%;
+    display: flex;
+
+    .taken, .not-taken {
+        padding: 1em;
+        flex: 1;
+        overflow: auto;
+
+        .entry {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 0.5em;
+
+            > div {
+                flex: 1;
+            }
+        }
+    }
+}

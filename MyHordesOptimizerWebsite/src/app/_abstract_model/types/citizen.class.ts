@@ -111,6 +111,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
             this.home_message = dto.homeMessage;
             this.id = dto.id;
             this.is_ghost = dto.isGhost;
+            this.is_shunned = dto.isShunned;
             this.is_dead = dto.dead;
             this.job = dto.jobUid ? <JobEnum>JobEnum.getByKey(dto.jobUid) : undefined;
             this.nombre_jour_hero = dto.nombreJourHero;

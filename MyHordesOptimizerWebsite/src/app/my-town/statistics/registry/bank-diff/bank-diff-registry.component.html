@@ -12,7 +12,10 @@
                                 <img [ngSrc]="HORDES_IMG_REPO + entry.item.img" width="16" height="16">
                                 <div>{{ entry.item.label[locale] }}
                                     @if (entry.citizen) {
-                                        <small>&nbsp;-&nbsp;{{ displayPseudo === 'simple' ? entry.citizen.name : entry.citizen.getTag() }}</small>
+                                        <small>&nbsp;-&nbsp;<mho-citizen-info [displayJob]="false" [displayShunStatus]="true"
+                                                                              [displayPseudoMode]="displayPseudo"
+                                                                              [citizen]="entry.citizen"></mho-citizen-info>
+                                        </small>
                                     }
                                 </div>
                             </div>
@@ -29,7 +32,9 @@
                             <img [ngSrc]="HORDES_IMG_REPO + entry.item.img" width="16" height="16">
                             <div>{{ entry.item.label[locale] }}
                                 @if (entry.citizen) {
-                                    <small>&nbsp;-&nbsp;{{ displayPseudo === 'simple' ? entry.citizen.name : entry.citizen.getTag() }}</small>
+                                    <small>&nbsp;-&nbsp;<mho-citizen-info [displayJob]="false" [displayShunStatus]="true" [displayPseudoMode]="displayPseudo"
+                                                                          [citizen]="entry.citizen"></mho-citizen-info>
+                                    </small>
                                 }
                             </div>
                         </div>

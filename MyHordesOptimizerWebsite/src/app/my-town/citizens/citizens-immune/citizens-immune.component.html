@@ -18,7 +18,8 @@
                     <h3>{{ state.label }}</h3>
                     <div>
                         @for (citizen of state.citizen; track citizen.id; let i_citizen = $index) {
-                            <mho-citizen-info [citizen]="citizen"></mho-citizen-info>
+                            <mho-citizen-info [displayJob]="true" [displayShunStatus]="true" [displayPseudoMode]="'simple'"
+                                              [citizen]="citizen"></mho-citizen-info>
                             @if (i_citizen < state.citizen.length - 1) {
                                 <span>,&nbsp;</span>
                             }
