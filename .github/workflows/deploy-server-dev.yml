@@ -73,7 +73,7 @@ jobs:
                 with:
                     host: ${{ secrets.SSH_HOST }}
                     username: ${{ secrets.SSH_USERNAME }}
-                    password: ${{ secrets.SSH_PASSWORD }}
+                    key: ${{ secrets.SSH_PRIVATE_KEY }}
                     port: ${{ secrets.SSH_PORT }}
                     source: './publish/*'
                     target: "/home/renack/livraison_mho"
@@ -84,6 +84,6 @@ jobs:
                 with:
                     host: ${{ secrets.SSH_HOST }}
                     username: ${{ secrets.SSH_USERNAME }}
-                    password: ${{ secrets.SSH_PASSWORD }}
+                    key: ${{ secrets.SSH_PRIVATE_KEY }}
                     port: ${{ secrets.SSH_PORT }}
-                    script: ./updateDev.sh -S
+                    script: ./updateDev.sh
