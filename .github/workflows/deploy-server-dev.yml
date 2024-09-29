@@ -62,10 +62,15 @@ jobs:
 
             -   name: echo
                 run: |
+                    echo 'pwd ===>'
                     pwd
+                    echo 'ls ===>'
                     ls
+                    echo 'cd ===>'
                     cd ./
+                    echo 'pwd ===>
                     pwd
+                    echo 'ls ===>'
                     ls
 
             -   name: Send to Server
