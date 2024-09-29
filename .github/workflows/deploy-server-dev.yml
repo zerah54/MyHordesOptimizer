@@ -68,7 +68,7 @@ jobs:
                     ls
                     echo 'cd ===>'
                     cd ./
-                    echo 'pwd ===>
+                    echo 'pwd ===>'
                     pwd
                     echo 'ls ===>'
                     ls
