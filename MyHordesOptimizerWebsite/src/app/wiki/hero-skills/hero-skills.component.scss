@@ -1,8 +1,19 @@
 .mho-hero-skills {
-    table {
-        width: 100%;
-        .mat-cell {
-            padding: 0.5em;
+    .content {
+
+        .mat-expansion-panel {
+            background-color: rgba(0, 0, 0, 0.15);
+
+            .mat-mdc-table {
+                background-color: transparent;
+            }
+        }
+
+        .skill-row {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5em;
+            align-items: center;
         }
     }
 }

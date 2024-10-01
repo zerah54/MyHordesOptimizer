@@ -2,37 +2,33 @@
     <mat-card-title i18n>Pouvoirs</mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-hero-skills">
-    @if (hero_skills) {
-        <div class="mat-elevation-z8">
-            <table mat-table [dataSource]="datasource" matSort>
-                @for (column of columns; track column.id) {
-                    <ng-container [matColumnDef]="column.id" [sticky]="column.sticky || false">
-                        <th mat-header-cell *matHeaderCellDef>{{ column.header }}</th>
-
-                        <td mat-cell *matCellDef="let row">
-                            @switch (column.id) {
-                                @case ('icon') {
-                                    @if (row[column.id] && row[column.id] !== '') {
-                                        <img [ngSrc]="HORDES_IMG_REPO + row[column.id]" width="16" height="16">
-                                    }
-                                }
-                                @case ('label') {
-                                    {{ row[column.id][locale] }}
-                                }
-                                @case ('description') {
-                                    <span [innerHTML]="row[column.id][locale]"></span>
-                                }
-                                @default {
-                                    {{ row[column.id] }}
-                                }
+    <mat-accordion class="content" [multi]="true">
+        @for (skill_class of new_hero_skills; track class_index; let class_index = $index) {
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>{{ skill_class.name[locale] }}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <table mat-table [dataSource]="skill_class.levels">
+                    <ng-container matColumnDef="name">
+                        <td mat-cell *matCellDef="let element">{{ element | debugLog }}
+                            <div>{{ element.name[locale] }}</div>
+                            @if (element.pointsNeeded) {
+                                <div i18n>{{ element.pointsNeeded }} points pour débloquer</div>
                             }
                         </td>
                     </ng-container>
-                }
-
-                <tr mat-header-row *matHeaderRowDef="columns | ids; sticky: true"></tr>
-                <tr mat-row *matRowDef="let row; columns: columns | ids;"></tr>
-            </table>
-        </div>
-    }
+                    <ng-container matColumnDef="description">
+                        <td mat-cell *matCellDef="let element">
+                            @for (skill of element.skills; track $index) {
+                                <div class="skill-row">
+                                    <img [ngSrc]="HORDES_IMG_REPO + 'emotes/middot.gif'" width="16" height="16">{{ skill[locale] }}
+                                </div>
+                            }
+                        </td>
+                    </ng-container>
+                    <tr mat-row *matRowDef="let row; columns: ['name', 'description']"></tr>
+                </table>
+            </mat-expansion-panel>
+        }
+    </mat-accordion>
 </mat-card-content>

@@ -110,7 +110,7 @@ export class ExpeditionsComponent implements OnInit {
                 next: (citizens: CitizenInfo): void => {
                     this.all_citizens = [...citizens.citizens];
                     this.all_citizens_job = (JobEnum.getAllValues<JobEnum>())
-                        .filter((job_enum: JobEnum) => this.all_citizens.some((citizen: Citizen): boolean => citizen.job?.key === job_enum.key));
+                        .filter((job_enum: JobEnum) => this.all_citizens.some((citizen: Citizen): boolean => citizen.job?.key === job_enum?.key));
                 }
             });
         this.api_service

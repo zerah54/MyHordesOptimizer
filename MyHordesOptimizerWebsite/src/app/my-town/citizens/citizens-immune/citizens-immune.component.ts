@@ -71,7 +71,7 @@ export class CitizensImmuneComponent implements OnInit {
     public changeFilters(): void {
         this.filtered_citizen = [...this.citizen_info.citizens]
             .filter((citizen: Citizen) => {
-                if (this.filters.jobs.length > 0 && !this.filters.jobs.some((job: JobEnum) => job.key === citizen.job?.key)) return false;
+                if (this.filters.jobs.length > 0 && !this.filters.jobs.some((job: JobEnum) => job?.key === citizen.job?.key)) return false;
                 return true;
             });
     }
@@ -84,7 +84,7 @@ export class CitizensImmuneComponent implements OnInit {
                 next: (citizen_info: CitizenInfo) => {
                     this.citizen_info = citizen_info;
                     this.all_citizens_job = (JobEnum.getAllValues<JobEnum>())
-                        .filter((job_enum: JobEnum) => this.citizen_info.citizens.some((citizen: Citizen): boolean => citizen.job?.key === job_enum.key));
+                        .filter((job_enum: JobEnum) => this.citizen_info.citizens.some((citizen: Citizen): boolean => citizen.job?.key === job_enum?.key));
                     this.changeFilters();
 
                 }

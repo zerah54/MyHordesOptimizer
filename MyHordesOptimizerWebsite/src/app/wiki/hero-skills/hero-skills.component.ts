@@ -1,6 +1,7 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import moment from 'moment';
@@ -12,18 +13,20 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { HeroSkill } from '../../_abstract_model/types/hero-skill.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
+import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
+import { NewHeroSkill, skills } from './temp-hero-skills.const';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [];
 const pipes: Imports = [ColumnIdPipe];
-const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule];
+const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule, MatExpansionModule];
 
 @Component({
     selector: 'mho-hero-skills',
     templateUrl: './hero-skills.component.html',
     styleUrls: ['./hero-skills.component.scss'],
     standalone: true,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes, DebugLogPipe]
 })
 export class HeroSkillsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -33,8 +36,10 @@ export class HeroSkillsComponent implements OnInit {
     /** La locale */
     public readonly locale: string = moment.locale();
 
-    /** La liste des bâtiments du jeu */
+    /** La liste des pouvoirs héroïques */
     public hero_skills!: HeroSkill[];
+    /** La nouvelle liste des pouvoirs héroïques */
+    public new_hero_skills: NewHeroSkill[] = skills;
     /** La datasource pour le tableau */
     public datasource: MatTableDataSource<HeroSkill> = new MatTableDataSource();
     /** La liste des colonnes */
@@ -55,7 +60,7 @@ export class HeroSkillsComponent implements OnInit {
         this.api.getHeroSkill()
             .pipe(takeUntil(this.destroy_sub))
             .subscribe((hero_skill: HeroSkill[]) => {
-                this.hero_skills = hero_skill;
+                // this.hero_skills = hero_skill;
                 this.datasource.data = [...hero_skill];
             });
     }

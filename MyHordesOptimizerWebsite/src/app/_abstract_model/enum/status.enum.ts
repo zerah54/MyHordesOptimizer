@@ -22,6 +22,8 @@ const WOUND3_KEY: string = 'wound3';
 const WOUND4_KEY: string = 'wound4';
 const WOUND5_KEY: string = 'wound5';
 const WOUND6_KEY: string = 'wound6';
+const SOBER_KEY: string = 'sober';
+const HYDRATED_KEY: string = 'hydrated';
 
 /** Type de champs de propriétés existants */
 export class StatusEnum extends CommonEnum {
@@ -47,6 +49,8 @@ export class StatusEnum extends CommonEnum {
     static WOUND4: StatusEnum = new StatusEnum(WOUND4_KEY, {}, '', 'status/status_' + WOUND4_KEY + '.gif', WOUND4_KEY);
     static WOUND5: StatusEnum = new StatusEnum(WOUND5_KEY, {}, '', 'status/status_' + WOUND5_KEY + '.gif', WOUND5_KEY);
     static WOUND6: StatusEnum = new StatusEnum(WOUND6_KEY, {}, '', 'status/status_' + WOUND6_KEY + '.gif', WOUND6_KEY);
+    static SOBER: StatusEnum = new StatusEnum(SOBER_KEY, {}, '', 'status/status_' + SOBER_KEY + '.gif', SOBER_KEY);
+    static HYDRATED: StatusEnum = new StatusEnum(WOUND6_KEY, {}, '', 'status/status_' + HYDRATED_KEY + '.gif', HYDRATED_KEY);
 
 
     /**

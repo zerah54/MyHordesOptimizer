@@ -59,47 +59,57 @@ export class MenuComponent implements OnInit {
     public routes: SidenavLinks[] = [
         {
             label: $localize`Ma ville`, lvl: 0, displayed: true, authorized: (): boolean => this.isInTown(), expanded: true, children: [
-                { label: $localize`Carte des fouilles`, path: 'my-town/map', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown() },
-                { label: $localize`Banque`, path: 'my-town/bank', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown() },
-                { label: $localize`Citoyens`, path: 'my-town/citizens', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown() },
-                { label: $localize`Liste de courses`, path: 'my-town/wishlist', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown() },
-                { label: $localize`Statistiques`, path: 'my-town/stats', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown() },
-                { label: $localize`Expéditions`, path: 'my-town/expeditions', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown() },
+                { label: $localize`Carte des fouilles`, path: 'my-town/map', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
+                { label: $localize`Banque`, path: 'my-town/bank', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
+                { label: $localize`Citoyens`, path: 'my-town/citizens', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
+                {
+                    label: $localize`Liste de courses`,
+                    path: 'my-town/wishlist',
+                    displayed: true,
+                    lvl: 1,
+                    authorized: (): boolean => this.isInTown(),
+                    spoil: false
+                },
+                { label: $localize`Statistiques`, path: 'my-town/stats', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
+                { label: $localize`Expéditions`, path: 'my-town/expeditions', displayed: true, lvl: 1, authorized: (): boolean => this.isInTown(), spoil: false },
                 {
                     label: $localize`Chantiers`,
                     path: 'my-town/buildings',
                     displayed: true,
                     lvl: 1,
-                    authorized: (): boolean => this.isInTown() && !environment.production
+                    authorized: (): boolean => this.isInTown() && !environment.production,
+                    spoil: false
                 },
                 {
                     label: $localize`Veilles`,
                     path: 'my-town/nightwatch',
                     displayed: true,
                     lvl: 1,
-                    authorized: (): boolean => this.isInTown() && !environment.production
+                    authorized: (): boolean => this.isInTown() && !environment.production,
+                    spoil: false
                 },
                 {
                     label: $localize`Campings`,
                     path: 'my-town/campings',
                     displayed: true,
                     lvl: 1,
-                    authorized: (): boolean => this.isInTown() && !environment.production
+                    authorized: (): boolean => this.isInTown() && !environment.production,
+                    spoil: false
                 },
-            ]
+            ], spoil: false
         },
         {
             label: $localize`Outils`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
-                { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
-                { label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true },
-            ]
+                { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+            ], spoil: false
         },
         {
             label: $localize`Wiki`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
-                { label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
-                { label: $localize`Recettes`, path: 'wiki/recipes', displayed: true, lvl: 1, authorized: (): boolean => true },
-                { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: true, lvl: 1, authorized: (): boolean => true },
-                { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
+                { label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Recettes`, path: 'wiki/recipes', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
                 {
                     label: $localize`Informations diverses`,
                     path: 'wiki/miscellaneous-info',
@@ -108,7 +118,7 @@ export class MenuComponent implements OnInit {
                     authorized: (): boolean => true,
                     spoil: true
                 }
-            ]
+            ], spoil: false
         },
         {
             label: $localize`Tutoriels`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
@@ -119,32 +129,76 @@ export class MenuComponent implements OnInit {
                             path: 'tutorials/script-extension/installation',
                             displayed: false,
                             lvl: 2,
-                            authorized: (): boolean => true
+                            authorized: (): boolean => true,
+                            spoil: false
                         },
-                        { label: $localize`Outils`, path: 'tutorials/script-extension/tools', displayed: false, lvl: 2, authorized: (): boolean => true },
-                        { label: $localize`Wiki`, path: 'tutorials/script-extension/wiki', displayed: false, lvl: 2, authorized: (): boolean => true },
+                        {
+                            label: $localize`Outils`,
+                            path: 'tutorials/script-extension/tools',
+                            displayed: false,
+                            lvl: 2,
+                            authorized: (): boolean => true,
+                            spoil: false
+                        },
+                        {
+                            label: $localize`Wiki`,
+                            path: 'tutorials/script-extension/wiki',
+                            displayed: false,
+                            lvl: 2,
+                            authorized: (): boolean => true,
+                            spoil: false
+                        },
                         {
                             label: $localize`Outils Externes`,
                             path: 'tutorials/script-extension/external-tools',
                             displayed: false,
                             lvl: 2,
-                            authorized: (): boolean => true
+                            authorized: (): boolean => true,
+                            spoil: false
                         },
-                        { label: $localize`Affichage`, path: 'tutorials/script-extension/display', displayed: false, lvl: 2, authorized: (): boolean => true },
-                        { label: $localize`Notifications`, path: 'tutorials/script-extension/alerts', displayed: false, lvl: 2, authorized: (): boolean => true },
-                    ]
+                        {
+                            label: $localize`Affichage`,
+                            path: 'tutorials/script-extension/display',
+                            displayed: false,
+                            lvl: 2,
+                            authorized: (): boolean => true,
+                            spoil: false
+                        },
+                        {
+                            label: $localize`Notifications`,
+                            path: 'tutorials/script-extension/alerts',
+                            displayed: false,
+                            lvl: 2,
+                            authorized: (): boolean => true,
+                            spoil: false
+                        },
+                    ], spoil: false
                 },
                 {
                     label: $localize`Site`, displayed: false, lvl: 1, authorized: (): boolean => true, expanded: false, children: [
-                        { label: $localize`Première utilisation`, path: 'tutorials/site/first-use', displayed: false, lvl: 2, authorized: (): boolean => true },
-                    ]
+                        {
+                            label: $localize`Première utilisation`,
+                            path: 'tutorials/site/first-use',
+                            displayed: false,
+                            lvl: 2,
+                            authorized: (): boolean => true,
+                            spoil: false
+                        },
+                    ], spoil: false
                 },
                 {
                     label: $localize`Bot Discord`, displayed: false, lvl: 1, authorized: (): boolean => true, expanded: false, children: [
-                        { label: $localize`Installation`, path: 'tutorials/discord-bot/installation', displayed: false, lvl: 2, authorized: (): boolean => true },
-                    ]
+                        {
+                            label: $localize`Installation`,
+                            path: 'tutorials/discord-bot/installation',
+                            displayed: false,
+                            lvl: 2,
+                            authorized: (): boolean => true,
+                            spoil: false
+                        },
+                    ], spoil: false
                 },
-            ]
+            ], spoil: false
         }
     ];
 
@@ -278,7 +332,7 @@ interface SidenavLinks {
     displayed: boolean;
     authorized: () => boolean;
     expanded?: boolean;
-    spoil?: boolean;
+    spoil: boolean;
 }
 
 interface Language {
