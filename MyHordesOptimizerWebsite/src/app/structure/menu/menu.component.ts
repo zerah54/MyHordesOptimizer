@@ -108,7 +108,7 @@ export class MenuComponent implements OnInit {
             label: $localize`Wiki`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
                 { label: $localize`Objets`, path: 'wiki/items', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
                 { label: $localize`Recettes`, path: 'wiki/recipes', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
-                { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: true },
                 { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
                 {
                     label: $localize`Informations diverses`,
@@ -116,7 +116,7 @@ export class MenuComponent implements OnInit {
                     displayed: true,
                     lvl: 1,
                     authorized: (): boolean => true,
-                    spoil: true
+                    spoil: false
                 }
             ], spoil: false
         },
