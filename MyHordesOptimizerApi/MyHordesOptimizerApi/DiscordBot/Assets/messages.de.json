@@ -144,7 +144,7 @@
         "description": "Tools zur Angriffsschätzung",
         "get": {
             "name": "erholen",
-            "description": "Ruft die berechnete Schätzung und die gespeicherte Liste der Schätzungen für den ausgewählten Tag und die ausgewählte Stadt ab",
+            "description": "Ruft die berechnete Schätzung und die gespeicherte Liste der Schätzungen für Tag und Stadt ab",
             "town-id": {
                 "name": "stadt-id",
                 "description": "Die Kennung der Stadt, für die Sie die Schätzung wünschen"

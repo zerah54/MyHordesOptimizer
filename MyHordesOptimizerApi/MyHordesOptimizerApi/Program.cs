@@ -44,6 +44,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using Discord;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -135,7 +136,13 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
 builder.Services.AddScoped<ITownService, TownService>();
 
-builder.Services.AddSingleton<DiscordSocketClient>();       // Add the discord client to services
+// Add the discord client to services
+builder.Services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
+{
+    GatewayIntents = GatewayIntents.AllUnprivileged 
+                     & ~GatewayIntents.GuildScheduledEvents
+                     & ~GatewayIntents.GuildInvites,
+})); 
 builder.Services.AddSingleton<InteractionService>();        // Add the interaction service to services
 var jsonLocalizationManager = new JsonLocalizationManager(
         basePath: Path.Combine("DiscordBot", "Assets"),

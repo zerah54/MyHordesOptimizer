@@ -144,7 +144,7 @@
         "description": "Outils liés à l'estimation de l'ataque",
         "get": {
             "name": "récupérer",
-            "description": "Récupère l'estimation calculée et la liste enregistrée des estimations pour le jour et la ville choisis",
+            "description": "Récupère l'estimation calculée et la liste enregistrée des estimations pour le jour et la ville",
             "town-id": {
                 "name": "identifiant-de-la-ville",
                 "description": "L'identifiant de la ville pour laquelle vous souhaitez l'estimation"
