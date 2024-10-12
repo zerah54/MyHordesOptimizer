@@ -3,6 +3,50 @@ import { I18nLabels } from '../../_abstract_model/types/_types';
 export const skills: NewHeroSkill[] = [
     {
         name: {
+            fr: 'Compétences disponibles',
+            en: '',
+            es: '',
+            de: ''
+        },
+        levels: [
+            {
+                name: {
+                    fr: 'Habitant',
+                    en: '',
+                    es: '',
+                    de: ''
+                },
+                skills: [
+                    {
+                        fr: '4 places dans le sac à dos',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: '4 places dans le coffre',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: '10 points de défense durant la Veille',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Écrire sur le forum de la ville',
+                        en: '',
+                        es: '',
+                        de: ''
+                    }
+                ]
+            },
+        ]
+    },
+    {
+        name: {
             fr: 'Stratège',
             en: '',
             es: '',
@@ -18,7 +62,7 @@ export const skills: NewHeroSkill[] = [
                 },
                 skills: [
                     {
-                        fr: '+5 défense pour la ville',
+                        fr: '+10 points de défense durant la veille',
                         en: '',
                         es: '',
                         de: ''
@@ -113,9 +157,28 @@ export const skills: NewHeroSkill[] = [
                     es: '',
                     de: ''
                 },
+                pointsNeeded: 75,
                 skills: [
                     {
-                        fr: '???',
+                        fr: '2% de chances supplémentaires de survie pendant la Veille',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Écrire des messages anonymes illimités',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Appareil photo d\'avant-guerre (4 charges)',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Vous pouvez voler chez vos voisins même si ils sont en ville',
                         en: '',
                         es: '',
                         de: ''
@@ -230,9 +293,22 @@ export const skills: NewHeroSkill[] = [
                     es: '',
                     de: ''
                 },
+                pointsNeeded: 75,
                 skills: [
                     {
-                        fr: '???',
+                        fr: 'Vaincre la mort (soigne la terreur, gueule de bois et convalescence)',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Soins rudimentaires pour vos voisins',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Supprimer des entrées du registre (max. 1)',
                         en: '',
                         es: '',
                         de: ''
@@ -347,9 +423,22 @@ export const skills: NewHeroSkill[] = [
                     es: '',
                     de: ''
                 },
+                pointsNeeded: 75,
                 skills: [
                     {
-                        fr: '???',
+                        fr: '1 point de contrôle supplémentaire si pas "ivre" ou "gueule de bois"',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Sacoche usée (au lieu d\'un plan) au début de la ville',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Étui pour violoncelle au début de la ville',
                         en: '',
                         es: '',
                         de: ''
@@ -387,7 +476,13 @@ export const skills: NewHeroSkill[] = [
                         de: ''
                     },
                     {
-                        fr: 'Uppercut sauvage : vous avez plus de chances de frapper un coup puissant en combat',
+                        fr: 'Uppercut sauvage : permet de tuer 2 zombies',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Second Souffle (4 PE)',
                         en: '',
                         es: '',
                         de: ''
@@ -403,19 +498,25 @@ export const skills: NewHeroSkill[] = [
                 },
                 skills: [
                     {
-                        fr: 'Deux places supplémentaires dans votre sac à dos',
+                        fr: 'Une autre place supplémentaire dans votre sac à dos',
                         en: '',
                         es: '',
                         de: ''
                     },
                     {
-                        fr: 'Deux places supplémentaires dans votre coffre',
+                        fr: 'Une autre place supplémentaire dans votre coffre',
                         en: '',
                         es: '',
                         de: ''
                     },
                     {
-                        fr: 'Votre coup Uppercut sauvage devient encore plus puissant',
+                        fr: 'Uppercut sauvage amélioré : permet de tuer 3 zombies',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Amélioration du Second Souffle (6 PE)',
                         en: '',
                         es: '',
                         de: ''
@@ -432,19 +533,25 @@ export const skills: NewHeroSkill[] = [
                 pointsNeeded: 40,
                 skills: [
                     {
-                        fr: 'Trois places supplémentaires dans votre sac à dos',
+                        fr: '1 objet dans votre coffre est caché',
                         en: '',
                         es: '',
                         de: ''
                     },
                     {
-                        fr: 'Trois places supplémentaires dans votre coffre',
+                        fr: 'Uppercut sauvage amélioré : permet de tuer 4 zombies',
                         en: '',
                         es: '',
                         de: ''
                     },
                     {
-                        fr: 'Votre Uppercut sauvage peut assommer l\'ennemi temporairement',
+                        fr: 'Amélioration du Second Souffle (2 PA, 6 PE)',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: '15 O² supplémentaires dans les ruines explorables',
                         en: '',
                         es: '',
                         de: ''
@@ -458,9 +565,28 @@ export const skills: NewHeroSkill[] = [
                     es: '',
                     de: ''
                 },
+                pointsNeeded: 75,
                 skills: [
                     {
-                        fr: '???',
+                        fr: 'Une autre place supplémentaire dans votre sac à dos',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Contrôle de zone temporaire de 30 secondes pour l\'Uppercut sauvage',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Amélioration du Second Souffle (4 PA, 6 PE)',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: '30 O² supplémentaires dans les ruines explorables',
                         en: '',
                         es: '',
                         de: ''
@@ -492,7 +618,7 @@ export const skills: NewHeroSkill[] = [
                         de: ''
                     },
                     {
-                        fr: 'Camping professionnel (limité à 6 emplacements)',
+                        fr: 'Camping professionnel (limité à 6 campings)',
                         en: '',
                         es: '',
                         de: ''
@@ -520,7 +646,7 @@ export const skills: NewHeroSkill[] = [
                         de: ''
                     },
                     {
-                        fr: 'Camping professionnel (limité à 8 emplacements)',
+                        fr: 'Camping professionnel (limité à 8 campings)',
                         en: '',
                         es: '',
                         de: ''
@@ -532,7 +658,7 @@ export const skills: NewHeroSkill[] = [
                         de: ''
                     },
                     {
-                        fr: 'Si vous êtes banni(e) au jour 3 ou après, vous recevez automatiquement du poison pour vous venger',
+                        fr: 'Si vous êtes banni(e) au jour 3 ou après, vous recevez automatiquement du poison pour vous donner l\'opportunité de vous venger... Et oui, il ne fallait pas vous embêter !',
                         en: '',
                         es: '',
                         de: ''
@@ -561,13 +687,13 @@ export const skills: NewHeroSkill[] = [
                         de: ''
                     },
                     {
-                        fr: 'Si vous êtes banni(e) au jour 3 ou après, vous recevez automatiquement 2 fioles de poison et une Toxine pour vous venger',
+                        fr: 'Si vous êtes banni(e) au jour 3 ou après, vous recevez automatiquement 2 fioles de poison ainsi qu\'une Toxine pour vous donner l\'opportunité de vous venger... Et oui, il ne fallait pas vous embêter !',
                         en: '',
                         es: '',
                         de: ''
                     },
                     {
-                        fr: '1 recherche supplémentaire par jour dans la poubelle de la ville',
+                        fr: '1 recherche dans la poubelle de la ville supplémentaire par jour',
                         en: '',
                         es: '',
                         de: ''
@@ -581,9 +707,22 @@ export const skills: NewHeroSkill[] = [
                     es: '',
                     de: ''
                 },
+                pointsNeeded: 75,
                 skills: [
                     {
-                        fr: '???',
+                        fr: 'Retour du Héros (15 km)',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Permet jusqu\'à 99% de chances de survie en camping',
+                        en: '',
+                        es: '',
+                        de: ''
+                    },
+                    {
+                        fr: 'Incroyable trouvaille (remplace Impressionnante trouvaille)',
                         en: '',
                         es: '',
                         de: ''
