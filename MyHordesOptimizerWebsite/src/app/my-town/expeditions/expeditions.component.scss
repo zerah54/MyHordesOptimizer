@@ -48,7 +48,7 @@
             overflow: auto;
 
             .expedition {
-                background-color: rgba(0, 0, 0, 0.15);
+                background-color: variables.$accented-background-color;
 
                 &:not(.mat-expansion-panel-spacing) {
                     margin-bottom: 0.5em;

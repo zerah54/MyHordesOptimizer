@@ -1,0 +1,61 @@
+<mat-card-header>
+    <mat-card-title i18n>Villes privées</mat-card-title>
+</mat-card-header>
+<mat-card-content class="mho-private-towns">
+    <table mat-table [dataSource]="datasource" class="mat-elevation-z8">
+        <ng-container matColumnDef="name" sticky>
+            <th mat-header-cell *matHeaderCellDef i18n>Paramètre</th>
+            <td mat-cell *matCellDef="let param; let i = index"
+                [attr.rowspan]="getRowSpan('name', i)"
+                [style.display]="getRowSpan('name', i) ? '' : 'none'">
+                {{ param.name[locale] }}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="option_name" sticky>
+            <th mat-header-cell *matHeaderCellDef i18n>Option</th>
+            <td mat-cell *matCellDef="let param">{{ param.option_name[locale] }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="option_description">
+            <th mat-header-cell *matHeaderCellDef i18n>Description</th>
+            <td mat-cell *matCellDef="let param">{{ param.option_description[locale] }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="default_rne">
+            <th mat-header-cell *matHeaderCellDef i18n>RNE</th>
+            <td mat-cell *matCellDef="let param" class="center">
+                @if (param.default_rne) {
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/star.gif'" width="16" height="16" matTooltip="Par défaut" i18n-matTooltip>
+                } @else if (param.disabled_rne) {
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_remove.gif'" width="16" height="16" matTooltip="Indisponible" i18n-matTooltip>
+                }
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="default_re">
+            <th mat-header-cell *matHeaderCellDef i18n>RE</th>
+            <td mat-cell *matCellDef="let param" class="center">
+                @if (param.default_re) {
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/star.gif'" width="16" height="16" matTooltip="Par défaut" i18n-matTooltip>
+                } @else if (param.disabled_re) {
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_remove.gif'" width="16" height="16" matTooltip="Indisponible" i18n-matTooltip>
+                }
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="default_pande">
+            <th mat-header-cell *matHeaderCellDef i18n>Pandemonium</th>
+            <td mat-cell *matCellDef="let param" class="center">
+                @if (param.default_pande) {
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/star.gif'" width="16" height="16" matTooltip="Par défaut" i18n-matTooltip>
+                } @else if (param.disabled_pande) {
+                    <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_remove.gif'" width="16" height="16" matTooltip="Indisponible" i18n-matTooltip>
+                }
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayed_columns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayed_columns;"></tr>
+    </table>
+</mat-card-content>

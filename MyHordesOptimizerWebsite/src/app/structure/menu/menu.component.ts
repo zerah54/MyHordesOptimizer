@@ -117,6 +117,14 @@ export class MenuComponent implements OnInit {
                     lvl: 1,
                     authorized: (): boolean => true,
                     spoil: true
+                },
+                {
+                    label: $localize`Villes privées`,
+                    path: 'wiki/private-towns',
+                    displayed: true,
+                    lvl: 1,
+                    authorized: (): boolean => true,
+                    spoil: true
                 }
             ], spoil: false
         },

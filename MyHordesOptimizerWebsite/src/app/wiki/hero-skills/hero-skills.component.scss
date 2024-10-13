@@ -1,8 +1,10 @@
+@use 'variables';
+
 .mho-hero-skills {
     .content {
 
         .mat-expansion-panel {
-            background-color: rgba(0, 0, 0, 0.15);
+            background-color: variables.$accented-background-color;
 
             .mat-mdc-table {
                 background-color: transparent;
