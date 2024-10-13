@@ -427,21 +427,21 @@ export const skills: NewHeroSkill[] = [
                 skills: [
                     {
                         fr: '1 point de contrôle supplémentaire si pas "ivre" ou "gueule de bois"',
-                        en: '',
-                        es: '',
-                        de: ''
+                        en: '1 additional zone control point if you are not "drunk" or "hungover"',
+                        es: '1 punto de control de zona adicional si no estas «borracho» o «resacoso»',
+                        de: '1 zusätzlicher Zonenkontrollpunkt wenn nicht "betrunken" oder "verkatert"'
                     },
                     {
                         fr: 'Sacoche usée (au lieu d\'un plan) au début de la ville',
-                        en: '',
-                        es: '',
-                        de: ''
+                        en: 'Worn Leather Bag (instead of a blueprint) at the start of the city',
+                        es: 'Maletín usado (en lugar del plano de construcción) al principio del pueblo',
+                        de: 'Abgenutzte Kuriertasche (statt Bauplan) beim Start der Stadt'
                     },
                     {
                         fr: 'Étui pour violoncelle au début de la ville',
-                        en: '',
-                        es: '',
-                        de: ''
+                        en: 'Cello case at the start of the city',
+                        es: 'Estuche para cello al principio del pueblo',
+                        de: 'Cellokasten beim Start der Stadt'
                     }
                 ]
             }
@@ -569,27 +569,27 @@ export const skills: NewHeroSkill[] = [
                 skills: [
                     {
                         fr: 'Une autre place supplémentaire dans votre sac à dos',
-                        en: '',
-                        es: '',
-                        de: ''
+                        en: 'Another additional space in your rucksack',
+                        es: 'Otro espacio adicional en la mochila',
+                        de: 'Ein weiterer zusätzlicher Platz im Rucksack'
                     },
                     {
                         fr: 'Contrôle de zone temporaire de 30 secondes pour l\'Uppercut sauvage',
-                        en: '',
-                        es: '',
-                        de: ''
+                        en: '30 second temporary zone control through Vicious Uppercut',
+                        es: '30 segundos de control temporal de la zona mediante Uppercut salvaje',
+                        de: '30 Sekunden temporäre Zonencontrolle durch Wildstyle Uppercut'
                     },
                     {
                         fr: 'Amélioration du Second Souffle (4 PA, 6 PE)',
-                        en: '',
-                        es: '',
-                        de: ''
+                        en: 'Improved Second Wind (4 AP, 6 EP)',
+                        es: 'Majora Segundo aliento (4 PA, 6 PE)',
+                        de: 'Verbesserung Zweite Lunge (4 AP, 6 EP)'
                     },
                     {
                         fr: '30 O² supplémentaires dans les ruines explorables',
-                        en: '',
-                        es: '',
-                        de: ''
+                        en: '30 extra O² in explorable ruins',
+                        es: '30 O² extra en las ruinas explorables',
+                        de: '30 Extra-O² in begehbaren Ruinen'
                     }
                 ]
             }
