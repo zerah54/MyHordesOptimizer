@@ -6,6 +6,22 @@
 
             .mat-mdc-table {
                 background-color: transparent;
+
+                tr:not(:first-child) {
+                    td {
+                        padding-top: 0.5em;
+                    }
+                }
+
+                tr:not(:last-child) {
+                    td {
+                        padding-bottom: 0.5em;
+                    }
+                }
+
+                td.mat-column-name {
+                    width: 115px;
+                }
             }
         }
 
