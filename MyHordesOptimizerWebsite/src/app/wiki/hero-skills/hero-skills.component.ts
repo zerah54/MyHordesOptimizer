@@ -3,7 +3,7 @@ import { Component, HostBinding, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSortModule } from '@angular/material/sort';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
@@ -13,7 +13,6 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { HeroSkill } from '../../_abstract_model/types/hero-skill.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { ColumnIdPipe } from '../../shared/pipes/column-id.pipe';
-import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
 import { NewHeroSkill, skills } from './temp-hero-skills.const';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
@@ -26,7 +25,7 @@ const material_modules: Imports = [MatCardModule, MatSortModule, MatTableModule,
     templateUrl: './hero-skills.component.html',
     styleUrls: ['./hero-skills.component.scss'],
     standalone: true,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes, DebugLogPipe]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
 export class HeroSkillsComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -37,11 +36,9 @@ export class HeroSkillsComponent implements OnInit {
     public readonly locale: string = moment.locale();
 
     /** La liste des pouvoirs héroïques */
-    public hero_skills!: HeroSkill[];
+    public old_hero_skills!: HeroSkill[];
     /** La nouvelle liste des pouvoirs héroïques */
     public new_hero_skills: NewHeroSkill[] = skills;
-    /** La datasource pour le tableau */
-    public datasource: MatTableDataSource<HeroSkill> = new MatTableDataSource();
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
         { id: 'icon', header: '' },
@@ -59,9 +56,8 @@ export class HeroSkillsComponent implements OnInit {
     ngOnInit(): void {
         this.api.getHeroSkill()
             .pipe(takeUntil(this.destroy_sub))
-            .subscribe((hero_skill: HeroSkill[]) => {
-                // this.hero_skills = hero_skill;
-                this.datasource.data = [...hero_skill];
+            .subscribe((old_hero_skills: HeroSkill[]) => {
+                this.old_hero_skills = [...old_hero_skills];
             });
     }
 }
