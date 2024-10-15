@@ -2780,7 +2780,7 @@
           <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Mis à jour par <x id="INTERPOLATION" equiv-text="{{ lastUpdateInfo.username }}"/> <x id="INTERPOLATION_1" equiv-text="{{ lastUpdateInfo.update_time.fromNow() }}"/></target>
+        <target state="translated">Updated by<x id="INTERPOLATION" equiv-text="{{ lastUpdateInfo.username }}"/><x id="INTERPOLATION_1" equiv-text="{{ lastUpdateInfo.update_time.fromNow() }}"/></target>
       </trans-unit>
       <trans-unit id="3130710248919896495" datatype="html" approved="yes">
         <source>Jamais mis à jour</source>
@@ -2800,7 +2800,7 @@
           <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Mis à jour par <x id="INTERPOLATION" equiv-text="{{lastUpdateInfo?.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo?.update_time?.fromNow()}}"/> (<x id="INTERPOLATION_2" equiv-text="{{lastUpdateInfo?.update_time?.toDate() | date:'medium'}}"/>)</target>
+        <target state="translated">Updated by<x id="INTERPOLATION" equiv-text="{{lastUpdateInfo?.username}}"/><x id="INTERPOLATION_1" equiv-text="{{lastUpdateInfo?.update_time?.fromNow()}}"/>(<x id="INTERPOLATION_2" equiv-text="{{lastUpdateInfo?.update_time?.toDate() | date:'medium'}}"/>)</target>
       </trans-unit>
       <trans-unit id="5829380065548494521" datatype="html" approved="yes">
         <source>Rechercher</source>
@@ -2824,7 +2824,7 @@
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> et <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
+        <target state="translated">Developed by <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> and <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/></target>
       </trans-unit>
       <trans-unit id="3288296146842467237" datatype="html" approved="yes">
         <source>Remerciements</source>
@@ -3481,7 +3481,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">80</context>
         </context-group>
-        <target state="needs-translation">Type de ville</target>
+        <target state="translated">Type of town</target>
       </trans-unit>
       <trans-unit id="5596519199501316309" datatype="html" approved="yes">
         <source>Nuit</source>
@@ -3645,7 +3645,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="needs-translation">Il faut en soustraire 3 après chaque attaque</target>
+        <target state="translated">Subtract 3 after each attack</target>
       </trans-unit>
       <trans-unit id="4379616016375089599" datatype="html" approved="yes">
         <source>Bonus : </source>
@@ -3661,7 +3661,7 @@
           <context context-type="sourcefile">src/app/tools/camping/camping.component.ts</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="needs-translation">Capacité : </target>
+        <target state="translated">Capacity:</target>
       </trans-unit>
       <trans-unit id="61672744151027488" datatype="html" approved="yes">
         <source>Le lien a bien été copié</source>
@@ -3981,7 +3981,7 @@
           <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.html</context>
           <context context-type="linenumber">8</context>
         </context-group>
-        <target state="needs-translation">Copier l'URL</target>
+        <target state="translated">Copy URL</target>
       </trans-unit>
       <trans-unit id="7620507202018349855" datatype="html" approved="yes">
         <source>Affichage des tooltips détaillés</source>
