@@ -808,7 +808,7 @@
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
           <context context-type="linenumber">211</context>
         </context-group>
-        <target state="needs-translation">Aucun objet ne correspond au filtre "<x id="INTERPOLATION" equiv-text="{{ filterInput.nativeElement.value }}"/>"</target>
+        <target state="translated">No object matches filter "<x id="INTERPOLATION" equiv-text="{{ filterInput.nativeElement.value }}"/>"</target>
       </trans-unit>
       <trans-unit id="8265078634979801865" datatype="html" approved="yes">
         <source>La liste est vide</source>
@@ -1716,7 +1716,7 @@
           <context context-type="sourcefile">src/app/my-town/map/draw-map/map-update/map-update.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Cellule</target>
+        <target state="translated">Cell</target>
       </trans-unit>
       <trans-unit id="4574043683605876869" datatype="html" approved="yes">
         <source>Bâtiment</source>
@@ -1892,7 +1892,7 @@
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">Aller / Retour</target>
+        <target state="translated">Round trip</target>
       </trans-unit>
       <trans-unit id="70397346439942337" datatype="html" approved="yes">
         <source>Ajouter</source>
@@ -1912,7 +1912,7 @@
           <context context-type="sourcefile">src/app/my-town/map/map.component.html</context>
           <context context-type="linenumber">91</context>
         </context-group>
-        <target state="needs-translation">Aller simple</target>
+        <target state="translated">One-way</target>
       </trans-unit>
       <trans-unit id="2881179225572512277" datatype="html" approved="yes">
         <source>Ma ville</source>
@@ -2112,7 +2112,7 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">259</context>
         </context-group>
-        <target state="needs-translation">La liste a bien été copiée au format forum</target>
+        <target state="translated">List has been successfully copied to forum format</target>
       </trans-unit>
       <trans-unit id="8778897284002625062" datatype="html">
         <source>Attaque théorique - Min</source>
@@ -4487,7 +4487,7 @@
           <context context-type="sourcefile">src/app/tutorials/script/tuto-script-extension-installation/tuto-script-installation.component.ts</context>
           <context context-type="linenumber">75</context>
         </context-group>
-        <target state="needs-translation">Rendez-vous sur la <x id="PH" equiv-text="this.firefox_extension_link"/> pour l'installer.</target>
+        <target state="translated">Go to the <x id="PH" equiv-text="this.firefox_extension_link"/> to install it.</target>
       </trans-unit>
       <trans-unit id="5960214076877261704" datatype="html" approved="yes">
         <source>Une fois le script installé, il faudra rafraîchir la page du jeu. Vous verrez alors apparaitre un nouveau bouton en haut de votre page MyHordes. Au survol, une fenêtre s&apos;affiche, donnant accès aux options du script ainsi qu&apos;à certaines de ses fonctionnalités.</source>
@@ -4563,7 +4563,7 @@
           <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Première utilisation du site</target>
+        <target state="translated">First time on the website</target>
       </trans-unit>
       <trans-unit id="641676974949717330" datatype="html">
         <source>Lors de votre première utilisation du site vous n&apos;aurez pas accès aux pages sous le menu &quot;Ma ville&quot;. En effet, il faut au préalable renseigner son identifiant externe pour les applications, en haut à droite de la page.</source>
@@ -4571,7 +4571,7 @@
           <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
           <context context-type="linenumber">23</context>
         </context-group>
-        <target state="needs-translation">Lors de votre première utilisation du site vous n'aurez pas accès aux pages sous le menu "Ma ville". En effet, il faut au préalable renseigner son identifiant externe pour les applications, en haut à droite de la page.</target>
+        <target state="translated">When you first come to this website, you won't have access to the pages under the menu "My Town". To get access, you need to enter your external ID for apps at the top right of the page.</target>
       </trans-unit>
       <trans-unit id="720951074500366028" datatype="html">
         <source>L&apos;identifiant externe pour les applications se trouve sur le site de MyHordes, dans la page de votre âme, onglet &quot;Avancé&quot;. Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.</source>
@@ -4579,7 +4579,7 @@
           <context context-type="sourcefile">src/app/tutorials/site/tuto-site-first-use/tuto-site-first-use.component.ts</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">L'identifiant externe pour les applications se trouve sur le site de MyHordes, dans la page de votre âme, onglet "Avancé". Une fois copié, il suffit de le coller dans le champ dédié sur le site de MyHordes Optimizer et de valider.</target>
+        <target state="translated">The external ID apps can be found on the MyHordes website. You need to go to your soul, then click on the "Settings" tab, then "Advanced". Once your ID copied, simply paste it into the MyHordes Optimizer's field and save it.</target>
       </trans-unit>
       <trans-unit id="814524093468498547" datatype="html" approved="yes">
         <source>Pouvoir</source>
@@ -4615,7 +4615,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">Calculateur de morts par désespoir</target>
+        <target state="translated">Death by despair calculator</target>
       </trans-unit>
       <trans-unit id="6332610342442382860" datatype="html" approved="yes">
         <source>Zombies sur la case</source>
@@ -4631,7 +4631,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">Zombies morts dans la nuit</target>
+        <target state="translated">Zombies dead during the night</target>
       </trans-unit>
       <trans-unit id="1703925095210020999" datatype="html" approved="yes">
         <source>Zombies tués</source>
@@ -4655,7 +4655,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/despair-deaths-calculator/despair-deaths-calculator.component.ts</context>
           <context context-type="linenumber">55</context>
         </context-group>
-        <target state="needs-translation">Jour J + <x id="PH" equiv-text="i"/></target>
+        <target state="translated">D-Day + <x id="PH" equiv-text="i"/></target>
       </trans-unit>
       <trans-unit id="8166568568518477878" datatype="html">
         <source>Calculateur de débordement</source>
@@ -4707,7 +4707,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Zombies morts sur la case depuis la dernière attaque</target>
+        <target state="translated">Zombies dead in zone since the last attack</target>
       </trans-unit>
       <trans-unit id="4971475201644632296" datatype="html">
         <source>Zombies qui vont mourir par désespoir</source>
@@ -4715,7 +4715,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">44</context>
         </context-group>
-        <target state="needs-translation">Zombies qui vont mourir par désespoir</target>
+        <target state="translated">Zombies who will die by despair</target>
       </trans-unit>
       <trans-unit id="5910955281519564678" datatype="html">
         <source>Attaque théorique</source>
@@ -4723,7 +4723,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Attaque théorique</target>
+        <target state="translated">Theoretical attack</target>
       </trans-unit>
       <trans-unit id="2156842490958660553" datatype="html">
         <source>Minimum théorique</source>
@@ -4771,7 +4771,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Chances de réussite du manuel</target>
+        <target state="translated">Book Success Chances</target>
       </trans-unit>
       <trans-unit id="6614826838240601282" datatype="html">
         <source>Chances de réussite du manuel en ville dévastée</source>
@@ -4779,7 +4779,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">Chances de réussite du manuel en ville dévastée</target>
+        <target state="translated">Chances of book success in devastated town</target>
       </trans-unit>
       <trans-unit id="1275317502767727996" datatype="html" approved="yes">
         <source>Points d&apos;âme</source>
@@ -4799,7 +4799,7 @@
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">125</context>
         </context-group>
-        <target state="needs-translation">Jours validés</target>
+        <target state="translated">Validated days</target>
       </trans-unit>
       <trans-unit id="19231624547333208" datatype="html" approved="yes">
         <source>Points d&apos;âmes gagnés</source>
@@ -4863,7 +4863,7 @@
           <context context-type="sourcefile">src/app/wiki/recipes/recipes.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Composants</target>
+        <target state="translated">Components</target>
       </trans-unit>
       <trans-unit id="4280305830543989718" datatype="html" approved="yes">
         <source>Nom du bâtiment</source>
@@ -4895,7 +4895,7 @@
           <context context-type="sourcefile">src/app/wiki/ruins/ruins.component.ts</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Capacité</target>
+        <target state="translated">Camping capacity</target>
       </trans-unit>
     </body>
   </file>
