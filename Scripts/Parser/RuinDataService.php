@@ -1006,7 +1006,13 @@ $ruins = [
             'vagoul_#00' => 3,
             'infect_poison_part_#00' => [15, 'DropMod::Infective']
         ], 'desc' => 'Diese heruntergekommene Gebäude scheint einmal ein Hospital gewesen zu sein. Du entdeckst einen Einstieg ins Gebäude, modriger Gestank schlägt dir entgegen. Du verziehst das Gesicht, aber hier könntest du mit ziemlicher Sicherheit etwas Nützliches finden...'],
+
+    // id 101
+    'sports_crow' => ["label" => "Die Sportkrähe", 'icon' => 'sports_crow', "camping" => 10, "min_dist" => 0, "max_dist" => 100, "chance" => 0, "empty" => 1, "drops" => [
+    ], 'desc' => 'Das Grab der ehemaligen Sportler...'],
+
 ];
+
 $ruins_additional_info = [
     // id 20
     'home' => ['capacity' => 2],
@@ -1212,6 +1218,8 @@ $ruins_additional_info = [
             11, 32, 35, 39, 61, 66, 67, 68, 74, 102, 105, 119, 129, 132, 135, 136, 144, 148, 150, 164
         ]
     ],
+
+    'sports_crow' => ['capacity' => 2],
 ];
 
 foreach ($ruins as &$ruin) {
