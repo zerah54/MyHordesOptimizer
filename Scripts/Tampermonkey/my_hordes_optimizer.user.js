@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.25.0
+// @version      1.0.26.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,9 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] L'enregistrement à la tour de guet ne fait plus planter l'affichange de l'attaque estimée`;
+    + `[Modification] Retrait de la notion de "priorité" dans la liste de courses et affichage des couleurs en fonction de la position\n\n`
+    + `[Correctif] La copie du registre ne copie plus les lignes masquées par le filtre\n`;
++`[Correctifs] Divers correctifs dont dont je me rappelle plus le détail parce que ça fait longtemps que j'ai pas fait de mise à jour`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -759,54 +761,6 @@ const action_types = [
     },
 ];
 
-const wishlist_priorities = [
-    {
-        value: -1,
-        label: {
-            en: `Do not bring to town`,
-            fr: `Ne pas ramener`,
-            de: `Nicht mitbringen`,
-            es: `No traer al pueblo`
-        }
-    },
-    {
-        value: 0,
-        label: {
-            en: `Not defined`,
-            fr: `Non définie`,
-            de: `Nicht definiert`,
-            es: `Indefinida`
-        }
-    },
-    {
-        value: 1,
-        label: {
-            en: `Low`,
-            fr: `Basse`,
-            de: `Niedrig`,
-            es: `Baja`
-        }
-    },
-    {
-        value: 2,
-        label: {
-            en: `Medium`,
-            fr: `Moyenne`,
-            de: `Mittel`,
-            es: `Media`
-        }
-    },
-    {
-        value: 3,
-        label: {
-            en: `High`,
-            fr: `Haute`,
-            de: `Hoch`,
-            es: `Alta`
-        }
-    },
-];
-
 const wishlist_depot = [
     {
         value: -1,
@@ -846,14 +800,6 @@ const wishlist_headers = [
             es: `Objeto`
         },
         id: `label`
-    },
-    {
-        label: {
-            en: `Priority`,
-            fr: `Priorité`,
-            de: `Priorität`,
-            es: `Prioridad`
-        }, id: `priority`
     },
     {
         label: {
@@ -1057,6 +1003,15 @@ let params_categories = [
                             es: `Registrar el número de zombis asesinados`
                         },
                     },
+                    // {
+                    //     id: `update_mho_job_markers`,
+                    //     label: {
+                    //         en: `Updates information from job markers`,
+                    //         fr: `Met à jour les informations issues des marqueurs de métiers`,
+                    //         de: `Aktualisiert Informationen von Jobmarkierungen`,
+                    //         es: `Actualiza la información de los marcadores de trabajo.`
+                    //     },
+                    // },
                     {
                         id: `update_mho_devastated`,
                         label: {
@@ -1264,6 +1219,15 @@ let params_categories = [
                             es: `Registrar el número de zombis asesinados`
                         },
                     },
+                    // {
+                    //     id: `update_fata_job_markers`,
+                    //     label: {
+                    //         en: `Updates information from job markers`,
+                    //         fr: `Met à jour les informations issues des marqueurs de métiers`,
+                    //         de: `Aktualisiert Informationen von Jobmarkierungen`,
+                    //         es: `Actualiza la información de los marcadores de trabajo.`
+                    //     },
+                    // },
                     {
                         id: `update_fata_devastated`,
                         label: {
@@ -1951,7 +1915,7 @@ function addSuccess(message) {
     let notification = document.createElement('div');
     notification.classList.add('notice', 'show');
     notification.innerText = `${getScriptInfo().name} : ${message}`;
-    notifications.appendChild(notification);
+    notifications?.appendChild(notification);
     notification.addEventListener('click', () => {
         notification.remove();
     });
@@ -1969,7 +1933,7 @@ function addWarning(message) {
     let notification = document.createElement('div');
     notification.classList.add('warning', 'show');
     notification.innerText = `${getScriptInfo().name} : ${message}`;
-    notifications.appendChild(notification);
+    notifications?.appendChild(notification);
     notification.addEventListener('click', () => {
         notification.remove();
     });
@@ -1989,7 +1953,7 @@ function addError(error) {
             <br />
         `;
         notification.innerHTML = error_text + (typeof error === 'string' ? error : getErrorFromApi(error));
-        notifications.appendChild(notification);
+        notifications?.appendChild(notification);
         is_error = true
         notification.addEventListener('click', () => {
             notification.remove();
@@ -4815,9 +4779,6 @@ function displayWishlistInApp() {
             }
         });
 
-        list_to_display = list_to_display.sort((item_a, item_b) => {
-            return item_b.priority - item_a.priority;
-        });
         if (is_workshop && list_to_display.length === 0) return;
 
         let refreshWishlist = () => {
@@ -4864,7 +4825,7 @@ function displayWishlistInApp() {
                 .forEach((header_cell_item) => {
                     let header_cell = document.createElement('div');
                     header_cell.classList.add('padded', 'cell');
-                    header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : ((header_cell_item.id === 'priority' || header_cell_item.id === 'depot') ? 'rw-3' : 'rw-2'));
+                    header_cell.classList.add(header_cell_item.id === 'label' ? 'rw-5' : (header_cell_item.id === 'depot' ? 'rw-3' : 'rw-2'));
                     header_cell.innerText = getI18N(header_cell_item.label);
                     list_header.appendChild(header_cell);
                 });
@@ -4879,11 +4840,6 @@ function displayWishlistInApp() {
                     title.classList.add('padded', 'cell', 'rw-5');
                     title.innerHTML = `<img src="${repo_img_hordes_url + item.item.img}" class="priority_${item.priority_main}"  style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`;
                     list_item.appendChild(title);
-
-                    let item_priority = document.createElement('span');
-                    item_priority.classList.add('padded', 'cell', 'rw-3');
-                    item_priority.innerHTML = `<span class="small">${getI18N(wishlist_priorities.find((priority) => item.priority_main === priority.value).label)}</span>`;
-                    list_item.appendChild(item_priority);
 
                     let item_depot = document.createElement('span');
                     item_depot.classList.add('padded', 'cell', 'rw-3');
@@ -4985,23 +4941,44 @@ function displayWishlistInApp() {
 function displayPriorityOnItems() {
     if (mho_parameters.display_wishlist && pageIsDesert() && wishlist) {
         let present_items = [];
-        let inventories = document.getElementsByClassName('inventory');
+        let empty_spaces = [];
+        let used_spaces = [];
+        let inventories = document.querySelectorAll('.inventory');
+        let rucksacks = document.querySelectorAll('.inventory.rucksack, .inventory.rucksack-escort');
+
         if (inventories) {
             for (let inventory of inventories) {
-                present_items.push(...inventory.getElementsByTagName('img'));
+                present_items.push(...inventory?.querySelectorAll('li.item:not(.locked):not(.plus)') || []);
+            }
+        }
+        if (rucksacks) {
+            for (let rucksack of rucksacks) {
+                empty_spaces.push(...rucksack?.querySelectorAll('li.free') || []);
+                used_spaces.push(...rucksack?.querySelectorAll('li.item:not(.locked):not(.plus)') || []);
             }
         }
 
         let used_wishlist = getWishlistForZone();
+        let item_count = used_spaces.length + empty_spaces.length;
 
         if (used_wishlist) {
+            let count = 0;
             used_wishlist
                 .filter((wishlist_item) => wishlist_item.priority !== 0)
                 .forEach((wishlist_item) => {
                     present_items
-                        .filter((present_item) => fixMhCompiledImg(present_item.src).indexOf(wishlist_item.item.img) > 0)
+                        .filter((present_item) => fixMhCompiledImg(present_item.querySelector('img').src).indexOf(wishlist_item.item.img) > 0)
                         .forEach((present_item) => {
-                            present_item.parentElement.parentElement.classList.add('priority_' + wishlist_item.priority_main);
+                            if (wishlist_item.priority_main > 0) {
+                                if (count < item_count) {
+                                    present_item.classList.add('priority_in');
+                                } else {
+                                    present_item.classList.add('priority_out');
+                                }
+                            } else {
+                                present_item.classList.add('priority_trash');
+                            }
+                            count += 1;
                         });
                 });
         }
@@ -5020,7 +4997,12 @@ function getWishlistForZone() {
         .filter((zone) => zone > current_zone && zone !== 0);
     zones = zones
         .sort((zone_a, zone_b) => zone_a - zone_b);
-    return zones.length === 0 ? wishlist.wishList[0] : wishlist.wishList[zones[0]];
+
+    let used_wishlist = zones.length === 0 ? wishlist.wishList[0] : wishlist.wishList[zones[0]];
+    used_wishlist?.sort((item_a, item_b) => {
+        return item_b.priority - item_a.priority;
+    });
+    return used_wishlist;
 }
 
 let hovered_tooltip_x_item_id;
@@ -6318,16 +6300,20 @@ function displayCellDetailsOnPage() {
             }
 
             let insertCellNote = (cell) => {
-                cell_informations.querySelector('#cell-note-content').innerHTML = cell.note && cell.note !== ''
-                    ? `<div>${cell.note}</div>`
-                    : `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.no_note)}</div>`;
+                if (cell_informations.querySelector('#cell-note-content')) {
+                    cell_informations.querySelector('#cell-note-content').innerHTML = cell.note && cell.note !== ''
+                        ? `<div>${cell.note}</div>`
+                        : `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.no_note)}</div>`;
+                }
             };
 
             let insertCellDigs = (cell) => {
-                cell_informations.querySelector('#cell-digs-content').innerHTML = `
+                if (cell_informations.querySelector('#cell-digs-content')) {
+                    cell_informations.querySelector('#cell-digs-content').innerHTML = `
                     <div>${getI18N(texts.digs_max)} : ${Math.round(cell.maxPotentialRemainingDig - cell.totalSucces)}</div>
                     <div>${getI18N(texts.digs_average)} : ${Math.round(cell.averagePotentialRemainingDig - cell.totalSucces)}</div>
                 `;
+                }
             };
 
             let insertRuinDigs = (cell) => {
@@ -6345,7 +6331,9 @@ function displayCellDetailsOnPage() {
                         }
                     }
                     ruin_drops += `</div>`;
-                    cell_informations.querySelector('#cell-ruin-content').innerHTML = (!current_ruin?.explorable ? (current_cell.isRuinDryed ? empty_text : complete_text) : '') + ruin_drops;
+                    if (cell_informations.querySelector('#cell-ruin-content')) {
+                        cell_informations.querySelector('#cell-ruin-content').innerHTML = (!current_ruin?.explorable ? (current_cell.isRuinDryed ? empty_text : complete_text) : '') + ruin_drops;
+                    }
                 }
             };
 
@@ -6971,7 +6959,7 @@ function displayCampingPredict() {
                 }
                 let conf = {
                     townType: mh_user.townDetails.townType.toUpperCase(),
-                    job: jobs.find((job) => mh_user.jobDetails.uid === job.img).id,
+                    job: jobs.find((job) => mh_user.jobDetails.uid === job.img)?.id,
                     distance: document.querySelector('.zone-dist > div > b')?.innerText.replace('km', ''), // OK
                     campings: 0,
                     proCamper: false,
@@ -7346,7 +7334,7 @@ function addCopyRegistryButton() {
             copy_button.title = getI18N(texts.copy_registry);
 
             copy_button.addEventListener('click', () => {
-                let entries = logs.querySelectorAll('.log-entry');
+                let entries = logs.querySelectorAll('.log-entry:not(.hidden)');
                 let soft_entries = Array.from(entries).map((entry) => {
                     let time = entry.querySelector('.log-part-time').innerText.trim();
                     let separator = ' [X] ';
@@ -8382,18 +8370,16 @@ function createStyles() {
         + 'max-width: 400px !important'
         + '}';
 
-    const item_priority_30 = `li.item[class^='priority_3'], li.item[class*=' priority_3'], img[class^='priority_3'], img[class*=' priority_3'] {`
-        + 'box-shadow: inset 0 0 0.30em springgreen, 0 0 0.5em springgreen;'
-        + '}';
-    const item_priority_20 = `li.item[class^='priority_2'], li.item[class*=' priority_2'], img[class^='priority_2'], img[class*=' priority_2'] {`
-        + 'box-shadow: inset 0 0 0.30em yellowgreen, 0 0 0.5em yellowgreen;'
-        + '}';
-    const item_priority_10 = `li.item[class^='priority_1'], li.item[class*=' priority_1'], img[class^='priority_1'], img[class*=' priority_1'] {`
-        + 'box-shadow: inset 0 0 0.30em darkgoldenrod, 0 0 0.5em darkgoldenrod;'
-        + '}';
-    const item_priority_trash = 'li.item.priority_-1, img.priority_-1 {'
-        + 'box-shadow: inset 0 0 0.30em darkslategrey, 0 0 0.5em darkslategrey;'
-        + '}';
+    const item_priority = `
+        li.item[class^='priority_in'], li.item[class*=' priority_in'], img[class^='priority_in'], img[class*=' priority_in'] {
+            box-shadow: inset 0 0 0.5em whitesmoke, 0 0 0.5em whitesmoke;
+        }
+        li.item[class^='priority_out'], li.item[class*=' priority_out'], img[class^='priority_out'], img[class*=' priority_out'] {
+            box-shadow: inset 0 0 1em darkslategrey, 0 0 1em darkslategrey;
+        }
+        li.item.priority_trash, img.priority_trash {
+            box-shadow: inset 0 0 0.5em black, 0 0 0.5em black;
+        }`;
 
     const item_tag_food = 'div.item-tag-food::after {'
         + `background: url(${repo_img_hordes_url}status/status_haseaten.gif) 50%/contain no-repeat;`
@@ -8568,7 +8554,7 @@ function createStyles() {
         + mho_table_style + mho_table_header_style + mho_table_row_style + mho_table_cells_style + mho_table_cells_td_style + label_text
         + item_title_style + add_to_wishlist_button_img_style + advanced_tooltip_recipe_li + item_recipe_li + advanced_tooltip_recipe_li_ul + large_tooltip + item_list_element_style
         + wishlist_label + wishlist_header + wishlist_header_cell + wishlist_cols + wishlist_delete + wishlist_in_app + wishlist_in_app_item + wishlist_even
-        + item_priority_10 + item_priority_20 + item_priority_30 + item_priority_trash + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
+        + item_priority + item_tag_food + item_tag_load + item_tag_hero + item_tag_smokebomb + item_tag_alcohol + item_tag_drug
         + display_map_btn + mho_map_td + mho_ruin_td + dotted_background + empty_bat_before_after + empty_bat_after + camping_spaced_label + citizen_list_more_info_content
         + citizen_list_more_info_header_content + hidden + item_tag;
 
@@ -9499,7 +9485,7 @@ function updateExternalTools() {
                 let object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id && _object_in_map.isBroken === object.isBroken);
                 if (object_in_map) {
                     object_in_map.count += 1;
-                } else {
+                } else if (object) {
                     object.count = 1;
                     object_map.push(object);
                 }
@@ -9544,7 +9530,7 @@ function updateExternalTools() {
             && pageIsDesert() && mh_user.townDetails.isDevaste) {
             let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
                 let item = convertImgToItem(desert_item.querySelector('img'));
-                return {id: item.id, isBroken: desert_item.classList.contains('broken')};
+                return {id: item?.id, isBroken: desert_item.classList.contains('broken')};
             });
 
             let content = {
@@ -9582,6 +9568,56 @@ function updateExternalTools() {
                 data.map.cell.citizenId = content.citizenId;
             } else {
                 data.map.cell = content;
+            }
+        }
+
+        // Mise à jour des marqueurs issus des métiers
+        if (((mho_parameters.update_mho && mho_parameters.update_mho_job_markers)
+                || (mho_parameters.update_fata && mho_parameters.update_fata_job_markers))
+            && pageIsDesert()) {
+            if (mh_user.jobDetails.uid === 'dig') {
+                let content = {
+                    x: +position[0],
+                    y: +position[1],
+                    scavNextCells: {
+                        north: !!document.querySelector('.scavenger-sense-north.scavenger-sense-1'),
+                        east: !!document.querySelector('.scavenger-sense-east.scavenger-sense-1'),
+                        south: !!document.querySelector('.scavenger-sense-south.scavenger-sense-1'),
+                        west: !!document.querySelector('.scavenger-sense-west.scavenger-sense-1')
+                    },
+                    citizenId: citizen_list.map((citizen) => citizen.id)
+                }
+
+                if (data.map.cell) {
+                    data.map.cell.scavNextCells = content.scavNextCells;
+                    data.map.cell.citizenId = content.citizenId;
+                } else {
+                    data.map.cell = content;
+                }
+            } else if (mh_user.jobDetails.uid === 'vest') {
+                let zone_scout_level_src = document.querySelector('.zone-scout')?.querySelector('img').src;
+                let index = zone_scout_level_src.indexOf(hordes_img_url);
+                zone_scout_level_src = zone_scout_level_src.slice(index).replace(hordes_img_url, '')
+                let content = {
+                    x: +position[0],
+                    y: +position[1],
+                    scoutNextCells: {
+                        north: +document.querySelector('.scout-sense-north')?.querySelector('text')?.innerText ?? undefined,
+                        east: +document.querySelector('.scout-sense-east')?.querySelector('text')?.innerText ?? undefined,
+                        south: +document.querySelector('.scout-sense-south')?.querySelector('text')?.innerText ?? undefined,
+                        west: +document.querySelector('.scout-sense-west')?.querySelector('text')?.innerText ?? undefined
+                    },
+                    scoutZoneLvl: +zone_scout_level_src.replace(/\D/g, '') ?? undefined,
+                    citizenId: citizen_list.map((citizen) => citizen.id)
+                }
+
+                if (data.map.cell) {
+                    data.map.cell.scoutNextCells = content.scoutNextCells;
+                    data.map.cell.scoutZoneLvl = content.scoutZoneLvl;
+                    data.map.cell.citizenId = content.citizenId;
+                } else {
+                    data.map.cell = content;
+                }
             }
         }
 
@@ -10379,7 +10415,7 @@ function getApiKey() {
                             initOptionsWithoutLoginNeeded();
                         });
 
-                        ['mh-navigation-complete', /*'pop', 'load', 'popstate', 'error', 'push', , 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
+                        ['mh-navigation-complete', 'mho-mutation-event', /*'pop', 'load', 'popstate', 'error', 'push', , 'tab-switch', '_react', 'x-react-degenerate', 'DOMContentLoaded', 'movement-reset', 'readystatechange'*/].forEach((event_name) => {
                             document.addEventListener(event_name, (event) => {
                                 // console.trace('event', event_name, event);
                                 if (shouldRefreshMe()) {
