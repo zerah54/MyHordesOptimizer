@@ -27,6 +27,14 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+a {
+    color: variables.$warn;
+
+    &:hover {
+        color: variables.$accent;
+    }
+}
+
 .comma::after {
     content: ', ';
 }

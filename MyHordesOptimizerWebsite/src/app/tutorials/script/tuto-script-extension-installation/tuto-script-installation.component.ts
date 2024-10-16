@@ -25,11 +25,11 @@ export class TutoScriptInstallationComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     public readonly title: string = $localize`Script / Extension`;
-    public readonly download_link: string = $localize`<a color="accent" href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js" target="_blank">lien de téléchargement du script</a>`;
+    public readonly download_link: string = $localize`<a href="https://github.com/zerah54/MyHordesOptimizer/raw/main/Scripts/Tampermonkey/my_hordes_optimizer.user.js" target="_blank">lien de téléchargement du script</a>`;
     public readonly firefox_link_href: string = 'https://addons.mozilla.org/fr/firefox/addon/myhordes-optimizer';
-    public readonly firefox_extension_link: string = $localize`<a color="accent" href="${this.firefox_link_href}" target="_blank">page de l'extension</a>`;
+    public readonly firefox_extension_link: string = $localize`<a href="${this.firefox_link_href}" target="_blank">page de l'extension</a>`;
     public readonly chrome_link_href: string = 'https://chromewebstore.google.com/detail/myhordes-optimizer/jolghobcgphmgaiachbipnpiimmgknno';
-    public readonly chrome_extension_link: string = $localize`<a color="accent" href="${this.chrome_link_href}" target="_blank">page de l'extension</a>`;
+    public readonly chrome_extension_link: string = $localize`<a href="${this.chrome_link_href}" target="_blank">page de l'extension</a>`;
     public readonly tuto_script_items: AccordionItem[] = [
         {
             title: $localize`Ordinateur`,
