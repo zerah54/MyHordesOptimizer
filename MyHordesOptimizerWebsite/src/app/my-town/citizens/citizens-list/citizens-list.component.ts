@@ -221,7 +221,7 @@ export class CitizensListComponent implements OnInit {
     public addStatus(citizen_id: number, status_key: string): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.status) {
-            citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status.key === status_key));
+            citizen.status.icons.push(<StatusEnum>this.all_status.find((status: StatusEnum) => status?.key === status_key));
 
             this.town_service
                 .updateStatus(citizen)
@@ -246,7 +246,7 @@ export class CitizensListComponent implements OnInit {
     public removeStatus(citizen_id: number, status_key: string): void {
         const citizen: Citizen | undefined = this.citizen_list.data.find((citizen: Citizen) => citizen.id === citizen_id);
         if (citizen && citizen.status) {
-            const existing_status_index: number | undefined = citizen.status.icons.findIndex((status: StatusEnum) => status.key === status_key);
+            const existing_status_index: number | undefined = citizen.status.icons.findIndex((status: StatusEnum) => status?.key === status_key);
             if (existing_status_index !== undefined && existing_status_index !== null && existing_status_index > -1) {
                 citizen.status.icons.splice(existing_status_index, 1);
             }

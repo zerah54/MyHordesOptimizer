@@ -73,7 +73,7 @@ export class Action extends CommonEnum {
      * Le constructeur privé empêche la création d'autres instances de cette classe.
      *
      * @param {string} key La clé de l'objet
-     * @param {AllowTypeData} value la valeur correspondante
+     * @param {ActionData} value la valeur correspondante
      */
     protected constructor(public override key: string, public override value: ActionData) {
         super(key, value);
@@ -91,7 +91,7 @@ export class Action extends CommonEnum {
             key = 'load_pilegun';
         }
         const elements: T[] = <T[]>this.getAllValues<CommonEnum>();
-        const element: T | undefined = elements.find((_element: T) => _element.key === key);
+        const element: T | undefined = elements.find((_element: T) => _element?.key === key);
         if (!element) {
             if (!environment.production) {
                 // console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);

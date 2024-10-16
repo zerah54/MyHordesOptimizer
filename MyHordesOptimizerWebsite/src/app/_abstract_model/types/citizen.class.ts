@@ -79,7 +79,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
     public toCitizenStatusDto(): { userId: number, status: string[] } {
         return {
             userId: this.id,
-            status: this.status?.icons.map((icon: StatusEnum) => icon.key) || [],
+            status: this.status?.icons.map((icon: StatusEnum) => icon?.key) || [],
         };
     }
 
@@ -87,7 +87,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
         return {
             userId: this.id,
             heroicActions: this.heroic_actions?.content.reduce((accumulator: Dictionary<number | boolean>, content: HeroicActionsWithValue) => {
-                return { ...accumulator, [content.element.key]: content.value };
+                return { ...accumulator, [content.element?.key]: content.value };
             }, {}) || {}
         };
     }
@@ -96,7 +96,7 @@ export class Citizen extends CommonModel<CitizenDTO> {
         return {
             userId: this.id,
             home: this.home?.content.reduce((accumulator: Dictionary<number | boolean>, content: HomeWithValue) => {
-                return { ...accumulator, [content.element.key]: content.value };
+                return { ...accumulator, [content.element?.key]: content.value };
             }, {}) || {}
         };
     }

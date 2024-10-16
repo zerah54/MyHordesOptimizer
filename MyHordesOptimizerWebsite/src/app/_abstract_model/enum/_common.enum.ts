@@ -43,7 +43,7 @@ export abstract class CommonEnum {
      */
     public static getByKey<T extends CommonEnum>(key: string): T | undefined {
         const elements: T[] = <T[]>this.getAllValues<CommonEnum>();
-        const element: T | undefined = elements.find((_element: T) => _element.key === key);
+        const element: T | undefined = elements.find((_element: T) => _element?.key === key);
         if (!element) {
             if (key !== null) {// TODO TEMPORAIRE
                 // console.error(`Aucune valeur pour "${this.name}" correspondant à la clé "${key}"`);
@@ -69,7 +69,7 @@ export abstract class CommonEnum {
         } else if (!a || !b) {
             return false;
         }
-        return a.key === b.key;
+        return a?.key === b?.key;
     }
 
     /** @return {T[]} retourne la liste des valeurs possibles */
@@ -80,7 +80,7 @@ export abstract class CommonEnum {
 
     /** @return {string} la liste des clés possibles */
     public static getAllKeys<T extends CommonEnum>(): (string | undefined)[] {
-        return this.getAllValues<T>().map((value: T | undefined) => value ? value.key : undefined);
+        return this.getAllValues<T>().map((value: T | undefined) => value?.key);
     }
 
     /** Le constructeur de la classe parente aux Enum personnalisés */
@@ -113,6 +113,6 @@ export abstract class CommonEnum {
 
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+
 export interface CommonEnumData {
 }

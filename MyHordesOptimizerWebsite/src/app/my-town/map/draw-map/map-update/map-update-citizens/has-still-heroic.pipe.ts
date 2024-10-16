@@ -11,7 +11,7 @@ export class HasStillHeroicPipe implements PipeTransform {
     transform(heroics: HeroicActions | undefined, cell_action: HeroicActionEnum): number {
         if (!heroics) return 0;
         const heroic_actions_with_value: HeroicActionsWithValue | undefined = heroics.content
-            .find((heroic: HeroicActionsWithValue): boolean => heroic.element.key === cell_action.key);
+            .find((heroic: HeroicActionsWithValue): boolean => heroic.element?.key === cell_action?.key);
         let remaining: number;
         if (!heroic_actions_with_value) {
             remaining = 0;

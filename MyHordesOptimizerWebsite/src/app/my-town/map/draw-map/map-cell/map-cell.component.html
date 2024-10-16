@@ -11,7 +11,7 @@
     [class.scrut-border-top]="cell|scrutBorderTop:options:drawedMap"
     [class.scrut-border-right]="cell|scrutBorderRight:options:drawedMap"
     [class.scrut-border-bottom]="cell|scrutBorderBottom:options:drawedMap"
-    (click)="openCellUpdate()" (mouseenter)="is_dev ? changeCurrentCell(cell) : undefined" (mouseleave)="is_dev ? changeCurrentCell(undefined) : undefined">
+    (click)="openCellUpdate()" (mouseenter)="changeCurrentCell(cell)" (mouseleave)="changeCurrentCell(undefined)">
 
     @if (cell.ruin_id) {
         <div [class]="'ruin'">

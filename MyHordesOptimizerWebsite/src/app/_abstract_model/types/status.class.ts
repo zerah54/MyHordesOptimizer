@@ -1,8 +1,8 @@
 import { StatusDTO } from '../dto/status.dto';
 import { StatusEnum } from '../enum/status.enum';
-import { UpdateInfo } from './update-info.class';
 import { CommonModel } from './_common.class';
 import { Dictionary } from './_types';
+import { UpdateInfo } from './update-info.class';
 
 export class Status extends CommonModel<StatusDTO> {
     public content!: Dictionary<boolean>;
@@ -20,7 +20,7 @@ export class Status extends CommonModel<StatusDTO> {
     public modelToDto(): StatusDTO {
         return {
             content: this.content,
-            icons: this.icons?.map((status: StatusEnum) => status.key),
+            icons: this.icons?.map((status: StatusEnum) => status?.key),
             lastUpdateInfo: this.update_info?.modelToDto(),
             ghoulStatusLastUpdateInfo: this.ghoul_status_update_info?.modelToDto(),
             isGhoul: this.is_ghoul,

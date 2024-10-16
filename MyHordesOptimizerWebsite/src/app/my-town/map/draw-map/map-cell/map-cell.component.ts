@@ -4,7 +4,6 @@ import { Component, EventEmitter, HostBinding, Input, Output, ViewEncapsulation 
 import { MatDialog } from '@angular/material/dialog';
 import moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
-import { environment } from '../../../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
@@ -68,7 +67,6 @@ export class MapCellComponent {
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     public readonly locale: string = moment.locale();
-    public readonly is_dev: boolean = !environment.production;
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 

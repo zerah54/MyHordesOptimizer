@@ -59,22 +59,22 @@ export class CountAvailableApPipe implements PipeTransform {
             }
 
             const is_6ap: boolean = item.actions.some((action: Action) => {
-                return action.key === Action.ALCOHOL_DX.key
-                    || action.key === Action.DRUG_6AP_1.key;
+                return action?.key === Action.ALCOHOL_DX.key
+                    || action?.key === Action.DRUG_6AP_1.key;
             });
             if (is_6ap) {
                 ap += max_ap;
             }
 
             const is_4ap: boolean = item.actions.some((action: Action) => {
-                return action.key === Action.COFFEE.key;
+                return action?.key === Action.COFFEE.key;
             });
             if (is_4ap) {
                 ap += 4;
             }
 
             const is_8ap: boolean = item.actions.some((action: Action) => {
-                return action.key === Action.DRUG_8AP_1.key;
+                return action?.key === Action.DRUG_8AP_1.key;
             });
             if (is_8ap) {
                 ap += max_ap + 2;

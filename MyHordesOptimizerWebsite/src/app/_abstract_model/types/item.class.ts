@@ -32,7 +32,7 @@ export class Item extends CommonModel<ItemDTO> {
 
     public modelToDto(): ItemDTO {
         return {
-            actions: this.actions ? this.actions.filter((action: Action) => action).map((action: Action) => action.key) : [],
+            actions: this.actions ? this.actions.filter((action: Action) => action).map((action: Action) => action?.key) : [],
             bankCount: this.bank_count,
             category: this.category.modelToDto(),
             deco: this.deco,
@@ -41,7 +41,7 @@ export class Item extends CommonModel<ItemDTO> {
             img: this.img,
             isHeaver: this.is_heaver,
             label: this.label,
-            properties: this.properties ? this.properties.filter((property: Property) => property).map((property: Property) => property.key) : [],
+            properties: this.properties ? this.properties.filter((property: Property) => property).map((property: Property) => property?.key) : [],
             recipes: modelToDtoArray(this.recipes),
             wishListCount: this.wishlist_count,
             id: this.id,
