@@ -25,7 +25,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="overflow: hidden; text-overflow: ellipsis">
                             @if (value | bind:bindValue:displayed_options; as display_values) {
-                                {{ display_values }}
+                                {{ $any(display_values) | multipleLabel:bindLabel }}
                             }
                         </span>
                     @if (value && clearable) {

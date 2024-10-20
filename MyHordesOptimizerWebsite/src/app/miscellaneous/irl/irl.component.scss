@@ -1,0 +1,29 @@
+@use 'variables';
+
+.mho-irl-header {
+    justify-content: space-between;
+
+    .actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+.mho-irl {
+    #hordiens {
+        width: calc(100% - 2px);
+        height: calc(100% - 2px);
+        border: 1px solid variables.$accented-background-color;
+    }
+
+    .filters {
+        margin-bottom: 1em;
+
+        .towns {
+            display: flex;
+            gap: 1em;
+        }
+    }
+
+}

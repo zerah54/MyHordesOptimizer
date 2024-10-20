@@ -35,6 +35,7 @@
         *, &:before, &:after, :after, :before {
             position: absolute;
             content: "";
+            pointer-events: none;
         }
 
         &:before {

@@ -1,0 +1,14 @@
+<mat-card-header class="mho-irl-header">
+    <mat-card-title i18n>IRL</mat-card-title>
+    <div class="actions">
+        <mat-form-field class="towns-filter">
+            <mat-label i18n>Villes</mat-label>
+            <mho-select [multiple]="true" [options]="towns" [bindLabel]="'label'" [(ngModel)]="selected_towns"
+                        (filterChange)="nodes_view.refresh()" [chips]="false">
+            </mho-select>
+        </mat-form-field>
+    </div>
+</mat-card-header>
+<mat-card-content class="mho-irl">
+    <div #hordiens id="hordiens"></div>
+</mat-card-content>

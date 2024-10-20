@@ -29,11 +29,11 @@ import { DebugLogPipe } from '../../pipes/debug-log.pipe';
 import { normalizeString } from '../../utilities/string.utils';
 import { BindPipe, BindValuePipe } from './bind.pipe';
 import { IconPipe } from './icon.pipe';
-import { LabelPipe } from './label.pipe';
+import { LabelPipe, MultipleLabelPipe } from './label.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage, NgTemplateOutlet];
 const components: Imports = [];
-const pipes: Imports = [BindPipe, BindValuePipe, DebugLogPipe, IconPipe, LabelPipe];
+const pipes: Imports = [BindPipe, BindValuePipe, DebugLogPipe, IconPipe, LabelPipe, MultipleLabelPipe];
 const material_modules: Imports = [MatChipsModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatOptionModule, MatSelectModule];
 
 @Component({

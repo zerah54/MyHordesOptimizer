@@ -42,6 +42,8 @@
         "ng-table-virtual-scroll": "1.6.1",
         "rxjs": "7.8.1",
         "uuid": "10.0.0",
+        "vis-data": "^7.1.9",
+        "vis-network": "^9.1.9",
         "zone.js": "0.14.10"
     },
     "devDependencies": {
@@ -77,6 +79,7 @@
     },
     "overrides": {
         "undici": "6.19.2",
-        "undici-types": "6.19.2"
+        "undici-types": "6.19.2",
+        "uuid": "10.0.0"
     }
 }
