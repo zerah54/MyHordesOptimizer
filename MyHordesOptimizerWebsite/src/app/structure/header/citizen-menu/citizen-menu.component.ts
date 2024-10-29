@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
-import moment from 'moment/moment';
+import moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
@@ -58,7 +58,7 @@ export class CitizenMenuComponent implements OnInit {
     public bag_lists: ListForAddRemove[] = [];
     /** La liste des listes disponibles dans les status */
     public readonly status_lists: ListForAddRemove[] = [
-        { label: $localize`Tous`, list: this.all_status }
+        {label: $localize`Tous`, list: this.all_status}
     ];
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
@@ -84,7 +84,7 @@ export class CitizenMenuComponent implements OnInit {
                 next: (items: Item[]) => {
                     this.all_items = items;
                     this.bag_lists = [
-                        { label: $localize`Tous`, list: this.all_items }
+                        {label: $localize`Tous`, list: this.all_items}
                     ];
                 }
             });

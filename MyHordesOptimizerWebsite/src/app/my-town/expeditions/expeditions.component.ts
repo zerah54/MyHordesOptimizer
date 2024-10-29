@@ -13,7 +13,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import moment from 'moment/moment';
+import moment from 'moment';
 import { firstValueFrom, Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { EXPEDITIONS_EDITION_MODE_KEY, FAVORITE_EXPEDITION_ITEMS_UID, HORDES_IMG_REPO } from '../../_abstract_model/const';
@@ -606,7 +606,7 @@ export class ExpeditionsComponent implements OnInit {
     public openReorganize(): void {
         this.dialog
             .open<EditPositionsComponent, EditPositionsData>(EditPositionsComponent, {
-                data: { expeditions: this.expeditions() },
+                data: {expeditions: this.expeditions()},
                 width: '500px'
             })
             .afterClosed()
@@ -653,8 +653,8 @@ export class ExpeditionsComponent implements OnInit {
                     return FAVORITE_EXPEDITION_ITEMS_UID.some((uid: string) => uid === item.uid);
                 })
             },
-            { label: $localize`Banque`, list: this.bank_items },
-            { label: $localize`Tous`, list: this.all_items },
+            {label: $localize`Banque`, list: this.bank_items},
+            {label: $localize`Tous`, list: this.all_items},
         ];
     }
 
@@ -795,7 +795,7 @@ export class ExpeditionsComponent implements OnInit {
                         if (pre_registered_job) {
                             pre_registered_job.count += 1;
                         } else {
-                            pre_registered_jobs.push({ count: 1, job: citizen?.preinscrit_job });
+                            pre_registered_jobs.push({count: 1, job: citizen?.preinscrit_job});
                         }
                     } else if (citizen.preinscrit) {
                         const pre_registered_citizen: Citizen = <Citizen>getCitizenFromId(this.all_citizens, citizen.citizen_id);
@@ -808,7 +808,7 @@ export class ExpeditionsComponent implements OnInit {
                         if (pre_registered_job) {
                             pre_registered_job.count += 1;
                         } else {
-                            pre_registered_jobs.push({ count: 1, job: <string>pre_registered_citizen?.job?.key });
+                            pre_registered_jobs.push({count: 1, job: <string>pre_registered_citizen?.job?.key});
                         }
                     }
                 });

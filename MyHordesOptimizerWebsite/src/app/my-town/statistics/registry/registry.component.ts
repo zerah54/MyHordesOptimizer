@@ -6,7 +6,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import moment from 'moment/moment';
+import moment from 'moment';
 import { environment } from '../../../../environments/environment';
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { DisplayPseudoMode, Entry } from '../../../_abstract_model/interfaces';
@@ -50,12 +50,12 @@ export class RegistryComponent implements OnInit {
     public display_pseudo: DisplayPseudoMode = 'simple';
 
     public tabs: Tab[] = [
-        { mode: 'plays', label: $localize`Dés / Cartes`, img: 'item/item_game_box.gif' },
-        { mode: 'bank_diff', label: $localize`Différenciel de la banque`, img: 'icons/home.gif' },
-        { mode: 'well', label: $localize`Prises dans le puits`, img: 'icons/small_well.gif' },
-        { mode: 'digs', label: $localize`Fouilles`, img: 'building/small_dig.gif' },
-        { mode: 'doors', label: $localize`Entrées / Sorties`, img: 'log/door_open.gif' },
-        { mode: 'telescope', label: $localize`Téléscope`, img: 'item/item_scope.gif' }
+        {mode: 'plays', label: $localize`Dés / Cartes`, img: 'item/item_game_box.gif'},
+        {mode: 'bank_diff', label: $localize`Différenciel de la banque`, img: 'icons/home.gif'},
+        {mode: 'well', label: $localize`Prises dans le puits`, img: 'icons/small_well.gif'},
+        {mode: 'digs', label: $localize`Fouilles`, img: 'building/small_dig.gif'},
+        {mode: 'doors', label: $localize`Entrées / Sorties`, img: 'log/door_open.gif'},
+        {mode: 'telescope', label: $localize`Téléscope`, img: 'item/item_scope.gif'}
     ];
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
