@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.26.0
+// @version      1.0.27.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,9 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Modification] Retrait de la notion de "priorité" dans la liste de courses et affichage des couleurs en fonction de la position\n\n`
-    + `[Correctif] La copie du registre ne copie plus les lignes masquées par le filtre\n`;
-+`[Correctifs] Divers correctifs dont dont je me rappelle plus le détail parce que ça fait longtemps que j'ai pas fait de mise à jour`;
+    + `[Correctif] Correctif du calcul du camping sur la case\n\n`
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -7253,7 +7251,7 @@ function displayCampingPredict() {
                 let hidden_campers = document.createElement('input');
                 hidden_campers.type = 'number';
                 hidden_campers.id = 'hidden-campers';
-                hidden_campers.value = conf.hidden_campers;
+                hidden_campers.value = conf.hiddenCampers;
                 hidden_campers.classList.add('inline');
                 hidden_campers.addEventListener('change', ($event) => {
                     conf.hidden_campers = +$event.srcElement.value;
@@ -9602,12 +9600,12 @@ function updateExternalTools() {
                     x: +position[0],
                     y: +position[1],
                     scoutNextCells: {
-                        north: +document.querySelector('.scout-sense-north')?.querySelector('text')?.innerText ?? undefined,
-                        east: +document.querySelector('.scout-sense-east')?.querySelector('text')?.innerText ?? undefined,
-                        south: +document.querySelector('.scout-sense-south')?.querySelector('text')?.innerText ?? undefined,
-                        west: +document.querySelector('.scout-sense-west')?.querySelector('text')?.innerText ?? undefined
+                        north: +document.querySelector('.scout-sense-north')?.querySelector('text')?.innerHTML ?? undefined,
+                        east: +document.querySelector('.scout-sense-east')?.querySelector('text')?.innerHTML ?? undefined,
+                        south: +document.querySelector('.scout-sense-south')?.querySelector('text')?.innerHTML ?? undefined,
+                        west: +document.querySelector('.scout-sense-west')?.querySelector('text')?.innerHTML ?? undefined
                     },
-                    scoutZoneLvl: +zone_scout_level_src.replace(/\D/g, '') ?? undefined,
+                    scoutZoneLvl: +fixMhCompiledImg(zone_scout_level_src).replace(/\D/g, '') ?? undefined,
                     citizenId: citizen_list.map((citizen) => citizen.id)
                 }
 
@@ -10169,7 +10167,7 @@ function saveEstimations(estim_value, planif_value) {
 }
 
 function calculateCamping(camping_parameters) {
-    if (camping_parameters.camping < 0 || camping_parameters === null || camping_parameters === undefined || camping_parameters === '') {
+    if (camping_parameters.camping < 0 || camping_parameters.camping === null || camping_parameters.camping === undefined || camping_parameters.camping === '') {
         camping_parameters.camping = 0;
     }
     return new Promise((resolve, reject) => {
