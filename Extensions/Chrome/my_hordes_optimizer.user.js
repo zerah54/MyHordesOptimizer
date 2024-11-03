@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.27.0
+// @version      1.0.28.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -7254,7 +7254,7 @@ function displayCampingPredict() {
                 hidden_campers.value = conf.hiddenCampers;
                 hidden_campers.classList.add('inline');
                 hidden_campers.addEventListener('change', ($event) => {
-                    conf.hidden_campers = +$event.srcElement.value;
+                    conf.hiddenCampers = +$event.srcElement.value;
                     calculateCamping(conf);
                 })
                 hidden_campers_div.appendChild(hidden_campers_label);
@@ -10167,8 +10167,8 @@ function saveEstimations(estim_value, planif_value) {
 }
 
 function calculateCamping(camping_parameters) {
-    if (camping_parameters.camping < 0 || camping_parameters.camping === null || camping_parameters.camping === undefined || camping_parameters.camping === '') {
-        camping_parameters.camping = 0;
+    if (camping_parameters.campings < 0 || camping_parameters.campings === null || camping_parameters.campings === undefined || camping_parameters.campings === '') {
+        camping_parameters.campings = 0;
     }
     return new Promise((resolve, reject) => {
         fetcher(api_url + '/Camping/Calculate',
