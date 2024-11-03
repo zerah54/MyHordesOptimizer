@@ -3,6 +3,7 @@ using MyHordesOptimizerApi.Configuration.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Abstract;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -34,17 +35,33 @@ namespace MyHordesOptimizerApi.Repository.Impl.ExternalTools
 
         public async Task UpdateAsync()
         {
-            var url = AddParameterToQuery($"{FataMorganaConfiguration.Url}/{_endpointUpdateMyZone}", _parameterUserKey, UserKeyProvider.UserKey);
-            var response = base.Post(url: url, body: null);
+            try
+            {
+                var url = AddParameterToQuery($"{FataMorganaConfiguration.Url}/{_endpointUpdateMyZone}", _parameterUserKey, UserKeyProvider.UserKey);
+                var response = base.Post(url: url, body: null);
+            }
+            catch (Exception e)
+            {
+                Logger.LogWarning(e, e.Message);
+                throw;
+            }
         }
 
         public async Task UpdateAsync(int chaosX, int chaosY, int deadZombie)
         {
-            var url = AddParameterToQuery($"{FataMorganaConfiguration.Url}/{_endpointUpdateMyZone}", _parameterUserKey, UserKeyProvider.UserKey);
-            url = AddParameterToQuery(url, _parameterChaosX, chaosX);
-            url = AddParameterToQuery(url, _parameterChaosY, chaosY);
-            url = AddParameterToQuery(url, _parameterDeadZombies, deadZombie);
-            var response = base.Post(url: url, body: null);
+            try
+            {
+                var url = AddParameterToQuery($"{FataMorganaConfiguration.Url}/{_endpointUpdateMyZone}", _parameterUserKey, UserKeyProvider.UserKey);
+                url = AddParameterToQuery(url, _parameterChaosX, chaosX);
+                url = AddParameterToQuery(url, _parameterChaosY, chaosY);
+                url = AddParameterToQuery(url, _parameterDeadZombies, deadZombie);
+                var response = base.Post(url: url, body: null);
+            }
+            catch (Exception e)
+            {
+                Logger.LogWarning(e, e.Message);
+                throw;
+            }
         }
     }
 }
