@@ -139,11 +139,19 @@ builder.Services.AddScoped<ITownService, TownService>();
 // Add the discord client to services
 builder.Services.AddSingleton(new DiscordSocketClient(new DiscordSocketConfig
 {
-    GatewayIntents = GatewayIntents.AllUnprivileged 
+    GatewayIntents = GatewayIntents.AllUnprivileged
                      & ~GatewayIntents.GuildScheduledEvents
                      & ~GatewayIntents.GuildInvites,
-})); 
-builder.Services.AddSingleton<InteractionService>();        // Add the interaction service to services
+}));
+builder.Services.AddSingleton(sp =>
+{
+    var client = sp.GetRequiredService<DiscordSocketClient>();
+    return new InteractionService(client, new InteractionServiceConfig
+    {
+        DefaultRunMode = RunMode.Async,
+        LogLevel = LogSeverity.Info
+    });
+});
 var jsonLocalizationManager = new JsonLocalizationManager(
         basePath: Path.Combine("DiscordBot", "Assets"),
         fileName: "messages"

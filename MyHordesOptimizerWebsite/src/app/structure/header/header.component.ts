@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Component, EventEmitter, HostBinding, HostListener, inject, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostBinding, HostListener, inject, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
@@ -11,7 +11,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbar, MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Title } from '@angular/platform-browser';
-import { Subject, takeUntil } from 'rxjs';
+import { skip, Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
@@ -20,8 +20,9 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { Me } from '../../_abstract_model/types/me.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
 import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
-import { getExternalAppId, getTown, getUser, setExternalAppId } from '../../shared/utilities/localstorage.util';
+import { getExternalAppId, getTown, getUser, setExternalAppId, setTokenWithMeWithExpirationDate } from '../../shared/utilities/localstorage.util';
 import { CitizenMenuComponent } from './citizen-menu/citizen-menu.component';
+import { HeaderService } from './header.service';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage, FormsModule];
 const components: Imports = [CitizenMenuComponent];
@@ -35,7 +36,7 @@ const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFie
     standalone: true,
     imports: [...angular_common, ...components, ...material_modules, ...pipes]
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
@@ -60,6 +61,7 @@ export class HeaderComponent {
     private title_service: Title = inject(Title);
     private authentication_api: AuthenticationService = inject(AuthenticationService);
     private town_service: TownService = inject(TownService);
+    private header_service: HeaderService = inject(HeaderService);
 
     @AutoDestroy private destroy_sub: Subject<void> = new Subject();
 
@@ -72,6 +74,17 @@ export class HeaderComponent {
         this.title = this.title_service.getTitle();
     }
 
+    public ngOnInit(): void {
+        this.header_service.token_obs
+            .pipe(skip(1))
+            .subscribe((token: string | null) => {
+                if (this.external_app_id_field_value !== token) {
+                    this.external_app_id_field_value = token;
+                    this.saveExternalAppId();
+                }
+            })
+    }
+
     /** Enregistre le nouvel id d'app externe */
     public saveExternalAppId(): void {
         setExternalAppId(this.external_app_id_field_value);
@@ -81,7 +94,8 @@ export class HeaderComponent {
     /** Supprime l'identifiant d'app externe */
     public disconnect(): void {
         setExternalAppId(null);
-        this.updateMe();
+        setTokenWithMeWithExpirationDate();
+        location.reload();
     }
 
     /** Mise à jour des outils externes */

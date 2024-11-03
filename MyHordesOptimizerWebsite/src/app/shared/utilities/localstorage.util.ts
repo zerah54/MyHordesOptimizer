@@ -111,12 +111,16 @@ export function getTokenWithMeWithExpirationDate(): TokenWithMe | null {
     }
 }
 
-export function setTokenWithMeWithExpirationDate(token: TokenWithMe): void {
-    const element_with_expiration: ElementWithExpiration<TokenWithMeDTO | null> = {
-        expire_at: moment(token.token.valid_to),
-        element: token.modelToDto()
-    };
-    localStorage.setItem(TOKEN_KEY, JSON.stringify(element_with_expiration));
+export function setTokenWithMeWithExpirationDate(token?: TokenWithMe): void {
+    if (token) {
+        const element_with_expiration: ElementWithExpiration<TokenWithMeDTO | null> = {
+            expire_at: moment(token.token.valid_to),
+            element: token.modelToDto()
+        };
+        localStorage.setItem(TOKEN_KEY, JSON.stringify(element_with_expiration));
+    } else {
+        localStorage.removeItem(TOKEN_KEY)
+    }
 }
 
 interface ElementWithExpiration<T> {

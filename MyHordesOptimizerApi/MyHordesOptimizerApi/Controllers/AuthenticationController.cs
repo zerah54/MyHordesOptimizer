@@ -43,5 +43,17 @@ namespace MyHordesOptimizerApi.Controllers
                 Token = token
             };
         }
+
+        [HttpPost]
+        [Route("ExternalLogin")]
+        public async Task<ActionResult<AuthenticationResponseDto>> PostExternalLogin([FromForm] string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return BadRequest($"{nameof(key)} cannot be empty");
+            }
+            
+            return Redirect($"http://localhost:4200/login?token={key}");
+        }
     }
 }
