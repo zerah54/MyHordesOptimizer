@@ -1,0 +1,74 @@
+<mat-card-header class="mho-minesweeper-header">
+    <mat-card-title i18n>Démineur</mat-card-title>
+    <div class="actions">
+
+        <mat-button-toggle-group [(ngModel)]="selected_theme">
+            @for (theme of themes_list; track theme.id) {
+                <mat-button-toggle [value]="theme">{{ theme.label }}</mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+
+        <mat-button-toggle-group [(ngModel)]="selected_size" (change)="resetGame()">
+            @for (size of sizes_list; track size.id) {
+                <mat-button-toggle [value]="size">{{ size.label }}</mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+    </div>
+</mat-card-header>
+<mat-card-content class="mho-minesweeper">
+    @if (selected_size.id === 'custom') {
+        <div>
+            <mat-form-field>
+                <mat-label i18n>Largeur</mat-label>
+                <input matInput type="number" [(ngModel)]="selected_size.width" (ngModelChange)="resetGame()">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label i18n>Hauteur</mat-label>
+                <input matInput type="number" [(ngModel)]="selected_size.height" (ngModelChange)="resetGame()">
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label i18n>Nombre de mines</mat-label>
+                <input matInput type="number" [(ngModel)]="selected_size.mines" (ngModelChange)="resetGame()">
+            </mat-form-field>
+        </div>
+    }
+
+    <div class="game-container" [ngClass]="selected_theme.id">
+        <div class="game-header">
+            <div class="remain-mines">{{ remaining_mines }}</div>
+            <div class="state" [ngClass]="{
+            'lose': game_over && remaining_mines > 0,
+            'play': !game_over,
+            'win': game_over && remaining_mines === 0,
+            'clicked': ''
+            }" (click)="resetGame()">
+            </div>
+            <div class="timer">{{ timer }}</div>
+        </div>
+        <div class="game-board">
+            @for (row of board; track i; let i = $index) {
+                <div class="row">
+                    @for (cell of row; track j; let j = $index) {
+                        <div [ngClass]="{
+                                'cell': true,
+                                'revealed': cell.is_revealed,
+                                'flagged': cell.is_flagged,
+                                'questioned': cell.is_questioned,
+                                'highlighted': cell.is_highlighted,
+                                'mined': cell.is_mine && !cell.is_flagged && game_over,
+                                'game-over': cell.is_mine && cell.is_game_over && game_over,
+                                'no-bomb': !cell.is_mine && cell.is_flagged && game_over
+                             }"
+                             class="{{cell.is_revealed && !cell.is_flagged && !cell.is_mine ? 'revealed-' + cell.adjacent_mines : ''}}"
+                             (click)="revealCell(i, j)"
+                             (contextmenu)="cycleMarker(i, j, $event)"
+                             (mousedown)="highlightAdjacentCells(i, j, $event)"
+                             (mouseup)="unhighlightCells()"
+                             (mouseleave)="unhighlightCells()">
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</mat-card-content>

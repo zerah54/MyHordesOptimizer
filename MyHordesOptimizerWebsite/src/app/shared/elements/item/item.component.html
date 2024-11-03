@@ -78,7 +78,7 @@
 
                     @if (item.properties && item.properties.length > 0) {
                         <mat-divider></mat-divider>
-                        @for (property of item.properties; track property.key) {
+                        @for (property of item.properties; track $index) {
                             <div>
                                 @if (property?.value?.img && property?.value?.img !== '') {
                                     <img [ngSrc]="HORDES_IMG_REPO + property?.value?.img" width="16" height="16">{{ property?.value?.label }}
@@ -89,7 +89,7 @@
 
                     @if (item.actions && item.actions.length > 0) {
                         <mat-divider></mat-divider>
-                        @for (action of item.actions; track action.key) {
+                        @for (action of item.actions; track $index) {
                             <div>
                                 @if (action?.value?.img && action?.value?.img !== '') {
                                     <img [ngSrc]="HORDES_IMG_REPO + action?.value?.img" width="16" height="16">{{ action?.value?.label }}

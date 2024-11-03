@@ -99,7 +99,7 @@
                                         }
                                         @case ('heroic_actions') {
                                             <div class="heroic-actions">
-                                                @for (action of (row.heroic_actions?.content || []); track action.element?.key) {
+                                                @for (action of (row.heroic_actions?.content || []); track $index) {
                                                     <div class="lvl-element" [class.full-width]="action.element.value.max_lvl > 1">
                                                         @if (action.element.value.max_lvl > 1) {
                                                             <mat-form-field [appearance]="'outline'" class="short-bottom compact-field">
@@ -125,7 +125,7 @@
                                         }
                                         @case ('home') {
                                             <div class="home">
-                                                @for (home of (row.home?.content || []); track home.element?.key) {
+                                                @for (home of (row.home?.content || []); track $index) {
                                                     <div class="lvl-element" [class.third-width]="home.element.value.max_lvl > 1">
                                                         @if (home.element.value.max_lvl > 1) {
                                                             <mat-form-field [appearance]="'outline'" class="short-bottom compact-field">

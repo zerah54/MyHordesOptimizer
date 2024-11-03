@@ -1,0 +1,122 @@
+@use 'variables';
+
+.mho-minesweeper-header {
+  justify-content: space-between;
+
+  .actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.mho-minesweeper {
+  .game-container {
+
+    width: fit-content;
+
+    .game-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1em;
+
+      .state {
+        height: 26px;
+        width: 26px;
+
+        &.lose {
+          background-image: url('/assets/img/minesweeper/lose.gif');
+        }
+
+        &.play {
+          background-image: url('/assets/img/minesweeper/smile.gif');
+        }
+
+        &.win {
+          background-image: url('/assets/img/minesweeper/win.gif');
+        }
+
+        &.clicked {
+
+        }
+      }
+
+    }
+
+    .game-board {
+      display: inline-block;
+      cursor: default;
+    }
+
+    .row {
+      display: flex;
+    }
+
+    .cell {
+      width: 16px;
+      height: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Styles pour le thème legacy */
+    &.legacy {
+      .cell {
+
+        &:not(.revealed):not(.flagged):not(.questioned):not(.highlighted) {
+          background-image: url('/assets/img/minesweeper/blank.gif');
+        }
+
+        &.revealed {
+          @for $i from 0 through 8 {
+            &.revealed-#{$i} {
+              background-image: url('/assets/img/minesweeper/open#{$i}.gif');
+            }
+          }
+
+          &.mined {
+            background-image: url('/assets/img/minesweeper/bombrevealed.gif');
+
+            &.game-over {
+              background-image: url('/assets/img/minesweeper/bombdeath.gif');
+            }
+          }
+        }
+
+        &.flagged {
+          background-image: url('/assets/img/minesweeper/bombflagged.gif');
+        }
+
+        &.questioned {
+          background-image: url('/assets/img/minesweeper/bombquestion.gif');
+        }
+
+        &.no-bomb {
+          background-image: url('/assets/img/minesweeper/nobomb.gif');
+        }
+
+        &.highlighted {
+          background-image: url('/assets/img/minesweeper/blank.gif');
+        }
+      }
+
+      .game-header {
+        .remain-mines {
+
+        }
+      }
+    }
+
+    /* Styles pour le thème moderne */
+    //&.modern {
+    //}
+
+    /* Styles pour le thème myhordes */
+    &.myhordes {
+
+    }
+  }
+}

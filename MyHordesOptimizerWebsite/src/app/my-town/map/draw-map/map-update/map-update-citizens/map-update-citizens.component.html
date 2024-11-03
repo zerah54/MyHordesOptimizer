@@ -9,7 +9,7 @@
                     }
                 </th>
                 <th i18n>Sac</th>
-                @for (action of heroics; track action.key) {
+                @for (action of heroics; track $index) {
                     <th><img [ngSrc]="HORDES_IMG_REPO + action.value.img" [title]="action.value.label" width="16" height="16"></th>
                 }
             </tr>
@@ -26,7 +26,7 @@
                                 <img [ngSrc]="HORDES_IMG_REPO + item.img" [class.broken]="item.is_broken" [title]="item.label[locale]" width="16" height="16">
                             }
                         </td>
-                        @for (action of heroics; track action.key) {
+                        @for (action of heroics; track $index) {
                             <td>
                                 @if (citizen.heroic_actions | remainingHeroicAction:action; as value_left) {
                                     @if (action.value.max_lvl > 1) {

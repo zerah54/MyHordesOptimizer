@@ -53,7 +53,7 @@ namespace MyHordesOptimizerApi.Controllers
                 return BadRequest($"{nameof(key)} cannot be empty");
             }
             
-            return Redirect($"http://localhost:4200/login?token={key}");
+            return Redirect($"https://myhordes-optimizer.web.app/login?token={key}");
         }
     }
 }

@@ -61,7 +61,7 @@
     </mat-menu>
     <mat-menu #heroicActions (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
               class="mho-menu-citizen-details heroic-actions">
-        @for (action of (citizen.heroic_actions?.content || []); track action.element.key) {
+        @for (action of (citizen.heroic_actions?.content || []); track $index) {
             <div mat-menu-item [role]="action.element.value.max_lvl > 1 ? 'menuitem': 'menuitemcheckbox'" (click)="$event.stopPropagation();">
                 @if (action.element.value.max_lvl > 1) {
                     <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
@@ -84,7 +84,7 @@
     </mat-menu>
     <mat-menu #home (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
               class="mho-menu-citizen-details home">
-        @for (home of (citizen.home?.content || []); track home.element.key) {
+        @for (home of (citizen.home?.content || []); track $index) {
             <div mat-menu-item [role]="home.element.value.max_lvl > 1 ? 'menuitem': 'menuitemcheckbox'" (click)="$event.stopPropagation();">
                 @if (home.element.value.max_lvl > 1) {
                     <mat-form-field [appearance]="'outline'" class="no-bottom compact-field">
