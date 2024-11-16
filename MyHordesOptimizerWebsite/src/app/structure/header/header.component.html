@@ -18,16 +18,33 @@
             </button>
         }
     }
-    <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
-        @if (saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === '') {
-            <ng-container i18n>Se connecter</ng-container>
-        } @else if (me && me.username && me.username !== '') {
-            {{ me.username }}
-        } @else {
-            <ng-container i18n>Utilisateur inconnu</ng-container>
-        }
-    </button>
 
+    @if (is_dev) {
+        <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
+            @if (saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === '') {
+                <ng-container i18n>Se connecter</ng-container>
+            } @else if (me && me.username && me.username !== '') {
+                {{ me.username }}
+            } @else {
+                <ng-container i18n>Utilisateur inconnu</ng-container>
+            }
+        </button>
+    } @else {
+        @if (saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === '') {
+            <a mat-button type="button" class="profil-button" [href]="'https://myhordes.eu/jx/disclaimer/22'">
+                <ng-container i18n>Se connecter</ng-container>
+            </a>
+        } @else if (me && me.username && me.username !== '') {
+            <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
+                {{ me.username }}
+            </button>
+        } @else {
+            <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
+                <ng-container i18n>Utilisateur inconnu</ng-container>
+            </button>
+        }
+    }
+    
     <mat-menu #userMenu="matMenu">
         @if (!saved_external_app_id) {
             <div mat-menu-item (click)="$event.stopPropagation()">

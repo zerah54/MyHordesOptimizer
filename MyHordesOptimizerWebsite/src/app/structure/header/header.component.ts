@@ -11,6 +11,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbar, MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Title } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 import { skip, Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
@@ -70,7 +71,7 @@ export class HeaderComponent implements OnInit {
         this.is_gt_xs = this.breakpoint_observer.isMatched(BREAKPOINTS['gt-xs']);
     }
 
-    public constructor(private breakpoint_observer: BreakpointObserver) {
+    public constructor(public router: Router, private breakpoint_observer: BreakpointObserver) {
         this.title = this.title_service.getTitle();
     }
 
