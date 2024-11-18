@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.28.0
+// @version      1.0.29.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Correctif du calcul du camping sur la case\n\n`
+    + `[Correctif] Les boutons pour incrémenter les valeurs des chantiers avaient disparu\n\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -2371,6 +2371,7 @@ function createSelectWithSearch() {
     let select = document.createElement('label');
 
     let input = document.createElement('input');
+    input.classList.add('mho-input');
     input.type = 'text';
     input.autocomplete = 'off';
 
@@ -2662,7 +2663,7 @@ function createParams(content) {
             let param_input = document.createElement('input');
             param_input.type = 'checkbox';
             param_input.id = param.id + '_input';
-            param_input.classList.add('mho-first-level-param');
+            param_input.classList.add('mho-input', 'mho-first-level-param');
             param_input.checked = mho_parameters && mho_parameters[param.id] ? mho_parameters[param.id] : false;
             param_input_div.appendChild(param_input);
 
@@ -2741,7 +2742,7 @@ function createParams(content) {
                     let child_param_input = document.createElement('input');
                     child_param_input.type = 'checkbox';
                     child_param_input.id = param_child.id + '_input';
-                    child_param_input.classList.add('mho-second-level-param');
+                    child_param_input.classList.add('mho-input', 'mho-second-level-param');
                     child_param_input.checked = mho_parameters && mho_parameters[param_child.id] ? mho_parameters[param_child.id] : false;
                     child_input_div.appendChild(child_param_input);
 
@@ -2954,7 +2955,7 @@ function createWikiToolsTabs(window_type) {
     let tabs_ul = document.createElement('ul');
 
     let current_tabs_list = tabs_list[window_type]
-        .filter((tab) => mh_user.townDetails.townId || !tab.needs_town)
+        .filter((tab) => mh_user.townDetails?.townId || !tab.needs_town)
         .sort((a, b) => {
             if (a.ordering > b.ordering) {
                 return 1;
@@ -3209,7 +3210,7 @@ function displayItems(filtered_items, tab_id) {
         item_title_container.setAttribute('style', 'flex: 1; cursor: pointer;');
         item_title_and_add_container.appendChild(item_title_container)
 
-        if ((tab_id === 'bank' || tab_id === 'items') && item.wishListCount === 0 && mh_user.townDetails.townId) {
+        if ((tab_id === 'bank' || tab_id === 'items') && item.wishListCount === 0 && mh_user.townDetails?.townId) {
             let item_add_to_wishlist = document.createElement('div');
             item_add_to_wishlist.classList.add('add-to-wishlist');
             item_title_and_add_container.appendChild(item_add_to_wishlist);
@@ -3326,6 +3327,7 @@ function displayCitizens() {
                                 break;
                             case 'nombreJourHero':
                                 var input = document.createElement('input');
+                                input.classList.add('mho-input');
                                 input.type = 'number';
                                 input.value = citizen[header_cell.id]
                                 cell.appendChild(input);
@@ -3503,6 +3505,7 @@ function displayCamping() {
         vest_label.htmlFor = 'vest';
         vest_label.innerHTML = `<img src="${repo_img_hordes_url}emotes/proscout.gif"> ${getI18N(texts.vest)}`;
         let vest = document.createElement('input');
+        vest.classList.add('mho-input');
         vest.type = 'checkbox';
         vest.id = 'vest';
         vest.checked = conf.vest;
@@ -3521,6 +3524,7 @@ function displayCamping() {
         pro_camper_label.htmlFor = 'pro';
         pro_camper_label.innerHTML = `<img src="${repo_img_hordes_url}status/status_camper.gif"> ${getI18N(texts.pro_camper)}`;
         let pro_camper = document.createElement('input');
+        pro_camper.classList.add('mho-input');
         pro_camper.type = 'checkbox';
         pro_camper.id = 'pro';
         pro_camper.checked = conf.pro;
@@ -3539,6 +3543,7 @@ function displayCamping() {
         tomb_label.htmlFor = 'tomb';
         tomb_label.innerHTML = `<img src="${repo_img_hordes_url}building/small_cemetery.gif"> ${getI18N(texts.tomb)}`;
         let tomb = document.createElement('input');
+        tomb.classList.add('mho-input');
         tomb.type = 'checkbox';
         tomb.id = 'tomb';
         tomb.checked = conf.tomb;
@@ -3561,7 +3566,7 @@ function displayCamping() {
         nb_campings.type = 'number';
         nb_campings.id = 'nb-campings';
         nb_campings.value = conf.campings;
-        nb_campings.classList.add('inline');
+        nb_campings.classList.add('mho-input', 'inline');
         nb_campings.addEventListener('change', ($event) => {
             conf.campings = +$event.srcElement.value;
             calculateCamping(conf);
@@ -3582,7 +3587,7 @@ function displayCamping() {
         objects_in_bag.type = 'number';
         objects_in_bag.id = 'nb-objects';
         objects_in_bag.value = conf.objects;
-        objects_in_bag.classList.add('inline');
+        objects_in_bag.classList.add('mho-input', 'inline');
         objects_in_bag.addEventListener('change', ($event) => {
             conf.objects = +$event.srcElement.value;
             calculateCamping(conf);
@@ -3644,7 +3649,7 @@ function displayCamping() {
         digs.type = 'number';
         digs.id = 'digs';
         digs.value = conf.ruinBuryCount;
-        digs.classList.add('inline');
+        digs.classList.add('mho-input', 'inline');
         digs.addEventListener('change', ($event) => {
             conf.ruinBuryCount = +$event.srcElement.value;
             calculateCamping(conf);
@@ -3665,7 +3670,7 @@ function displayCamping() {
         distance.type = 'number';
         distance.id = 'distance';
         distance.value = conf.distance;
-        distance.classList.add('inline');
+        distance.classList.add('mho-input', 'inline');
         distance.addEventListener('change', ($event) => {
             conf.distance = +$event.srcElement.value;
             calculateCamping(conf);
@@ -3685,7 +3690,7 @@ function displayCamping() {
         zombies.type = 'number';
         zombies.id = 'nb-zombies';
         zombies.value = conf.zombies;
-        zombies.classList.add('inline');
+        zombies.classList.add('mho-input', 'inline');
         zombies.addEventListener('change', ($event) => {
             conf.zombies = +$event.srcElement.value;
             calculateCamping(conf);
@@ -3705,7 +3710,7 @@ function displayCamping() {
         improve.type = 'number';
         improve.id = 'nb-improve';
         improve.value = conf.improve;
-        improve.classList.add('inline');
+        improve.classList.add('mho-input', 'inline');
         improve.addEventListener('change', ($event) => {
             conf.improve = +$event.srcElement.value;
             calculateCamping(conf);
@@ -3725,7 +3730,7 @@ function displayCamping() {
         object_improve.type = 'number';
         object_improve.id = 'nb-object-improve';
         object_improve.value = conf.objectImprove;
-        object_improve.classList.add('inline');
+        object_improve.classList.add('mho-input', 'inline');
         object_improve.addEventListener('change', ($event) => {
             conf.objectImprove = +$event.srcElement.value;
             calculateCamping(conf);
@@ -3745,7 +3750,7 @@ function displayCamping() {
         hidden_campers.type = 'number';
         hidden_campers.id = 'hidden-campers';
         hidden_campers.value = conf.hiddenCampers;
-        hidden_campers.classList.add('inline');
+        hidden_campers.classList.add('mho-input', 'inline');
         hidden_campers.addEventListener('change', ($event) => {
             conf.hiddenCampers = +$event.srcElement.value;
             calculateCamping(conf);
@@ -3764,6 +3769,7 @@ function displayCamping() {
         night.type = 'checkbox';
         night.id = 'night';
         night.checked = conf.night;
+        night.classList.add('mho-input');
         night.addEventListener('change', ($event) => {
             conf.night = $event.srcElement.checked;
             calculateCamping(conf);
@@ -3782,6 +3788,7 @@ function displayCamping() {
         devastated.type = 'checkbox';
         devastated.id = 'devastated';
         devastated.checked = conf.devastated;
+        devastaded.classList.add('mho-input');
         devastated.addEventListener('change', ($event) => {
             conf.devastated = $event.srcElement.checked;
             calculateCamping(conf);
@@ -3801,6 +3808,7 @@ function displayCamping() {
         phare.type = 'checkbox';
         phare.id = 'phare';
         phare.checked = conf.phare;
+        phare.classList.add('mho-input');
         phare.addEventListener('change', ($event) => {
             conf.phare = $event.srcElement.checked;
             calculateCamping(conf);
@@ -4397,7 +4405,7 @@ function displaySearchFieldOnBuildings() {
             let search_field = document.createElement('input');
             search_field.type = 'text';
             search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_buildings').label);
-            search_field.classList.add('inline');
+            search_field.classList.add('mho-input', 'inline');
             search_field.setAttribute('style', 'min-width: 200px; padding-left: 24px;');
             search_field_div.appendChild(search_field);
 
@@ -4452,7 +4460,7 @@ function displaySearchFieldOnRecipientList() {
             search_field.type = 'text';
             search_field.id = mho_search_recipient_field_id;
             search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_recipients').label);
-            search_field.classList.add('inline');
+            search_field.classList.add('mho-input', 'inline');
             search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
 
             search_field.addEventListener('keyup', (event) => {
@@ -4520,7 +4528,7 @@ function displaySearchFieldOnDump() {
                 search_field = document.createElement('input');
                 search_field.type = 'text';
                 search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_dump').label);
-                search_field.classList.add('inline');
+                search_field.classList.add('mho-input', 'inline');
                 search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
 
                 search_field_container.appendChild(search_field);
@@ -4532,6 +4540,7 @@ function displaySearchFieldOnDump() {
                 can_be_dumped_input.type = 'checkbox';
                 can_be_dumped_input.id = 'can_be_dumped';
                 can_be_dumped_input.checked = true;
+                can_be_dumped_input.classList.add('mho-input');
                 can_be_dumped.appendChild(can_be_dumped_input);
 
                 let can_be_dumped_label = document.createElement('label');
@@ -4546,6 +4555,7 @@ function displaySearchFieldOnDump() {
                 can_be_recovered_input.type = 'checkbox';
                 can_be_recovered_input.id = 'can_be_recovered';
                 can_be_recovered_input.checked = true;
+                can_be_recovered_input.classList.add('mho-input');
                 can_be_recovered.appendChild(can_be_recovered_input);
 
                 let can_be_recovered_label = document.createElement('label');
@@ -4596,6 +4606,7 @@ function displaySearchFieldOnRegistry() {
             search_field = document.createElement('input');
             search_field.type = 'text';
             search_field.id = mho_search_registry_field_id;
+            search_field.classList.add('mho-input');
             search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_registry').label);
             search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
 
@@ -5288,8 +5299,8 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             break;
         case 'hero_surv_1':
             if (mh_user.townDetails) {
-                var days = mh_user.townDetails.day;
-                var devastated = mh_user.townDetails.isDevaste;
+                var days = mh_user.townDetails?.day;
+                var devastated = mh_user.townDetails?.isDevaste;
                 var chances = 1;
                 if (days >= 20) {
                     chances = 0.50;
@@ -6956,7 +6967,7 @@ function displayCampingPredict() {
                     ruin = all_ruins.find((one_ruin) => getI18N(one_ruin.label).toLowerCase() === zone_ruin.innerText.toLowerCase()).id;
                 }
                 let conf = {
-                    townType: mh_user.townDetails.townType.toUpperCase(),
+                    townType: mh_user.townDetails?.townType.toUpperCase(),
                     job: jobs.find((job) => mh_user.jobDetails.uid === job.img)?.id,
                     distance: document.querySelector('.zone-dist > div > b')?.innerText.replace('km', ''), // OK
                     campings: 0,
@@ -6967,7 +6978,7 @@ function displayCampingPredict() {
                     tomb: false,
                     zombies: document.querySelectorAll('.actor.zombie')?.length || 0,
                     night: !!document.querySelector('.map.night'),
-                    devastated: mh_user.townDetails.isDevaste,
+                    devastated: mh_user.townDetails?.isDevaste,
                     phare: false,
                     improve: 0,
                     objectImprove: 0,
@@ -7031,6 +7042,7 @@ function displayCampingPredict() {
                 vest.type = 'checkbox';
                 vest.id = 'vest';
                 vest.checked = conf.vest;
+                vest.classList.add('mho-input');
                 vest.addEventListener('change', ($event) => {
                     conf.vest = $event.srcElement.checked;
                     calculateCamping(conf);
@@ -7049,6 +7061,7 @@ function displayCampingPredict() {
                 pro_camper.type = 'checkbox';
                 pro_camper.id = 'pro';
                 pro_camper.checked = conf.pro;
+                pro_camper.classList.add('mho-input');
                 pro_camper.addEventListener('change', ($event) => {
                     conf.proCamper = $event.srcElement.checked;
                     calculateCamping(conf);
@@ -7067,6 +7080,7 @@ function displayCampingPredict() {
                 tomb.type = 'checkbox';
                 tomb.id = 'tomb';
                 tomb.checked = conf.tomb;
+                tomb.classList.add('mho-input');
                 tomb.addEventListener('change', ($event) => {
                     conf.tomb = $event.srcElement.checked;
                     calculateCamping(conf);
@@ -7086,7 +7100,7 @@ function displayCampingPredict() {
                 nb_campings.type = 'number';
                 nb_campings.id = 'nb-campings';
                 nb_campings.value = conf.campings;
-                nb_campings.classList.add('inline');
+                nb_campings.classList.add('mho-input', 'inline');
                 nb_campings.addEventListener('change', ($event) => {
                     conf.campings = +$event.srcElement.value;
                     calculateCamping(conf);
@@ -7107,7 +7121,7 @@ function displayCampingPredict() {
                 objects_in_bag.type = 'number';
                 objects_in_bag.id = 'nb-objects';
                 objects_in_bag.value = conf.objects;
-                objects_in_bag.classList.add('inline');
+                objects_in_bag.classList.add('mho-input', 'inline');
                 objects_in_bag.addEventListener('change', ($event) => {
                     conf.objects = +$event.srcElement.value;
                     calculateCamping(conf);
@@ -7172,7 +7186,7 @@ function displayCampingPredict() {
                 digs.type = 'number';
                 digs.id = 'digs';
                 digs.value = conf.ruinBuryCount;
-                digs.classList.add('inline');
+                digs.classList.add('mho-input', 'inline');
                 digs.addEventListener('change', ($event) => {
                     conf.ruinBuryCount = +$event.srcElement.value;
                     calculateCamping(conf);
@@ -7192,7 +7206,7 @@ function displayCampingPredict() {
                 zombies.type = 'number';
                 zombies.id = 'nb-zombies';
                 zombies.value = conf.zombies;
-                zombies.classList.add('inline');
+                zombies.classList.add('mho-input', 'inline');
                 zombies.addEventListener('change', ($event) => {
                     conf.zombies = +$event.srcElement.value;
                     calculateCamping(conf);
@@ -7212,7 +7226,7 @@ function displayCampingPredict() {
                 improve.type = 'number';
                 improve.id = 'nb-improve';
                 improve.value = conf.improve;
-                improve.classList.add('inline');
+                improve.classList.add('mho-input', 'inline');
                 improve.addEventListener('change', ($event) => {
                     conf.improve = +$event.srcElement.value;
                     calculateCamping(conf);
@@ -7232,7 +7246,7 @@ function displayCampingPredict() {
                 object_improve.type = 'number';
                 object_improve.id = 'nb-object-improve';
                 object_improve.value = conf.objectImprove;
-                object_improve.classList.add('inline');
+                object_improve.classList.add('mho-input', 'inline');
                 object_improve.addEventListener('change', ($event) => {
                     conf.objectImprove = +$event.srcElement.value;
                     calculateCamping(conf);
@@ -7252,7 +7266,7 @@ function displayCampingPredict() {
                 hidden_campers.type = 'number';
                 hidden_campers.id = 'hidden-campers';
                 hidden_campers.value = conf.hiddenCampers;
-                hidden_campers.classList.add('inline');
+                hidden_campers.classList.add('mho-input', 'inline');
                 hidden_campers.addEventListener('change', ($event) => {
                     conf.hiddenCampers = +$event.srcElement.value;
                     calculateCamping(conf);
@@ -7271,6 +7285,7 @@ function displayCampingPredict() {
                 night.type = 'checkbox';
                 night.id = 'night';
                 night.checked = conf.night;
+                night.classList.add('mho-input');
                 night.addEventListener('change', ($event) => {
                     conf.night = $event.srcElement.checked;
                     calculateCamping(conf);
@@ -7290,6 +7305,7 @@ function displayCampingPredict() {
                 phare.type = 'checkbox';
                 phare.id = 'phare';
                 phare.checked = conf.phare;
+                phare.classList.add('mho-input');
                 phare.addEventListener('change', ($event) => {
                     conf.phare = $event.srcElement.checked;
                     calculateCamping(conf);
@@ -8295,12 +8311,12 @@ function createStyles() {
         + 'margin-right: 0;'
         + '}';
 
-    const input_number_webkit_style = 'input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {'
+    const input_number_webkit_style = 'input.mho-input::-webkit-outer-spin-button, input.mho-input::-webkit-inner-spin-button {'
         + '-webkit-appearance: none;'
         + 'margin: 0;'
         + '}';
 
-    const input_number_firefox_style = 'input[type=number] {'
+    const input_number_firefox_style = 'input.mho-input[type=number] {'
         + '-moz-appearance: textfield;'
         + '}';
 
@@ -8845,7 +8861,7 @@ function getGHRuin() {
 /** Récupère la carte de GH */
 function getBBHMap() {
     return new Promise((resolve, reject) => {
-        fetcher(`https://bbh.fred26.fr/?cid=5-${mh_user.townDetails.townId}&pg=map`)
+        fetcher(`https://bbh.fred26.fr/?cid=5-${mh_user.townDetails?.townId}&pg=map`)
             .then((response) => {
                 if (response.status === 200) {
                     return response.text();
@@ -9188,7 +9204,7 @@ function getFMRuin() {
 
 function getItems() {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + '/Fetcher/items' + (mh_user && mh_user.townDetails && mh_user.townDetails.townId > 0 ? ('?townId=' + mh_user.townDetails.townId) : ''))
+        fetcher(api_url + '/Fetcher/items' + (mh_user && mh_user.townDetails && mh_user.townDetails?.townId > 0 ? ('?townId=' + mh_user.townDetails?.townId) : ''))
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -9273,7 +9289,7 @@ function getToken(force, stop) {
             let tokenReceived = async () => {
                 console.log('MHO - I am...', mh_user);
 
-                if (mh_user !== '' && mh_user.townDetails.townId) {
+                if (mh_user !== '' && mh_user.townDetails?.townId) {
                     let get_items_promise = getItems();
                     let get_wishlist_promise = getWishlist();
                     if (pageIsDesert()) {
@@ -9299,7 +9315,7 @@ function getToken(force, stop) {
                     .then((response) => {
                         token = response;
                         mh_user = token.simpleMe;
-                        if (!mh_user || mh_user.id === 0 && mh_user.townDetails.townId === 0) {
+                        if (!mh_user || mh_user.id === 0 && mh_user.townDetails?.townId === 0) {
                             mh_user = '';
                         }
                         setStorageItem(mh_user_key, mh_user);
@@ -9335,7 +9351,7 @@ function getToken(force, stop) {
 function getCitizens() {
     return new Promise((resolve, reject) => {
         getHeroSkills().then((hero_skills) => {
-            fetcher(api_url + `/Fetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails.townId}`)
+            fetcher(api_url + `/Fetcher/citizens?userId=${mh_user.id}&townId=${mh_user.townDetails?.townId}`)
                 .then((response) => {
                     if (response.status === 200) {
                         return response.json();
@@ -9396,7 +9412,7 @@ function getBank() {
 /** Récupère les informations de liste de course */
 function getWishlist() {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + '/wishlist?townId=' + mh_user.townDetails.townId)
+        fetcher(api_url + '/wishlist?townId=' + mh_user.townDetails?.townId)
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -9448,7 +9464,7 @@ function getWishlist() {
  */
 function addItemToWishlist(item) {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + '/wishlist/add/' + item.id + '?userId=' + mh_user.id + '&townId=' + mh_user.townDetails.townId, {
+        fetcher(api_url + '/wishlist/add/' + item.id + '?userId=' + mh_user.id + '&townId=' + mh_user.townDetails?.townId, {
             method: 'POST'
         })
             .then((response) => {
@@ -9495,18 +9511,18 @@ function updateExternalTools() {
         let nb_dead_zombies = +document.querySelectorAll('.actor.splatter').length;
 
         data.townDetails = {
-            townX: mh_user.townDetails.townX,
-            townY: mh_user.townDetails.townY,
-            townid: mh_user.townDetails.townId,
-            isDevaste: mh_user.townDetails.isDevaste,
+            townX: mh_user.townDetails?.townX,
+            townY: mh_user.townDetails?.townY,
+            townid: mh_user.townDetails?.townId,
+            isDevaste: mh_user.townDetails?.isDevaste,
         };
 
         data.map = {}
         data.map.toolsToUpdate = {
             isBigBrothHordes: mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : 'none',
-            isFataMorgana: mho_parameters && mho_parameters.update_fata ? (pageIsDesert() && ((mho_parameters.update_fata_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_fata_devastated && mh_user.townDetails.isDevaste)) ? 'cell' : 'api') : 'none',
-            isGestHordes: mho_parameters && mho_parameters.update_gh ? (pageIsDesert() && ((mho_parameters.update_gh_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_gh_devastated && mh_user.townDetails.isDevaste)) ? 'cell' : 'api') : 'none',
-            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? (pageIsDesert() && ((mho_parameters.update_mho_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_mho_devastated && mh_user.townDetails.isDevaste)) ? 'cell' : 'api') : 'none'
+            isFataMorgana: mho_parameters && mho_parameters.update_fata ? (pageIsDesert() && ((mho_parameters.update_fata_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_fata_devastated && mh_user.townDetails?.isDevaste)) ? 'cell' : 'api') : 'none',
+            isGestHordes: mho_parameters && mho_parameters.update_gh ? (pageIsDesert() && ((mho_parameters.update_gh_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_gh_devastated && mh_user.townDetails?.isDevaste)) ? 'cell' : 'api') : 'none',
+            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? (pageIsDesert() && ((mho_parameters.update_mho_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_mho_devastated && mh_user.townDetails?.isDevaste)) ? 'cell' : 'api') : 'none'
         };
 
         let position = getCurrentPosition();
@@ -9525,7 +9541,7 @@ function updateExternalTools() {
 
         // Mise à jour en ville dévastée
         if (((mho_parameters.update_gh && mho_parameters.update_gh_devastated) || (mho_parameters.update_mho && mho_parameters.update_mho_devastated) || (mho_parameters.update_fata && mho_parameters.update_fata_devastated))
-            && pageIsDesert() && mh_user.townDetails.isDevaste) {
+            && pageIsDesert() && mh_user.townDetails?.isDevaste) {
             let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
                 let item = convertImgToItem(desert_item.querySelector('img'));
                 return {id: item?.id, isBroken: desert_item.classList.contains('broken')};
@@ -9801,7 +9817,7 @@ function updateExternalTools() {
         if (pageIsDesert() && (mho_parameters.update_mho && mho_parameters.update_mho_digs)) {
             data.successedDig = {};
             data.successedDig.cell = {
-                day: mh_user.townDetails.day,
+                day: mh_user.townDetails?.day,
                 x: +position[0],
                 y: +position[1]
             }
@@ -10054,7 +10070,7 @@ function getParameters() {
 
 function getMap() {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + '/Fetcher/map?townId=' + mh_user.townDetails.townId)
+        fetcher(api_url + '/Fetcher/map?townId=' + mh_user.townDetails?.townId)
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -10075,7 +10091,7 @@ function getMap() {
 
 function getEstimations() {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + `/AttaqueEstimation/Estimations/${mh_user.townDetails.day}?townId=${mh_user.townDetails.townId}`)
+        fetcher(api_url + `/AttaqueEstimation/Estimations/${mh_user.townDetails?.day}?townId=${mh_user.townDetails?.townId}`)
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -10089,9 +10105,9 @@ function getEstimations() {
                     today_attack: undefined,
                     tomorrow_attack: undefined
                 }
-                getApofooAttackCalculation(mh_user.townDetails.day, false).then((today_result) => {
+                getApofooAttackCalculation(mh_user.townDetails?.day, false).then((today_result) => {
                     estimations.today_attack = today_result;
-                    getApofooAttackCalculation(mh_user.townDetails.day + 1, false).then((tomorrow_result) => {
+                    getApofooAttackCalculation(mh_user.townDetails?.day + 1, false).then((tomorrow_result) => {
                         estimations.tomorrow_attack = tomorrow_result;
                         resolve(estimations);
                     });
@@ -10106,7 +10122,7 @@ function getEstimations() {
 
 function getApofooAttackCalculation(day, beta) {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + `/attaqueEstimation/apofooAttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${mh_user.townDetails.townId}`)
+        fetcher(api_url + `/attaqueEstimation/apofooAttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${mh_user.townDetails?.townId}`)
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -10141,7 +10157,7 @@ function saveEstimations(estim_value, planif_value) {
                 new_estimations.planif = {...new_estimations_workaround_planif};
             }
 
-            fetcher(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails.townId}&userId=${mh_user.id}`, {
+            fetcher(api_url + `/AttaqueEstimation/Estimations?townId=${mh_user.townDetails?.townId}&userId=${mh_user.id}`, {
                 method: 'POST',
                 body: JSON.stringify(new_estimations),
                 headers: {
@@ -10202,7 +10218,7 @@ function calculateCamping(camping_parameters) {
 
 function getMyExpeditions() {
     return new Promise((resolve, reject) => {
-        fetcher(api_url + `/expeditions/me/${mh_user.townDetails.day}`,
+        fetcher(api_url + `/expeditions/me/${mh_user.townDetails?.day}`,
             {
                 method: 'GET',
                 headers: {
@@ -10232,7 +10248,7 @@ function saveBath(bath_taken) {
     if (bath_taken === undefined) return;
 
     return new Promise((resolve, reject) => {
-        fetcher(api_url + `/town/${mh_user.townDetails.townId}/user/${mh_user.id}/bath?day=${mh_user.townDetails.day}`,
+        fetcher(api_url + `/town/${mh_user.townDetails?.townId}/user/${mh_user.id}/bath?day=${mh_user.townDetails?.day}`,
             {
                 method: bath_taken ? 'POST' : 'DELETE',
             })
