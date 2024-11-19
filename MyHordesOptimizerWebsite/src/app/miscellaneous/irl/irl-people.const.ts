@@ -27,7 +27,6 @@ export const people: IrlPeople[] = [
     {id: 'Katoptris', towns: ['BB']},
     {id: 'Cessouu', towns: ['FHv2']},
     {id: 'Étoile de Feu', towns: ['FHv2', 'BB']},
-    {id: 'Paulo', towns: ['FHv2']},
 ];
 
 export interface IrlPeople {
