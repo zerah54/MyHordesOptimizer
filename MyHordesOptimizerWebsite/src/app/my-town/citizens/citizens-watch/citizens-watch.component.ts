@@ -18,7 +18,6 @@ import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { AutoDestroy } from '../../../shared/decorators/autodestroy.decorator';
 import { CitizenInfoComponent } from '../../../shared/elements/citizen-info/citizen-info.component';
-import { DigComponent } from '../../../shared/elements/dig/dig.component';
 import {
     HeaderWithNumberPreviousNextFilterComponent
 } from '../../../shared/elements/lists/header-with-number-previous-next/header-with-number-previous-next-filter.component';
@@ -29,7 +28,7 @@ import { BathForDayPipe } from '../bath-for-day.pipe';
 import { CitizenGroupByBathStatePipe } from './citizen-group-by-bath_state.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgClass];
-const components: Imports = [DigComponent, HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
+const components: Imports = [HeaderWithNumberPreviousNextFilterComponent, HeaderWithSelectFilterComponent, CitizenInfoComponent];
 const pipes: Imports = [BathForDayPipe, CitizenGroupByBathStatePipe, ColumnIdPipe];
 const material_modules: Imports = [MatCheckboxModule, MatSlideToggleModule, MatSortModule, MatTableModule, MatButtonToggleModule];
 
@@ -59,8 +58,8 @@ export class CitizensWatchComponent implements OnInit {
     public citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** La liste des colonnes */
     public readonly columns: StandardColumn[] = [
-        { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
-        ...Array.from({ length: getTown()?.day || 1 }, (_: unknown, i: number): StandardColumn => {
+        {id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true},
+        ...Array.from({length: getTown()?.day || 1}, (_: unknown, i: number): StandardColumn => {
             return {
                 id: (i + 1).toString(10),
                 header: $localize`Jour` + ' ' + (i + 1).toString(10),
@@ -108,7 +107,7 @@ export class CitizensWatchComponent implements OnInit {
                         if (bath_to_update_index > -1) {
                             citizen.baths[bath_to_update_index].update_info = update_info;
                         } else {
-                            citizen.baths.push(new Bath({ day: day, lastUpdateInfo: update_info.modelToDto() }));
+                            citizen.baths.push(new Bath({day: day, lastUpdateInfo: update_info.modelToDto()}));
                         }
                     }
                 });

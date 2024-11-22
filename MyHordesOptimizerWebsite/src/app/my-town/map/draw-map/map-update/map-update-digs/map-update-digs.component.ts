@@ -1,4 +1,4 @@
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,7 +21,7 @@ import { getTown } from '../../../../../shared/utilities/localstorage.util';
 import { DigsPerDayPipe } from './digs-per-day.pipe';
 import { NotInListCitizenDigPipe } from './not-in-list-citizen.pipe';
 
-const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
+const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [HeaderWithNumberPreviousNextFilterComponent, CitizenInfoComponent];
 const pipes: Imports = [DigsPerDayPipe, NotInListCitizenDigPipe];
 const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatListModule, MatMenuModule];

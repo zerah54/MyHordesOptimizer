@@ -2,6 +2,8 @@
 
     z-index: 3;
     height: 52px !important;
+    overflow-x: auto;
+    overflow-y: hidden;
 
     .title {
         margin-right: 1em;

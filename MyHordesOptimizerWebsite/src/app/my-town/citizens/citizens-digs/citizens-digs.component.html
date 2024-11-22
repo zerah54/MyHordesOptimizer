@@ -18,7 +18,8 @@
                                                                              [header]="column.header"
                                                                              [(filterValue)]="filters.selected_day"
                                                                              (filterValueChange)="citizen_filter_change.next()"
-                                                                             [min]="1" [max]="current_day">
+                                                                             [min]="1" [max]="current_day"
+                                                                             [displayFirstLast]="true">
                                 </mho-header-with-number-previous-next-filter>
                             }
                         }

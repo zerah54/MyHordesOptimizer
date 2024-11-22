@@ -11,9 +11,11 @@
 
     @if (visible) {
         <mat-form-field (click)="$event.stopPropagation();" class="short-bottom">
-            <button mat-icon-button type="button" matPrefix [disabled]="filterValue === min" (click)="filterValueChange.next(min)">
-                <mat-icon>first_page</mat-icon>
-            </button>
+            @if (displayFirstLast) {
+                <button mat-icon-button type="button" matPrefix [disabled]="filterValue === min" (click)="filterValueChange.next(min)">
+                    <mat-icon>first_page</mat-icon>
+                </button>
+            }
             <button mat-icon-button type="button" matPrefix [disabled]="filterValue === min" (click)="filterValueChange.next(+filterValue - 1)">
                 <mat-icon>arrow_back_ios</mat-icon>
             </button>
@@ -21,9 +23,11 @@
             <button mat-icon-button type="button" matSuffix [disabled]="filterValue === max" (click)="filterValueChange.next(+filterValue + 1)">
                 <mat-icon>arrow_forward_ios</mat-icon>
             </button>
-            <button mat-icon-button type="button" matSuffix [disabled]="filterValue === max" (click)="filterValueChange.next(max)">
-                <mat-icon>last_page</mat-icon>
-            </button>
+            @if (displayFirstLast) {
+                <button mat-icon-button type="button" matSuffix [disabled]="filterValue === max" (click)="filterValueChange.next(max)">
+                    <mat-icon>last_page</mat-icon>
+                </button>
+            }
         </mat-form-field>
     }
 </div>

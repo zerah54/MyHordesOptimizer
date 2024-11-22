@@ -26,9 +26,11 @@ export class HeaderWithNumberPreviousNextFilterComponent implements OnInit {
 
     @Input() header!: string;
     @Input() textAlign?: string = 'left';
+    @Input({required: true}) displayFirstLast: boolean = false;
 
     @Input() min: number = 1;
     @Input() max: number = 1;
+
 
     @Input() filterValue!: number;
     @Output() filterValueChange: EventEmitter<number> = new EventEmitter<number>();
