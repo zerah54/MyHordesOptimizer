@@ -89,6 +89,7 @@ $recipes = [
     'com049' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['angryc_#00'], 'provoking' => 'pet_snake2_#00', 'in' => ['pet_snake2_#00', 'cutter_#00']],
     'com050' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['pumpkin_off_#00'], 'provoking' => 'pumpkin_raw_#00', 'in' => ['pumpkin_raw_#00', 'small_knife_#00'], 'keep' => ['small_knife_#00']],
     'com051' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['infect_poison_#00'], 'provoking' => 'infect_poison_part_#00', 'in' => ['infect_poison_part_#00', 'drug_#00', 'pharma_#00', 'water_#00', 'drug_water_#00']],
+    'com052' => ['type' => 'Recipe::ManualAnywhere', 'out' => ['bike_#00'], 'provoking' => 'bike_#00', 'in' => ['bike_#00', 'rustine_#00', 'metal_#00', 'chain_#00']],
 ];
 
 foreach ($recipes as &$recipe) {

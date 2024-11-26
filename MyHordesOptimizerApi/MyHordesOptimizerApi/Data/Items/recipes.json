@@ -1065,5 +1065,18 @@
             "water_#00",
             "drug_water_#00"
         ]
+    },
+    "com052": {
+        "type": "Recipe::ManualAnywhere",
+        "out": [
+            "bike_#00"
+        ],
+        "provoking": "bike_#00",
+        "in": [
+            "bike_#00",
+            "rustine_#00",
+            "metal_#00",
+            "chain_#00"
+        ]
     }
 }

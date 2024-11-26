@@ -9,6 +9,7 @@ $ruins = [
         'electro_box_#00' => 8,
         'chair_basic_#00' => 5,
         'cdelvi_#00' => 1,
+        'bike_part_#00' => 1,
     ], 'desc' => 'Hier wohnte ein Bürger, der  sich außerhalb der Stadt niedergelassen hat, weil er den Streitigkeiten und dem Verrat, die das Stadtleben mit sich bringt, entfliehen wollte. Die Hälfte seiner Leiche liegt immer noch im Wohnzimmer.'],
 
     // id 41
@@ -58,6 +59,7 @@ $ruins = [
         'courroie_#00' => 10,
         'pocket_belt_#00' => 10,
         'radio_off_#00' => 5,
+        'bike_part_#00' => 1,
     ], 'desc' => 'Ein altes Fahrradverleihlager, das mit Metallstücken, Werkzeugen und allen Arten von Schutt übersät ist.'],
 
     // id 53
@@ -1009,7 +1011,10 @@ $ruins = [
 
     // id 101
     'sports_crow' => ["label" => "Die Sportkrähe", 'icon' => 'sports_crow', "camping" => 10, "min_dist" => 0, "max_dist" => 100, "chance" => 0, "empty" => 1, "drops" => [
-    ], 'desc' => 'Das Grab der ehemaligen Sportler...'],
+    ], 'desc' => 'Das Grab der ehemaligen Sportler...',
+        'drops' => [
+            "bike_part_#00" => 1
+        ]],
 
 ];
 

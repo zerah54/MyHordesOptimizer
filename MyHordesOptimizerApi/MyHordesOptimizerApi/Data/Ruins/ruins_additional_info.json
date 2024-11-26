@@ -252,5 +252,8 @@
             150,
             164
         ]
+    },
+    "sports_crow": {
+        "capacity": 2
     }
 }
