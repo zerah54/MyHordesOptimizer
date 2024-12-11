@@ -1,15 +1,15 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { Entry } from '../../../../_abstract_model/interfaces';
-import { CitizenInfo } from '../../../../_abstract_model/types/citizen-info.class';
-import { Citizen } from '../../../../_abstract_model/types/citizen.class';
-import { normalizeString } from '../../../../shared/utilities/string.utils';
+import { Entry } from '../../../_abstract_model/interfaces';
+import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { normalizeString } from '../../../shared/utilities/string.utils';
 
 
 @Pipe({
-    name: 'citizenUseDiceOrCards',
+    name: 'isCitizenInEntries',
     standalone: true,
 })
-export class CitizenUseDiceOrCardsPipe implements PipeTransform {
+export class IsCitizenInEntriesPipe implements PipeTransform {
     transform(entries: Entry[], complete_citizen_list: CitizenInfo, reverse?: boolean): Citizen[] {
         const citizen_for_entry: Citizen[] = [];
         let citizen_to_write: Citizen[] = [];

@@ -16,15 +16,16 @@ import { Imports } from '../../../_abstract_model/types/_types';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { BankDiffRegistryComponent } from './bank-diff/bank-diff-registry.component';
-import { DiceCardsRegistryComponent } from './dice-cards/dice-cards-registry.component';
+import { BuildingsRegistryComponent } from './buildings/buildings-registry.component';
 import { DigsRegistryComponent } from './digs/digs-registry.component';
 import { DoorsRegistryComponent } from './doors/doors-registry.component';
+import { PlaysRegistryComponent } from './plays/plays-registry.component';
 import { TelescopeRegistryComponent } from './telescope/telescope-registry.component';
 import { WellRegistryComponent } from './well/well-registry.component';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
-const components: Imports = [BankDiffRegistryComponent, DiceCardsRegistryComponent, DigsRegistryComponent, DoorsRegistryComponent, WellRegistryComponent,
-    TelescopeRegistryComponent];
+const components: Imports = [BankDiffRegistryComponent, PlaysRegistryComponent, DigsRegistryComponent, DoorsRegistryComponent, WellRegistryComponent,
+    TelescopeRegistryComponent, BuildingsRegistryComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatFormFieldModule, MatInputModule, MatTooltipModule];
 
@@ -50,12 +51,13 @@ export class RegistryComponent implements OnInit {
     public display_pseudo: DisplayPseudoMode = 'simple';
 
     public tabs: Tab[] = [
-        {mode: 'plays', label: $localize`Dés / Cartes`, img: 'item/item_game_box.gif'},
+        {mode: 'plays', label: $localize`Dés / Cartes / Ballon`, img: 'item/item_game_box.gif'},
         {mode: 'bank_diff', label: $localize`Différenciel de la banque`, img: 'icons/home.gif'},
         {mode: 'well', label: $localize`Prises dans le puits`, img: 'icons/small_well.gif'},
         {mode: 'digs', label: $localize`Fouilles`, img: 'building/small_dig.gif'},
         {mode: 'doors', label: $localize`Entrées / Sorties`, img: 'log/door_open.gif'},
-        {mode: 'telescope', label: $localize`Téléscope`, img: 'item/item_scope.gif'}
+        {mode: 'telescope', label: $localize`Téléscope`, img: 'item/item_scope.gif'},
+        {mode: 'buildings', label: $localize`Utilisation des chantiers`, img: 'icons/home.gif'}
     ];
 
     public readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
@@ -97,7 +99,7 @@ export class RegistryComponent implements OnInit {
 
 }
 
-type RegistryMode = 'dice' | 'card' | 'digs' | 'bank_diff' | 'well' | 'plays' | 'doors' | 'telescope' | undefined;
+type RegistryMode = 'dice' | 'card' | 'digs' | 'bank_diff' | 'well' | 'plays' | 'doors' | 'telescope' | 'buildings' | undefined;
 
 interface Tab {
     mode: RegistryMode;

@@ -39,9 +39,9 @@ export class MaxActiveCalculatorComponent implements OnInit {
         header: '',
         highlight_day: true,
         columns: [
-            { id: 'header', header: $localize`Jour` },
-            ...Array.from({ length: 50 }, (_: unknown, i: number) => {
-                return { id: '' + (i + 1), header: '' + (i + 1) };
+            {id: 'header', header: $localize`Jour`},
+            ...Array.from({length: 50}, (_: unknown, i: number) => {
+                return {id: '' + (i + 1), header: '' + (i + 1)};
             })
         ],
         table: new MatTableDataSource()
@@ -52,16 +52,16 @@ export class MaxActiveCalculatorComponent implements OnInit {
     }
 
     protected getMaxActiveZombies(day: number): string {
-        const max_active: number = Math.round((+day + 1) * Math.max(1.0, (+day + 1) / 10)) * Math.max(15, this.nb_citizen);
+        const max_active: number = Math.min(10 + 2 * Math.floor(Math.max(0, day - 10) / 2), Math.ceil(this.nb_citizen * 1.0));
         return formatNumber(max_active, this.locale, '1.0-2');
     }
 
     protected buildDatasource(): void {
         this.max_active_by_day.table = new MatTableDataSource([
             <{ [key: string]: string | number | null; }>{
-                ...{ header: $localize`Débordement maximum` },
-                ...Array.from({ length: 50 }, (_: unknown, i: number) => {
-                    return { key: '' + (i + 1), value: this.getMaxActiveZombies(i + 1) };
+                ...{header: $localize`Débordement maximum`},
+                ...Array.from({length: 50}, (_: unknown, i: number) => {
+                    return {key: '' + (i + 1), value: this.getMaxActiveZombies(i + 1)};
                 }).reduce((r: Record<string, string>, e: { key: string, value: string }) => {
                     r[e.key] = e.value;
                     return r;
