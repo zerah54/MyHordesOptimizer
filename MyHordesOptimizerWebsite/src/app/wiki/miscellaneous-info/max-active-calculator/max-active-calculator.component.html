@@ -7,11 +7,16 @@
 
 <mat-dialog-content class="mho-max-active-calculator">
     <small i18n>Le débordement dépend du jour et du nombre de citoyens en vie. Il dépend peut être également du nombre de citoyens présents en ville.</small>
-    <div class="nb-citizen">
+    <div class="options">
         <mat-form-field appearance="outline">
             <mat-label i18n>Nombre de citoyens en ville</mat-label>
             <input matInput type="number" [(ngModel)]="nb_citizen" [min]="0" (ngModelChange)="buildDatasource()">
         </mat-form-field>
+        <mat-form-field appearance="outline">
+            <mat-label i18n>Niveau d'habitation maximum</mat-label>
+            <input matInput type="number" [(ngModel)]="habitation_max_level" [min]="0" [max]="8" (ngModelChange)="buildDatasource()">
+        </mat-form-field>
+        <mat-checkbox [(ngModel)]="guitar_played" (ngModelChange)="buildDatasource()" i18n>Guitare jouée</mat-checkbox>
     </div>
     <div class="table-container">
         <table mat-table [dataSource]="max_active_by_day.table">

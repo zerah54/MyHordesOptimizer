@@ -8,6 +8,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
     public town_y!: number;
     public town_max_x!: number;
     public town_max_y!: number;
+    public is_chaos!: boolean;
     public is_devaste!: boolean;
     public day!: number;
     public town_type!: TownTypeId;
@@ -24,6 +25,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
             townY: this.town_y,
             townMaxX: this.town_max_x,
             townMaxY: this.town_max_y,
+            isChaos: this.is_chaos,
             isDevaste: this.is_devaste,
             day: this.day,
             townType: this.town_type
@@ -37,6 +39,7 @@ export class TownDetails extends CommonModel<TownDetailsDTO> {
             this.town_y = dto.townY;
             this.town_max_x = dto.townMaxX;
             this.town_max_y = dto.townMaxY;
+            this.is_chaos = dto.isChaos;
             this.is_devaste = dto.isDevaste;
             this.day = dto.day;
             this.town_type = dto.townType;

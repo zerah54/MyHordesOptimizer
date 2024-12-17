@@ -19,7 +19,7 @@
 
 .mho-max-active-calculator {
 
-    div.nb-citizen {
+    div.options {
         margin-top: 0.25em;
     }
 
@@ -37,6 +37,7 @@
 
             th:not(.mat-column-header), td:not(.mat-column-header) {
                 text-align: center;
+                white-space: nowrap;
             }
         }
     }

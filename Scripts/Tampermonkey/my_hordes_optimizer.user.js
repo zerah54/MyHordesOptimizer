@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.29.0
+// @version      1.0.30.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,8 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Les boutons pour incrémenter les valeurs des chantiers avaient disparu\n\n`;
+    + `[Correctif] Libellé dans le tooltip des objets (l'info "en sac" était affichée au lieu de "en banque")\n`
+    + `[Correctif] La mise à jour en chaos ne fonctionnait pas\n\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -1013,10 +1014,10 @@ let params_categories = [
                     {
                         id: `update_mho_devastated`,
                         label: {
-                            en: `Zone update even after the town has been devastated`,
-                            fr: `Mise à jour en ville dévastée`,
+                            en: `Zone update even after the town is in Chaos`,
+                            fr: `Mise à jour quand la ville est en Chaos`,
                             de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
-                            es: `Actualización en pueblo devastado`
+                            es: `Actualización de zona cuando los pueblo está sumida en el caos`
                         },
                     },
                     {
@@ -1143,10 +1144,10 @@ let params_categories = [
                     {
                         id: `update_gh_devastated`,
                         label: {
-                            en: `Zone update even after the town has been devastated`,
-                            fr: `Mise à jour en ville dévastée`,
+                            en: `Zone update even after the town is in Chaos`,
+                            fr: `Mise à jour quand la ville est en Chaos`,
                             de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
-                            es: `Actualización en pueblo devastado`
+                            es: `Actualización de zona cuando los pueblo está sumida en el caos`
                         },
                     },
                     {
@@ -1229,10 +1230,10 @@ let params_categories = [
                     {
                         id: `update_fata_devastated`,
                         label: {
-                            en: `Zone update even after the town has been devastated`,
-                            fr: `Mise à jour en ville dévastée`,
+                            en: `Zone update even after the town is in Chaos`,
+                            fr: `Mise à jour quand la ville est en Chaos`,
                             de: `Zonen-Update, nachdem die Stadt bereits zerstört wurde`,
-                            es: `Actualización en pueblo devastado`
+                            es: `Actualización de zona cuando los pueblo está sumida en el caos`
                         },
                     },
                     {
@@ -5094,6 +5095,7 @@ function displayAdvancedTooltips() {
             }, 1000);
         }
 
+        console.log('hovered_item', hovered_item);
         let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
         let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
 
@@ -5130,7 +5132,7 @@ function createAdvancedProperties(content, item, tooltip) {
 
         let bank_div = document.createElement('div');
         bank_div.style.width = 'calc(50% - 0.5em)';
-        bank_div.innerText = getI18N(wishlist_headers[3].label) + ' : ' + item.bankCount;
+        bank_div.innerText = getI18N(wishlist_headers.find((header) => header.id === 'bank_count').label) + ' : ' + item.bankCount;
         stock_div.appendChild(bank_div);
 
         let wishlist_for_zone = getWishlistForZone();
@@ -9514,15 +9516,15 @@ function updateExternalTools() {
             townX: mh_user.townDetails?.townX,
             townY: mh_user.townDetails?.townY,
             townid: mh_user.townDetails?.townId,
-            isDevaste: mh_user.townDetails?.isDevaste,
+            isChaos: mh_user.townDetails?.isChaos,
         };
 
         data.map = {}
         data.map.toolsToUpdate = {
             isBigBrothHordes: mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : 'none',
-            isFataMorgana: mho_parameters && mho_parameters.update_fata ? (pageIsDesert() && ((mho_parameters.update_fata_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_fata_devastated && mh_user.townDetails?.isDevaste)) ? 'cell' : 'api') : 'none',
-            isGestHordes: mho_parameters && mho_parameters.update_gh ? (pageIsDesert() && ((mho_parameters.update_gh_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_gh_devastated && mh_user.townDetails?.isDevaste)) ? 'cell' : 'api') : 'none',
-            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? (pageIsDesert() && ((mho_parameters.update_mho_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_mho_devastated && mh_user.townDetails?.isDevaste)) ? 'cell' : 'api') : 'none'
+            isFataMorgana: mho_parameters && mho_parameters.update_fata ? (pageIsDesert() && ((mho_parameters.update_fata_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_fata_devastated && mh_user.townDetails?.isChaos)) ? 'cell' : 'api') : 'none',
+            isGestHordes: mho_parameters && mho_parameters.update_gh ? (pageIsDesert() && ((mho_parameters.update_gh_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_gh_devastated && mh_user.townDetails?.isChaos)) ? 'cell' : 'api') : 'none',
+            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? (pageIsDesert() && ((mho_parameters.update_mho_killed_zombies && nb_dead_zombies > 0) || (mho_parameters.update_mho_devastated && mh_user.townDetails?.isChaos)) ? 'cell' : 'api') : 'none'
         };
 
         let position = getCurrentPosition();
@@ -9539,9 +9541,9 @@ function updateExternalTools() {
             citizen_list = [{id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid}];
         }
 
-        // Mise à jour en ville dévastée
+        // Mise à jour en ville chaos
         if (((mho_parameters.update_gh && mho_parameters.update_gh_devastated) || (mho_parameters.update_mho && mho_parameters.update_mho_devastated) || (mho_parameters.update_fata && mho_parameters.update_fata_devastated))
-            && pageIsDesert() && mh_user.townDetails?.isDevaste) {
+            && pageIsDesert() && mh_user.townDetails?.isChaos) {
             let objects = Array.from(document.querySelector('.inventory.desert')?.querySelectorAll('li.item') || []).map((desert_item) => {
                 let item = convertImgToItem(desert_item.querySelector('img'));
                 return {id: item?.id, isBroken: desert_item.classList.contains('broken')};

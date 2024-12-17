@@ -50,6 +50,7 @@ namespace MyHordesOptimizerApi.MappingProfiles
                 .ForMember(dest => dest.TownY, opt => { opt.MapFrom(src => src.Map.City.Y); opt.Condition(src => src.Map != null && src.Map.City != null); })
                 .ForMember(dest => dest.TownMaxX, opt => { opt.MapFrom(src => src.Map.Wid); opt.Condition(src => src.Map != null); })
                 .ForMember(dest => dest.TownMaxY, opt => { opt.MapFrom(src => src.Map.Hei); opt.Condition(src => src.Map != null); })
+                .ForMember(dest => dest.IsChaos, opt => { opt.MapFrom(src => src.Map.City.Chaos); opt.Condition(src => src.Map != null && src.Map.City != null); })
                 .ForMember(dest => dest.IsDevaste, opt => { opt.MapFrom(src => src.Map.City.Devast); opt.Condition(src => src.Map != null && src.Map.City != null); })
                 .ForMember(dest => dest.TownType, opt => { opt.MapFrom(src => src.Map.GetTownType()); })
                 .ForMember(dest => dest.Day, opt => { opt.MapFrom(src => src.Map.Days); });

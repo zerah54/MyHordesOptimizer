@@ -22,7 +22,7 @@ import { Town } from '../types/town.class';
 import { UpdateInfo } from '../types/update-info.class';
 import { GlobalService } from './_global.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class TownService extends GlobalService {
 
     /** La locale */
@@ -70,18 +70,18 @@ export class TownService extends GlobalService {
         const town_details: {
             townX: number,
             townY: number,
-            isDevaste: boolean,
+            isChaos: boolean,
             townId: number
         } = {
             townX: getTown()?.town_x || 0,
             townY: getTown()?.town_y || 0,
-            isDevaste: getTown()?.is_devaste || false,
+            isChaos: getTown()?.is_devaste || false,
             townId: getTown()?.town_id || 0
         };
 
         super.post(this.API_URL + `/externaltools/update?userKey=${getExternalAppId()}&userId=${getUserId()}`,
             JSON.stringify({
-                map: { toolsToUpdate: tools_to_update },
+                map: {toolsToUpdate: tools_to_update},
                 townDetails: town_details
             })
         )

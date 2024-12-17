@@ -85,7 +85,7 @@ export class MiscellaneousInfoComponent {
             columns: [
                 {id: 'day', header: $localize`Jour`},
                 {id: 'max', header: $localize`Débordement maximum`},
-                {id: 'citizen', header: $localize`Nombre de citoyens touchés par le débordement`},
+                {id: 'citizen', header: $localize`Citoyens maximum attaqués`},
             ],
             table: new MatTableDataSource(Array.from({length: 50}, (_: unknown, i: number): { [key: string]: number | string | null } => {
                 return {
@@ -174,11 +174,12 @@ export class MiscellaneousInfoComponent {
     }
 
     private getMaxActiveZombies(day: number): string {
-        return day + '';
+        let max_active: number = Math.round((40 / 3.0) * day * (8 + 1.5) * 1.1)
+        return formatNumber(max_active, this.locale, '1.0-2');
     }
 
     private getTargettedCitizen(day: number): string {
-        const max_active: number = Math.min(10 + 2 * Math.floor(Math.max(0, day - 10) / 2), Math.ceil(40 * 1.0));
-        return formatNumber(max_active, this.locale, '1.0-2');
+        const max_targetted: number = Math.min(10 + 2 * Math.floor(Math.max(0, day - 10) / 2), Math.ceil(40));
+        return formatNumber(max_targetted, this.locale, '1.0-2');
     }
 }

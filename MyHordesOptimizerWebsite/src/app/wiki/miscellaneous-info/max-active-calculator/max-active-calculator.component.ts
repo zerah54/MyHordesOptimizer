@@ -2,6 +2,7 @@ import { CommonModule, formatNumber } from '@angular/common';
 import { Component, HostBinding, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckbox } from '@angular/material/checkbox';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,7 +25,7 @@ const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFiel
     templateUrl: './max-active-calculator.component.html',
     styleUrls: ['./max-active-calculator.component.scss'],
     standalone: true,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes],
+    imports: [...angular_common, ...components, ...material_modules, ...pipes, MatCheckbox],
 })
 export class MaxActiveCalculatorComponent implements OnInit {
     @HostBinding('style.display') display: string = 'contents';
@@ -32,6 +33,8 @@ export class MaxActiveCalculatorComponent implements OnInit {
     public readonly locale: string = moment.locale();
 
     public nb_citizen: number = 40;
+    public habitation_max_level: number = 0;
+    public guitar_played: boolean = false;
     public day: number = 1;
     public my_town: TownDetails | null = getTown();
 
@@ -52,8 +55,14 @@ export class MaxActiveCalculatorComponent implements OnInit {
     }
 
     protected getMaxActiveZombies(day: number): string {
-        const max_active: number = Math.min(10 + 2 * Math.floor(Math.max(0, day - 10) / 2), Math.ceil(this.nb_citizen * 1.0));
-        return formatNumber(max_active, this.locale, '1.0-2');
+        const min_active: number = Math.round((Math.max(10, this.nb_citizen) / 3.0) * day * (this.habitation_max_level + 1) * (this.guitar_played ? 1.1 : 1.0));
+        const max_active: number = Math.round((Math.max(10, this.nb_citizen) / 3.0) * day * (this.habitation_max_level + 1.5) * (this.guitar_played ? 1.1 : 1.0));
+        return formatNumber(min_active, this.locale, '1.0-2') + ' - ' + formatNumber(max_active, this.locale, '1.0-2');
+    }
+
+    private getTargettedCitizen(day: number): string {
+        const max_targetted: number = Math.min(10 + 2 * Math.floor(Math.max(0, day - 10) / 2), Math.ceil(40));
+        return formatNumber(max_targetted, this.locale, '1.0-2');
     }
 
     protected buildDatasource(): void {
@@ -66,7 +75,16 @@ export class MaxActiveCalculatorComponent implements OnInit {
                     r[e.key] = e.value;
                     return r;
                 }, {})
-            }
+            },
+            <{ [key: string]: string | number | null; }>{
+                ...{header: $localize`Citoyens maximum attaqués`},
+                ...Array.from({length: 50}, (_: unknown, i: number) => {
+                    return {key: '' + (i + 1), value: this.getTargettedCitizen(i + 1)};
+                }).reduce((r: Record<string, string>, e: { key: string, value: string }) => {
+                    r[e.key] = e.value;
+                    return r;
+                }, {})
+            },
         ]);
     }
 }

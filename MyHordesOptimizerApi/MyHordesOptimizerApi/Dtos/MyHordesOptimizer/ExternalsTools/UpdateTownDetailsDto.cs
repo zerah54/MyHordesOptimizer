@@ -10,7 +10,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools
         public int TownX { get; set; }
         [JsonProperty("townY")]
         public int TownY { get; set; }
-        [JsonProperty("isDevaste")]
-        public bool IsDevaste { get; set; }
+        [JsonProperty("isChaos")]
+        public bool IsChaos { get; set; }
     }
 }
