@@ -874,23 +874,23 @@
         </context-group>
         <target state="needs-translation">Immunisés</target>
       </trans-unit>
-      <trans-unit id="8664804111267568290" datatype="html">
+      <trans-unit id="8664804111267568290" datatype="html" approved="yes">
         <source><x id="PH" equiv-text="nb"/> potions bues</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-immune/citizen-group-by-immune-state.pipe.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="translated">
-                    <x id="PH" equiv-text="nb"/> potions bues</target>
+        <target state="final">
+                    <x id="PH" equiv-text="nb"/> potions drunk</target>
       </trans-unit>
-      <trans-unit id="1590090738705851179" datatype="html">
+      <trans-unit id="1590090738705851179" datatype="html" approved="yes">
         <source><x id="PH" equiv-text="nb"/> potion bue</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-immune/citizen-group-by-immune-state.pipe.ts</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="translated">
-                    <x id="PH" equiv-text="nb"/> potion bue</target>
+        <target state="final">
+                    <x id="PH" equiv-text="nb"/> potion drunk</target>
       </trans-unit>
       <trans-unit id="7945783910888141498" datatype="html" approved="yes">
         <source>États</source>
@@ -1044,7 +1044,7 @@
         </context-group>
         <target state="final">Bath taken</target>
       </trans-unit>
-      <trans-unit id="1654995770303703868" datatype="html">
+      <trans-unit id="1654995770303703868" datatype="html" approved="yes">
         <source>Potions bues</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens-list/citizens-list.component.html</context>
@@ -1054,7 +1054,7 @@
           <context context-type="sourcefile">src/app/structure/header/citizen-menu/citizen-menu.component.html</context>
           <context context-type="linenumber">34</context>
         </context-group>
-        <target state="needs-translation">Potions bues</target>
+        <target state="final">Potions drunk</target>
       </trans-unit>
       <trans-unit id="5932960630557670586" datatype="html">
         <source>Immunisé</source>
@@ -1228,13 +1228,13 @@
         </context-group>
         <target state="needs-translation">Bains</target>
       </trans-unit>
-      <trans-unit id="5343881027002333937" datatype="html">
+      <trans-unit id="5343881027002333937" datatype="html" approved="yes">
         <source>Immunités</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/citizens/citizens.component.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Immunités</target>
+        <target state="final">Immunities</target>
       </trans-unit>
       <trans-unit id="6351937635910938762" datatype="html" approved="yes">
         <source>Disponibilités</source>
@@ -2936,14 +2936,14 @@
         </context-group>
         <target state="final">Watch weapon</target>
       </trans-unit>
-      <trans-unit id="8559558498834606319" datatype="html">
+      <trans-unit id="8559558498834606319" datatype="html" approved="yes">
         <source>Mis à jour par <x id="INTERPOLATION" equiv-text="{{ lastUpdateInfo.username }}"/> <x id="INTERPOLATION_1" equiv-text="{{ lastUpdateInfo.update_time.fromNow() }}"/>
                 </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/elements/last-update/last-update.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Mis à jour par <x id="INTERPOLATION" equiv-text="{{ lastUpdateInfo.username }}"/> <x id="INTERPOLATION_1" equiv-text="{{ lastUpdateInfo.update_time.fromNow() }}"/>
+        <target state="final">Updated by <x id="INTERPOLATION" equiv-text="{{ lastUpdateInfo.username }}"/> <x id="INTERPOLATION_1" equiv-text="{{ lastUpdateInfo.update_time.fromNow() }}"/>
                 </target>
       </trans-unit>
       <trans-unit id="3130710248919896495" datatype="html" approved="yes">
@@ -2982,14 +2982,14 @@
         </context-group>
         <target state="final">This field is required</target>
       </trans-unit>
-      <trans-unit id="3497151032813605747" datatype="html">
+      <trans-unit id="3497151032813605747" datatype="html" approved="yes">
         <source>Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> et <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Développé par <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> et <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
+        <target state="final">Developed by <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://myhordes.eu/jx/soul/6042&quot;&gt;"/>Zerah<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> and <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhordes.eu/jx/soul/6173&quot;&gt;"/>Renack<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
       </trans-unit>
       <trans-unit id="3288296146842467237" datatype="html" approved="yes">
@@ -3004,24 +3004,24 @@
         </context-group>
         <target state="final">Special Thanks</target>
       </trans-unit>
-      <trans-unit id="5186837657495593523" datatype="html">
+      <trans-unit id="5186837657495593523" datatype="html" approved="yes">
         <source>Ce site n&apos;est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">17,18</context>
         </context-group>
-        <target state="needs-translation">Ce site n'est pas affilié à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
+        <target state="final">This site is not affiliated with <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> or <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
       </trans-unit>
-      <trans-unit id="239352375316430833" datatype="html">
+      <trans-unit id="239352375316430833" datatype="html" approved="yes">
         <source>Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/footer/footer.component.html</context>
           <context context-type="linenumber">20,21</context>
         </context-group>
-        <target state="needs-translation">Certains éléments graphiques appartiennent à <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> ou à <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
+        <target state="final">Certain graphic elements are copyrighted by <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://motion-twin.com/fr/&quot; target=&quot;_blank&quot;&gt;"/>Motion Twin<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> or <x id="START_LINK_1" equiv-text="&lt;a                 href=&quot;https://myhord.es&quot; target=&quot;_blank&quot;&gt;"/>MyHordes<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>
                 </target>
       </trans-unit>
       <trans-unit id="3984780497725315833" datatype="html" approved="yes">
@@ -3332,7 +3332,7 @@
         </context-group>
         <target state="final">Miscellaneous information</target>
       </trans-unit>
-      <trans-unit id="1240364028521909633" datatype="html">
+      <trans-unit id="1240364028521909633" datatype="html" approved="yes">
         <source>Villes privées</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/structure/menu/menu.component.ts</context>
@@ -3346,7 +3346,7 @@
           <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="needs-translation">Villes privées</target>
+        <target state="final">Private towns</target>
       </trans-unit>
       <trans-unit id="5212877493927146920" datatype="html" approved="yes">
         <source>Tutoriels</source>
