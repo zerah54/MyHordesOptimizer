@@ -350,13 +350,13 @@
         </context-group>
         <target state="final">Cannot be dropped by the escort leader</target>
       </trans-unit>
-      <trans-unit id="8260511042256310681" datatype="html">
+      <trans-unit id="8260511042256310681" datatype="html" approved="yes">
         <source>Sécurise le coffre dans lequel il se trouve</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Sécurise le coffre dans lequel il se trouve</target>
+        <target state="final">Protects the home in which it is located</target>
       </trans-unit>
       <trans-unit id="8327474089390088254" datatype="html" approved="yes">
         <source>Peut être trouvé empoisonné</source>
@@ -366,13 +366,13 @@
         </context-group>
         <target state="final">Can be found poisoned</target>
       </trans-unit>
-      <trans-unit id="3010819442113072629" datatype="html">
+      <trans-unit id="3010819442113072629" datatype="html" approved="yes">
         <source>Empêche d&apos;être terrorisé à cause d&apos;un objet</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Empêche d'être terrorisé à cause d'un objet</target>
+        <target state="final">Prevents terrorized status due to an item</target>
       </trans-unit>
       <trans-unit id="4473485791956023608" datatype="html" approved="yes">
         <source>Trouvaille améliorée</source>
@@ -382,21 +382,21 @@
         </context-group>
         <target state="final">Lucky find</target>
       </trans-unit>
-      <trans-unit id="5692845604197038843" datatype="html">
+      <trans-unit id="5692845604197038843" datatype="html" approved="yes">
         <source>Perdu en cas de bannissement</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">40</context>
         </context-group>
-        <target state="needs-translation">Perdu en cas de bannissement</target>
+        <target state="final">Removed from inventory when shunned</target>
       </trans-unit>
-      <trans-unit id="2748909889856907502" datatype="html">
+      <trans-unit id="2748909889856907502" datatype="html" approved="yes">
         <source>Annule le malus de nuit sur la case une fois posé au sol</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Annule le malus de nuit sur la case une fois posé au sol</target>
+        <target state="final">Cancels the night penalty on the zone once placed on the ground</target>
       </trans-unit>
       <trans-unit id="5955173880887946945" datatype="html" approved="yes">
         <source>Désaltère</source>
@@ -406,21 +406,21 @@
         </context-group>
         <target state="final">Quenches thirst</target>
       </trans-unit>
-      <trans-unit id="8849931921318150989" datatype="html">
+      <trans-unit id="8849931921318150989" datatype="html" approved="yes">
         <source>Compte dans le calcul du bonus de veille donné par l&apos;armurerie</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">45</context>
         </context-group>
-        <target state="needs-translation">Compte dans le calcul du bonus de veille donné par l'armurerie</target>
+        <target state="final">Counts in the calculation of the watch bonus given by the Miniature Armory</target>
       </trans-unit>
-      <trans-unit id="1323581807907830212" datatype="html">
+      <trans-unit id="1323581807907830212" datatype="html" approved="yes">
         <source>Compte dans le calcul du bonus de veille donné par le magasin suédois</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/property.enum.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">Compte dans le calcul du bonus de veille donné par le magasin suédois</target>
+        <target state="final">Counts in the calculation of the watch bonus given by the Swedish Workshop</target>
       </trans-unit>
       <trans-unit id="84445083220864178" datatype="html">
         <source>Compte dans le calcul du bonus de veille donné par le lance-bête</source>
@@ -602,13 +602,13 @@
         </context-group>
         <target state="final">Bank</target>
       </trans-unit>
-      <trans-unit id="4169579143978188553" datatype="html">
+      <trans-unit id="4169579143978188553" datatype="html" approved="yes">
         <source>Zone de rapatriement</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/_abstract_model/enum/wishlist-depot.enum.ts</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Zone de rapatriement</target>
+        <target state="final">Teleport zone</target>
       </trans-unit>
       <trans-unit id="8648912876673109537" datatype="html">
         <source>Ne pas ramener</source>
@@ -1391,7 +1391,7 @@
           <context context-type="sourcefile">src/app/my-town/expeditions/expeditions.component.html</context>
           <context context-type="linenumber">19,20</context>
         </context-group>
-        <target state="needs-translation">Jour <x id="INTERPOLATION" equiv-text="{{day_index + 1}}"/>
+        <target state="translated">Day <x id="INTERPOLATION" equiv-text="{{day_index + 1}}"/>
                 </target>
       </trans-unit>
       <trans-unit id="5629314860074083420" datatype="html" approved="yes">
@@ -2194,7 +2194,7 @@
         </context-group>
         <target state="final">Max</target>
       </trans-unit>
-      <trans-unit id="5177435738614405515" datatype="html">
+      <trans-unit id="5177435738614405515" datatype="html" approved="yes">
         <source>Attaque du lendemain (J<x id="INTERPOLATION" equiv-text="{{ selected_day + 1 }}"/>)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
@@ -2204,7 +2204,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Attaque du lendemain (J<x id="INTERPOLATION" equiv-text="{{ selected_day + 1 }}"/>)</target>
+        <target state="final">Tomorrow's attack (D<x id="INTERPOLATION" equiv-text="{{ selected_day + 1 }}"/>)</target>
       </trans-unit>
       <trans-unit id="3167198928570165301" datatype="html">
         <source>Attaque J<x id="INTERPOLATION" equiv-text="{{ selected_day }}"/> calculée (par Apofoo)</source>
@@ -2218,7 +2218,7 @@
         </context-group>
         <target state="needs-translation">Attaque J<x id="INTERPOLATION" equiv-text="{{ selected_day }}"/> calculée (par Apofoo)</target>
       </trans-unit>
-      <trans-unit id="795113065551434631" datatype="html">
+      <trans-unit id="795113065551434631" datatype="html" approved="yes">
         <source>Répartition des valeurs</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
@@ -2228,7 +2228,7 @@
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.html</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">Répartition des valeurs</target>
+        <target state="final">Values distribution</target>
       </trans-unit>
       <trans-unit id="5556258391635461081" datatype="html" approved="yes">
         <source>Attaque du jour</source>
@@ -2258,21 +2258,21 @@
         </context-group>
         <target state="final">List has been successfully copied to forum format</target>
       </trans-unit>
-      <trans-unit id="8778897284002625062" datatype="html">
+      <trans-unit id="8778897284002625062" datatype="html" approved="yes">
         <source>Attaque théorique - Min</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
           <context context-type="linenumber">280</context>
         </context-group>
-        <target state="needs-translation">Attaque théorique - Min</target>
+        <target state="final">Theoretical attack - Min</target>
       </trans-unit>
-      <trans-unit id="6060152585303564997" datatype="html">
+      <trans-unit id="6060152585303564997" datatype="html" approved="yes">
         <source>Attaque théorique - Max</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/estimations/estimations.component.ts</context>
           <context context-type="linenumber">289</context>
         </context-group>
-        <target state="needs-translation">Attaque théorique - Max</target>
+        <target state="final">Theoretical attack - Max</target>
       </trans-unit>
       <trans-unit id="6940019443590511183" datatype="html">
         <source>Attaque J<x id="PH" equiv-text="day"/> calculée (Par Apofoo) - Min</source>
@@ -2424,13 +2424,13 @@
         </context-group>
         <target state="needs-translation">Activité</target>
       </trans-unit>
-      <trans-unit id="868416859251656813" datatype="html">
+      <trans-unit id="868416859251656813" datatype="html" approved="yes">
         <source>Coller le contenu du registre à analyser</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/registry/registry.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
-        <target state="needs-translation">Coller le contenu du registre à analyser</target>
+        <target state="final">Paste the contents of the registry to be analyzed</target>
       </trans-unit>
       <trans-unit id="6806022574374286744" datatype="html">
         <source>Vider le champ</source>
@@ -2512,21 +2512,21 @@
         </context-group>
         <target state="final">Level</target>
       </trans-unit>
-      <trans-unit id="3877095303685712752" datatype="html">
+      <trans-unit id="3877095303685712752" datatype="html" approved="yes">
         <source>Taux</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Taux</target>
+        <target state="final">Percentage</target>
       </trans-unit>
-      <trans-unit id="9104606150638849284" datatype="html">
+      <trans-unit id="9104606150638849284" datatype="html" approved="yes">
         <source>Direction des regénérations</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/statistics/scrutateur/scrutateur.component.ts</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Direction des regénérations</target>
+        <target state="final">Wind direction</target>
       </trans-unit>
       <trans-unit id="9119183608655124664" datatype="html" approved="yes">
         <source>Droite</source>
@@ -2644,7 +2644,7 @@
         </context-group>
         <target state="final">Item</target>
       </trans-unit>
-      <trans-unit id="4434386636143018239" datatype="html">
+      <trans-unit id="4434386636143018239" datatype="html" approved="yes">
         <source>Priorité</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
@@ -2654,15 +2654,15 @@
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">119</context>
         </context-group>
-        <target state="needs-translation">Priorité</target>
+        <target state="final">Priority</target>
       </trans-unit>
-      <trans-unit id="8217045774850995170" datatype="html">
+      <trans-unit id="8217045774850995170" datatype="html" approved="yes">
         <source>Dépôt</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">Dépôt</target>
+        <target state="final">Drop</target>
       </trans-unit>
       <trans-unit id="8141956022659606503" datatype="html" approved="yes">
         <source>Sacs</source>
@@ -2680,13 +2680,13 @@
         </context-group>
         <target state="final">Desired stock</target>
       </trans-unit>
-      <trans-unit id="5281938868222344363" datatype="html">
+      <trans-unit id="5281938868222344363" datatype="html" approved="yes">
         <source>Quantité manquante</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">85</context>
         </context-group>
-        <target state="needs-translation">Quantité manquante</target>
+        <target state="final">Missing quantity</target>
       </trans-unit>
       <trans-unit id="542725519312506171" datatype="html" approved="yes">
         <source>Signaler</source>
@@ -2704,13 +2704,13 @@
         </context-group>
         <target state="final">The whole map</target>
       </trans-unit>
-      <trans-unit id="8142874177184348276" datatype="html">
+      <trans-unit id="8142874177184348276" datatype="html" approved="yes">
         <source>Identifiant</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/my-town/wishlist/wishlist.component.ts</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">Identifiant</target>
+        <target state="final">Identifier</target>
       </trans-unit>
       <trans-unit id="347985381929507270" datatype="html" approved="yes">
         <source>Nom de l&apos;objet</source>
@@ -3294,7 +3294,7 @@
           <context context-type="sourcefile">src/app/wiki/wiki.routes.ts</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="final">Powers</target>
+        <target state="final">Skills</target>
       </trans-unit>
       <trans-unit id="8819719048481824214" datatype="html" approved="yes">
         <source>Bâtiments</source>
@@ -3604,13 +3604,13 @@
         </context-group>
         <target state="final">In my town</target>
       </trans-unit>
-      <trans-unit id="6487260431971357562" datatype="html">
+      <trans-unit id="6487260431971357562" datatype="html" approved="yes">
         <source>Bonus en équivalent PA</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Bonus en équivalent PA</target>
+        <target state="final">Equivalent AP bonus</target>
       </trans-unit>
       <trans-unit id="4328907410933636413" datatype="html" approved="yes">
         <source>Le citoyen</source>
@@ -3654,21 +3654,21 @@
         </context-group>
         <target state="needs-translation">Tombe</target>
       </trans-unit>
-      <trans-unit id="3231213779188554984" datatype="html">
+      <trans-unit id="3231213779188554984" datatype="html" approved="yes">
         <source>Nombre de campings déjà effectués</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Nombre de campings déjà effectués</target>
+        <target state="final">Number of times camped</target>
       </trans-unit>
-      <trans-unit id="3915433859665099927" datatype="html">
+      <trans-unit id="3915433859665099927" datatype="html" approved="yes">
         <source>Nombre de pelures de peau et de toiles de tentes dans le sac</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">66</context>
         </context-group>
-        <target state="needs-translation">Nombre de pelures de peau et de toiles de tentes dans le sac</target>
+        <target state="final">Number of camping aids on the rucksack</target>
       </trans-unit>
       <trans-unit id="560884417072143682" datatype="html" approved="yes">
         <source>La ville</source>
@@ -3694,13 +3694,13 @@
         </context-group>
         <target state="final">Night</target>
       </trans-unit>
-      <trans-unit id="5745500004130467995" datatype="html">
+      <trans-unit id="5745500004130467995" datatype="html" approved="yes">
         <source>Ville dévastée</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Ville dévastée</target>
+        <target state="final">Devastated town</target>
       </trans-unit>
       <trans-unit id="3246864206079397926" datatype="html" approved="yes">
         <source>Phare</source>
@@ -3718,13 +3718,13 @@
         </context-group>
         <target state="final">Ruin</target>
       </trans-unit>
-      <trans-unit id="7523060874803429510" datatype="html">
+      <trans-unit id="7523060874803429510" datatype="html" approved="yes">
         <source>Distance de la ville (en km)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">111</context>
         </context-group>
-        <target state="needs-translation">Distance de la ville (en km)</target>
+        <target state="final">Distance from town (in km)</target>
       </trans-unit>
       <trans-unit id="1342160137926124174" datatype="html">
         <source>Nombre de tas</source>
@@ -3734,37 +3734,37 @@
         </context-group>
         <target state="needs-translation">Nombre de tas</target>
       </trans-unit>
-      <trans-unit id="2420553302076927639" datatype="html">
+      <trans-unit id="2420553302076927639" datatype="html" approved="yes">
         <source>Nombre de zombies sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">135</context>
         </context-group>
-        <target state="needs-translation">Nombre de zombies sur la case</target>
+        <target state="final">Number of zombies on the zone</target>
       </trans-unit>
-      <trans-unit id="7014743875484323339" datatype="html">
+      <trans-unit id="7014743875484323339" datatype="html" approved="yes">
         <source>Nombre de campeurs déjà cachés sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">143</context>
         </context-group>
-        <target state="needs-translation">Nombre de campeurs déjà cachés sur la case</target>
+        <target state="final">Number of citizens already camping in the zone</target>
       </trans-unit>
-      <trans-unit id="1759876158817324985" datatype="html">
+      <trans-unit id="1759876158817324985" datatype="html" approved="yes">
         <source>Nombre d&apos;améliorations simples faites sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">Nombre d'améliorations simples faites sur la case</target>
+        <target state="final">Number of small improvements in the zone</target>
       </trans-unit>
-      <trans-unit id="1569331568164081073" datatype="html">
+      <trans-unit id="1569331568164081073" datatype="html" approved="yes">
         <source>Nombre d&apos;objets de défense installés sur la case</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/camping/camping.component.html</context>
           <context context-type="linenumber">166</context>
         </context-group>
-        <target state="needs-translation">Nombre d'objets de défense installés sur la case</target>
+        <target state="final">Number of installed defense objects in the zone</target>
       </trans-unit>
       <trans-unit id="4837777735310918701" datatype="html" approved="yes">
         <source>Et</source>
@@ -3923,29 +3923,29 @@
         </context-group>
         <target state="final">Default value</target>
       </trans-unit>
-      <trans-unit id="980939234227251011" datatype="html">
+      <trans-unit id="980939234227251011" datatype="html" approved="yes">
         <source>Nombre de personnes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
           <context context-type="linenumber">48</context>
         </context-group>
-        <target state="needs-translation">Nombre de personnes</target>
+        <target state="final">Number of citizens</target>
       </trans-unit>
-      <trans-unit id="789097210155389951" datatype="html">
+      <trans-unit id="789097210155389951" datatype="html" approved="yes">
         <source>Nombre de morts</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Nombre de morts</target>
+        <target state="final">Number of deaths</target>
       </trans-unit>
-      <trans-unit id="8007458421319879300" datatype="html">
+      <trans-unit id="8007458421319879300" datatype="html" approved="yes">
         <source>Probabilité</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/tools/probabilities/probabilities.component.html</context>
           <context context-type="linenumber">60</context>
         </context-group>
-        <target state="needs-translation">Probabilité</target>
+        <target state="final">Probability</target>
       </trans-unit>
       <trans-unit id="7745390044882644493" datatype="html" approved="yes">
         <source>Simulation 1</source>
@@ -4888,21 +4888,21 @@ Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont
         <target state="needs-translation">Jour J + <x id="PH" equiv-text="i"/>
                 </target>
       </trans-unit>
-      <trans-unit id="8166568568518477878" datatype="html">
+      <trans-unit id="8166568568518477878" datatype="html" approved="yes">
         <source>Calculateur de débordement</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/max-active-calculator/max-active-calculator.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
-        <target state="needs-translation">Calculateur de débordement</target>
+        <target state="final">Overflow calculator</target>
       </trans-unit>
-      <trans-unit id="8535752095699309359" datatype="html">
+      <trans-unit id="8535752095699309359" datatype="html" approved="yes">
         <source>Le débordement dépend du jour et du nombre de citoyens en vie. Il dépend peut être également du nombre de citoyens présents en ville.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/max-active-calculator/max-active-calculator.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Le débordement dépend du jour et du nombre de citoyens en vie. Il dépend peut être également du nombre de citoyens présents en ville.</target>
+        <target state="final">The overflow depends on the day and the number of citizens alive. It may also depend on the number of citizens present in the city.</target>
       </trans-unit>
       <trans-unit id="5757378082117611724" datatype="html" approved="yes">
         <source>Nombre de citoyens en ville</source>
@@ -4956,21 +4956,21 @@ Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont
         </context-group>
         <target state="final">Theoretical attack</target>
       </trans-unit>
-      <trans-unit id="2156842490958660553" datatype="html">
+      <trans-unit id="2156842490958660553" datatype="html" approved="yes">
         <source>Minimum théorique</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">64</context>
         </context-group>
-        <target state="needs-translation">Minimum théorique</target>
+        <target state="final">Theoretical minimum</target>
       </trans-unit>
-      <trans-unit id="3293715381875250565" datatype="html">
+      <trans-unit id="3293715381875250565" datatype="html" approved="yes">
         <source>Maximum théorique</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/miscellaneous-info/miscellaneous-info.component.ts</context>
           <context context-type="linenumber">65</context>
         </context-group>
-        <target state="needs-translation">Maximum théorique</target>
+        <target state="final">Theoretical maximum</target>
       </trans-unit>
       <trans-unit id="5670260346776362636" datatype="html" approved="yes">
         <source>Débordement</source>
@@ -5072,13 +5072,13 @@ Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont
         </context-group>
         <target state="needs-translation">Option</target>
       </trans-unit>
-      <trans-unit id="6185081972728086262" datatype="html">
+      <trans-unit id="6185081972728086262" datatype="html" approved="yes">
         <source>RNE</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/private-towns/private-towns.component.html</context>
           <context context-type="linenumber">26</context>
         </context-group>
-        <target state="needs-translation">RNE</target>
+        <target state="final">Small town</target>
       </trans-unit>
       <trans-unit id="3835013333520355539" datatype="html">
         <source>Indisponible</source>
@@ -5096,21 +5096,21 @@ Si vous êtes incarné, les objets qui ne sont pas dans la liste de courses sont
         </context-group>
         <target state="needs-translation">Indisponible</target>
       </trans-unit>
-      <trans-unit id="4379904882658374793" datatype="html">
+      <trans-unit id="4379904882658374793" datatype="html" approved="yes">
         <source>RE</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/private-towns/private-towns.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">RE</target>
+        <target state="final">Distant town</target>
       </trans-unit>
-      <trans-unit id="1214118337095291621" datatype="html">
+      <trans-unit id="1214118337095291621" datatype="html" approved="yes">
         <source>Pandemonium</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/wiki/private-towns/private-towns.component.html</context>
           <context context-type="linenumber">48</context>
         </context-group>
-        <target state="needs-translation">Pandemonium</target>
+        <target state="final">Hardcore town</target>
       </trans-unit>
       <trans-unit id="3435963616715084719" datatype="html" approved="yes">
         <source>Action de citoyen</source>
