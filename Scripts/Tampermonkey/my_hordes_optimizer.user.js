@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.30.0
+// @version      1.0.31.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,8 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Correctif] Libellé dans le tooltip des objets (l'info "en sac" était affichée au lieu de "en banque")\n`
-    + `[Correctif] La mise à jour en chaos ne fonctionnait pas\n\n`;
+    + `[Nouveauté] Ajout d'informations sur les tooltips améliorés des statuts\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -621,6 +620,51 @@ const texts = {
     }
 };
 
+const status_texts = {
+    head_wounded: {
+        en: `Alters messages on the Town Forum`,
+        fr: `Déforme les messages sur le Forum Ville`,
+        de: `Verändert Nachrichten im Stadtforum`,
+        es: `Deforma los mensajes en el Foro del Pueblo`,
+    },
+    hand_wounded: {
+        en: `Prevents the use of certain items`,
+        fr: `Empêche l'utilisation de certains objets`,
+        de: `Verhindert die Nutzung bestimmter Gegenstände`,
+        es: `Impide el uso de ciertos objetos`,
+    },
+    arm_wounded: {
+        en: `Prevents working on projects or handling the gate`,
+        fr: `Empêche de travailler aux chantiers ou de manipuler la porte`,
+        de: `Verhindert Arbeiten an Projekten oder das Bedienen des Tors`,
+        es: `Impide trabajar en proyectos o manipular la puerta`,
+    },
+    leg_wounded: {
+        en: `20% chance to prevent movement in the desert while consuming the AP`,
+        fr: `20% de chances d'empêcher un déplacement dans le désert tout en consommant le PA`,
+        de: `20% Chance, Bewegung in der Wüste zu verhindern, während AP verbraucht werden`,
+        es: `20% de probabilidad de impedir el movimiento en el desierto mientras se consume el PA`,
+    },
+    zombies_killed: {
+        en: `Zombies killed while on watch`,
+        fr: `Zombies tués en veille`,
+        de: `Zombies, die während der Wache getötet wurden`,
+        es: `Zombis eliminados mientras estás de guardia`,
+    },
+    watch_survival_chances: {
+        en: `Survival chances while on watch`,
+        fr: `Chances de survie en veille`,
+        de: `Überlebenschancen während der Wache`,
+        es: `Probabilidades de supervivencia mientras estás de guardia`,
+    },
+    success_digs_changed: {
+        en: `Modification of success chances for digging`,
+        fr: `Modification des chances de réussite des fouilles`,
+        de: `Änderung der Erfolgschancen beim Graben`,
+        es: `Modificación de las probabilidades de éxito en las excavaciones`,
+    }
+}
+
 const jobs = [
     {
         id: 'citizen',
@@ -699,6 +743,66 @@ const jobs = [
         },
         camping_factor: 0.9
     },
+];
+
+const status_list = [
+    {id: "clean", img: "status/status_clean.gif", pdc: 1}, // Jamais drogué
+    {id: "hasdrunk", img: "status/status_hasdrunk.gif"}, // A bu
+    {id: "haseaten", img: "status/status_haseaten.gif"}, // A mangé
+    {id: "camper", img: "status/status_camper.gif", searches: '+10%'}, // A campé
+    {id: "immune", img: "status/status_immune.gif", watch_death: -0.01}, // Immunisé
+    {id: "hsurvive", img: "status/status_hsurvive.gif"}, // VLM niveau 1
+    {id: "hsurvive2", img: "status/status_hsurvive2.gif"}, // VLM niveau 2
+    {id: "hsurvive3", img: "status/status_hsurvive3.gif"}, // VLM niveau 3
+    {id: "tired", img: "status/status_tired.gif"}, // Fatigué
+    {id: "terror", img: "status/status_terror.gif", watch_def: -30, watch_death: 0.05}, // Terrorisé
+    {id: "thirst1", img: "status/status_thirst1.gif", watch_def: -5}, // Soif
+    {id: "thirst2", img: "status/status_thirst2.gif", watch_def: -10, wath_death: 0.03}, // Deshy
+    {id: "drugged", img: "status/status_drugged.gif", watch_def: 10}, // Drogué
+    {id: "addict", img: "status/status_addict.gif", watch_def: 10, watch_death: 0.06}, // Dépendant
+    {id: "infection", img: "status/status_infection.gif", watch_def: -15, watch_death: 0.1}, // Infecté
+    {id: "drunk", img: "status/status_drunk.gif", watch_def: 15, watch_death: -0.02, searches: '-20%"'}, // Ivre
+    {id: "hungover", img: "status/status_hungover.gif", watch_def: -15, watch_death: 0.06}, // Gueule de bois
+    {
+        id: "wound1",
+        img: "status/status_wound1.gif",
+        watch_def: -15,
+        watch_death: 0.10,
+        properties: ['wounded', 'head_wounded']
+    }, // Blessure à la tête
+    {
+        id: "wound2",
+        img: "status/status_wound2.gif",
+        watch_def: -15,
+        watch_death: 0.10,
+        properties: ['wounded', 'hand_wounded']
+    }, // Blessure à la main
+    {
+        id: "wound3",
+        img: "status/status_wound3.gif",
+        watch_def: -15,
+        watch_death: 0.10,
+        properties: ['wounded', 'arm_wounded']
+    }, // Blessure au bras
+    {
+        id: "wound4",
+        img: "status/status_wound4.gif",
+        watch_def: -15,
+        watch_death: 0.10,
+        properties: ['wounded', 'leg_wounded']
+    }, // Blessure à la jambe
+    {
+        id: "wound5",
+        img: "status/status_wound5.gif",
+        watch_def: -15,
+        watch_death: 0.10,
+        properties: ['wounded'],
+        searches: '/2'
+    }, // Blessure à l'oeil
+    {id: "wound6", img: "status/status_wound6.gif", watch_def: -15, watch_death: 0.10, properties: ['wounded']}, // Blessure au pied
+    {id: "healed", img: "status/status_healed.gif", watch_def: -15, watch_death: 0.05}, // Convalescent
+    {id: "hydrated", img: "status/status_hydrated.gif", pdc: 1}, // Hydraté
+    {id: "sober", img: "status/status_sober.gif", pdc: 1} // Sobre
 ];
 
 const api_texts = {
@@ -2216,16 +2320,20 @@ function isValidToken() {
 
 function getHoveredItem() {
     let hovered = document.querySelectorAll(':hover');
-    let hovered_item_icon = Array.from(hovered).find((hovered_element) => hovered_element.classList.contains('item-icon'));
+    let hovered_item_icon = Array.from(hovered).find((hovered_element) => hovered_element.classList.contains('item-icon') || (hovered_element.classList.contains('status') && hovered_element.tagName.toLowerCase() === 'LI'.toLowerCase()));
 
     let hovered_item_img = hovered_item_icon?.firstElementChild;
-    let hovered_item_li = hovered_item_icon?.parentElement;
+    let hovered_item_li = hovered_item_icon?.tagName.toLowerCase() === 'LI'.toLowerCase() ? hovered_item_icon : hovered_item_icon?.parentElement;
 
     let hovered_item;
     let broken;
+    let hovered_status;
 
     if (hovered_item_img && hovered_item_img.src) {
         hovered_item = getItemFromImg(hovered_item_img.src);
+        if (!hovered_item) {
+            hovered_status = getStatusFromImg(hovered_item_img.src);
+        }
         broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
     }
 
@@ -2247,8 +2355,13 @@ function getHoveredItem() {
 //             broken = hovered_item_img.parentElement.parentElement.classList.contains('broken');
 //         }
 //     }
-
-    return {item: hovered_item, broken: broken, li: hovered_item_li};
+    return {
+        item: hovered_item,
+        broken: broken,
+        li: hovered_item_li,
+        status: hovered_status,
+        alt: hovered_item_img?.alt
+    };
 }
 
 function getClickedItem(target) {
@@ -2265,6 +2378,14 @@ function getItemFromImg(img_src) {
         let index = img_src.indexOf(hordes_img_url);
         img_src = img_src.slice(index).replace(hordes_img_url, '');
         return items.find((item) => item.img === fixMhCompiledImg(img_src));
+    }
+}
+
+function getStatusFromImg(img_src) {
+    if (img_src) {
+        let index = img_src.indexOf(hordes_img_url);
+        img_src = img_src.slice(index).replace(hordes_img_url, '');
+        return status_list.find((status) => status.img === fixMhCompiledImg(img_src));
     }
 }
 
@@ -4248,10 +4369,10 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
     title.innerHTML = `<h5 style="margin-top: 0; font-size: 10px;">${getScriptInfo().name}</h5>`;
     external_tools_btn_tooltip.appendChild(title);
 
-    let status = document.createElement('div');
-    status.classList.add('status');
-    status.innerText = getI18N(texts.update_external_tools_needed_btn_label);
-    external_tools_btn_tooltip.appendChild(status);
+    let status_div = document.createElement('div');
+    status_div.classList.add('status');
+    status_div.innerText = getI18N(texts.update_external_tools_needed_btn_label);
+    external_tools_btn_tooltip.appendChild(status_div);
 
     update_external_tools_btn.addEventListener('pointerover', () => {
         external_tools_btn_tooltip.style.display = 'block';
@@ -4266,7 +4387,7 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
     update_external_tools_btn.addEventListener('click', () => {
         /** Au clic sur le bouton, on appelle la fonction de mise à jour */
         update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/middot.gif" height="16">`;
-        status.innerText = getI18N(texts.update_external_tools_pending_btn_label);
+        status_div.innerText = getI18N(texts.update_external_tools_pending_btn_label);
 
         updateExternalTools()
             .then((response) => {
@@ -4288,7 +4409,7 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
                         update_external_tools_btn.innerHTML = tools_fail.length === 0
                             ? `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}icons/done.png" height="16">`
                             : `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/warning.gif" height="16">`;
-                        status.innerHTML = tools_fail.length === 0 ? getI18N(texts.update_external_tools_success_btn_label)
+                        status_div.innerHTML = tools_fail.length === 0 ? getI18N(texts.update_external_tools_success_btn_label)
                             : `${getI18N(texts.update_external_tools_errors_btn_label)}<br>${tools_fail.map((item) => item.key.replace('Status', ` : ${item.value}`)).join('<br>')}`;
                     }
                 });
@@ -4299,7 +4420,7 @@ function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
             .catch((error) => {
                 console.error(`Erreur lors de la mise à jour de l'un des outils`, error);
                 update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}professions/death.gif" height="16">`;
-                status.innerText = getI18N(texts.update_external_tools_fail_btn_label);
+                status_div.innerText = getI18N(texts.update_external_tools_fail_btn_label);
             });
     });
 
@@ -4698,14 +4819,14 @@ function displayMinApOnBuildings() {
 
                     let tooltip_status_match = tooltip.innerText.match(/[0-9]+\/[0-9]+/);
                     if (!tooltip_status_match || tooltip_status_match.length <= 0) return;
-                    let status = tooltip_status_match[0]?.split('/');
+                    let building_status = tooltip_status_match[0]?.split('/');
 
                     let tooltip_match = tooltip.innerHTML.match(/<b>[0-9]+<\/b>/);
                     if (!tooltip_match || tooltip_match.length <= 0) return;
 
                     let nb_pts_per_ap = parseInt(tooltip_match[0].match(/[0-9]+/)[0], 10);
-                    let current_pv = parseInt(status[0], 10);
-                    let total_pv = parseInt(status[1], 10);
+                    let current_pv = parseInt(building_status[0], 10);
+                    let total_pv = parseInt(building_status[1], 10);
 
                     let minimum_safe = Math.ceil(total_pv * 70 / 100) + 1
                     if (minimum_safe <= current_pv) return;
@@ -5026,90 +5147,112 @@ function displayAdvancedTooltips() {
 
         let hovered = getHoveredItem();
         let hovered_item = hovered.item;
+        let hovered_status = hovered.status;
 
-        if (!hovered_item) return;
+        if (!hovered_item && !hovered_status) return;
 
-        let tooltip_container = Array.from(tooltip_containers).find((container) => getItemFromImg(container.querySelector('h1 img')?.src)?.id === hovered_item.id);
+        let tooltip_container = Array.from(tooltip_containers).find((container) => hovered_item ? getItemFromImg(container.querySelector('h1 img')?.src)?.id === hovered_item.id : container.querySelector('h1')?.innerText === hovered.alt);
+
         if (!tooltip_container) return;
 
         let advanced_tooltip_container = tooltip_container.querySelector('#mho-advanced-tooltip');
 
-        let hovered_item_x_item_id = hovered.li.getAttribute('x-item-id');
-        if (!hovered_tooltip_x_item_id && hovered_item?.recipes?.length > 0) {
-            let tooltip_loading = tooltip_container.querySelector('.mho-tooltip-loading');
-            if (!tooltip_loading) {
-                tooltip_loading = document.createElement('img');
-                tooltip_loading.classList.add('mho-tooltip-loading');
-                tooltip_loading.style.position = 'absolute';
-                tooltip_loading.style.left = '8px';
-                tooltip_loading.style.top = '0';
-                tooltip_container.querySelector('h1').appendChild(tooltip_loading);
-                tooltip_loading.src = `${repo_img_hordes_url}anims/loading_wheel.gif`;
-            } else {
-                tooltip_loading.style.display = 'inline';
-            }
-            let timeout = setTimeout(() => {
-                if (hovered_tooltip_x_item_id && hovered_tooltip_x_item_id === hovered_item_x_item_id) return;
-                tooltip_loading.style.display = 'none';
+        if (hovered_item) {
 
-                // Remove opened tooltips
-                let current_tooltips_containers = document.querySelectorAll('.tooltip.item[style*="display: block"]');
-                Array.from(tooltip_containers).forEach((container) => {
-                    if (getItemFromImg(container.querySelector('h1 img')?.src)?.id !== hovered_item.id) {
-                        container.style.display = 'none';
-                    }
-                });
-
-                const controller = new AbortController();
-                hovered_tooltip_x_item_id = hovered_item_x_item_id;
-                tooltip_container.style.pointerEvents = 'all';
-                hovered.li.addEventListener('mouseleave', function (event) {
-                    event.stopImmediatePropagation();
-                }, true, {signal: controller.signal});
-                hovered.li.addEventListener('pointerleave', function (event) {
-                    event.stopImmediatePropagation();
-                }, true, {signal: controller.signal});
-
-                let cancelHover = () => {
-                    hovered_tooltip_x_item_id = undefined;
-                    controller.abort();
-                    tooltip_container.style.display = 'none';
-                    tooltip_container.style.pointerEvents = 'none';
-                    clearTimeout(timeout);
+            let hovered_item_x_item_id = hovered.li.getAttribute('x-item-id');
+            if (!hovered_tooltip_x_item_id && hovered_item?.recipes?.length > 0) {
+                let tooltip_loading = tooltip_container.querySelector('.mho-tooltip-loading');
+                if (!tooltip_loading) {
+                    tooltip_loading = document.createElement('img');
+                    tooltip_loading.classList.add('mho-tooltip-loading');
+                    tooltip_loading.style.position = 'absolute';
+                    tooltip_loading.style.left = '8px';
+                    tooltip_loading.style.top = '0';
+                    tooltip_container.querySelector('h1').appendChild(tooltip_loading);
+                    tooltip_loading.src = `${repo_img_hordes_url}anims/loading_wheel.gif`;
+                } else {
+                    tooltip_loading.style.display = 'inline';
                 }
-                hovered.li.addEventListener('mouseout', (event) => {
-                    setTimeout(() => {
-                        if (!hovered_tooltip_x_item_id) return;
-                        let all_hovered = document.querySelectorAll(':hover');
-                        if (!Array.from(all_hovered).some((hovered_element) => hovered_element.classList.contains('tooltip') || hovered_element.getAttribute('x-item-id') === hovered_tooltip_x_item_id)) {
-                            cancelHover();
+                let timeout = setTimeout(() => {
+                    if (hovered_tooltip_x_item_id && hovered_tooltip_x_item_id === hovered_item_x_item_id) return;
+                    tooltip_loading.style.display = 'none';
+
+                    // Remove opened tooltips
+                    let current_tooltips_containers = document.querySelectorAll('.tooltip.item[style*="display: block"]');
+                    Array.from(tooltip_containers).forEach((container) => {
+                        if (getItemFromImg(container.querySelector('h1 img')?.src)?.id !== hovered_item.id) {
+                            container.style.display = 'none';
                         }
-                    }, 1000)
-                }, true, {signal: controller.signal});
-                tooltip_container.addEventListener('mouseleave', (event) => {
-                    cancelHover();
-                }, {signal: controller.signal});
-                tooltip_container.addEventListener('pointerleave', (event) => {
-                    cancelHover();
-                }, {signal: controller.signal});
-            }, 1000);
-        }
+                    });
 
-        console.log('hovered_item', hovered_item);
-        let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
-        let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
+                    const controller = new AbortController();
+                    hovered_tooltip_x_item_id = hovered_item_x_item_id;
+                    tooltip_container.style.pointerEvents = 'all';
+                    hovered.li.addEventListener('mouseleave', function (event) {
+                        event.stopImmediatePropagation();
+                    }, true, {signal: controller.signal});
+                    hovered.li.addEventListener('pointerleave', function (event) {
+                        event.stopImmediatePropagation();
+                    }, true, {signal: controller.signal});
 
-        if (should_display_advanced_tooltip) {
-
-            if (!advanced_tooltip_container) {
-                advanced_tooltip_container = document.createElement('div');
-                advanced_tooltip_container.id = 'mho-advanced-tooltip';
-                advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
-
-                tooltip_container.appendChild(advanced_tooltip_container);
-            } else if (!advanced_tooltip_container.innerHTML) {
-                createAdvancedProperties(advanced_tooltip_container, hovered_item, tooltip_container);
+                    let cancelHover = () => {
+                        hovered_tooltip_x_item_id = undefined;
+                        controller.abort();
+                        tooltip_container.style.display = 'none';
+                        tooltip_container.style.pointerEvents = 'none';
+                        clearTimeout(timeout);
+                    }
+                    hovered.li.addEventListener('mouseout', (event) => {
+                        setTimeout(() => {
+                            if (!hovered_tooltip_x_item_id) return;
+                            let all_hovered = document.querySelectorAll(':hover');
+                            if (!Array.from(all_hovered).some((hovered_element) => hovered_element.classList.contains('tooltip') || hovered_element.getAttribute('x-item-id') === hovered_tooltip_x_item_id)) {
+                                cancelHover();
+                            }
+                        }, 1000)
+                    }, true, {signal: controller.signal});
+                    tooltip_container.addEventListener('mouseleave', (event) => {
+                        cancelHover();
+                    }, {signal: controller.signal});
+                    tooltip_container.addEventListener('pointerleave', (event) => {
+                        cancelHover();
+                    }, {signal: controller.signal});
+                }, 1000);
             }
+
+            let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
+            let should_display_advanced_tooltip = hovered_item.recipes.length > 0 || hovered_item.actions || hovered_item.properties || (item_deco && hovered_item.deco > 0);
+
+            if (should_display_advanced_tooltip) {
+
+                if (!advanced_tooltip_container) {
+                    advanced_tooltip_container = document.createElement('div');
+                    advanced_tooltip_container.id = 'mho-advanced-tooltip';
+                    advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
+
+                    tooltip_container.appendChild(advanced_tooltip_container);
+                } else if (!advanced_tooltip_container.innerHTML) {
+                    createAdvancedProperties(advanced_tooltip_container, hovered_item, tooltip_container);
+                }
+            }
+        } else {
+            let item_deco = tooltip_container.getElementsByClassName('item-tag-deco')[0];
+            let should_display_advanced_tooltip = hovered_status.watch_def !== undefined || hovered_status.watch_kills !== undefined;
+
+            if (should_display_advanced_tooltip) {
+
+                if (!advanced_tooltip_container) {
+                    advanced_tooltip_container = document.createElement('div');
+                    advanced_tooltip_container.id = 'mho-advanced-tooltip';
+                    advanced_tooltip_container.setAttribute('style', 'margin-top: 0.5em; border-top: 1px solid;');
+
+                    tooltip_container.appendChild(advanced_tooltip_container);
+                } else if (!advanced_tooltip_container.innerHTML) {
+                    createAdvancedPropertiesStatus(advanced_tooltip_container, hovered_status, tooltip_container);
+                }
+            }
+
+
         }
     }
 
@@ -5326,6 +5469,9 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             // ne pas afficher
             item_action.classList.remove('item-tag');
             break;
+        case 'prevent_night':
+            item_action.innerText = `Malus de nuit divisé par 4`;
+            break;
         case 'box_opener':
         case 'can_opener':
         case 'parcel_opener':
@@ -5340,7 +5486,6 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'slaughter_2xs':
         case 'throw_animal_cat':
         case 'throw_animal_tekel':
-        case 'prevent_night':
         case 'parcel_opener_h':
         case 'hero_tamer_3':
         case 'throw_b_chair_basic':
@@ -5596,6 +5741,83 @@ function displayPropertiesOrActions(property_or_action, hovered_item) {
             break;
     }
     return item_action;
+}
+
+function createAdvancedPropertiesStatus(content, status, tooltip) {
+    content.innerHtml = '';
+    let status_details = document.createElement('div');
+    content.appendChild(status_details);
+
+    let have_properties = status.properties && status.properties.length > 0;
+
+    if (status.pdc === undefined && status.watch_def === undefined && status.watch_kills === undefined && status.searches === undefined && !have_properties) return;
+
+    if (status.pdc !== undefined) {
+        let status_detail = document.createElement('div');
+        status_detail.classList.add('item-tag');
+        status_detail.innerHTML = `${status.pdc} ${status.pdc > 1 || status.pdc < -1 ? 'points' : 'point'} de contrôle ${status.pdc > 1 || status.pdc < -1 ? 'supplémentaires' : 'supplémentaire'}`;
+        status_details.appendChild(status_detail);
+    }
+
+    if (status.watch_def === undefined && status.watch_kills === undefined && status.searches === undefined && !have_properties) return;
+
+    if (status.watch_def !== undefined) {
+        let status_detail = document.createElement('div');
+        status_detail.classList.add('item-tag');
+        status_detail.innerHTML = `${getI18N(status_texts.zombies_killed)} : ${status.watch_def}`;
+        status_details.appendChild(status_detail);
+    }
+
+    if (status.watch_kills === undefined && status.searches === undefined && !have_properties) return;
+
+    if (status.watch_kills !== undefined) {
+        let status_detail = document.createElement('div');
+        status_detail.classList.add('item-tag');
+        status_detail.innerHTML = `${getI18N(status_texts.watch_survival_chances)} : ${status.watch_kills < 0 ? status.watch_kills * 100 : '+' + status.watch_kills * 100}%`;
+        status_details.appendChild(status_detail);
+    }
+
+    if (status.searches === undefined && !have_properties) return;
+
+    if (status.searches !== undefined) {
+        let status_detail = document.createElement('div');
+        status_detail.classList.add('item-tag');
+        status_detail.innerHTML = `${getI18N(status_texts.success_digs_changes)} : ${status.searches}`;
+        status_details.appendChild(status_detail);
+    }
+    if (!have_properties) return;
+
+    if (have_properties) {
+        status.properties.forEach((property) => {
+            let status_property = displayStatusProperties(property, status);
+            status_details.appendChild(status_property);
+        });
+    }
+}
+
+function displayStatusProperties(status_properties, hovered_item) {
+    let item_action = document.createElement('div');
+    item_action.classList.add('item-tag');
+    switch (status_properties) {
+        case 'head_wounded':
+            item_action.innerText = getI18N(status_texts.head_wounded);
+            break;
+        case 'hand_wounded':
+            item_action.innerText = getI18N(status_texts.hand_wounded);
+            break;
+        case 'arm_wounded':
+            item_action.innerText = getI18N(status_texts.arm_wounded);
+            break;
+        case 'leg_wounded':
+            item_action.innerText = getI18N(status_texts.leg_wounded);
+            break;
+        case null:
+            item_action.classList.remove('item-tag');
+            break;
+        default:
+            console.log(status_properties);
+            break;
+    }
 }
 
 function createDisplayMapButton() {
