@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         MHO Addon
-// @version      1.0.31.0
+// @version      1.0.32.0
 // @description  Optimizer for MyHordes - Documentation & fonctionnalités : https://myhordes-optimizer.web.app/, rubrique Tutoriels
 // @author       Zerah
 //
@@ -31,7 +31,7 @@
 // ==/UserScript==
 
 const changelog = `${getScriptInfo().name} : Changelog pour la version ${getScriptInfo().version}\n\n`
-    + `[Nouveauté] Ajout d'informations sur les tooltips améliorés des statuts\n`;
+    + `[Correctif] Textes manquants dans certains tooltips\n`;
 
 const lang = (document.querySelector('html[lang]')?.getAttribute('lang') || document.documentElement.lang || navigator.language || navigator.userLanguage).substring(0, 2) || 'fr';
 
@@ -657,7 +657,7 @@ const status_texts = {
         de: `Überlebenschancen während der Wache`,
         es: `Probabilidades de supervivencia mientras estás de guardia`,
     },
-    success_digs_changed: {
+    success_digs_changes: {
         en: `Modification of success chances for digging`,
         fr: `Modification des chances de réussite des fouilles`,
         de: `Änderung der Erfolgschancen beim Graben`,

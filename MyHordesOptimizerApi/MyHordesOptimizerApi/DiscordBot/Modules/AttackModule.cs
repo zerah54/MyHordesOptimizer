@@ -57,7 +57,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                     foreach (var tuple in estimationsForDayPlanifValues)
                     {
                         var estimationTuple = estimationService.CreateTupleFromValue(tuple.Name, tuple.GetValue(estimationsForDayPlanif.Planif) as EstimationValueDto);
-                        values += estimationTuple.Percent + " : " + estimationTuple.Min + " - " + estimationTuple.Max + "\n";
+                        values += estimationTuple.Percent + "% : " + estimationTuple.Min + " - " + estimationTuple.Max + "\n";
                     }
                     var estimationsForDayPlanifField = new EmbedFieldBuilder()
                         .WithName($"Planificateur J{day - 1}")
@@ -74,7 +74,7 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
                     foreach (var tuple in estimationsForDayEstimValues)
                     {
                         var estimationTuple = estimationService.CreateTupleFromValue(tuple.Name, tuple.GetValue(estimationsForDayEstim.Estim) as EstimationValueDto);
-                        values += estimationTuple.Percent + " : " + estimationTuple.Min + " - " + estimationTuple.Max + "\n";
+                        values += estimationTuple.Percent + "% : " + estimationTuple.Min + " - " + estimationTuple.Max + "\n";
                     }
                     var estimationsForDayEstimField = new EmbedFieldBuilder()
                         .WithName($"Estimation J{day}")

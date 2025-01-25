@@ -206,7 +206,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
                                 && IsValidStagnationFinaleEstimOffsetMax(estim100, lastMaxBehind50Estim, targetMax, dayAttack)
                                 && IsValidSommeOffsets100AndPrevious(planif100, lastMinDiffFrom100Planif, lastMaxDiffFrom100Planif, targetMin,
                                     targetMax)
-                                && IsValidAlter(estim, targetMin, targetMax)
+                                && IsValidAlter(estim, targetMin, targetMax, beta)
                                )
                             {
                                 calculateAttackMin = Math.Max(calculateAttackMin, targetMin);
@@ -429,7 +429,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
             return !(sommeOffsets100 < _shift && sommeOffsetsPrevious < _shift);
         }
 
-        private bool IsValidAlter(EstimationsDto estim, double targetMin, double targetMax)
+        private bool IsValidAlter(EstimationsDto estim, double targetMin, double targetMax, bool beta)
         {
 
             var values = new List<EstimationTuple>();
@@ -471,11 +471,11 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
 
 
                 // Pour le calcul d'ecart
-                var offsetMinHighMin = CalculateOffset("min", targetMin, firstEstim.Min + 1); // Min 100% le plus loin
-                var offsetMinHighMax = CalculateOffset("min", targetMin, firstEstim.Min - 1); // Min 100% le plus pres
+                var offsetMinHighMin = CalculateOffset("min", targetMin, firstEstim.Min + (beta ? 0.501 : 1)); // Min 100% le plus loin
+                var offsetMinHighMax = CalculateOffset("min", targetMin, firstEstim.Min - (beta ? 0.501 : 1)); // Min 100% le plus pres
 
-                var offsetMaxHighMin = CalculateOffset("max", targetMax, firstEstim.Max - 1); // Max 100% le plus loin
-                var offsetMaxHighMax = CalculateOffset("max", targetMax, firstEstim.Max + 1); // Max 100% le plus pres
+                var offsetMaxHighMin = CalculateOffset("max", targetMax, firstEstim.Max - (beta ? 0.501 : 1)); // Max 100% le plus loin
+                var offsetMaxHighMax = CalculateOffset("max", targetMax, firstEstim.Max + (beta ? 0.501 : 1)); // Max 100% le plus pres
 
                 var spendableMin = (Math.Max(0, offsetMinHighMin - 3) + Math.Max(0, offsetMaxHighMin - 3)) /
                                    (24 - (i + 1));
@@ -488,10 +488,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
 
                 if (firstEstim.Min != lastEstim.Min)
                 {
-                    var ecartMin = CalculateOffset("min", targetMin, firstEstim.Min + 1) -
-                                   CalculateOffset("min", targetMin, lastEstim.Min - 1);
-                    var ecartMax = CalculateOffset("min", targetMin, firstEstim.Min - 1) -
-                                   CalculateOffset("min", targetMin, lastEstim.Min + 1);
+                    var ecartMin = CalculateOffset("min", targetMin, firstEstim.Min + (beta ? 0.501 : 1)) -
+                                   CalculateOffset("min", targetMin, lastEstim.Min -  (beta ? 0.501 : 1));
+                    var ecartMax = CalculateOffset("min", targetMin, firstEstim.Min - (beta ? 0.501 : 1)) -
+                                   CalculateOffset("min", targetMin, lastEstim.Min + (beta ? 0.501 : 1));
 
                     if (!IsInBetween(ecartMin, alterMin, alterMax) && !IsInBetween(ecartMax, alterMin, alterMax))
                     {
@@ -501,10 +501,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Estimations
 
                 if (firstEstim.Max != lastEstim.Max)
                 {
-                    var ecartMin = CalculateOffset("max", targetMax, firstEstim.Max - 1) -
-                                   CalculateOffset("max", targetMax, lastEstim.Max + 1);
-                    var ecartMax = CalculateOffset("max", targetMax, firstEstim.Max + 1) -
-                                   CalculateOffset("max", targetMax, lastEstim.Max - 1);
+                    var ecartMin = CalculateOffset("max", targetMax, firstEstim.Max - (beta ? 0.501 : 1)) -
+                                   CalculateOffset("max", targetMax, lastEstim.Max + (beta ? 0.501 : 1));
+                    var ecartMax = CalculateOffset("max", targetMax, firstEstim.Max + (beta ? 0.501 : 1)) -
+                                   CalculateOffset("max", targetMax, lastEstim.Max - (beta ? 0.501 : 1));
 
                     if (!IsInBetween(ecartMin, alterMin, alterMax) && !IsInBetween(ecartMax, alterMin, alterMax))
                     {
