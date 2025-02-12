@@ -43,3 +43,6 @@ Thumbs.db
 
 # Firebase
 /.firebase
+
+# Sentry Config File
+.sentryclirc

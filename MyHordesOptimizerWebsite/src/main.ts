@@ -15,6 +15,7 @@ import 'moment/dist/locale/en-gb';
 import 'moment/dist/locale/es';
 import 'moment/dist/locale/fr';
 
+import * as Sentry from "@sentry/angular";
 import { enableProdMode } from '@angular/core';
 import { loadTranslations } from '@angular/localize';
 import { bootstrapApplication } from '@angular/platform-browser';
@@ -23,6 +24,12 @@ import { AppComponent } from './app/app.component';
 import { appConfig } from './app/app.config';
 import { environment } from './environments/environment';
 import { xliffToJson } from './xliff-to-json';
+
+Sentry.init({
+    dsn: "https://61d309773a068eb1aeaaae0e3fe39f23@o4506962035539968.ingest.us.sentry.io/4506962042224640",
+    integrations: [
+    ],
+});
 
 registerLocaleData(localeDE);
 registerLocaleData(localeEN);
