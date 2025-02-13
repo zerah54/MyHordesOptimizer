@@ -37,6 +37,7 @@ using MyHordesOptimizerApi.Services.Interfaces.Estimations;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
 using MyHordesOptimizerApi.Services.Interfaces.Translations;
+using Sentry;
 using Serilog;
 using System;
 using System.IO;
@@ -46,24 +47,27 @@ using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Discord;
 
+SentrySdk.Init(options =>
+{
+    options.Dsn = "https://bac883f9c765169e27cfbbb52f170cb9@o4506962035539968.ingest.us.sentry.io/4508809012314112";
+    options.AutoSessionTracking = true;
+});
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors();
-builder.Host.UseSerilog((context, services, configuration) =>
+builder.Host.UseSerilog((_, services, configuration) =>
                 configuration.ReadFrom.Configuration(builder.Configuration)
-                             .Enrich.With(services.GetService<MyHordesOptimizerEnricher>()));
+                             .Enrich.With(services.GetService<MyHordesOptimizerEnricher>()!));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient(nameof(MyHordesApiRepository), client =>
 {
     client.Timeout = TimeSpan.FromSeconds(10);
 });
-builder.Services.AddHttpClient(nameof(GestHordesRepository)).ConfigurePrimaryHttpMessageHandler(() =>
+builder.Services.AddHttpClient(nameof(GestHordesRepository)).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
 {
-    return new HttpClientHandler()
-    {
-        UseCookies = true,
-    };
+    UseCookies = true,
 });
 builder.Services.AddAuthorization();
 builder.Services.AddControllers(config =>
@@ -170,11 +174,11 @@ builder.Services.AddBearerAuthentication(builder.Configuration);
 
 builder.Services.AddRateLimiter(options =>
 {
-    options.AddConcurrencyLimiter(policyName: "MhoInRice", options =>
+    options.AddConcurrencyLimiter(policyName: "MhoInRice", limiterOptions =>
      {
-         options.PermitLimit = builder.Configuration.GetSection("MhoApiLimit").GetValue<int>("PermitLimit");
-         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
-         options.QueueLimit = builder.Configuration.GetSection("MhoApiLimit").GetValue<int>("QueueLimit");
+         limiterOptions.PermitLimit = builder.Configuration.GetSection("MhoApiLimit").GetValue<int>("PermitLimit");
+         limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+         limiterOptions.QueueLimit = builder.Configuration.GetSection("MhoApiLimit").GetValue<int>("QueueLimit");
      });
 });
 
