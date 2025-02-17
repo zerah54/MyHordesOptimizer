@@ -20,14 +20,13 @@ import { TownService } from '../../_abstract_model/services/town.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { Me } from '../../_abstract_model/types/me.class';
 import { AutoDestroy } from '../../shared/decorators/autodestroy.decorator';
-import { DebugLogPipe } from '../../shared/pipes/debug-log.pipe';
 import { getExternalAppId, getTown, getUser, setExternalAppId, setTokenWithMeWithExpirationDate } from '../../shared/utilities/localstorage.util';
 import { CitizenMenuComponent } from './citizen-menu/citizen-menu.component';
 import { HeaderService } from './header.service';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage, FormsModule];
 const components: Imports = [CitizenMenuComponent];
-const pipes: Imports = [DebugLogPipe];
+const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatToolbarModule, MatTooltipModule];
 
 @Component({
@@ -54,6 +53,8 @@ export class HeaderComponent implements OnInit {
     /** Les informations de l'utilisateur */
     public me: Me = getUser();
     public readonly is_dev: boolean = !environment.production;
+    public readonly myhordes_url: string = environment.myhordes_url;
+    public readonly myhordes_app_id: number = environment.myhordes_app_id;
 
     public is_in_town: boolean = !!getTown()?.town_id;
 

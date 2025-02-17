@@ -31,7 +31,7 @@
         </button>
     } @else {
         @if (saved_external_app_id === null || saved_external_app_id === undefined || saved_external_app_id === '') {
-            <a mat-button type="button" class="profil-button" [href]="'https://myhordes.eu/jx/disclaimer/22'">
+            <a mat-button type="button" class="profil-button" [href]="myhordes_url + 'jx/disclaimer/' + myhordes_app_id">
                 <ng-container i18n>Se connecter</ng-container>
             </a>
         } @else if (me && me.username && me.username !== '') {
@@ -44,7 +44,7 @@
             </button>
         }
     }
-    
+
     <mat-menu #userMenu="matMenu">
         @if (!saved_external_app_id) {
             <div mat-menu-item (click)="$event.stopPropagation()">

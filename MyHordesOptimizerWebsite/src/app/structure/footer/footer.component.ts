@@ -2,6 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, HostBinding, inject, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatToolbar, MatToolbarModule } from '@angular/material/toolbar';
+import { environment } from '../../../environments/environment';
 import { Imports } from '../../_abstract_model/types/_types';
 import { ThanksComponent } from '../../thanks/thanks.component';
 
@@ -22,6 +23,8 @@ export class FooterComponent {
     @HostBinding('style.display') display: string = 'contents';
 
     @ViewChild(MatToolbar) mat_toolbar!: MatToolbar;
+
+    public readonly myhordes_url: string = environment.myhordes_url;
 
     private dialog: MatDialog = inject(MatDialog);
 

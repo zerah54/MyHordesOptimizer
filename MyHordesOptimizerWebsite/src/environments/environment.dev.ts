@@ -4,6 +4,8 @@ export const environment: Environment = {
     production: true,
     api_url: 'https://api.myhordesoptimizer.fr/dev',
     website_url: 'https://myhordes-optimizer-dev.web.app/',
+    myhordes_url: 'https://myhordes.eu/',
+    myhordes_app_id: 22,
     firebase_config: {
         apiKey: 'AIzaSyB3H--KamQP_FZfFgFgrGXHpaa9msDqp50',
         authDomain: 'myhordes-optimizer-dev.firebaseapp.com',
@@ -18,5 +20,7 @@ interface Environment {
     production: boolean;
     api_url: string;
     website_url: string;
+    myhordes_url: string;
+    myhordes_app_id: number;
     firebase_config: FirebaseOptions;
 }
