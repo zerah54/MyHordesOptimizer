@@ -64,9 +64,9 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
             }
         }
 
-        [SlashCommand(name: "timer", description: "Launches a custom counter. Example: 1h 25m 12s")]
+        [SlashCommand(name: "timer", description: "Launches a custom counter. Example: 1Y 2M 7D 1h 25m 12s")]
         public async Task CounterAsync(
-            [Summary(name:"time", description: "The duration of the counter (Example: 1h 25m 12s)")]
+            [Summary(name:"time", description: "The duration of the counter (Example: 1Y 2M 7D 1h 25m 12s)")]
             string time, 
             [Summary(name:"reason", description: "The reason for the counter. It is this message that will be sent at the end of the counter")]
             string reason, 
